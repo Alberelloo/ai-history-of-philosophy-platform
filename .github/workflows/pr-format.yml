@@ -1,0 +1,29 @@
+name: PR format
+
+# Заголовок и описание PR становятся сообщением squash-коммита в main,
+# поэтому проверяем их так же строго, как код.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  pr-format:
+    name: pr-format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Заголовок и описание
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          pattern='^(feat|fix|docs|refactor|test|chore|ci|data|eval)(\([a-z0-9-]+\))?: .{3,}$'
+          if [[ ! "$TITLE" =~ $pattern ]]; then
+            echo "::error::Заголовок «$TITLE» не по формату «<тип>: <что сделано>», например «feat: RAG по главам учебника». Типы: feat, fix, docs, refactor, test, chore, ci, data, eval."
+            exit 1
+          fi
+          if [ -z "${BODY//[[:space:]]/}" ]; then
+            echo "::error::Описание PR пустое. Заполните разделы из шаблона."
+            exit 1
+          fi

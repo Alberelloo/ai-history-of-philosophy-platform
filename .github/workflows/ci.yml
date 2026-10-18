@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Репозиторий публичный, а проект ходит в LLM API: ключ в истории коммитов = утечка.
+      - name: Поиск секретов
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.18.4 detect --source=/repo --redact --no-banner
+
+      - name: Битые ссылки в Markdown
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress './**/*.md'
+          fail: true
+
+      # Python-шаги включаются, когда в корне появится pyproject.toml.
+      - name: Есть ли Python-проект
+        id: py
+        run: |
+          if [ -f pyproject.toml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::pyproject.toml нет, линтер и тесты пропущены"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.py.outputs.present == 'true'
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Установка зависимостей
+        if: steps.py.outputs.present == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . ruff pytest
+
+      - name: Ruff
+        if: steps.py.outputs.present == 'true'
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Pytest
+        if: steps.py.outputs.present == 'true'
+        run: |
+          set +e
+          pytest -q
+          code=$?
+          # 5 = тесты не найдены: пока их нет, это не ошибка.
+          if [ "$code" -eq 5 ]; then
+            echo "::notice::Тестов пока нет"
+            exit 0
+          fi
+          exit "$code"
