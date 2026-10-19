@@ -2,6 +2,7 @@
 
 | Файл | Что внутри |
 |---|---|
+| [product/vision.md](product/vision.md) | Продуктовое видение: аудитория, проблема, решение, новизна, функционал |
 | [thesis/concept.md](thesis/concept.md) | Концепция ВКР: тема, проблема, цель, ожидаемый результат |
 | [thesis/requirements.md](thesis/requirements.md) | Требования и критерии валидации ВКР трека Education в формате AI-решения |
 | [course/final-project-requirements.md](course/final-project-requirements.md) | Критерии оценки и чекпоинты финального проекта курса по LLM-приложениям |
