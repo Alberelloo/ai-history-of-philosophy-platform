@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Language: ru
+  All artifacts must be written in ru.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Project: PhiloGraph, an interactive AI textbook on the history of philosophy
+  (pilot section: theory of knowledge). The user reads a chapter of a chosen
+  textbook, opens cards of concepts/philosophers/events, builds a graph of
+  connections on request, and asks an LLM assistant about a selected passage.
+  Knowledge lives in an ontology (entities and relations) used together with
+  RAG over source texts; every answer cites source passages. Relations that the
+  LLM generated and nobody verified must be marked as such in the interface.
+  Product background: docs/product/vision.md and docs/product/system-design.md.
+  Specs describe observable behavior, not technology: the stack is not chosen yet.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
