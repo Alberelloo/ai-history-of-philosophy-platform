@@ -60,12 +60,28 @@ services:
       interval: 10s
       retries: 6
 
+  search:
+    <<: *service
+    command: uvicorn philograph.search.main:app --host 0.0.0.0 --port 8002
+    environment: &search-env
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+      PHILOGRAPH_LIBRARY_URL: http://library:8001
+      PHILOGRAPH_LLM_URL: http://llm:8000
+      PHILOGRAPH_QDRANT_URL: http://qdrant:6333
+      # Провайдер эмбеддингов выбирается замером (docs/architecture/adr/0002-embeddings.md).
+      PHILOGRAPH_EMBEDDING_MODEL: stub-embeddings
+      PHILOGRAPH_EMBEDDING_DIMENSION: "8"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8002/health/ready').status == 200 else 1)"]
+      interval: 10s
+      retries: 6
+
   worker:
     <<: *service
     # Исполнитель очереди: обработка источников, плановая проверка, события для конвейеров.
     command: python -m philograph.worker
     environment:
-      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+      <<: *search-env
       PHILOGRAPH_FILES_ROOT: /data/files
     volumes:
       - library-files:/data/files
