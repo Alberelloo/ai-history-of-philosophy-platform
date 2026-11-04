@@ -219,6 +219,14 @@ page_cache = Table(
     schema=SCHEMA,
 )
 
+defaults = Table(
+    "defaults",
+    metadata,
+    Column("key", String(50), primary_key=True),  # default_source — учебник по умолчанию
+    Column("value", String(100), nullable=False),
+    schema=SCHEMA,
+)
+
 migrations = Migrations(SCHEMA, metadata)
 migrations.add(1, "учёт источников, версии, структура")(
     migrations.create_tables(
@@ -238,3 +246,4 @@ migrations.add(1, "учёт источников, версии, структур
         "page_cache",
     )
 )
+migrations.add(2, "учебник по умолчанию")(migrations.create_tables("defaults"))

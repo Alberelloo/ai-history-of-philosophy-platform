@@ -252,7 +252,7 @@ class _Draft:
     kind: str
     text: str
     pages: list[PageMark]
-    notes: list[tuple[int, str, int]]  # позиция, ключ сноски, страница знака
+    notes: list[tuple[int, str, int, str]]  # позиция, ключ, страница знака, текст знака
     page_pos: int = 0  # страница, где блок начинается
     heading_level: int | None = None
     detail: str | None = None
@@ -350,7 +350,15 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                     kind,
                     line.text.strip(),
                     marks,
-                    [(s.start, s.target or line.text[s.start : s.end], pos) for s in line.spans],
+                    [
+                        (
+                            s.start,
+                            s.target or line.text[s.start : s.end],
+                            pos,
+                            line.text[s.start : s.end],
+                        )
+                        for s in line.spans
+                    ],
                     page_pos=pos,
                 )
                 drafts.append(current)
@@ -377,6 +385,7 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
     preamble: Section | None = None
     page_owner: dict[int, Section] = {}  # страница → глава, к которой она относится
     ref_pages: dict[tuple[str, int], int] = {}  # (блок, позиция знака) → страница
+    ref_markers: dict[tuple[str, int], str] = {}  # (блок, позиция знака) → текст знака
 
     def attach(section: Section) -> None:
         while stack and stack[-1].level >= section.level:
@@ -403,8 +412,9 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
             pages=draft.pages,
             detail=draft.detail,
         )
-        block.notes = [NoteRef(offset, key) for offset, key, _ in draft.notes]
-        ref_pages.update({(block.id, offset): page for offset, _, page in draft.notes})
+        block.notes = [NoteRef(offset, key) for offset, key, _, _ in draft.notes]
+        ref_pages.update({(block.id, offset): page for offset, _, page, _ in draft.notes})
+        ref_markers.update({(block.id, offset): text for offset, _, _, text in draft.notes})
         target.blocks.append(block)
         page_owner.setdefault(draft.page_pos, target)
 
@@ -424,7 +434,7 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
         last = page_owner.get(pos, last)
         if last is not None:
             owners[pos] = last
-    _link_footnotes(doc, raw_notes, new_id, owners, ref_pages)
+    _link_footnotes(doc, raw_notes, new_id, owners, ref_pages, ref_markers)
     _compare_toc(doc)
     return doc
 
@@ -435,6 +445,7 @@ def _link_footnotes(
     new_id: Callable[[str], str],
     owners: dict[int, Section],
     ref_pages: dict[tuple[str, int], int],
+    ref_markers: dict[tuple[str, int], str],
 ) -> None:
     """Связывает знаки с текстами сносок.
 
@@ -458,7 +469,7 @@ def _link_footnotes(
                 )
                 continue
             used.add(note.order)
-            marker = note.key if len(note.key) <= 3 else str(len(section.footnotes) + 1)
+            marker = ref_markers.get((block.id, ref.offset)) or note.key
             footnote = Footnote(new_id("f"), marker, note.text.strip(), True)
             section.footnotes.append(footnote)
             kept.append(NoteRef(ref.offset, footnote.id))
