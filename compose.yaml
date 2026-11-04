@@ -1,0 +1,53 @@
+# Вся система одной командой: docker compose up --build
+# Секреты берутся из файла .env рядом (в репозиторий не попадает), пример в .env.example.
+# Новые сервисы добавляются сюда вместе со своими изменениями OpenSpec.
+
+x-service: &service
+  build: .
+  restart: unless-stopped
+  env_file: .env
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: philograph
+      POSTGRES_USER: philograph
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U philograph"]
+      interval: 5s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 5s
+      retries: 10
+
+  llm:
+    <<: *service
+    command: uvicorn philograph.llm.main:app --host 0.0.0.0 --port 8000
+    environment:
+      PHILOGRAPH_LLM_CONFIG: /app/config/llm.yaml
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+    volumes:
+      - ./config:/app/config:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready').status == 200 else 1)"]
+      interval: 10s
+      retries: 6
+
+volumes:
+  postgres-data:
+  qdrant-data:

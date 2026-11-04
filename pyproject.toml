@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "philograph"
+version = "0.1.0"
+description = "PhiloGraph: интерактивный учебник по истории философии"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "pyyaml>=6",
+    "sqlalchemy>=2.0",
+    "structlog>=24",
+]
+
+[project.optional-dependencies]
+dev = ["import-linter>=2.1", "pytest>=8", "ruff>=0.6"]
+postgres = ["psycopg[binary]>=3.2"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "req(capability, requirement): тест проверяет требование спецификации OpenSpec",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+# Русский текст в строках и комментариях — норма для проекта.
+ignore = ["RUF001", "RUF002", "RUF003", "UP047"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Зависимости FastAPI объявляются в значениях по умолчанию — так устроен фреймворк.
+extend-immutable-calls = ["fastapi.Depends", "philograph.operator.access.require"]
+
+[tool.importlinter]
+root_package = "philograph"
+
+[[tool.importlinter.contracts]]
+name = "Сервисы не зависят от внутренностей друг друга"
+type = "independence"
+modules = ["philograph.llm", "philograph.operator"]
+
+[[tool.importlinter.contracts]]
+name = "Общий каркас не зависит от сервисов"
+type = "forbidden"
+source_modules = ["philograph.platform"]
+forbidden_modules = ["philograph.llm", "philograph.operator"]

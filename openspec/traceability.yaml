@@ -1,0 +1,7 @@
+# Возможности, для которых CI требует тест на каждое требование.
+# Возможность добавляется сюда, когда её изменение реализовано.
+enforce:
+  - llm-gateway
+  - observability
+  - operator-access
+  - service-runtime

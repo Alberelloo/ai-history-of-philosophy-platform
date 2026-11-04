@@ -1,0 +1,35 @@
+# Настройка сервиса LLM. Ключей здесь нет: только имена переменных окружения.
+# Цены — долларов за миллион токенов; сверять со страницей цен провайдера перед запуском.
+providers:
+  deepseek:
+    kind: openai_compatible
+    base_url: https://api.deepseek.com
+    api_key_env: DEEPSEEK_API_KEY
+  # Провайдер эмбеддингов выбирается при реализации поиска (add-paragraph-search).
+  embeddings-stub:
+    kind: fake
+
+roles:
+  fast: {provider: deepseek, model: deepseek-flash, max_output_tokens: 200, timeout_seconds: 10}
+  main: {provider: deepseek, model: deepseek-flash, max_output_tokens: 1500, timeout_seconds: 60}
+  strong: {provider: deepseek, model: deepseek-v4-pro, max_output_tokens: 1500, timeout_seconds: 120}
+  embeddings: {provider: embeddings-stub, model: stub-embeddings}
+
+prices:
+  deepseek-flash:
+    input_cache_miss: 0.30
+    input_cache_hit: 0.03
+    output: 1.20
+    night: {start_minute: 990, end_minute: 30, multiplier: 0.5}  # 16:30–00:30 UTC
+  deepseek-v4-pro:
+    input_cache_miss: 1.00
+    input_cache_hit: 0.10
+    output: 4.00
+    night: {start_minute: 990, end_minute: 30, multiplier: 0.5}
+  stub-embeddings:
+    input_cache_miss: 0.0
+    input_cache_hit: 0.0
+
+budgets:
+  site: {daily_limit_usd: 1.7, monthly_limit_usd: 50, alert_ratio: 0.8}
+  filling: {alert_ratio: 0.8}
