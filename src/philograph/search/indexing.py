@@ -191,6 +191,7 @@ class Indexer:
                             ord=p["ord"],
                             chapter_id=p["chapter_id"],
                             section_title=p["section_title"],
+                            quoting=bool(data["permissions"].get("quoting", True)),
                         )
                     )
             if external and (old is None or old.text_hash != digest or not old.embedded):
@@ -227,6 +228,7 @@ class Indexer:
                     length=sum(counted.values()),
                     embedded=False,
                     active=True,
+                    quoting=bool(data["permissions"].get("quoting", True)),
                 )
             )
             if counted:

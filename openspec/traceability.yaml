@@ -13,3 +13,6 @@ enforce:
   - chapter-reading
   - paragraph-indexing
   - paragraph-search
+  - assistant-dialog
+  - question-routing
+  - answer-grounding

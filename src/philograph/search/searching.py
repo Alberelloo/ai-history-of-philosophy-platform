@@ -63,6 +63,7 @@ class Query:
     sources: list[str] | None = None
     languages: list[str] | None = None
     exclude: list[str] = field(default_factory=list)
+    exclude_sources: list[str] = field(default_factory=list)
     extra_terms: list[str] = field(default_factory=list)  # расширение запроса, например онтологией
     priority: list[str] = field(default_factory=list)  # абзацы, которым дать приоритет
     neighbors: int = 0
@@ -94,6 +95,8 @@ class Searcher:
             conds.append(t.docs.c.lang.in_(q.languages))
         if q.exclude:
             conds.append(t.docs.c.paragraph_id.not_in(q.exclude))
+        if q.exclude_sources:
+            conds.append(t.docs.c.source_id.not_in(q.exclude_sources))
         return and_(*conds)
 
     def lexical(self, q: Query, words: list[str]) -> dict[str, float]:
@@ -145,6 +148,7 @@ class Searcher:
                 sources=q.sources,
                 languages=q.languages,
                 exclude=q.exclude,
+                exclude_sources=q.exclude_sources,
                 scopes=q.scopes,
                 limit=self.settings.candidates,
             )
@@ -203,6 +207,7 @@ class Searcher:
                     "section_title": doc.section_title,
                     "text": doc.text,
                     "lang": doc.lang,
+                    "quoting": doc.quoting,
                     "score": round(fused[pid], 6),
                     "found_by": sorted(found_by[pid]),
                     "neighbors": self._neighbors(doc, q.neighbors),

@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from typing import Any
 
 import httpx
@@ -74,3 +76,26 @@ class ServiceClient:
 
     def post(self, path: str, **kwargs: Any) -> httpx.Response:
         return self.request("POST", path, **kwargs)
+
+    @contextmanager
+    def stream(self, method: str, path: str, **kwargs: Any) -> Iterator[httpx.Response]:
+        """Потоковый ответ соседа. Таймаут и обрыв — ``ServiceUnavailable``, без повторов."""
+        url = f"/{self.api_version}/{path.lstrip('/')}"
+        headers = {**context.outgoing_headers(), **kwargs.pop("headers", {})}
+        try:
+            with self._http.stream(method.upper(), url, headers=headers, **kwargs) as response:
+                yield response
+        except httpx.TimeoutException:
+            events.emit(
+                "service.call.failed", target=self.target, path=url, reason="таймаут", attempts=1
+            )
+            raise ServiceUnavailable(self.target, "таймаут") from None
+        except httpx.TransportError as exc:
+            events.emit(
+                "service.call.failed",
+                target=self.target,
+                path=url,
+                reason=f"нет связи: {type(exc).__name__}",
+                attempts=1,
+            )
+            raise ServiceUnavailable(self.target, "нет связи") from None

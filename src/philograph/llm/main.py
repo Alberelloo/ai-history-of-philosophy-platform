@@ -13,11 +13,12 @@ from philograph.llm.app import build_app
 from philograph.llm.config import LLMSettings, load_config
 from philograph.llm.gateway import LLMGateway
 from philograph.llm.providers import FakeProvider, OpenAICompatibleProvider, Provider
-from philograph.llm.templates import TemplateRegistry
+from philograph.llm.templates import Template, TemplateRegistry
 from philograph.platform import events
 from philograph.platform.db import make_engine
 from philograph.platform.health import Health
 from philograph.platform.settings import load
+from philograph.prompts import PROMPTS
 
 
 def create(env: dict[str, str] | None = None) -> FastAPI:
@@ -44,8 +45,10 @@ def create(env: dict[str, str] | None = None) -> FastAPI:
             conn.execute(text("SELECT 1"))
 
     health.depends_on("database", database)
-    # Шаблоны регистрируют сервисы-потребители в своих модулях при подключении.
-    gateway = LLMGateway(config, providers, TemplateRegistry(), st.Store(engine))
+    templates = TemplateRegistry()
+    for spec in PROMPTS:
+        templates.register(Template(spec.name, spec.instructions, spec.data_slots))
+    gateway = LLMGateway(config, providers, templates, st.Store(engine))
     return build_app(gateway, health)
 
 

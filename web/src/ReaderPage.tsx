@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
 import { navigate } from "./App";
+import { AssistantPanel } from "./AssistantPanel";
 import { FootnoteRef } from "./Footnote";
 import { storage } from "./storage";
 
@@ -81,7 +82,33 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   const [problem, setProblem] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [selection, setSelection] = useState<{ text: string; paragraphs: string[]; top: number } | null>(
+    null,
+  );
+  const [asked, setAsked] = useState<{ text: string; paragraphs: string[] } | null>(null);
   const textRef = useRef<HTMLElement>(null);
+
+  // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
+  useEffect(() => {
+    const onUp = () => {
+      const sel = window.getSelection();
+      const text = sel?.toString().trim() ?? "";
+      if (!sel || !text || !textRef.current?.contains(sel.anchorNode)) {
+        setSelection(null);
+        return;
+      }
+      const ids = new Set<string>();
+      const range = sel.getRangeAt(0);
+      textRef.current.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
+        if (range.intersectsNode(el)) ids.add(el.dataset.paragraph!);
+      });
+      const rect = range.getBoundingClientRect();
+      setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
+    };
+    document.addEventListener("mouseup", onUp);
+    return () => document.removeEventListener("mouseup", onUp);
+  }, []);
 
   // Какой источник открыть, если он не указан: запомненный или учебник по умолчанию.
   useEffect(() => {
@@ -179,8 +206,39 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         <button className="link" onClick={() => navigate("/")}>
           ← Библиотека
         </button>
+        <button
+          className="link"
+          onClick={() => {
+            setAsked(null);
+            setAssistantOpen(true);
+          }}
+        >
+          Ассистент
+        </button>
         <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
       </nav>
+      {selection && (
+        <button
+          className="ask-selection primary"
+          style={{ top: selection.top + 8 }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            setAsked({ text: selection.text, paragraphs: selection.paragraphs });
+            setAssistantOpen(true);
+            setSelection(null);
+          }}
+        >
+          Спросить ассистента
+        </button>
+      )}
+      {assistantOpen && (
+        <AssistantPanel
+          sourceId={sourceId}
+          selection={asked?.text ?? null}
+          selectionParagraphs={asked?.paragraphs ?? []}
+          onClose={() => setAssistantOpen(false)}
+        />
+      )}
       <article className="chapter" ref={textRef}>
         {notice && <p className="notice" role="status">{notice}</p>}
         <h1>{chapter.title}</h1>

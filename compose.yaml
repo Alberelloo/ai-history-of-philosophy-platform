@@ -76,6 +76,18 @@ services:
       interval: 10s
       retries: 6
 
+  assistant:
+    <<: *service
+    command: uvicorn philograph.assistant.main:app --host 0.0.0.0 --port 8003
+    environment:
+      PHILOGRAPH_SEARCH_URL: http://search:8002
+      PHILOGRAPH_LLM_URL: http://llm:8000
+      PHILOGRAPH_VISITOR_SECRET: ${PHILOGRAPH_VISITOR_SECRET:?задайте PHILOGRAPH_VISITOR_SECRET в .env}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8003/health/ready').status == 200 else 1)"]
+      interval: 10s
+      retries: 6
+
   worker:
     <<: *service
     # Исполнитель очереди: обработка источников, плановая проверка, события для конвейеров.
