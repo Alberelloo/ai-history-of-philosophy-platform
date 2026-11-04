@@ -14,6 +14,8 @@ dependencies = [
     "pymorphy3>=2.0",
     "pymorphy3-dicts-ru",
     "pymupdf>=1.24",
+    "qdrant-client>=1.12",
+    "snowballstemmer>=2.2",
     "pydantic>=2.8",
     "pydantic-settings>=2.4",
     "pyyaml>=6",
@@ -56,16 +58,18 @@ root_package = "philograph"
 [[tool.importlinter.contracts]]
 name = "Сервисы не зависят от внутренностей друг друга"
 type = "independence"
-modules = ["philograph.llm", "philograph.library"]
+modules = ["philograph.llm", "philograph.library", "philograph.search"]
 
 [[tool.importlinter.contracts]]
 name = "Общий каркас не зависит от сервисов"
 type = "forbidden"
 source_modules = ["philograph.platform"]
-forbidden_modules = ["philograph.llm", "philograph.library", "philograph.operator"]
+forbidden_modules = [
+    "philograph.llm", "philograph.library", "philograph.operator", "philograph.search",
+]
 
 [[tool.importlinter.contracts]]
 name = "Доступ оператора — общий компонент и не зависит от сервисов"
 type = "forbidden"
 source_modules = ["philograph.operator"]
-forbidden_modules = ["philograph.llm", "philograph.library"]
+forbidden_modules = ["philograph.llm", "philograph.library", "philograph.search"]

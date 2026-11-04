@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from philograph import __version__
-from philograph.library.reading import NotVisible, Reading
+from philograph.library.reading import Internal, NotVisible, Reading
 from philograph.platform.health import Health
 from philograph.platform.web import UserFacingError, create_app
 
@@ -57,6 +57,16 @@ def build_app(
     @router.get("/paragraphs/{paragraph_id}")
     def paragraph(paragraph_id: str) -> dict[str, Any]:
         return reading.resolve_paragraph(paragraph_id)
+
+    internal = Internal(reading.registry, reading)
+
+    @router.get("/internal/versions/{version_id}/paragraphs")
+    def version_paragraphs(version_id: str) -> dict[str, Any]:
+        return internal.version_paragraphs(version_id)
+
+    @router.get("/internal/published")
+    def published() -> list[dict[str, str]]:
+        return internal.published()
 
     app.include_router(router, prefix="/api")
 

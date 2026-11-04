@@ -305,3 +305,54 @@ class Reading:
             result = {"status": status}
         events.emit("library.paragraph.resolved", paragraph_id=paragraph_id, status=status)
         return result
+
+
+class Internal:
+    """Интерфейс библиотеки для других сервисов: абзацы версии и разрешения источника.
+
+    Поиск и онтология получают текст только так, а не из таблиц библиотеки.
+    """
+
+    def __init__(self, registry: Registry, reading: Reading) -> None:
+        self.registry = registry
+        self.reading = reading
+
+    def version_paragraphs(self, version_id: str) -> dict[str, Any]:
+        version = self.registry.version(version_id)
+        source = self.registry.get(version["source_id"])
+        doc = self.registry.load_document(version_id)
+        chapter_of = {}
+        for chapter in self.reading.chapters(doc):
+            for section in chapter.walk():
+                chapter_of[section.id] = chapter.id
+        paragraphs = []
+        order = 0
+        for section in doc.walk():
+            for block in section.blocks:
+                order += 1
+                paragraphs.append(
+                    {
+                        "id": block.id,
+                        "text": block.text,
+                        "lang": block.lang,
+                        "ord": order,
+                        "section_id": section.id,
+                        "section_title": section.title,
+                        "chapter_id": chapter_of.get(section.id),
+                        "searchable": section.searchable and block.kind != "unrendered",
+                    }
+                )
+        return {
+            "source_id": source.id,
+            "version_id": version_id,
+            "scope": source.scope,
+            "published": source.published_version == version_id and source.status == "active",
+            "permissions": self.registry.permissions(source.id),
+            "paragraphs": paragraphs,
+        }
+
+    def published(self) -> list[dict[str, str]]:
+        return [
+            {"source_id": r["id"], "version_id": r["published_version"]}
+            for r in self.reading._visible_rows(Reader(frozenset({PUBLIC})))
+        ]

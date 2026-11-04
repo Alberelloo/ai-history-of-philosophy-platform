@@ -931,15 +931,19 @@ class Pipeline:
                     ids.append(item["source_id"])
         return self.batch(actor, ids)
 
-    def dispatch_outbox(self, queue) -> int:
-        """Передаёт записанные события в очередь. Повторная передача не создаёт дублей."""
+    def dispatch_outbox(self, queue, subscribers: tuple[str, ...] = ("search",)) -> int:
+        """Передаёт записанные события в очередь, каждому подписчику своей задачей.
+
+        Задача называется ``<подписчик>:<событие>``; повторная передача не создаёт дублей.
+        """
         sent = 0
         for item in self.registry.outbox_pending():
-            queue.enqueue(
-                item["kind"],
-                {**item["payload"], "event_id": item["event_id"]},
-                key=item["event_id"],
-            )
+            for subscriber in subscribers:
+                queue.enqueue(
+                    f"{subscriber}:{item['kind']}",
+                    {**item["payload"], "event_id": item["event_id"]},
+                    key=f"{item['event_id']}:{subscriber}",
+                )
             self.registry.mark_sent(item["event_id"], self.clock.now())
             events.emit("library.outbox.dispatched", event_id=item["event_id"], kind=item["kind"])
             sent += 1

@@ -11,3 +11,5 @@ enforce:
   - document-structure
   - source-library
   - chapter-reading
+  - paragraph-indexing
+  - paragraph-search

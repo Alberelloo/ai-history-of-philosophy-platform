@@ -44,6 +44,11 @@ def main() -> None:
         Registry(engine), FileStore(Path(os.environ["PHILOGRAPH_FILES_ROOT"])), _fetch
     )
     library_worker.register(queue, pipeline)
+    if os.environ.get("PHILOGRAPH_QDRANT_URL"):
+        from philograph.search.app import subscribe
+        from philograph.search.main import components
+
+        subscribe(queue, components(dict(os.environ))[0])
     while True:
         if not queue.run_once():
             time.sleep(1.0)

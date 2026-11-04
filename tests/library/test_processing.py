@@ -325,7 +325,7 @@ def test_outbox_events_to_queue(lib, engine_for, clock, events):
     assert lib.pipeline.dispatch_outbox(queue) == 2
     assert lib.pipeline.dispatch_outbox(queue) == 0
     received = []
-    queue.handler("source.published")(lambda job: received.append(job.payload))
+    queue.handler("search:source.published")(lambda job: received.append(job.payload))
     queue.run_until_empty()
     second = received[-1]
     assert len(second["changed"]) == 1 and second["added"] == [] and second["event_id"]
