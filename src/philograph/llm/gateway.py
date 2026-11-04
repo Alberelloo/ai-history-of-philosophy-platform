@@ -172,6 +172,32 @@ def cost_of(price: Price, usage: Usage, minute_of_day: int | None) -> float:
     return round(total, 8)
 
 
+def _parser(schema: Any) -> Callable[[str], Any]:
+    if isinstance(schema, dict):
+        import jsonschema
+
+        validator = jsonschema.Draft202012Validator(schema)
+
+        def parse_json(text: str) -> dict[str, Any]:
+            try:
+                value = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise ValueError("неверный JSON") from exc
+            errors = sorted(validator.iter_errors(value), key=lambda e: e.path)
+            if errors:
+                raise ValueError(errors[0].message)
+            return value
+
+        return parse_json
+    return schema.model_validate_json
+
+
+def _problem(exc: Exception) -> str:
+    if isinstance(exc, ValidationError):
+        return exc.errors()[0]["msg"] if exc.errors() else "неверный JSON"
+    return str(exc) or "неверный JSON"
+
+
 class LLMGateway:
     def __init__(
         self,
@@ -595,12 +621,16 @@ class LLMGateway:
             return cached
         return self._complete(call, "generate", role, template, messages, max_out, key)
 
-    def structured(self, call: Call, schema: type[M]) -> M:
-        """Ответ, прошедший проверку по схеме. После повторов — ``SchemaMismatch``."""
+    def structured(self, call: Call, schema: type[M] | dict[str, Any]) -> M | dict[str, Any]:
+        """Ответ, прошедший проверку по схеме. После повторов — ``SchemaMismatch``.
+
+        Схема — класс pydantic (вызов внутри процесса) или JSON Schema (вызов по HTTP).
+        """
+        parse = _parser(schema)
         role, template, messages, key, max_out = self._prepare(call, "structured")
         cached = self._from_cache(call, "structured", role, template, key, messages)
         if cached is not None:
-            return schema.model_validate_json(cached.text)
+            return parse(cached.text)
         problem = ""
         for attempt in range(1, self.config.schema_retries + 2):
             # Повтор не должен брать из кэша неудачный ответ, поэтому ключ только у успеха.
@@ -608,9 +638,9 @@ class LLMGateway:
                 call, "structured", role, template, messages, max_out, key=None, json_mode=True
             )
             try:
-                parsed = schema.model_validate_json(result.text)
-            except ValidationError as exc:
-                problem = exc.errors()[0]["msg"] if exc.errors() else "неверный JSON"
+                parsed = parse(result.text)
+            except (ValidationError, ValueError) as exc:
+                problem = _problem(exc)
                 events.emit(
                     "llm.schema.mismatch",
                     role=call.role,
@@ -650,10 +680,16 @@ class LLMGateway:
         chunks = 0
         usage: Usage | None = None
         started = time.perf_counter()
+
+        def produced_text() -> str:
+            return text  # текст, полученный к моменту остановки
+
         while True:
             attempt += 1
             try:
-                for chunk in provider.stream(request):
+                for chunk in self._guard_stop(
+                    provider.stream(request), reservation, role, messages, produced_text
+                ):
                     if chunk.text:
                         text += chunk.text
                         chunks += 1
@@ -735,6 +771,25 @@ class LLMGateway:
         yield StreamEvent(
             "done", result=Result(text, usage, cost, False, role.model, template.version)
         )
+
+    def _guard_stop(
+        self,
+        chunks,
+        reservation: int,
+        role: RoleConfig,
+        messages: tuple[Message, ...],
+        produced: Callable[[], str],
+    ):
+        """Если получатель закрыл поток (читатель нажал «остановить»), резерв закрывается
+        стоимостью уже полученной части, а не висит оценкой до конца суток."""
+        try:
+            yield from chunks
+        except GeneratorExit:
+            partial = Usage(sum(len(m.content) for m in messages) // 4, 0, len(produced()) // 4)
+            self.store.settle(
+                reservation, cost_of(self.config.prices[role.model], partial, self._minute())
+            )
+            raise
 
     def embed(
         self,

@@ -343,3 +343,60 @@ def test_user_text_goes_as_data_block(rig, events):
     tree = ast.parse((SRC / "llm" / "templates.py").read_text(encoding="utf-8"))
     # В инструкции ничего не подставляется: у шаблона нет форматирования.
     assert not any(isinstance(n, ast.Attribute) and n.attr == "format" for n in ast.walk(tree))
+
+
+@req("llm-gateway", "Потоковый ответ")
+def test_http_stream_is_not_buffered(rig):
+    """Регрессия: обработчик собирал весь поток в список до отправки."""
+    import threading
+    import time as _time
+
+    import httpx
+    import uvicorn
+
+    from philograph.llm.app import build_app
+
+    slow = rig.provider
+
+    def stream(request):
+        slow.calls.append(request)
+        from philograph.llm.providers import StreamChunk, Usage
+
+        yield StreamChunk(text="Первый фрагмент. ")
+        _time.sleep(1.0)
+        yield StreamChunk(text="Второй.")
+        yield StreamChunk(usage=Usage(10, 0, 5))
+
+    slow.stream = stream
+    import socket
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    server = uvicorn.Server(
+        uvicorn.Config(build_app(rig.gateway), host="127.0.0.1", port=port, log_level="warning")
+    )
+    threading.Thread(target=server.run, daemon=True).start()
+    while not server.started:
+        _time.sleep(0.05)
+    body = {
+        "role": "main",
+        "template": "answer",
+        "caller": "assistant",
+        "operation": "answer",
+        "budget": "site",
+        "data": {"question": "?"},
+    }
+    try:
+        started = _time.perf_counter()
+        with httpx.stream(
+            "POST", f"http://127.0.0.1:{port}/v1/stream", json=body, timeout=10
+        ) as response:
+            first_at = None
+            for line in response.iter_lines():
+                if first_at is None and line.strip():
+                    first_at = _time.perf_counter() - started
+            total = _time.perf_counter() - started
+        assert first_at is not None and first_at < 0.8 < total
+    finally:
+        server.should_exit = True

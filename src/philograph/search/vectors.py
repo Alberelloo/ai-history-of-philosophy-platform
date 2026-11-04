@@ -82,6 +82,7 @@ class VectorStore:
         exclude: list[str] | None,
         scopes: list[str],
         limit: int,
+        exclude_sources: list[str] | None = None,
     ) -> list[Hit]:
         must = [
             qm.FieldCondition(key="active", match=qm.MatchValue(value=True)),
@@ -96,6 +97,10 @@ class VectorStore:
             if exclude
             else []
         )
+        if exclude_sources:
+            must_not.append(
+                qm.FieldCondition(key="source_id", match=qm.MatchAny(any=exclude_sources))
+            )
         points = self.client.query_points(
             collection,
             query=vector,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import json
 from collections.abc import Iterator
 from typing import Any
@@ -58,6 +59,10 @@ class CallBody(BaseModel):
         )
 
 
+class StructuredBody(CallBody):
+    json_schema: dict[str, Any]
+
+
 class EmbedBody(BaseModel):
     texts: list[str]
     caller: str
@@ -101,6 +106,13 @@ def build_app(gateway: LLMGateway, health: Health | None = None) -> FastAPI:
             "template_version": result.template_version,
         }
 
+    @router.post("/structured")
+    def structured(body: StructuredBody) -> dict[str, Any]:
+        try:
+            return {"value": gateway.structured(body.to_call(), body.json_schema)}
+        except Exception as exc:
+            raise _translate(exc) from exc
+
     @router.post("/stream")
     def stream(body: CallBody) -> StreamingResponse:
         call = body.to_call()
@@ -111,7 +123,8 @@ def build_app(gateway: LLMGateway, health: Health | None = None) -> FastAPI:
             raise _translate(exc) from exc
 
         def lines() -> Iterator[str]:
-            for event in [first, *events]:
+            # chain, а не [first, *events]: список прочитал бы весь поток до отправки.
+            for event in itertools.chain([first], events):
                 item: dict[str, Any] = {"type": event.type}
                 if event.type == "delta":
                     item["text"] = event.text

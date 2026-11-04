@@ -22,6 +22,7 @@ class SearchBody(BaseModel):
     sources: list[str] | None = None
     languages: list[str] | None = None
     exclude: list[str] = []
+    exclude_sources: list[str] = []
     extra_terms: list[str] = []
     priority: list[str] = []
     neighbors: int = Field(default=0, ge=0, le=3)

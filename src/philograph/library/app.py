@@ -16,8 +16,13 @@ from philograph.platform.web import UserFacingError, create_app
 
 
 def build_app(
-    reading: Reading, health: Health | None = None, web_root: Path | None = None
+    reading: Reading,
+    health: Health | None = None,
+    web_root: Path | None = None,
+    mounts: dict[str, FastAPI] | None = None,
 ) -> FastAPI:
+    """``mounts`` — соседние сервисы под общим адресом (для разработки и тестов; в работе
+    их объединяет шлюз)."""
     health = health or Health("library", __version__)
     app = create_app(
         "library", __version__, health, internal_error_message="Не удалось открыть главу"
@@ -69,6 +74,8 @@ def build_app(
         return internal.published()
 
     app.include_router(router, prefix="/api")
+    for path, sub in (mounts or {}).items():
+        app.mount(path, sub)
 
     if web_root is not None and (web_root / "index.html").exists():
         app.mount("/assets", StaticFiles(directory=web_root / "assets"), name="assets")

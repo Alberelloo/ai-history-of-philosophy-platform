@@ -27,6 +27,7 @@ docs = Table(
     Column("length", Integer, nullable=False),  # число терминов, для BM25
     Column("embedded", Boolean, nullable=False),  # есть ли в смысловом индексе
     Column("active", Boolean, nullable=False),  # снятый источник: в поиске нет, данные целы
+    Column("quoting", Boolean, nullable=False, server_default="1"),  # можно ли цитировать
     schema=SCHEMA,
 )
 
@@ -68,3 +69,15 @@ migrations = Migrations(SCHEMA, metadata)
 migrations.add(1, "индекс абзацев")(
     migrations.create_tables("docs", "postings", "vectors_done", "state", "processed_events")
 )
+
+
+@migrations.add(2, "разрешение на цитирование у абзаца")
+def _add_quoting(conn) -> None:
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("docs", schema=SCHEMA)}
+    if "quoting" not in columns:  # база, созданная до этой миграции
+        default = "TRUE" if conn.dialect.name == "postgresql" else "1"
+        conn.execute(
+            text(f"ALTER TABLE {SCHEMA}.docs ADD COLUMN quoting BOOLEAN NOT NULL DEFAULT {default}")
+        )
