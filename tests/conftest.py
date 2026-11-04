@@ -69,9 +69,11 @@ def clock() -> ManualClock:
 
 
 @pytest.fixture
-def database_url() -> str:
-    """SQLite в памяти локально; в CI можно задать PostgreSQL через PHILOGRAPH_TEST_DATABASE_URL."""
-    return os.environ.get("PHILOGRAPH_TEST_DATABASE_URL", "sqlite://")
+def database_url(tmp_path) -> str:
+    """Файловая SQLite во временной папке; в CI — PostgreSQL через PHILOGRAPH_TEST_DATABASE_URL."""
+    return os.environ.get(
+        "PHILOGRAPH_TEST_DATABASE_URL", f"sqlite:///{(tmp_path / 'test.db').as_posix()}"
+    )
 
 
 @pytest.fixture

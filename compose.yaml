@@ -48,6 +48,20 @@ services:
       interval: 10s
       retries: 6
 
+  worker:
+    <<: *service
+    # Исполнитель очереди: обработка источников, плановая проверка, события для конвейеров.
+    command: python -m philograph.worker
+    environment:
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+      PHILOGRAPH_FILES_ROOT: /data/files
+    volumes:
+      - library-files:/data/files
+    healthcheck:
+      test: ["CMD", "python", "-c", "import philograph.worker"]
+      interval: 30s
+
 volumes:
+  library-files:
   postgres-data:
   qdrant-data:

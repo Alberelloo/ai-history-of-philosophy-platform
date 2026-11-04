@@ -39,6 +39,24 @@ def test_markers() -> dict[tuple[str, str], list[str]]:
     markers: dict[tuple[str, str], list[str]] = {}
     for path in (ROOT / "tests").rglob("test_*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))
+        # Строковые константы модуля: ``SR = "source-registry"`` и ``@req(SR, "...")``.
+        consts = {
+            target.id: stmt.value.value
+            for stmt in tree.body
+            if isinstance(stmt, ast.Assign)
+            and isinstance(stmt.value, ast.Constant)
+            and isinstance(stmt.value.value, str)
+            for target in stmt.targets
+            if isinstance(target, ast.Name)
+        }
+
+        def value(arg: ast.expr, consts: dict[str, str] = consts) -> str | None:
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                return arg.value
+            if isinstance(arg, ast.Name):
+                return consts.get(arg.id)
+            return None
+
         for node in ast.walk(tree):
             if not isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
                 continue
@@ -52,9 +70,9 @@ def test_markers() -> dict[tuple[str, str], list[str]]:
                     is_req
                     and isinstance(deco, ast.Call)
                     and len(deco.args) == 2
-                    and all(isinstance(a, ast.Constant) for a in deco.args)
+                    and all(value(a) is not None for a in deco.args)
                 ):
-                    key = (deco.args[0].value, deco.args[1].value)
+                    key = (value(deco.args[0]), value(deco.args[1]))
                     markers.setdefault(key, []).append(f"{path.relative_to(ROOT)}::{node.name}")
     return markers
 

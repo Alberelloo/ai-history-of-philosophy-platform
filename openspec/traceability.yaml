@@ -5,3 +5,7 @@ enforce:
   - observability
   - operator-access
   - service-runtime
+  - source-registry
+  - source-processing
+  - text-quality-check
+  - document-structure
