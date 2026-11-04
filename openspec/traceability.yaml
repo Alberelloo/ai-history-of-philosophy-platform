@@ -9,3 +9,5 @@ enforce:
   - source-processing
   - text-quality-check
   - document-structure
+  - source-library
+  - chapter-reading

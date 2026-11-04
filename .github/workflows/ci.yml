@@ -73,6 +73,24 @@ jobs:
           ruff check .
           ruff format --check .
 
+      - uses: actions/setup-node@v4
+        if: steps.py.outputs.present == 'true'
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Сборка веб-клиента
+        if: steps.py.outputs.present == 'true'
+        working-directory: web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Браузер для тестов интерфейса
+        if: steps.py.outputs.present == 'true'
+        run: python -m playwright install --with-deps chromium
+
       - name: Границы сервисов
         if: steps.py.outputs.present == 'true'
         run: lint-imports

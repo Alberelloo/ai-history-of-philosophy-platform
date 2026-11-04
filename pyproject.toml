@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["import-linter>=2.1", "pytest>=8", "ruff>=0.6"]
+dev = ["import-linter>=2.1", "playwright>=1.47", "pytest>=8", "ruff>=0.6", "uvicorn>=0.30"]
 postgres = ["psycopg[binary]>=3.2"]
 ocr = ["pytesseract>=0.3.10", "pillow>=10"]
 
@@ -48,7 +48,7 @@ ignore = ["RUF001", "RUF002", "RUF003", "UP047"]
 
 [tool.ruff.lint.flake8-bugbear]
 # Зависимости FastAPI объявляются в значениях по умолчанию — так устроен фреймворк.
-extend-immutable-calls = ["fastapi.Depends", "philograph.operator.access.require"]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "philograph.operator.access.require"]
 
 [tool.importlinter]
 root_package = "philograph"

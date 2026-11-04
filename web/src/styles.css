@@ -1,0 +1,273 @@
+:root {
+  --text: #1d1b18;
+  --muted: #6b655c;
+  --paper: #fbf9f4;
+  --line: #e4ded2;
+  --accent: #7a3e1d;
+  --highlight: #fff1c9;
+  font-family: "Iowan Old Style", "PT Serif", Georgia, serif;
+  color: var(--text);
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+}
+
+button.link {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  text-decoration: underline;
+  padding: 0;
+}
+
+.badge {
+  font-size: 0.75rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.badge.muted {
+  background: var(--line);
+  color: var(--muted);
+}
+
+/* Библиотека */
+.library {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: flex-start;
+  margin: 1rem 0 1.5rem;
+}
+
+.filters input[type="search"] {
+  flex: 1 1 18rem;
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.filters fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.filters legend {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.sources {
+  list-style: none;
+  padding: 0;
+}
+
+.source {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  padding: 1rem 0;
+}
+
+.source.current h2 {
+  color: var(--accent);
+}
+
+.source h2 {
+  display: inline;
+  font-size: 1.15rem;
+}
+
+.source dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 0.75rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+.source dt {
+  color: var(--muted);
+}
+
+.source dd {
+  margin: 0;
+}
+
+.license-details {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Чтение */
+.reader {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 40rem);
+  gap: 3rem;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.toc {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  font-size: 0.9rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}
+
+.toc ul {
+  list-style: none;
+  padding-left: 0.9rem;
+}
+
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.toc a[aria-current="true"] {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.chapter {
+  font-size: 1.1rem;
+  line-height: 1.65;
+}
+
+.block {
+  position: relative;
+}
+
+.block.verse {
+  white-space: pre-line;
+}
+
+blockquote.block {
+  margin-left: 1.5rem;
+  color: #3a352e;
+}
+
+.highlight {
+  background: var(--highlight);
+  transition: background 1.5s;
+}
+
+.page-mark {
+  font-size: 0.7rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 0.25rem;
+  margin: 0 0.2rem;
+  font-family: system-ui, sans-serif;
+  vertical-align: super;
+}
+
+.copy-link {
+  position: absolute;
+  left: -2rem;
+  top: 0.1rem;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  opacity: 0;
+}
+
+.block:hover .copy-link,
+.copy-link:focus {
+  opacity: 1;
+}
+
+.note {
+  position: relative;
+}
+
+.note-ref {
+  background: none;
+  border: 0;
+  padding: 0 0.1rem;
+  color: var(--accent);
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+.note-popup {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  top: 1.4em;
+  width: 22rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.12);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.unrendered {
+  border: 1px dashed var(--line);
+  padding: 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+
+.notice {
+  background: var(--highlight);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+.reader-problem,
+.loading {
+  max-width: 40rem;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}

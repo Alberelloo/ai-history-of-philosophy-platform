@@ -7,3 +7,5 @@ __pycache__/
 .import_linter_cache/
 .env
 data/
+web/node_modules/
+web/dist/
