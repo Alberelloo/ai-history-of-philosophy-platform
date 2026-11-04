@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 from sqlalchemy import (
     Column,
@@ -39,17 +40,23 @@ events.define(
 def make_engine(url: str, schemas: list[str]) -> Engine:
     """Создаёт подключение. Для SQLite подключает каждую схему как базу в памяти."""
     if url.startswith("sqlite"):
-        engine = create_engine(
-            url,
-            connect_args={"check_same_thread": False},
-            poolclass=StaticPool,
-        )
+        path = url.removeprefix("sqlite:///") if url.startswith("sqlite:///") else None
+        if path:
+            # Файловая база: у каждой схемы свой файл рядом, соединений может быть несколько.
+            engine = create_engine(url, connect_args={"check_same_thread": False, "timeout": 30})
+            targets = {s: str(Path(path).with_suffix(f".{s}.db")) for s in schemas}
+        else:
+            engine = create_engine(
+                url, connect_args={"check_same_thread": False}, poolclass=StaticPool
+            )
+            targets = {s: ":memory:" for s in schemas}
 
         @event.listens_for(engine, "connect")
         def _attach(dbapi_conn, _record) -> None:  # pragma: no cover - вызывается драйвером
             cur = dbapi_conn.cursor()
-            for schema in schemas:
-                cur.execute(f"ATTACH DATABASE ':memory:' AS {schema}")
+            cur.execute("PRAGMA busy_timeout = 30000")
+            for schema, target in targets.items():
+                cur.execute(f"ATTACH DATABASE '{target}' AS {schema}")
             cur.close()
 
         return engine

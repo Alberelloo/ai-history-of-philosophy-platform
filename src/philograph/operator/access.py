@@ -218,21 +218,29 @@ class ActionLog:
         self.clock = clock or SystemClock()
 
     def record(
-        self, session: Session, action: str, target: str, details: dict[str, Any] | None = None
+        self,
+        actor: Session | str,
+        action: str,
+        target: str,
+        details: dict[str, Any] | None = None,
+        *,
+        conn: Any = None,
     ) -> None:
-        with self.engine.begin() as conn:
-            conn.execute(
-                actions.insert().values(
-                    time=self.clock.now(),
-                    actor=session.actor,
-                    action=action,
-                    target=target,
-                    details=details,
-                )
-            )
-        events.emit(
-            "operator.action", actor=session.actor, action=action, target=target, details=details
-        )
+        """Записывает действие. ``conn`` — чтобы попасть в ту же транзакцию, что и само действие."""
+        name = actor.actor if isinstance(actor, Session) else actor
+        values = {
+            "time": self.clock.now(),
+            "actor": name,
+            "action": action,
+            "target": target,
+            "details": details,
+        }
+        if conn is not None:
+            conn.execute(actions.insert().values(**values))
+        else:
+            with self.engine.begin() as own:
+                own.execute(actions.insert().values(**values))
+        events.emit("operator.action", actor=name, action=action, target=target, details=details)
 
     def entries(self) -> list[dict[str, Any]]:
         with self.engine.begin() as conn:
