@@ -106,6 +106,7 @@ class Searcher:
             ).one()
             if not total:
                 return {}
+            avg = float(avg or 1)  # PostgreSQL отдаёт среднее как Decimal
             df = dict(
                 conn.execute(
                     select(t.postings.c.term, func.count())
