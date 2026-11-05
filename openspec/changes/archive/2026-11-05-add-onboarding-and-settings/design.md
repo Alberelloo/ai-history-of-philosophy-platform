@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), принцип П-5 в [vision.md](../../../docs/product/vision.md), требования в `first-run-notice` и `reader-settings`. Аккаунтов в продукте нет, поэтому всё состояние читателя живёт в браузере.
+Мотивация в [proposal.md](proposal.md), принцип П-5 в [vision.md](../../../../docs/product/vision.md), требования в `first-run-notice` и `reader-settings`. Аккаунтов в продукте нет, поэтому всё состояние читателя живёт в браузере.
 
 ## Decisions
 

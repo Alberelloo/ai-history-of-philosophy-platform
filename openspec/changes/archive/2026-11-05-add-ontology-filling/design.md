@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), порядок наполнения — раздел 12 [ontology.md](../../../docs/product/ontology.md), требования в `ontology-extraction` и `ontology-review`. Модель онтологии — [add-ontology-core](../add-ontology-core/design.md).
+Мотивация в [proposal.md](proposal.md), порядок наполнения — раздел 12 [ontology.md](../../../../docs/product/ontology.md), требования в `ontology-extraction` и `ontology-review`. Модель онтологии — [add-ontology-core](../2026-11-05-add-ontology-core/design.md).
 
 ## Decisions
 

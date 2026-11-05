@@ -93,6 +93,6 @@ Qdrant выбран по решению А2 (отдельная векторна
 
 ## Что сделать
 
-1. [x] Каркас пакета, CI с ruff, pytest, import-linter, прослеживаемостью ([add-platform-foundation](../../../openspec/changes/add-platform-foundation/proposal.md)).
+1. [x] Каркас пакета, CI с ruff, pytest, import-linter, прослеживаемостью ([add-platform-foundation](../../../openspec/changes/archive/2026-11-05-add-platform-foundation/proposal.md)).
 2. [x] Docker Compose (дополняется сервисами по мере их появления).
 3. [ ] Выбрать провайдера эмбеддингов замером: [ADR-0002](0002-embeddings.md).

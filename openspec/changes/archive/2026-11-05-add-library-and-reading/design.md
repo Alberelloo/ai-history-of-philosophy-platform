@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), требования в `source-library` и `chapter-reading`. Данные готовит конвейер источника ([add-source-pipeline](../add-source-pipeline/design.md)): опубликованные версии, разделы, абзацы с постоянными идентификаторами, отметки страниц, сноски. Стек — [ADR-0001](../../../docs/architecture/adr/0001-stack.md).
+Мотивация в [proposal.md](proposal.md), требования в `source-library` и `chapter-reading`. Данные готовит конвейер источника ([add-source-pipeline](../2026-11-05-add-source-pipeline/design.md)): опубликованные версии, разделы, абзацы с постоянными идентификаторами, отметки страниц, сноски. Стек — [ADR-0001](../../../../docs/architecture/adr/0001-stack.md).
 
 ## Goals / Non-Goals
 

@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), требования в `evaluation-datasets` и `quality-evaluation`, метрики по компонентам — блок 7 [system-design.md](../../../docs/product/system-design.md).
+Мотивация в [proposal.md](proposal.md), требования в `evaluation-datasets` и `quality-evaluation`, метрики по компонентам — блок 7 [system-design.md](../../../../docs/product/system-design.md).
 
 ## Decisions
 

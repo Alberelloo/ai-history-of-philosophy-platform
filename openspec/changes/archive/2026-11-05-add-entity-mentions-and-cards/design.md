@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), устройство упоминаний и карточек — разделы 10.3 и 11.1 [ontology.md](../../../docs/product/ontology.md), требования в `entity-mentions` и `entity-cards`. Модель онтологии — [add-ontology-core](../add-ontology-core/design.md), наполнение — [add-ontology-filling](../add-ontology-filling/design.md).
+Мотивация в [proposal.md](proposal.md), устройство упоминаний и карточек — разделы 10.3 и 11.1 [ontology.md](../../../../docs/product/ontology.md), требования в `entity-mentions` и `entity-cards`. Модель онтологии — [add-ontology-core](../2026-11-05-add-ontology-core/design.md), наполнение — [add-ontology-filling](../2026-11-05-add-ontology-filling/design.md).
 
 ## Decisions
 

@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), роль онтологии в ответах — раздел 11.3 [ontology.md](../../../docs/product/ontology.md), требования в `ontology-retrieval`. Цепочки ассистента — [add-assistant](../add-assistant/proposal.md), упоминания — [add-entity-mentions-and-cards](../add-entity-mentions-and-cards/design.md), рецепты графа — [add-knowledge-graph](../add-knowledge-graph/design.md).
+Мотивация в [proposal.md](proposal.md), роль онтологии в ответах — раздел 11.3 [ontology.md](../../../../docs/product/ontology.md), требования в `ontology-retrieval`. Цепочки ассистента — [add-assistant](../2026-11-05-add-assistant/proposal.md), упоминания — [add-entity-mentions-and-cards](../2026-11-05-add-entity-mentions-and-cards/design.md), рецепты графа — [add-knowledge-graph](../2026-11-05-add-knowledge-graph/design.md).
 
 ## Decisions
 

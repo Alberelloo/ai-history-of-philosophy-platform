@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), угрозы и эксплуатация — блок 8 [system-design.md](../../../docs/product/system-design.md), требования в `abuse-protection`, `backup-and-recovery`, `operational-alerts` и `deployment`. Продукт работает на одном сервере в Docker Compose ([add-platform-foundation](../add-platform-foundation/proposal.md)). Аккаунтов нет, главная угроза — израсходованный бюджет на модели.
+Мотивация в [proposal.md](proposal.md), угрозы и эксплуатация — блок 8 [system-design.md](../../../../docs/product/system-design.md), требования в `abuse-protection`, `backup-and-recovery`, `operational-alerts` и `deployment`. Продукт работает на одном сервере в Docker Compose ([add-platform-foundation](../2026-11-05-add-platform-foundation/proposal.md)). Аккаунтов нет, главная угроза — израсходованный бюджет на модели.
 
 ## Decisions
 

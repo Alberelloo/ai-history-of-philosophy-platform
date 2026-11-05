@@ -2,13 +2,13 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), требования в `paragraph-indexing` и `paragraph-search`. Абзацы и события даёт библиотека, эмбеддинги — сервис LLM. Стек — [ADR-0001](../../../docs/architecture/adr/0001-stack.md), провайдер эмбеддингов — [ADR-0002](../../../docs/architecture/adr/0002-embeddings.md).
+Мотивация в [proposal.md](proposal.md), требования в `paragraph-indexing` и `paragraph-search`. Абзацы и события даёт библиотека, эмбеддинги — сервис LLM. Стек — [ADR-0001](../../../../docs/architecture/adr/0001-stack.md), провайдер эмбеддингов — [ADR-0002](../../../../docs/architecture/adr/0002-embeddings.md).
 
 ## Goals / Non-Goals
 
 **Goals:** находить абзацы по смыслу и по словам, не тратить бюджет на неизменённое, соблюдать разрешения лицензий, не ломаться без векторной базы.
 
-**Non-Goals:** выбор конкретной модели эмбеддингов, расширение запроса онтологией (это [add-ontology-aware-assistant](../add-ontology-aware-assistant/proposal.md); здесь только точка расширения).
+**Non-Goals:** выбор конкретной модели эмбеддингов, расширение запроса онтологией (это [add-ontology-aware-assistant](../2026-11-05-add-ontology-aware-assistant/proposal.md); здесь только точка расширения).
 
 ## Decisions
 

@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), стек в [ADR-0001](../../../docs/architecture/adr/0001-stack.md). Требования в спецификациях `llm-gateway`, `observability`, `operator-access`, `service-runtime`. На машине разработчика нет Docker и PostgreSQL, поэтому всё, что касается данных, должно запускаться в тестах на SQLite, а в CI — ещё и на PostgreSQL.
+Мотивация в [proposal.md](proposal.md), стек в [ADR-0001](../../../../docs/architecture/adr/0001-stack.md). Требования в спецификациях `llm-gateway`, `observability`, `operator-access`, `service-runtime`. На машине разработчика нет Docker и PostgreSQL, поэтому всё, что касается данных, должно запускаться в тестах на SQLite, а в CI — ещё и на PostgreSQL.
 
 ## Goals / Non-Goals
 

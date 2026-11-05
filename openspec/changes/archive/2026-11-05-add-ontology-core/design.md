@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), модель — [ontology.md](../../../docs/product/ontology.md), требования в `ontology-registry`, `ontology-entities`, `ontology-statements`.
+Мотивация в [proposal.md](proposal.md), модель — [ontology.md](../../../../docs/product/ontology.md), требования в `ontology-registry`, `ontology-entities`, `ontology-statements`.
 
 ## Decisions
 

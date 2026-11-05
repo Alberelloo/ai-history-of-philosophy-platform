@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), граф по запросу — раздел 11.2 [ontology.md](../../../docs/product/ontology.md), требования в `knowledge-graph` и `source-scope`. Обход по рецептам уже есть в `Statements.traverse` ([add-ontology-core](../add-ontology-core/design.md)), карточки — в [add-entity-mentions-and-cards](../add-entity-mentions-and-cards/design.md).
+Мотивация в [proposal.md](proposal.md), граф по запросу — раздел 11.2 [ontology.md](../../../../docs/product/ontology.md), требования в `knowledge-graph` и `source-scope`. Обход по рецептам уже есть в `Statements.traverse` ([add-ontology-core](../2026-11-05-add-ontology-core/design.md)), карточки — в [add-entity-mentions-and-cards](../2026-11-05-add-entity-mentions-and-cards/design.md).
 
 ## Decisions
 

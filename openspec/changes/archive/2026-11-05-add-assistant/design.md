@@ -2,13 +2,13 @@
 
 ## Context
 
-Мотивация в [proposal.md](proposal.md), требования в `assistant-dialog`, `question-routing`, `answer-grounding`. Ассистент вызывает поиск ([add-paragraph-search](../add-paragraph-search/design.md)) и сервис LLM ([add-platform-foundation](../add-platform-foundation/design.md)) только по HTTP.
+Мотивация в [proposal.md](proposal.md), требования в `assistant-dialog`, `question-routing`, `answer-grounding`. Ассистент вызывает поиск ([add-paragraph-search](../2026-11-05-add-paragraph-search/design.md)) и сервис LLM ([add-platform-foundation](../2026-11-05-add-platform-foundation/design.md)) только по HTTP.
 
 ## Goals / Non-Goals
 
 **Goals:** ответ потоком с первым фрагментом как можно раньше, проверка опоры кодом, предсказуемое число вызовов модели, понятные сообщения при любом сбое.
 
-**Non-Goals:** онтология в цепочках (точки `hooks` для [add-ontology-aware-assistant](../add-ontology-aware-assistant/proposal.md)), настройки читателя в отдельном экране (этап 6; пока флаги в запросе).
+**Non-Goals:** онтология в цепочках (точки `hooks` для [add-ontology-aware-assistant](../2026-11-05-add-ontology-aware-assistant/proposal.md)), настройки читателя в отдельном экране (этап 6; пока флаги в запросе).
 
 ## Decisions
 
