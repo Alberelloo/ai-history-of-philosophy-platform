@@ -191,6 +191,7 @@ class Indexer:
                             ord=p["ord"],
                             chapter_id=p["chapter_id"],
                             section_title=p["section_title"],
+                            source_title=data.get("source_title"),
                             quoting=bool(data["permissions"].get("quoting", True)),
                         )
                     )
@@ -220,6 +221,7 @@ class Indexer:
                     chapter_id=p["chapter_id"],
                     section_id=p["section_id"],
                     section_title=p["section_title"],
+                    source_title=data.get("source_title"),
                     ord=p["ord"],
                     lang=p["lang"],
                     scope=data["scope"],

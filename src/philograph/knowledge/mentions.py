@@ -75,8 +75,16 @@ class Mentions:
     # --- поиск в тексте ---
 
     def scan(
-        self, text: str, index: dict[tuple, set[str]], longest: int, chapter: set[str]
+        self,
+        text: str,
+        index: dict[tuple, set[str]],
+        longest: int,
+        chapter: set[str],
+        *,
+        keep_ambiguous: bool = False,
     ) -> list[dict[str, Any]]:
+        """Упоминания в тексте. ``keep_ambiguous`` — вместо пропуска неоднозначного названия
+        вернуть всех кандидатов с пометкой: так ассистент ищет по всем с пониженным весом."""
         words = forms(text)
         found: list[dict[str, Any]] = []
         seen: set[str] = set()
@@ -96,6 +104,19 @@ class Mentions:
             size, candidates = match
             start, end = words[i][1], words[i + size - 1][2]
             entity, method = self._choose(text[start:end], sorted(candidates), chapter, text)
+            if entity is None and keep_ambiguous:
+                for candidate in sorted(candidates):
+                    if candidate not in seen:
+                        found.append(
+                            {
+                                "entity_id": candidate,
+                                "start": start,
+                                "end": end,
+                                "method": "ambiguous",
+                                "surface": text[start:end],
+                            }
+                        )
+                        seen.add(candidate)
             if entity and entity not in seen:
                 found.append(
                     {
@@ -250,6 +271,40 @@ class Mentions:
         for item in self.library.get("internal/published").json():
             total += self.index_version(item["version_id"], only_entities={entity_id})
         return total
+
+    def find_in_text(self, text: str, chapter: set[str]) -> list[dict[str, Any]]:
+        """Сущности в произвольном тексте (вопрос читателя): неоднозначные — все кандидаты."""
+        index, longest = self._index()
+        return self.scan(text, index, longest, chapter, keep_ambiguous=True)
+
+    def chapter_entities(self, target_ids: list[str]) -> set[str]:
+        """Сущности глав, к которым относятся абзацы: контекст для неоднозначных названий."""
+        with self.engine.begin() as conn:
+            chapters = set(
+                conn.scalars(
+                    select(t.mentions.c.chapter_id).where(t.mentions.c.target_id.in_(target_ids))
+                )
+            )
+            if not chapters:
+                return set()
+            return set(
+                conn.scalars(
+                    select(t.mentions.c.entity_id).where(t.mentions.c.chapter_id.in_(chapters))
+                )
+            )
+
+    def paragraphs_of(self, entity_ids: list[str], limit: int = 300) -> list[str]:
+        """Абзацы, где упомянуты сущности: им ассистент даёт приоритет в поиске."""
+        with self.engine.begin() as conn:
+            rows = conn.scalars(
+                select(t.mentions.c.target_id)
+                .where(
+                    t.mentions.c.entity_id.in_(entity_ids)
+                    & (t.mentions.c.target_kind == "paragraph")
+                )
+                .limit(limit)
+            )
+            return list(dict.fromkeys(rows))
 
     # --- чтение ---
 

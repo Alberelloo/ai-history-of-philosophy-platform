@@ -27,3 +27,4 @@ enforce:
   - entity-cards
   - knowledge-graph
   - source-scope
+  - ontology-retrieval

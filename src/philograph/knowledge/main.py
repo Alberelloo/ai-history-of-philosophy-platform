@@ -11,6 +11,7 @@ from sqlalchemy import text
 from philograph import __version__
 from philograph.knowledge import schema
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
+from philograph.knowledge.assist import AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
@@ -39,6 +40,7 @@ class Components:
     cards: Cards
     mentions: Mentions
     graphs: Graphs
+    assistant: AssistantKnowledge
 
 
 def components(env: dict[str, str]) -> Components:
@@ -85,7 +87,8 @@ def components(env: dict[str, str]) -> Components:
     )
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
-    return Components(statements, health, queue, review, auth, cards, mentions, graphs)
+    assistant = AssistantKnowledge(statements, mentions)
+    return Components(statements, health, queue, review, auth, cards, mentions, graphs, assistant)
 
 
 if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
@@ -103,4 +106,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         cards=_c.cards,
         mentions=_c.mentions,
         graphs=_c.graphs,
+        assistant=_c.assistant,
     )

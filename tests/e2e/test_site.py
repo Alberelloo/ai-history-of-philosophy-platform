@@ -371,6 +371,25 @@ def test_empty_graph_and_unsuitable_recipe(page, stack):
     page.wait_for_selector("h1:text('Полемика: Причинность')")
 
 
+@req("ontology-retrieval", "Сущности вопроса")
+@req("ontology-retrieval", "Утверждения в контексте")
+def test_assistant_answer_uses_ontology(page, stack):
+    open_textbook(page, stack)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    panel.get_by_label("Вопрос ассистенту").fill("что Кант взял у Юма?")
+    panel.get_by_role("button", name="Спросить").click()
+    panel.locator(".fragment").first.wait_for()
+    used = wait_logs(stack, "assistant", lambda e: e["event"] == "assistant.ontology.used")
+    assert {"Кант", "Юм"} <= set(used[-1]["entities"]) and used[-1]["statements"] >= 1
+    request_id = used[-1]["request_id"]
+    assert wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.assistant.context" and e.get("request_id") == request_id,
+    )
+
+
 @req("ontology-review", "Доступ")
 @req("ontology-review", "Очередь проверки")
 @req("ontology-review", "Решения")

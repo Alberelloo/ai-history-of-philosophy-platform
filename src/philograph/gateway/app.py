@@ -86,7 +86,10 @@ def build_app(
 
     @app.api_route("/api/knowledge/{path:path}", methods=["GET", "POST"])
     async def knowledge(path: str, request: Request) -> Response:
-        if "knowledge" not in upstreams or path.startswith(("v1/internal", "internal")):
+        if path.startswith(("v1/internal", "internal")):
+            events.emit("gateway.internal.blocked", path=f"/api/knowledge/{path}")
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+        if "knowledge" not in upstreams:
             return JSONResponse({"detail": "Not Found"}, status_code=404)
         return await proxy(request, "knowledge", path)
 

@@ -205,6 +205,7 @@ class Searcher:
                     "source_id": doc.source_id,
                     "chapter_id": doc.chapter_id,
                     "section_title": doc.section_title,
+                    "source_title": doc.source_title,
                     "text": doc.text,
                     "lang": doc.lang,
                     "quoting": doc.quoting,
