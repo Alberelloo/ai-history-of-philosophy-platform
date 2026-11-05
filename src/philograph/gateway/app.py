@@ -84,6 +84,12 @@ def build_app(
     async def assistant(path: str, request: Request) -> Response:
         return await proxy(request, "assistant", path)
 
+    @app.api_route("/api/knowledge/{path:path}", methods=["GET", "POST"])
+    async def knowledge(path: str, request: Request) -> Response:
+        if "knowledge" not in upstreams or path.startswith(("v1/internal", "internal")):
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+        return await proxy(request, "knowledge", path)
+
     @app.api_route("/api/{path:path}", methods=["GET", "POST"])
     async def library(path: str, request: Request) -> Response:
         if path.startswith(("v1/internal", "internal")):
@@ -104,10 +110,10 @@ def build_app(
 if os.environ.get("PHILOGRAPH_LIBRARY_URL") and os.environ.get("PHILOGRAPH_ASSISTANT_URL"):
     events.configure(sinks=[events.json_sink()])
     _root = os.environ.get("PHILOGRAPH_WEB_ROOT")
-    app = build_app(
-        {
-            "library": os.environ["PHILOGRAPH_LIBRARY_URL"],
-            "assistant": os.environ["PHILOGRAPH_ASSISTANT_URL"],
-        },
-        Path(_root) if _root else None,
-    )
+    _upstreams = {
+        "library": os.environ["PHILOGRAPH_LIBRARY_URL"],
+        "assistant": os.environ["PHILOGRAPH_ASSISTANT_URL"],
+    }
+    if os.environ.get("PHILOGRAPH_KNOWLEDGE_URL"):
+        _upstreams["knowledge"] = os.environ["PHILOGRAPH_KNOWLEDGE_URL"]
+    app = build_app(_upstreams, Path(_root) if _root else None)

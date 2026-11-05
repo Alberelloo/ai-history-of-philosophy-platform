@@ -93,6 +93,7 @@ services:
       PHILOGRAPH_KNOWLEDGE_SERVICE: "1"
       PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
       PHILOGRAPH_LIBRARY_URL: http://library:8001
+      PHILOGRAPH_LLM_URL: http://llm:8000
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8004/health/ready').status == 200 else 1)"]
       interval: 10s
@@ -118,6 +119,7 @@ services:
     environment:
       PHILOGRAPH_LIBRARY_URL: http://library:8001
       PHILOGRAPH_ASSISTANT_URL: http://assistant:8003
+      PHILOGRAPH_KNOWLEDGE_URL: http://knowledge:8004
       PHILOGRAPH_WEB_ROOT: /app/web/dist
     ports: ["8080:8080"]
     healthcheck:

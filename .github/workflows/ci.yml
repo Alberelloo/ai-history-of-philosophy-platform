@@ -125,6 +125,9 @@ jobs:
             echo "POSTGRES_PASSWORD=e2e-ci-password"
             echo "DEEPSEEK_API_KEY=not-used-in-demo"
             echo "PHILOGRAPH_VISITOR_SECRET=e2e-ci-secret"
+            # Пароль оператора демо-стенда: demo-operator. Кавычки — чтобы Compose
+            # не подставлял переменные вместо $.
+            echo "PHILOGRAPH_OPERATOR_PASSWORD_HASH='pbkdf2_sha256\$1000\$64656d6f2d73616c74\$907c04102bee49f460c2bee8e69686fd19c37d7fbc0fe866c4a0fb4a84fb029d'"
           } > .env
 
       # Вся система в контейнерах: PostgreSQL, Qdrant, сервисы, исполнитель, шлюз, демо-данные.

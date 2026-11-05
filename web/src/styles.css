@@ -361,3 +361,28 @@ blockquote.block {
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
+
+/* Проверка онтологии */
+.review {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.review-queue {
+  padding-left: 1.2rem;
+}
+
+.review-item {
+  margin: 0.4rem 0;
+}
+
+.review-context {
+  border-top: 1px solid var(--line);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+}
+
+.review-context mark {
+  background: var(--highlight);
+}
