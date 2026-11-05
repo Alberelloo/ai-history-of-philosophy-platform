@@ -272,6 +272,9 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         >
           Ассистент
         </button>
+        <button className="link" onClick={() => navigate("/settings")}>
+          Настройки
+        </button>
         <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
       </nav>
       {selection && (

@@ -214,6 +214,9 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
         <button className="link" onClick={() => navigate(textbook ? `/read/${textbook}` : "/")}>
           ← К чтению
         </button>
+        <button className="link" onClick={() => navigate("/settings")}>
+          Настройки
+        </button>
         <h1>{start ? `${state?.recipes.find((r) => r.code === recipe)?.title ?? "Граф"}: ${start.label}` : "Граф"}</h1>
       </header>
       <div className="graph-controls">

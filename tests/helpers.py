@@ -24,3 +24,22 @@ def asgi_transport(app: FastAPI) -> httpx.BaseTransport:
             )
 
     return Transport()
+
+
+# Версия уведомления при первом входе (web/src/Notice.tsx). Браузерные сценарии, кроме самих
+# сценариев уведомления, идут от читателя, который его уже закрыл.
+NOTICE_VERSION = "2026-11"
+STORAGE_KEY = "philograph:v2"
+_ACCEPTED = f"""
+if (!localStorage.getItem("{STORAGE_KEY}")) {{
+  localStorage.setItem("{STORAGE_KEY}", JSON.stringify({{version: 2, notice: "{NOTICE_VERSION}"}}));
+}}
+"""
+
+
+def reader_context(browser, *, accepted: bool = True, **options):
+    """Контекст браузера читателя; ``accepted`` — уведомление при первом входе уже закрыто."""
+    context = browser.new_context(**options)
+    if accepted:
+        context.add_init_script(_ACCEPTED)
+    return context

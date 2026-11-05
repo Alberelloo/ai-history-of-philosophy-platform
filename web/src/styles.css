@@ -523,3 +523,67 @@ blockquote.block {
   color: #a33a1d;
   margin-right: 0.2rem;
 }
+
+/* Уведомление при первом входе и настройки */
+.first-run {
+  position: fixed;
+  left: 1.5rem; /* справа открывается панель ассистента */
+  bottom: 1.5rem;
+  z-index: 40;
+  width: min(30rem, calc(100vw - 3rem));
+  max-height: 80vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
+  padding: 1rem 1.2rem;
+  font-size: 0.95rem;
+}
+
+.first-run.attention {
+  outline: 3px solid var(--accent);
+}
+
+.first-run h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.generation-settings label,
+.settings label {
+  display: block;
+  margin: 0.3rem 0;
+}
+
+.notice-example {
+  padding: 0 0.3rem;
+}
+
+.settings {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.settings section {
+  margin: 1.4rem 0;
+}
+
+.settings .muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.confirm {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+}
+
+.storage-warning {
+  margin: 0;
+  padding: 0.4rem 1rem;
+  background: var(--highlight);
+  font-size: 0.9rem;
+}

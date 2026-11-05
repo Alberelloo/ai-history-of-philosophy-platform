@@ -23,6 +23,7 @@ from philograph.operator.access import migrations as operator_migrations
 from philograph.platform.db import make_engine
 from philograph.platform.files import FileStore
 
+from ..helpers import reader_context
 from ..library.builders import epub
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -163,7 +164,7 @@ def site(tmp_path_factory) -> Site:
 
 @pytest.fixture
 def page(browser, site):
-    context = browser.new_context(permissions=["clipboard-read", "clipboard-write"])
+    context = reader_context(browser, permissions=["clipboard-read", "clipboard-write"])
     page = context.new_page()
     page.set_default_timeout(5000)
     yield page

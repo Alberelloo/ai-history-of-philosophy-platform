@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+from ..helpers import reader_context
+
 req = pytest.mark.req
 SL = "source-library"
 CR = "chapter-reading"
@@ -139,7 +141,7 @@ def test_default_textbook_on_first_visit(page, site):
 
 @req(SL, "Запоминание выбранного источника")
 def test_remembered_source_and_fallback(browser, site):
-    context = browser.new_context()
+    context = reader_context(browser)
     page = context.new_page()
     open_library(page, site)
     page.locator(".source", has_text="Critique").get_by_role("button", name="Читать").click()
@@ -156,7 +158,7 @@ def test_remembered_source_and_fallback(browser, site):
         assert f"/read/{site.ids['textbook']}" in page.url
     finally:
         site.registry.republish("operator", site.ids["primary"])
-    other = browser.new_context().new_page()  # другой браузер — своё хранилище
+    other = reader_context(browser).new_page()  # другой браузер — своё хранилище
     other.goto(site.url + "/read")
     other.wait_for_selector(".chapter p")
     assert f"/read/{site.ids['textbook']}" in other.url
@@ -210,7 +212,7 @@ def test_previous_and_next(page, site):
 
 @req(CR, "Запоминание места чтения")
 def test_reading_position_per_source(browser, site):
-    context = browser.new_context()
+    context = reader_context(browser)
     page = context.new_page()
     open_textbook(page, site)
     page.get_by_role("link", name="Глава 2. Рассудок").click()
@@ -220,7 +222,7 @@ def test_reading_position_per_source(browser, site):
     page.mouse.wheel(0, 1)
     page.wait_for_timeout(400)
     saved = page.evaluate(
-        f"JSON.parse(localStorage['philograph:v1']).positions['{site.ids['textbook']}']"
+        f"JSON.parse(localStorage['philograph:v2']).positions['{site.ids['textbook']}']"
     )
     page.goto(f"{site.url}/read/{site.ids['primary']}")
     page.wait_for_selector(".chapter p")
@@ -231,7 +233,7 @@ def test_reading_position_per_source(browser, site):
     assert first_visible == saved["paragraphId"]
     chapter_start = page.locator("p.block").first.get_attribute("data-paragraph")
     assert saved["paragraphId"] != chapter_start  # место в середине главы, а не её начало
-    fresh = browser.new_context().new_page()
+    fresh = reader_context(browser).new_page()
     fresh.goto(f"{site.url}/read/{site.ids['reference']}")
     fresh.wait_for_selector(".chapter p")
     assert fresh.evaluate("window.scrollY") == 0  # первое открытие — с начала
@@ -251,7 +253,7 @@ def test_paragraph_link_opens_and_highlights(page, site, events):
     page.wait_for_selector(f"#p-{primary_pid}")
     assert site.ids["primary"] in page.url
     assert (
-        page.evaluate("JSON.parse(localStorage['philograph:v1']).currentSource")
+        page.evaluate("JSON.parse(localStorage['philograph:v2']).currentSource")
         == (site.ids["primary"])
     )
 

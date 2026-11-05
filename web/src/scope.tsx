@@ -1,48 +1,17 @@
-import { useEffect, useState } from "react";
+import { storage, useStored, type Settings } from "./storage";
 
-// Переключатель источников «только выбранный учебник / все источники» и достройка моделью.
-// Значение общее для графа, карточек и ассистента: изменение в одном месте видно в остальных,
-// в том числе в других вкладках. Без хранилища (приватный режим) живёт до закрытия вкладки.
+// Переключатель источников «только выбранный учебник / все источники» и настройки генерации.
+// Значение общее для графа, карточек, ассистента и экрана настроек: изменение в одном месте
+// видно в остальных, в том числе в других вкладках.
 
-const KEY = "philograph:scope:v1";
-const EVENT = "philograph:scope";
+export type Scope = Settings;
 
-export type Scope = { onlyTextbook: boolean; generation: boolean };
-
-const defaults: Scope = { onlyTextbook: false, generation: true };
-let memory: Scope = defaults;
-
-function read(): Scope {
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    return raw ? { ...defaults, ...(JSON.parse(raw) as Partial<Scope>) } : memory;
-  } catch {
-    return memory;
-  }
+export function setScope(change: Partial<Settings>): void {
+  storage.setSettings(change);
 }
 
-export function setScope(change: Partial<Scope>): void {
-  memory = { ...read(), ...change };
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(memory));
-  } catch {
-    // хранилище недоступно: значение остаётся в памяти вкладки
-  }
-  window.dispatchEvent(new Event(EVENT));
-}
-
-export function useScope(): Scope {
-  const [scope, set] = useState<Scope>(read);
-  useEffect(() => {
-    const update = () => set(read());
-    window.addEventListener(EVENT, update);
-    window.addEventListener("storage", update);
-    return () => {
-      window.removeEventListener(EVENT, update);
-      window.removeEventListener("storage", update);
-    };
-  }, []);
-  return scope;
+export function useScope(): Settings {
+  return useStored((s) => s.settings);
 }
 
 export function ScopeToggle({ textbook }: { textbook?: string }) {

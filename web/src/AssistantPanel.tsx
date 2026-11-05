@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "./App";
+import { requestNotice, useNoticeAccepted } from "./Notice";
 import { ScopeToggle, useScope } from "./scope";
+import { storage } from "./storage";
 
 // Панель ассистента рядом с текстом. Ответ приходит потоком событий NDJSON; каждый фрагмент
 // уже проверен сервером: со ссылками на абзацы или с пометкой «без опоры на источники».
@@ -25,26 +27,13 @@ type Turn = {
   suggestion?: Suggestion;
 };
 
-const DIALOG_KEY = "philograph:dialog:v1";
 const MAX_SELECTION = 4000;
 const MAX_QUESTION = 2000;
 const UNGROUNDED_MARK = "[без опоры на источники]";
 
+// Диалоги хранятся в общем хранилище браузера; самые старые удаляются при пределе объёма.
 function loadDialog(): Turn[] {
-  try {
-    const raw = window.localStorage.getItem(DIALOG_KEY);
-    return raw ? (JSON.parse(raw) as Turn[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveDialog(turns: Turn[]) {
-  try {
-    window.localStorage.setItem(DIALOG_KEY, JSON.stringify(turns.slice(-20)));
-  } catch {
-    // без хранилища диалог живёт до закрытия вкладки
-  }
+  return storage.dialog().filter((t): t is Turn => typeof (t as Turn)?.question === "string");
 }
 
 export function answerText(turn: Turn): string {
@@ -61,6 +50,7 @@ type Props = {
 
 export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, settings }: Props) {
   const [turns, setTurns] = useState<Turn[]>(loadDialog);
+  const accepted = useNoticeAccepted();
   const [question, setQuestion] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
@@ -72,13 +62,19 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     current.current = selection ?? undefined;
     paragraphs.current = selectionParagraphs;
   }, [selection, selectionParagraphs]);
-  useEffect(() => saveDialog(turns), [turns]);
+  useEffect(() => storage.saveDialog(turns), [turns]);
 
   const update = (index: number, change: (t: Turn) => Turn) =>
     setTurns((all) => all.map((t, i) => (i === index ? change(t) : t)));
 
   async function send(text: string, selected?: string) {
     setProblem(null);
+    if (!accepted) {
+      // Сначала читатель видит, что вопросы обрабатывает внешний провайдер.
+      setProblem("Прочитайте уведомление о том, как обрабатываются вопросы, и закройте его.");
+      requestNotice();
+      return;
+    }
     if ((selected ?? "").length > MAX_SELECTION || text.length > MAX_QUESTION) {
       setProblem("Слишком длинный фрагмент или вопрос: выделите меньше.");
       return;
@@ -102,7 +98,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           selection_paragraphs: selected ? paragraphs.current : [],
           source_id: sourceId,
           history,
-          sources_only: settings?.sourcesOnly ?? false,
+          sources_only: settings?.sourcesOnly ?? scope.sourcesOnly,
           generation: settings?.generation ?? scope.generation,
           // Общий переключатель источников: «только выбранный учебник» — поиск только в нём.
           scope: settings?.scope ?? (scope.onlyTextbook ? "current" : "all"),
@@ -151,7 +147,13 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     <aside className="assistant" aria-label="Ассистент">
       <header>
         <h2>Ассистент</h2>
-        <button className="link" onClick={() => setTurns([])}>
+        <button
+          className="link"
+          onClick={() => {
+            storage.newDialog();
+            setTurns([]);
+          }}
+        >
           Новый диалог
         </button>
         <button className="link" aria-label="Закрыть ассистента" onClick={onClose}>
