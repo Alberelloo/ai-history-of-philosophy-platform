@@ -1,6 +1,6 @@
 # Эксплуатация публичного сервера
 
-Что делать оператору: первый запуск, обновление, откат, резервные копии, восстановление, оповещения. Устройство описано в [design.md](../../openspec/changes/add-production-readiness/design.md) изменения `add-production-readiness`.
+Что делать оператору: первый запуск, обновление, откат, резервные копии, восстановление, оповещения. Устройство описано в [design.md](../../openspec/changes/archive/2026-11-05-add-production-readiness/design.md) изменения `add-production-readiness`.
 
 ## Первый запуск
 
