@@ -31,3 +31,8 @@ export function pick(map: object, key: string | null | undefined): string | unde
 }
 
 export type { Catalog };
+
+// Сообщение об ошибке сервера: по коду из каталога, иначе текст сервера, иначе общее.
+export function errorText(t: Catalog, kind: string | null | undefined, fallback?: string | null): string {
+  return pick(t.errors, kind) ?? (fallback || t.errors.generic);
+}

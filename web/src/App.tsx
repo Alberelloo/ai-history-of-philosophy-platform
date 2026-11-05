@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { GraphPage } from "./GraphPage";
+import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
 import { FirstRunNotice } from "./Notice";
-import { ReaderPage } from "./ReaderPage";
 import { ParagraphLink } from "./ParagraphLink";
+import { ReaderPage } from "./ReaderPage";
 import { ReviewPage } from "./ReviewPage";
 import { SettingsPage } from "./SettingsPage";
 import { storage } from "./storage";
+import { useDocumentAppearance } from "./theme";
+import { TopBar } from "./TopBar";
+import { Icon } from "./ui";
 
 // Адреса: /                   — библиотека
 //         /read/:source[/:chapter][#p-<абзац> | #s-<раздел>] — чтение
@@ -33,25 +37,33 @@ function useLocation(): string {
   return location;
 }
 
+type Section = "library" | "reading" | "settings" | "other";
+
 export function App() {
+  const t = useT();
+  useDocumentAppearance();
+  const location = useLocation();
+  const [beforeHash, hash = ""] = location.split("#");
+  const [path, search = ""] = beforeHash.split("?");
+  const parts = path.split("/").filter(Boolean);
+  const section: Section =
+    parts[0] === "settings" ? "settings" : parts[0] === "read" ? "reading" : parts.length === 0 ? "library" : "other";
   return (
     <>
+      <TopBar section={section} />
       {!storage.persistent() && (
-        <p className="storage-warning" role="status">
-          Хранилище браузера недоступно: настройки и места чтения не сохранятся после закрытия вкладки.
-        </p>
+        <div className="pg-notice pg-notice--warning storage-warning" role="status">
+          <Icon name="info" />
+          <div>{t.app.storageUnavailable}</div>
+        </div>
       )}
-      <Page />
+      <Page parts={parts} search={search} hash={hash} />
       <FirstRunNotice />
     </>
   );
 }
 
-function Page() {
-  const location = useLocation();
-  const [beforeHash, hash = ""] = location.split("#");
-  const [path, search = ""] = beforeHash.split("?");
-  const parts = path.split("/").filter(Boolean);
+function Page({ parts, search, hash }: { parts: string[]; search: string; hash: string }) {
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
   if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;
   if (parts[0] === "settings") return <SettingsPage />;

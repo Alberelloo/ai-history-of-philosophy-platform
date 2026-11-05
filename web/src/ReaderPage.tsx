@@ -4,7 +4,9 @@ import { navigate } from "./App";
 import { AssistantPanel } from "./AssistantPanel";
 import { CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
+import { errorText, useT, type Catalog } from "./i18n";
 import { storage } from "./storage";
+import { Icon } from "./ui";
 
 type Props = { sourceId?: string; chapterId?: string; anchor: string };
 
@@ -13,9 +15,10 @@ function replace(path: string) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-// Текст блока с отметками страниц и знаками сносок на своих местах.
 type Mention = { target_id: string; entity_id: string; start: number; end: number };
 type OpenMention = (entityId: string, x: number, y: number) => void;
+// Что показать вместо главы: код ошибки сервера (переводится) и запасной текст.
+type Problem = { kind: string; text?: string };
 
 // Текст с отметками страниц, знаками сносок и упоминаниями сущностей на своих местах.
 function renderText(
@@ -48,7 +51,7 @@ function renderText(
         <button
           key={`m${a}`}
           type="button"
-          className="mention"
+          className="mention pg-mention"
           data-entity={mention.entity_id}
           onClick={(e) => open(mention.entity_id, e.pageX, e.pageY + 12)}
         >
@@ -62,14 +65,14 @@ function renderText(
   return parts;
 }
 
-function blockPoints(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter) {
+function blockPoints(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter, t: Catalog) {
   return [
     ...block.pages.map(([at, label]) => ({
       at,
       skip: 0,
       node: (key: string) => (
         <span key={key} className="page-mark" data-page={label}>
-          с. {label}
+          {t.reader.page(label)}
         </span>
       ),
     })),
@@ -116,10 +119,11 @@ function Toc({ items, sourceId, current }: { items: TocItem[]; sourceId: string;
 }
 
 export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
+  const t = useT();
   const [toc, setToc] = useState<TocItem[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
+  const [previousUnavailable, setPreviousUnavailable] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [selection, setSelection] = useState<{ text: string; paragraphs: string[]; top: number } | null>(
@@ -157,11 +161,9 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
     if (sourceId) return;
     const remembered = storage.currentSource();
     api.current(remembered).then((result) => {
-      if (result.notice === "previous_unavailable") {
-        setNotice("Прежний источник недоступен, открыт учебник по умолчанию.");
-      }
+      if (result.notice === "previous_unavailable") setPreviousUnavailable(true);
       if (!result.source_id) {
-        setProblem("В библиотеке пока нет учебника по умолчанию.");
+        setProblem({ kind: "no_default" });
         return;
       }
       storage.setCurrentSource(result.source_id);
@@ -184,7 +186,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         if (saved) replace(`/read/${sourceId}/${saved.chapterId}${saved.paragraphId ? `#p-${saved.paragraphId}` : ""}`);
         else if (first) replace(`/read/${sourceId}/${first}`);
       })
-      .catch((e: ApiError) => setProblem(e.kind === "source_unavailable" ? "Источник недоступен." : e.message));
+      .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
   }, [sourceId, chapterId]);
 
   useEffect(() => {
@@ -192,7 +194,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
     api
       .chapter(sourceId, chapterId)
       .then(setChapter)
-      .catch((e: ApiError) => setProblem(e.message));
+      .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
   }, [sourceId, chapterId]);
 
   // Упоминания сущностей главы. Без онтологии глава показывается без них.
@@ -246,40 +248,41 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
 
   if (problem) {
     return (
-      <main className="reader-problem" role="alert">
-        <p>{problem}</p>
-        <button className="link" onClick={() => navigate("/")}>
-          Перейти в библиотеку
-        </button>
+      <main className="page page--narrow reader-problem">
+        <div className="pg-notice pg-notice--danger" role="alert">
+          <Icon name="warning" />
+          <div>{problem.kind === "no_default" ? t.reader.noDefault : errorText(t, problem.kind, problem.text)}</div>
+        </div>
+        <div className="actions">
+          <button className="pg-btn pg-btn--secondary" onClick={() => navigate("/")}>
+            {t.app.goLibrary}
+          </button>
+        </div>
       </main>
     );
   }
-  if (!sourceId || !chapter) return <main className="loading">Загрузка…</main>;
+  if (!sourceId || !chapter) return <main className="page loading">{t.app.loading}</main>;
 
   const go = (id: string) => navigate(`/read/${sourceId}/${id}`);
   return (
     <div className="reader">
-      <nav className="toc" aria-label="Оглавление">
-        <button className="link" onClick={() => navigate("/")}>
-          ← Библиотека
-        </button>
+      <nav className="toc" aria-label={t.reader.toc}>
         <button
-          className="link"
+          className="pg-btn pg-btn--secondary toc__assistant"
           onClick={() => {
             setAsked(null);
             setAssistantOpen(true);
           }}
         >
-          Ассистент
+          <Icon name="chat" />
+          {t.reader.assistant}
         </button>
-        <button className="link" onClick={() => navigate("/settings")}>
-          Настройки
-        </button>
+        <p className="toc__title">{t.reader.toc}</p>
         <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
       </nav>
       {selection && (
         <button
-          className="ask-selection primary"
+          className="ask-selection pg-btn pg-btn--primary pg-btn--sm"
           style={{ top: selection.top + 8 }}
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
@@ -288,7 +291,8 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
             setSelection(null);
           }}
         >
-          Спросить ассистента
+          <Icon name="chat" small />
+          {t.reader.askSelection}
         </button>
       )}
       {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
@@ -300,8 +304,13 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           onClose={() => setAssistantOpen(false)}
         />
       )}
-      <article className="chapter" ref={textRef}>
-        {notice && <p className="notice" role="status">{notice}</p>}
+      <article className="chapter pg-reading" ref={textRef}>
+        {previousUnavailable && (
+          <div className="pg-notice notice" role="status">
+            <Icon name="info" />
+            <div>{t.reader.previousUnavailable}</div>
+          </div>
+        )}
         <h1>{chapter.title}</h1>
         {chapter.blocks.map((block) => {
           if (block.type === "heading") {
@@ -315,7 +324,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           if (block.kind === "unrendered") {
             return (
               <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered">
-                <span>Непереданный элемент: {block.detail}</span>
+                <span>{t.reader.unrendered(block.detail)}</span>
                 {block.text && <figcaption>{block.text}</figcaption>}
               </figure>
             );
@@ -329,21 +338,22 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
               lang={block.lang}
               className={`block ${block.kind}`}
             >
-              {renderText(block.text, blockPoints(block, chapter), mentions[block.id] ?? [], openCard)}
+              {renderText(block.text, blockPoints(block, chapter, t), mentions[block.id] ?? [], openCard)}
               <button
                 type="button"
-                className="copy-link"
-                aria-label="Скопировать ссылку на абзац"
+                className="copy-link pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+                aria-label={t.reader.copyLink}
+                title={copied === block.id ? t.reader.copied : t.reader.copyLink}
                 onClick={() => copyLink(block.id, () => setCopied(block.id))}
               >
-                {copied === block.id ? "Скопировано" : "¶"}
+                <Icon name={copied === block.id ? "check" : "link"} small />
               </button>
             </Tag>
           );
         })}
         {chapter.unlinked_notes.length > 0 && (
-          <section className="unlinked-notes" aria-label="Примечания без знака в тексте">
-            <h2>Примечания</h2>
+          <section className="unlinked-notes" aria-label={t.reader.unlinkedNotes}>
+            <h2>{t.reader.notes}</h2>
             <ol>
               {chapter.unlinked_notes.map((note, i) => (
                 <li key={i}>{note.text}</li>
@@ -351,15 +361,17 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
             </ol>
           </section>
         )}
-        <nav className="chapter-nav" aria-label="Главы">
+        <nav className="chapter-nav" aria-label={t.reader.chapters}>
           {chapter.previous && (
-            <button onClick={() => go(chapter.previous!)} rel="prev">
-              ← Предыдущая глава
+            <button className="pg-btn pg-btn--secondary" onClick={() => go(chapter.previous!)} rel="prev">
+              <Icon name="arrowLeft" />
+              {t.reader.previous}
             </button>
           )}
           {chapter.next && (
-            <button onClick={() => go(chapter.next!)} rel="next">
-              Следующая глава →
+            <button className="pg-btn pg-btn--secondary chapter-nav__next" onClick={() => go(chapter.next!)} rel="next">
+              {t.reader.next}
+              <Icon name="arrowRight" />
             </button>
           )}
         </nav>

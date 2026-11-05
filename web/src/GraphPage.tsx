@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigate } from "./App";
 import { CardPopup } from "./CardPopup";
+import { errorText, pick, useT } from "./i18n";
 import { ScopeToggle, setScope, useScope } from "./scope";
 import { storage } from "./storage";
+import { familyOf, Generated, Icon, StatusMark, Switch } from "./ui";
 
 // Граф по запросу: сохранённые связи приходят сразу, достроенные моделью — по мере появления.
-// Пометка достроенного задаётся атрибутами SVG, а не стилями страницы, поэтому сохраняется
-// в выгруженном изображении.
+// Пометка достроенного (пунктир, ромб) задаётся атрибутами SVG; цвета берутся из токенов
+// через классы, а при выгрузке изображения подставляются вычисленными значениями.
 
 type GNode = { id: string; label: string; type: string; depth: number; year: number | null; dates: string | null };
 type GEdge = {
@@ -39,11 +41,6 @@ type State = {
 };
 
 const API = "/api/knowledge/v1";
-const STATUS = { verified: "проверено", sourced: "по источникам", generated: "сгенерировано", rejected: "отклонено" };
-const STANCE: Record<string, string> = { asserts: "утверждает", disputes: "оспаривает", mentions: "упоминает" };
-const COLORS: Record<string, string> = { person: "#7a3e1d", concept: "#2f5d8a", doctrine: "#4f7a3a", work: "#8a6d2f" };
-const STROKE: Record<string, string> = { verified: "#1d1b18", sourced: "#6b655c", generated: "#b07d2c" };
-
 async function* lines(response: Response): AsyncGenerator<Record<string, unknown>> {
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
@@ -76,20 +73,51 @@ function layout(nodes: GNode[], order: string | null): Record<string, { x: numbe
   return result;
 }
 
+// Форма узла по семье сущности: люди — круг, понятия — квадрат, учения — ромб,
+// произведения — прямоугольник, история — кольцо. Цвет — токен семьи (классы graph-family-*).
 function Shape({ node, x, y }: { node: GNode; x: number; y: number }) {
-  const fill = COLORS[node.type] ?? "#666";
-  if (node.type === "person") return <circle cx={x} cy={y} r={20} fill={fill} />;
-  if (node.type === "concept") return <rect x={x - 20} y={y - 16} width={40} height={32} rx={6} fill={fill} />;
-  return <polygon points={`${x},${y - 22} ${x + 22},${y} ${x},${y + 22} ${x - 22},${y}`} fill={fill} />;
+  const family = familyOf(node.type) ?? "ideas";
+  const className = `graph-shape graph-family-${family}`;
+  if (family === "people") return <circle className={className} cx={x} cy={y} r={20} />;
+  if (family === "ideas") return <rect className={className} x={x - 18} y={y - 18} width={36} height={36} rx={6} />;
+  if (family === "texts") return <rect className={className} x={x - 14} y={y - 20} width={28} height={40} rx={4} />;
+  if (family === "history")
+    return <circle className={`${className} graph-shape--ring`} cx={x} cy={y} r={17} strokeWidth={6} />;
+  return <polygon className={className} points={`${x},${y - 22} ${x + 22},${y} ${x},${y + 22} ${x - 22},${y}`} />;
 }
 
+// Копия SVG для выгрузки: цвета из CSS-переменных подставляются значениями, чтобы файл
+// выглядел так же вне сайта.
+function standalone(svg: SVGSVGElement): string {
+  const copy = svg.cloneNode(true) as SVGSVGElement;
+  const source = svg.querySelectorAll<SVGElement>("*");
+  const target = copy.querySelectorAll<SVGElement>("*");
+  source.forEach((el, i) => {
+    const style = window.getComputedStyle(el);
+    const out = target[i];
+    ["fill", "stroke", "color", "font-family", "font-size", "font-weight"].forEach((prop) => {
+      const value = style.getPropertyValue(prop);
+      if (value) out.style.setProperty(prop, value);
+    });
+  });
+  copy.removeAttribute("class");
+  return new XMLSerializer().serializeToString(copy);
+}
+
+const STROKE_CLASS: Record<string, string> = {
+  verified: "graph-stroke-verified",
+  sourced: "graph-stroke-sourced",
+  generated: "graph-stroke-generated",
+};
+
 export function GraphPage({ entityId, query }: { entityId: string; query: URLSearchParams }) {
+  const t = useT();
   const scope = useScope();
   const textbook = storage.currentSource();
   const [recipe, setRecipe] = useState(query.get("recipe") ?? "genesis");
   const [depth, setDepth] = useState<number | null>(query.get("depth") ? Number(query.get("depth")) : null);
   const [state, setState] = useState<State | null>(null);
-  const [problem, setProblem] = useState<{ message: string; suggestions: Recipe[] } | null>(null);
+  const [problem, setProblem] = useState<{ kind?: string; message?: string; suggestions: Recipe[] } | null>(null);
   const [selected, setSelected] = useState<{ edge?: string; node?: string }>({});
   const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
   const [notInTextbook, setNotInTextbook] = useState(false);
@@ -111,7 +139,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
     });
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      setProblem({ message: body.error ?? "Не удалось построить граф", suggestions: body.suggestions ?? [] });
+      setProblem({ kind: body.kind ?? "failed", message: body.error, suggestions: body.suggestions ?? [] });
       return;
     }
     for await (const event of lines(response)) {
@@ -158,7 +186,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
     setProblem(null);
     setSelected({});
     window.history.replaceState(null, "", `/graph/${entityId}?recipe=${recipe}${depth ? `&depth=${depth}` : ""}`);
-    load(entityId, depth, false).catch(() => setProblem({ message: "Сервис знаний недоступен", suggestions: [] }));
+    load(entityId, depth, false).catch(() => setProblem({ kind: "service_down", suggestions: [] }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityId, recipe, depth, onlyTextbook, scope.generation]);
 
@@ -189,7 +217,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
         e,
         d: `M${a.x},${a.y} Q${c.x},${c.y} ${b.x},${b.y}`,
         mid: { x: (a.x + 2 * c.x + b.x) / 4, y: (a.y + 2 * c.y + b.y) / 4 },
-        stroke: STROKE[e.status] ?? "#6b655c",
+        stroke: STROKE_CLASS[e.status] ?? "graph-stroke-sourced",
         name: `${label(e.subject)} — ${e.title} — ${label(e.object)}`,
       },
     ];
@@ -197,259 +225,300 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
   const edge = state?.edges.find((e) => e.id === selected.edge);
   const node = selected.node ? state?.nodes[selected.node] : undefined;
   const start = state?.nodes[entityId];
+  const recipeTitle = state?.recipes.find((r) => r.code === recipe)?.title ?? t.graph.title;
+  const notice = state?.notice ? (pick(t.graph.notices, state.extension) ?? state.notice) : null;
 
   function download() {
     if (!svg.current) return;
-    const text = new XMLSerializer().serializeToString(svg.current);
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob([text], { type: "image/svg+xml" }));
+    link.href = URL.createObjectURL(new Blob([standalone(svg.current)], { type: "image/svg+xml" }));
     link.download = `graph-${recipe}.svg`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
 
   return (
-    <div className="graph-page">
-      <header className="graph-header">
-        <button className="link" onClick={() => navigate(textbook ? `/read/${textbook}` : "/")}>
-          ← К чтению
-        </button>
-        <button className="link" onClick={() => navigate("/settings")}>
-          Настройки
-        </button>
-        <h1>{start ? `${state?.recipes.find((r) => r.code === recipe)?.title ?? "Граф"}: ${start.label}` : "Граф"}</h1>
+    <main className="page graph-page">
+      <header className="page-header graph-header">
+        <h1 className="page-title">{start ? t.graph.heading(recipeTitle, start.label) : t.graph.title}</h1>
       </header>
       <div className="graph-controls">
-        <label>
-          Рецепт{" "}
-          <select aria-label="Рецепт" value={recipe} onChange={(e) => (setDepth(null), setRecipe(e.target.value))}>
-            {(state?.recipes ?? [{ code: recipe, title: recipe, depth: 1 }]).map((r) => (
-              <option key={r.code} value={r.code}>
-                {r.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="pg-field graph-recipe">
+          <label className="pg-field__label" htmlFor="graph-recipe">
+            {t.graph.recipe}
+          </label>
+          <div className="pg-field__control select">
+            <select
+              id="graph-recipe"
+              className="pg-input"
+              value={recipe}
+              onChange={(e) => (setDepth(null), setRecipe(e.target.value))}
+            >
+              {(state?.recipes ?? [{ code: recipe, title: recipe, depth: 1 }]).map((r) => (
+                <option key={r.code} value={r.code}>
+                  {r.title}
+                </option>
+              ))}
+            </select>
+            <Icon name="chevronDown" small className="select__chevron" />
+          </div>
+        </div>
         {state && (
-          <span className="graph-depth">
-            Глубина {state.depth} из {state.maxDepth}{" "}
-            <button disabled={state.depth <= 1} onClick={() => setDepth(state.depth - 1)}>
-              Мельче
-            </button>{" "}
-            <button disabled={state.depth >= state.maxDepth} onClick={() => setDepth(state.depth + 1)}>
-              Глубже
+          <div className="graph-depth">
+            <span className="graph-depth__label">{t.graph.depth(state.depth, state.maxDepth)}</span>
+            <button
+              className="pg-btn pg-btn--secondary pg-btn--sm"
+              disabled={state.depth <= 1}
+              onClick={() => setDepth(state.depth - 1)}
+            >
+              <Icon name="minus" small />
+              {t.graph.shallower}
             </button>
-          </span>
+            <button
+              className="pg-btn pg-btn--secondary pg-btn--sm"
+              disabled={state.depth >= state.maxDepth}
+              onClick={() => setDepth(state.depth + 1)}
+            >
+              <Icon name="plus" small />
+              {t.graph.deeper}
+            </button>
+          </div>
         )}
-        <ScopeToggle textbook={textbook} />
-        <label>
-          <input type="checkbox" checked={scope.generation} onChange={(e) => setScope({ generation: e.target.checked })} />
-          Достраивать моделью
-        </label>
-        <label>
-          <input
-            type="checkbox"
+        <div className="graph-switches">
+          <ScopeToggle textbook={textbook} />
+          <Switch label={t.graph.extend} checked={scope.generation} onChange={(value) => setScope({ generation: value })} />
+          <Switch
+            label={t.scope.notInTextbook}
             checked={notInTextbook}
             disabled={!textbook || onlyTextbook}
-            onChange={(e) => setNotInTextbook(e.target.checked)}
+            onChange={setNotInTextbook}
           />
-          Нет в моём учебнике
-        </label>
-        <button onClick={download} disabled={!state}>
-          Сохранить изображение
+        </div>
+        <button className="pg-btn pg-btn--ghost pg-btn--sm graph-download" onClick={download} disabled={!state}>
+          <Icon name="download" small />
+          {t.graph.download}
         </button>
       </div>
       {problem && (
-        <div className="graph-problem" role="alert">
-          {problem.message}
-          {problem.suggestions.map((r) => (
-            <button key={r.code} className="link" onClick={() => setRecipe(r.code)}>
-              {r.title}
-            </button>
-          ))}
+        <div className="graph-problem pg-notice pg-notice--danger" role="alert">
+          <Icon name="warning" />
+          <div>
+            {problem.kind === "service_down"
+              ? t.graph.serviceDown
+              : problem.kind === "failed"
+                ? t.graph.failed
+                : errorText(t, problem.kind, problem.message)}
+            {problem.suggestions.length > 0 && (
+              <div className="actions">
+                {problem.suggestions.map((r) => (
+                  <button key={r.code} className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setRecipe(r.code)}>
+                    {r.title}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
-      {state?.notice && (
-        <p className="notice" role="status">
-          {state.notice}
-          {state.extension === "scope" && (
-            <button className="link" onClick={() => setScope({ onlyTextbook: false })}>
-              Показать все источники
+      {notice && (
+        <div className="notice pg-notice" role="status">
+          <Icon name="info" />
+          <div>{notice}</div>
+          {state?.extension === "scope" && (
+            <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setScope({ onlyTextbook: false })}>
+              {t.graph.showAll}
             </button>
           )}
-        </p>
+        </div>
       )}
-      {state?.truncated && <p className="notice">Показана часть графа: раскройте узел, чтобы увидеть его связи.</p>}
-      {state && state.extension === "pending" && !state.done && <p className="loading">Достраиваю недостающие связи…</p>}
+      {state?.truncated && (
+        <div className="notice pg-notice">
+          <Icon name="info" />
+          <div>{t.graph.truncated}</div>
+        </div>
+      )}
+      {state && state.extension === "pending" && !state.done && <p className="loading muted">{t.graph.extending}</p>}
       {state?.done && visible.edges.length === 0 && (
         <div className="graph-empty">
-          <p>Связей пока нет.</p>
-          {state.extension === "disabled" && (
-            <button className="link" onClick={() => setScope({ generation: true })}>
-              Включить достройку моделью
-            </button>
-          )}
-          {state.recipes
-            .filter((r) => r.code !== recipe)
-            .map((r) => (
-              <button key={r.code} className="link" onClick={() => setRecipe(r.code)}>
-                Попробовать: {r.title}
+          <p>{t.graph.empty}</p>
+          <div className="actions">
+            {state.extension === "disabled" && (
+              <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setScope({ generation: true })}>
+                {t.graph.enableExtension}
               </button>
-            ))}
+            )}
+            {state.recipes
+              .filter((r) => r.code !== recipe)
+              .map((r) => (
+                <button key={r.code} className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setRecipe(r.code)}>
+                  {t.graph.tryRecipe(r.title)}
+                </button>
+              ))}
+          </div>
         </div>
       )}
-      {state && visible.edges.length > 0 && (
-        <svg
-          ref={svg}
-          xmlns="http://www.w3.org/2000/svg"
-          className="graph"
-          width={width}
-          height={height + 30}
-          viewBox={`0 0 ${width} ${height + 30}`}
-          role="img"
-          aria-label="Граф связей"
-        >
-          <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="30" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="#6b655c" />
-            </marker>
-          </defs>
-          <rect width="100%" height="100%" fill="#fbf9f4" />
-          {/* Линии — только рисунок; нажимаются ручки в верхнем слое. */}
-          {curves.map(({ e, d, stroke }) => (
-            <path
-              key={e.id}
-              className="graph-line"
-              data-generated={e.generated ? "true" : "false"}
-              d={d}
-              fill="none"
-              stroke={stroke}
-              strokeWidth={e.id === selected.edge ? 3 : 1.6}
-              strokeDasharray={e.generated ? "6 4" : undefined}
-              markerEnd="url(#arrow)"
-            />
-          ))}
-          {visible.nodes.map((n) => {
-            const p = positions[n.id];
-            return (
-              <g
-                key={n.id}
-                className="graph-node"
-                data-node={n.id}
-                data-type={n.type}
-                data-x={p.x}
-                role="button"
-                aria-label={n.label}
-                tabIndex={0}
-                onClick={() => setSelected({ node: n.id })}
-                onKeyDown={(k) => k.key === "Enter" && setSelected({ node: n.id })}
-              >
-                <Shape node={n} x={p.x} y={p.y} />
-                <text x={p.x} y={p.y + 38} textAnchor="middle" fontSize="13" fill="#1d1b18">
-                  {n.label}
-                </text>
-                {n.dates && (
-                  <text x={p.x} y={p.y + 53} textAnchor="middle" fontSize="11" fill="#6b655c">
-                    {n.dates}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-          {/* Ручки связей поверх линий и узлов: любую связь можно нажать. */}
-          {curves.map(({ e, mid, stroke, name }) => (
-            <g
-              key={e.id}
-              className="graph-edge"
-              data-edge={e.id}
-              data-status={e.status}
-              data-generated={e.generated ? "true" : "false"}
-              role="button"
-              aria-label={name}
-              tabIndex={0}
-              onClick={() => setSelected({ edge: e.id })}
-              onKeyDown={(k) => k.key === "Enter" && setSelected({ edge: e.id })}
+      <div className="graph-layout">
+        {state && visible.edges.length > 0 && (
+          <div className="graph-canvas">
+            <svg
+              ref={svg}
+              xmlns="http://www.w3.org/2000/svg"
+              className="graph"
+              width={width}
+              height={height + 30}
+              viewBox={`0 0 ${width} ${height + 30}`}
+              role="img"
+              aria-label={t.graph.image}
             >
-              <circle cx={mid.x} cy={mid.y} r={9} fill="#fff" stroke={stroke} />
-              <text x={mid.x} y={mid.y + 4} fill={e.generated ? "#b07d2c" : stroke} fontSize="11" textAnchor="middle">
-                {e.generated ? "◇" : "•"}
-                <title>{e.generated ? `${name}: достроено моделью, не подтверждено источниками` : name}</title>
-              </text>
-            </g>
-          ))}
-          <text x={12} y={height + 18} fontSize="11" fill="#6b655c">
-            ◇ и пунктир — достроено моделью, не подтверждено источниками
-          </text>
-        </svg>
-      )}
-      {edge && (
-        <aside className="graph-details" role="region" aria-label="Связь">
-          <h2>
-            {label(edge.subject)} — {edge.title} — {label(edge.object)}
-          </h2>
-          <p>
-            Статус: {STATUS[edge.status as keyof typeof STATUS] ?? edge.status}
-            {edge.consensus === "disputed" && <span className="badge muted">спорно</span>}
-            {edge.in_textbook === true && <span className="badge muted">есть в учебнике</span>}
-            {edge.in_textbook === false && <span className="badge muted">нет в учебнике</span>}
-          </p>
-          {edge.generated && (
-            <p className="card-description ungrounded">
-              <span className="ungrounded-mark" role="img" aria-label="Сгенерировано">
-                ◇
-              </span>
-              Связь достроена моделью и не подтверждена источниками.
-            </p>
-          )}
-          {Object.keys(edge.qualifiers).length > 0 && (
-            <p>
-              {Object.entries(edge.qualifiers)
-                .map(([k, v]) => `${k}: ${String(v)}`)
-                .join("; ")}
-            </p>
-          )}
-          {edge.attributions.length > 0 && (
-            <ul className="graph-who">
-              {edge.attributions.map((a, i) => (
-                <li key={i}>
-                  так считает: {a.who} ({STANCE[a.stance] ?? a.stance}
-                  {a.place ? `, ${a.place}` : ""})
-                </li>
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="30" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path className="graph-arrow" d="M0,0 L10,5 L0,10 z" />
+                </marker>
+              </defs>
+              <rect className="graph-paper" width="100%" height="100%" />
+              {/* Линии — только рисунок; нажимаются ручки в верхнем слое. */}
+              {curves.map(({ e, d, stroke }) => (
+                <path
+                  key={e.id}
+                  className={`graph-line ${stroke}`}
+                  data-generated={e.generated ? "true" : "false"}
+                  d={d}
+                  fill="none"
+                  strokeWidth={e.id === selected.edge ? 3 : 1.6}
+                  strokeDasharray={e.generated ? "6 4" : undefined}
+                  markerEnd="url(#arrow)"
+                />
               ))}
-            </ul>
-          )}
-          {edge.evidence.map((ev) => (
-            <blockquote key={ev.paragraph_id} className="selection-context">
-              «{ev.quote}»{" "}
-              <a
-                className="citation"
-                href={ev.link}
-                onClick={(x) => {
-                  x.preventDefault();
-                  navigate(ev.link);
-                }}
+              {visible.nodes.map((n) => {
+                const p = positions[n.id];
+                return (
+                  <g
+                    key={n.id}
+                    className={n.id === selected.node ? "graph-node is-selected" : "graph-node"}
+                    data-node={n.id}
+                    data-type={n.type}
+                    data-x={p.x}
+                    role="button"
+                    aria-label={n.label}
+                    tabIndex={0}
+                    onClick={() => setSelected({ node: n.id })}
+                    onKeyDown={(k) => k.key === "Enter" && setSelected({ node: n.id })}
+                  >
+                    <Shape node={n} x={p.x} y={p.y} />
+                    <text className="graph-label" x={p.x} y={p.y + 40} textAnchor="middle">
+                      {n.label}
+                    </text>
+                    {n.dates && (
+                      <text className="graph-dates" x={p.x} y={p.y + 55} textAnchor="middle">
+                        {n.dates}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+              {/* Ручки связей поверх линий и узлов: любую связь можно нажать. */}
+              {curves.map(({ e, mid, stroke, name }) => (
+                <g
+                  key={e.id}
+                  className={`graph-edge ${stroke}`}
+                  data-edge={e.id}
+                  data-status={e.status}
+                  data-generated={e.generated ? "true" : "false"}
+                  role="button"
+                  aria-label={name}
+                  tabIndex={0}
+                  onClick={() => setSelected({ edge: e.id })}
+                  onKeyDown={(k) => k.key === "Enter" && setSelected({ edge: e.id })}
+                >
+                  <circle className="graph-handle" cx={mid.x} cy={mid.y} r={9} />
+                  <text className="graph-handle__mark" x={mid.x} y={mid.y + 4} fontSize="11" textAnchor="middle">
+                    {e.generated ? "◇" : "•"}
+                    <title>{e.generated ? t.graph.generatedEdge(name) : name}</title>
+                  </text>
+                </g>
+              ))}
+              <text className="graph-legend" x={12} y={height + 18}>
+                ◇ {t.graph.legend}
+              </text>
+            </svg>
+          </div>
+        )}
+        {edge && (
+          <aside className="graph-details" role="region" aria-label={t.graph.edge}>
+            <h2 className="section-title">
+              {label(edge.subject)} — {edge.title} — {label(edge.object)}
+            </h2>
+            <p className="graph-details__status">
+              <span className="muted">{t.graph.statusLabel}:</span>{" "}
+              {edge.status === "verified" || edge.status === "sourced" || edge.status === "generated" ? (
+                <StatusMark status={edge.status} />
+              ) : (
+                (pick(t.status, edge.status) ?? edge.status)
+              )}
+              {edge.consensus === "disputed" && <StatusMark status="disputed" />}
+              {edge.in_textbook === true && <span className="badge">{t.scope.inTextbook}</span>}
+              {edge.in_textbook === false && <span className="badge">{t.scope.notInTextbookMark}</span>}
+            </p>
+            {edge.generated && (
+              <p className="pg-desc">
+                <Generated className="card-description ungrounded">{t.graph.generatedNote}</Generated>
+              </p>
+            )}
+            {Object.keys(edge.qualifiers).length > 0 && (
+              <p className="muted">
+                {Object.entries(edge.qualifiers)
+                  .map(([k, v]) => `${k}: ${String(v)}`)
+                  .join("; ")}
+              </p>
+            )}
+            {edge.attributions.length > 0 && (
+              <ul className="graph-who">
+                {edge.attributions.map((a, i) => (
+                  <li key={i}>
+                    {t.card.believes(a.who)} ({pick(t.graph.stance, a.stance) ?? a.stance}
+                    {a.place ? `, ${a.place}` : ""})
+                  </li>
+                ))}
+              </ul>
+            )}
+            {edge.evidence.map((ev, i) => (
+              <blockquote key={ev.paragraph_id} className="selection-context">
+                «{ev.quote}»
+                <a
+                  className="citation pg-cite"
+                  href={ev.link}
+                  title={t.card.evidence(i + 1)}
+                  onClick={(x) => {
+                    x.preventDefault();
+                    navigate(ev.link);
+                  }}
+                >
+                  {i + 1}
+                </a>
+              </blockquote>
+            ))}
+          </aside>
+        )}
+        {node && (
+          <aside className="graph-details" role="region" aria-label={t.graph.node}>
+            <h2 className="section-title graph-details__name">{node.label}</h2>
+            <div className="actions">
+              <button
+                className="pg-btn pg-btn--secondary pg-btn--sm"
+                onClick={(e) => setCard({ id: node.id, x: e.pageX, y: e.pageY + 12 })}
               >
-                [абзац]
-              </a>
-            </blockquote>
-          ))}
-        </aside>
-      )}
-      {node && (
-        <aside className="graph-details" role="region" aria-label="Узел">
-          <h2>{node.label}</h2>
-          <button
-            className="link"
-            onClick={(e) => setCard({ id: node.id, x: e.pageX, y: e.pageY + 12 })}
-          >
-            Открыть карточку
-          </button>{" "}
-          <button className="link" onClick={() => load(node.id, 1, true)}>
-            Раскрыть связи
-          </button>
-        </aside>
-      )}
+                <Icon name="expand" small />
+                {t.graph.openCard}
+              </button>
+              <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => load(node.id, 1, true)}>
+                <Icon name="graph" small />
+                {t.graph.expand}
+              </button>
+            </div>
+          </aside>
+        )}
+      </div>
       {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
-    </div>
+    </main>
   );
 }

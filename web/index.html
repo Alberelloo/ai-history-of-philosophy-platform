@@ -3,7 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>PhiloGraph</title>
+    <script>
+      // Тема и язык до первой отрисовки, чтобы страница не мигала. Формат — web/src/storage.ts.
+      (function () {
+        var root = document.documentElement;
+        var state = {};
+        try {
+          state = JSON.parse(window.localStorage.getItem("philograph:v2") || "{}") || {};
+        } catch (e) {
+          state = {};
+        }
+        if (state.theme === "light" || state.theme === "dark") root.setAttribute("data-theme", state.theme);
+        var lang = state.lang === "ru" || state.lang === "en" ? state.lang : null;
+        if (!lang) lang = /^ru/i.test(navigator.language || "") ? "ru" : "en";
+        root.lang = lang;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
