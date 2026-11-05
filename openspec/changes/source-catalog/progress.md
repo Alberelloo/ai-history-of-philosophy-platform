@@ -11,7 +11,7 @@
 | 1.1–3.3 | сделан: миграция 3, `replace_files`, схема и модель каталога, `validate`, `Fetcher`/`CatalogFetch`, очистка Gutenberg/Wikisource, адаптеры, `add`/`harvest`/`approve`/`sync`/`check-updates`/`status`, правило публикации; исполнитель очереди на `CatalogFetch` |
 | 4.1 | сделан: `docs/architecture/source-ingestion.md`, ADR-0003, ссылка в `docs/README.md` |
 | 4.2 | сделан: 26 тестов `tests/library/catalog` (все 9 требований) |
-| 4.3 | не начат: сквозной тест загрузки |
+| 4.3 | сделан: `tests/e2e/test_catalog_ingest.py` (свой стенд, локальный HTTP, sync дважды, читалка) |
 | 4.4 | сделан: шаг «Каталог источников» в CI |
 | 5.1–5.3 | не начат |
 

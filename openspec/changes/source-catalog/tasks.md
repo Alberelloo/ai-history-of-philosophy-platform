@@ -20,7 +20,7 @@
 
 - [x] 4.1 `docs/architecture/source-ingestion.md`, ADR-0002, ссылки из `docs/README.md`
 - [x] 4.2 Тесты требований `source-catalog` (без сети), трассировка
-- [ ] 4.3 Сквозной тест: локальный HTTP → `sync` → источник в читалке
+- [x] 4.3 Сквозной тест: локальный HTTP → `sync` → источник в читалке
 - [x] 4.4 `catalog validate` в CI
 
 ## 5. Настоящие данные
