@@ -96,7 +96,9 @@ def test_assistant_on_selection_through_all_services(page, stack):
     panel.get_by_role("button", name="Спросить").click()
     grounded = panel.locator(".fragment:not(.ungrounded)").first
     grounded.wait_for()
-    assert panel.locator(".fragment.ungrounded .ungrounded-mark").count() == 1
+    # Фрагменты приходят потоком: ждём и второй, без опоры на источники.
+    panel.locator(".fragment.ungrounded .ungrounded-mark").wait_for()
+    assert panel.locator(".fragment.ungrounded").count() == 1
     grounded.locator(".citation").first.click()
     page.locator("p.block.highlight").wait_for()
 
@@ -147,3 +149,24 @@ def test_knowledge_service_receives_library_events(stack):
         60,
     )
     assert len({e["event_id"] for e in received}) >= 2  # оба демо-источника
+
+
+@req("ontology-review", "Доступ")
+@req("ontology-review", "Очередь проверки")
+@req("ontology-review", "Решения")
+def test_operator_reviews_ontology_in_browser(page, stack):
+    assert httpx.get(stack.url + "/api/knowledge/v1/review/queue").status_code == 404
+    page.goto(stack.url + "/internal/review")
+    page.get_by_label("Пароль оператора").fill("не тот пароль")
+    page.get_by_role("button", name="Войти").click()
+    assert "Неверный пароль" in page.get_by_role("alert").inner_text()
+    page.get_by_label("Пароль оператора").fill("demo-operator")
+    page.get_by_role("button", name="Войти").click()
+    warned = page.locator(".review-item", has_text="influence_against_time")
+    warned.get_by_role("button").click()
+    context = page.get_by_role("region", name="Утверждение")
+    assert "Локк — испытал влияние — Новые опыты" in context.inner_text()
+    context.get_by_role("button", name="Отклонить").click()
+    page.wait_for_function("!document.body.innerText.includes('influence_against_time')")
+    decided = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.review.decided")
+    assert decided and decided[-1]["decision"] == "reject"

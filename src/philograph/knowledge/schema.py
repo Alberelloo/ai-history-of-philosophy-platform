@@ -197,3 +197,50 @@ migrations.add(1, "онтология: реестр, сущности, утве�
         "processed_events",
     )
 )
+
+# --- наполнение и проверка (миграция 2) ---
+filling_runs = Table(
+    "filling_runs",
+    metadata,
+    Column("run_id", String(64), primary_key=True),
+    Column("kind", String(30), nullable=False),  # extraction | core | wikidata | sample
+    Column("target", String(100)),  # источник или версия
+    Column("model", String(100)),
+    Column("template_version", String(40)),
+    Column("started_at", DateTime(timezone=True), nullable=False),
+    Column("finished_at", DateTime(timezone=True)),
+    Column("created", Integer, nullable=False),
+    Column("dropped", Integer, nullable=False),
+    Column("cost_usd", JSON),
+    Column("status", String(20), nullable=False),  # running | done | rolled_back
+    schema=SCHEMA,
+)
+review_items = Table(
+    "review_items",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("kind", String(30), nullable=False),  # ambiguous_link | duplicate | proposal
+    Column("payload", JSON, nullable=False),
+    Column("status", String(20), nullable=False),  # open | resolved
+    Column("resolution", JSON),
+    schema=SCHEMA,
+)
+statement_views = Table(
+    "statement_views",
+    metadata,
+    Column("statement_id", String(40), primary_key=True),
+    Column("views", Integer, nullable=False),
+    schema=SCHEMA,
+)
+review_samples = Table(
+    "review_samples",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("sample", String(64), nullable=False, index=True),
+    Column("statement_id", String(40), nullable=False),
+    Column("decision", String(20)),  # correct | wrong
+    schema=SCHEMA,
+)
+migrations.add(2, "наполнение и проверка")(
+    migrations.create_tables("filling_runs", "review_items", "statement_views", "review_samples")
+)

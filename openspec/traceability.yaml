@@ -21,3 +21,5 @@ enforce:
   - ontology-registry
   - ontology-entities
   - ontology-statements
+  - ontology-extraction
+  - ontology-review

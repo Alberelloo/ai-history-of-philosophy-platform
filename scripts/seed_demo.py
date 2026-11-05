@@ -79,9 +79,73 @@ def seed(database_url: str, files_root: Path) -> dict[str, str]:
             raise SystemExit(f"{spec['title']}: версия в состоянии {state}")
         registry.publish("seed", version_id)
         ids[spec["kind"]] = source_id
-    Reading(registry, engine).set_default("seed", ids["textbook"])
+    reading = Reading(registry, engine)
+    reading.set_default("seed", ids["textbook"])
+    seed_ontology(database_url, reading, ids["textbook"])
     pipeline.dispatch_outbox(Queue(engine))
     return ids
+
+
+def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
+    """Маленькая демо-онтология: связь с цитатой из учебника и одна на проверку."""
+    from philograph.knowledge import schema as knowledge_schema
+    from philograph.knowledge.dates import lifespan, parse
+    from philograph.knowledge.entities import Entities
+    from philograph.knowledge.registry import OntologyRegistry
+    from philograph.knowledge.statements import Attribution, Evidence, Provenance, Statements
+    from philograph.library.reading import Internal
+
+    engine = make_engine(database_url, [knowledge_schema.SCHEMA])
+    knowledge_schema.migrations.upgrade(engine)
+    registry = OntologyRegistry(engine)
+    registry.load_defaults()
+    entities = Entities(engine, registry)
+    if entities.find("Кант"):
+        return
+    internal = Internal(reading.registry, reading)
+    paragraphs = internal.version_paragraphs(reading.registry.get(textbook).published_version)
+    text_of = {p["id"]: p["text"] for p in paragraphs["paragraphs"]}
+    statements = Statements(engine, registry, entities, text_of.get)
+    people = {}
+    for name, birth, death in (
+        ("Кант", "1724", "1804"),
+        ("Юм", "1711", "1776"),
+        ("Локк", "1632", "1704"),
+        ("Лейбниц", "1646", "1716"),
+    ):
+        people[name] = entities.create("person", [("ru", name, "primary")])
+        statements.add(
+            people[name],
+            "lifespan",
+            value=lifespan(birth, death).to_json(),
+            attributions=[Attribution("common")],
+        )
+    awakening = next(pid for pid, text in text_of.items() if "догматического сна" in text)
+    statements.add(
+        people["Кант"],
+        "influenced_by",
+        obj=people["Юм"],
+        attributions=[Attribution("source", textbook)],
+        evidence=[Evidence(awakening, "Юм пробудил его от догматического сна", source_id=textbook)],
+        provenance=Provenance("extracted", actor="seed"),
+    )
+    new_essays = entities.create(
+        "work", [("ru", "Новые опыты о человеческом разумении", "primary")]
+    )
+    statements.add(
+        new_essays, "dating", value=parse("1765").to_json(), attributions=[Attribution("common")]
+    )
+    statements.add(
+        new_essays, "author", obj=people["Лейбниц"], attributions=[Attribution("common")]
+    )
+    # Влияние против времени: Локк умер до издания «Новых опытов» — попадёт на проверку.
+    statements.add(
+        people["Локк"],
+        "influenced_by",
+        obj=new_essays,
+        attributions=[Attribution("common")],
+        provenance=Provenance("generated"),
+    )
 
 
 if __name__ == "__main__":

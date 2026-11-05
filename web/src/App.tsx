@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LibraryPage } from "./LibraryPage";
 import { ReaderPage } from "./ReaderPage";
 import { ParagraphLink } from "./ParagraphLink";
+import { ReviewPage } from "./ReviewPage";
 
 // Адреса: /                   — библиотека
 //         /read/:source[/:chapter][#p-<абзац> | #s-<раздел>] — чтение
@@ -30,6 +31,7 @@ export function App() {
   const [path, hash = ""] = location.split("#");
   const parts = path.split("/").filter(Boolean);
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
+  if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;
   if (parts[0] === "read") {
     return <ReaderPage sourceId={parts[1]} chapterId={parts[2]} anchor={hash} />;
   }

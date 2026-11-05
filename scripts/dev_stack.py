@@ -22,6 +22,11 @@ from pathlib import Path
 import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
+DEMO_OPERATOR_PASSWORD = "demo-operator"
+DEMO_OPERATOR_HASH = (
+    "pbkdf2_sha256$1000$64656d6f2d73616c74$"
+    "907c04102bee49f460c2bee8e69686fd19c37d7fbc0fe866c4a0fb4a84fb029d"
+)  # hash_password("demo-operator", salt=b"demo-salt", iterations=1000)
 
 
 def free_port() -> int:
@@ -89,6 +94,9 @@ def start(data: Path, port: int | None = None) -> Stack:
         "PHILOGRAPH_WEB_ROOT": str(ROOT / "web" / "dist"),
         "PHILOGRAPH_VISITOR_SECRET": "dev-stack",
         "PHILOGRAPH_KNOWLEDGE_SERVICE": "1",
+        "PHILOGRAPH_KNOWLEDGE_URL": f"http://127.0.0.1:{ports['knowledge']}",
+        # Пароль оператора демо-стенда: demo-operator.
+        "PHILOGRAPH_OPERATOR_PASSWORD_HASH": DEMO_OPERATOR_HASH,
     }
     apps = {
         "llm": "philograph.llm.main:app",
