@@ -1,0 +1,32 @@
+<!-- @dsCard group="Люди" height=480 -->
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>PortraitGallery</title></head>
+<body>
+<div class="pg-demo pg-demo--split" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))"><div><span class="pg-demo__label">Иммануил Кант</span><div class="pg-gallery"><div class="pg-gallery__track" tabindex="0" aria-label="Портреты: Иммануил Кант"><figure class="pg-gallery__slide" data-caption="Иоганн Готлиб Беккер, 1768"><img src="PORTRAIT.jpg" alt="Иммануил Кант, портрет 1 из 4"></figure><figure class="pg-gallery__slide" data-caption="Неизвестный художник, около 1790"><img src="PORTRAIT.jpg" alt="Иммануил Кант, портрет 2 из 4"></figure><figure class="pg-gallery__slide" data-caption="Иоганн Кристоф Фриш"><img src="PORTRAIT.jpg" alt="Иммануил Кант, портрет 3 из 4"></figure><figure class="pg-gallery__slide" data-caption="Гравюра"><img src="PORTRAIT.jpg" alt="Иммануил Кант, портрет 4 из 4"></figure></div><span class="pg-gallery__count"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="3.5" width="13" height="13" rx="2"/><path d="M4.5 7.5v11a2 2 0 0 0 2 2h11"/></svg><span data-count>1 / 4</span></span><button class="pg-gallery__nav pg-gallery__nav--prev" aria-label="Предыдущий портрет" disabled><svg class="pg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg></button><button class="pg-gallery__nav pg-gallery__nav--next" aria-label="Следующий портрет"><svg class="pg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button><div class="pg-gallery__dots"><button class="pg-gallery__dot" aria-label="Портрет 1" aria-current="true"></button><button class="pg-gallery__dot" aria-label="Портрет 2" aria-current="false"></button><button class="pg-gallery__dot" aria-label="Портрет 3" aria-current="false"></button><button class="pg-gallery__dot" aria-label="Портрет 4" aria-current="false"></button></div><div class="pg-gallery__caption">Иоганн Готлиб Беккер, 1768</div></div></div><div><span class="pg-demo__label">Дэвид Юм</span><div class="pg-gallery"><div class="pg-gallery__track" tabindex="0" aria-label="Портреты: Дэвид Юм"><figure class="pg-gallery__slide" data-caption="Аллан Рэмзи, 1754"><img src="PORTRAIT.jpg" alt="Дэвид Юм, портрет 1 из 2"></figure><figure class="pg-gallery__slide" data-caption="Аллан Рэмзи, 1766"><img src="PORTRAIT.jpg" alt="Дэвид Юм, портрет 2 из 2"></figure></div><span class="pg-gallery__count"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="3.5" width="13" height="13" rx="2"/><path d="M4.5 7.5v11a2 2 0 0 0 2 2h11"/></svg><span data-count>1 / 2</span></span><button class="pg-gallery__nav pg-gallery__nav--prev" aria-label="Предыдущий портрет" disabled><svg class="pg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg></button><button class="pg-gallery__nav pg-gallery__nav--next" aria-label="Следующий портрет"><svg class="pg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button><div class="pg-gallery__dots"><button class="pg-gallery__dot" aria-label="Портрет 1" aria-current="true"></button><button class="pg-gallery__dot" aria-label="Портрет 2" aria-current="false"></button></div><div class="pg-gallery__caption">Аллан Рэмзи, 1754</div></div></div><div><span class="pg-demo__label">Готфрид Лейбниц</span><div class="pg-gallery pg-gallery--empty"><div class="pg-gallery__track"><div class="pg-gallery__slide" role="img" aria-label="Изображений нет"><span class="pg-gallery__initials">ГЛ</span><span class="pg-gallery__empty-text">Изображений нет</span></div></div></div></div></div>
+<script>
+document.querySelectorAll('.pg-gallery').forEach(function (g) {
+  var track = g.querySelector('.pg-gallery__track'), slides = g.querySelectorAll('.pg-gallery__slide');
+  var dots = g.querySelectorAll('.pg-gallery__dot'), count = g.querySelector('[data-count]'), cap = g.querySelector('.pg-gallery__caption');
+  var prev = g.querySelector('.pg-gallery__nav--prev'), next = g.querySelector('.pg-gallery__nav--next');
+  if (!slides.length || !track) return;
+  function at() { var w = slides[0].offsetWidth + 8; return Math.min(slides.length - 1, Math.round(track.scrollLeft / w)); }
+  function sync() {
+    var i = at();
+    dots.forEach(function (d, k) { d.setAttribute('aria-current', String(k === i)); });
+    if (count) count.textContent = (i + 1) + ' / ' + slides.length;
+    if (cap) cap.textContent = slides[i].dataset.caption || '';
+    if (prev) prev.disabled = i === 0;
+    if (next) next.disabled = i === slides.length - 1;
+  }
+  function go(i) { track.scrollTo({ left: i * (slides[0].offsetWidth + 8) }); }
+  if (prev) prev.onclick = function () { go(at() - 1); };
+  if (next) next.onclick = function () { go(at() + 1); };
+  dots.forEach(function (d, k) { d.onclick = function () { go(k); }; });
+  track.addEventListener('scroll', function () { window.requestAnimationFrame(sync); });
+  track.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') go(at() + 1); if (e.key === 'ArrowLeft') go(at() - 1); });
+  sync();
+});
+</script>
+</body>
+</html>

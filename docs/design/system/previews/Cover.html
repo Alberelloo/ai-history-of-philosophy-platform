@@ -1,0 +1,64 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PhiloGraph</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-ui); overflow: hidden; }
+  .cover { position: relative; width: 960px; height: 288px; overflow: hidden; }
+  .art { position: absolute; top: 0; left: 480px; width: 480px; height: 288px; overflow: hidden; }
+  .art svg { display: block; width: 480px; height: 288px; }
+  .ink { fill: var(--ink); }
+  .people { fill: var(--people-tint); }
+  .ideas { fill: var(--ideas-tint); }
+  .teach { fill: var(--teachings-tint); }
+  .blk { rx: var(--radius-md); }
+  .axis { stroke: var(--line-strong); stroke-width: 1; fill: none; }
+  .tick { stroke: var(--line-strong); stroke-width: 1; }
+  .arc { stroke: var(--accent); stroke-width: 1.75; fill: none; stroke-linecap: round; }
+  .d-accent { fill: var(--accent); }
+  .d-people { fill: var(--people); }
+  .d-ideas { fill: var(--ideas); }
+  .d-teach { fill: var(--teachings); }
+  .d-paper { fill: var(--paper); }
+  .ring { fill: none; stroke: var(--paper); stroke-width: 3; }
+  .words { position: absolute; left: var(--space-8); bottom: var(--space-8); max-width: 440px; }
+  .name { margin: 0; font: 500 80px/.95 var(--font-read); letter-spacing: -.02em; color: var(--ink); }
+  .tag { margin: var(--space-3) 0 0 3px; font: 400 14px/20px var(--font-ui); color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      ink 152×208 bled off the top and right edge (the deep surface of the dark theme) · people-tint 160×136 · ideas-tint 112×96 · teachings-tint 96×48 — pastel tints are the identity, ≈35% of the box
+  arrangement a staggered stack stepping down from the ink slab toward the time axis, gutters space-4
+  pattern     medallions on a time axis — «portraits as discs and thinking along time»: five discs of the portrait sizes (40, 28, 20, 48, 32 = Portrait 40/24/56 steps) resting on a line-strong hairline with century ticks, two accent arcs of influence
+  scales      gutters space-4 (16), axis y = 288 − space-12, tick pitch 112 (= 7 × space-4), corners radius-md, discs radius-full
+-->
+<rect class="ink blk" x="344" y="-24" width="152" height="208" rx="12"/>
+<rect class="people blk" x="168" y="32" width="160" height="136" rx="12"/>
+<rect class="ideas blk" x="40" y="88" width="112" height="96" rx="12"/>
+<rect class="teach blk" x="168" y="184" width="96" height="16" rx="8"/>
+<path class="axis" d="M16 240 H 480"/>
+<path class="tick" d="M64 240 v8 M176 240 v8 M288 240 v8 M400 240 v8"/>
+<path class="arc" d="M96 202 Q 210 96 316 196"/>
+<path class="arc" d="M212 224 Q 330 120 432 210"/>
+<circle class="d-accent" cx="96" cy="220" r="20"/>
+<circle class="d-people" cx="212" cy="226" r="14"/>
+<circle class="d-ideas" cx="262" cy="230" r="10"/>
+<circle class="d-teach" cx="320" cy="216" r="24"/>
+<circle class="ring" cx="320" cy="216" r="24"/>
+<circle class="d-accent" cx="432" cy="224" r="16"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">PhiloGraph</h1>
+<p class="tag">Учебник, где у каждой связи видно источник.</p>
+</div>
+</div>
+</body>
+</html>

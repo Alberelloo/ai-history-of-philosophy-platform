@@ -1,0 +1,35 @@
+<!-- @dsCard group="Чтение" height=300 -->
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>Sidenote</title></head>
+<body>
+<div class="pg-page">
+  <div class="pg-reading">
+    <p>Локк сравнивал ум новорождённого с чистой доской, на которой опыт пишет свои знаки<button class="pg-note-ref" data-note="1">1</button>. Всё наше знание, по Локку, приходит из ощущения и рефлексии.</p>
+    <p data-page="46">Лейбниц отвечал, что ум похож скорее на мрамор с прожилками<button class="pg-note-ref" data-note="2">2</button>: прожилки заранее намечают фигуру, которую выявит резец опыта.</p>
+  </div>
+  <div class="pg-page__margin">
+    <div class="pg-sidenote" data-note="1"><b>1</b><span>Сам образ восходит к античности; Локк писал о «белой бумаге».</span></div>
+    <div class="pg-pagemark" data-page-mark="46">с. 46</div>
+    <div class="pg-sidenote" data-note="2"><b>2</b><span>«Новые опыты о человеческом разумении», предисловие.</span></div>
+  </div>
+</div>
+<script>
+var root = document.querySelector('.pg-page'), margin = root.querySelector('.pg-page__margin');
+root.classList.add('is-placed');
+function place() {
+  var top0 = margin.getBoundingClientRect().top, floor = 0;
+  margin.querySelectorAll(':scope > *').forEach(function (el) {
+    var anchor = el.dataset.note ? root.querySelector('.pg-note-ref[data-note="' + el.dataset.note + '"]')
+                                 : root.querySelector('p[data-page="' + el.dataset.pageMark + '"]');
+    var y = Math.max(anchor.getBoundingClientRect().top - top0 - (el.dataset.note ? 6 : -6), floor);
+    el.style.top = y + 'px'; floor = y + el.offsetHeight + 12;
+  });
+}
+function link(n, on) { root.querySelectorAll('[data-note="' + n + '"]').forEach(function (x) { x.classList.toggle('is-linked', on); }); }
+root.addEventListener('mouseover', function (e) { var t = e.target.closest('[data-note]'); if (t) link(t.dataset.note, true); });
+root.addEventListener('mouseout', function (e) { var t = e.target.closest('[data-note]'); if (t) link(t.dataset.note, false); });
+document.fonts.ready.then(place); window.addEventListener('resize', place); place();
+</script>
+</body>
+</html>
