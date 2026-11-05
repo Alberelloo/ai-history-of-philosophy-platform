@@ -16,3 +16,5 @@ enforce:
   - assistant-dialog
   - question-routing
   - answer-grounding
+  - evaluation-datasets
+  - quality-evaluation

@@ -441,7 +441,15 @@ class Assistant:
             total_ms=total,
             **stats,
         )
-        yield {"type": "done", "kind": kind}
+        yield {
+            "type": "done",
+            "kind": kind,
+            "stats": stats,
+            "passages": len(passages),
+            "llm_calls": calls,
+            "first_fragment_ms": first_ms,
+            "total_ms": total,
+        }
 
     def _unavailable(self, kind: str) -> Iterator[dict[str, Any]]:
         if kind == "budget_exhausted":

@@ -76,6 +76,7 @@ CONFIG = {
         **LLM_CONFIG["roles"],
         "fast": {"provider": "concept", "model": "flash", "max_output_tokens": 100},
         "main": {"provider": "concept", "model": "flash", "max_output_tokens": 800},
+        "strong": {"provider": "concept", "model": "flash", "max_output_tokens": 800},
     },
     "prices": {
         **LLM_CONFIG["prices"],
