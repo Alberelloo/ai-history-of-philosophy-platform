@@ -151,6 +151,88 @@ def test_knowledge_service_receives_library_events(stack):
     assert len({e["event_id"] for e in received}) >= 2  # оба демо-источника
 
 
+@req("entity-mentions", "Показ при чтении")
+@req("entity-cards", "Карточка рядом с текстом")
+@req("entity-cards", "Природа каждой строки")
+@req("entity-cards", "Скорость карточки")
+def test_mention_opens_card_and_navigates(page, stack):
+    open_textbook(page, stack)
+    page.get_by_role("link", name="Глава 3. Ответ Канта").click()
+    page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
+    awakening = page.locator("p.block", has_text="догматического сна")
+    mention = awakening.locator(".mention", has_text="Юм")
+    mention.wait_for()
+    assert awakening.locator(".mention").all_inner_texts() == ["Кант", "Юм"]
+    page.evaluate("window.scrollTo(0, 120)")
+    scroll = page.evaluate("window.scrollY")
+    mention.click()
+    card = page.get_by_role("dialog", name="Карточка")
+    card.locator("h3:text('Юм')").wait_for()
+    assert page.evaluate("window.scrollY") == scroll  # глава не сдвигается
+    assert "1711" in card.locator(".card-dates").inner_text()
+    influence = card.locator("[data-section=influence]")
+    assert "так считает" in influence.inner_text()
+    # Описание дописывается потоком и помечено как сгенерированное.
+    card.locator(".card-description.ungrounded").get_by_role("img", name="Сгенерировано").wait_for()
+    assert "демонстрационный" in card.locator(".card-description").inner_text()
+    influence.get_by_role("button", name="Кант", exact=True).click()
+    card.locator("h3:text('Кант')").wait_for()
+    card.get_by_role("button", name="← Назад").click()
+    card.locator("h3:text('Юм')").wait_for()
+    # Подтверждающий абзац из строки ведёт к абзацу учебника.
+    card.get_by_role("button", name="Кант", exact=True).click()
+    card.locator("h3:text('Кант')").wait_for()
+    card.locator("[data-section=influence] .citation").first.click()
+    page.locator("p.block.highlight", has_text="догматического сна").wait_for()
+
+    indexed = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.mentions.indexed")
+    assert any(e["mentions"] > 0 for e in indexed)
+    served = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.card.served")
+    assert "person" in {e["type"] for e in served}
+    described = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.card.description")
+    assert "generated" in {e["result"] for e in described}
+
+
+@req("entity-cards", "Разделы карточки по типу")
+@req("entity-mentions", "Где читать")
+def test_concept_card_with_definition_and_where_to_read(page, stack):
+    open_textbook(page, stack)
+    page.get_by_role("link", name="Глава 2. Юм и проблема индукции").click()
+    page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
+    page.locator("p.block", has_text="привычка ума").locator(
+        ".mention", has_text="причинность"
+    ).click()
+    card = page.get_by_role("dialog", name="Карточка")
+    card.locator("h3:text('Причинность')").wait_for()
+    definitions = card.locator("[data-section=definitions]")
+    assert "априорная категория рассудка" in definitions.inner_text()
+    assert "так считает: Кант" in definitions.inner_text()
+    where = card.locator("[data-section=where]")
+    # По одному упоминанию в каждой главе, поэтому порядок между ними не задан.
+    assert sorted(where.get_by_role("button").all_inner_texts()) == [
+        "Глава 2. Юм и проблема индукции",
+        "Глава 3. Ответ Канта",
+    ]
+    assert TEXTBOOK in where.inner_text()
+    where.get_by_role("button", name="Глава 3. Ответ Канта").click()
+    page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
+    card.get_by_role("button", name="Закрыть карточку").click()
+    assert page.get_by_role("dialog", name="Карточка").count() == 0
+
+
+@req("entity-mentions", "Показ при чтении")
+def test_chapter_without_knowledge_service(browser, stack):
+    context = browser.new_context()
+    page = context.new_page()
+    page.route("**/api/knowledge/**", lambda route: route.abort())
+    open_textbook(page, stack)
+    page.get_by_role("link", name="Глава 3. Ответ Канта").click()
+    page.locator("p.block", has_text="догматического сна").wait_for()
+    assert page.locator(".mention").count() == 0
+    assert page.get_by_role("alert").count() == 0
+    context.close()
+
+
 @req("ontology-review", "Доступ")
 @req("ontology-review", "Очередь проверки")
 @req("ontology-review", "Решения")

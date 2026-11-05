@@ -563,11 +563,12 @@ class Statements:
         da, db = self._date(a, "dates"), self._date(b, "dates")
         if not da or not db:
             return None
-        before = da.before(db)
-        after = db.before(da)
-        if before is None or after is None:
-            return None
-        return not before and not after
+        if da.before(db) or db.before(da):
+            return False
+        # Современники наверняка, если периоды пересекаются при любых уточнениях дат.
+        if da.latest_start <= db.earliest_end and db.latest_start <= da.earliest_end:
+            return True
+        return None
 
     # --- обход по рецепту ---
 

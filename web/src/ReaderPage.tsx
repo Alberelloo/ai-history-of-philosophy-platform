@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
 import { navigate } from "./App";
 import { AssistantPanel } from "./AssistantPanel";
+import { CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { storage } from "./storage";
 
@@ -13,13 +14,60 @@ function replace(path: string) {
 }
 
 // Текст блока с отметками страниц и знаками сносок на своих местах.
-function renderText(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter) {
-  type Mark = { at: number; node: (key: number) => ReactNode; skip: number };
-  const marks: Mark[] = [
+type Mention = { target_id: string; entity_id: string; start: number; end: number };
+type OpenMention = (entityId: string, x: number, y: number) => void;
+
+// Текст с отметками страниц, знаками сносок и упоминаниями сущностей на своих местах.
+function renderText(
+  text: string,
+  points: { at: number; skip: number; node: (key: string) => ReactNode }[],
+  mentions: Mention[],
+  open: OpenMention,
+): ReactNode[] {
+  const cuts = new Set<number>([0, text.length]);
+  points.forEach((p) => {
+    cuts.add(p.at);
+    cuts.add(Math.min(text.length, p.at + p.skip));
+  });
+  mentions.forEach((m) => {
+    cuts.add(m.start);
+    cuts.add(m.end);
+  });
+  const sorted = [...cuts].filter((c) => c <= text.length).sort((a, b) => a - b);
+  const skipped = points.flatMap((p) => (p.skip ? [[p.at, p.at + p.skip]] : []));
+  const parts: ReactNode[] = [];
+  sorted.forEach((a, i) => {
+    points.filter((p) => p.at === a).forEach((p, j) => parts.push(p.node(`p${a}-${j}`)));
+    const b = sorted[i + 1];
+    if (b === undefined || b <= a) return;
+    if (skipped.some(([x, y]) => a >= x && b <= y)) return; // знак сноски заменён кнопкой
+    const piece = text.slice(a, b);
+    const mention = mentions.find((m) => m.start <= a && b <= m.end);
+    parts.push(
+      mention ? (
+        <button
+          key={`m${a}`}
+          type="button"
+          className="mention"
+          data-entity={mention.entity_id}
+          onClick={(e) => open(mention.entity_id, e.pageX, e.pageY + 12)}
+        >
+          {piece}
+        </button>
+      ) : (
+        piece
+      ),
+    );
+  });
+  return parts;
+}
+
+function blockPoints(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter) {
+  return [
     ...block.pages.map(([at, label]) => ({
       at,
       skip: 0,
-      node: (key: number) => (
+      node: (key: string) => (
         <span key={key} className="page-mark" data-page={label}>
           с. {label}
         </span>
@@ -29,18 +77,9 @@ function renderText(block: Extract<ChapterBlock, { type: "block" }>, chapter: Ch
       const note = chapter.footnotes[id];
       if (!note) return [];
       const skip = block.text.startsWith(note.marker, at) ? note.marker.length : 0;
-      return [{ at, skip, node: (key: number) => <FootnoteRef key={key} note={note} /> }];
+      return [{ at, skip, node: (key: string) => <FootnoteRef key={key} note={note} /> }];
     }),
-  ].sort((a, b) => a.at - b.at);
-  const parts: ReactNode[] = [];
-  let cursor = 0;
-  marks.forEach((mark, i) => {
-    if (mark.at > cursor) parts.push(block.text.slice(cursor, mark.at));
-    parts.push(mark.node(i));
-    cursor = Math.max(cursor, mark.at + mark.skip);
-  });
-  parts.push(block.text.slice(cursor));
-  return parts;
+  ];
 }
 
 function copyLink(paragraphId: string, onDone: () => void) {
@@ -87,6 +126,9 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
     null,
   );
   const [asked, setAsked] = useState<{ text: string; paragraphs: string[] } | null>(null);
+  const [mentions, setMentions] = useState<Record<string, Mention[]>>({});
+  const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
+  const openCard: OpenMention = (id, x, y) => setCard({ id, x, y });
   const textRef = useRef<HTMLElement>(null);
 
   // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
@@ -152,6 +194,21 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
       .then(setChapter)
       .catch((e: ApiError) => setProblem(e.message));
   }, [sourceId, chapterId]);
+
+  // Упоминания сущностей главы. Без онтологии глава показывается без них.
+  useEffect(() => {
+    setMentions({});
+    if (!chapter) return;
+    const targets = chapter.blocks.map((b) => (b.type === "block" ? b.id : b.section_id));
+    fetch(`/api/knowledge/v1/mentions?targets=${targets.join(",")}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((items: Mention[]) => {
+        const map: Record<string, Mention[]> = {};
+        items.forEach((m) => (map[m.target_id] ??= []).push(m));
+        setMentions(map);
+      })
+      .catch(() => setMentions({}));
+  }, [chapter]);
 
   // Прокрутка к абзацу или разделу из адреса, подсветка абзаца.
   useLayoutEffect(() => {
@@ -231,6 +288,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           Спросить ассистента
         </button>
       )}
+      {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
       {assistantOpen && (
         <AssistantPanel
           sourceId={sourceId}
@@ -247,7 +305,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
             const Tag = block.level >= 3 ? "h3" : "h2";
             return (
               <Tag key={block.section_id} id={`s-${block.section_id}`}>
-                {block.text}
+                {renderText(block.text, [], mentions[block.section_id] ?? [], openCard)}
               </Tag>
             );
           }
@@ -268,7 +326,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
               lang={block.lang}
               className={`block ${block.kind}`}
             >
-              {renderText(block, chapter)}
+              {renderText(block.text, blockPoints(block, chapter), mentions[block.id] ?? [], openCard)}
               <button
                 type="button"
                 className="copy-link"

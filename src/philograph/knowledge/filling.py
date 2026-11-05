@@ -99,6 +99,7 @@ class Filling:
         self.library = library
         self.clock = clock or SystemClock()
         self.fragment_size = fragment_size
+        self.created_entities: list[str] = []  # для пересчёта упоминаний новых сущностей
 
     # --- запуски ---
 
@@ -395,6 +396,7 @@ class Filling:
         if not type_:
             raise _Skip(f"новая сущность «{name}» без типа")
         resolved[name] = self.entities.create(type_, [("ru", name, "primary")])
+        self.created_entities.append(resolved[name])
         return resolved[name]
 
     def handle_published(self, payload: dict[str, Any]) -> None:
