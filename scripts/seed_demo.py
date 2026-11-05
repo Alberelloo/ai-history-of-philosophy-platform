@@ -129,6 +129,18 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         evidence=[Evidence(awakening, "Юм пробудил его от догматического сна", source_id=textbook)],
         provenance=Provenance("extracted", actor="seed"),
     )
+    causality = entities.create("concept", [("ru", "Причинность", "primary")])
+    category = next(pid for pid, text in text_of.items() if "априорная категория" in text)
+    statements.add(
+        causality,
+        "definition",
+        value="априорная категория рассудка",
+        attributions=[Attribution("entity", people["Кант"])],
+        evidence=[
+            Evidence(category, "причинность — априорная категория рассудка", source_id=textbook)
+        ],
+        provenance=Provenance("extracted", actor="seed"),
+    )
     new_essays = entities.create(
         "work", [("ru", "Новые опыты о человеческом разумении", "primary")]
     )

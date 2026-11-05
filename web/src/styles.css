@@ -386,3 +386,64 @@ blockquote.block {
 .review-context mark {
   background: var(--highlight);
 }
+
+/* Упоминания и карточки */
+.mention {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  border-bottom: 1px dotted var(--accent);
+  cursor: pointer;
+}
+
+.card-popup {
+  position: absolute;
+  z-index: 25;
+  width: 24rem;
+  max-height: 60vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  padding: 0.8rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.card-popup header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.card-popup h3 {
+  flex: 1;
+  margin: 0;
+}
+
+.card-section h4 {
+  margin: 0.8rem 0 0.2rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.card-section ul {
+  padding-left: 1rem;
+  margin: 0;
+}
+
+.card-row.ungrounded,
+.card-description.ungrounded {
+  border: 1px dashed #c9b48a;
+  border-radius: 4px;
+  background: #fffaf0;
+  padding: 0 0.2rem;
+}
+
+.card-who,
+.card-dates {
+  color: var(--muted);
+}

@@ -10,8 +10,10 @@ from sqlalchemy import text
 from philograph import __version__
 from philograph.knowledge import schema
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
+from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
+from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
 from philograph.knowledge.statements import Statements
@@ -49,18 +51,27 @@ def components(env: dict[str, str]):
             statements, ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=120), library
         )
     queue = Queue(engine)
-    subscribe(queue, statements, filling)
+    mentions = Mentions(statements, library)
+    subscribe(queue, statements, filling, mentions)
     review = Review(statements, ActionLog(engine))
+    llm = (
+        ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=60)
+        if env.get("PHILOGRAPH_LLM_URL")
+        else None
+    )
+    cards = Cards(statements, mentions, llm, on_view=review.record_views)
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
-    return statements, health, queue, review, auth
+    return statements, health, queue, review, auth, cards, mentions
 
 
 if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
     events.configure(sinks=[events.json_sink()])
-    _statements, _health, _queue, _review, _auth = components(dict(os.environ))
+    _statements, _health, _queue, _review, _auth, _cards, _mentions = components(dict(os.environ))
     _stop = threading.Event()
     threading.Thread(
         target=_queue.serve, args=(_stop,), daemon=True, name="knowledge-queue"
     ).start()
-    app = build_app(_statements, _health, review=_review, auth=_auth)
+    app = build_app(
+        _statements, _health, review=_review, auth=_auth, cards=_cards, mentions=_mentions
+    )

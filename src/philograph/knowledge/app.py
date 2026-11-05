@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from fastapi import APIRouter, Depends, FastAPI, Query, Request, Response
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from philograph import __version__
+from philograph.knowledge.cards import Cards
+from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
 from philograph.knowledge.statements import Statements
@@ -58,6 +62,8 @@ def build_app(
     *,
     review: Review | None = None,
     auth: OperatorAuth | None = None,
+    cards: Cards | None = None,
+    mentions: Mentions | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -88,6 +94,33 @@ def build_app(
             return statements.traverse(recipe, start, depth=depth, attributed_to=attributed_to)
         except RegistryError as exc:
             raise UserFacingError(str(exc), status=400, kind="recipe_not_applicable") from exc
+
+    if mentions is not None:
+
+        @router.get("/mentions")
+        def mentions_of(targets: str) -> list[dict[str, Any]]:
+            """Упоминания для абзацев главы; без онтологии клиент показывает текст без них."""
+            return mentions.for_targets([x for x in targets.split(",") if x][:500])
+
+        @router.get("/entities/{entity_id}/where")
+        def where(entity_id: str) -> list[dict[str, Any]]:
+            return mentions.where_to_read(entity_id)
+
+    if cards is not None:
+
+        @router.get("/entities/{entity_id}/card")
+        def card(
+            entity_id: str, attributed_to: str | None = None, generation: bool = True
+        ) -> dict[str, Any]:
+            return cards.card(entity_id, attributed_to=attributed_to, generation=generation)
+
+        @router.post("/entities/{entity_id}/description")
+        def describe(entity_id: str, generation: bool = True) -> StreamingResponse:
+            def lines():
+                for item in cards.describe(entity_id, generation=generation):
+                    yield json.dumps(item, ensure_ascii=False) + "\n"
+
+            return StreamingResponse(lines(), media_type="application/x-ndjson")
 
     if review is not None and auth is not None:
         _review_routes(router, review, auth)
@@ -167,7 +200,7 @@ def _review_routes(router: APIRouter, review: Review, auth: OperatorAuth) -> Non
         return review.export_sample(sample_id)
 
 
-def subscribe(queue: Queue, statements: Statements, filling=None) -> None:
+def subscribe(queue: Queue, statements: Statements, filling=None, mentions=None) -> None:
     """Подписка на события библиотеки: подтверждения обновляются всегда, извлечение — если
     подключено наполнение (публикация запускает его для добавленных и изменённых абзацев)."""
     for kind in EVENTS:
@@ -176,5 +209,12 @@ def subscribe(queue: Queue, statements: Statements, filling=None) -> None:
             statements.handle_library_event(kind, job.payload)
             if filling is not None and kind == "source.published":
                 filling.handle_published(job.payload)
+            if mentions is not None and kind == "source.published":
+                mentions.handle_published(job.payload)
+                created = list(getattr(filling, "created_entities", []))
+                if filling is not None:
+                    filling.created_entities.clear()
+                for entity_id in created:  # новые сущности — пересчёт их названий везде
+                    mentions.recompute_entity(entity_id)
 
         queue.handler(f"knowledge:{kind}")(handle)

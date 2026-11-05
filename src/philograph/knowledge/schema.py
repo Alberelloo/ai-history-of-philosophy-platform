@@ -244,3 +244,22 @@ review_samples = Table(
 migrations.add(2, "наполнение и проверка")(
     migrations.create_tables("filling_runs", "review_items", "statement_views", "review_samples")
 )
+
+# --- упоминания в тексте (миграция 3) ---
+mentions = Table(
+    "mentions",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("target_id", String(40), nullable=False, index=True),  # абзац, сноска или раздел
+    Column("target_kind", String(20), nullable=False),  # paragraph | footnote | heading
+    Column("source_id", String(40), nullable=False, index=True),
+    Column("chapter_id", String(40)),
+    Column("source_title", String(500)),  # для указателя «где читать» без запроса к библиотеке
+    Column("chapter_title", String(500)),
+    Column("entity_id", String(40), nullable=False, index=True),
+    Column("start", Integer, nullable=False),
+    Column("end", Integer, nullable=False),
+    Column("method", String(20), nullable=False),  # name | context | model
+    schema=SCHEMA,
+)
+migrations.add(3, "упоминания в тексте")(migrations.create_tables("mentions"))

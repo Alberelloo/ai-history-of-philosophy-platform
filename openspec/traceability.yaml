@@ -23,3 +23,5 @@ enforce:
   - ontology-statements
   - ontology-extraction
   - ontology-review
+  - entity-mentions
+  - entity-cards

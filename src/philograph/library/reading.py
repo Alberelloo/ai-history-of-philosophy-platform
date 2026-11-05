@@ -322,7 +322,9 @@ class Internal:
         source = self.registry.get(version["source_id"])
         doc = self.registry.load_document(version_id)
         chapter_of = {}
+        chapter_titles = {}
         for chapter in self.reading.chapters(doc):
+            chapter_titles[chapter.id] = chapter.title
             for section in chapter.walk():
                 chapter_of[section.id] = chapter.id
         paragraphs = []
@@ -342,13 +344,27 @@ class Internal:
                         "searchable": section.searchable and block.kind != "unrendered",
                     }
                 )
+        # Упоминания ищутся и в заголовках, и в сносках, не только в абзацах.
+        headings = [
+            {"id": s.id, "text": s.title, "chapter_id": chapter_of.get(s.id)}
+            for s in doc.walk()
+            if s.title and s.visible
+        ]
+        footnotes = [
+            {"id": n.id, "text": n.text, "chapter_id": chapter_of.get(sec.id)}
+            for sec, n in doc.footnotes()
+        ]
         return {
             "source_id": source.id,
+            "source_title": source.title,
+            "chapters": chapter_titles,
             "version_id": version_id,
             "scope": source.scope,
             "published": source.published_version == version_id and source.status == "active",
             "permissions": self.registry.permissions(source.id),
             "paragraphs": paragraphs,
+            "headings": headings,
+            "footnotes": footnotes,
         }
 
     def paragraph_text(self, paragraph_id: str) -> dict[str, Any] | None:

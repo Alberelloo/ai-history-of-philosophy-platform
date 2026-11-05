@@ -245,6 +245,12 @@ class Entities:
                 .where(t.external_ids.c.entity_id == removed)
                 .values(entity_id=kept)
             )
+            moved_mentions = list(
+                conn.scalars(select(t.mentions.c.id).where(t.mentions.c.entity_id == removed))
+            )
+            conn.execute(
+                update(t.mentions).where(t.mentions.c.entity_id == removed).values(entity_id=kept)
+            )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == removed).values(redirect_to=kept)
             )
@@ -253,7 +259,12 @@ class Entities:
                     kept=kept,
                     removed=removed,
                     undone=False,
-                    moved={"names": moved_names, "subject": moved_subject, "object": moved_object},
+                    moved={
+                        "names": moved_names,
+                        "subject": moved_subject,
+                        "object": moved_object,
+                        "mentions": moved_mentions,
+                    },
                 )
             ).inserted_primary_key[0]
         events.emit("knowledge.entity.merged", kept=kept, removed=removed)
@@ -277,6 +288,11 @@ class Entities:
                 update(t.statements)
                 .where(t.statements.c.id.in_(moved["object"]))
                 .values(object=m["removed"])
+            )
+            conn.execute(
+                update(t.mentions)
+                .where(t.mentions.c.id.in_(moved.get("mentions", [])))
+                .values(entity_id=m["removed"])
             )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == m["removed"]).values(redirect_to=None)
