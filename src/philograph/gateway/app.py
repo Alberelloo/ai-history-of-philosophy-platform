@@ -2,13 +2,16 @@
 
 Отдаёт веб-клиент, проксирует ``/api/assistant/*`` в ассистента, ``/api/*`` — в библиотеку.
 Ответы идут потоком, без буферизации: первое слово ассистента не ждёт конца ответа.
-Внутренние интерфейсы сервисов (``/api/v1/internal/*``) снаружи недоступны. Позже здесь же
-лимиты запросов (``abuse-protection``) и, когда появятся, аккаунты.
+Внутренние интерфейсы сервисов (``/api/v1/internal/*``) снаружи недоступны. Здесь же лимиты
+запросов и защита бюджета (``gateway.limits``), а когда появятся — аккаунты.
 """
 
 from __future__ import annotations
 
+import json
+import math
 import os
+from collections.abc import Iterator
 from pathlib import Path
 
 import httpx
@@ -18,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.background import BackgroundTask
 
 from philograph import __version__
+from philograph.gateway.limits import PAGE_COOKIE, Limits, LimitSettings, paid_operation
 from philograph.platform import context, events
 from philograph.platform.health import Health
 from philograph.platform.web import create_app
@@ -42,18 +46,114 @@ HOP_HEADERS = {
 }
 
 
+def _ndjson(*items: dict) -> StreamingResponse:
+    def lines() -> Iterator[str]:
+        for item in items:
+            yield json.dumps(item, ensure_ascii=False) + "\n"
+
+    return StreamingResponse(lines(), media_type="application/x-ndjson")
+
+
 def build_app(
     upstreams: dict[str, str],
     web_root: Path | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
+    limits: Limits | None = None,
 ) -> FastAPI:
-    """``upstreams``: ``{"library": url, "assistant": url}``."""
+    """``upstreams``: ``{"library": url, "assistant": url}``; ``limits`` — защита бюджета."""
     health = Health("gateway", __version__)
     app = create_app("gateway", __version__, health)
     client = httpx.AsyncClient(timeout=httpx.Timeout(10.0, read=120.0), transport=transport)
 
+    def who(request: Request) -> tuple[str, str]:
+        address = limits.address(
+            request.client.host if request.client else None,
+            request.headers.get("X-Forwarded-For"),
+        )
+        return address, request.headers.get("User-Agent", "")
+
+    if limits is not None:
+
+        @app.middleware("http")
+        async def rate(request: Request, call_next):
+            """Общий лимит частоты с одного адреса — для всех запросов, включая статику."""
+            address, user_agent = who(request)
+            wait = limits.rate(address)
+            if wait is None:
+                return await call_next(request)
+            seconds = max(1, math.ceil(wait))
+            events.emit(
+                "gateway.limit.triggered",
+                kind="rate",
+                visitor=limits.visitor(address, user_agent),
+                retry_after_seconds=seconds,
+            )
+            return JSONResponse(
+                {
+                    "error": "Слишком много запросов, попробуйте чуть позже",
+                    "kind": "rate_limited",
+                    "retry_after_seconds": seconds,
+                },
+                status_code=429,
+                headers={"Retry-After": str(seconds)},
+            )
+
+    async def guard(request: Request, body: bytes) -> Response | bytes:
+        """Платные операции: токен страницы и лимит посетителя. Возвращает ответ отказа
+        или тело запроса, которое уйдёт сервису (для графа — без достройки)."""
+        operation = paid_operation(request.method, request.url.path)
+        if limits is None or operation is None:
+            return body
+        address, user_agent = who(request)
+        visitor = limits.visitor(address, user_agent)
+        if not limits.check_token(request.cookies.get(PAGE_COOKIE), user_agent):
+            events.emit(
+                "gateway.limit.triggered", kind="page_token", visitor=visitor, operation=operation
+            )
+            return JSONResponse(
+                {
+                    "error": "Откройте страницу продукта, чтобы пользоваться этой возможностью",
+                    "kind": "page_token_required",
+                },
+                status_code=403,
+            )
+        payload = json.loads(body or b"{}") if operation == "graph" else {}
+        if operation == "graph" and not payload.get("generation", True):
+            return body  # без достройки — бесплатно
+        if operation == "description" and request.query_params.get("generation") == "false":
+            return body
+        refused = limits.paid(visitor, operation)
+        if refused is None:
+            return body
+        kind, seconds = refused
+        events.emit(
+            "gateway.limit.triggered",
+            kind=kind,
+            visitor=visitor,
+            operation=operation,
+            retry_after_seconds=seconds,
+        )
+        if operation == "graph":
+            # Граф из сохранённых связей бесплатен: строится, но без достройки моделью.
+            return json.dumps({**payload, "generation": False, "visitor_limited": True}).encode()
+        if operation == "description":
+            return _ndjson({"type": "unavailable", "reason": "visitor_limit"})
+        minutes = max(1, seconds // 60)
+        return _ndjson(
+            {
+                "type": "unavailable",
+                "reason": "visitor_limit",
+                "retry_after_seconds": seconds,
+                "message": f"Слишком много вопросов подряд. Спросите снова через {minutes} мин. "
+                "Чтение и карточки работают.",
+            }
+        )
+
     async def proxy(request: Request, target: str, path: str) -> Response:
         url = f"{upstreams[target].rstrip('/')}/{path}"
+        body = await guard(request, await request.body())
+        if isinstance(body, Response):
+            return body
         headers = {k: v for k, v in request.headers.items() if k.lower() not in HOP_HEADERS}
         headers["X-Forwarded-For"] = request.client.host if request.client else "unknown"
         headers[context.REQUEST_ID_HEADER] = context.request_id() or context.new_id()
@@ -62,7 +162,7 @@ def build_app(
             url,
             params=request.query_params,
             headers=headers,
-            content=await request.body(),
+            content=body,
         )
         try:
             response = await client.send(upstream, stream=True)
@@ -104,8 +204,19 @@ def build_app(
         app.mount("/assets", StaticFiles(directory=web_root / "assets"), name="assets")
 
         @app.get("/{path:path}", include_in_schema=False)
-        def spa(path: str) -> FileResponse:
-            return FileResponse(web_root / "index.html")
+        def spa(path: str, request: Request) -> FileResponse:
+            response = FileResponse(web_root / "index.html")
+            if limits is not None:
+                # Токен страницы: платные операции доступны только со страницы продукта.
+                response.set_cookie(
+                    PAGE_COOKIE,
+                    limits.page_token(request.headers.get("User-Agent", "")),
+                    max_age=limits.settings.token_ttl_seconds,
+                    httponly=True,
+                    samesite="strict",
+                    secure=request.headers.get("X-Forwarded-Proto") == "https",
+                )
+            return response
 
     return app
 
@@ -119,4 +230,8 @@ if os.environ.get("PHILOGRAPH_LIBRARY_URL") and os.environ.get("PHILOGRAPH_ASSIS
     }
     if os.environ.get("PHILOGRAPH_KNOWLEDGE_URL"):
         _upstreams["knowledge"] = os.environ["PHILOGRAPH_KNOWLEDGE_URL"]
-    app = build_app(_upstreams, Path(_root) if _root else None)
+    _limits = Limits(
+        LimitSettings.from_env(dict(os.environ)),
+        os.environ.get("PHILOGRAPH_VISITOR_SECRET", "dev-secret"),
+    )
+    app = build_app(_upstreams, Path(_root) if _root else None, limits=_limits)

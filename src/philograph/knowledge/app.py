@@ -59,6 +59,7 @@ class GraphRequest(BaseModel):
     textbook: str | None = None  # выбранный учебник читателя
     only_textbook: bool = False  # переключатель «только выбранный учебник»
     generation: bool = True
+    visitor_limited: bool = False  # ставит шлюз, когда посетитель исчерпал лимит
 
 
 class AssistantContextRequest(BaseModel):
@@ -158,6 +159,7 @@ def build_app(
                 textbook=body.textbook,
                 only_textbook=body.only_textbook,
                 generation=body.generation,
+                visitor_limited=body.visitor_limited,
             )
             return StreamingResponse(ndjson(items), media_type="application/x-ndjson")
 
