@@ -12,6 +12,7 @@ import json
 from collections.abc import Iterator
 from typing import Any
 
+from philograph.knowledge.graph import attribution_label, recipes_for
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.statements import Attribution, Provenance, Statements
 from philograph.platform import events
@@ -84,20 +85,17 @@ class Cards:
         self.llm = llm
         self.on_view = on_view  # приоритет очереди проверки: что чаще видят читатели
 
-    def _row(self, s: dict[str, Any], entity_id: str) -> dict[str, Any]:
+    def _row(
+        self, s: dict[str, Any], entity_id: str, textbook: str | None = None
+    ) -> dict[str, Any]:
         spec = self.registry.relation(s["type"])
         outward = s["subject"] == entity_id
         other = s["object"] if outward else s["subject"]
         visible = [a for a in s["attributions"] if not a["hidden"]]
-        who = []
-        for a in visible:
-            if a["who_kind"] == "common":
-                who.append("распространённое мнение")
-            elif a["who_kind"] == "entity" and a["who"]:
-                who.append(self.entities.label(a["who"]))
-            elif a["who"]:
-                who.append(a["who"])
-        disputers = [a["who"] for a in visible if a["stance"] == "disputes"]
+        who = list(dict.fromkeys(attribution_label(self.statements, a) for a in visible))
+        disputers = [
+            attribution_label(self.statements, a) for a in visible if a["stance"] == "disputes"
+        ]
         return {
             "statement_id": s["id"],
             "type": s["type"],
@@ -113,6 +111,8 @@ class Cards:
             "disputed_by": disputers,
             "generated": s["status"] == "generated",
             "derived": s.get("derived", False),
+            # Есть ли строка в выбранном учебнике: для сравнения «как у меня и у других».
+            "in_textbook": self.statements._attributed(s, textbook) if textbook else None,
             "attributed_to": who,
             "evidence": [
                 {
@@ -126,8 +126,15 @@ class Cards:
         }
 
     def card(
-        self, entity_id: str, *, attributed_to: str | None = None, generation: bool = True
+        self,
+        entity_id: str,
+        *,
+        attributed_to: str | None = None,
+        generation: bool = True,
+        textbook: str | None = None,
     ) -> dict[str, Any]:
+        """``attributed_to`` — режим «только выбранный учебник», ``textbook`` — пометка строк,
+        которые есть в выбранном учебнике, в режиме «все источники»."""
         entity = self.entities.get(entity_id)
         entity_id = entity["id"]  # перенаправление слитой сущности
         statements = self.statements.about(entity_id, attributed_to=attributed_to)
@@ -136,7 +143,7 @@ class Cards:
         for code, title, types, direction in SECTIONS.get(entity["type"], []):
             allowed = set().union(*(self.registry.relation_subtypes(x) for x in types))
             rows = [
-                self._row(s, entity_id)
+                self._row(s, entity_id, textbook)
                 for s in statements
                 if s["type"] in allowed
                 and (
@@ -174,6 +181,7 @@ class Cards:
             and attributed_to is None,
             "sections": sections,
             "where_to_read": where[:10],
+            "recipes": recipes_for(self.registry, entity["type"]),
         }
         events.emit(
             "knowledge.card.served",

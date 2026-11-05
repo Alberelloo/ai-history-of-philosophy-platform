@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from philograph import __version__
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.graph import Graphs, RecipeNotApplicable, ndjson
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
@@ -50,6 +51,15 @@ class Decision(BaseModel):
     changes: dict[str, Any] | None = None
 
 
+class GraphRequest(BaseModel):
+    entity_id: str
+    recipe: str
+    depth: int | None = None
+    textbook: str | None = None  # выбранный учебник читателя
+    only_textbook: bool = False  # переключатель «только выбранный учебник»
+    generation: bool = True
+
+
 class SampleRequest(BaseModel):
     relation: str
     size: int = 20
@@ -64,6 +74,7 @@ def build_app(
     auth: OperatorAuth | None = None,
     cards: Cards | None = None,
     mentions: Mentions | None = None,
+    graphs: Graphs | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -95,6 +106,36 @@ def build_app(
         except RegistryError as exc:
             raise UserFacingError(str(exc), status=400, kind="recipe_not_applicable") from exc
 
+    if graphs is not None:
+
+        @router.get("/entities/{entity_id}/recipes")
+        def recipes(entity_id: str) -> list[dict[str, Any]]:
+            return graphs.recipes_for(entity_id)
+
+        @router.post("/graph/build")
+        def build(body: GraphRequest) -> StreamingResponse:
+            """Поток графа: сохранённое сразу, достроенное моделью — по мере появления."""
+            try:
+                graphs.check_recipe(body.entity_id, body.recipe)
+            except RecipeNotApplicable as exc:
+                raise UserFacingError(
+                    "Этот рецепт не подходит сущности, выберите другой",
+                    status=400,
+                    kind="recipe_not_applicable",
+                    details={"suggestions": exc.suggestions},
+                ) from exc
+            except RegistryError as exc:
+                raise UserFacingError(str(exc), status=400, kind="unknown_recipe") from exc
+            items = graphs.build(
+                body.entity_id,
+                body.recipe,
+                depth=body.depth,
+                textbook=body.textbook,
+                only_textbook=body.only_textbook,
+                generation=body.generation,
+            )
+            return StreamingResponse(ndjson(items), media_type="application/x-ndjson")
+
     if mentions is not None:
 
         @router.get("/mentions")
@@ -110,9 +151,14 @@ def build_app(
 
         @router.get("/entities/{entity_id}/card")
         def card(
-            entity_id: str, attributed_to: str | None = None, generation: bool = True
+            entity_id: str,
+            attributed_to: str | None = None,
+            generation: bool = True,
+            textbook: str | None = None,
         ) -> dict[str, Any]:
-            return cards.card(entity_id, attributed_to=attributed_to, generation=generation)
+            return cards.card(
+                entity_id, attributed_to=attributed_to, generation=generation, textbook=textbook
+            )
 
         @router.post("/entities/{entity_id}/description")
         def describe(entity_id: str, generation: bool = True) -> StreamingResponse:

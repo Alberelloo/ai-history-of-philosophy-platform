@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import threading
+from dataclasses import dataclass
 
 from sqlalchemy import text
 
@@ -13,6 +14,7 @@ from philograph.knowledge.app import build_app, library_paragraphs, subscribe
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
+from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
@@ -27,7 +29,19 @@ from philograph.platform.queue import Queue
 from philograph.platform.queue import migrations as queue_migrations
 
 
-def components(env: dict[str, str]):
+@dataclass
+class Components:
+    statements: Statements
+    health: Health
+    queue: Queue
+    review: Review
+    auth: OperatorAuth | None
+    cards: Cards
+    mentions: Mentions
+    graphs: Graphs
+
+
+def components(env: dict[str, str]) -> Components:
     sets = (schema.migrations, queue_migrations, operator_migrations)
     engine = make_engine(env["PHILOGRAPH_DATABASE_URL"], [m.schema for m in sets])
     for m in sets:
@@ -60,18 +74,33 @@ def components(env: dict[str, str]):
         else None
     )
     cards = Cards(statements, mentions, llm, on_view=review.record_views)
+    graphs = Graphs(
+        statements,
+        llm,
+        queue,
+        GraphSettings(
+            min_edges=int(env.get("PHILOGRAPH_GRAPH_MIN_EDGES", "5")),
+            max_nodes=int(env.get("PHILOGRAPH_GRAPH_MAX_NODES", "60")),
+        ),
+    )
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
-    return statements, health, queue, review, auth, cards, mentions
+    return Components(statements, health, queue, review, auth, cards, mentions, graphs)
 
 
 if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
     events.configure(sinks=[events.json_sink()])
-    _statements, _health, _queue, _review, _auth, _cards, _mentions = components(dict(os.environ))
+    _c = components(dict(os.environ))
     _stop = threading.Event()
     threading.Thread(
-        target=_queue.serve, args=(_stop,), daemon=True, name="knowledge-queue"
+        target=_c.queue.serve, args=(_stop,), daemon=True, name="knowledge-queue"
     ).start()
     app = build_app(
-        _statements, _health, review=_review, auth=_auth, cards=_cards, mentions=_mentions
+        _c.statements,
+        _c.health,
+        review=_c.review,
+        auth=_c.auth,
+        cards=_c.cards,
+        mentions=_c.mentions,
+        graphs=_c.graphs,
     )

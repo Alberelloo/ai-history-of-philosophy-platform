@@ -224,7 +224,9 @@ class Filling:
             )
             return {"skipped": True}
         run_id = run_id or self.start_run("extraction", version_id)
-        source = self.entities.source_entity(data["source_id"], data["source_id"])
+        source = self.entities.source_entity(
+            data["source_id"], data.get("source_title") or data["source_id"]
+        )
         paragraphs = [p for p in data["paragraphs"] if p["searchable"]]
         fragments = self.fragments(paragraphs, set(changed) if changed is not None else None)
         if limit is not None:

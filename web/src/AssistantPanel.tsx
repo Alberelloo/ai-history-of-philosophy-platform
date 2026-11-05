@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "./App";
+import { ScopeToggle, useScope } from "./scope";
 
 // Панель ассистента рядом с текстом. Ответ приходит потоком событий NDJSON; каждый фрагмент
 // уже проверен сервером: со ссылками на абзацы или с пометкой «без опоры на источники».
@@ -55,6 +56,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const abort = useRef<AbortController | null>(null);
   const current = useRef<string | undefined>(selection ?? undefined);
   const paragraphs = useRef<string[]>(selectionParagraphs);
+  const scope = useScope();
 
   useEffect(() => {
     current.current = selection ?? undefined;
@@ -91,8 +93,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           source_id: sourceId,
           history,
           sources_only: settings?.sourcesOnly ?? false,
-          generation: settings?.generation ?? true,
-          scope: settings?.scope ?? "all",
+          generation: settings?.generation ?? scope.generation,
+          // Общий переключатель источников: «только выбранный учебник» — поиск только в нём.
+          scope: settings?.scope ?? (scope.onlyTextbook ? "current" : "all"),
         }),
       });
       const reader = response.body!.getReader();
@@ -143,6 +146,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           ✕
         </button>
       </header>
+      <ScopeToggle textbook={sourceId} />
       <ol className="turns">
         {turns.map((turn, i) => (
           <li key={i} className="turn">

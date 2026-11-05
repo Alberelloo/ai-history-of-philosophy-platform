@@ -7,6 +7,9 @@ providers:
   demo-answer:
     kind: fake
     fake_reply: "Это демонстрационный ответ: он опирается на первый найденный абзац [1]. Настоящая модель подключается в config/llm.yaml."
+    # Достройка графа: две допустимые связи и одна с типом вне рецепта (будет отброшена).
+    fake_replies:
+      graph.extend: '{"statements": [{"subject": "Кант", "relation": "develops", "object": "Лейбниц"}, {"subject": "Юм", "relation": "influenced_by", "object": "Локк"}, {"subject": "Кант", "relation": "lived_in", "object": "Юм"}]}'
   demo-embeddings:
     kind: fake
 

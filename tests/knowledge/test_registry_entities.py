@@ -267,3 +267,32 @@ def test_textbook_is_a_work_with_edition(onto):
     assert onto.entities.source_entity("s_textbook", "дубль") == source
     edition = onto.statements.about(work)[0]
     assert edition["type"] == "edition_of" and edition["subject"] == source
+
+
+def test_parallel_start_loads_registry_once(engine_for):
+    """Сервис знаний и заполнение демо стартуют одновременно и оба загружают реестр."""
+    import threading
+
+    from philograph.knowledge import schema
+    from philograph.knowledge.registry import OntologyRegistry
+
+    engine = engine_for(schema.migrations)
+    if engine.dialect.name != "postgresql":
+        pytest.skip("гонка воспроизводится только с параллельными соединениями PostgreSQL")
+    errors: list[Exception] = []
+    barrier = threading.Barrier(4)
+
+    def start() -> None:
+        barrier.wait()
+        try:
+            OntologyRegistry(engine).load_defaults()
+        except Exception as exc:
+            errors.append(exc)
+
+    threads = [threading.Thread(target=start) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert errors == []
+    assert OntologyRegistry(engine).version() == 1
