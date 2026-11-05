@@ -31,3 +31,6 @@ enforce:
   - first-run-notice
   - reader-settings
   - abuse-protection
+  - backup-and-recovery
+  - operational-alerts
+  - deployment

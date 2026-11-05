@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import hmac
+import os
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, Request, Response
@@ -11,6 +14,7 @@ from fastapi.responses import JSONResponse
 
 from philograph.platform import context, events
 from philograph.platform.health import Health
+from philograph.platform.lifecycle import running
 from philograph.platform.metrics import metrics
 
 events.define(
@@ -25,7 +29,6 @@ events.define(
     "Внутренняя ошибка при обработке запроса",
     required=("method", "route", "detail"),
 )
-events.define("service.started", "info", "Сервис запущен", required=("version",))
 
 
 class UserFacingError(Exception):
@@ -53,7 +56,13 @@ def create_app(
     *,
     internal_error_message: str = "Не удалось выполнить запрос",
 ) -> FastAPI:
-    app = FastAPI(title=f"philograph-{service}", version=version)
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        # Версия в журнале при старте и признак перезапуска после сбоя.
+        with running(service, version):
+            yield
+
+    app = FastAPI(title=f"philograph-{service}", version=version, lifespan=lifespan)
 
     @app.middleware("http")
     async def request_context(
@@ -104,6 +113,15 @@ def create_app(
             status_code=exc.status,
         )
 
+    @app.get("/internal/metrics", include_in_schema=False)
+    def internal_metrics(request: Request) -> JSONResponse:
+        """Метрики для оповещений: только со служебным токеном, иначе адреса будто нет."""
+        token = os.environ.get("PHILOGRAPH_INTERNAL_TOKEN", "")
+        given = request.headers.get("X-Internal-Token", "")
+        if not token or not hmac.compare_digest(given, token):
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+        return JSONResponse(metrics.snapshot())
+
     @app.get("/health/live")
     def live() -> dict[str, str]:
         return health.live()
@@ -120,6 +138,4 @@ def create_app(
         }
         return JSONResponse(body, status_code=200 if report.ready else 503)
 
-    with context.scope(service=service):
-        events.emit("service.started", version=version)
     return app

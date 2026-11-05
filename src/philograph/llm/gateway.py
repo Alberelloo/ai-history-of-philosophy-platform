@@ -883,6 +883,33 @@ class LLMGateway:
         events.emit("llm.texts.purged", count=count, older_than=border.isoformat())
         return count
 
+    def budget_status(self) -> list[dict[str, Any]]:
+        """Расход каждого бюджета относительно лимитов за сутки и месяц — для оповещений."""
+        now = self.clock.now()
+        day = st.day_of(now)
+        first, last = st.month_bounds(now)
+        result = []
+        for name, conf in self.config.budgets.items():
+            if conf.daily_limit_usd:
+                result.append(
+                    {
+                        "budget": name,
+                        "period": "day",
+                        "spent_usd": round(self.store.spent(name, day), 4),
+                        "limit_usd": conf.daily_limit_usd,
+                    }
+                )
+            if conf.monthly_limit_usd:
+                result.append(
+                    {
+                        "budget": name,
+                        "period": "month",
+                        "spent_usd": round(self.store.spent_between(name, first, last), 4),
+                        "limit_usd": conf.monthly_limit_usd,
+                    }
+                )
+        return result
+
     def spend_summary(
         self, days: int = 1, group_by: tuple[str, ...] = ("budget",)
     ) -> list[dict[str, Any]]:

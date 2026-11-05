@@ -42,6 +42,10 @@ def build_app(searcher: Searcher, indexer: Indexer, health: Health | None = None
     def reconcile() -> dict[str, int]:
         return indexer.reconcile()
 
+    @router.post("/internal/reindex")
+    def reindex() -> dict[str, int]:
+        return indexer.reindex()
+
     @router.get("/internal/estimate")
     def estimate() -> dict[str, float]:
         return indexer.estimate()

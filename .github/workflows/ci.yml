@@ -151,6 +151,22 @@ jobs:
           PHILOGRAPH_E2E_URL: http://127.0.0.1:8080
         run: pytest -q tests/e2e
 
+      # Публичный сервер: Caddy с HTTPS (для localhost сертификат выпускает его внутренний
+      # центр), закрытый порт шлюза, перезапуск упавшего сервиса.
+      - name: Развёртывание с HTTPS
+        env:
+          PHILOGRAPH_DOMAIN: localhost
+        run: docker compose -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml up -d --wait
+
+      - name: Проверки развёртывания
+        env:
+          PHILOGRAPH_DOMAIN: localhost
+          PHILOGRAPH_DEPLOY_URL: https://localhost
+          PHILOGRAPH_DEPLOY_COMPOSE: -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml
+        run: pytest -q tests/ops/test_deploy.py
+
       - name: Журналы сервисов при падении
         if: failure()
-        run: docker compose -f compose.yaml -f compose.e2e.yaml logs --no-color | tail -300
+        env:
+          PHILOGRAPH_DOMAIN: localhost
+        run: docker compose -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml logs --no-color | tail -300

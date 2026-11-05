@@ -10,3 +10,7 @@ data/
 web/node_modules/
 web/dist/
 .stack/
+
+# Резервные копии и состояние развёртывания на сервере
+backups/
+.deploy/

@@ -48,6 +48,20 @@ class Metrics:
         rank = max(1, math.ceil(q / 100 * len(samples)))
         return samples[rank - 1]
 
+    def snapshot(self) -> dict[str, list[dict]]:
+        """Все счётчики и показатели — для оповещений; распределения не отдаются."""
+        with self._lock:
+            return {
+                "counters": [
+                    {"name": n, "labels": dict(labels), "value": v}
+                    for (n, labels), v in self._counters.items()
+                ],
+                "gauges": [
+                    {"name": n, "labels": dict(labels), "value": v}
+                    for (n, labels), v in self._gauges.items()
+                ],
+            }
+
     def summary(self, name: str, **labels: str) -> dict[str, float | None]:
         return {
             "count": len(self._samples.get(_key(name, labels), [])),

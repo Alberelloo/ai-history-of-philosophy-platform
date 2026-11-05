@@ -40,6 +40,8 @@ def test_compose_describes_whole_system():
     services = compose["services"]
     assert {"postgres", "qdrant", "llm"} <= set(services)
     for name, service in services.items():
+        if service.get("restart") == "no":
+            continue  # разовая задача (миграции перед обновлением): не живёт, а завершается
         assert "healthcheck" in service, f"{name} без проверки готовности"
         assert service.get("restart") or "<<" in service
     # Сервисы приложения собираются из одного образа и ждут готовности базы.
