@@ -263,3 +263,15 @@ mentions = Table(
     schema=SCHEMA,
 )
 migrations.add(3, "упоминания в тексте")(migrations.create_tables("mentions"))
+
+# Граф уже достраивался моделью: повторный запрос берёт сохранённое, модель не вызывается.
+graph_extensions = Table(
+    "graph_extensions",
+    metadata,
+    Column("entity_id", String(40), primary_key=True),
+    Column("recipe", String(40), primary_key=True),
+    Column("proposed", Integer, nullable=False),
+    Column("time", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+migrations.add(4, "достройка графов")(migrations.create_tables("graph_extensions"))

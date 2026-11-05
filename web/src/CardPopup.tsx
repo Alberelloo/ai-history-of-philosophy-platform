@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { navigate } from "./App";
+import { ScopeToggle, useScope } from "./scope";
+import { storage } from "./storage";
 
 // Карточка сущности рядом с упоминанием: не уводит из текста и не сдвигает главу.
 // Каждая строка — утверждение: видно, кто так считает, где прочитать и не сгенерировано ли.
@@ -14,6 +16,7 @@ type Row = {
   disputed: boolean;
   disputed_by: string[];
   generated: boolean;
+  in_textbook: boolean | null;
   attributed_to: string[];
   evidence: { paragraph_id: string; link: string }[];
 };
@@ -31,6 +34,7 @@ type Card = {
     chapter_title: string | null;
     count: number;
   }[];
+  recipes: { code: string; title: string }[];
 };
 
 const API = "/api/knowledge/v1";
@@ -46,7 +50,11 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
   const [stack, setStack] = useState<string[]>([entityId]);
   const [card, setCard] = useState<Card | null>(null);
   const [description, setDescription] = useState<{ text: string; generated: boolean } | null>(null);
+  const [notInTextbook, setNotInTextbook] = useState(false);
   const current = stack[stack.length - 1];
+  const scope = useScope();
+  const textbook = storage.currentSource();
+  const onlyTextbook = scope.onlyTextbook && Boolean(textbook);
 
   useEffect(() => setStack([entityId]), [entityId]);
 
@@ -54,7 +62,10 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
     let cancelled = false;
     setCard(null);
     setDescription(null);
-    fetch(`${API}/entities/${current}/card`)
+    // В режиме учебника — только его утверждения, иначе пометка «есть в учебнике».
+    const params = new URLSearchParams({ generation: String(scope.generation) });
+    if (textbook) params.set(onlyTextbook ? "attributed_to" : "textbook", textbook);
+    fetch(`${API}/entities/${current}/card?${params}`)
       .then((r) => r.json())
       .then(async (data: Card) => {
         if (cancelled) return;
@@ -63,7 +74,9 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
           setDescription({ text: value(data.description), generated: data.description.generated });
         } else if (data.description_pending) {
           // Разделы уже видны, описание дописывается потоком.
-          const response = await fetch(`${API}/entities/${current}/description`, { method: "POST" });
+          const response = await fetch(`${API}/entities/${current}/description?generation=${scope.generation}`, {
+            method: "POST",
+          });
           const reader = response.body!.getReader();
           const decoder = new TextDecoder();
           let buffer = "";
@@ -88,7 +101,12 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
     return () => {
       cancelled = true;
     };
-  }, [current]);
+  }, [current, onlyTextbook, scope.generation, textbook]);
+
+  // Фильтр «нет в моём учебнике» не оставляет пустых разделов.
+  const sections = (card?.sections ?? [])
+    .map((s) => ({ ...s, rows: notInTextbook ? s.rows.filter((r) => r.in_textbook === false) : s.rows }))
+    .filter((s) => s.rows.length > 0);
 
   return (
     <div className="card-popup" role="dialog" aria-label="Карточка" style={{ left: x, top: y }}>
@@ -104,6 +122,15 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
         </button>
       </header>
       {card?.dates && <p className="card-dates">{card.dates.original}</p>}
+      <div className="card-scope">
+        <ScopeToggle textbook={textbook} />
+        {textbook && !onlyTextbook && (
+          <label>
+            <input type="checkbox" checked={notInTextbook} onChange={(e) => setNotInTextbook(e.target.checked)} />
+            Нет в моём учебнике
+          </label>
+        )}
+      </div>
       {description && (
         <p className={description.generated ? "card-description ungrounded" : "card-description"}>
           {description.generated && (
@@ -114,7 +141,7 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
           {description.text}
         </p>
       )}
-      {card?.sections.map((section) => (
+      {sections.map((section) => (
         <section key={section.code} className="card-section" data-section={section.code}>
           <h4>{section.title}</h4>
           <ul>
@@ -134,6 +161,7 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
                   value(row)
                 )}
                 {row.disputed && <span className="badge muted">спорно: {row.disputed_by.join(", ")}</span>}
+                {row.in_textbook === true && <span className="badge muted">есть в учебнике</span>}
                 {row.attributed_to.length > 0 && (
                   <span className="card-who"> — так считает: {row.attributed_to.join(", ")}</span>
                 )}
@@ -155,6 +183,23 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
           </ul>
         </section>
       ))}
+      {card && card.recipes.length > 0 && (
+        <section className="card-section" data-section="graph">
+          <h4>Граф</h4>
+          {card.recipes.map((r) => (
+            <button
+              key={r.code}
+              className="link card-recipe"
+              onClick={() => {
+                onClose();
+                navigate(`/graph/${card.id}?recipe=${r.code}`);
+              }}
+            >
+              {r.title}
+            </button>
+          ))}
+        </section>
+      )}
       {card && card.where_to_read.length > 0 && (
         <section className="card-section" data-section="where">
           <h4>Где читать</h4>

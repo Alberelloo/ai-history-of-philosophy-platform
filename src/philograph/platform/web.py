@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
@@ -30,11 +31,19 @@ events.define("service.started", "info", "Сервис запущен", required
 class UserFacingError(Exception):
     """Ошибка с сообщением, которое можно показать пользователю."""
 
-    def __init__(self, message: str, *, status: int = 400, kind: str = "user_error") -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: int = 400,
+        kind: str = "user_error",
+        details: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__(message)
         self.message = message
         self.status = status
         self.kind = kind
+        self.details = details or {}  # то, что поможет клиенту предложить выход
 
 
 def create_app(
@@ -86,7 +95,12 @@ def create_app(
     @app.exception_handler(UserFacingError)
     async def user_error(request: Request, exc: UserFacingError) -> JSONResponse:
         return JSONResponse(
-            {"error": exc.message, "kind": exc.kind, "request_id": context.request_id()},
+            {
+                **exc.details,
+                "error": exc.message,
+                "kind": exc.kind,
+                "request_id": context.request_id(),
+            },
             status_code=exc.status,
         )
 

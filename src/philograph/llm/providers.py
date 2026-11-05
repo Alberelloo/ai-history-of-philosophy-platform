@@ -25,6 +25,7 @@ class ProviderRequest:
     temperature: float
     timeout_seconds: float
     json_mode: bool = False
+    template: str = ""  # имя шаблона: для журналов и сценариев фальшивого провайдера
 
 
 @dataclass(frozen=True)
@@ -77,6 +78,7 @@ class FakeProvider:
 
     script: deque[Any] = field(default_factory=deque)
     default: str = "ok"
+    replies: dict[str, str] = field(default_factory=dict)  # постоянный ответ по шаблону
     calls: list[ProviderRequest] = field(default_factory=list)
     embed_calls: list[list[str]] = field(default_factory=list)
     dimension: int = 8
@@ -84,8 +86,12 @@ class FakeProvider:
     def push(self, *items: Any) -> None:
         self.script.extend(items)
 
-    def _next(self) -> Any:
-        return self.script.popleft() if self.script else self.default
+    def _next(self, request: ProviderRequest | None = None) -> Any:
+        if self.script:
+            return self.script.popleft()
+        if request is not None and request.template in self.replies:
+            return self.replies[request.template]
+        return self.default
 
     @staticmethod
     def _usage(request: ProviderRequest, text: str) -> Usage:
@@ -98,7 +104,7 @@ class FakeProvider:
 
     def generate(self, request: ProviderRequest) -> Completion:
         self.calls.append(request)
-        item = self._next()
+        item = self._next(request)
         if isinstance(item, Exception):
             raise item
         if isinstance(item, list):
@@ -107,7 +113,7 @@ class FakeProvider:
 
     def stream(self, request: ProviderRequest) -> Iterator[StreamChunk]:
         self.calls.append(request)
-        item = self._next()
+        item = self._next(request)
         if isinstance(item, Exception):
             raise item
         parts = item if isinstance(item, list) else [item]

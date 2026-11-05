@@ -25,3 +25,5 @@ enforce:
   - ontology-review
   - entity-mentions
   - entity-cards
+  - knowledge-graph
+  - source-scope

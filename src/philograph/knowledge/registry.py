@@ -8,12 +8,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Engine, func, select, update
+from sqlalchemy import Connection, Engine, func, select, update
 
 from philograph.knowledge import registry_data as data
 from philograph.knowledge import schema as t
 from philograph.platform import events
 from philograph.platform.clock import Clock, SystemClock
+from philograph.platform.db import advisory_lock
 
 events.define(
     "knowledge.registry.changed",
@@ -42,7 +43,10 @@ class OntologyRegistry:
     # --- загрузка и версии ---
 
     def load_defaults(self, actor: str = "system") -> None:
+        """Начальный реестр. Сервисы и заполнение демо стартуют одновременно: проверка и
+        запись идут в одной транзакции под блокировкой, второй процесс увидит готовый реестр."""
         with self.engine.begin() as conn:
+            advisory_lock(conn, "philograph-ontology-registry")
             if conn.scalar(select(func.count()).select_from(t.entity_types)):
                 return
             conn.execute(
@@ -80,16 +84,19 @@ class OntologyRegistry:
                     for c, title, starts, families, direction, depth, order in data.RECIPES
                 ],
             )
-        self._bump(actor, "начальный реестр")
+            self._bump(actor, "начальный реестр", conn)
 
-    def _bump(self, actor: str, change: str) -> int:
-        with self.engine.begin() as conn:
-            version = (conn.scalar(select(func.max(t.registry_versions.c.version))) or 0) + 1
-            conn.execute(
-                t.registry_versions.insert().values(
-                    version=version, time=self.clock.now(), actor=actor, change=change
-                )
+    def _bump(self, actor: str, change: str, conn: Connection | None = None) -> int:
+        if conn is None:
+            with self.engine.begin() as own:
+                return self._bump(actor, change, own)
+        advisory_lock(conn, "philograph-ontology-registry")
+        version = (conn.scalar(select(func.max(t.registry_versions.c.version))) or 0) + 1
+        conn.execute(
+            t.registry_versions.insert().values(
+                version=version, time=self.clock.now(), actor=actor, change=change
             )
+        )
         self._cache = None
         events.emit("knowledge.registry.changed", version=version, change=change)
         return version
@@ -182,6 +189,9 @@ class OntologyRegistry:
             q = known[code]
             if q["value_kind"] == "enum" and value not in (q["allowed"] or []):
                 raise RegistryError(f"значение {value!r} недопустимо для уточнителя {code}")
+
+    def recipes(self) -> dict[str, dict[str, Any]]:
+        return dict(self._load()["recipes"])
 
     def recipe(self, code: str) -> dict[str, Any]:
         try:

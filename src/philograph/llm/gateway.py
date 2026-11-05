@@ -476,6 +476,7 @@ class LLMGateway:
             temperature=call.temperature,
             timeout_seconds=role.timeout_seconds,
             json_mode=json_mode,
+            template=call.template,
         )
 
     def _complete(

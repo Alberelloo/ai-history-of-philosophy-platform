@@ -25,6 +25,7 @@ class ProviderConfig(BaseModel):
     api_key_env: str | None = None
     # Только для kind=fake: постоянный ответ (демо-стенд и сквозные тесты без ключей).
     fake_reply: str | None = None
+    fake_replies: dict[str, str] = {}  # ответ по имени шаблона, иначе fake_reply
 
 
 class RoleConfig(BaseModel):

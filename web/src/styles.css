@@ -447,3 +447,74 @@ blockquote.block {
 .card-dates {
   color: var(--muted);
 }
+
+/* Граф и переключатель источников */
+.scope-toggle,
+.card-scope label,
+.graph-controls label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: 0.8rem;
+}
+
+.card-scope {
+  margin: 0.4rem 0;
+}
+
+.card-recipe {
+  margin-right: 0.7rem;
+}
+
+.graph-page {
+  padding: 1.5rem;
+}
+
+.graph-header {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.graph-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.graph-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.graph {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+}
+
+.graph-edge,
+.graph-node {
+  cursor: pointer;
+}
+
+.graph-details {
+  margin-top: 1rem;
+  max-width: 40rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  background: #fff;
+}
+
+.graph-details h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+.graph-empty button,
+.graph-problem button {
+  margin-left: 0.7rem;
+}

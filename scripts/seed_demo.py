@@ -106,6 +106,7 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
     paragraphs = internal.version_paragraphs(reading.registry.get(textbook).published_version)
     text_of = {p["id"]: p["text"] for p in paragraphs["paragraphs"]}
     statements = Statements(engine, registry, entities, text_of.get)
+    entities.source_entity(textbook, reading.registry.get(textbook).title)
     people = {}
     for name, birth, death in (
         ("Кант", "1724", "1804"),

@@ -265,6 +265,31 @@ class Statements:
         self._update_primary(subject, type_)
         return statement_id
 
+    def check_proposal(self, subject: str, type_: str, obj: str) -> str | None:
+        """Причина отказа от предложенной моделью связи или None, если её можно показать.
+
+        Предложение проходит те же проверки, что и запись, а также проверки целостности;
+        совпадающее с отклонённым или уже сохранённым не показывается.
+        """
+        subject, obj = self.entities.resolve(subject), self.entities.resolve(obj)
+        if subject == obj:
+            return "self_link"
+        try:
+            self._check(subject, type_, obj, None, {}, [], [])
+        except (StatementError, RegistryError):
+            return "invalid"
+        warnings = self._integrity(subject, type_, obj)
+        if warnings:
+            return f"integrity:{warnings[0]}"
+        key = self._key(subject, type_, obj, None, {})
+        with self.engine.begin() as conn:
+            status = conn.scalar(select(t.statements.c.status).where(t.statements.c.key == key))
+        if status == "rejected":
+            return "rejected_before"
+        if status is not None:
+            return "exists"
+        return None
+
     def _attach(
         self,
         statement_id: str,
@@ -597,9 +622,11 @@ class Statements:
             current = queue.popleft()
             if nodes[current] >= depth:
                 continue
-            for s in self.about(
+            found = self.about(
                 current, families=recipe["families"], scopes=scopes, attributed_to=attributed_to
-            ):
+            )
+            # При пределе узлов остаются самые значимые: сначала проверенное и по источникам.
+            for s in sorted(found, key=lambda s: -STRENGTH[s["status"]]):
                 outward = s["direction"] == "out"
                 if (
                     recipe["direction"] == "backward"

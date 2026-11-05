@@ -63,10 +63,20 @@ def make_engine(url: str, schemas: list[str]) -> Engine:
     engine = create_engine(url, pool_pre_ping=True)
     with engine.begin() as conn:
         # Параллельный запуск сервисов: создание схем тоже под блокировкой.
-        conn.execute(text("SELECT pg_advisory_xact_lock(hashtext('philograph-schemas'))"))
+        advisory_lock(conn, "philograph-schemas")
         for schema in schemas:
             conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
     return engine
+
+
+def advisory_lock(conn: Connection, name: str) -> None:
+    """Блокировка до конца транзакции для «проверить, затем записать» при параллельном старте.
+
+    В PostgreSQL — рекомендательная блокировка транзакции. В SQLite не нужна: пишущие
+    транзакции там и так идут по одной.
+    """
+    if conn.dialect.name == "postgresql":
+        conn.execute(text("SELECT pg_advisory_xact_lock(hashtext(:s))"), {"s": name})
 
 
 @dataclass(frozen=True)
@@ -127,11 +137,7 @@ class Migrations:
 
         applied = []
         with engine.begin() as conn:
-            if conn.dialect.name == "postgresql":
-                conn.execute(
-                    text("SELECT pg_advisory_xact_lock(hashtext(:s))"),
-                    {"s": f"philograph-migrations:{self.schema}"},
-                )
+            advisory_lock(conn, f"philograph-migrations:{self.schema}")
             self._version_table.create(conn, checkfirst=True)
             done = set(conn.scalars(select(self._version_table.c.version)))
             for migration in [m for m in self._items if m.version not in done]:
