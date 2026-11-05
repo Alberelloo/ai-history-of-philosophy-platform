@@ -89,11 +89,11 @@ def gutenberg(data: bytes) -> bytes:
     return data
 
 
-# --- Wikisource (ws-export) -----------------------------------------------------------
+# --- Wikisource ---------------------------------------------------------------------------
 
 
 def wikisource(data: bytes) -> bytes:
-    """EPUB ws-export без страницы об участниках и даты сборки; HTML — без служебных блоков."""
+    """HTML страницы без шапки, навигации и служебных блоков; EPUB — без страницы участников."""
     if data.startswith(b"PK\x03\x04"):
 
         def transform(name: str, body: bytes) -> bytes | None:
@@ -118,9 +118,20 @@ def wikisource(data: bytes) -> bytes:
         tree = html.fromstring(data)
         for el in tree.xpath(
             "//*[contains(@class,'ws-noexport') or contains(@class,'mw-editsection') or "
-            "@id='toc' or contains(@class,'printfooter')]"
+            "contains(@class,'headertemplate') or @id='ws-data' or @id='toc' or "
+            "contains(@class,'printfooter') or contains(@class,'mw-cite-backlink')]"
         ):
             el.getparent().remove(el)
+        # Подстраница «Книга/Глава 1»: заголовок главы — последняя часть названия страницы.
+        title = tree.find(".//title")
+        body = tree.find(".//body")
+        if title is not None and title.text and body is not None:
+            short = title.text.rsplit("/", 1)[-1].strip()
+            title.text = short
+            if not body.xpath(".//h1|.//h2"):
+                heading = html.Element("h2")
+                heading.text = short
+                body.insert(0, heading)
         return html.tostring(tree, encoding="utf-8")
     return data
 

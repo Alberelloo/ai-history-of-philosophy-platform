@@ -340,7 +340,12 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 if page_started and raw.paginated:
                     current.pages.append(PageMark(shift, label))
                 current.notes.extend(
-                    (shift + s.start, s.target or line.text[s.start : s.end], pos)
+                    (
+                        shift + s.start,
+                        s.target or line.text[s.start : s.end],
+                        pos,
+                        line.text[s.start : s.end],
+                    )
                     for s in line.spans
                 )
                 current.text = joined

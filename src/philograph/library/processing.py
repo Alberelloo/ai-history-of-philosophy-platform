@@ -380,7 +380,15 @@ class Pipeline:
             and latest["state"] != "published"
             and same_inputs(latest)
         ):
-            if latest["error"]:
+            waiting = latest["state"] in (
+                "checked",
+                "awaiting_quality",
+                "deferred",
+                "withdrawn",
+                "replaced",
+            )
+            if latest["error"] or not waiting:
+                # упавшая или прерванная на полпути версия продолжается с места остановки
                 self.run(latest["id"], limit_usd=limit_usd)
                 return latest["id"]
             events.emit("library.pipeline.nothing_to_do", source_id=source_id)
@@ -489,19 +497,21 @@ class Pipeline:
                     new_state, reused = step(version, limit_usd)
                 except BudgetStop:
                     return state
-                except (StepFailed, ExtractionError) as exc:
+                except Exception as exc:  # любая ошибка шага записывается в версию
                     page = getattr(exc, "page", None)
+                    expected = isinstance(exc, (StepFailed, ExtractionError))
+                    message = str(exc) if expected else f"{type(exc).__name__}: {exc}"
                     self.registry.update_version(
-                        version_id, error={"step": name, "message": str(exc), "page": page}
+                        version_id, error={"step": name, "message": message, "page": page}
                     )
-                    self._log(version_id, name, "error", str(exc), page=page)
+                    self._log(version_id, name, "error", message, page=page)
                     events.emit(
                         "library.pipeline.step.failed",
                         version_id=version_id,
                         step=name,
-                        message=str(exc),
+                        message=message,
                         page=page,
-                        error_kind="pipeline_step",
+                        error_kind="pipeline_step" if expected else "unexpected",
                     )
                     return state
                 self.registry.update_version(version_id, state=new_state, error=None)

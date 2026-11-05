@@ -225,7 +225,7 @@ class CatalogService:
             **fields,
             "license": model.license_of(entry),
             "files": [
-                {k: v for k, v in f.items() if k in ("name", "url", "clean") and v}
+                {k: v for k, v in f.items() if k in ("name", "url", "clean", "api") and v}
                 for f in model.files(entry)
             ],
             "settings": {"languages": [fields["language"]]},
@@ -297,6 +297,22 @@ class CatalogService:
         if version_id is None:
             return Outcome(cid, "unchanged", source_id=source_id)
         return Policy(self.registry, self.actor).apply(entry, source_id, version_id)
+
+    # --- решение по качеству распознавания ----------------------------------------------
+
+    def latest_version(self, entry_id: str) -> dict[str, Any] | None:
+        source_id = self.linked(entry_id)
+        versions = self.registry.versions(source_id) if source_id else []
+        return max(versions, key=lambda v: v["number"]) if versions else None
+
+    def decide(self, entry_id: str, decision: str, reason: str | None = None) -> Outcome:
+        """Решение оператора по выборке страниц; при «принять» обработка идёт дальше."""
+        entry = self.catalog.find(entry_id)
+        version = self.latest_version(entry_id)
+        if entry is None or version is None:
+            raise RegistryError(f"у записи {entry_id} нет версии")
+        self.pipeline.decide_quality(self.actor, version["id"], decision, reason)
+        return Policy(self.registry, self.actor).apply(entry, version["source_id"], version["id"])
 
     # --- плановая проверка ------------------------------------------------------------
 

@@ -217,6 +217,26 @@ def test_footnotes_removed_from_flow_and_linked():
     assert second.footnotes[0].text == "Ко второй главе."
 
 
+@req(DS, "Сноски")
+def test_footnote_in_continued_line_is_linked():
+    # знак сноски во второй строке абзаца (нашлось на настоящем скане archive.org)
+    doc = parse_raw(
+        scan(
+            [
+                line("Глава 1", size=TITLE, start=True),
+                line("Гераклит, которого за любовь", start=True),
+                line("к парадоксам звали Тёмным,1 жил в Эфесе.", note_at=26),
+                line("1 Диоген Лаэртский, IX.", size=SMALL),
+            ]
+        )
+    )
+    block = doc.sections[0].blocks[0]
+    assert block.text.startswith("Гераклит, которого за любовь к парадоксам")
+    note = doc.sections[0].footnotes[0]
+    assert note.text == "Диоген Лаэртский, IX." and note.linked
+    assert block.notes[0].footnote_id == note.id
+
+
 @req(DS, "Несвязанные сноски")
 def test_unlinked_footnote_kept_at_chapter_end():
     doc = parse_raw(

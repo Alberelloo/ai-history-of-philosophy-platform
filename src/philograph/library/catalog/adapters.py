@@ -57,7 +57,7 @@ class Wikidata:
     def entity(self, qid: str) -> dict[str, Any]:
         if qid not in self._cache:
             data = self.fetcher.get(
-                f"https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
+                f"https://www.wikidata.org/wiki/Special:EntityData/{qid}.json", api=True
             ).json()
             self._cache[qid] = data["entities"].get(qid) or next(iter(data["entities"].values()))
         return self._cache[qid]
@@ -96,7 +96,8 @@ class Wikidata:
         try:
             found = self.fetcher.get(
                 "https://www.wikidata.org/w/api.php?action=wbsearchentities&type=item&format=json"
-                f"&limit=5&language={lang}&search={quote(name)}"
+                f"&limit=5&language={lang}&search={quote(name)}",
+                api=True,
             ).json()
         except FetchError:
             return None
@@ -120,7 +121,8 @@ NS = {
 
 def _pg_name(raw: str) -> str:
     """«Locke, John» → «John Locke»; годы и уточнения в скобках отбрасываются."""
-    raw = re.sub(r"\s*\(.*?\)\s*", " ", raw).strip()
+    raw = re.sub(r"\s*\(.*?\)\s*", " ", raw)
+    raw = re.sub(r",?\s*\d{3,4}\??\s*-\s*(\d{3,4})?\??\s*$", "", raw).strip(" ,")
     if "," in raw:
         last, first = (p.strip() for p in raw.split(",", 1))
         return f"{first} {last}".strip()
@@ -218,9 +220,43 @@ def _plain(value: str) -> str:
     return " ".join(value.split())
 
 
+AUTHOR_NS = {"ru": "Автор", "en": "Author", "de": "Autor", "fr": "Auteur", "la": "Scriptor"}
+
+
 class Wikisource:
+    """Текст — HTML страницы и подстраниц через REST API Wikimedia, в порядке оглавления.
+
+    ws-export (EPUB) закрыт для программ в robots.txt, поэтому не используется.
+    """
+
     name = "wikisource"
-    version = 1
+    version = 2
+
+    @staticmethod
+    def rest_url(host: str, page: str) -> str:
+        return f"https://{host}/api/rest_v1/page/html/{quote(page.replace(' ', '_'), safe='')}"
+
+    def files(self, host: str, page: str, fetcher: Fetcher) -> list[dict[str, Any]]:
+        """Главная страница и подстраницы по ссылкам из неё, в порядке появления."""
+        main = self.rest_url(host, page)
+        body = fetcher.get(main, api=True).data
+        prefix = page.replace(" ", "_") + "/"
+        subpages: list[str] = []
+        for href in re.findall(rb'href="\./([^"#?]+)', body):
+            title = unquote(href.decode("utf-8"))
+            if title.startswith(prefix) and title not in subpages:
+                subpages.append(title)
+        result = [{"name": page, "url": main, "clean": "wikisource", "api": True}]
+        for title in subpages:
+            result.append(
+                {
+                    "name": title.replace("_", " "),
+                    "url": self.rest_url(host, title),
+                    "clean": "wikisource",
+                    "api": True,
+                }
+            )
+        return result
 
     def matches(self, url: str) -> bool:
         return bool(re.match(r"https?://[a-z-]+\.wikisource\.org/wiki/", url))
@@ -232,12 +268,16 @@ class Wikisource:
         api = f"https://{parts.netloc}/w/api.php"
         query = fetcher.get(
             f"{api}?action=query&prop=pageprops&redirects=1&format=json&formatversion=2"
-            f"&titles={quote(page)}"
+            f"&titles={quote(page)}",
+            api=True,
         ).json()
         info = query["query"]["pages"][0]
+        if info.get("missing") or info.get("invalid"):
+            raise ValueError(f"на {parts.netloc} нет страницы «{page}»")
         page = info.get("title", page)
         wikitext = fetcher.get(
-            f"{api}?action=parse&prop=wikitext&format=json&formatversion=2&page={quote(page)}"
+            f"{api}?action=parse&prop=wikitext&format=json&formatversion=2&page={quote(page)}",
+            api=True,
         ).json()["parse"]["wikitext"]
         wikidata = Wikidata(fetcher)
 
@@ -245,32 +285,33 @@ class Wikisource:
             raw = _template_value(wikitext, field_names)
             if not raw:
                 return []
+            # «[[Иммануил Кант]]» или «David Hume (1711-1776)»: страница автора по ссылке или имени
+            targets = _links(raw) or [n for n in re.split(r",| и | and ", _plain(raw)) if n.strip()]
             result = []
-            linked = _links(raw)
-            names = [_plain(n) for n in (linked or re.split(r",| и ", _plain(raw)))]
-            for target in linked or [None] * len(names):
-                person: dict[str, Any] = {"name": "", "death_year": None, "wikidata": None}
-                if target:
-                    title = (
-                        target
-                        if ":" in target
-                        else (f"Автор:{target}" if lang == "ru" else f"Author:{target}")
+            for target in targets:
+                target = target.strip()
+                name = _pg_name(target.split(":", 1)[-1])
+                years = re.search(r"\((?:\d{3,4})\s*[-–—]\s*(\d{3,4})\)", target)
+                person: dict[str, Any] = {
+                    "name": name,
+                    "death_year": int(years.group(1)) if years else None,
+                    "wikidata": None,
+                }
+                title = target if ":" in target else f"{AUTHOR_NS.get(lang, 'Author')}:{target}"
+                pages = fetcher.get(
+                    f"{api}?action=query&prop=pageprops&redirects=1&format=json&formatversion=2"
+                    f"&titles={quote(title)}",
+                    api=True,
+                ).json()["query"]["pages"]
+                qid = (pages[0].get("pageprops") or {}).get("wikibase_item") if pages else None
+                if qid:
+                    found = wikidata.person(qid, lang)
+                    person.update(
+                        wikidata=qid,
+                        death_year=found["death_year"] or person["death_year"],
+                        name=found["name"] if found["name"] != qid else name,
                     )
-                    person["name"] = _plain(target.split(":", 1)[-1])
-                    props = (
-                        fetcher.get(
-                            f"{api}?action=query&prop=pageprops&redirects=1&format=json&formatversion=2"
-                            f"&titles={quote(title)}"
-                        )
-                        .json()["query"]["pages"][0]
-                        .get("pageprops", {})
-                    )
-                    qid = props.get("wikibase_item")
-                    if qid:
-                        person.update(wikidata.person(qid, lang))
                 result.append(person)
-            if not linked:
-                result = [{"name": n, "death_year": None, "wikidata": None} for n in names if n]
             return result
 
         authors = people(_TEMPLATE_FIELDS["author"])
@@ -288,14 +329,7 @@ class Wikisource:
                 "translator": translators[0] if translators else None,
                 "publisher": f"{lang}.wikisource.org",
             },
-            files=[
-                {
-                    "name": f"{page}.epub",
-                    "url": "https://ws-export.wmcloud.org/?format=epub&fonts=&images=false"
-                    f"&lang={lang}&page={quote(page)}",
-                    "clean": "wikisource",
-                }
-            ],
+            files=self.files(parts.netloc, page, fetcher),
             license_hint=", ".join(dict.fromkeys(h.strip() for h in hints)) or None,
             slug_hint=[*(a["name"].split()[-1] for a in authors[:1]), title, lang, "wikisource"],
         )
@@ -314,7 +348,7 @@ class ArchiveOrg:
 
     def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
         item = urlsplit(url).path.split("/details/", 1)[1].split("/")[0]
-        data = fetcher.get(f"https://archive.org/metadata/{item}").json()
+        data = fetcher.get(f"https://archive.org/metadata/{item}", api=True).json()
         meta = data.get("metadata", {})
 
         def as_list(value: Any) -> list[str]:

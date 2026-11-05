@@ -6,6 +6,8 @@
   approve ID ... [--by NAME] [--note TEXT]          одобрить записи
   validate                                          проверить каталог (для CI)
   sync [--id ID ...] [--dry-run]                    привести библиотеку к каталогу
+  review ID                                         выборка страниц для решения по качеству
+  decide ID accept|defer [--reason R]               решение по качеству распознавания
   check-updates                                     проверить обновления файлов по ссылкам
   status                                            состояние записей
 
@@ -102,6 +104,13 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("sync")
     p.add_argument("--id", action="append")
     p.add_argument("--dry-run", action="store_true")
+    p = sub.add_parser("review")
+    p.add_argument("id")
+    p.add_argument("--chars", type=int, default=1500)
+    p = sub.add_parser("decide")
+    p.add_argument("id")
+    p.add_argument("decision", choices=["accept", "defer"])
+    p.add_argument("--reason")
     sub.add_parser("check-updates")
     sub.add_parser("status")
     args = parser.parse_args(argv)
@@ -201,6 +210,23 @@ def main(argv: list[str] | None = None) -> int:
                 ],
             )
         )
+        return 0
+    if args.command == "review":
+        version = service.latest_version(args.id)
+        if version is None or version["state"] != "awaiting_quality":
+            print("версия не ждёт решения по качеству")
+            return 1
+        for page in service.pipeline.review_sample(version["id"]):
+            print(
+                f"=== страница {page['index']}; сомнительные: {', '.join(page['suspicious'][:15])}"
+            )
+            print(page["text"][: args.chars])
+        return 0
+    if args.command == "decide":
+        from philograph.platform.queue import Queue
+
+        print(_outcomes([service.decide(args.id, args.decision, args.reason)]))
+        service.pipeline.dispatch_outbox(Queue(engine))
         return 0
     outcomes = (
         service.check_updates()

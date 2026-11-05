@@ -83,7 +83,7 @@ flowchart TD
 | Адаптер | Сайт | Метаданные | Файл |
 |---|---|---|---|
 | `gutenberg` | gutenberg.org/ebooks/N | RDF книги: название, авторы и годы смерти, переводчик, язык, права | EPUB3, иначе TXT; без разделов `pg-header` и `pg-footer` |
-| `wikisource` | \*.wikisource.org/wiki/… | шаблон «Отексте» или `header` в вики-тексте, авторы через Wikidata | EPUB из ws-export со всеми подстраницами; без страницы участников |
+| `wikisource` | \*.wikisource.org/wiki/… | шаблон «Отексте» или `header` в вики-тексте, авторы через Wikidata | HTML главной страницы и подстраниц через REST API (`/api/rest_v1/page/html/…`) в порядке оглавления; без шапки и служебных блоков. ws-export закрыт для программ в robots.txt и не используется |
 | `archive_org` | archive.org/details/… | API `metadata`: название, автор, язык, год, лицензия | EPUB, иначе PDF с текстовым слоем, иначе DjVu TXT |
 | `direct` | любая прямая ссылка на файл | заполняются вручную в `override` | как есть; правило публикации по умолчанию `manual` |
 
@@ -109,7 +109,7 @@ flowchart TD
 
 - User-Agent: `PhiloGraph/<версия> (+https://github.com/Alberelloo/ai-history-of-philosophy-platform)`. Почту владельца сайтам не передаём.
 - Не чаще одного запроса в секунду на сайт.
-- Соблюдается robots.txt.
+- При загрузке страниц и файлов соблюдается robots.txt. Документированные API (MediaWiki API, Wikidata, метаданные archive.org) работают по своим правилам для программ: представиться User-Agent и не перегружать сервер. robots.txt Wikimedia закрывает `/w/` для обходчиков, но не для API.
 - Временные ошибки (429, 5xx, сеть) повторяются трижды с паузой 2, 4, 8 секунд.
 - Файл больше 200 МБ не скачивается.
 

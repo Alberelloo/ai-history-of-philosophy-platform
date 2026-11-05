@@ -153,8 +153,11 @@ class Fetcher:
             response._content = b"".join(chunks)
             return response
 
-    def get(self, url: str, headers: dict[str, str] | None = None) -> Response:
-        if not self._allowed(url):
+    def get(
+        self, url: str, headers: dict[str, str] | None = None, *, api: bool = False
+    ) -> Response:
+        """``api=True`` — документированный API сайта: действуют его правила, а не robots.txt."""
+        if not api and not self._allowed(url):
             raise FetchError(f"robots.txt сайта запрещает загрузку: {url}")
         pause = self.settings.backoff
         reason = ""
@@ -253,7 +256,7 @@ class CatalogFetch:
             if state.get("last_modified"):
                 headers["If-Modified-Since"] = state["last_modified"]
         try:
-            response = self.fetcher.get(url, headers)
+            response = self.fetcher.get(url, headers, api=bool(spec.get("api")))
         except FetchError as exc:
             failures = int(state.get("failures") or 0) + 1
             self._save(url, failures=failures, last_error=str(exc), last_status=exc.status)
