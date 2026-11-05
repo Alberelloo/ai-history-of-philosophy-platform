@@ -70,7 +70,7 @@ def _wait(url: str, seconds: float = 60) -> None:
 def start(data: Path, port: int | None = None) -> Stack:
     data.mkdir(parents=True, exist_ok=True)
     (data / "logs").mkdir(exist_ok=True)
-    ports = {name: free_port() for name in ("llm", "library", "search", "assistant")}
+    ports = {name: free_port() for name in ("llm", "library", "search", "assistant", "knowledge")}
     ports["gateway"] = port or free_port()
     db = f"sqlite:///{(data / 'stack.db').as_posix()}"
     env = {
@@ -88,6 +88,7 @@ def start(data: Path, port: int | None = None) -> Stack:
         "PHILOGRAPH_EMBEDDING_DIMENSION": "8",
         "PHILOGRAPH_WEB_ROOT": str(ROOT / "web" / "dist"),
         "PHILOGRAPH_VISITOR_SECRET": "dev-stack",
+        "PHILOGRAPH_KNOWLEDGE_SERVICE": "1",
     }
     apps = {
         "llm": "philograph.llm.main:app",
@@ -95,6 +96,7 @@ def start(data: Path, port: int | None = None) -> Stack:
         "search": "philograph.search.main:app",
         "assistant": "philograph.assistant.main:app",
         "gateway": "philograph.gateway.app:app",
+        "knowledge": "philograph.knowledge.main:app",
     }
     stack = Stack(f"http://127.0.0.1:{ports['gateway']}", data)
 
@@ -130,7 +132,7 @@ def start(data: Path, port: int | None = None) -> Stack:
             stdout=seed_log,
             stderr=subprocess.STDOUT,
         )
-    for name in ("search", "assistant", "gateway"):
+    for name in ("search", "assistant", "gateway", "knowledge"):
         run(
             name,
             [
@@ -145,7 +147,7 @@ def start(data: Path, port: int | None = None) -> Stack:
             ],
         )
     run("worker", [sys.executable, "-m", "philograph.worker"])
-    for name in ("search", "assistant", "gateway"):
+    for name in ("search", "assistant", "gateway", "knowledge"):
         _wait(f"http://127.0.0.1:{ports[name]}/health/ready")
     # Индексацию делает сервис поиска из очереди: ждём, пока поиск начнёт находить.
     deadline = time.time() + 60

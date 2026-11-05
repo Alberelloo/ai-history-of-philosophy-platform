@@ -75,6 +75,7 @@ type = "forbidden"
 source_modules = ["philograph.platform"]
 forbidden_modules = [
     "philograph.llm", "philograph.library", "philograph.operator", "philograph.search",
+    "philograph.knowledge",
 ]
 
 [[tool.importlinter.contracts]]

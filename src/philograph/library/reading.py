@@ -351,6 +351,21 @@ class Internal:
             "paragraphs": paragraphs,
         }
 
+    def paragraph_text(self, paragraph_id: str) -> dict[str, Any] | None:
+        """Текст абзаца опубликованной версии: онтология сверяет с ним цитаты."""
+        resolved = self.registry.resolve_paragraph(paragraph_id)
+        if resolved["status"] != "found":
+            return None
+        version = self.registry.get(resolved["source_id"]).published_version
+        for _, block in self.registry.load_document(version).blocks():
+            if block.id == resolved["paragraph_id"]:
+                return {
+                    "paragraph_id": block.id,
+                    "source_id": resolved["source_id"],
+                    "text": block.text,
+                }
+        return None
+
     def published(self) -> list[dict[str, str]]:
         return [
             {"source_id": r["id"], "version_id": r["published_version"]}
