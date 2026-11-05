@@ -1,0 +1,34 @@
+PhiloGraph
+Library
+Теория познания: демонстрационный учебник
+Settings
+RU
+EN
+Генезис: Кант
+Recipe
+Генезис
+Последствия
+Полемика
+Контекст
+Depth 3 of 3
+Shallower
+Deeper
+Selected textbook only
+Extend with the model
+Not in my textbook
+Save image
+Локк
+1632 – 1704
+Лейбниц
+1646 – 1716
+Юм
+1711 – 1776
+Кант
+1724 – 1804
+Новые опыты о человеческом разумении
+1765
+•
+◇
+◇
+◇
+◇ Dashes and diamond: added by the model, not confirmed by sources
