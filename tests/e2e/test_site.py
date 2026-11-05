@@ -136,3 +136,14 @@ def test_first_visit_and_remembered_source(browser, stack):
     page.goto(stack.url + "/read")
     page.wait_for_selector("p.block:has-text('blank slate')")
     context.close()
+
+
+@req("ontology-statements", "Реакция на изменения библиотеки")
+def test_knowledge_service_receives_library_events(stack):
+    received = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.library.event" and e["kind"] == "source.published",
+        60,
+    )
+    assert len({e["event_id"] for e in received}) >= 2  # оба демо-источника

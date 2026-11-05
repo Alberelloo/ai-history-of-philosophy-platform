@@ -931,7 +931,7 @@ class Pipeline:
                     ids.append(item["source_id"])
         return self.batch(actor, ids)
 
-    def dispatch_outbox(self, queue, subscribers: tuple[str, ...] = ("search",)) -> int:
+    def dispatch_outbox(self, queue, subscribers: tuple[str, ...] = ("search", "knowledge")) -> int:
         """Передаёт записанные события в очередь, каждому подписчику своей задачей.
 
         Задача называется ``<подписчик>:<событие>``; повторная передача не создаёт дублей.

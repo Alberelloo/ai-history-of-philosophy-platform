@@ -69,6 +69,13 @@ def build_app(
     def version_paragraphs(version_id: str) -> dict[str, Any]:
         return internal.version_paragraphs(version_id)
 
+    @router.get("/internal/paragraphs/{paragraph_id}")
+    def paragraph_text(paragraph_id: str) -> dict[str, Any]:
+        found = internal.paragraph_text(paragraph_id)
+        if found is None:
+            raise UserFacingError("Абзац не найден", status=404, kind="paragraph_not_found")
+        return found
+
     @router.get("/internal/published")
     def published() -> list[dict[str, str]]:
         return internal.published()
