@@ -155,7 +155,12 @@ def build_app(
         if isinstance(body, Response):
             return body
         headers = {k: v for k, v in request.headers.items() if k.lower() not in HOP_HEADERS}
-        headers["X-Forwarded-For"] = request.client.host if request.client else "unknown"
+        # Сервисам — адрес посетителя, а не обратного прокси перед шлюзом.
+        headers["X-Forwarded-For"] = (
+            who(request)[0]
+            if limits is not None
+            else (request.client.host if request.client else "unknown")
+        )
         headers[context.REQUEST_ID_HEADER] = context.request_id() or context.new_id()
         upstream = client.build_request(
             request.method,

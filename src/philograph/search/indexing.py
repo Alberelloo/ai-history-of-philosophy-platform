@@ -19,6 +19,12 @@ from philograph.search.text import terms
 from philograph.search.vectors import VectorStore
 
 events.define(
+    "search.index.rebuilt",
+    "info",
+    "Индексы восстановлены из библиотеки",
+    required=("versions", "indexed", "embedded", "removed"),
+)
+events.define(
     "search.index.event",
     "info",
     "Индексация обработала событие библиотеки",
@@ -394,6 +400,25 @@ class Indexer:
             self._set_source_active(source_id, False)
         events.emit("search.index.reconciled", missing=len(missing), extra=len(extra))
         return {"missing": len(missing), "extra": len(extra)}
+
+    def reindex(self) -> dict[str, int]:
+        """Восстановление производных индексов из библиотеки после потери векторной базы.
+
+        Полнотекстовый индекс пересобирается, отметки «есть вектор» снимаются, смысловой индекс
+        строится заново. Поиск по словам работает всё это время: таблица абзацев не пустеет.
+        """
+        collection = self.active_collection
+        self.vectors.ensure(collection, self.embedder.dimension)
+        with self.engine.begin() as conn:
+            conn.execute(update(t.docs).values(embedded=False, text_hash=""))
+        totals = {"versions": 0, "indexed": 0, "embedded": 0, "removed": 0}
+        for item in self.library.published():
+            counts = self.index_version(item["version_id"], collection=collection)
+            totals["versions"] += 1
+            for key in ("indexed", "embedded", "removed"):
+                totals[key] += counts[key]
+        events.emit("search.index.rebuilt", **totals)
+        return totals
 
     def estimate(self) -> dict[str, float]:
         with self.engine.begin() as conn:

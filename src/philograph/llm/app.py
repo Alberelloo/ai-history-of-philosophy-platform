@@ -146,6 +146,10 @@ def build_app(gateway: LLMGateway, health: Health | None = None) -> FastAPI:
             raise _translate(exc) from exc
         return {"vectors": vectors, "cost_usd": cost}
 
+    @router.get("/budgets")
+    def budgets() -> list[dict[str, Any]]:
+        return gateway.budget_status()
+
     @router.get("/spend")
     def spend(days: int = 1, group_by: str = "budget") -> list[dict[str, Any]]:
         try:

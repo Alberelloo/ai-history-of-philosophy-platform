@@ -10,6 +10,7 @@ import os
 import time
 from pathlib import Path
 
+from philograph import __version__
 from philograph.library import schema as library_schema
 from philograph.library import worker as library_worker
 from philograph.library.processing import Pipeline
@@ -18,6 +19,7 @@ from philograph.operator.access import migrations as operator_migrations
 from philograph.platform import events
 from philograph.platform.db import make_engine
 from philograph.platform.files import FileStore
+from philograph.platform.lifecycle import running
 from philograph.platform.queue import Queue
 from philograph.platform.queue import migrations as queue_migrations
 
@@ -44,9 +46,10 @@ def main() -> None:
         Registry(engine), FileStore(Path(os.environ["PHILOGRAPH_FILES_ROOT"])), _fetch
     )
     library_worker.register(queue, pipeline)
-    while True:
-        if not queue.run_once():
-            time.sleep(1.0)
+    with running("worker", __version__):
+        while True:
+            if not queue.run_once():
+                time.sleep(1.0)
 
 
 if __name__ == "__main__":

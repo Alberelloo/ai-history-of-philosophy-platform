@@ -1,9 +1,13 @@
 # Вся система одной командой: docker compose up --build
 # Секреты берутся из файла .env рядом (в репозиторий не попадает), пример в .env.example.
 # Новые сервисы добавляются сюда вместе со своими изменениями OpenSpec.
+# Публичный сервер — вместе с compose.prod.yaml, обновление и откат — scripts/deploy.py.
 
 x-service: &service
   build: .
+  image: philograph:${PHILOGRAPH_VERSION:-local}
+  # tini первым процессом: сигналы доходят до сервиса, а его падение — до политики перезапуска.
+  init: true
   restart: unless-stopped
   env_file: .env
   depends_on:
@@ -128,6 +132,39 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health/ready').status == 200 else 1)"]
       interval: 10s
       retries: 6
+
+  migrate:
+    <<: *service
+    # Одноразовый запуск миграций всех схем перед обновлением (scripts/deploy.py).
+    command: python -m philograph.ops.migrate
+    environment:
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+    restart: "no"
+    profiles: ["tools"]
+
+  ops:
+    <<: *service
+    # Оповещения раз в минуту, резервная копия раз в сутки, проверка восстановления раз в неделю.
+    command: python -m philograph.ops
+    environment:
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+      PHILOGRAPH_BACKUP_VERIFY_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph_verify
+      PHILOGRAPH_FILES_ROOT: /data/files
+      PHILOGRAPH_BACKUP_TARGET: ${PHILOGRAPH_BACKUP_TARGET:-/backups}
+      PHILOGRAPH_LIBRARY_URL: http://library:8001
+      PHILOGRAPH_SEARCH_URL: http://search:8002
+      PHILOGRAPH_ASSISTANT_URL: http://assistant:8003
+      PHILOGRAPH_KNOWLEDGE_URL: http://knowledge:8004
+      PHILOGRAPH_LLM_URL: http://llm:8000
+      PHILOGRAPH_GATEWAY_URL: http://gateway:8080
+    volumes:
+      # Запись нужна восстановлению из копии (python -m philograph.ops.backup restore).
+      - library-files:/data/files
+      # Каталог копий — смонтированное внешнее хранилище; S3 задаётся PHILOGRAPH_BACKUP_TARGET.
+      - ${PHILOGRAPH_BACKUP_DIR:-./backups}:/backups
+    healthcheck:
+      test: ["CMD", "python", "-c", "import philograph.ops"]
+      interval: 30s
 
 volumes:
   library-files:

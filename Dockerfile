@@ -8,7 +8,9 @@ RUN npm run build
 
 FROM python:3.13-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONUTF8=1
+# Маркеры запуска: по ним сервис после падения пишет в журнал, что его перезапустили.
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONUTF8=1 \
+    PHILOGRAPH_STATE_DIR=/tmp/philograph-state
 WORKDIR /app
 
 COPY pyproject.toml ./

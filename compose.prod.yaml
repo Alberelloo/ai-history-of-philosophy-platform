@@ -1,0 +1,27 @@
+# Публичный сервер: docker compose -f compose.yaml -f compose.prod.yaml up -d
+# Снаружи открыты только 80 и 443 (Caddy); шлюз и остальные сервисы — во внутренней сети.
+
+services:
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      PHILOGRAPH_DOMAIN: ${PHILOGRAPH_DOMAIN:?задайте PHILOGRAPH_DOMAIN в .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      gateway:
+        condition: service_healthy
+
+  gateway:
+    ports: !reset []
+    environment:
+      # Адрес посетителя берётся из X-Forwarded-For, который выставляет Caddy.
+      PHILOGRAPH_TRUSTED_PROXY: "1"
+
+volumes:
+  caddy-data:
+  caddy-config:

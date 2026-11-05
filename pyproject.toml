@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "PhiloGraph: интерактивный учебник по истории философии"
 requires-python = ">=3.13"
 dependencies = [
+    "cryptography>=43",
     "fastapi>=0.115",
     "httpx>=0.27",
     "jsonschema>=4.23",
@@ -27,6 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["import-linter>=2.1", "playwright>=1.47", "pytest>=8", "ruff>=0.6", "uvicorn>=0.30"]
 postgres = ["psycopg[binary]>=3.2"]
+s3 = ["boto3>=1.35"]  # хранилище резервных копий S3
 ocr = ["pytesseract>=0.3.10", "pillow>=10"]
 
 [tool.setuptools.packages.find]

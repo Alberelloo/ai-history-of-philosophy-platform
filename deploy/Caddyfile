@@ -1,0 +1,6 @@
+# Публичный адрес продукта. Caddy выпускает и обновляет сертификат сам и перенаправляет
+# HTTP на HTTPS. Для localhost сертификат выпускает внутренний центр Caddy (проверка стенда).
+{$PHILOGRAPH_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy gateway:8080
+}
