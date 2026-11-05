@@ -122,6 +122,7 @@ services:
       PHILOGRAPH_ASSISTANT_URL: http://assistant:8003
       PHILOGRAPH_KNOWLEDGE_URL: http://knowledge:8004
       PHILOGRAPH_WEB_ROOT: /app/web/dist
+      PHILOGRAPH_VISITOR_SECRET: ${PHILOGRAPH_VISITOR_SECRET:?задайте PHILOGRAPH_VISITOR_SECRET в .env}
     ports: ["8080:8080"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health/ready').status == 200 else 1)"]

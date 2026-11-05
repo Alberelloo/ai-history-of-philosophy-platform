@@ -390,6 +390,17 @@ def test_assistant_answer_uses_ontology(page, stack):
     )
 
 
+@req("abuse-protection", "Защита от автоматических запросов")
+def test_direct_paid_call_without_page_rejected(stack):
+    response = httpx.post(stack.url + "/api/assistant/v1/ask", json={"question": "что такое опыт?"})
+    assert response.status_code == 403 and response.json()["kind"] == "page_token_required"
+    assert wait_logs(
+        stack,
+        "gateway",
+        lambda e: e["event"] == "gateway.limit.triggered" and e["kind"] == "page_token",
+    )
+
+
 @req("ontology-review", "Доступ")
 @req("ontology-review", "Очередь проверки")
 @req("ontology-review", "Решения")

@@ -104,6 +104,12 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           scope: settings?.scope ?? (scope.onlyTextbook ? "current" : "all"),
         }),
       });
+      if (!response.ok) {
+        // Отказ шлюза (например, нет токена страницы) приходит обычным JSON.
+        const body = await response.json().catch(() => ({}));
+        update(index, (t) => ({ ...t, status: "done", notice: body.error ?? "Ответ временно недоступен." }));
+        return;
+      }
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = "";

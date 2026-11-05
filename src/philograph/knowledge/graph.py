@@ -56,6 +56,7 @@ NOTICES = {
     "scope": "В режиме «только выбранный учебник» граф показывает только то, что есть в учебнике.",
     "unavailable": "Достройка временно недоступна, показаны сохранённые связи.",
     "limit": "Дневной лимит достройки исчерпан, показаны сохранённые связи.",
+    "visitor_limit": "Лимит достройки для вас на сегодня исчерпан, показаны сохранённые связи.",
 }
 
 
@@ -176,8 +177,11 @@ class Graphs:
         textbook: str | None = None,
         only_textbook: bool = False,
         generation: bool = True,
+        visitor_limited: bool = False,
     ) -> Iterator[dict[str, Any]]:
-        """Поток событий графа: сначала сохранённое, затем достроенное моделью."""
+        """Поток событий графа: сначала сохранённое, затем достроенное моделью.
+
+        ``visitor_limited`` — шлюз отключил достройку: посетитель исчерпал лимит."""
         entity_id = self.entities.resolve(entity_id)
         self.check_recipe(entity_id, recipe)
         spec = self.registry.recipe(recipe)
@@ -191,7 +195,11 @@ class Graphs:
         )
         nodes = {n["id"]: self._node(n["id"], n["depth"]) for n in found["nodes"]}
         edges = [self._edge(s, textbook) for s in found["edges"]]
-        extension = self._extension(entity_id, recipe, len(edges), attributed_to, generation)
+        extension = self._extension(
+            entity_id, recipe, len(edges), attributed_to, generation and not visitor_limited
+        )
+        if visitor_limited and extension == "disabled":
+            extension = "visitor_limit"
         events.emit(
             "knowledge.graph.built",
             entity_id=entity_id,
