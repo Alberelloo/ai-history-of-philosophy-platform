@@ -5,14 +5,24 @@ import { ScopeToggle, useScope } from "./scope";
 // Панель ассистента рядом с текстом. Ответ приходит потоком событий NDJSON; каждый фрагмент
 // уже проверен сервером: со ссылками на абзацы или с пометкой «без опоры на источники».
 
-type Citation = { paragraph_id: string; source_id: string; chapter_id: string | null; title: string };
-type Fragment = { text: string; grounded: boolean; citations: Citation[] };
+type Citation = {
+  kind?: "paragraph" | "statement";
+  paragraph_id: string | null;
+  statement_id?: string | null;
+  source_id: string;
+  chapter_id: string | null;
+  title: string;
+};
+type Contradiction = { kind: string; entity: string; expected: string; found: string };
+type Fragment = { text: string; grounded: boolean; citations: Citation[]; contradicts?: Contradiction[] };
+type Suggestion = { entity_id: string; recipe: string; title: string };
 type Turn = {
   question: string;
   selection?: string;
   fragments: Fragment[];
   status: "streaming" | "done" | "stopped" | "error";
   notice?: string;
+  suggestion?: Suggestion;
 };
 
 const DIALOG_KEY = "philograph:dialog:v1";
@@ -112,6 +122,8 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           const event = JSON.parse(line);
           if (event.type === "fragment") {
             update(index, (t) => ({ ...t, fragments: [...t.fragments, event] }));
+          } else if (event.type === "suggestion") {
+            update(index, (t) => ({ ...t, suggestion: event as Suggestion }));
           } else if (event.type === "done") {
             update(index, (t) => ({ ...t, status: "done" }));
           } else if (event.type === "error") {
@@ -156,30 +168,54 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             <div className="answer" data-status={turn.status}>
               {turn.fragments.map((f, j) => (
                 <span key={j} className={f.grounded ? "fragment" : "fragment ungrounded"}>
-                  {!f.grounded && (
+                  {f.contradicts && f.contradicts.length > 0 && (
+                    <span
+                      className="contradiction-mark"
+                      role="img"
+                      aria-label="Противоречит источникам"
+                      title={f.contradicts.map((c) => `${c.entity}: в онтологии ${c.expected}`).join("; ")}
+                    >
+                      ⚠
+                    </span>
+                  )}
+                  {!f.grounded && (!f.contradicts || f.contradicts.length === 0) && (
                     <span className="ungrounded-mark" role="img" aria-label="Без опоры на источники" title="Без опоры на источники">
                       ◇
                     </span>
                   )}
                   {f.text}
-                  {f.citations.map((c) => (
-                    <a
-                      key={c.paragraph_id}
-                      className="citation"
-                      href={`/p/${c.paragraph_id}`}
-                      title={c.title}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/p/${c.paragraph_id}`);
-                      }}
-                    >
-                      [{c.title || "источник"}]
-                    </a>
-                  ))}{" "}
+                  {f.citations.map((c) =>
+                    c.paragraph_id ? (
+                      <a
+                        key={c.statement_id ?? c.paragraph_id}
+                        className="citation"
+                        href={`/p/${c.paragraph_id}`}
+                        title={c.title}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/p/${c.paragraph_id}`);
+                        }}
+                      >
+                        [{c.title || "источник"}]
+                      </a>
+                    ) : (
+                      <span key={c.statement_id ?? c.title} className="citation" title={c.title}>
+                        [{c.title}]
+                      </span>
+                    ),
+                  )}{" "}
                 </span>
               ))}
               {turn.status === "stopped" && <span className="status-mark">остановлено</span>}
             </div>
+            {turn.suggestion && (
+              <button
+                className="link"
+                onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}
+              >
+                {turn.suggestion.title}
+              </button>
+            )}
             {turn.status === "error" && (
               <button className="link" onClick={() => send(turn.question, turn.selection)}>
                 Повторить

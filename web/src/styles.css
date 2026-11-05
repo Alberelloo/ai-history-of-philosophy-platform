@@ -518,3 +518,8 @@ blockquote.block {
 .graph-problem button {
   margin-left: 0.7rem;
 }
+
+.contradiction-mark {
+  color: #a33a1d;
+  margin-right: 0.2rem;
+}

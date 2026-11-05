@@ -19,6 +19,7 @@ docs = Table(
     Column("chapter_id", String(40)),
     Column("section_id", String(40)),
     Column("section_title", Text),
+    Column("source_title", Text),  # чтобы ответ «по авторам» называл учебник
     Column("ord", Integer, nullable=False),
     Column("lang", String(10), nullable=False),
     Column("scope", String(100), nullable=False),
@@ -81,3 +82,12 @@ def _add_quoting(conn) -> None:
         conn.execute(
             text(f"ALTER TABLE {SCHEMA}.docs ADD COLUMN quoting BOOLEAN NOT NULL DEFAULT {default}")
         )
+
+
+@migrations.add(3, "название источника у абзаца")
+def _add_source_title(conn) -> None:
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("docs", schema=SCHEMA)}
+    if "source_title" not in columns:  # база, созданная до этой миграции
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.docs ADD COLUMN source_title TEXT"))

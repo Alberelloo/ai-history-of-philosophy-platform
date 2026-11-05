@@ -80,6 +80,7 @@ services:
     environment:
       PHILOGRAPH_SEARCH_URL: http://search:8002
       PHILOGRAPH_LLM_URL: http://llm:8000
+      PHILOGRAPH_KNOWLEDGE_URL: http://knowledge:8004
       PHILOGRAPH_VISITOR_SECRET: ${PHILOGRAPH_VISITOR_SECRET:?задайте PHILOGRAPH_VISITOR_SECRET в .env}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8003/health/ready').status == 200 else 1)"]

@@ -101,18 +101,16 @@ def test_chains_search_scopes_and_call_limit(bot, events):
 
 
 @req(QR, "Цепочки без онтологии")
-def test_genesis_without_ontology_uses_search_and_hooks(bot, events):
-    bot.model.routes.append({"type": "genesis", "confidence": 0.9, "names": []})
-    bot.ask(question="откуда взялась идея чистой доски?")
-    assert events.of("assistant.searched")
+def test_genesis_without_ontology_uses_search(bot, events):
     from philograph.assistant.service import CHAINS
 
-    assert CHAINS["genesis"]["hooks"] == ["genesis"]  # сюда подключится онтология
-    seen = []
-    bot.assistant.hooks["genesis"] = lambda request, found: seen.append(len(found)) or found
+    assert bot.assistant.ontology is None
     bot.model.routes.append({"type": "genesis", "confidence": 0.9, "names": []})
-    bot.ask(question="откуда взялась идея чистой доски?")
-    assert seen
+    items = bot.ask(question="откуда взялась идея чистой доски?")
+    assert events.of("assistant.searched") and items[-1]["type"] == "done"
+    assert events.one("assistant.ontology.skipped")["reason"] == "not_configured"
+    assert CHAINS["genesis"]["recipe"] == "genesis"  # линия графа, когда онтология есть
+    assert not [i for i in items if i["type"] == "suggestion"]
 
 
 # --- answer-grounding ----------------------------------------------------------------

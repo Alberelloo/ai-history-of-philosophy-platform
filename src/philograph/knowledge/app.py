@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from philograph import __version__
+from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, ndjson
 from philograph.knowledge.mentions import Mentions
@@ -60,6 +61,15 @@ class GraphRequest(BaseModel):
     generation: bool = True
 
 
+class AssistantContextRequest(BaseModel):
+    text: str
+    names: list[str] = []
+    paragraphs: list[str] = []  # абзацы выделенного фрагмента
+    steps: list[str] = list(STEPS)
+    recipe: str | None = None
+    textbook: str | None = None  # режим «только выбранный учебник»
+
+
 class SampleRequest(BaseModel):
     relation: str
     size: int = 20
@@ -75,6 +85,7 @@ def build_app(
     cards: Cards | None = None,
     mentions: Mentions | None = None,
     graphs: Graphs | None = None,
+    assistant: AssistantKnowledge | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -105,6 +116,20 @@ def build_app(
             return statements.traverse(recipe, start, depth=depth, attributed_to=attributed_to)
         except RegistryError as exc:
             raise UserFacingError(str(exc), status=400, kind="recipe_not_applicable") from exc
+
+    if assistant is not None:
+
+        @router.post("/internal/assistant/context")
+        def assistant_context(body: AssistantContextRequest) -> dict[str, Any]:
+            """Только для ассистента: шлюз внутренние адреса наружу не пропускает."""
+            return assistant.context(
+                text=body.text[:4000],
+                names=body.names[:10],
+                paragraphs=body.paragraphs[:50],
+                steps=[s for s in body.steps if s in STEPS],
+                recipe=body.recipe,
+                textbook=body.textbook,
+            )
 
     if graphs is not None:
 

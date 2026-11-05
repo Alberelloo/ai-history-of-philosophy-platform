@@ -1,7 +1,8 @@
 """Ассистент: маршрутизация → заданная цепочка поисков → ответ потоком с проверкой опоры.
 
 Это не агент с циклами: число вызовов модели на вопрос ограничено заранее, а шаги каждого
-типа вопроса описаны данными (``CHAINS``). Шаги онтологии подключаются в точки ``hooks``.
+типа вопроса описаны данными (``CHAINS``). Онтология (``ontology``) добавляет к поиску и
+контексту то, что знает о сущностях вопроса; без неё цепочки работают только по поиску.
 """
 
 from __future__ import annotations
@@ -9,12 +10,13 @@ from __future__ import annotations
 import re
 import time
 from collections import defaultdict, deque
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any
 
 from philograph.assistant.clients import LlmUnavailable
 from philograph.assistant.grounding import FragmentStream, Passage
+from philograph.assistant.ontology import Ontology, OntologyContext
 from philograph.platform import events
 from philograph.platform.client import ServiceUnavailable
 from philograph.platform.clock import Clock, SystemClock
@@ -41,7 +43,7 @@ CHAINS: dict[str, dict[str, Any]] = {
     },
     "genesis": {
         "template": "assistant.answer.genesis",
-        "hooks": ["genesis"],
+        "recipe": "genesis",  # линия графа, если онтология подключена
         "searches": [
             {"scope": "toggle", "limit": 8, "extra_terms": ["истоки", "предшественники", "впервые"]}
         ],
@@ -112,6 +114,8 @@ events.define(
 )
 events.define("assistant.stopped", "info", "Читатель остановил ответ", required=("fragments",))
 
+STATUS_TITLES = {"verified": "проверено", "sourced": "по источникам", "generated": "сгенерировано"}
+
 
 @dataclass
 class AskRequest:
@@ -174,13 +178,13 @@ class Assistant:
         *,
         settings: AssistantSettings | None = None,
         clock: Clock | None = None,
-        hooks: dict[str, Callable[[AskRequest, list[dict]], list[dict]]] | None = None,
+        ontology: Ontology | None = None,
     ) -> None:
         self.search = search
         self.llm = llm
         self.settings = settings or AssistantSettings()
         self.clock = clock or SystemClock()
-        self.hooks = hooks or {}
+        self.ontology = ontology
         self.limits = VisitorLimit(self.settings.visitor_per_hour, self.clock)
 
     # --- маршрутизация ---
@@ -237,7 +241,9 @@ class Assistant:
 
     # --- поиск ---
 
-    def _gather(self, kind: str, request: AskRequest, names: list[str]) -> list[dict]:
+    def _gather(
+        self, kind: str, request: AskRequest, names: list[str], ctx: OntologyContext | None
+    ) -> list[dict]:
         chain = CHAINS[kind]
         query_text = request.question
         if request.selection:
@@ -255,11 +261,18 @@ class Assistant:
                 "limit": step["limit"],
                 "neighbors": step.get("neighbors", 0),
                 "per_chapter": step.get("per_chapter", 3),
-                "extra_terms": list(step.get("extra_terms", [])) + names,
+                "extra_terms": list(step.get("extra_terms", []))
+                + names
+                + (ctx.terms if ctx else []),
+                # Приоритет: абзацы выделения и абзацы, где упомянуты сущности вопроса.
+                "priority": list(
+                    dict.fromkeys(
+                        list(request.selection_paragraphs) + (ctx.priority if ctx else [])
+                    )
+                ),
             }
             if scope == "current" and request.source_id:
                 query["sources"] = [request.source_id]
-                query["priority"] = list(request.selection_paragraphs)
             if scope == "others" and request.source_id:
                 query["exclude_sources"] = [request.source_id]
             results = self.search.search(**query)["results"]
@@ -268,10 +281,29 @@ class Assistant:
                 if r["paragraph_id"] not in seen:
                     seen.add(r["paragraph_id"])
                     found.append(r)
-        for hook in chain.get("hooks", []):
-            if hook in self.hooks:
-                found = self.hooks[hook](request, found)
+        # Подтверждающие абзацы линии графа: модель видит их рядом с утверждениями.
+        for p in ctx.paragraphs if ctx else []:
+            if p["paragraph_id"] not in seen:
+                seen.add(p["paragraph_id"])
+                found.append({**p, "chapter_id": None, "section_title": "", "source_title": None})
         return found
+
+    def _ontology(self, kind: str, request: AskRequest, names: list[str]) -> OntologyContext | None:
+        if self.ontology is None:
+            events.emit("assistant.ontology.skipped", reason="not_configured")
+            return None
+        text = (
+            request.question
+            if not request.selection
+            else f"{request.question}\n{request.selection}"
+        )
+        return self.ontology.prepare(
+            text=text,
+            names=names,
+            paragraphs=list(request.selection_paragraphs),
+            recipe=CHAINS[kind].get("recipe"),
+            textbook=request.source_id if request.scope == "current" else None,
+        )
 
     # --- ответ ---
 
@@ -321,8 +353,9 @@ class Assistant:
                 "message": "Я помогаю разбираться с материалами по философии.",
             }
             return
+        ctx = self._ontology(kind, request, names)
         try:
-            results = self._gather(kind, request, names)
+            results = self._gather(kind, request, names, ctx)
         except ServiceUnavailable:
             yield {
                 "type": "unavailable",
@@ -351,6 +384,25 @@ class Assistant:
             )
             for i, r in enumerate(results)
         }
+        # Утверждения онтологии — под своими номерами, проверяются так же, как абзацы.
+        for s in ctx.statements if ctx else []:
+            number = len(passages) + 1
+            passages[number] = Passage(
+                number,
+                s["evidence"][0]["paragraph_id"] if s["evidence"] else "",
+                s["sources"][0] if s["sources"] else "",
+                None,
+                f"утверждение: {s['text']}",
+                s["text"],
+                kind="statement",
+                statement_id=s["id"],
+                grounds=s["status"] in ("verified", "sourced"),
+            )
+        paragraphs = [p for p in passages.values() if p.kind == "paragraph"]
+        if kind == "other_authors":
+            # Ответ по авторам: абзацы сгруппированы по источникам.
+            titles = {r["source_id"]: r.get("source_title") or r["source_id"] for r in results}
+            paragraphs.sort(key=lambda p: (titles.get(p.source_id, ""), p.number))
         if not results:
             yield {
                 "type": "notice",
@@ -361,12 +413,16 @@ class Assistant:
             "question": request.question,
             "history": self._history_summary(request),
             "answer_language": answer_language(request.question),
-            "passages": "\n\n".join(
-                f"[{p.number}] {p.title}\n{p.text}"
-                + ("" if p.quoting else "\n(пересказывай, не цитируй дословно)")
-                for p in passages.values()
-            ),
+            "passages": self._passages_block(kind, paragraphs, results),
         }
+        statements = [p for p in passages.values() if p.kind == "statement"]
+        if statements:
+            data["statements"] = "\n".join(
+                f"[{p.number}] {s['text']} "
+                f"(так считает: {', '.join(s['attributed_to']) or 'не указано'}; "
+                f"статус: {STATUS_TITLES.get(s['status'], s['status'])})"
+                for p, s in zip(statements, ctx.statements, strict=True)
+            )
         if kind != "knowledge":
             data["selection"] = request.selection or ""
         stream = FragmentStream(passages)
@@ -389,6 +445,11 @@ class Assistant:
                 stats["removed_quotes"] += fragment.removed_quotes
                 if fragment.removed_citations:
                     events.emit("assistant.citation.invented", count=fragment.removed_citations)
+                if ctx is not None and "verification" in self.ontology.steps:
+                    problems = self.ontology.check(fragment.text, ctx)
+                    if problems:
+                        fragment.contradicts = problems
+                        fragment.grounded = False  # противоречит проверенному утверждению
                 if not fragment.grounded and strict:
                     stats["hidden"] += 1
                     continue
@@ -431,6 +492,8 @@ class Assistant:
                 "message": "В источниках ответа не нашлось.",
                 "suggestions": [p.title for p in passages.values()][:3],
             }
+        if ctx is not None and ctx.graph and stats["fragments"]:
+            yield {"type": "suggestion", "kind": "graph", **ctx.graph}
         total = round((time.perf_counter() - started) * 1000, 2)
         events.emit(
             "assistant.answer.completed",
@@ -450,6 +513,20 @@ class Assistant:
             "first_fragment_ms": first_ms,
             "total_ms": total,
         }
+
+    @staticmethod
+    def _passages_block(kind: str, paragraphs: list[Passage], results: list[dict]) -> str:
+        titles = {r["source_id"]: r.get("source_title") or "" for r in results}
+        lines, current = [], None
+        for p in paragraphs:
+            if kind == "other_authors" and titles.get(p.source_id) != current:
+                current = titles.get(p.source_id)
+                lines.append(f"Источник: {current or p.source_id}")
+            lines.append(
+                f"[{p.number}] {p.title}\n{p.text}"
+                + ("" if p.quoting else "\n(пересказывай, не цитируй дословно)")
+            )
+        return "\n\n".join(lines)
 
     def _unavailable(self, kind: str) -> Iterator[dict[str, Any]]:
         if kind == "budget_exhausted":

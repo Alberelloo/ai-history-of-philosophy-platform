@@ -3,6 +3,8 @@
 Модель получает абзацы под номерами и ставит после каждого предложения ссылки ``[n]``.
 Код делит ответ на фрагменты, переводит номера в идентификаторы абзацев, удаляет ссылки на
 непереданное, сверяет цитаты с абзацем и помечает фрагменты без подтверждённой опоры.
+Под номером может стоять и утверждение онтологии: проверенное или подтверждённое источником
+служит опорой, сгенерированное моделью — нет.
 Инструкции внутри вопроса или текста источника эти правила отключить не могут.
 """
 
@@ -29,6 +31,9 @@ class Passage:
     title: str
     text: str
     quoting: bool = True
+    kind: str = "paragraph"  # paragraph | statement
+    statement_id: str | None = None
+    grounds: bool = True  # служит ли опорой: у сгенерированного утверждения — нет
 
 
 @dataclass
@@ -39,15 +44,19 @@ class Fragment:
     removed_citations: int = 0
     removed_quotes: int = 0
     unverified_quotes: list[str] = field(default_factory=list)
+    contradicts: list[dict] = field(default_factory=list)  # противоречия онтологии
 
     def to_json(self) -> dict:
         return {
             "text": self.text,
             "grounded": self.grounded,
             "unverified_quotes": self.unverified_quotes,
+            "contradicts": self.contradicts,
             "citations": [
                 {
-                    "paragraph_id": p.paragraph_id,
+                    "kind": p.kind,
+                    "paragraph_id": p.paragraph_id or None,
+                    "statement_id": p.statement_id,
                     "source_id": p.source_id,
                     "chapter_id": p.chapter_id,
                     "title": p.title,
@@ -83,9 +92,10 @@ def verify(raw: str, passages: dict[int, Passage]) -> Fragment:
         if passage is None:
             fragment.removed_citations += 1  # ссылка на непереданный абзац
             continue
-        if passage.paragraph_id not in seen:
+        key = passage.statement_id or passage.paragraph_id
+        if key not in seen:
             fragment.citations.append(passage)
-            seen.add(passage.paragraph_id)
+            seen.add(key)
     for match in QUOTE_RE.finditer(text):
         quote = next(g for g in match.groups() if g)
         found_in = [p for p in fragment.citations if _norm(quote) in _norm(p.text)]
@@ -100,7 +110,9 @@ def verify(raw: str, passages: dict[int, Passage]) -> Fragment:
                 match.group(0), "[цитата опущена: источник не разрешает цитирование]"
             )
     fragment.text = text
-    fragment.grounded = bool(fragment.citations) and not fragment.unverified_quotes
+    fragment.grounded = (
+        any(p.grounds for p in fragment.citations) and not fragment.unverified_quotes
+    )
     return fragment
 
 
