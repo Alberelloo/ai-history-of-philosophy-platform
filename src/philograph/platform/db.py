@@ -62,6 +62,8 @@ def make_engine(url: str, schemas: list[str]) -> Engine:
         return engine
     engine = create_engine(url, pool_pre_ping=True)
     with engine.begin() as conn:
+        # Параллельный запуск сервисов: создание схем тоже под блокировкой.
+        conn.execute(text("SELECT pg_advisory_xact_lock(hashtext('philograph-schemas'))"))
         for schema in schemas:
             conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
     return engine
@@ -115,28 +117,39 @@ class Migrations:
         return [m for m in self._items if m.version not in done]
 
     def upgrade(self, engine: Engine) -> list[int]:
-        """Применяет недостающие миграции по порядку, каждую в своей транзакции."""
+        """Применяет недостающие миграции по порядку в одной транзакции.
+
+        Сервисы стартуют одновременно и могут мигрировать одну схему параллельно. В PostgreSQL
+        транзакция берёт блокировку на схему и пересчитывает недостающие миграции уже под ней:
+        второй процесс дождётся первого и ничего не применит повторно.
+        """
         from datetime import UTC, datetime
 
         applied = []
-        for migration in self.pending(engine):
-            with engine.begin() as conn:
+        with engine.begin() as conn:
+            if conn.dialect.name == "postgresql":
+                conn.execute(
+                    text("SELECT pg_advisory_xact_lock(hashtext(:s))"),
+                    {"s": f"philograph-migrations:{self.schema}"},
+                )
+            self._version_table.create(conn, checkfirst=True)
+            done = set(conn.scalars(select(self._version_table.c.version)))
+            for migration in [m for m in self._items if m.version not in done]:
                 migration.apply(conn)
                 conn.execute(
                     self._version_table.insert().values(
-                        version=migration.version,
-                        name=migration.name,
-                        applied_at=datetime.now(UTC),
+                        version=migration.version, name=migration.name, applied_at=datetime.now(UTC)
                     )
                 )
+                applied.append(migration)
+        for migration in applied:
             events.emit(
                 "db.migration.applied",
                 schema=self.schema,
                 version=migration.version,
                 name=migration.name,
             )
-            applied.append(migration.version)
-        return applied
+        return [m.version for m in applied]
 
     def current(self, engine: Engine) -> int | None:
         with engine.begin() as conn:

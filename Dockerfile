@@ -15,6 +15,10 @@ COPY pyproject.toml ./
 COPY src ./src
 RUN pip install --no-cache-dir ".[postgres]" "uvicorn[standard]>=0.30"
 COPY --from=web /web/dist ./web/dist
+COPY config ./config
+COPY scripts ./scripts
+COPY demo ./demo
 
-RUN useradd --create-home philograph
+# Именованный том при первом подключении берёт владельца каталога из образа.
+RUN useradd --create-home philograph && mkdir -p /data/files && chown philograph /data/files
 USER philograph

@@ -1,0 +1,34 @@
+# Сквозные тесты и демо-стенд в контейнерах без ключей провайдеров:
+#   docker compose -f compose.yaml -f compose.e2e.yaml up -d --build --wait
+#   PHILOGRAPH_E2E_URL=http://127.0.0.1:8080 pytest tests/e2e
+# Модели отвечают постоянным текстом (config/llm.demo.yaml), библиотека заполняется демо-данными.
+
+services:
+  llm:
+    environment:
+      PHILOGRAPH_LLM_CONFIG: /app/config/llm.demo.yaml
+    volumes: []
+
+  search:
+    environment:
+      PHILOGRAPH_EMBEDDING_MODEL: demo-embeddings
+      PHILOGRAPH_EMBEDDING_DIMENSION: "8"
+
+  gateway:
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+
+  seed:
+    build: .
+    env_file: .env
+    command: python scripts/seed_demo.py
+    environment:
+      PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
+      PHILOGRAPH_FILES_ROOT: /data/files
+    volumes:
+      - library-files:/data/files
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"

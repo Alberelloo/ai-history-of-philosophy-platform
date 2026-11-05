@@ -32,7 +32,7 @@ def create(env: dict[str, str] | None = None) -> FastAPI:
     providers: dict[str, Provider] = {}
     for name, provider in config.providers.items():
         if provider.kind == "fake":
-            providers[name] = FakeProvider()
+            providers[name] = FakeProvider(default=provider.fake_reply or "ok")
         else:
             key = env.get(provider.api_key_env or "", "")
             providers[name] = OpenAICompatibleProvider(provider.base_url or "", key)
