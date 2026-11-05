@@ -26,6 +26,11 @@ def asgi_transport(app: FastAPI) -> httpx.BaseTransport:
     return Transport()
 
 
+def topnav(page):
+    """Навигация верхней панели: библиотека, текущий источник, настройки."""
+    return page.get_by_role("navigation", name="Разделы")
+
+
 # Версия уведомления при первом входе (web/src/Notice.tsx). Браузерные сценарии, кроме самих
 # сценариев уведомления, идут от читателя, который его уже закрыл.
 NOTICE_VERSION = "2026-11"
@@ -38,7 +43,12 @@ if (!localStorage.getItem("{STORAGE_KEY}")) {{
 
 
 def reader_context(browser, *, accepted: bool = True, **options):
-    """Контекст браузера читателя; ``accepted`` — уведомление при первом входе уже закрыто."""
+    """Контекст браузера читателя; ``accepted`` — уведомление при первом входе уже закрыто.
+
+    Язык интерфейса по умолчанию берётся из языка браузера, поэтому прежние сценарии идут
+    с русской локалью.
+    """
+    options.setdefault("locale", "ru-RU")
     context = browser.new_context(**options)
     if accepted:
         context.add_init_script(_ACCEPTED)

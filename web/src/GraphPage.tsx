@@ -197,7 +197,11 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
     return { nodes: Object.values(state.nodes).filter((n) => used.has(n.id)), edges };
   }, [state, notInTextbook, entityId]);
   const positions = useMemo(() => layout(visible.nodes, state?.order ?? null), [visible, state?.order]);
-  const width = Math.max(480, ...Object.values(positions).map((p) => p.x + 110));
+  // Ширина холста с запасом под подпись узла: длинное название не обрезается краем.
+  const width = Math.max(
+    480,
+    ...visible.nodes.map((n) => (positions[n.id]?.x ?? 0) + Math.max(110, n.label.length * 4 + 24)),
+  );
   const height = Math.max(260, ...Object.values(positions).map((p) => p.y + 90));
   const label = (id: string) => state?.nodes[id]?.label ?? "…";
   // Дуги с изгибом в разные стороны: связи одного узла не сливаются в одну линию,

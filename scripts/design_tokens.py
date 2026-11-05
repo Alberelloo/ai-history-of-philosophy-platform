@@ -113,7 +113,7 @@ def main() -> int:
     if args.check:
         current = TARGET.read_text(encoding="utf-8") if TARGET.exists() else ""
         if current.replace("\r\n", "\n") != expected:
-            print(f"{TARGET.relative_to(ROOT)} устарел: python scripts/design_tokens.py")
+            print(f"{TARGET} устарел: python scripts/design_tokens.py")
             return 1
         return 0
     TARGET.parent.mkdir(parents=True, exist_ok=True)

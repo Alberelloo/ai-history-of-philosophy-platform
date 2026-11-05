@@ -5,6 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
+from ..helpers import topnav
 from .conftest import reader_context, wait_logs
 
 req = pytest.mark.req
@@ -49,7 +50,7 @@ def test_reading_journey(page, stack):
     assert "белой бумаге" in popup.inner_text()
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/tabula-rasa"
     page.get_by_role("navigation", name="Главы").get_by_role(
-        "button", name="Следующая глава →"
+        "button", name="Следующая глава"
     ).click()
     page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
     toc = page.get_by_role("navigation", name="Оглавление")
@@ -177,7 +178,7 @@ def test_mention_opens_card_and_navigates(page, stack):
     assert "демонстрационный" in card.locator(".card-description").inner_text()
     influence.get_by_role("button", name="Кант", exact=True).click()
     card.locator("h3:text('Кант')").wait_for()
-    card.get_by_role("button", name="← Назад").click()
+    card.get_by_role("button", name="Назад").click()
     card.locator("h3:text('Юм')").wait_for()
     # Подтверждающий абзац из строки ведёт к абзацу учебника.
     card.get_by_role("button", name="Кант", exact=True).click()
@@ -326,7 +327,7 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
     card = page.get_by_role("dialog", name="Карточка")
     assert card.get_by_label("Только выбранный учебник").is_checked()
     card.get_by_role("button", name="Закрыть карточку").click()
-    page.get_by_role("button", name="← К чтению").click()
+    topnav(page).get_by_role("link", name=TEXTBOOK).click()
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.evaluate("""() => {
         const p = document.querySelector('p.block');

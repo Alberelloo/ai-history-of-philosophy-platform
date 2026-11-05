@@ -15,6 +15,9 @@ services:
       PHILOGRAPH_EMBEDDING_DIMENSION: "8"
 
   gateway:
+    environment:
+      # Тесты открывают сотни страниц с одного адреса (шрифты, без кэша браузера).
+      PHILOGRAPH_RATE_BURST: "2000"
     depends_on:
       seed:
         condition: service_completed_successfully

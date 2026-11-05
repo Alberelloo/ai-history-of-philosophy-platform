@@ -162,9 +162,9 @@ svg :where(g[tabindex]):focus-visible {
   z-index: var(--z-topbar);
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--space-6);
   height: var(--topbar);
-  padding: 0 var(--space-8);
+  padding: 0 var(--space-6);
   background: var(--paper);
   border-bottom: 1px solid var(--line);
 }
@@ -897,6 +897,8 @@ blockquote.block {
   font-weight: 500;
   white-space: normal;
   text-align: left;
+  justify-content: flex-start;
+  justify-self: start;
 }
 
 .card-where li {
@@ -1195,6 +1197,10 @@ blockquote.block {
   align-items: center;
   justify-content: start;
   gap: var(--space-4);
+}
+
+.settings__section > .pg-seg {
+  justify-self: start;
 }
 
 .settings__label {

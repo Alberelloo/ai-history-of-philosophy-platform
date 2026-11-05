@@ -7,6 +7,7 @@ import json
 import httpx
 import pytest
 
+from ..helpers import topnav
 from .conftest import NOTICE_VERSION, reader_context, wait_logs
 
 req = pytest.mark.req
@@ -59,7 +60,7 @@ def test_first_run_notice_choice_and_once(browser, stack):
     generation.uncheck()
     notice.get_by_role("button", name="Понятно").click()
     assert page.get_by_role("dialog", name=NOTICE).count() == 0
-    page.get_by_role("button", name="Настройки").click()
+    topnav(page).get_by_role("link", name="Настройки").click()
     page.wait_for_selector("h1:text('Настройки')")
     assert not page.get_by_label("Генерация без опоры на источники").is_checked()
     # Второй визит — без уведомления; новая версия текста — снова с ним.
@@ -115,7 +116,7 @@ def test_settings_defaults_and_effect(page, stack):
     assert page.get_by_label("Все источники").is_checked()
     page.get_by_label("Генерация без опоры на источники").uncheck()
     # Без перезагрузки: переход внутри приложения.
-    page.get_by_role("button", name="← Библиотека").click()
+    topnav(page).get_by_role("link", name="Библиотека").click()
     page.locator(".source", has_text="Теория познания").get_by_role("button", name="Читать").click()
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.get_by_role("button", name="Ассистент", exact=True).click()
@@ -191,7 +192,7 @@ def test_private_mode_without_storage(browser, stack):
     page.wait_for_selector(".source")
     assert "не сохранятся" in page.locator(".storage-warning").inner_text()
     page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
-    page.get_by_role("button", name="Настройки").click()
+    topnav(page).get_by_role("link", name="Настройки").click()
     page.get_by_label("Только по источникам").check()  # в пределах вкладки работает
     assert page.get_by_label("Только по источникам").is_checked()
     context.close()
