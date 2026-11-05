@@ -161,18 +161,6 @@ def site(tmp_path_factory) -> Site:
     thread.join(5)
 
 
-@pytest.fixture(scope="module")
-def browser():
-    sync_api = pytest.importorskip("playwright.sync_api")
-    with sync_api.sync_playwright() as p:
-        try:
-            instance = p.chromium.launch(headless=True)
-        except Exception as exc:  # браузер не установлен
-            pytest.skip(f"Chromium недоступен: {exc}")
-        yield instance
-        instance.close()
-
-
 @pytest.fixture
 def page(browser, site):
     context = browser.new_context(permissions=["clipboard-read", "clipboard-write"])

@@ -37,6 +37,7 @@ testpaths = ["tests"]
 addopts = "-ra --strict-markers"
 markers = [
     "req(capability, requirement): тест проверяет требование спецификации OpenSpec",
+    "e2e: сквозной тест по живому стенду в браузере",
 ]
 
 [tool.ruff]
@@ -65,6 +66,7 @@ name = "Сервисы не зависят от внутренностей др�
 type = "independence"
 modules = [
     "philograph.llm", "philograph.library", "philograph.search", "philograph.assistant",
+    "philograph.gateway",
 ]
 
 [[tool.importlinter.contracts]]
@@ -81,4 +83,5 @@ type = "forbidden"
 source_modules = ["philograph.operator"]
 forbidden_modules = [
     "philograph.llm", "philograph.library", "philograph.search", "philograph.assistant",
+    "philograph.gateway",
 ]

@@ -23,6 +23,8 @@ class ProviderConfig(BaseModel):
     kind: Literal["openai_compatible", "fake"]
     base_url: str | None = None
     api_key_env: str | None = None
+    # Только для kind=fake: постоянный ответ (демо-стенд и сквозные тесты без ключей).
+    fake_reply: str | None = None
 
 
 class RoleConfig(BaseModel):

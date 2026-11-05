@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
@@ -142,11 +143,21 @@ class Queue:
         return job_id
 
     def _claim(self) -> tuple[Job, str | None, str | None] | None:
+        """Берёт только задачи, для которых у этого исполнителя есть обработчик: каждый сервис
+        разбирает свою подписку и не трогает чужую."""
+        if not self._handlers:
+            return None
         now = self.clock.now()
         with self.engine.begin() as conn:
             query = (
                 select(jobs)
-                .where(and_(jobs.c.status == "pending", jobs.c.run_after <= now))
+                .where(
+                    and_(
+                        jobs.c.status == "pending",
+                        jobs.c.run_after <= now,
+                        jobs.c.kind.in_(list(self._handlers)),
+                    )
+                )
                 .order_by(jobs.c.id)
                 .limit(1)
             )
@@ -182,6 +193,12 @@ class Queue:
                     conn.execute(update(jobs).where(jobs.c.id == job.id).values(status="done"))
                 events.emit("queue.job.done", job_id=job.id, kind=job.kind)
         return True
+
+    def serve(self, stop: threading.Event, idle_seconds: float = 1.0) -> None:
+        """Цикл исполнителя: берёт задачи, пока не попросят остановиться."""
+        while not stop.is_set():
+            if not self.run_once():
+                stop.wait(idle_seconds)
 
     def run_until_empty(self, limit: int = 1000) -> int:
         count = 0

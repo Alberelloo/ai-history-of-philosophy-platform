@@ -98,3 +98,16 @@ def engine_for(database_url: str):
     yield factory
     for engine in created:
         engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def browser():
+    """Один Chromium на весь прогон: два экземпляра синхронного Playwright не уживаются."""
+    sync_api = pytest.importorskip("playwright.sync_api")
+    with sync_api.sync_playwright() as p:
+        try:
+            instance = p.chromium.launch(headless=True)
+        except Exception as exc:  # браузер не установлен
+            pytest.skip(f"Chromium недоступен: {exc}")
+        yield instance
+        instance.close()

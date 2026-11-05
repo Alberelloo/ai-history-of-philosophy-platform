@@ -194,13 +194,27 @@ def _write(spec: EventSpec, fields: dict[str, Any]) -> Event:
     return event
 
 
-def json_sink() -> Sink:
-    """Приёмник для работы: событие одной строкой JSON через structlog."""
-    import structlog
+def json_sink(stream=None) -> Sink:
+    """Приёмник для работы: событие — одна строка JSON в stdout (или в ``stream``).
 
-    logger = structlog.get_logger()
+    Строку разбирают сборщики журналов и сквозные тесты, поэтому формат стабилен: ``event``,
+    ``level``, ``time`` и поля события.
+    """
+    import json
+    import sys
+    import threading
+
+    lock = threading.Lock()
 
     def sink(event: Event) -> None:
-        getattr(logger, event.level)(event.name, time=event.time, **event.fields)
+        line = json.dumps(
+            {"event": event.name, "level": event.level, "time": event.time, **event.fields},
+            ensure_ascii=False,
+            default=str,
+        )
+        out = stream or sys.stdout
+        with lock:
+            out.write(line + "\n")
+            out.flush()
 
     return sink

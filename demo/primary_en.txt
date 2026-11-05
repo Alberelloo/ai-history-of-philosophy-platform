@@ -1,0 +1,7 @@
+Chapter 1. Experience
+
+This is a short demonstration text written for the PhiloGraph test stand (CC BY 4.0).
+
+Locke described the mind at birth as a blank slate, written on by experience.
+
+Hume argued that our expectation about the future rests on custom, not on reason.
