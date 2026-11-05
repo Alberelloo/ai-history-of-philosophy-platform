@@ -29,7 +29,9 @@ def _node() -> str | None:
         return found
     # Windows без node в PATH: установка WinGet.
     packages = Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "WinGet" / "Packages"
-    candidates = sorted(packages.glob("OpenJS.NodeJS*/node-*/node.exe")) if packages.exists() else []
+    candidates = (
+        sorted(packages.glob("OpenJS.NodeJS*/node-*/node.exe")) if packages.exists() else []
+    )
     return str(candidates[-1]) if candidates else None
 
 

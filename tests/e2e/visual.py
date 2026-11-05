@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import itertools
 import os
 import sys
 from dataclasses import dataclass
@@ -35,6 +36,7 @@ WIDTHS = (1024, 1280, 1600, 1920)
 
 def settle(page) -> None:
     """Ждёт шрифтов и конца перестроек: снимок и измерения стабильны."""
+    page.mouse.move(0, 0)  # наведение после клика меняло бы вид кнопок
     page.wait_for_load_state("networkidle")
     page.evaluate("document.fonts.ready.then(() => true)")
     page.evaluate(
@@ -148,10 +150,7 @@ def assert_no_overlap(page, selectors: list[str]) -> None:
     """Заданные области не накладываются друг на друга."""
     items = boxes(page, selectors)
     clashes = [
-        (a.name, b.name)
-        for i, a in enumerate(items)
-        for b in items[i + 1 :]
-        if a.intersects(b)
+        (a.name, b.name) for i, a in enumerate(items) for b in items[i + 1 :] if a.intersects(b)
     ]
     assert not clashes, f"области перекрываются: {clashes} {items}"
 
@@ -166,7 +165,7 @@ def assert_separated(page, selector: str, min_gap: float = 4.0) -> None:
         selector,
     )
     assert len(rects) >= 2, rects
-    for (name_a, _, right_a), (name_b, left_b, _) in zip(rects, rects[1:], strict=False):
+    for (name_a, _, right_a), (name_b, left_b, _) in itertools.pairwise(rects):
         assert left_b - right_a >= min_gap, f"слиплись: {name_a!r} и {name_b!r} ({rects})"
 
 
@@ -177,7 +176,8 @@ def clipped_text(page) -> list[str]:
             if (!el.getClientRects().length || el.closest('svg')) return false;
             const st = getComputedStyle(el);
             if (st.visibility === 'hidden') return false;
-            const clips = ['hidden', 'clip'].includes(st.overflowX) || st.textOverflow === 'ellipsis';
+            const clips = ['hidden', 'clip'].includes(st.overflowX)
+                || st.textOverflow === 'ellipsis';
             if (!clips) return false;
             const hasText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
             return hasText && el.scrollWidth > el.clientWidth + 1;
@@ -198,7 +198,8 @@ def low_contrast(page, minimum: float = 4.5) -> list[dict]:
     return page.evaluate(
         f"""min => {{ {_RGBA_JS}
         const lum = c => {{
-            const f = v => {{ v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }};
+            const f = v => {{ v /= 255;
+                return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }};
             return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
         }};
         const over = (top, bottom) => {{
@@ -265,8 +266,13 @@ def unstyled_buttons(page) -> list[str]:
 def focus_ring(page) -> dict:
     """Оформление элемента в фокусе: есть ли видимое кольцо."""
     return page.evaluate(
-        """() => { const el = document.activeElement; const st = getComputedStyle(el);
-            return {tag: el.tagName, cls: String(el.className), text: el.textContent.trim().slice(0, 30),
+        """() => { const el = document.activeElement;
+            // Флажок или радиокнопка внутри подписи-метки: кольцо рисуется на подписи.
+            const own = getComputedStyle(el);
+            const bare = own.boxShadow === 'none' && own.outlineStyle === 'none';
+            const st = bare && el.closest('label') ? getComputedStyle(el.closest('label')) : own;
+            return {tag: el.tagName, cls: String(el.className),
+                    text: el.textContent.trim().slice(0, 30),
                     shadow: st.boxShadow, outline: st.outlineStyle,
                     visible: el.matches(':focus-visible')}; }"""
     )

@@ -46,6 +46,11 @@ button {
   border-radius: var(--radius-xs);
 }
 
+/* Нажатие мышью на узел или связь графа не рисует рамку: выбор виден по обводке. */
+svg :where(g[tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+
 svg :where(g[tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
