@@ -28,3 +28,5 @@ enforce:
   - knowledge-graph
   - source-scope
   - ontology-retrieval
+  - first-run-notice
+  - reader-settings

@@ -59,6 +59,9 @@ export function LibraryPage() {
     <main className="library">
       <header className="library-header">
         <h1>Библиотека</h1>
+        <button className="link" onClick={() => navigate("/settings")}>
+          Настройки
+        </button>
         <button className="primary" onClick={() => navigate("/read")}>
           Перейти к чтению
         </button>

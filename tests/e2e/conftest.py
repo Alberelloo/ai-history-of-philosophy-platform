@@ -17,6 +17,9 @@ from pathlib import Path
 
 import pytest
 
+from ..helpers import NOTICE_VERSION  # noqa: F401 — для сценариев
+from ..helpers import reader_context as shared_reader_context
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -80,11 +83,15 @@ def stack(tmp_path_factory):
     running.stop()
 
 
+def reader_context(browser, *, accepted: bool = True, **options):
+    return shared_reader_context(
+        browser, accepted=accepted, viewport={"width": 1400, "height": 900}, **options
+    )
+
+
 @pytest.fixture
 def page(browser, stack):
-    context = browser.new_context(
-        permissions=["clipboard-read", "clipboard-write"], viewport={"width": 1400, "height": 900}
-    )
+    context = reader_context(browser, permissions=["clipboard-read", "clipboard-write"])
     page = context.new_page()
     page.set_default_timeout(15000)
     yield page

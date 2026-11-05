@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from .conftest import wait_logs
+from .conftest import reader_context, wait_logs
 
 req = pytest.mark.req
 TEXTBOOK = "Теория познания: демонстрационный учебник"
@@ -128,7 +128,7 @@ def test_internal_interfaces_hidden_behind_gateway(stack):
 @req("source-library", "Учебник по умолчанию")
 @req("source-library", "Запоминание выбранного источника")
 def test_first_visit_and_remembered_source(browser, stack):
-    context = browser.new_context()
+    context = reader_context(browser)
     page = context.new_page()
     page.goto(stack.url + "/read")
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
@@ -222,7 +222,7 @@ def test_concept_card_with_definition_and_where_to_read(page, stack):
 
 @req("entity-mentions", "Показ при чтении")
 def test_chapter_without_knowledge_service(browser, stack):
-    context = browser.new_context()
+    context = reader_context(browser)
     page = context.new_page()
     page.route("**/api/knowledge/**", lambda route: route.abort())
     open_textbook(page, stack)
