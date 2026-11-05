@@ -66,5 +66,13 @@ def build_app(assistant: Assistant, health: Health | None = None) -> FastAPI:
 
         return StreamingResponse(lines(), media_type="application/x-ndjson")
 
+    @router.post("/internal/route")
+    def route(body: AskBody) -> dict[str, object]:
+        """Только тип вопроса — для оценки маршрутизатора."""
+        kind, names = assistant.route(
+            AskRequest(question=body.question, visitor="evaluation", selection=body.selection)
+        )
+        return {"type": kind, "names": names}
+
     app.include_router(router)
     return app
