@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Alberelloo/ai-history-of-philosophy-platform/sources/catalog.schema.json",
+  "title": "Каталог источников PhiloGraph",
+  "description": "Список изданий, которые библиотека загружает по ссылкам. Тексты здесь не хранятся.",
+  "type": "object",
+  "required": ["version", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"const": 1},
+    "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "person": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "death_year": {"type": ["integer", "null"]},
+        "wikidata": {"type": ["string", "null"], "pattern": "^Q[0-9]+$"}
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "authors": {"type": "array", "items": {"$ref": "#/$defs/person"}},
+        "language": {"type": "string", "pattern": "^[a-z]{2,3}$"},
+        "year": {"type": ["integer", "null"]},
+        "translator": {"oneOf": [{"$ref": "#/$defs/person"}, {"type": "null"}]},
+        "editor": {"type": ["string", "null"]},
+        "edition": {"type": ["string", "null"]},
+        "publisher": {"type": ["string", "null"]},
+        "isbn": {"type": ["string", "null"]}
+      }
+    },
+    "file": {
+      "type": "object",
+      "required": ["name", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "pattern": "^https?://"},
+        "clean": {"enum": ["gutenberg", "wikisource", null], "description": "очистка служебных частей сайта перед хешированием"}
+      }
+    },
+    "license": {
+      "type": "object",
+      "required": ["kind", "basis", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "description": "код из sources/licenses.yaml"},
+        "basis": {"enum": ["public_domain", "open_license", "rightsholder_permission"]},
+        "author_death_years": {"type": "array", "items": {"type": "integer"}},
+        "translator_death_year": {"type": ["integer", "null"]},
+        "document_url": {"type": ["string", "null"]},
+        "narrowed": {"type": "object", "additionalProperties": {"type": "boolean"}},
+        "evidence": {"type": "string", "minLength": 1, "description": "откуда известно основание"}
+      }
+    },
+    "entry": {
+      "type": "object",
+      "required": ["id", "landing_url", "adapter", "kind", "review", "publish"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,118}$"},
+        "landing_url": {"type": "string", "pattern": "^https?://"},
+        "adapter": {"enum": ["gutenberg", "wikisource", "archive_org", "direct"]},
+        "kind": {"enum": ["textbook", "primary", "reference"]},
+        "section": {"type": ["string", "null"]},
+        "harvested": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "at": {"type": "string"},
+            "adapter_version": {"type": "integer"},
+            "metadata": {"$ref": "#/$defs/metadata"},
+            "files": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+            "license_hint": {"type": ["string", "null"]}
+          }
+        },
+        "override": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "metadata": {"$ref": "#/$defs/metadata"},
+            "files": {"type": "array", "items": {"$ref": "#/$defs/file"}}
+          }
+        },
+        "license": {"oneOf": [{"$ref": "#/$defs/license"}, {"type": "null"}]},
+        "review": {
+          "type": "object",
+          "required": ["status"],
+          "additionalProperties": false,
+          "properties": {
+            "status": {"enum": ["draft", "approved", "withdrawn", "rejected"]},
+            "by": {"type": ["string", "null"]},
+            "at": {"type": ["string", "null"]},
+            "note": {"type": ["string", "null"]}
+          }
+        },
+        "publish": {"enum": ["auto", "manual"]}
+      }
+    }
+  }
+}

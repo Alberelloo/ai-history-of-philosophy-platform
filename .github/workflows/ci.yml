@@ -99,6 +99,10 @@ jobs:
         if: steps.py.outputs.present == 'true'
         run: python scripts/check_traceability.py
 
+      - name: Каталог источников
+        if: steps.py.outputs.present == 'true'
+        run: python -m philograph.library.catalog validate
+
       - name: Pytest (SQLite)
         if: steps.py.outputs.present == 'true'
         run: pytest -q

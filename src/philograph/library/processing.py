@@ -356,17 +356,35 @@ class Pipeline:
             [asdict(c.anchor) for c in self._corrections(source_id)],
             [c.payload for c in self._corrections(source_id)],
         )
-        if source.published_version:
-            published = self.registry.version(source.published_version)
-            same = (
-                [f["sha256"] for f in published["files"]] == [f["sha256"] for f in received]
-                and published["pipeline_version"] == PIPELINE_VERSION
-                and published["settings"] == source.settings
-                and published["corrections_digest"] == digest
+
+        def same_inputs(version: dict[str, Any]) -> bool:
+            return (
+                [f["sha256"] for f in version["files"]] == [f["sha256"] for f in received]
+                and version["pipeline_version"] == PIPELINE_VERSION
+                and version["settings"] == source.settings
+                and version["corrections_digest"] == digest
             )
-            if same:
-                events.emit("library.pipeline.nothing_to_do", source_id=source_id)
-                return None
+
+        if source.published_version and same_inputs(
+            self.registry.version(source.published_version)
+        ):
+            events.emit("library.pipeline.nothing_to_do", source_id=source_id)
+            return None
+        # Версия с теми же входами уже ждёт решения: вторая такая же не нужна.
+        # Упавшая на шаге версия с теми же входами продолжается с места падения.
+        versions = self.registry.versions(source_id)
+        latest = max(versions, key=lambda v: v["number"]) if versions else None
+        if (
+            latest is not None
+            and latest["id"] != source.published_version
+            and latest["state"] != "published"
+            and same_inputs(latest)
+        ):
+            if latest["error"]:
+                self.run(latest["id"], limit_usd=limit_usd)
+                return latest["id"]
+            events.emit("library.pipeline.nothing_to_do", source_id=source_id)
+            return None
         version_id = self.registry.create_version(
             source_id, received, PIPELINE_VERSION, source.settings, digest
         )

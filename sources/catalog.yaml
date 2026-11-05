@@ -1,0 +1,6 @@
+# Каталог источников PhiloGraph. Формат: sources/catalog.schema.json,
+# процесс: docs/architecture/source-ingestion.md. Тексты здесь не хранятся.
+# harvested пишет адаптер (python -m philograph.library.catalog harvest),
+# override и review — человек.
+version: 1
+entries: []
