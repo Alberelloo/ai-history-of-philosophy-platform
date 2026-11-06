@@ -83,8 +83,13 @@ export function LibraryPage() {
           selected={languages}
           onChange={setLanguages}
         />
-        {/* Сброс всегда на своём месте: строка не прыгает, когда фильтры выбирают и снимают. */}
-        <button className="pg-btn pg-btn--ghost pg-btn--sm filters__reset" onClick={reset} disabled={!filtered}>
+        {/* Сброс всегда на своём месте: строка не прыгает, когда фильтры выбирают и снимают.
+            Неактивна через aria-disabled: после нажатия фокус остаётся на кнопке. */}
+        <button
+          className="pg-btn pg-btn--ghost pg-btn--sm filters__reset"
+          onClick={() => filtered && reset()}
+          aria-disabled={!filtered || undefined}
+        >
           <Icon name="close" small />
           {t.library.reset}
         </button>

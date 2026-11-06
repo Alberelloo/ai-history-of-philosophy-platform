@@ -388,7 +388,9 @@ export function FilterMenu({
 
   useEffect(() => {
     if (!open) return;
-    menu.current?.querySelector<HTMLElement>("button:not([disabled]), input")?.focus();
+    menu.current
+      ?.querySelector<HTMLElement>('button:not([disabled]):not([aria-disabled="true"]), input')
+      ?.focus();
     const outside = (e: PointerEvent) => {
       if (!root.current?.contains(e.target as Node)) setOpen(false);
     };
@@ -426,16 +428,22 @@ export function FilterMenu({
             <button
               type="button"
               className="pg-btn pg-btn--ghost pg-btn--sm"
-              disabled={all}
-              onClick={() => onChange(items.map((item) => item.value))}
+              // Неактивна через aria-disabled, а не disabled: кнопка, на которой фокус, не
+              // теряет его (иначе Esc не закрыл бы окно, а Tab начинал бы страницу сначала).
+              aria-disabled={all || undefined}
+              onClick={() => {
+                if (!all) onChange(items.map((item) => item.value));
+              }}
             >
               {t.filter.selectAll}
             </button>
             <button
               type="button"
               className="pg-btn pg-btn--ghost pg-btn--sm"
-              disabled={count === 0}
-              onClick={() => onChange([])}
+              aria-disabled={count === 0 || undefined}
+              onClick={() => {
+                if (count > 0) onChange([]);
+              }}
             >
               {t.filter.clearAll}
             </button>

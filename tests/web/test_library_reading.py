@@ -130,6 +130,35 @@ def test_kind_filter_select_all_clear_all_and_closing(page, site):
     assert button.inner_text().split() == ["Вид", "·", "1"]
 
 
+@req(SL, "Фильтр по виду источника")
+@req(SL, "Фильтр по языку")
+@pytest.mark.parametrize("name", ["Вид", "Язык"])
+@pytest.mark.parametrize("action", ["Выбрать все", "Снять все"])
+def test_escape_after_select_all_and_clear_all(page, site, name, action):
+    """Esc сразу после «Выбрать все» или «Снять все» закрывает окно, фокус — на кнопке фильтра.
+
+    Кнопка, которая после нажатия стала неактивной, не теряет фокус: иначе Esc уходил бы
+    в пустоту, а Tab начинал обход страницы сначала.
+    """
+    open_library(page, site)
+    button, menu = filter_menu(page, name)
+    select_all = menu.get_by_role("button", name="Выбрать все")
+    clear_all = menu.get_by_role("button", name="Снять все")
+    if action == "Снять все":
+        select_all.click()
+        page.wait_for_function(
+            "() => [...document.querySelectorAll('.pg-filter-menu input')].every(i => i.checked)"
+        )
+    target = select_all if action == "Выбрать все" else clear_all
+    target.click()
+    # Кнопка теперь ничего не изменит: неактивна, но в фокусе (aria-disabled, не disabled).
+    assert target.get_attribute("aria-disabled") == "true"
+    assert target.evaluate("el => el === document.activeElement")
+    page.keyboard.press("Escape")
+    assert menu.count() == 0
+    assert button.evaluate("el => el === document.activeElement")
+
+
 @req(SL, "Фильтр по языку")
 def test_language_filter_offers_available_languages(page, site):
     open_library(page, site)
