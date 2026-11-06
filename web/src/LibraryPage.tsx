@@ -3,7 +3,7 @@ import { api, SourceList } from "./api";
 import { navigate } from "./App";
 import { pick, useT } from "./i18n";
 import { storage } from "./storage";
-import { rememberTitles } from "./TopBar";
+import { rememberSources } from "./sources";
 import { Icon } from "./ui";
 
 const KINDS = ["textbook", "primary", "reference"];
@@ -38,7 +38,7 @@ export function LibraryPage() {
     let cancelled = false;
     api.sources({ kinds, languages, query }).then((result) => {
       if (cancelled) return;
-      rememberTitles(result.sources);
+      rememberSources(result.sources);
       setData(result);
       setAllLanguages(result.languages);
     });
