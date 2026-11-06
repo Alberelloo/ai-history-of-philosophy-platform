@@ -17,7 +17,7 @@
 | 5.1 Сервер: глава по разделу, first_chapter_id | сделан: Reading.chapter отдаёт главу раздела с anchor, ChapterNotFound → 404 с first_chapter_id; тесты tests/library/test_reading_resilience.py |
 | 5.2 Клиент: устойчивое чтение | сделан: ReaderPage на chapter_not_found ищет сохранённый абзац (или абзац из адреса), иначе первую главу; уведомление в потоке; раздел по адресу → глава с прокруткой; ApiError.details |
 | 5.3 Заглушки необработанных частей | сделан: extract — blank_page и missing, parse — блоки unrendered с пояснением, Wikisource v3 пишет красные ссылки с missing, CatalogFetch отдаёт заглушку, схема каталога; оформление unrendered в клиенте; PIPELINE_VERSION 3, STEP_VERSIONS 3; тесты tests/library/test_unrendered_parts.py, tests/library/catalog/test_missing_subpages.py |
-| 6.1 Прослеживаемость RENAMED/REMOVED | не начат |
+| 6.1 Прослеживаемость RENAMED/REMOVED | сделан: check_traceability понимает RENAMED (FROM) и REMOVED; тест tests/platform/test_runtime.py::test_traceability_follows_renamed_and_removed |
 | 6.2 Тесты требований | не начат |
 | 6.3 Визуальные эталоны | не начат |
 | 6.4 Итоговый прогон | не начат |
@@ -30,11 +30,11 @@
 
 ## Сейчас
 
-Пункт 5.3 закрыт, tests/library зелёные (104).
+Пункт 6.1 закрыт. Прослеживаемость: не хватает тестов на «Открытые книги», «Боковая панель навигации», «Разделы в разработке»; маркер «Верхняя панель» — переводится в 6.2.
 
 ## Следующий шаг
 
-6.1 — прослеживаемость RENAMED/REMOVED, затем 6.2 — перевод тестов на боковую панель.
+6.2 — тесты требований и перевод сквозных тестов на боковую панель.
 
 ## Известные проблемы
 

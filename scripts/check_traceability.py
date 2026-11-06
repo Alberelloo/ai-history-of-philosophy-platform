@@ -3,7 +3,9 @@
 Требования берутся из спецификаций OpenSpec (заголовки ``### Requirement:``) для
 возможностей, перечисленных в ``openspec/traceability.yaml``. Тесты связываются с
 требованием маркером ``@pytest.mark.req("<возможность>", "<требование>")``. Скрипт падает,
-если требование без теста или маркер ссылается на несуществующее требование.
+если требование без теста или маркер ссылается на несуществующее требование. Требование,
+которое действующее изменение переименовало (``## RENAMED Requirements``, строка ``- FROM:``)
+или удалило (``## REMOVED Requirements``), теста больше не ждёт, а маркер на него — ошибка.
 
 Запуск: ``python scripts/check_traceability.py``.
 """
@@ -19,20 +21,40 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 REQ_RE = re.compile(r"^### Requirement:\s*(.+?)\s*$", re.MULTILINE)
+RENAMED_FROM_RE = re.compile(r"^-\s*FROM:\s*`?###\s*Requirement:\s*(.+?)`?\s*$", re.MULTILINE)
+
+
+def _sections(text: str) -> dict[str, str]:
+    """Спецификация изменения по разделам: ``ADDED/MODIFIED/REMOVED/RENAMED Requirements``."""
+    parts = re.split(r"^## ", text, flags=re.MULTILINE)
+    return {part.partition("\n")[0].strip(): part for part in parts[1:]}
+
+
+def retired(text: str) -> set[str]:
+    """Имена требований, которые изменение переименовало или удалило."""
+    sections = _sections(text)
+    names = set(RENAMED_FROM_RE.findall(sections.get("RENAMED Requirements", "")))
+    return names | set(REQ_RE.findall(sections.get("REMOVED Requirements", "")))
 
 
 def spec_requirements(capability: str) -> dict[str, list[str]]:
-    """Требования возможности по всем местам, где она описана: основная спецификация и изменения."""
+    """Требования возможности по всем местам, где она описана: основная спецификация и изменения.
+
+    Требование, которое действующее изменение переименовало или удалило, теста больше не ждёт.
+    """
     found: dict[str, list[str]] = {}
+    gone: set[str] = set()
     candidates = [
         ROOT / "openspec" / "specs" / capability / "spec.md",
         *ROOT.glob(f"openspec/changes/*/specs/{capability}/spec.md"),
     ]
     for path in candidates:
         if path.exists() and "archive" not in path.parts:
-            for name in REQ_RE.findall(path.read_text(encoding="utf-8")):
+            text = path.read_text(encoding="utf-8")
+            for name in REQ_RE.findall(text):
                 found.setdefault(name, []).append(str(path.relative_to(ROOT)))
-    return found
+            gone |= retired(text)
+    return {name: where for name, where in found.items() if name not in gone}
 
 
 def test_markers() -> dict[tuple[str, str], list[str]]:
