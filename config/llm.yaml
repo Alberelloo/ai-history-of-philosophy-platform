@@ -32,4 +32,5 @@ prices:
 
 budgets:
   site: {daily_limit_usd: 1.7, monthly_limit_usd: 50, alert_ratio: 0.8}
-  filling: {alert_ratio: 0.8}
+  # Наполнение онтологии из загруженных книг: без лимита загрузка каталога тратила бы сколько угодно.
+  filling: {daily_limit_usd: 2.0, monthly_limit_usd: 20, alert_ratio: 0.8}
