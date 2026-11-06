@@ -123,6 +123,9 @@ def _take_label(page: RawPage, text: str) -> None:
             return
 
 
+UNRELIABLE_LABELS = 0.1  # доля нарушений порядка, после которой номера страниц не показываются
+
+
 def infer_labels(raw: RawDocument, settings: ParseSettings) -> list[str | None]:
     """Номер страницы как напечатан; нераспознанный выводится, только если нумерация непрерывна."""
     labels = [p.printed_label for p in raw.pages]
@@ -153,6 +156,12 @@ def infer_labels(raw: RawDocument, settings: ParseSettings) -> list[str | None]:
         ):
             numbers[i] = None
             labels[i] = None
+    # Номера часто идут не по порядку — это не нумерация страниц, а случайные числа
+    # колонтитулов: неверный номер хуже отсутствующего.
+    known = [n for n in numbers if n is not None]
+    drops = sum(1 for a, b in itertools.pairwise(known) if b < a)
+    if known and drops > max(1, UNRELIABLE_LABELS * len(known)):
+        return [None] * len(labels)
     for i, value in enumerate(numbers):
         if value is not None or labels[i] is not None:
             continue

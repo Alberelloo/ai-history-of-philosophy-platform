@@ -364,9 +364,10 @@ class CatalogService:
 class Policy:
     """Когда новая версия публикуется сама.
 
-    - Тот же текст, что у опубликованной, — всегда.
-    - Правило записи «auto», проверки пройдены, решение по качеству не нужно, удалено
-      не больше 2% абзацев опубликованной версии (первая версия — без этого условия).
+    - Правило записи «auto» или тот же текст, что у опубликованной; проверки пройдены,
+      решение по качеству не нужно; удалено не больше 2% абзацев опубликованной версии
+      (первая версия — без этого условия). Тот же текст ещё не значит та же разбивка:
+      новая версия конвейера может иначе делить абзацы, поэтому порог действует всегда.
     Остальное ждёт оператора и даёт предупреждение.
     """
 
@@ -393,9 +394,8 @@ class Policy:
         published = (
             self.registry.version(source.published_version) if source.published_version else None
         )
-        if published and published["text_digest"] == version["text_digest"]:
-            return self._publish(cid, version_id, "published_same_text", base)
-        if entry.get("publish") != "auto":
+        same_text = bool(published and published["text_digest"] == version["text_digest"])
+        if not same_text and entry.get("publish") != "auto":
             self._warn(cid, source_id, version_id, "правило записи: публикует оператор")
             return Outcome(cid, "waiting_operator", **base)
         if published:
@@ -405,7 +405,9 @@ class Policy:
                 reason = f"удалено {removed} из {total} абзацев"
                 self._warn(cid, source_id, version_id, reason)
                 return Outcome(cid, "waiting_operator", reason, **base)
-        return self._publish(cid, version_id, "published", base)
+        return self._publish(
+            cid, version_id, "published_same_text" if same_text else "published", base
+        )
 
     def _publish(self, cid: str, version_id: str, code: str, base: dict[str, Any]) -> Outcome:
         try:

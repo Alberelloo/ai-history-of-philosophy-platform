@@ -452,3 +452,18 @@ def test_page_label_outlier_from_running_footer_is_ignored():
         paginated=True,
     )
     assert infer_labels(raw, ParseSettings()) == ["105", "106", "107", "108", "109", "110"]
+
+
+@req(DS, "Страницы печатного издания")
+def test_chaotic_numbers_are_not_page_labels():
+    from philograph.library.model import RawDocument, RawPage
+    from philograph.library.parse import ParseSettings, infer_labels
+
+    # числа из колонтитулов цифрового учебника вразнобой: это не нумерация страниц
+    labels = ["2022", "108", "110", "370", "373", "1", "5", "6", "300", "12"]
+    raw = RawDocument(
+        pages=[RawPage(i, [], printed_label=x) for i, x in enumerate(labels)],
+        fmt="pdf",
+        paginated=True,
+    )
+    assert infer_labels(raw, ParseSettings()) == [None] * len(labels)
