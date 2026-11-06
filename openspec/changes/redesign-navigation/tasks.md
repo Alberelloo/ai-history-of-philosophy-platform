@@ -3,7 +3,7 @@
 ## 1. Задача и документы
 
 - [x] 1.1 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, дельты `visual-design`, `reader-settings`, `source-library`, `chapter-reading`, `progress.md`; `openspec validate`
-- [ ] 1.2 Документы дизайна: `layout.md`, `components/Sidebar.md`, `components/FilterMenu.md`, журнал решений в `design-system.md`
+- [x] 1.2 Документы дизайна: `layout.md`, `components/Sidebar.md`, `components/FilterMenu.md`, журнал решений в `design-system.md`
 
 ## 2. Боковая панель
 
