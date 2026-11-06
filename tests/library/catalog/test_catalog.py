@@ -374,3 +374,21 @@ def test_wikisource_header_with_nested_markup():
     assert _links(_template_value(header, ("translator",))) == ["Author:Octavius Freire Owen"]
     ru = "{{Отексте\n|АВТОР=[[Платон]]\n|ПЕРЕВОДЧИК={{Перевод|[[Василий Карпов|В. Карпов]]}}\n}}"
     assert _links(_template_value(ru, ("ПЕРЕВОДЧИК",))) == ["Василий Карпов"]
+
+
+@req(SC, "Проверка обновлений без лишней загрузки")
+def test_wikisource_cleaner_drops_site_notices():
+    from philograph.library.catalog.clean import wikisource
+
+    page = (
+        "<html><head><title>Book/Chapter 2</title></head><body>"
+        '<table class="mbox plainlinks"><tr><td class="mbox-text">A scan-backed version '
+        "of this work can be edited</td></tr></table>"
+        '<strong class="error">Ошибка Lua в Модуль:Отексте</strong>'
+        '<div class="wst-header-mainblock headertemplate">header</div>'
+        "<p>The real text of the chapter.</p></body></html>"
+    ).encode()
+    cleaned = wikisource(page).decode()
+    assert "scan-backed" not in cleaned and "Lua" not in cleaned and "header</div>" not in cleaned
+    assert "The real text of the chapter." in cleaned
+    assert "<h2>Chapter 2</h2>" in cleaned

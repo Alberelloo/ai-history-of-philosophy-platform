@@ -320,6 +320,9 @@ class PdfPageImage:
     png: bytes
 
 
+TEXTLESS_SHARE = 0.1  # доля страниц без текстового слоя, после которой без распознавания нельзя
+
+
 def extract_pdf(
     data: bytes,
     *,
@@ -345,6 +348,7 @@ def extract_pdf(
     if doc.needs_pass:
         raise ExtractionError("файл защищён паролем")
     pages: list[RawPage] = []
+    textless: list[int] = []
     for index in range(doc.page_count):
         if skip_pages and index in skip_pages:
             continue
@@ -370,16 +374,21 @@ def extract_pdf(
             )
             if store_image is not None:
                 raw.image_ref = store_image(page.get_pixmap(dpi=150, clip=clip).tobytes("png"))
-            if not lines:
-                if ocr is None:
-                    raise ExtractionError(
-                        f"страница {index + 1} без текста, распознавание не задано"
-                    )
+            if not lines and ocr is None:
+                # Обложка или иллюстрация во всю страницу в цифровом PDF: страница остаётся
+                # пустой. Если таких страниц много, это скан — см. проверку после цикла.
+                textless.append(index)
+            elif not lines:
                 image = page.get_pixmap(dpi=300, clip=clip).tobytes("png")
                 raw.lines, raw.ocr_confidence = ocr.recognize(image, languages)
             pages.append(raw)
             if on_page is not None:
                 on_page(raw)
+    if textless and len(textless) > max(1, TEXTLESS_SHARE * doc.page_count):
+        raise ExtractionError(
+            f"{len(textless)} из {doc.page_count} страниц без текста (первая — страница "
+            f"{textless[0] + 1}), распознавание не задано"
+        )
     return RawDocument(pages=pages, fmt="pdf", paginated=True)
 
 

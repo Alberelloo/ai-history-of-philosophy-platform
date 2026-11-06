@@ -119,7 +119,13 @@ def wikisource(data: bytes) -> bytes:
         for el in tree.xpath(
             "//*[contains(@class,'ws-noexport') or contains(@class,'mw-editsection') or "
             "contains(@class,'headertemplate') or @id='ws-data' or @id='toc' or "
-            "contains(@class,'printfooter') or contains(@class,'mw-cite-backlink')]"
+            "contains(@class,'printfooter') or contains(@class,'mw-cite-backlink') or "
+            # плашки сайта («scan-backed version…»), ошибки модулей Lua, служебные метаданные
+            "contains(@class,'mbox') or contains(@class,'ambox') or "
+            "contains(concat(' ', @class, ' '), ' error ') or "
+            "contains(@class,'scribunto-error') or "
+            "contains(concat(' ', @class, ' '), ' noprint ') or "
+            "contains(concat(' ', @class, ' '), ' metadata ')]"
         ):
             el.getparent().remove(el)
         # Подстраница «Книга/Глава 1»: заголовок главы — последняя часть названия страницы.

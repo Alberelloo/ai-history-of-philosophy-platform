@@ -759,7 +759,7 @@ entries:
   kind: primary
   section: epistemology
   harvested:
-    at: '2026-11-06T00:02:26+00:00'
+    at: '2026-11-06T00:09:54+00:00'
     adapter_version: 2
     metadata:
       title: The Phenomenology of Mind
@@ -785,38 +785,6 @@ entries:
       api: true
     - name: The Phenomenology of Mind/Introduction
       url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FIntroduction
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 1
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_1
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 2
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_2
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 3
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_3
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 4
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_4
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 5
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_5
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 6
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_6
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 7
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_7
-      clean: wikisource
-      api: true
-    - name: The Phenomenology of Mind/Part 8
-      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_8
       clean: wikisource
       api: true
     license_hint: PD-old, PD/US
@@ -1101,10 +1069,10 @@ entries:
   kind: textbook
   section: epistemology
   harvested:
-    at: '2026-11-06T00:02:47+00:00'
+    at: '2026-11-06T00:09:59+00:00'
     adapter_version: 2
     metadata:
-      title: History of Modern Philosophy{{smaller
+      title: History of Modern Philosophyfrom Nicolas of Cusa to the Present Time
       authors:
       - name: Richard Falckenberg
         death_year: 1920
@@ -1139,66 +1107,6 @@ entries:
       api: true
     - name: History of Modern Philosophy/Chapter 1
       url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_1
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 2
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_2
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 3
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_3
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 4
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_4
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 5
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_5
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 6
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_6
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 7
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_7
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 8
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_8
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 9
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_9
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 10
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_10
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 11
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_11
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 12
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_12
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 13
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_13
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 14
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_14
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 15
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_15
-      clean: wikisource
-      api: true
-    - name: History of Modern Philosophy/Chapter 16
-      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_16
       clean: wikisource
       api: true
     license_hint: PD/US

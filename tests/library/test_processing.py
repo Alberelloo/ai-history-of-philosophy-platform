@@ -410,3 +410,24 @@ def test_removed_paragraph_record(lib):
     resolved = lib.registry.resolve_paragraph(removed.id)
     assert resolved["status"] == "removed"
     assert resolved["section_title"] == "Глава 2. Рассудок"
+
+
+@req(SP, "Извлечение текста")
+def test_digital_pdf_with_textless_cover_needs_no_ocr(lib):
+    # цифровой учебник: обложка без текстового слоя, остальные 19 страниц с текстом
+    sentence = "All our knowledge begins with experience, but it does not all arise from it."
+    lib.files["book.pdf"] = pdf(
+        [[]] + [[(f"{sentence} Page {i}.", BODY) for _ in range(12)] for i in range(1, 20)]
+    )
+    source_id = lib.register(
+        files=[{"name": "b", "path": "book.pdf"}], language="en", settings={"languages": ["en"]}
+    )
+    lib.pipeline.ocr = None
+    version = lib.registry.version(lib.pipeline.start("operator", source_id))
+    assert version["error"] is None, version["error"]
+    assert version["state"] in ("checked", "awaiting_quality"), version["deferred_reason"]
+    # скан, где без текста больше десятой части страниц, без распознавания не обрабатывается
+    lib.files["scan.pdf"] = scan_pdf(20, text_pages=set(range(5, 20)))
+    scan_id = lib.register(title="Скан", files=[{"name": "s", "path": "scan.pdf"}])
+    failed = lib.registry.version(lib.pipeline.start("operator", scan_id))
+    assert "5 из 20 страниц без текста" in failed["error"]["message"]

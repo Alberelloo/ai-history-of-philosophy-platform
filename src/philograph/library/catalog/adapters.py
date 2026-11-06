@@ -268,8 +268,10 @@ class Wikisource:
         body = fetcher.get(main, api=True).data
         prefix = page.replace(" ", "_") + "/"
         subpages: list[str] = []
-        for href in re.findall(rb'href="\./([^"#?]+)', body):
-            title = unquote(href.decode("utf-8")).rstrip("/")
+        for href in re.findall(rb'href="\./([^"]+)"', body):
+            if b"redlink=1" in href:
+                continue  # «красная» ссылка: такой подстраницы на сайте нет
+            title = unquote(re.split(rb"[#?]", href)[0].decode("utf-8")).rstrip("/")
             if title.startswith(prefix) and title not in subpages:
                 subpages.append(title)
         result = [{"name": page, "url": main, "clean": "wikisource", "api": True}]
