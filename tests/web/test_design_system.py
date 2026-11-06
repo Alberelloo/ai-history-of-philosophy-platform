@@ -89,7 +89,8 @@ def test_client_styles_use_only_tokens():
 def test_fonts_bundled_without_external_services():
     main = (WEB / "src" / "main.tsx").read_text(encoding="utf-8")
     assert "@fontsource/onest" in main and "@fontsource-variable/literata" in main
-    for path in [*(WEB / "src").rglob("*.*"), WEB / "index.html"]:
+    design_css = (ROOT / "docs" / "design" / "system").glob("*.css")
+    for path in [*(WEB / "src").rglob("*.*"), WEB / "index.html", *design_css]:
         text = path.read_text(encoding="utf-8", errors="ignore")
         assert "fonts.googleapis.com" not in text and "fonts.gstatic.com" not in text, path
 

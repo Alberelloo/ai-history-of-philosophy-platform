@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..600&family=Onest:wght@400..700&display=swap");
-
 /* PhiloGraph: компоненты. Все цвета, отступы, радиусы и длительности берутся из токенов. */
 
 *, *::before, *::after { box-sizing: border-box; }

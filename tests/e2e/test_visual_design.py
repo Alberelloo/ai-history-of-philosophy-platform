@@ -194,6 +194,7 @@ def test_layout_at_supported_widths(browser, site, ids, width):
         visual.settle(page)
         visual.assert_no_horizontal_scroll(page)
         visual.assert_no_clipped_text(page)
+        visual.assert_fills_width(page, ".sources")
         if width == 1024:
             dark, dark_page = open_context(browser, theme="dark", width=width)
             try:
@@ -313,7 +314,7 @@ def test_english_interface(browser, site, ids):
         assert page.evaluate("document.documentElement.lang") == "en"
         nav.get_by_role("link", name="Settings").click()
         page.wait_for_selector("h1:text('Settings')")
-        assert page.get_by_role("main").get_by_role("button", name="English").get_attribute(
+        assert page.get_by_role("main").get_by_role("button", name="EN", exact=True).get_attribute(
             "aria-pressed"
         ) == ("true")
         visual.snap(page, "settings-en-light-1280")

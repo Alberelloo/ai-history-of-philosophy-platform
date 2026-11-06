@@ -1,5 +1,5 @@
 /* Компоненты дизайн-системы PhiloGraph (классы pg-*). Источник — docs/design/system/components.css;
-   здесь без подключения Google Fonts (шрифты из @fontsource, см. main.tsx) и без раскладки превью.
+   отличается от него только тем, что здесь нет раскладки превью (.pg-demo*). Шрифты — из @fontsource, см. main.tsx.
    Правки компонентов сначала вносятся в дизайн-систему. */
 
 *, *::before, *::after { box-sizing: border-box; }

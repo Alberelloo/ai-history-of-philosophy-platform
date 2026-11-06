@@ -22,7 +22,7 @@
 
 ### 3. Компоненты — классы дизайн-системы
 
-`web/src/styles/components.css` — копия `docs/design/system/components.css` без подключения Google Fonts и раскладки превью. Обёртки на React — `web/src/ui.tsx` (значки, `Switch`, `Seg`, `StatusMark`, `Generated`, `Portrait` с монограммой). Флажки фильтров библиотеки и выбор источников в настройках остаются настоящими `input`, оформленными по токенам: так сохраняются подписи и проверка флажков в тестах.
+`web/src/styles/components.css` — копия `docs/design/system/components.css` без раскладки превью (`.pg-demo*`). Обёртки на React — `web/src/ui.tsx` (значки, `Switch`, `Seg`, `StatusMark`, `Generated`, `Portrait` с монограммой). Флажки фильтров библиотеки и выбор источников в настройках остаются настоящими `input`, оформленными по токенам: так сохраняются подписи и проверка флажков в тестах.
 
 ### 4. Тема без мигания
 

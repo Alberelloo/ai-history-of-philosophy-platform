@@ -45,8 +45,8 @@ export function SettingsPage() {
             value={lang}
             onChange={(value) => storage.setLang(value)}
             items={[
-              { value: "ru", label: t.lang.ruName },
-              { value: "en", label: t.lang.enName },
+              { value: "ru", label: t.lang.ru },
+              { value: "en", label: t.lang.en },
             ]}
           />
         </div>

@@ -397,7 +397,7 @@ svg :where(g[tabindex]):focus-visible {
 
 .sources {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--space-4);
   margin: 0;
   padding: 0;

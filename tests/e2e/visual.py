@@ -169,6 +169,20 @@ def assert_separated(page, selector: str, min_gap: float = 4.0) -> None:
         assert left_b - right_a >= min_gap, f"слиплись: {name_a!r} и {name_b!r} ({rects})"
 
 
+def assert_fills_width(page, selector: str) -> None:
+    """Первый ряд сетки доходит до её правого края: справа нет пустой дорожки."""
+    edges = page.evaluate(
+        """s => { const grid = document.querySelector(s);
+            const items = [...grid.children].filter(e => e.getClientRects().length);
+            const top = items[0].getBoundingClientRect().top;
+            const row = items.filter(e => Math.abs(e.getBoundingClientRect().top - top) < 1);
+            return {grid: grid.getBoundingClientRect().right,
+                    last: row[row.length - 1].getBoundingClientRect().right}; }""",
+        selector,
+    )
+    assert abs(edges["grid"] - edges["last"]) <= 1, f"сетка не заполняет ширину: {edges}"
+
+
 def clipped_text(page) -> list[str]:
     """Видимые элементы, у которых текст не помещается и обрезан (overflow hidden/clip)."""
     return page.evaluate(

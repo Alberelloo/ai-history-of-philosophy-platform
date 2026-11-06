@@ -24,8 +24,6 @@ export const en: Catalog = {
     label: "Interface language",
     ru: "RU",
     en: "EN",
-    ruName: "Русский",
-    enName: "English",
   },
   status: {
     verified: "Verified",

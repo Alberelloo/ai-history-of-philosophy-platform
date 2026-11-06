@@ -34,8 +34,6 @@ export const ru = {
     label: "Язык интерфейса",
     ru: "RU",
     en: "EN",
-    ruName: "Русский",
-    enName: "English",
   },
   status: {
     verified: "Проверено",
