@@ -160,14 +160,16 @@ def check_screen(page, theme: str) -> None:
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_main_screens_in_both_themes(browser, site, ids, theme):
     """Основные экраны: токены, оформленные кнопки, контраст и снимки при 1280."""
+    snaps = visual.Snaps()
     for name, open_screen in SCREENS.items():
         context, page = open_context(browser, theme=theme)
         try:
             open_screen(page, site, ids)
             check_screen(page, theme)
-            visual.snap(page, f"{name}-{theme}-1280")
+            snaps(page, f"{name}-{theme}-1280")
         finally:
             context.close()
+    snaps.check()
 
 
 @req(VD, "Раскладка без наложений")
@@ -175,6 +177,7 @@ def test_main_screens_in_both_themes(browser, site, ids, theme):
 @pytest.mark.parametrize("width", visual.WIDTHS)
 def test_layout_at_supported_widths(browser, site, ids, width):
     """Чтение и библиотека: без прокрутки по горизонтали, наложений и обрезанного текста."""
+    snaps = visual.Snaps()
     context, page = open_context(browser, width=width)
     try:
         chapter(page, site, ids)
@@ -190,7 +193,7 @@ def test_layout_at_supported_widths(browser, site, ids, width):
         )
         assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f}"
         if width != 1280:
-            visual.snap(page, f"chapter-light-{width}")
+            snaps(page, f"chapter-light-{width}")
         library(page, site, ids)
         visual.settle(page)
         visual.assert_no_horizontal_scroll(page)
@@ -202,11 +205,12 @@ def test_layout_at_supported_widths(browser, site, ids, width):
                 for name in ("chapter", "card", "assistant", "graph"):
                     SCREENS[name](dark_page, site, ids)
                     check_screen(dark_page, "dark")
-                    visual.snap(dark_page, f"{name}-dark-{width}")
+                    snaps(dark_page, f"{name}-dark-{width}")
             finally:
                 dark.close()
     finally:
         context.close()
+    snaps.check()
 
 
 @req(VD, "Шрифты")

@@ -364,3 +364,20 @@ def snap(page, name: str, *, mask: list | None = None, full_page: bool = False) 
     ratio = compare(actual, expected, name)
     actual.unlink()
     return ratio
+
+
+class Snaps:
+    """Снимки нескольких экранов в одном тесте: сравниваются все, падение — в конце списком."""
+
+    def __init__(self) -> None:
+        self.failed: list[str] = []
+
+    def __call__(self, page, name: str, **options) -> None:
+        try:
+            snap(page, name, **options)
+        except SnapshotMismatch as error:
+            self.failed.append(str(error))
+
+    def check(self) -> None:
+        if self.failed:
+            raise SnapshotMismatch("; ".join(self.failed))

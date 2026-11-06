@@ -29,7 +29,7 @@
 | D2 Граф и ассистент: рецепты и связи по коду | сделан: `GraphPage.tsx` (рецепты, связи, «распространённое мнение»), подсказка ассистента из `recipe` и `label`; тесты `test_ontology_names_in_both_catalogs`, `test_english_card_and_graph` |
 | З2 Описание заглушки модели в карточке | сделан: `card.description` в `fake_replies` (`config/llm.demo.yaml`), проверка в `test_site.py` |
 | D4 Уведомление в потоке страницы | сделан: `pg-notice` под верхней панелью (роль region), при открытой панели ассистента сужается; тест `test_first_run_notice_in_flow` |
-| Эталоны снимков | не начат |
+| Эталоны снимков | сделан: обновлены `library-*-1280`, `settings-*-1280`, `settings-en-light-1280`, `card-*`, `graph-*`, `notice-light-1280`; новый `notice-dark-1024`. Тест снимков сравнивает все экраны и падает в конце списком (`visual.Snaps`) |
 
 ## Сделано
 
