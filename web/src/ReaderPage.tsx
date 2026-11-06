@@ -289,8 +289,8 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
     if (!chapter || !sourceId) return;
     const save = () => {
       const paragraphs = textRef.current?.querySelectorAll<HTMLElement>("[data-paragraph]") ?? [];
-      // Верх окна закрыт закреплённой верхней панелью: видимым считается то, что ниже отступа
-      // прокрутки (панель и зазор), — туда же абзац встаёт при возврате к месту.
+      // Видимым считается то, что ниже отступа прокрутки, — туда же абзац встаёт при возврате
+      // к месту.
       const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
       const visible = Array.from(paragraphs).find((p) => p.getBoundingClientRect().bottom > top);
       storage.setPosition(sourceId, { chapterId: chapter.chapter_id, paragraphId: visible?.dataset.paragraph });
