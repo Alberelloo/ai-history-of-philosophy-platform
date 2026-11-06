@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal.md](proposal.md). Правила оформления — [layout.md](../../../docs/design/system/layout.md), [Sidebar.md](../../../docs/design/system/components/Sidebar.md), [FilterMenu.md](../../../docs/design/system/components/FilterMenu.md), журнал решений — [design-system.md](../../../docs/design/design-system.md). Изменение продолжает PR #25 в ветке `claude/design-system`: основа не сливается в main в виде, который не понравился владельцу.
+Мотивация — в [proposal.md](proposal.md). Правила оформления — [layout.md](../../../../docs/design/system/layout.md), [Sidebar.md](../../../../docs/design/system/components/Sidebar.md), [FilterMenu.md](../../../../docs/design/system/components/FilterMenu.md), журнал решений — [design-system.md](../../../../docs/design/design-system.md). Изменение продолжает PR #25 в ветке `claude/design-system`: основа не сливается в main в виде, который не понравился владельцу.
 
 ## Decisions
 
