@@ -121,4 +121,10 @@ flowchart TD
 docker compose exec worker python -m philograph.library.catalog --catalog /app/sources/catalog.yaml check-updates
 ```
 
+Каталог входит в образ (`COPY sources` в `Dockerfile`). Чтобы взять каталог из рабочей копии без пересборки, подключите его томом:
+
+```sh
+docker compose run --rm -v ./sources:/app/sources:ro worker python -m philograph.library.catalog --catalog /app/sources/catalog.yaml sync
+```
+
 Исполнитель очереди (`python -m philograph.worker`) получает файлы тем же загрузчиком. Поэтому задача `library.check_updates` тоже идёт условными запросами, но правило публикации применяет только команда каталога.
