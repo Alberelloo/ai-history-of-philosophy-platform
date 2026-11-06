@@ -174,8 +174,11 @@ def test_settings_sections_and_toc(page, stack):
     # Адрес раздела открывает экран на нём.
     page.goto(stack.url + "/settings#books")
     books = main.get_by_role("region", name="Открытые книги")
+    # раздел у верха окна или, если ниже страница кончается, целиком на экране
     page.wait_for_function(
-        "() => Math.abs(document.getElementById('books').getBoundingClientRect().top - 24) < 4"
+        "() => { const top = document.getElementById('books').getBoundingClientRect().top;"
+        " return top >= 0 && (Math.abs(top - 24) < 4"
+        " || innerHeight + scrollY >= document.documentElement.scrollHeight - 2); }"
     )
     assert books.is_visible()
     assert toc.locator("[aria-current=true]").inner_text() == "Открытые книги"

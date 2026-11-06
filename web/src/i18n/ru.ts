@@ -41,6 +41,8 @@ export const ru = {
     pinNarrow: "Закрепить панель можно на экране шириной от 1280 пикселей",
     soon: "скоро",
     themeCycle: (current: string, next: string) => `Тема: ${current.toLowerCase()}. Сменить на «${next.toLowerCase()}»`,
+    langName: "Русский",
+    themeName: (name: string) => `Тема: ${name.toLowerCase()}`,
     langToggle: (next: string) => `Язык интерфейса: переключить на ${next}`,
   },
   soon: {

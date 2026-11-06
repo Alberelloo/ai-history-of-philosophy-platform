@@ -29,6 +29,8 @@ export const en: Catalog = {
     pinNarrow: "The sidebar can be pinned on screens 1280 pixels wide or more",
     soon: "soon",
     themeCycle: (current: string, next: string) => `Theme: ${current.toLowerCase()}. Switch to “${next.toLowerCase()}”`,
+    langName: "English",
+    themeName: (name: string) => `Theme: ${name.toLowerCase()}`,
     langToggle: (next: string) => `Interface language: switch to ${next}`,
   },
   soon: {

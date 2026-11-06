@@ -5,7 +5,7 @@ import { SOON } from "./SoonPage";
 import { useSources } from "./sources";
 import { storage, THEMES, useStored, type Lang, type Theme } from "./storage";
 import { useTheme } from "./theme";
-import { Icon, Mark, Seg, type IconName } from "./ui";
+import { Icon, Mark, type IconName } from "./ui";
 
 // Боковая панель навигации (docs/design/system/components/Sidebar.md): свёрнута до значков,
 // раскрывается при наведении или фокусе поверх содержимого, закрепляется и тогда сдвигает его.
@@ -97,6 +97,11 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
     else delete document.documentElement.dataset.sidebar;
   }, [pinnedChoice]);
 
+  // Раскрывает только фокус с клавиатуры: после щелчка мышью фокус остаётся на пункте, и панель
+  // не должна висеть поверх текста, когда указатель ушёл.
+  const onFocus = (e: FocusEvent) => {
+    if ((e.target as HTMLElement).matches?.(":focus-visible")) setFocused(true);
+  };
   const onBlur = (e: FocusEvent) => {
     if (!root.current?.contains(e.relatedTarget as Node | null)) {
       setFocused(false);
@@ -130,7 +135,7 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
         setHover(false);
         setDismissed(false);
       }}
-      onFocus={() => setFocused(true)}
+      onFocus={onFocus}
       onBlur={onBlur}
       onKeyDown={onKeyDown}
     >
@@ -168,7 +173,7 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
                     onClick={go(`/read/${id}`)}
                     aria-current={reading ? "page" : id === current ? "true" : undefined}
                   >
-                    <span className="sidebar__icon">
+                    <span className="sidebar__icon" role="img" aria-label={pick(t.library.kinds, book.kind)}>
                       <Icon name={KIND_ICON[book.kind] ?? "book"} small />
                     </span>
                     <span className="sidebar__label sidebar__book-text">
@@ -176,8 +181,7 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
                       {book.authors.length > 0 && (
                         <span className="sidebar__book-author">{book.authors.join(", ")}</span>
                       )}
-                      <span className="visually-hidden">{pick(t.library.kinds, book.kind)}</span>
-                    </span>
+                      </span>
                   </a>
                   <button
                     type="button"
@@ -216,47 +220,36 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
         </div>
         <div className="sidebar__foot">
           <Item href="/settings" icon="settings" label={t.nav.settings} current={active === "settings"} />
-          <div className="sidebar__tools sidebar__tools--full">
-            <Seg<Lang>
-              label={t.lang.label}
-              value={lang}
-              onChange={(value) => storage.setLang(value)}
-              items={[
-                { value: "ru", label: t.lang.ru },
-                { value: "en", label: t.lang.en },
-              ]}
-            />
-            <Seg<Theme>
-              label={t.theme.label}
-              value={theme}
-              onChange={(value) => storage.setTheme(value)}
-              items={[
-                { value: "light", label: t.theme.light, icon: "sun", iconOnly: true },
-                { value: "dark", label: t.theme.dark, icon: "moon", iconOnly: true },
-                { value: "system", label: t.theme.system, icon: "system", iconOnly: true },
-              ]}
-            />
-          </div>
-          <div className="sidebar__tools sidebar__tools--compact">
-            <button
-              type="button"
-              className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
-              aria-label={t.sidebar.langToggle(t.lang[otherLang])}
-              title={t.sidebar.langToggle(t.lang[otherLang])}
-              onClick={() => storage.setLang(otherLang)}
-            >
+          {/* Язык и тема — одни и те же кнопки в свёрнутой и раскрытой панели: наведение раскрывает
+              панель, и кнопка под указателем не должна исчезать. */}
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost sidebar__item sidebar__tool"
+            aria-label={t.sidebar.langToggle(t.lang[otherLang])}
+            title={t.sidebar.langToggle(t.lang[otherLang])}
+            onClick={() => storage.setLang(otherLang)}
+          >
+            <span className="sidebar__icon sidebar__lang" aria-hidden="true">
               {t.lang[lang]}
-            </button>
-            <button
-              type="button"
-              className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
-              aria-label={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
-              title={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
-              onClick={() => storage.setTheme(nextTheme)}
-            >
+            </span>
+            <span className="sidebar__label" aria-hidden="true">
+              {t.sidebar.langName}
+            </span>
+          </button>
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost sidebar__item sidebar__tool"
+            aria-label={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
+            title={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
+            onClick={() => storage.setTheme(nextTheme)}
+          >
+            <span className="sidebar__icon">
               <Icon name={theme === "light" ? "sun" : theme === "dark" ? "moon" : "system"} />
-            </button>
-          </div>
+            </span>
+            <span className="sidebar__label" aria-hidden="true">
+              {t.sidebar.themeName(themeName(theme))}
+            </span>
+          </button>
           <button
             type="button"
             className="pg-btn pg-btn--ghost sidebar__item sidebar__pin"

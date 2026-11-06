@@ -21,7 +21,7 @@ from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 req = pytest.mark.req
 VD = "visual-design"
 pytestmark = pytest.mark.e2e
-KEY = "philograph:v2"
+KEY = "philograph:v3"
 TEXTBOOK = "Теория познания: демонстрационный учебник"
 LIGHT_PAPER, DARK_PAPER = "#eff1ec", "#13171e"
 
@@ -52,12 +52,14 @@ def ids(site) -> dict[str, str]:
     return {"source": source, "chapter": chapter, "kant": kant[0]["id"]}
 
 
-def open_context(browser, *, theme="light", width=1280, lang=None, accepted=True, **options):
+def open_context(
+    browser, *, theme="light", width=1280, lang=None, accepted=True, pinned=False, **options
+):
     """Страница читателя: фиксированное окно, без движения, с выбранной темой и языком."""
     options.setdefault("locale", "ru-RU")
     options.setdefault("reduced_motion", "reduce")
     context = browser.new_context(viewport={"width": width, "height": 860}, **options)
-    state = {"version": 2, "theme": theme}
+    state = {"version": 3, "theme": theme, "sidebarPinned": pinned}
     if accepted:
         state["notice"] = NOTICE_VERSION
     if lang:
@@ -83,7 +85,7 @@ def chapter(page, site, ids):
     page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
     page.locator(".mention").first.wait_for()
-    page.locator(".topbar__link--source").wait_for()
+    page.locator(".sidebar__count").wait_for()  # открытая книга в боковой панели
 
 
 def card(page, site, ids):
@@ -110,7 +112,7 @@ def assistant(page, site, ids):
 
 
 def graph(page, site, ids):
-    # Выбранный учебник — для подписи источника в верхней панели и пометок «есть в учебнике».
+    # Выбранный учебник — для открытых книг в боковой панели и пометок «есть в учебнике».
     page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
     page.wait_for_selector(".chapter p")
     page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
@@ -183,8 +185,7 @@ def test_layout_at_supported_widths(browser, site, ids, width):
         chapter(page, site, ids)
         visual.settle(page)
         visual.assert_no_horizontal_scroll(page)
-        visual.assert_no_overlap(page, [".topbar", ".toc", ".chapter"])
-        visual.assert_no_overlap(page, [".topbar__brand", ".topbar__nav", ".topbar__tools"])
+        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
         visual.assert_no_clipped_text(page)
         measure = page.evaluate(
             "() => { const c = document.querySelector('.chapter');"
@@ -242,7 +243,10 @@ def test_dark_theme_chosen_and_kept(browser, site, ids):
         library(page, site, ids)
         visual.assert_color(page, "body", "backgroundColor", "paper")
         assert visual.token(page, "paper") == LIGHT_PAPER
-        page.get_by_role("group", name="Тема").get_by_role("button", name="Тёмная").click()
+        visual.expand_sidebar(page)
+        theme = page.locator(".sidebar").get_by_role("button", name=re.compile("^Тема"))
+        theme.click()  # как в системе → светлая
+        theme.click()  # светлая → тёмная
         visual.settle(page)
         assert page.evaluate("document.documentElement.dataset.theme") == "dark"
         assert visual.token(page, "paper") == DARK_PAPER
@@ -290,10 +294,8 @@ def test_system_theme_follows_os(browser, site, ids):
         assert page.evaluate("document.documentElement.hasAttribute('data-theme')") is False
         assert visual.token(page, "paper") == DARK_PAPER
         visual.assert_color(page, "body", "backgroundColor", "paper")
-        group = page.get_by_role("group", name="Тема")
-        assert group.get_by_role("button", name="Как в системе").get_attribute("aria-pressed") == (
-            "true"
-        )
+        theme = page.locator(".sidebar").get_by_role("button", name=re.compile("^Тема"))
+        assert theme.get_attribute("aria-label").startswith("Тема: как в системе")
     finally:
         context.close()
 
@@ -306,8 +308,10 @@ def test_english_interface(browser, site, ids):
         # Абзац без номера страницы: «с. 45» — подпись интерфейса и переводится.
         text = page.locator("p.block", has_text="Ответ Канта Юму")
         paragraph = text.inner_text()
-        page.get_by_role("group", name="Язык интерфейса").get_by_role("button", name="EN").click()
+        visual.expand_sidebar(page)
+        page.get_by_role("button", name="Язык интерфейса: переключить на EN").click()
         nav = page.get_by_role("navigation", name="Sections")
+        assert nav.get_by_role("link", name="Open books").is_visible()
         assert nav.get_by_role("link", name="Library").is_visible()
         assert nav.get_by_role("link", name="Settings").is_visible()
         assert page.get_by_role("button", name="Assistant", exact=True).is_visible()
@@ -317,8 +321,10 @@ def test_english_interface(browser, site, ids):
         page.reload()
         page.wait_for_selector(".chapter p")
         assert page.evaluate("document.documentElement.lang") == "en"
+        visual.expand_sidebar(page)
         nav.get_by_role("link", name="Settings").click()
         page.wait_for_selector("h1:text('Settings')")
+        visual.collapse_sidebar(page)
         assert page.get_by_role("main").get_by_role("button", name="EN", exact=True).get_attribute(
             "aria-pressed"
         ) == ("true")
@@ -368,46 +374,221 @@ def test_language_follows_browser_by_default(browser, site, ids):
         library(page, site, ids)
         assert page.evaluate("document.documentElement.lang") == "en"
         assert page.get_by_role("heading", name="Library").is_visible()
-        group = page.get_by_role("group", name="Interface language")
-        assert group.get_by_role("button", name="EN").get_attribute("aria-pressed") == "true"
+        toggle = page.locator(".sidebar").get_by_role("button", name=re.compile("^Interface"))
+        assert toggle.get_attribute("aria-label") == "Interface language: switch to RU"
+        assert toggle.inner_text().split()[0] == "EN"
     finally:
         context.close()
 
 
-@req(VD, "Верхняя панель")
-def test_top_bar_on_every_screen(browser, site, ids):
+SIDEBAR_PATHS = [
+    "/",
+    "/read/{source}/{chapter}",
+    "/settings",
+    "/graph/{kant}?recipe=genesis",
+    "/soon/compare",
+    "/p/missing-paragraph",
+    "/internal/review",
+]
+
+
+def content_left(page) -> float:
+    """Левый край содержимого экрана (не самой панели)."""
+    return page.evaluate(
+        "() => { const el = document.querySelector('main, .reader');"
+        " return el.getBoundingClientRect().left; }"
+    )
+
+
+@req(VD, "Боковая панель навигации")
+def test_sidebar_on_every_screen(browser, site, ids):
+    """Свёрнута по умолчанию на каждом экране, содержимое правее неё; при наведении
+    раскрывается поверх, ничего не сдвигая; пункты не слипаются и не обрезаны."""
     context, page = open_context(browser, width=1024)
     try:
-        paths = [
-            "/",
-            f"/read/{ids['source']}/{ids['chapter']}",
-            "/settings",
-            f"/graph/{ids['kant']}?recipe=genesis",
-            "/p/missing-paragraph",
-            "/internal/review",
-        ]
-        for path in paths:
-            page.goto(site.url + path)
-            bar = page.locator(".topbar")
-            bar.wait_for()
+        for path in SIDEBAR_PATHS:
+            page.goto(site.url + path.format(**ids))
             page.get_by_role("main").or_(page.locator(".reader")).first.wait_for()
+            visual.settle(page)
+            bar = page.locator(".sidebar")
+            assert visual.sidebar_state(page) == "collapsed", path
+            assert round(visual.sidebar_width(page)) == 56, path
             box = bar.bounding_box()
-            assert box and round(box["height"]) == 56, (path, box)
-            assert bar.get_by_role("link", name="PhiloGraph, библиотека").is_visible()
-            assert bar.get_by_role("group", name="Язык интерфейса").is_visible()
-            assert bar.get_by_role("group", name="Тема").is_visible()
-            visual.assert_color(page, ".topbar", "backgroundColor", "paper")
+            assert box and box["x"] == 0 and box["y"] == 0 and box["height"] == 860, (path, box)
+            assert content_left(page) >= 56, path
+            nav = page.get_by_role("navigation", name="Разделы")
+            assert nav.get_by_role("link", name="Библиотека").is_visible()
+            assert nav.get_by_role("link", name="Настройки").is_visible()
+            assert page.get_by_role("link", name="PhiloGraph, библиотека").is_visible()
+            visual.assert_color(page, ".sidebar", "backgroundColor", "surface")
         chapter(page, site, ids)
         visual.settle(page)
-        nav = page.get_by_role("navigation", name="Разделы")
-        assert nav.get_by_role("link").all_inner_texts() == ["Библиотека", TEXTBOOK, "Настройки"]
-        visual.assert_separated(page, ".topbar__link")
-        visual.assert_separated(page, ".topbar__tools > *")
-        visual.assert_no_overlap(page, [".topbar__brand", ".topbar__nav", ".topbar__tools"])
+        before = content_left(page)
+        visual.expand_sidebar(page)
+        assert visual.sidebar_state(page) == "expanded"
+        assert round(visual.sidebar_width(page)) == 260
+        assert content_left(page) == before  # поверх содержимого, без сдвига
+        visual.assert_stacked(page, ".sidebar__item:not(.sidebar__pin), .sidebar__brand")
         visual.assert_no_clipped_text(page)
+        visual.assert_contrast(page)
+        assert not visual.unstyled_buttons(page), visual.unstyled_buttons(page)
+        visual.collapse_sidebar(page)
+        assert visual.sidebar_state(page) == "collapsed"
         page.mouse.wheel(0, 600)
         page.wait_for_timeout(200)
-        assert bar.bounding_box()["y"] == 0  # панель закреплена
+        assert page.locator(".sidebar").bounding_box()["y"] == 0  # закреплена у края окна
+    finally:
+        context.close()
+
+
+@req(VD, "Боковая панель навигации")
+def test_sidebar_keyboard_and_escape(browser, site, ids):
+    context, page = open_context(browser)
+    try:
+        library(page, site, ids)
+        visual.settle(page)
+        page.keyboard.press("Tab")  # первым фокус получает знак в панели
+        focused = page.evaluate("document.activeElement.closest('.sidebar') !== null")
+        assert focused
+        page.wait_for_function("document.querySelector('.sidebar').dataset.state === 'expanded'")
+        for _ in range(3):
+            page.keyboard.press("Tab")
+        assert visual.sidebar_state(page) == "expanded"
+        page.keyboard.press("Escape")
+        page.wait_for_function("document.querySelector('.sidebar').dataset.state === 'collapsed'")
+        assert page.evaluate("document.activeElement.id") == "content"  # фокус на содержимом
+        page.keyboard.press("Tab")  # следующий Tab — уже по содержимому экрана
+        assert page.evaluate("document.activeElement.closest('.sidebar') === null")
+        assert visual.sidebar_state(page) == "collapsed"
+    finally:
+        context.close()
+
+
+@req(VD, "Боковая панель навигации")
+def test_sidebar_pin_persists_and_shifts_content(browser, site, ids):
+    context, page = open_context(browser, width=1280)
+    try:
+        chapter(page, site, ids)
+        visual.settle(page)
+        assert content_left(page) < 280
+        visual.expand_sidebar(page)
+        pin = page.get_by_role("button", name="Закрепить панель")
+        assert pin.get_attribute("aria-pressed") == "false"
+        pin.click()
+        visual.collapse_sidebar(page)  # указатель ушёл, а панель закреплена
+        assert visual.sidebar_state(page) == "pinned"
+        page.wait_for_function(
+            "() => document.querySelector('.reader').getBoundingClientRect().left >= 280"
+        )
+        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+        page.reload()
+        page.wait_for_selector(".chapter p")
+        assert visual.sidebar_state(page) == "pinned"
+        assert round(visual.sidebar_width(page)) == 280
+        assert json.loads(page.evaluate(f"localStorage.getItem('{KEY}')"))["sidebarPinned"]
+        # Узкий экран: закрепление не действует, панель только раскрывается поверх.
+        page.set_viewport_size({"width": 1024, "height": 860})
+        page.wait_for_function("document.querySelector('.sidebar').dataset.state === 'collapsed'")
+        assert content_left(page) < 280
+        visual.expand_sidebar(page)
+        assert visual.sidebar_state(page) == "expanded"
+        assert page.get_by_role("button", name="Закрепить панель").is_disabled()
+    finally:
+        context.close()
+
+
+@req(VD, "Боковая панель навигации")
+@req(VD, "Раскладка без наложений")
+@pytest.mark.parametrize("width", visual.SIDEBAR_WIDTHS)
+def test_sidebar_never_covers_chapter(browser, site, ids, width):
+    """Свёрнутая и закреплённая панель не закрывают ни оглавление, ни текст главы."""
+    for pinned in (False, True):
+        context, page = open_context(browser, width=width, pinned=pinned)
+        try:
+            chapter(page, site, ids)
+            visual.settle(page)
+            state = visual.sidebar_state(page)
+            assert state == ("pinned" if pinned and width >= 1280 else "collapsed"), state
+            visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+            visual.assert_no_horizontal_scroll(page)
+            visual.assert_no_clipped_text(page)
+            measure = page.evaluate(
+                "() => { const c = document.querySelector('.chapter');"
+                " const ch = parseFloat(getComputedStyle(c).fontSize) * 0.5;"
+                " return c.getBoundingClientRect().width / ch; }"
+            )
+            assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f} ({state})"
+        finally:
+            context.close()
+
+
+@req(VD, "Тема")
+def test_theme_cycles_from_collapsed_sidebar(browser, site, ids):
+    """Кнопка темы в свёрнутой панели — по кругу: светлая, тёмная, как в системе."""
+    context, page = open_context(browser, theme="light")
+    try:
+        library(page, site, ids)
+        visual.settle(page)
+        button = page.locator(".sidebar").get_by_role("button", name=re.compile("^Тема"))
+        seen = []
+        for _ in range(3):
+            assert visual.sidebar_state(page) == "collapsed"
+            assert button.is_visible()  # в свёрнутой панели — значок текущей темы
+            button.click()
+            visual.collapse_sidebar(page)
+            seen.append(json.loads(page.evaluate(f"localStorage.getItem('{KEY}')"))["theme"])
+        assert seen == ["dark", "system", "light"]
+    finally:
+        context.close()
+
+
+@req(VD, "Разделы в разработке")
+def test_future_sections_marked_and_described(browser, site, ids):
+    context, page = open_context(browser)
+    try:
+        library(page, site, ids)
+        visual.expand_sidebar(page)
+        nav = page.get_by_role("navigation", name="Разделы")
+        future = [
+            "Ассистент",
+            "Граф",
+            "Справочник",
+            "Эпохи и контекст",
+            "Сравнение трактовок",
+            "Маршрут изучения",
+            "Мои материалы",
+            "Подборки",
+        ]
+        for name in future:
+            link = nav.get_by_role("link", name=name)
+            assert "скоро" in link.inner_text(), name
+            assert link.get_attribute("title"), name  # подсказка при наведении
+        visual.collapse_sidebar(page)
+        # С клавиатуры: Tab до пункта и Enter.
+        for _ in range(40):
+            page.keyboard.press("Tab")
+            if page.evaluate("document.activeElement.textContent").startswith(
+                "Сравнение трактовок"
+            ):
+                break
+        else:
+            raise AssertionError("пункт «Сравнение трактовок» не достижим с клавиатуры")
+        page.keyboard.press("Enter")
+        page.wait_for_selector("h1:text('Сравнение трактовок')")
+        assert page.url.endswith("/soon/compare")
+        main = page.get_by_role("main")
+        text = main.inner_text()
+        assert "Позже" in text and "Сценарий У1" in text and "сопоставление трактовок" in text
+        assert main.locator(".source, .graph-edge, .card-row").count() == 0  # без данных
+        page.goto(site.url + "/soon/assistant")
+        assert "В разработке" in page.get_by_role("main").inner_text()
+        # Граф: поиск сущности ведёт на её граф.
+        page.goto(site.url + "/soon/graph")
+        page.get_by_label("Найти сущность").fill("Кант")
+        page.get_by_role("button", name="Найти", exact=True).click()
+        page.get_by_role("main").get_by_role("link", name="Кант").click()
+        page.wait_for_function(f"location.pathname === '/graph/{ids['kant']}'")
+        page.wait_for_selector("h1:has-text('Кант')")
     finally:
         context.close()
 
@@ -420,12 +601,14 @@ def test_keyboard_focus_ring(browser, site, ids):
         library(page, site, ids)
         visual.settle(page)
         seen = []
-        for _ in range(14):
+        for _ in range(30):  # сначала боковая панель, затем поиск и фильтры библиотеки
             seen.append(visual.assert_focus_ring(page))
+            if seen[-1]["tag"] == "INPUT":
+                break
         tags = {s["tag"] for s in seen}
         assert {"A", "BUTTON", "INPUT"} <= tags, seen
         settings(page, site, ids)
-        page.locator("body").click(position={"x": 5, "y": 300})
+        page.get_by_role("main").click(position={"x": 5, "y": 5})  # фокус в начало содержимого
         on_settings = [visual.assert_focus_ring(page) for _ in range(16)]
         assert any("pg-switch__input" in s["cls"] for s in on_settings), on_settings
     finally:
@@ -473,7 +656,7 @@ def test_first_run_notice_in_flow(browser, site, ids, width):
             notice = page.get_by_role("region", name="О пометках и обработке вопросов")
             notice.wait_for()
             visual.settle(page)
-            visual.assert_no_overlap(page, [".topbar", ".first-run", "main, .reader"])
+            visual.assert_no_overlap(page, [".sidebar", ".first-run", "main, .reader"])
             visual.assert_no_horizontal_scroll(page)
             if open_screen is library and width == 1024:
                 check_screen(page, theme)

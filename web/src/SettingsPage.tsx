@@ -40,9 +40,10 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
   );
 }
 
-// Раздел, заголовок которого сейчас ближе всего к верху окна.
-function useVisibleSection(initial: SectionId): SectionId {
-  const [visible, setVisible] = useState<SectionId>(initial);
+// Раздел, заголовок которого сейчас ближе всего к верху окна. Внизу страницы последние разделы
+// не доходят до верха: тогда отмечен раздел из адреса, если он на экране, иначе последний.
+function useVisibleSection(requested: SectionId | undefined): SectionId {
+  const [visible, setVisible] = useState<SectionId>(requested ?? SECTIONS[0]);
   useEffect(() => {
     const update = () => {
       const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
@@ -53,7 +54,9 @@ function useVisibleSection(initial: SectionId): SectionId {
       }
       // Внизу страницы последний раздел может не дойти до верха — он и виден.
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
-        current = SECTIONS[SECTIONS.length - 1];
+        const wanted = requested && document.getElementById(requested)?.getBoundingClientRect();
+        const onScreen = wanted && wanted.top >= 0 && wanted.top < window.innerHeight;
+        current = onScreen ? requested : SECTIONS[SECTIONS.length - 1];
       }
       setVisible(current);
     };
@@ -64,7 +67,7 @@ function useVisibleSection(initial: SectionId): SectionId {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [requested]);
   return visible;
 }
 
@@ -79,7 +82,7 @@ export function SettingsPage({ hash }: { hash: string }) {
   const [confirming, setConfirming] = useState(false);
   const [done, setDone] = useState(false);
   const requested = SECTIONS.find((id) => id === hash);
-  const visible = useVisibleSection(requested ?? "appearance");
+  const visible = useVisibleSection(requested);
 
   // Адрес раздела открывает экран на нём (и при переходе по оглавлению, и по ссылке).
   useEffect(() => {

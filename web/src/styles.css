@@ -406,7 +406,7 @@ svg :where(g[tabindex]):focus-visible {
 }
 
 .sidebar__book-author {
-  color: var(--ink-3);
+  color: var(--ink-2); /* ink-3 не читается на accent-soft текущей книги */
   font: var(--type-ui-caption);
   font-weight: 400;
   overflow-wrap: anywhere;
@@ -442,36 +442,7 @@ svg :where(g[tabindex]):focus-visible {
   border-top: 1px solid var(--line);
 }
 
-.sidebar__tools {
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.sidebar__tools--full {
-  display: none;
-  width: calc(var(--sidebar-open) - 2 * var(--space-4));
-  margin: 0 var(--space-4);
-  justify-content: space-between;
-}
-
-.sidebar__tools--compact {
-  display: grid;
-  justify-items: center;
-  width: var(--sidebar);
-}
-
-.sidebar:not([data-state="collapsed"]) .sidebar__tools--full {
-  display: flex;
-}
-
-.sidebar:not([data-state="collapsed"]) .sidebar__tools--compact {
-  display: none;
-}
-
-.sidebar__tool {
-  font-size: 13px;
-}
-
+.sidebar .sidebar__tool,
 .sidebar .sidebar__pin {
   justify-content: flex-start;
   height: auto;
@@ -479,6 +450,11 @@ svg :where(g[tabindex]):focus-visible {
   border: 0;
   font: var(--type-ui-label);
   font-size: 14px;
+}
+
+.sidebar__lang {
+  font: 600 13px/18px var(--font-ui);
+  letter-spacing: 0.02em;
 }
 
 .sidebar__pin[aria-pressed="true"] {

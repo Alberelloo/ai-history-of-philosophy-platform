@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 
-from ..helpers import via_sidebar
+from ..helpers import sidenav, via_sidebar
 from .conftest import reader_context, wait_logs
 
 req = pytest.mark.req
@@ -139,6 +141,68 @@ def test_first_visit_and_remembered_source(browser, stack):
     page.wait_for_selector("p.block:has-text('blank slate')")
     page.goto(stack.url + "/read")
     page.wait_for_selector("p.block:has-text('blank slate')")
+    context.close()
+
+
+EMPIRICISM = "Empiricism: a demonstration reader"
+
+
+def stored(page) -> dict:
+    return json.loads(page.evaluate("localStorage.getItem('philograph:v3')") or "{}")
+
+
+def read_from_library(page, stack, title: str, heading: str) -> None:
+    page.goto(stack.url + "/")
+    page.locator(".source", has_text=title).get_by_role("button", name="Читать").click()
+    page.locator(".chapter h1", has_text=heading).wait_for()
+
+
+@req("source-library", "Открытые книги")
+def test_open_books_in_sidebar(browser, stack):
+    """Открыть две книги, закрыть одну: её место чтения сохраняется."""
+    context = reader_context(browser)
+    page = context.new_page()
+    page.set_default_timeout(15000)
+    read_from_library(page, stack, TEXTBOOK, "Глава 1. Опыт и врождённые идеи")
+    page.get_by_role("navigation", name="Оглавление").get_by_role(
+        "link", name="Глава 2. Юм и проблема индукции"
+    ).click()
+    page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
+    read_from_library(page, stack, EMPIRICISM, "")
+    empiricism = page.url.split("/read/")[1].split("/")[0]
+
+    # Свёрнутая панель: число открытых книг, ссылка ведёт к последней открытой.
+    page.mouse.move(1390, 890)  # указатель вне панели: она свёрнута
+    header = page.locator(".sidebar").get_by_role("link", name="Открытые книги")
+    assert page.locator(".sidebar__count").inner_text() == "2"
+    assert header.get_attribute("href") == f"/read/{empiricism}"
+
+    nav = sidenav(page)
+    books = nav.get_by_role("list", name="Открытые книги").get_by_role("listitem")
+    assert books.count() == 2
+    texts = books.all_inner_texts()
+    assert EMPIRICISM in texts[0] and TEXTBOOK in texts[1]  # новая книга — первой
+    assert "Проект PhiloGraph" in texts[1]  # автор
+    current = nav.locator(".sidebar__books [aria-current=page]")
+    assert EMPIRICISM in current.inner_text()  # текущая отмечена
+
+    nav.get_by_role("button", name=f"Закрыть книгу «{TEXTBOOK}»").click()
+    assert books.count() == 1 and EMPIRICISM in books.first.inner_text()
+    data = stored(page)
+    textbook = next(k for k in data["positions"] if k != empiricism)
+    assert [o["id"] for o in data["openSources"]] == [empiricism]
+    assert data["positions"][textbook]["chapterId"]  # место чтения осталось
+    page.mouse.move(1390, 890)  # указатель вне панели: она свёрнута
+    assert page.locator(".sidebar__count").inner_text() == "1"
+
+    # Снова открыть закрытую книгу: она на прежнем месте и снова в списке.
+    read_from_library(page, stack, TEXTBOOK, "Глава 2. Юм и проблема индукции")
+    assert [o["id"] for o in stored(page)["openSources"]] == [textbook, empiricism]
+    # Переход из списка открытых книг: книга открывается на своём месте.
+    via_sidebar(page, EMPIRICISM)
+    page.wait_for_url(f"**/read/{empiricism}/**")
+    page.wait_for_selector("p.block:has-text('blank slate')")
+    assert stored(page)["currentSource"] == empiricism
     context.close()
 
 
