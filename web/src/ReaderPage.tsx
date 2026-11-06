@@ -19,6 +19,30 @@ type Mention = { target_id: string; entity_id: string; start: number; end: numbe
 type OpenMention = (entityId: string, x: number, y: number) => void;
 // Что показать вместо главы: код ошибки сервера (переводится) и запасной текст.
 type Problem = { kind: string; text?: string };
+// Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
+type Relocated = { chapterId: string; reason: "saved" | "link" };
+
+// Ближайшее место вместо пропавшей главы: глава сохранённого абзаца, иначе первая глава.
+async function nearestPlace(
+  sourceId: string,
+  paragraphId: string | undefined,
+  first: unknown,
+): Promise<{ chapterId: string; path: string } | null> {
+  if (paragraphId) {
+    try {
+      const found = await api.paragraph(paragraphId);
+      if (found.status === "found" && found.source_id === sourceId) {
+        return { chapterId: found.chapter_id, path: `/read/${sourceId}/${found.chapter_id}#p-${found.paragraph_id}` };
+      }
+      if (found.status === "removed" && found.source_id === sourceId && found.chapter_id) {
+        return { chapterId: found.chapter_id, path: `/read/${sourceId}/${found.chapter_id}` };
+      }
+    } catch {
+      // абзац не нашёлся — остаётся первая глава
+    }
+  }
+  return typeof first === "string" ? { chapterId: first, path: `/read/${sourceId}/${first}` } : null;
+}
 
 // Текст с отметками страниц, знаками сносок и упоминаниями сущностей на своих местах.
 function renderText(
@@ -124,6 +148,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [previousUnavailable, setPreviousUnavailable] = useState(false);
+  const [relocated, setRelocated] = useState<Relocated | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [selection, setSelection] = useState<{ text: string; paragraphs: string[]; top: number } | null>(
@@ -134,6 +159,8 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
   const openCard: OpenMention = (id, x, y) => setCard({ id, x, y });
   const textRef = useRef<HTMLElement>(null);
+  const anchorRef = useRef(anchor);
+  anchorRef.current = anchor;
 
   // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
   useEffect(() => {
@@ -189,12 +216,44 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
       .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
   }, [sourceId, chapterId]);
 
+  // Глава по адресу. Раздел внутри главы — его глава с прокруткой к разделу. Главы больше нет
+  // (книгу обработали заново) — читатель остаётся в книге: ближайшее место и уведомление.
   useEffect(() => {
     if (!sourceId || !chapterId) return;
+    let cancelled = false;
+    setRelocated((r) => (r && r.chapterId === chapterId ? r : null));
     api
       .chapter(sourceId, chapterId)
-      .then(setChapter)
-      .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
+      .then((result) => {
+        if (cancelled) return;
+        if (result.anchor && result.chapter_id !== chapterId) {
+          replace(`/read/${sourceId}/${result.chapter_id}#s-${result.anchor}`);
+          return;
+        }
+        setChapter(result);
+      })
+      .catch(async (e: ApiError) => {
+        if (cancelled) return;
+        if (e.kind !== "chapter_not_found") {
+          setProblem({ kind: e.kind, text: e.message });
+          return;
+        }
+        const saved = storage.position(sourceId);
+        const reason = saved?.chapterId === chapterId ? "saved" : "link";
+        const linked = anchorRef.current.startsWith("p-") ? anchorRef.current.slice(2) : undefined;
+        const paragraphId = linked ?? (reason === "saved" ? saved?.paragraphId : undefined);
+        const place = await nearestPlace(sourceId, paragraphId, e.details.first_chapter_id);
+        if (cancelled) return;
+        if (!place) {
+          setProblem({ kind: e.kind, text: e.message });
+          return;
+        }
+        setRelocated({ chapterId: place.chapterId, reason });
+        replace(place.path);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [sourceId, chapterId]);
 
   // Упоминания сущностей главы. Без онтологии глава показывается без них.
@@ -308,6 +367,12 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         />
       )}
       <article className="chapter pg-reading" ref={textRef}>
+        {relocated && relocated.chapterId === chapter.chapter_id && (
+          <div className="pg-notice notice relocated" role="status">
+            <Icon name="info" />
+            <div>{relocated.reason === "saved" ? t.reader.relocatedSaved : t.reader.relocatedLink}</div>
+          </div>
+        )}
         {previousUnavailable && (
           <div className="pg-notice notice" role="status">
             <Icon name="info" />
@@ -327,8 +392,12 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           if (block.kind === "unrendered") {
             return (
               <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered">
-                <span>{t.reader.unrendered(block.detail)}</span>
-                {block.text && <figcaption>{block.text}</figcaption>}
+                <Icon name="info" className="unrendered__icon" />
+                <div className="unrendered__body">
+                  <span className="unrendered__label">{t.reader.unrendered}</span>
+                  {block.detail && <span className="unrendered__detail">{block.detail}</span>}
+                  {block.text && <figcaption>{block.text}</figcaption>}
+                </div>
               </figure>
             );
           }

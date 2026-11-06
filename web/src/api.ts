@@ -49,6 +49,7 @@ export type Chapter = {
   previous: string | null;
   next: string | null;
   first: string;
+  anchor: string | null; // адрес указывал на раздел внутри главы
 };
 
 export type Resolved =
@@ -61,6 +62,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public kind: string,
+    public details: Record<string, unknown> = {},
   ) {
     super(message);
   }
@@ -69,7 +71,7 @@ export class ApiError extends Error {
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`/api/v1${path}`);
   const body = await response.json();
-  if (!response.ok) throw new ApiError(body.error ?? "", body.kind ?? "error");
+  if (!response.ok) throw new ApiError(body.error ?? "", body.kind ?? "error", body ?? {});
   return body as T;
 }
 

@@ -930,13 +930,44 @@ blockquote.block {
   animation: pg-pop-in var(--dur-base) var(--ease-out) both;
 }
 
+/* Не переданное текстом (иллюстрация, пустая страница PDF, неоцифрованная глава):
+   плашка с тёплой подложкой и значком, а не абзац источника. */
 .unrendered {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  column-gap: var(--space-3);
+  align-items: start;
   margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-4);
-  border: 1px dashed var(--line-strong);
+  border: 1px dashed var(--generated-line);
   border-radius: var(--radius-sm);
-  color: var(--ink-2);
+  background: var(--generated-tint);
+  color: var(--ink);
   font: var(--type-ui-body-sm);
+}
+
+.unrendered__icon {
+  margin-top: 1px;
+  color: var(--generated);
+}
+
+.unrendered__body {
+  display: grid;
+  gap: 2px;
+}
+
+.unrendered__label {
+  color: var(--ink-2);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+.unrendered__detail::first-letter {
+  text-transform: uppercase;
+}
+
+.unrendered figcaption {
+  color: var(--ink-2);
 }
 
 .unlinked-notes {
