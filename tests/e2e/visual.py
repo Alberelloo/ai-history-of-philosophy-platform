@@ -237,17 +237,21 @@ def assert_fills_width(page, selector: str) -> None:
 
 
 def clipped_text(page) -> list[str]:
-    """Видимые элементы, у которых текст не помещается и обрезан (overflow hidden/clip)."""
+    """Видимые элементы, у которых текст не помещается и обрезан: по ширине (overflow
+    hidden/clip, многоточие) или по высоте (overflow-y hidden/clip, ограничение строк)."""
     return page.evaluate(
         """() => [...document.querySelectorAll('body *')].filter(el => {
             if (!el.getClientRects().length || el.closest('svg')) return false;
             const st = getComputedStyle(el);
             if (st.visibility === 'hidden') return false;
-            const clips = ['hidden', 'clip'].includes(st.overflowX)
+            const clipsX = ['hidden', 'clip'].includes(st.overflowX)
                 || st.textOverflow === 'ellipsis';
-            if (!clips) return false;
+            const clamp = st.webkitLineClamp && st.webkitLineClamp !== 'none';
+            const clipsY = ['hidden', 'clip'].includes(st.overflowY) || clamp;
+            if (!clipsX && !clipsY) return false;
             const hasText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
-            return hasText && el.scrollWidth > el.clientWidth + 1;
+            return hasText && ((clipsX && el.scrollWidth > el.clientWidth + 1)
+                || (clipsY && el.scrollHeight > el.clientHeight + 1));
         }).map(el => el.className + ': ' + el.textContent.trim().slice(0, 60))"""
     )
 
