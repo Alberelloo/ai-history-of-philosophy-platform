@@ -1,0 +1,227 @@
+{
+ "S1 hover-expands-no-shift": {
+  "before": {
+   "state": "collapsed",
+   "h1": 180,
+   "w": 56
+  },
+  "after": {
+   "state": "expanded",
+   "h1": 180,
+   "w": 260
+  },
+  "ok": true
+ },
+ "S2 keyboard-focus-expands-esc-collapses": {
+  "first_focus": {
+   "tag": "A",
+   "cls": "sidebar__brand",
+   "focusVisible": true,
+   "inSidebar": true
+  },
+  "state_after_tab": "expanded",
+  "focus_ring": "rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px 0px 4px",
+  "state_after_esc": "collapsed",
+  "focus_after_esc": "content",
+  "ok": true
+ },
+ "S3 pin-shifts-content-at-1280plus": {
+  "1280": {
+   "state": "pinned",
+   "sidebar_w": 280,
+   "chapter_left": 597.0625,
+   "toc_left": 312,
+   "overlaps": false,
+   "no_horizontal_scroll": true,
+   "pinned_after_reload": "pinned"
+  },
+  "1440": {
+   "state": "pinned",
+   "sidebar_w": 280,
+   "chapter_left": 645.3125,
+   "toc_left": 325.3125,
+   "overlaps": false,
+   "no_horizontal_scroll": true,
+   "pinned_after_reload": "pinned"
+  },
+  "1920": {
+   "state": "pinned",
+   "sidebar_w": 280,
+   "chapter_left": 885.3125,
+   "toc_left": 565.3125,
+   "overlaps": false,
+   "no_horizontal_scroll": true,
+   "pinned_after_reload": "pinned"
+  },
+  "ok": true
+ },
+ "S4 pin-unavailable-below-1280": {
+  "1024": {
+   "state": "collapsed",
+   "pin_disabled": true,
+   "pin_pressed": "true",
+   "pin_title": "Закрепить панель можно на экране шириной от 1280 пикселей",
+   "chapter_left": 364.6875,
+   "sidebar_w": 56,
+   "hover_state": "expanded",
+   "chapter_left_on_hover": 364.6875
+  },
+  "1279": {
+   "state": "collapsed",
+   "pin_disabled": true,
+   "pin_pressed": "true",
+   "pin_title": "Закрепить панель можно на экране шириной от 1280 пикселей",
+   "chapter_left": 452.8125,
+   "sidebar_w": 56,
+   "hover_state": "expanded",
+   "chapter_left_on_hover": 452.8125
+  },
+  "ok": true
+ },
+ "S5 text-not-under-panel-by-width": {
+  "1024": {
+   "collapsed_overlap": false,
+   "collapsed_chapter_left": 364.6875,
+   "chapter_w_chars_ok": true
+  },
+  "1280": {
+   "collapsed_overlap": false,
+   "collapsed_chapter_left": 453.3125,
+   "chapter_w_chars_ok": true
+  },
+  "1440": {
+   "collapsed_overlap": false,
+   "collapsed_chapter_left": 533.3125,
+   "chapter_w_chars_ok": true
+  },
+  "1920": {
+   "collapsed_overlap": false,
+   "collapsed_chapter_left": 773.3125,
+   "chapter_w_chars_ok": true
+  },
+  "ok": true
+ },
+ "S6 open-books-close-keeps-place": {
+  "books_after_two_opens": 2,
+  "books_after_reopen_first": 2,
+  "current_title": "Empiricism: a demonstration reader",
+  "books_after_close": 1,
+  "reopened_url": "http://127.0.0.1:8099/read/s_9523bd67d4ff/sec_6653c671686c#p-p_e2deca8607f1",
+  "target_paragraph": "p-p_79f738a35a7e",
+  "paragraph_in_view_after_reopen": true,
+  "ok": true
+ },
+ "S7 filters-menu-behaviour": {
+  "search_w_before": 360,
+  "open_kind": 1,
+  "menu_labels": "Выбрать все\nСнять все\nУчебник\nПервоисточник\nСправочное издание",
+  "select_all": "· 3",
+  "visible_all": 0,
+  "clear_all": 2,
+  "esc_closes": 1,
+  "focus_after_esc": "",
+  "reopen_and_pick_textbook": {
+   "error": "Locator.click: Timeout 15000ms exceeded."
+  },
+  "outside_closes": 0,
+  "count_after_pick": "",
+  "search_w_after_pick": 360,
+  "typing": null,
+  "search_w_typing": 360,
+  "reset_button_enabled": {
+   "error": "Locator.is_enabled: Error: strict mode violation: get_by_role(\"button\", name=\"Сбросить поиск и фильтры\") resolved to 2 elements:"
+  },
+  "reset": {
+   "error": "Locator.click: Error: strict mode violation: get_by_role(\"button\", name=\"Сбросить поиск и фильтры\") resolved to 2 elements:"
+  },
+  "lang_options": [
+   "английский",
+   "русский"
+  ],
+  "lang_close": 0,
+  "empty_pick": "ok",
+  "empty_text": "Библиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\n· 1\nЯзык\n· 1\nСбросить поиск и фильтры\nПодходящих источников нет.\nСбросить поиск и фильтры",
+  "ok": false
+ },
+ "S8 stale-chapter-stays-in-book": {
+  "url_after": "http://127.0.0.1:8099/read/s_9523bd67d4ff/sec_36398b8e4ff1",
+  "alert_count": 0,
+  "notice_texts": [
+   "Главы по этой ссылке нет в текущей версии книги — открыто ближайшее место."
+  ],
+  "toc_present": 1,
+  "chapter_present": 1,
+  "bad_anchor_alerts": 0,
+  "bad_anchor_chapter": 1,
+  "ok": true
+ },
+ "S9 unrendered-blocks-in-chapters": {
+  "unrendered_in_demo": {},
+  "note": "в демо-данных необработанных частей нет, если пусто"
+ },
+ "S10 soon-pages-and-sidebar-en": {
+  "sidebar_cyrillic": [],
+  "sidebar_sample": "Read\n\nLibrary\nOpen books\nOpen a book in the library and it will appear here.\n\nExplore\n\nAssistant\nsoon\nGraph\nsoon\nReference\nsoon\nEpochs and context\nsoon\nCompare interpretations\nsoon\nStudy route\nsoon\n\nMine\n\nMy materials\nsoon\nCollections\nsoon\nSettings\nEN\nEnglish\nTheme: light\nPin sidebar",
+  "graph": {
+   "cyrillic_lines": [],
+   "has_status": false
+  },
+  "assistant": {
+   "cyrillic_lines": [],
+   "has_status": false
+  },
+  "reference": {
+   "cyrillic_lines": [],
+   "has_status": false
+  },
+  "epochs": {
+   "cyrillic_lines": [],
+   "has_status": false
+  },
+  "compare": {
+   "cyrillic_lines": [],
+   "has_status": true
+  },
+  "route": {
+   "cyrillic_lines": [],
+   "has_status": true
+  },
+  "materials": {
+   "cyrillic_lines": [],
+   "has_status": true
+  },
+  "collections": {
+   "cyrillic_lines": [],
+   "has_status": true
+  }
+ },
+ "S11 sidebar-labels-keyboard-and-cycles": {
+  "theme_cycle": [
+   "dark",
+   "system",
+   "light"
+  ],
+  "lang_after_toggle": "en",
+  "ok": true
+ },
+ "S12 book-titles-clipped-at-1024-expanded": {
+  "1024": {
+   "text": "Теория познания: демонстрационный учебник",
+   "clientH": 36,
+   "scrollH": 54,
+   "lineClamp": "2",
+   "clipped": true,
+   "overflow": "hidden",
+   "ellipsis": "clip"
+  },
+  "1440": {
+   "text": "Теория познания: демонстрационный учебник",
+   "clientH": 36,
+   "scrollH": 54,
+   "lineClamp": "2",
+   "clipped": true,
+   "overflow": "hidden",
+   "ellipsis": "clip"
+  }
+ }
+}

@@ -12,8 +12,10 @@ import threading
 import time
 from pathlib import Path
 
+import httpx
 import pytest
 
+from philograph.gateway.app import build_app as gateway_app
 from philograph.library import schema
 from philograph.library.app import build_app
 from philograph.library.processing import Pipeline
@@ -147,10 +149,15 @@ def site(tmp_path_factory) -> Site:
     reading = Reading(registry, engine)
     reading.set_default("operator", ids["textbook"])
     port = _free_port()
+    # Браузер ходит через настоящий шлюз, как на стенде: он раздаёт клиент и передаёт запросы
+    # библиотеке (так ловятся ошибки пересылки, например потеря повторяющихся параметров).
+    gateway = gateway_app(
+        {"library": "http://library", "assistant": "http://assistant"},
+        DIST,
+        transport=httpx.ASGITransport(app=build_app(reading)),
+    )
     server = uvicorn.Server(
-        uvicorn.Config(
-            build_app(reading, web_root=DIST), host="127.0.0.1", port=port, log_level="warning"
-        )
+        uvicorn.Config(gateway, host="127.0.0.1", port=port, log_level="warning")
     )
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import httpx
 import pytest
 
 from ..helpers import reader_context, via_sidebar
@@ -83,6 +84,21 @@ def test_kind_filter(page, site):
     count(page, 2)
     assert "Философский словарь" not in titles(page)
     assert button.inner_text().split() == ["Вид", "·", "2"]  # число выбранных видов
+
+
+@req(SL, "Фильтр по виду источника")
+def test_several_kinds_in_one_request(site):
+    """Учебник и первоисточник одним запросом через шлюз: в ответе оба, справочника нет."""
+    response = httpx.get(
+        site.url + "/api/v1/sources", params=[("kind", "textbook"), ("kind", "primary")]
+    )
+    assert response.status_code == 200
+    titles = {s["title"] for s in response.json()["sources"]}
+    assert titles == {"История теории познания", "Critique of Pure Reason"}
+    three = httpx.get(
+        site.url + "/api/v1/sources?kind=textbook&kind=primary&kind=reference&lang=ru&lang=en"
+    ).json()["sources"]
+    assert len(three) == 3
 
 
 @req(SL, "Фильтр по виду источника")

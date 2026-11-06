@@ -35,6 +35,8 @@ def test_library_search_filter_and_choose(page, stack):
     page.get_by_label("Первоисточник").check()
     page.wait_for_selector(".source h2:text('Empiricism: a demonstration reader')")
     page.wait_for_function("document.querySelectorAll('.source').length === 1")
+    page.get_by_label("Учебник").check()  # два вида через шлюз: оба источника
+    page.wait_for_function("document.querySelectorAll('.source').length === 2")
     page.get_by_role("button", name="Сбросить поиск и фильтры").first.click()
     page.wait_for_function("document.querySelectorAll('.source').length === 2")
     textbook = page.locator(".source", has_text=TEXTBOOK)

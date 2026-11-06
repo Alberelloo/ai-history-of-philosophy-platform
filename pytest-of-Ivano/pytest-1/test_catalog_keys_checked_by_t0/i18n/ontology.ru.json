@@ -1,0 +1,222 @@
+{
+  "sections": {
+    "definitions": "Определения",
+    "words": "Происхождение слова",
+    "conceptions": "История: концепции",
+    "related": "Связанные понятия",
+    "problems": "Проблемы",
+    "life": "Годы и места жизни",
+    "biography": "Биография",
+    "teachers": "Учителя и ученики",
+    "influence": "Влияния",
+    "works": "Произведения",
+    "schools": "Школы и направления",
+    "positions": "Позиции и учения",
+    "epoch": "Контекст эпохи",
+    "when": "Дата и место",
+    "effects": "На что повлияло",
+    "parts": "Состав",
+    "answers": "Ответы и сторонники",
+    "arguments": "Аргументы за и против",
+    "misconceptions": "Часто считают, но…"
+  },
+  "relations": {
+    "influenced_by": {
+      "title": "испытал влияние",
+      "inverse": "повлиял на"
+    },
+    "studied_with": {
+      "title": "учился у",
+      "inverse": "учил"
+    },
+    "borrows": {
+      "title": "заимствует у",
+      "inverse": "стал источником для"
+    },
+    "develops": {
+      "title": "развивает",
+      "inverse": "развит в"
+    },
+    "reinterprets": {
+      "title": "переосмысляет",
+      "inverse": "переосмыслен в"
+    },
+    "criticizes": {
+      "title": "критикует",
+      "inverse": "подвергся критике"
+    },
+    "defends": {
+      "title": "защищает",
+      "inverse": "защищался"
+    },
+    "synthesizes": {
+      "title": "синтезирует",
+      "inverse": "синтезирован в"
+    },
+    "written_in_response": {
+      "title": "написано в ответ на",
+      "inverse": "вызвало ответ"
+    },
+    "similar_to": {
+      "title": "сходно с",
+      "inverse": "сходно с"
+    },
+    "opposed_to": {
+      "title": "противопоставлено",
+      "inverse": "противопоставлено"
+    },
+    "conception_of": {
+      "title": "концепция",
+      "inverse": "имеет концепцию"
+    },
+    "narrower": {
+      "title": "уже",
+      "inverse": "шире"
+    },
+    "part_of": {
+      "title": "часть",
+      "inverse": "состоит из"
+    },
+    "presupposes": {
+      "title": "предполагает",
+      "inverse": "предпосылка для"
+    },
+    "answers": {
+      "title": "отвечает на",
+      "inverse": "ответы"
+    },
+    "holds": {
+      "title": "придерживается",
+      "inverse": "сторонники"
+    },
+    "supports": {
+      "title": "поддерживает",
+      "inverse": "поддержана"
+    },
+    "attacks": {
+      "title": "атакует",
+      "inverse": "атакована"
+    },
+    "advanced": {
+      "title": "выдвинул",
+      "inverse": "выдвинут"
+    },
+    "denotes": {
+      "title": "обозначает",
+      "inverse": "обозначается"
+    },
+    "derives_from": {
+      "title": "происходит от",
+      "inverse": "дал начало"
+    },
+    "translated_as": {
+      "title": "перевод",
+      "inverse": "переведён как"
+    },
+    "introduced_by": {
+      "title": "введён",
+      "inverse": "ввёл"
+    },
+    "member_of": {
+      "title": "входит в",
+      "inverse": "члены"
+    },
+    "founded": {
+      "title": "основал",
+      "inverse": "основатель"
+    },
+    "worked_at": {
+      "title": "работал в",
+      "inverse": "сотрудники"
+    },
+    "corresponded": {
+      "title": "переписывался с",
+      "inverse": "переписывался с"
+    },
+    "debated": {
+      "title": "полемизировал с",
+      "inverse": "полемизировал с"
+    },
+    "knew_work": {
+      "title": "знал произведение",
+      "inverse": "читатели"
+    },
+    "author": {
+      "title": "автор",
+      "inverse": "написал"
+    },
+    "expresses": {
+      "title": "выражает",
+      "inverse": "выражено в"
+    },
+    "discusses": {
+      "title": "рассматривает",
+      "inverse": "рассматривается в"
+    },
+    "work_part_of": {
+      "title": "часть произведения",
+      "inverse": "состоит из"
+    },
+    "edition_of": {
+      "title": "издание",
+      "inverse": "издания"
+    },
+    "stimulated": {
+      "title": "стимулировало",
+      "inverse": "возникло в контексте"
+    },
+    "participated": {
+      "title": "участвовал",
+      "inverse": "участники"
+    },
+    "happened_in": {
+      "title": "произошло в",
+      "inverse": "место событий"
+    },
+    "belongs_to_epoch": {
+      "title": "относится к эпохе",
+      "inverse": "эпоха"
+    },
+    "lived_in": {
+      "title": "жил в",
+      "inverse": "жители"
+    },
+    "source_material": {
+      "title": "исходный материал",
+      "inverse": "стал исходным материалом"
+    },
+    "result": {
+      "title": "результат",
+      "inverse": "возникло в"
+    },
+    "in_work": {
+      "title": "в произведении",
+      "inverse": "событие в произведении"
+    },
+    "circumstance": {
+      "title": "обстоятельства",
+      "inverse": "обстоятельство для"
+    },
+    "lifespan": {
+      "title": "годы жизни"
+    },
+    "dating": {
+      "title": "датировка"
+    },
+    "definition": {
+      "title": "определение"
+    },
+    "description": {
+      "title": "описание"
+    }
+  },
+  "recipes": {
+    "genesis": "Генезис",
+    "consequences": "Последствия",
+    "polemic": "Полемика",
+    "context": "Контекст",
+    "answers": "Ответы на проблему",
+    "conceptions": "Сравнение концепций",
+    "path": "Путь между двумя"
+  }
+}
