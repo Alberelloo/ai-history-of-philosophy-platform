@@ -199,12 +199,33 @@ _TEMPLATE_FIELDS = {
 
 
 def _template_value(wikitext: str, names: tuple[str, ...]) -> str | None:
+    """Значение параметра шаблона с учётом вложенных ``[[…|…]]`` и ``{{…|…}}``."""
     for name in names:
-        m = re.search(
-            rf"\|\s*{re.escape(name)}\s*=\s*([^|\n}}]*(?:\[\[[^\]]*\]\][^|\n}}]*)*)", wikitext
-        )
-        if m and m.group(1).strip():
-            return m.group(1).strip()
+        m = re.search(rf"\|\s*{re.escape(name)}\s*=", wikitext)
+        if not m:
+            continue
+        i, depth, out = m.end(), 0, []
+        while i < len(wikitext):
+            pair = wikitext[i : i + 2]
+            if pair in ("[[", "{{"):
+                depth += 1
+                out.append(pair)
+                i += 2
+                continue
+            if pair in ("]]", "}}"):
+                if depth == 0:
+                    break  # конец самого шаблона
+                depth -= 1
+                out.append(pair)
+                i += 2
+                continue
+            if depth == 0 and wikitext[i] in "|\n":
+                break
+            out.append(wikitext[i])
+            i += 1
+        value = "".join(out).strip()
+        if value:
+            return value
     return None
 
 
@@ -215,8 +236,13 @@ def _links(value: str) -> list[str]:
 
 def _plain(value: str) -> str:
     value = re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]+)\]\]", r"\1", value)
-    value = re.sub(r"\{\{[^}]*\}\}", "", value)
+    # {{smaller|текст}} → текст, {{abbr|ИМ|полное}} → полное; шаблоны без параметров
+    # убираются; разбор идёт изнутри наружу
+    for _ in range(5):
+        value = re.sub(r"\{\{[^{}|]*\|([^{}]*)\}\}", lambda m: m.group(1).split("|")[-1], value)
+        value = re.sub(r"\{\{[^{}]*\}\}", "", value)
     value = re.sub(r"<[^>]+>", "", value)
+    value = re.sub(r"'{2,}", "", value)
     return " ".join(value.split())
 
 

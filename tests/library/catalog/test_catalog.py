@@ -359,3 +359,18 @@ def test_moved_site_is_followed_and_reported(env, events):
     assert env.sync()["test-book"].outcome == "published"
     assert env.service.pipeline.fetch.state(URL)["final_url"] == new
     assert events.one("library.catalog.moved").get("final_url") == new
+
+
+@req(SC, "Добавление источника по ссылке")
+def test_wikisource_header_with_nested_markup():
+    from philograph.library.catalog.adapters import _links, _plain, _template_value
+
+    header = (
+        "{{header\n | title = [[Organon (Owen)|The Organon]]: {{smaller|Posterior Analytics}}\n"
+        " | author = Aristotle\n | translator = [[Author:Octavius Freire Owen|Owen]]\n}}"
+    )
+    assert _plain(_template_value(header, ("title",))) == "The Organon: Posterior Analytics"
+    assert _template_value(header, ("author",)) == "Aristotle"
+    assert _links(_template_value(header, ("translator",))) == ["Author:Octavius Freire Owen"]
+    ru = "{{Отексте\n|АВТОР=[[Платон]]\n|ПЕРЕВОДЧИК={{Перевод|[[Василий Карпов|В. Карпов]]}}\n}}"
+    assert _links(_template_value(ru, ("ПЕРЕВОДЧИК",))) == ["Василий Карпов"]
