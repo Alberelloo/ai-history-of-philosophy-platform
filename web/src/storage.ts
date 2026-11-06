@@ -1,31 +1,38 @@
 import { useEffect, useState } from "react";
 
 // Всё, что продукт хранит о читателе, — в одном хранилище браузера с версией формата:
-// настройки, выбранный источник, места чтения, диалоги, отметка об уведомлении. На сервере
+// настройки, открытые книги и текущая из них, места чтения, закрепление боковой панели,
+// диалоги, отметка об уведомлении. На сервере
 // ничего этого нет: настройки уходят с каждым запросом.
 //
 // Новая версия формата переносит старые данные; повреждённые сбрасываются к значениям по
 // умолчанию. Без хранилища (приватный режим) состояние живёт в памяти вкладки, а читатель
 // видит, что настройки не сохранятся.
 
-const KEY = "philograph:v2";
+const KEY = "philograph:v3";
+const V2 = "philograph:v2";
 const LEGACY = { state: "philograph:v1", scope: "philograph:scope:v1", dialog: "philograph:dialog:v1" };
 const EVENT = "philograph:state";
 // Диалоги — больше всего данных; при превышении удаляются самые старые.
 export const MAX_DIALOG_CHARS = 200_000;
+// Открытых книг не больше: лишней уходит та, что открывалась давнее всех.
+export const MAX_OPEN_SOURCES = 10;
 
 export type Position = { chapterId: string; paragraphId?: string };
+export type OpenSource = { id: string; openedAt: number };
 export type Settings = { generation: boolean; sourcesOnly: boolean; onlyTextbook: boolean };
 export type Theme = "light" | "dark" | "system";
 export type Lang = "ru" | "en";
 export const THEMES: Theme[] = ["light", "dark", "system"];
 export const LANGS: Lang[] = ["ru", "en"];
 export type State = {
-  version: 2;
+  version: 3;
   settings: Settings;
   theme: Theme; // «как в системе» — по умолчанию
   lang?: Lang; // не выбран — язык браузера
-  currentSource?: string;
+  currentSource?: string; // последняя открытая книга
+  openSources: OpenSource[]; // новые — первыми
+  sidebarPinned: boolean;
   positions: Record<string, Position>;
   dialogs: unknown[][]; // последний — текущий
   notice?: string; // версия закрытого уведомления
@@ -33,9 +40,11 @@ export type State = {
 
 export const DEFAULT_SETTINGS: Settings = { generation: true, sourcesOnly: false, onlyTextbook: false };
 const empty = (): State => ({
-  version: 2,
+  version: 3,
   settings: { ...DEFAULT_SETTINGS },
   theme: "system",
+  openSources: [],
+  sidebarPinned: false,
   positions: {},
   dialogs: [[]],
 });
@@ -74,8 +83,18 @@ function normalize(raw: unknown): State {
     }
   });
   const dialogs = Array.isArray(data.dialogs) ? data.dialogs.filter(Array.isArray) : [];
+  const currentSource = typeof data.currentSource === "string" ? data.currentSource : undefined;
+  const open: OpenSource[] = [];
+  (Array.isArray(data.openSources) ? data.openSources : []).forEach((item) => {
+    const o = object(item);
+    if (typeof o.id === "string" && !open.some((x) => x.id === o.id)) {
+      open.push({ id: o.id, openedAt: typeof o.openedAt === "number" ? o.openedAt : 0 });
+    }
+  });
+  // Формат 2 знал только выбранный источник: он становится первой открытой книгой.
+  if (!Array.isArray(data.openSources) && currentSource) open.push({ id: currentSource, openedAt: Date.now() });
   return {
-    version: 2,
+    version: 3,
     settings: {
       generation: bool(settings.generation, DEFAULT_SETTINGS.generation),
       sourcesOnly: bool(settings.sourcesOnly, DEFAULT_SETTINGS.sourcesOnly),
@@ -83,11 +102,34 @@ function normalize(raw: unknown): State {
     },
     theme: THEMES.includes(data.theme as Theme) ? (data.theme as Theme) : "system",
     lang: LANGS.includes(data.lang as Lang) ? (data.lang as Lang) : undefined,
-    currentSource: typeof data.currentSource === "string" ? data.currentSource : undefined,
+    currentSource,
+    openSources: trimOpen(open),
+    sidebarPinned: bool(data.sidebarPinned, false),
     positions,
     dialogs: dialogs.length ? (dialogs as unknown[][]) : [[]],
     notice: typeof data.notice === "string" ? data.notice : undefined,
   };
+}
+
+// Не больше MAX_OPEN_SOURCES: уходят те, что открывались давнее всех; порядок списка сохраняется.
+function trimOpen(open: OpenSource[]): OpenSource[] {
+  if (open.length <= MAX_OPEN_SOURCES) return open;
+  const keep = new Set(
+    [...open]
+      .sort((a, b) => b.openedAt - a.openedAt)
+      .slice(0, MAX_OPEN_SOURCES)
+      .map((o) => o.id),
+  );
+  return open.filter((o) => keep.has(o.id));
+}
+
+function opened(state: State, id: string): State {
+  const now = Date.now();
+  const known = state.openSources.some((o) => o.id === id);
+  const open = known
+    ? state.openSources.map((o) => (o.id === id ? { ...o, openedAt: now } : o))
+    : [{ id, openedAt: now }, ...state.openSources];
+  return { ...state, currentSource: id, openSources: trimOpen(open) };
 }
 
 function parse(text: string | null): unknown {
@@ -99,8 +141,13 @@ function parse(text: string | null): unknown {
   }
 }
 
-// Перенос из формата 1: три отдельных ключа.
+// Перенос из прежних форматов: 2 — один ключ без открытых книг, 1 — три отдельных ключа.
 function migrate(): State | undefined {
+  const v2 = parse(window.localStorage.getItem(V2));
+  if (v2 !== undefined || window.localStorage.getItem(V2) !== null) {
+    window.localStorage.removeItem(V2);
+    return normalize(v2);
+  }
   const old = object(parse(window.localStorage.getItem(LEGACY.state)));
   const scope = object(parse(window.localStorage.getItem(LEGACY.scope)));
   const dialog = parse(window.localStorage.getItem(LEGACY.dialog));
@@ -176,8 +223,25 @@ export const storage = {
   persistent: (): boolean => persistent,
   read,
   currentSource: (): string | undefined => read().currentSource,
+  // Книга открыта для чтения: она текущая и в списке открытых книг.
   setCurrentSource(id: string | undefined): void {
-    update((s) => ({ ...s, currentSource: id }));
+    update((s) => (id ? opened(s, id) : { ...s, currentSource: undefined }));
+  },
+  openSources: (): OpenSource[] => read().openSources,
+  // Закрытая книга уходит из списка, место чтения в ней остаётся. Текущей становится следующая.
+  closeSource(id: string): void {
+    update((s) => {
+      const open = s.openSources.filter((o) => o.id !== id);
+      const current = s.currentSource === id ? open[0]?.id : s.currentSource;
+      return { ...s, openSources: open, currentSource: current };
+    });
+  },
+  closeAllSources(): void {
+    update((s) => ({ ...s, openSources: [], currentSource: undefined }));
+  },
+  sidebarPinned: (): boolean => read().sidebarPinned,
+  setSidebarPinned(pinned: boolean): void {
+    update((s) => ({ ...s, sidebarPinned: pinned }));
   },
   position: (sourceId: string): Position | undefined => read().positions[sourceId],
   setPosition(sourceId: string, position: Position): void {
@@ -211,7 +275,7 @@ export const storage = {
   reset(): void {
     if (persistent) {
       try {
-        [KEY, ...Object.values(LEGACY)].forEach((key) => window.localStorage.removeItem(key));
+        [KEY, V2, ...Object.values(LEGACY)].forEach((key) => window.localStorage.removeItem(key));
       } catch {
         // нечего удалять
       }

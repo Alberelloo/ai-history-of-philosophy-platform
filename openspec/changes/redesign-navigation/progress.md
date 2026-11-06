@@ -9,7 +9,7 @@
 | 1.1 Изменение OpenSpec | сделан |
 | 1.2 Документы дизайна | сделан: layout.md, Sidebar.md, FilterMenu.md, журнал в design-system.md, content.md |
 | 2.1 Токены | сделан: sidebar, sidebar-open, sidebar-pinned, dur-sidebar, z-sidebar; tokens.css перегенерирован |
-| 2.2 Хранилище v3 | не начат |
+| 2.2 Хранилище v3 | сделан: ключ philograph:v3, openSources, sidebarPinned, перенос из v2 и v1, скрипт темы читает v3/v2 и ставит data-sidebar |
 | 2.3 Боковая панель | не начат |
 | 2.4 Заглушки разделов | не начат |
 | 3.1 Настройки | не начат |
@@ -30,11 +30,11 @@
 
 ## Сейчас
 
-Пункт 2.1 закрыт: токены панели в tokens.json и tokens.css.
+Пункт 2.2 закрыт: storage.ts формата 3 (openSource/closeSource/closeAllSources/setSidebarPinned). Тесты хранилища ещё на v2 — переводятся в 6.2.
 
 ## Следующий шаг
 
-2.2 — хранилище формата 3.
+2.3 — Sidebar.tsx и раскладка.
 
 ## Известные проблемы
 

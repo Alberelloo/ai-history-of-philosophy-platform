@@ -11,7 +11,8 @@
         var root = document.documentElement;
         var state = {};
         try {
-          state = JSON.parse(window.localStorage.getItem("philograph:v2") || "{}") || {};
+          var ls = window.localStorage;
+          state = JSON.parse(ls.getItem("philograph:v3") || ls.getItem("philograph:v2") || "{}") || {};
         } catch (e) {
           state = {};
         }
@@ -19,6 +20,8 @@
         var lang = state.lang === "ru" || state.lang === "en" ? state.lang : null;
         if (!lang) lang = /^ru/i.test(navigator.language || "") ? "ru" : "en";
         root.lang = lang;
+        // Закреплённая боковая панель: отступ содержимого до первой отрисовки, без сдвига.
+        if (state.sidebarPinned === true) root.setAttribute("data-sidebar", "pinned");
       })();
     </script>
   </head>
