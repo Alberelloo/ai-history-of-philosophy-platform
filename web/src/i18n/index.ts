@@ -36,3 +36,26 @@ export type { Catalog };
 export function errorText(t: Catalog, kind: string | null | undefined, fallback?: string | null): string {
   return pick(t.errors, kind) ?? (fallback || t.errors.generic);
 }
+
+// Названия онтологии по коду; неизвестный код (тип добавлен в реестр во время работы) —
+// подпись сервера.
+type RelationNames = Record<string, { title: string; inverse?: string } | undefined>;
+
+export function sectionTitle(t: Catalog, code: string, fallback: string): string {
+  return pick(t.onto.sections, code) ?? fallback;
+}
+
+export function relationTitle(t: Catalog, code: string | undefined, inverse: boolean, fallback: string): string {
+  const names = code ? (t.onto.relations as RelationNames)[code] : undefined;
+  if (!names) return fallback;
+  return inverse ? (names.inverse ?? names.title) : names.title;
+}
+
+export function recipeTitle(t: Catalog, code: string, fallback?: string): string {
+  return pick(t.onto.recipes, code) ?? fallback ?? code;
+}
+
+// Кто так считает: «распространённое мнение» переводится, имена — контент.
+export function whoLabel(t: Catalog, a: { who: string; kind?: string }): string {
+  return a.kind === "common" ? t.card.commonOpinion : a.who;
+}

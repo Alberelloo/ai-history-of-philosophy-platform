@@ -64,6 +64,8 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
         ("arguments", "Аргументы за и против", ["supports", "attacks"], "in"),
     ],
 }
+# Раздел «что часто путают» собирается отдельно (_misconceptions).
+MISCONCEPTIONS_TITLE = "Часто считают, но…"
 SECTIONS["phenomenon"] = SECTIONS["event"]
 SECTIONS["idea_event"] = SECTIONS["event"]
 for _type in ("problem", "position", "argument", "conception"):
@@ -102,6 +104,8 @@ class Cards:
             "relation": spec["title"]
             if outward or spec.get("symmetric")
             else spec.get("inverse_title") or spec["title"],
+            # Коды для перевода на клиенте: связь читается от другого конца (обратная подпись).
+            "inverse": not outward and not spec.get("symmetric"),
             "entity_id": other,
             "label": self.entities.label(other) if other else None,
             "value": s.get("value"),
@@ -114,6 +118,14 @@ class Cards:
             # Есть ли строка в выбранном учебнике: для сравнения «как у меня и у других».
             "in_textbook": self.statements._attributed(s, textbook) if textbook else None,
             "attributed_to": who,
+            "attributions": [
+                {
+                    "who": attribution_label(self.statements, a),
+                    "kind": a["who_kind"],
+                    "stance": a["stance"],
+                }
+                for a in visible
+            ],
             "evidence": [
                 {
                     "paragraph_id": e["paragraph_id"],
@@ -163,7 +175,7 @@ class Cards:
         myths = self._misconceptions(entity_id)
         if myths:
             sections.append(
-                {"code": "misconceptions", "title": "Часто считают, но…", "rows": myths}
+                {"code": "misconceptions", "title": MISCONCEPTIONS_TITLE, "rows": myths}
             )
         where = self.mentions.where_to_read(entity_id) if self.mentions else []
         if self.on_view and shown:

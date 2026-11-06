@@ -149,6 +149,7 @@ class Graphs:
             "attributions": [
                 {
                     "who": attribution_label(self.statements, a),
+                    "kind": a["who_kind"],  # common — «распространённое мнение», переводит клиент
                     "stance": a["stance"],
                     "place": a["place"],
                 }

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { navigate } from "./App";
-import { pick, useT } from "./i18n";
+import { pick, recipeTitle, relationTitle, sectionTitle, useT, whoLabel } from "./i18n";
 import { ScopeToggle, useScope } from "./scope";
 import { storage } from "./storage";
 import { familyOf, Generated, Icon, Portrait, StatusMark, Switch } from "./ui";
@@ -8,9 +8,13 @@ import { familyOf, Generated, Icon, Portrait, StatusMark, Switch } from "./ui";
 // Карточка сущности рядом с упоминанием: не уводит из текста и не сдвигает главу.
 // Каждая строка — утверждение: видно, кто так считает, где прочитать и не сгенерировано ли.
 
+type Who = { who: string; kind?: string; stance?: string };
 type Row = {
   statement_id: string;
+  type?: string;
   relation: string;
+  inverse?: boolean;
+  attributions?: Who[];
   entity_id: string | null;
   label: string | null;
   value: unknown;
@@ -122,6 +126,13 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
     .map((s) => ({ ...s, rows: notInTextbook ? s.rows.filter((r) => r.in_textbook === false) : s.rows }))
     .filter((s) => s.rows.length > 0);
   const family = familyOf(card?.type);
+  // Кто так считает и кто спорит — по кодам атрибуций; без них — подписи сервера.
+  const believers = (row: Row) =>
+    row.attributions ? [...new Set(row.attributions.map((a) => whoLabel(t, a)))] : row.attributed_to;
+  const disputers = (row: Row) =>
+    row.attributions
+      ? row.attributions.filter((a) => a.stance === "disputes").map((a) => whoLabel(t, a))
+      : row.disputed_by;
   const typeName = pick(t.family, card?.type);
 
   return (
@@ -178,12 +189,12 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
         ))}
       {sections.map((section) => (
         <section key={section.code} className="card-section" data-section={section.code}>
-          <h4>{section.title}</h4>
+          <h4>{sectionTitle(t, section.code, section.title)}</h4>
           <ul>
             {section.rows.map((row) => {
               const body = (
                 <>
-                  <span className="card-row__relation">{row.relation}: </span>
+                  <span className="card-row__relation">{relationTitle(t, row.type, Boolean(row.inverse), row.relation)}: </span>
                   {row.entity_id ? (
                     <button
                       className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
@@ -196,11 +207,11 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
                   )}
                   {row.status === "verified" && <StatusMark status="verified" iconOnly />}
                   {row.disputed && (
-                    <StatusMark status="disputed">{t.card.disputed(row.disputed_by.join(", "))}</StatusMark>
+                    <StatusMark status="disputed">{t.card.disputed(disputers(row).join(", "))}</StatusMark>
                   )}
                   {row.in_textbook === true && <span className="badge">{t.scope.inTextbook}</span>}
-                  {row.attributed_to.length > 0 && (
-                    <span className="card-who"> — {t.card.believes(row.attributed_to.join(", "))}</span>
+                  {believers(row).length > 0 && (
+                    <span className="card-who"> — {t.card.believes(believers(row).join(", "))}</span>
                   )}
                   {row.evidence.map((e, i) => (
                     <a
@@ -260,7 +271,7 @@ export function CardPopup({ entityId, x, y, onClose }: { entityId: string; x: nu
               }}
             >
               <Icon name="graph" small />
-              {r.title}
+              {recipeTitle(t, r.code, r.title)}
             </button>
           ))}
         </section>

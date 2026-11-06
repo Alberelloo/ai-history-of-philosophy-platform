@@ -1,8 +1,10 @@
+import ontology from "./ontology.en.json";
 import type { Catalog } from "./ru";
 
 // Английский каталог: те же ключи, что в ru.ts. Нейтральное «you», без восклицаний.
 
 export const en: Catalog = {
+  onto: ontology,
   app: {
     storageUnavailable: "Browser storage is unavailable: settings and reading places will be lost when you close the tab.",
     loading: "Loading…",
@@ -138,9 +140,11 @@ export const en: Catalog = {
     source: "source",
     mentions: (n: number) => `${n} ${n === 1 ? "mention" : "mentions"}`,
     noImage: (name: string) => `${name}: no image`,
+    commonOpinion: "common opinion",
   },
   assistant: {
     label: "Assistant",
+    openGraph: (recipe: string, entity: string) => `Open graph: ${recipe.toLowerCase()} — ${entity}`,
     newDialog: "New dialog",
     close: "Close assistant",
     contradiction: (entity: string, expected: string) => `${entity}: the ontology says ${expected}`,

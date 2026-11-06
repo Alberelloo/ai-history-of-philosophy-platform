@@ -1,7 +1,10 @@
 // Каталог строк интерфейса на русском. Английский каталог (en.ts) типизирован как typeof ru:
-// ключ, которого нет в одном из каталогов, ломает проверку типов. Тексты источников и данные
-// онтологии (названия разделов карточки, рецептов, связей) приходят с сервера и не переводятся.
-// Тон и термины — docs/design/system/content.md.
+// ключ, которого нет в одном из каталогов, ломает проверку типов. Названия онтологии (разделы
+// карточки, связи, рецепты) переводятся по коду из ontology.{ru,en}.json; русский файл совпадает
+// с реестром (проверяет тест). Не переводятся только тексты источников, имена сущностей и
+// описания — это контент. Тон и термины — docs/design/system/content.md.
+
+import ontology from "./ontology.ru.json";
 
 function plural(n: number, one: string, few: string, many: string): string {
   const mod10 = n % 10;
@@ -12,6 +15,7 @@ function plural(n: number, one: string, few: string, many: string): string {
 }
 
 export const ru = {
+  onto: ontology,
   app: {
     storageUnavailable:
       "Хранилище браузера недоступно: настройки и места чтения не сохранятся после закрытия вкладки.",
@@ -148,9 +152,11 @@ export const ru = {
     source: "источник",
     mentions: (n: number) => `${n} ${plural(n, "упоминание", "упоминания", "упоминаний")}`,
     noImage: (name: string) => `${name}: изображения нет`,
+    commonOpinion: "распространённое мнение",
   },
   assistant: {
     label: "Ассистент",
+    openGraph: (recipe: string, entity: string) => `Открыть граф: ${recipe.toLowerCase()} — ${entity}`,
     newDialog: "Новый диалог",
     close: "Закрыть ассистента",
     contradiction: (entity: string, expected: string) => `${entity}: в онтологии ${expected}`,
