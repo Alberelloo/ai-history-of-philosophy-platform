@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import html
 import time
 import urllib.robotparser
 from collections.abc import Callable
@@ -199,6 +200,15 @@ class Fetcher:
 Cleaner = Callable[[bytes], bytes]
 
 
+def missing_page(name: str) -> bytes:
+    """Страница-заглушка вместо подстраницы, которой нет на сайте: название и отметка."""
+    title = html.escape(name)
+    return (
+        f'<html><head><meta charset="utf-8"/><title>{title}</title></head>'
+        f'<body><div data-philograph="missing"></div></body></html>'
+    ).encode()
+
+
 class CatalogFetch:
     """Функция получения файла для ``Pipeline``: ``fetch(spec) -> bytes``."""
 
@@ -246,6 +256,12 @@ class CatalogFetch:
     def __call__(self, spec: dict[str, Any]) -> bytes:
         if "path" in spec:
             return Path(spec["path"]).read_bytes()
+        if spec.get("missing"):
+            # Подстраницы нет на сайте: заглушка проходит ту же очистку, что и страницы сайта
+            # (у Wikisource очистка ставит заголовок главы по названию подстраницы).
+            stub = missing_page(spec["name"])
+            cleaner = self.cleaners.get(spec.get("clean") or "")
+            return cleaner(stub) if cleaner else stub
         url = spec["url"]
         state = self.state(url) or {}
         headers: dict[str, str] = {}

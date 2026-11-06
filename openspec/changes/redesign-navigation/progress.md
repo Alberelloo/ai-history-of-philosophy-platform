@@ -16,7 +16,7 @@
 | 4.1 Фильтры библиотеки | сделан: FilterMenu в ui.tsx, поиск 360px, сброс всегда на месте (неактивен без фильтров) |
 | 5.1 Сервер: глава по разделу, first_chapter_id | сделан: Reading.chapter отдаёт главу раздела с anchor, ChapterNotFound → 404 с first_chapter_id; тесты tests/library/test_reading_resilience.py |
 | 5.2 Клиент: устойчивое чтение | сделан: ReaderPage на chapter_not_found ищет сохранённый абзац (или абзац из адреса), иначе первую главу; уведомление в потоке; раздел по адресу → глава с прокруткой; ApiError.details |
-| 5.3 Заглушки необработанных частей | не начат |
+| 5.3 Заглушки необработанных частей | сделан: extract — blank_page и missing, parse — блоки unrendered с пояснением, Wikisource v3 пишет красные ссылки с missing, CatalogFetch отдаёт заглушку, схема каталога; оформление unrendered в клиенте; PIPELINE_VERSION 3, STEP_VERSIONS 3; тесты tests/library/test_unrendered_parts.py, tests/library/catalog/test_missing_subpages.py |
 | 6.1 Прослеживаемость RENAMED/REMOVED | не начат |
 | 6.2 Тесты требований | не начат |
 | 6.3 Визуальные эталоны | не начат |
@@ -30,11 +30,11 @@
 
 ## Сейчас
 
-Пункт 5.2 закрыт; браузерный тест регресс-сценария — в 6.2 (tests/web/test_reading_resilience.py).
+Пункт 5.3 закрыт, tests/library зелёные (104).
 
 ## Следующий шаг
 
-5.3 — заглушки необработанных частей и конвейер 3.
+6.1 — прослеживаемость RENAMED/REMOVED, затем 6.2 — перевод тестов на боковую панель.
 
 ## Известные проблемы
 

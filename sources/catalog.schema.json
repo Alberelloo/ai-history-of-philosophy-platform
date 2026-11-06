@@ -44,7 +44,8 @@
         "name": {"type": "string", "minLength": 1},
         "url": {"type": "string", "pattern": "^https?://"},
         "clean": {"enum": ["gutenberg", "wikisource", null], "description": "очистка служебных частей сайта перед хешированием"},
-        "api": {"type": "boolean", "description": "ссылка — документированный API сайта: robots.txt не применяется"}
+        "api": {"type": "boolean", "description": "ссылка — документированный API сайта: robots.txt не применяется"},
+        "missing": {"type": "boolean", "description": "подстраницы нет на сайте («красная» ссылка): в тексте будет глава-заглушка"}
       }
     },
     "license": {

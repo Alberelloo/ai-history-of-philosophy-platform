@@ -256,34 +256,37 @@ class Wikisource:
     """
 
     name = "wikisource"
-    version = 2
+    version = 3  # 3: «красные» ссылки записываются как неоцифрованные подстраницы
 
     @staticmethod
     def rest_url(host: str, page: str) -> str:
         return f"https://{host}/api/rest_v1/page/html/{quote(page.replace(' ', '_'), safe='')}"
 
     def files(self, host: str, page: str, fetcher: Fetcher) -> list[dict[str, Any]]:
-        """Главная страница и подстраницы по ссылкам из неё, в порядке появления."""
+        """Главная страница и подстраницы по ссылкам из неё, в порядке появления.
+
+        «Красная» ссылка — подстраницы на сайте нет: она записывается с ``missing``, и в тексте
+        на её месте будет глава-заглушка, а не пропуск.
+        """
         main = self.rest_url(host, page)
         body = fetcher.get(main, api=True).data
         prefix = page.replace(" ", "_") + "/"
-        subpages: list[str] = []
+        subpages: dict[str, bool] = {}  # название → нет на сайте
         for href in re.findall(rb'href="\./([^"]+)"', body):
-            if b"redlink=1" in href:
-                continue  # «красная» ссылка: такой подстраницы на сайте нет
             title = unquote(re.split(rb"[#?]", href)[0].decode("utf-8")).rstrip("/")
             if title.startswith(prefix) and title not in subpages:
-                subpages.append(title)
+                subpages[title] = b"redlink=1" in href
         result = [{"name": page, "url": main, "clean": "wikisource", "api": True}]
-        for title in subpages:
-            result.append(
-                {
-                    "name": title.replace("_", " "),
-                    "url": self.rest_url(host, title),
-                    "clean": "wikisource",
-                    "api": True,
-                }
-            )
+        for title, missing in subpages.items():
+            item = {
+                "name": title.replace("_", " "),
+                "url": self.rest_url(host, title),
+                "clean": "wikisource",
+                "api": True,
+            }
+            if missing:
+                item["missing"] = True
+            result.append(item)
         return result
 
     def matches(self, url: str) -> bool:
