@@ -227,6 +227,32 @@ defaults = Table(
     schema=SCHEMA,
 )
 
+# Связь записи каталога источников (sources/catalog.yaml) с источником учёта.
+catalog_links = Table(
+    "catalog_links",
+    metadata,
+    Column("catalog_id", String(120), primary_key=True),
+    Column("source_id", String(40), nullable=False, unique=True),
+    Column("linked_at", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+
+# Состояние загрузки по ссылке: условные запросы, неудачи подряд, перенаправления.
+fetch_state = Table(
+    "fetch_state",
+    metadata,
+    Column("url", String(1000), primary_key=True),
+    Column("etag", String(300)),
+    Column("last_modified", String(100)),
+    Column("sha256", String(64)),  # хеш очищенного содержимого прошлого ответа 200
+    Column("final_url", String(1000)),
+    Column("last_status", Integer),
+    Column("last_error", Text),
+    Column("failures", Integer, nullable=False, default=0),
+    Column("checked_at", DateTime(timezone=True)),
+    schema=SCHEMA,
+)
+
 migrations = Migrations(SCHEMA, metadata)
 migrations.add(1, "учёт источников, версии, структура")(
     migrations.create_tables(
@@ -247,3 +273,6 @@ migrations.add(1, "учёт источников, версии, структур
     )
 )
 migrations.add(2, "учебник по умолчанию")(migrations.create_tables("defaults"))
+migrations.add(3, "каталог источников и состояние загрузки")(
+    migrations.create_tables("catalog_links", "fetch_state")
+)

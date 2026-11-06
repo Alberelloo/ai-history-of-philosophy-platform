@@ -114,7 +114,7 @@ _BLOCK_TAGS = {
     "dd": None,
     "dt": None,
 }
-_NOTE_CLASS_RE = re.compile(r"foot-?note|endnote|\bnote\b|сноска", re.IGNORECASE)
+_NOTE_CLASS_RE = re.compile(r"foot-?note|endnote|cite_note|\bnote\b|сноска", re.IGNORECASE)
 
 
 def _epub_type(el: etree._Element) -> str:
@@ -128,10 +128,21 @@ def _is_note_container(el: etree._Element, note_targets: set[str]) -> bool:
     if "footnote" in _epub_type(el) or "endnote" in _epub_type(el) or el.tag == "aside":
         return True
     ident = el.get("id")
+    if not (ident and ident in note_targets):
+        # Project Gutenberg: <p class="footnote"><a id="fn1.3"/> … — якорь внутри абзаца
+        ident = next(
+            (
+                c.get("id")
+                for c in el.iterchildren()
+                if c.tag == "a" and c.get("id") in note_targets
+            ),
+            None,
+        )
     return bool(
         ident
         and ident in note_targets
-        and _NOTE_CLASS_RE.search((el.get("class") or "") + " " + el.tag)
+        # Wikisource (Parsoid): <li id="cite_note-1"> — признак сноски в идентификаторе
+        and _NOTE_CLASS_RE.search((el.get("class") or "") + " " + el.tag + " " + ident)
     )
 
 
@@ -183,6 +194,12 @@ def extract_html(
     data = re.sub(r"^\s*<\?xml[^>]*\?>", "", data)
     root = html.fromstring(data)
     body = root.find("body") if root.find("body") is not None else root
+    # Обратная ссылка из сноски на её знак («[3]» в начале сноски Gutenberg) — не текст.
+    ref_ids = {a.get("id") for a in body.iter("a") if a.get("id") and "#" in (a.get("href") or "")}
+    for a in list(body.iter("a")):
+        target = (a.get("href") or "").split("#", 1)[1] if "#" in (a.get("href") or "") else None
+        if target in ref_ids and a.get("id") not in ref_ids:
+            a.drop_tree()
     note_targets = {
         a.get("href").split("#", 1)[1]
         for a in body.iter("a")
@@ -320,6 +337,9 @@ class PdfPageImage:
     png: bytes
 
 
+TEXTLESS_SHARE = 0.1  # доля страниц без текстового слоя, после которой без распознавания нельзя
+
+
 def extract_pdf(
     data: bytes,
     *,
@@ -345,6 +365,7 @@ def extract_pdf(
     if doc.needs_pass:
         raise ExtractionError("файл защищён паролем")
     pages: list[RawPage] = []
+    textless: list[int] = []
     for index in range(doc.page_count):
         if skip_pages and index in skip_pages:
             continue
@@ -370,16 +391,21 @@ def extract_pdf(
             )
             if store_image is not None:
                 raw.image_ref = store_image(page.get_pixmap(dpi=150, clip=clip).tobytes("png"))
-            if not lines:
-                if ocr is None:
-                    raise ExtractionError(
-                        f"страница {index + 1} без текста, распознавание не задано"
-                    )
+            if not lines and ocr is None:
+                # Обложка или иллюстрация во всю страницу в цифровом PDF: страница остаётся
+                # пустой. Если таких страниц много, это скан — см. проверку после цикла.
+                textless.append(index)
+            elif not lines:
                 image = page.get_pixmap(dpi=300, clip=clip).tobytes("png")
                 raw.lines, raw.ocr_confidence = ocr.recognize(image, languages)
             pages.append(raw)
             if on_page is not None:
                 on_page(raw)
+    if textless and len(textless) > max(1, TEXTLESS_SHARE * doc.page_count):
+        raise ExtractionError(
+            f"{len(textless)} из {doc.page_count} страниц без текста (первая — страница "
+            f"{textless[0] + 1}), распознавание не задано"
+        )
     return RawDocument(pages=pages, fmt="pdf", paginated=True)
 
 

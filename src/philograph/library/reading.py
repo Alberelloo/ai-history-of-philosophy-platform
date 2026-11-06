@@ -178,10 +178,17 @@ class Reading:
     @staticmethod
     def chapters(doc: Document) -> list[Section]:
         result: list[Section] = []
-        for section in doc.sections:
-            if not section.visible:
-                continue
-            if section.level == 0 and section.children:
+        visible = [s for s in doc.sections if s.visible]
+
+        def size(section: Section) -> int:
+            return len(section.blocks) + sum(size(c) for c in section.children)
+
+        # Весь текст под одним заголовком (название книги): главы — разделы под ним.
+        wrappers = [s for s in visible if s.children]
+        total = sum(size(s) for s in visible) or 1
+        wrapper = wrappers[0] if len(wrappers) == 1 and size(wrappers[0]) >= 0.8 * total else None
+        for section in visible:
+            if (section.level == 0 or section is wrapper) and section.children:
                 result.extend(c for c in section.children if c.visible)
                 if section.blocks:
                     result.insert(len(result) - len(section.children), section)

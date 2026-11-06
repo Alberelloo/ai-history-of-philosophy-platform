@@ -135,15 +135,39 @@ def test_resume_after_crash(lib):
     lib.files["scan.pdf"] = scan_pdf(6)
     source_id = lib.register(files=[{"name": "s", "path": "scan.pdf"}])
     lib.ocr.fail_on = 4
-    with pytest.raises(RuntimeError):
-        lib.pipeline.start("operator", source_id)
-    version_id = lib.registry.versions(source_id)[-1]["id"]
-    assert lib.registry.version(version_id)["state"] == "files_received"
+    # сбой распознавания не роняет запуск, а записывается в версию
+    version_id = lib.pipeline.start("operator", source_id)
+    version = lib.registry.version(version_id)
+    assert version["state"] == "files_received"
+    assert version["error"]["message"].startswith("RuntimeError: процесс распознавания упал")
     lib.ocr.fail_on = None
     calls_before = lib.ocr.calls
-    lib.registry.update_version(version_id, lock_owner=None)
-    lib.pipeline.run(version_id)
+    # повторный запуск с теми же файлами продолжает ту же версию, а не создаёт новую
+    assert lib.pipeline.start("operator", source_id) == version_id
     assert lib.ocr.calls - calls_before == 3  # страницы 1–3 заново не распознаются
+    assert len(lib.registry.versions(source_id)) == 1
+
+
+@req(SP, "Продолжение с места сбоя")
+def test_version_stopped_midway_is_resumed(lib):
+    source_id = lib.register()
+    version_id = lib.pipeline.start("operator", source_id)
+    # версия осталась на полпути без ошибки (процесс убили между шагами)
+    lib.registry.update_version(version_id, state="quality_passed")
+    assert lib.pipeline.start("operator", source_id) == version_id
+    assert lib.registry.version(version_id)["state"] == "checked"
+    assert len(lib.registry.versions(source_id)) == 1
+
+
+@req(SP, "Нечего обрабатывать")
+def test_waiting_version_is_not_duplicated(lib, events):
+    source_id = lib.register()
+    version_id = lib.pipeline.start("operator", source_id)
+    assert lib.registry.version(version_id)["state"] == "checked"
+    # версия ждёт публикации: повторный запуск с теми же файлами не создаёт вторую
+    assert lib.pipeline.start("operator", source_id) is None
+    assert len(lib.registry.versions(source_id)) == 1
+    assert events.of("library.pipeline.nothing_to_do")
 
 
 @req(SP, "Безопасный повтор")
@@ -386,3 +410,24 @@ def test_removed_paragraph_record(lib):
     resolved = lib.registry.resolve_paragraph(removed.id)
     assert resolved["status"] == "removed"
     assert resolved["section_title"] == "Глава 2. Рассудок"
+
+
+@req(SP, "Извлечение текста")
+def test_digital_pdf_with_textless_cover_needs_no_ocr(lib):
+    # цифровой учебник: обложка без текстового слоя, остальные 19 страниц с текстом
+    sentence = "All our knowledge begins with experience, but it does not all arise from it."
+    lib.files["book.pdf"] = pdf(
+        [[]] + [[(f"{sentence} Page {i}.", BODY) for _ in range(12)] for i in range(1, 20)]
+    )
+    source_id = lib.register(
+        files=[{"name": "b", "path": "book.pdf"}], language="en", settings={"languages": ["en"]}
+    )
+    lib.pipeline.ocr = None
+    version = lib.registry.version(lib.pipeline.start("operator", source_id))
+    assert version["error"] is None, version["error"]
+    assert version["state"] in ("checked", "awaiting_quality"), version["deferred_reason"]
+    # скан, где без текста больше десятой части страниц, без распознавания не обрабатывается
+    lib.files["scan.pdf"] = scan_pdf(20, text_pages=set(range(5, 20)))
+    scan_id = lib.register(title="Скан", files=[{"name": "s", "path": "scan.pdf"}])
+    failed = lib.registry.version(lib.pipeline.start("operator", scan_id))
+    assert "5 из 20 страниц без текста" in failed["error"]["message"]

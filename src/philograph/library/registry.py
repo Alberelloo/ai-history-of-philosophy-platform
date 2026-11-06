@@ -430,6 +430,17 @@ class Registry:
                 actor, "update_settings", source_id, {"keys": sorted(settings)}, conn=conn
             )
 
+    def replace_files(self, actor: str, source_id: str, files: list[dict[str, Any]]) -> None:
+        """Новый список файлов источника; версия появится при следующей обработке."""
+        if not files or any(
+            not f.get("name") or not (f.get("url") or f.get("path")) for f in files
+        ):
+            raise RegistryError("у каждого файла нужны имя и ссылка или путь", fields=["files"])
+        with self.engine.begin() as conn:
+            conn.execute(update(t.sources).where(t.sources.c.id == source_id).values(files=files))
+            self.actions.record(actor, "replace_files", source_id, {"count": len(files)}, conn=conn)
+        events.emit("library.metadata.updated", source_id=source_id, fields=["files"])
+
     # --- версии ---
 
     def create_version(
