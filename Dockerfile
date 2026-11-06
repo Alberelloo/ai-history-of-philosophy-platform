@@ -20,6 +20,7 @@ COPY --from=web /web/dist ./web/dist
 COPY config ./config
 COPY scripts ./scripts
 COPY demo ./demo
+COPY sources ./sources
 
 # Именованный том при первом подключении берёт владельца каталога из образа.
 RUN useradd --create-home philograph && mkdir -p /data/files && chown philograph /data/files
