@@ -13,7 +13,8 @@ from pathlib import Path
 from philograph import __version__
 from philograph.library import schema as library_schema
 from philograph.library import worker as library_worker
-from philograph.library.processing import Pipeline
+from philograph.library.catalog.fetcher import CatalogFetch, Fetcher
+from philograph.library.processing import Pipeline, PipelineSettings
 from philograph.library.registry import Registry
 from philograph.operator.access import migrations as operator_migrations
 from philograph.platform import events
@@ -24,17 +25,6 @@ from philograph.platform.queue import Queue
 from philograph.platform.queue import migrations as queue_migrations
 
 
-def _fetch(spec: dict) -> bytes:
-    if "path" in spec:
-        return Path(spec["path"]).read_bytes()
-    import httpx
-
-    response = httpx.get(spec["url"], timeout=60, follow_redirects=True)
-    if response.status_code != 200:
-        raise OSError(f"ответ {response.status_code}")
-    return response.content
-
-
 def main() -> None:
     events.configure(sinks=[events.json_sink()])
     sets = (library_schema.migrations, operator_migrations, queue_migrations)
@@ -42,8 +32,13 @@ def main() -> None:
     for m in sets:
         m.upgrade(engine)
     queue = Queue(engine)
+    files = FileStore(Path(os.environ["PHILOGRAPH_FILES_ROOT"]))
+    # Бережная загрузка: User-Agent проекта, robots.txt, условные запросы, учёт неудач.
     pipeline = Pipeline(
-        Registry(engine), FileStore(Path(os.environ["PHILOGRAPH_FILES_ROOT"])), _fetch
+        Registry(engine),
+        files,
+        CatalogFetch(engine, Fetcher(), files),
+        settings=PipelineSettings(fetch_retries=0),
     )
     library_worker.register(queue, pipeline)
     with running("worker", __version__):

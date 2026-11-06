@@ -35,3 +35,4 @@ enforce:
   - operational-alerts
   - deployment
   - visual-design
+  - source-catalog

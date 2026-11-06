@@ -36,8 +36,8 @@ from philograph.platform import context, events
 from philograph.platform.clock import Clock, SystemClock
 from philograph.platform.files import FileStore, fingerprint
 
-PIPELINE_VERSION = "1"
-STEP_VERSIONS = {"extract": "1", "parse": "1"}
+PIPELINE_VERSION = "2"  # 2: сноски HTML/EPUB, обложки PDF, выбросы номеров страниц
+STEP_VERSIONS = {"extract": "2", "parse": "2"}
 FORMATS = ("txt", "html", "epub", "pdf")
 ORDER = ["created", "files_received", "text_extracted", "quality_passed", "structured", "checked"]
 
@@ -356,17 +356,43 @@ class Pipeline:
             [asdict(c.anchor) for c in self._corrections(source_id)],
             [c.payload for c in self._corrections(source_id)],
         )
-        if source.published_version:
-            published = self.registry.version(source.published_version)
-            same = (
-                [f["sha256"] for f in published["files"]] == [f["sha256"] for f in received]
-                and published["pipeline_version"] == PIPELINE_VERSION
-                and published["settings"] == source.settings
-                and published["corrections_digest"] == digest
+
+        def same_inputs(version: dict[str, Any]) -> bool:
+            return (
+                [f["sha256"] for f in version["files"]] == [f["sha256"] for f in received]
+                and version["pipeline_version"] == PIPELINE_VERSION
+                and version["settings"] == source.settings
+                and version["corrections_digest"] == digest
             )
-            if same:
-                events.emit("library.pipeline.nothing_to_do", source_id=source_id)
-                return None
+
+        if source.published_version and same_inputs(
+            self.registry.version(source.published_version)
+        ):
+            events.emit("library.pipeline.nothing_to_do", source_id=source_id)
+            return None
+        # Версия с теми же входами уже ждёт решения: вторая такая же не нужна.
+        # Упавшая на шаге версия с теми же входами продолжается с места падения.
+        versions = self.registry.versions(source_id)
+        latest = max(versions, key=lambda v: v["number"]) if versions else None
+        if (
+            latest is not None
+            and latest["id"] != source.published_version
+            and latest["state"] != "published"
+            and same_inputs(latest)
+        ):
+            waiting = latest["state"] in (
+                "checked",
+                "awaiting_quality",
+                "deferred",
+                "withdrawn",
+                "replaced",
+            )
+            if latest["error"] or not waiting:
+                # упавшая или прерванная на полпути версия продолжается с места остановки
+                self.run(latest["id"], limit_usd=limit_usd)
+                return latest["id"]
+            events.emit("library.pipeline.nothing_to_do", source_id=source_id)
+            return None
         version_id = self.registry.create_version(
             source_id, received, PIPELINE_VERSION, source.settings, digest
         )
@@ -471,19 +497,21 @@ class Pipeline:
                     new_state, reused = step(version, limit_usd)
                 except BudgetStop:
                     return state
-                except (StepFailed, ExtractionError) as exc:
+                except Exception as exc:  # любая ошибка шага записывается в версию
                     page = getattr(exc, "page", None)
+                    expected = isinstance(exc, (StepFailed, ExtractionError))
+                    message = str(exc) if expected else f"{type(exc).__name__}: {exc}"
                     self.registry.update_version(
-                        version_id, error={"step": name, "message": str(exc), "page": page}
+                        version_id, error={"step": name, "message": message, "page": page}
                     )
-                    self._log(version_id, name, "error", str(exc), page=page)
+                    self._log(version_id, name, "error", message, page=page)
                     events.emit(
                         "library.pipeline.step.failed",
                         version_id=version_id,
                         step=name,
-                        message=str(exc),
+                        message=message,
                         page=page,
-                        error_kind="pipeline_step",
+                        error_kind="pipeline_step" if expected else "unexpected",
                     )
                     return state
                 self.registry.update_version(version_id, state=new_state, error=None)

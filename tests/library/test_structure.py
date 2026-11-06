@@ -217,6 +217,26 @@ def test_footnotes_removed_from_flow_and_linked():
     assert second.footnotes[0].text == "Ко второй главе."
 
 
+@req(DS, "Сноски")
+def test_footnote_in_continued_line_is_linked():
+    # знак сноски во второй строке абзаца (нашлось на настоящем скане archive.org)
+    doc = parse_raw(
+        scan(
+            [
+                line("Глава 1", size=TITLE, start=True),
+                line("Гераклит, которого за любовь", start=True),
+                line("к парадоксам звали Тёмным,1 жил в Эфесе.", note_at=26),
+                line("1 Диоген Лаэртский, IX.", size=SMALL),
+            ]
+        )
+    )
+    block = doc.sections[0].blocks[0]
+    assert block.text.startswith("Гераклит, которого за любовь к парадоксам")
+    note = doc.sections[0].footnotes[0]
+    assert note.text == "Диоген Лаэртский, IX." and note.linked
+    assert block.notes[0].footnote_id == note.id
+
+
 @req(DS, "Несвязанные сноски")
 def test_unlinked_footnote_kept_at_chapter_end():
     doc = parse_raw(
@@ -387,3 +407,63 @@ def test_checks_errors_and_warnings():
     clean.warn("unlinked_note", "Текст сноски «2» без знака")
     issues = checks.check(clean)
     assert not checks.has_errors(issues) and len(issues) == 2
+
+
+@req(DS, "Сноски")
+def test_footnotes_of_gutenberg_and_wikisource_html():
+    from philograph.library.extract import extract_html
+    from philograph.library.model import RawDocument
+
+    gutenberg = (
+        "<html><body><h2>PART I</h2>"
+        '<p>Mr. Locke has proved it<a href="ch1.xhtml#fn1.3" id="fnref1.3">[3]</a> long ago.</p>'
+        '<p class="footnote"><a id="fn1.3"/> <a href="ch1.xhtml#fnref1.3">[3]</a> '
+        "Dr. Berkeley, Introduction.</p></body></html>"
+    )
+    wikisource = (
+        "<html><body><h2>Essay 1</h2>"
+        '<p>Philosophy may be treated<sup class="mw-ref reference">'
+        '<a href="./Essays#cite_note-1">[1]</a></sup> after two manners.</p>'
+        '<ol class="mw-references references"><li id="cite_note-1">'
+        '<span class="mw-reference-text">See the Treatise.</span></li></ol></body></html>'
+    )
+    for page, expected in (
+        (gutenberg, "Dr. Berkeley, Introduction."),
+        (wikisource, "See the Treatise."),
+    ):
+        pages, _ = extract_html(page)
+        doc = parse_raw(RawDocument(pages=pages, fmt="html", paginated=False))
+        notes = [f for s in doc.sections for f in s.footnotes]
+        assert [n.text for n in notes] == [expected], [b.text for _, b in doc.blocks()]
+        assert notes[0].linked
+        assert all(expected not in b.text for _, b in doc.blocks())
+
+
+@req(DS, "Страницы печатного издания")
+def test_page_label_outlier_from_running_footer_is_ignored():
+    from philograph.library.model import RawDocument, RawPage
+    from philograph.library.parse import ParseSettings, infer_labels
+
+    # колонтитул с годом «2022» дал ложный номер между 107 и 109
+    labels = ["105", "106", "107", "2022", "109", "110"]
+    raw = RawDocument(
+        pages=[RawPage(i, [], printed_label=x) for i, x in enumerate(labels)],
+        fmt="pdf",
+        paginated=True,
+    )
+    assert infer_labels(raw, ParseSettings()) == ["105", "106", "107", "108", "109", "110"]
+
+
+@req(DS, "Страницы печатного издания")
+def test_chaotic_numbers_are_not_page_labels():
+    from philograph.library.model import RawDocument, RawPage
+    from philograph.library.parse import ParseSettings, infer_labels
+
+    # числа из колонтитулов цифрового учебника вразнобой: это не нумерация страниц
+    labels = ["2022", "108", "110", "370", "373", "1", "5", "6", "300", "12"]
+    raw = RawDocument(
+        pages=[RawPage(i, [], printed_label=x) for i, x in enumerate(labels)],
+        fmt="pdf",
+        paginated=True,
+    )
+    assert infer_labels(raw, ParseSettings()) == [None] * len(labels)

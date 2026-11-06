@@ -123,6 +123,9 @@ def _take_label(page: RawPage, text: str) -> None:
             return
 
 
+UNRELIABLE_LABELS = 0.1  # доля нарушений порядка, после которой номера страниц не показываются
+
+
 def infer_labels(raw: RawDocument, settings: ParseSettings) -> list[str | None]:
     """Номер страницы как напечатан; нераспознанный выводится, только если нумерация непрерывна."""
     labels = [p.printed_label for p in raw.pages]
@@ -131,13 +134,38 @@ def infer_labels(raw: RawDocument, settings: ParseSettings) -> list[str | None]:
     if all(label is None for label in labels) and settings.page_offset is not None:
         return [str(p.index + settings.page_offset) for p in raw.pages]
     numbers = [int(x) if x and x.isdigit() else None for x in labels]
-    for i, value in enumerate(numbers):
-        if value is not None or labels[i] is not None:
-            continue
+
+    def neighbours(i: int) -> tuple[tuple[int, int] | None, tuple[int, int] | None]:
         prev = next(((j, numbers[j]) for j in range(i - 1, -1, -1) if numbers[j] is not None), None)
         nxt = next(
             ((j, numbers[j]) for j in range(i + 1, len(numbers)) if numbers[j] is not None), None
         )
+        return prev, nxt
+
+    # Выброс: соседи согласованы между собой, а номер между ними нет («2022» из колонтитула
+    # с годом между 107 и 109). Такой номер не напечатанный, а ошибочно взятый.
+    for i, value in enumerate(numbers):
+        if value is None:
+            continue
+        prev, nxt = neighbours(i)
+        if (
+            prev
+            and nxt
+            and nxt[1] - prev[1] == nxt[0] - prev[0]
+            and value != prev[1] + (i - prev[0])
+        ):
+            numbers[i] = None
+            labels[i] = None
+    # Номера часто идут не по порядку — это не нумерация страниц, а случайные числа
+    # колонтитулов: неверный номер хуже отсутствующего.
+    known = [n for n in numbers if n is not None]
+    drops = sum(1 for a, b in itertools.pairwise(known) if b < a)
+    if known and drops > max(1, UNRELIABLE_LABELS * len(known)):
+        return [None] * len(labels)
+    for i, value in enumerate(numbers):
+        if value is not None or labels[i] is not None:
+            continue
+        prev, nxt = neighbours(i)
         if prev and nxt and nxt[1] - prev[1] == nxt[0] - prev[0]:
             labels[i] = str(prev[1] + (i - prev[0]))
     return labels
@@ -340,7 +368,12 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 if page_started and raw.paginated:
                     current.pages.append(PageMark(shift, label))
                 current.notes.extend(
-                    (shift + s.start, s.target or line.text[s.start : s.end], pos)
+                    (
+                        shift + s.start,
+                        s.target or line.text[s.start : s.end],
+                        pos,
+                        line.text[s.start : s.end],
+                    )
                     for s in line.spans
                 )
                 current.text = joined
