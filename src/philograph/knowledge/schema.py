@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+
 from sqlalchemy import (
     JSON,
     Boolean,
@@ -13,7 +16,10 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    select,
+    update,
 )
+from sqlalchemy.engine import Connection
 
 from philograph.platform.db import Migrations
 
@@ -275,3 +281,58 @@ graph_extensions = Table(
     schema=SCHEMA,
 )
 migrations.add(4, "достройка графов")(migrations.create_tables("graph_extensions"))
+
+
+def _lifespan_dash(conn: Connection) -> None:
+    """Годы жизни через короткое тире без пробелов: «1724 – 1804» → «1724–1804».
+
+    Меняются только записи типа ``lifespan`` с точной старой записью и копии дат в
+    ``entities.primary``; ключ объединения повторов пересчитывается, потому что в него входит
+    значение (тот же расчёт, что ``Statements._key`` для связи без объекта).
+    """
+    from philograph.knowledge.dates import LIFESPAN_DASH, OLD_LIFESPAN_DASH
+
+    def fixed(value):
+        if isinstance(value, dict) and OLD_LIFESPAN_DASH in str(value.get("original", "")):
+            return {
+                **value,
+                "original": value["original"].replace(OLD_LIFESPAN_DASH, LIFESPAN_DASH),
+            }
+        return None
+
+    rows = conn.execute(
+        select(
+            statements.c.id, statements.c.subject, statements.c.value, statements.c.qualifiers
+        ).where(statements.c.type == "lifespan")
+    ).all()
+    changed: dict[str, tuple[str, str]] = {}  # сущность → (старая запись, новая)
+    for row in rows:
+        value = fixed(row.value)
+        if value is None:
+            continue
+        payload = json.dumps(
+            [[row.subject, None], "lifespan", value, row.qualifiers],
+            sort_keys=True,
+            ensure_ascii=False,
+            default=str,
+        )
+        key = hashlib.sha256(payload.encode()).hexdigest()
+        conn.execute(
+            update(statements).where(statements.c.id == row.id).values(value=value, key=key)
+        )
+        changed[row.subject] = (row.value["original"], value["original"])
+    # Копия дат в карточке сущности — только у тех, чьи годы жизни переписаны, и только
+    # если копия совпадает со старой записью.
+    for entity_id, (old, new) in changed.items():
+        found = conn.execute(select(entities.c.primary).where(entities.c.id == entity_id)).first()
+        primary = (found.primary if found else None) or {}
+        dates = primary.get("dates")
+        if isinstance(dates, dict) and dates.get("original") == old:
+            conn.execute(
+                update(entities)
+                .where(entities.c.id == entity_id)
+                .values(primary={**primary, "dates": {**dates, "original": new}})
+            )
+
+
+migrations.add(5, "даты: короткое тире без пробелов")(_lifespan_dash)

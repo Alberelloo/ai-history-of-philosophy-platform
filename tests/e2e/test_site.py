@@ -170,7 +170,7 @@ def test_mention_opens_card_and_navigates(page, stack):
     card = page.get_by_role("dialog", name="Карточка")
     card.locator("h3:text('Юм')").wait_for()
     assert page.evaluate("window.scrollY") == scroll  # глава не сдвигается
-    assert "1711" in card.locator(".card-dates").inner_text()
+    assert card.locator(".card-dates").inner_text() == "1711–1776"  # тире без пробелов
     influence = card.locator("[data-section=influence]")
     assert "так считает" in influence.inner_text()
     # Описание дописывается потоком и помечено как сгенерированное.
@@ -262,6 +262,8 @@ def test_genesis_graph_from_card(page, stack, tmp_path):
     page.wait_for_selector("h1:text('Генезис: Кант')")
     # Сохранённая связь видна сразу, достроенные приходят следом и помечены.
     page.locator(".graph-edge[data-generated=false]").first.wait_for()
+    kant_dates = page.locator(".graph-node[aria-label='Кант'] .graph-dates")
+    assert kant_dates.text_content() == "1724–1804"
     page.wait_for_function(
         "document.querySelectorAll('.graph-edge[data-generated=true]').length === 2"
     )

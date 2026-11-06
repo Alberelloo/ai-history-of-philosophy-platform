@@ -296,3 +296,47 @@ def test_parallel_start_loads_registry_once(engine_for):
         thread.join()
     assert errors == []
     assert OntologyRegistry(engine).version() == 1
+
+
+@req(OE, "Нечёткие даты")
+def test_lifespan_written_with_short_dash(onto):
+    from philograph.knowledge.dates import lifespan
+
+    assert lifespan("1724", "1804").original == "1724–1804"  # без пробелов вокруг тире
+    kant = onto.person("Кант", "1724", "1804")
+    assert onto.entities.get(kant)["primary"]["dates"]["original"] == "1724–1804"
+
+
+@req(OE, "Нечёткие даты")
+def test_old_lifespan_records_migrated(onto):
+    """Миграция knowledge:5 переписывает сохранённые «1724 – 1804» и копию в карточке."""
+    from sqlalchemy import select, update
+
+    from philograph.knowledge import schema
+
+    kant = onto.person("Кант", "1724", "1804")
+    engine = onto.statements.engine
+    t = schema.statements
+    with engine.begin() as conn:
+        row = conn.execute(select(t.c.id, t.c.value).where(t.c.subject == kant)).one()
+        old = {**row.value, "original": "1724 – 1804"}
+        conn.execute(update(t).where(t.c.id == row.id).values(value=old))
+        primary = conn.execute(
+            select(schema.entities.c.primary).where(schema.entities.c.id == kant)
+        ).scalar_one()
+        conn.execute(
+            update(schema.entities)
+            .where(schema.entities.c.id == kant)
+            .values(primary={**primary, "dates": old})
+        )
+        schema._lifespan_dash(conn)
+    assert onto.statements.get(row.id)["value"]["original"] == "1724–1804"
+    assert onto.entities.get(kant)["primary"]["dates"]["original"] == "1724–1804"
+    # Ключ объединения повторов пересчитан так же, как его считает хранилище утверждений.
+    with engine.begin() as conn:
+        stored = conn.execute(
+            select(t.c.key, t.c.value, t.c.qualifiers).where(t.c.id == row.id)
+        ).one()
+    assert stored.key == onto.statements._key(
+        kant, "lifespan", None, stored.value, stored.qualifiers
+    )
