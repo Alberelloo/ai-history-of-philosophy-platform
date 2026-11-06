@@ -1,0 +1,3137 @@
+{
+ "ids": {
+  "source": "s_debc9758671c",
+  "chapter": "sec_32fc04b73331",
+  "kant": "e_0cd64f72ced1"
+ },
+ "contrast": [
+  {
+   "theme": "light",
+   "pair": "ink на paper",
+   "fg": "#1a222f",
+   "bg": "#eff1ec",
+   "ratio": 14.05,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink на surface",
+   "fg": "#1a222f",
+   "bg": "#fafbf8",
+   "ratio": 15.39,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink на sunken",
+   "fg": "#1a222f",
+   "bg": "#e8eae4",
+   "ratio": 13.18,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink-2 на paper",
+   "fg": "#48505d",
+   "bg": "#eff1ec",
+   "ratio": 7.15,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink-2 на surface",
+   "fg": "#48505d",
+   "bg": "#fafbf8",
+   "ratio": 7.83,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink-2 на sunken",
+   "fg": "#48505d",
+   "bg": "#e8eae4",
+   "ratio": 6.71,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink-3 на paper",
+   "fg": "#646d78",
+   "bg": "#eff1ec",
+   "ratio": 4.62,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink-3 на surface",
+   "fg": "#646d78",
+   "bg": "#fafbf8",
+   "ratio": 5.05,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "accent на paper",
+   "fg": "#385b8f",
+   "bg": "#eff1ec",
+   "ratio": 6.03,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "accent на surface",
+   "fg": "#385b8f",
+   "bg": "#fafbf8",
+   "ratio": 6.6,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "accent на sunken",
+   "fg": "#385b8f",
+   "bg": "#e8eae4",
+   "ratio": 5.66,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "on-accent на accent",
+   "fg": "#fafbf8",
+   "bg": "#385b8f",
+   "ratio": 6.6,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "people на paper",
+   "fg": "#425490",
+   "bg": "#eff1ec",
+   "ratio": 6.36,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ideas на paper",
+   "fg": "#25624b",
+   "bg": "#eff1ec",
+   "ratio": 6.31,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "teachings на paper",
+   "fg": "#644a80",
+   "bg": "#eff1ec",
+   "ratio": 6.52,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "texts на paper",
+   "fg": "#25616f",
+   "bg": "#eff1ec",
+   "ratio": 6.12,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "history на paper",
+   "fg": "#834860",
+   "bg": "#eff1ec",
+   "ratio": 6.03,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "people на people-tint",
+   "fg": "#425490",
+   "bg": "#dee6fc",
+   "ratio": 5.8,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ideas на ideas-tint",
+   "fg": "#25624b",
+   "bg": "#d5efe3",
+   "ratio": 5.9,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "teachings на teachings-tint",
+   "fg": "#644a80",
+   "bg": "#ebe1f8",
+   "ratio": 5.88,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "texts на texts-tint",
+   "fg": "#25616f",
+   "bg": "#d4edf4",
+   "ratio": 5.71,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "history на history-tint",
+   "fg": "#834860",
+   "bg": "#f9e0e9",
+   "ratio": 5.51,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink на accent-soft",
+   "fg": "#1a222f",
+   "bg": "#dbe7f9",
+   "ratio": 12.8,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "generated на generated-tint",
+   "fg": "#8d5d1c",
+   "bg": "#fbefd6",
+   "ratio": 4.96,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ink на generated-tint",
+   "fg": "#1a222f",
+   "bg": "#fbefd6",
+   "ratio": 14.02,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "ok на surface",
+   "fg": "#2c6c47",
+   "bg": "#fafbf8",
+   "ratio": 6.05,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "danger на paper",
+   "fg": "#a83630",
+   "bg": "#eff1ec",
+   "ratio": 5.71,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "danger на surface",
+   "fg": "#a83630",
+   "bg": "#fafbf8",
+   "ratio": 6.25,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "danger на danger-tint",
+   "fg": "#a83630",
+   "bg": "#ffe4e1",
+   "ratio": 5.39,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "фокус accent на paper (нетекст)",
+   "fg": "#385b8f",
+   "bg": "#eff1ec",
+   "ratio": 6.03,
+   "need": 3.0,
+   "ok": true
+  },
+  {
+   "theme": "light",
+   "pair": "фокус accent на surface (нетекст)",
+   "fg": "#385b8f",
+   "bg": "#fafbf8",
+   "ratio": 6.6,
+   "need": 3.0,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink на paper",
+   "fg": "#e7e6df",
+   "bg": "#13171e",
+   "ratio": 14.36,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink на surface",
+   "fg": "#e7e6df",
+   "bg": "#1c2128",
+   "ratio": 12.93,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink на sunken",
+   "fg": "#e7e6df",
+   "bg": "#0e1217",
+   "ratio": 15.02,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink-2 на paper",
+   "fg": "#bfbeb5",
+   "bg": "#13171e",
+   "ratio": 9.62,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink-2 на surface",
+   "fg": "#bfbeb5",
+   "bg": "#1c2128",
+   "ratio": 8.67,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink-2 на sunken",
+   "fg": "#bfbeb5",
+   "bg": "#0e1217",
+   "ratio": 10.06,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink-3 на paper",
+   "fg": "#9a9990",
+   "bg": "#13171e",
+   "ratio": 6.27,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink-3 на surface",
+   "fg": "#9a9990",
+   "bg": "#1c2128",
+   "ratio": 5.65,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "accent на paper",
+   "fg": "#a4beef",
+   "bg": "#13171e",
+   "ratio": 9.57,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "accent на surface",
+   "fg": "#a4beef",
+   "bg": "#1c2128",
+   "ratio": 8.62,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "accent на sunken",
+   "fg": "#a4beef",
+   "bg": "#0e1217",
+   "ratio": 10.01,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "on-accent на accent",
+   "fg": "#13171e",
+   "bg": "#a4beef",
+   "ratio": 9.57,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "people на paper",
+   "fg": "#b1c2f6",
+   "bg": "#13171e",
+   "ratio": 10.19,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ideas на paper",
+   "fg": "#a0d5bd",
+   "bg": "#13171e",
+   "ratio": 10.9,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "teachings на paper",
+   "fg": "#ceb9e9",
+   "bg": "#13171e",
+   "ratio": 10.04,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "texts на paper",
+   "fg": "#9fd1de",
+   "bg": "#13171e",
+   "ratio": 10.82,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "history на paper",
+   "fg": "#ebb6c9",
+   "bg": "#13171e",
+   "ratio": 10.32,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "people на people-tint",
+   "fg": "#b1c2f6",
+   "bg": "#282f45",
+   "ratio": 7.53,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ideas на ideas-tint",
+   "fg": "#a0d5bd",
+   "bg": "#1f362c",
+   "ratio": 7.86,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "teachings на teachings-tint",
+   "fg": "#ceb9e9",
+   "bg": "#352b41",
+   "ratio": 7.46,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "texts на texts-tint",
+   "fg": "#9fd1de",
+   "bg": "#1c353a",
+   "ratio": 7.81,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "history на history-tint",
+   "fg": "#ebb6c9",
+   "bg": "#402831",
+   "ratio": 7.71,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink на accent-soft",
+   "fg": "#e7e6df",
+   "bg": "#253045",
+   "ratio": 10.57,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "generated на generated-tint",
+   "fg": "#e9c67d",
+   "bg": "#382c15",
+   "ratio": 8.34,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ink на generated-tint",
+   "fg": "#e7e6df",
+   "bg": "#382c15",
+   "ratio": 10.9,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "ok на surface",
+   "fg": "#8ecfa4",
+   "bg": "#1c2128",
+   "ratio": 8.95,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "danger на paper",
+   "fg": "#fb988d",
+   "bg": "#13171e",
+   "ratio": 8.54,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "danger на surface",
+   "fg": "#fb988d",
+   "bg": "#1c2128",
+   "ratio": 7.69,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "danger на danger-tint",
+   "fg": "#fb988d",
+   "bg": "#442321",
+   "ratio": 6.62,
+   "need": 4.5,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "фокус accent на paper (нетекст)",
+   "fg": "#a4beef",
+   "bg": "#13171e",
+   "ratio": 9.57,
+   "need": 3.0,
+   "ok": true
+  },
+  {
+   "theme": "dark",
+   "pair": "фокус accent на surface (нетекст)",
+   "fg": "#a4beef",
+   "bg": "#1c2128",
+   "ratio": 8.62,
+   "need": 3.0,
+   "ok": true
+  }
+ ],
+ "shots": [
+  {
+   "screen": "library",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/library-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "chapter",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/chapter-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "card",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/card-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nПерсона\n1711–1776\nТолько выбранный учебник\nНет в моём учебнике\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nГоды и места жизни\nгоды жизни: 1711–1776\n — так считает: распространённое мнение\nВлияния\nповлиял на: Кантесть в учебнике — так считает: Теория познания: демонстрационный учебник1\nГде читать\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 упоминания\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 упоминания\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "assistant",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/assistant-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nАссистент\nНовый диалог\nТолько выбранный учебник\nСпросить\nОстановить\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "graph",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/graph-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nГенезис: Кант\nРецепт\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлубина 3 из 3\nМельче\nГлубже\nТолько выбранный учебник\nДостраивать моделью\nНет в моём учебнике\nСохранить изображение\nЮм\n1711–1776\nКант\n1724–1804\nЛейбниц\n1646–1716\nЛокк\n1632–1704\n•\n◇\n◇\n◇ Пунктир и ромб — достроено моделью, не подтверждено источниками"
+  },
+  {
+   "screen": "settings",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/settings-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nНастройки\n\nНастройки хранятся только в этом браузере и уходят с каждым запросом.\n\nОформление\nТема\nСветлая\nТёмная\nКак в системе\nЯзык интерфейса\nRU\nEN\nОтветы и карточки\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\n\nБез генерации граф не достраивается моделью, карточки показываются без описаний модели, а ассистент показывает только то, что подтверждено источниками.\n\nИсточники\nВсе источники\nТолько выбранный учебник\nО пометках и обработке вопросов\nДанные в этом браузере\n\nНастройки, места чтения и диалоги с ассистентом хранятся только здесь.\n\nСбросить все данные"
+  },
+  {
+   "screen": "library",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/library-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "chapter",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/chapter-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "card",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/card-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nПерсона\n1711–1776\nТолько выбранный учебник\nНет в моём учебнике\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nГоды и места жизни\nгоды жизни: 1711–1776\n — так считает: распространённое мнение\nВлияния\nиспытал влияние: Локк\nповлиял на: Кантесть в учебнике — так считает: Теория познания: демонстрационный учебник1\nГде читать\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 упоминания\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 упоминания\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "assistant",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/assistant-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nАссистент\nНовый диалог\nТолько выбранный учебник\nСпросить\nОстановить\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "graph",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/graph-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nГенезис: Кант\nРецепт\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлубина 3 из 3\nМельче\nГлубже\nТолько выбранный учебник\nДостраивать моделью\nНет в моём учебнике\nСохранить изображение\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Пунктир и ромб — достроено моделью, не подтверждено источниками"
+  },
+  {
+   "screen": "settings",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/settings-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nНастройки\n\nНастройки хранятся только в этом браузере и уходят с каждым запросом.\n\nОформление\nТема\nСветлая\nТёмная\nКак в системе\nЯзык интерфейса\nRU\nEN\nОтветы и карточки\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\n\nБез генерации граф не достраивается моделью, карточки показываются без описаний модели, а ассистент показывает только то, что подтверждено источниками.\n\nИсточники\nВсе источники\nТолько выбранный учебник\nО пометках и обработке вопросов\nДанные в этом браузере\n\nНастройки, места чтения и диалоги с ассистентом хранятся только здесь.\n\nСбросить все данные"
+  },
+  {
+   "screen": "library",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/library-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "chapter",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/chapter-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "card",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/card-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nPerson\n1711–1776\nSelected textbook only\nNot in my textbook\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nLife and places\nlifespan: 1711–1776\n — according to: common opinion\nInfluences\ninfluenced by: Локк\ninfluenced: Кантin the textbook — according to: Теория познания: демонстрационный учебник1\nWhere to read\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 mentions\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 mentions\nGenesis\nConsequences\nPolemic\nContext\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "assistant",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/assistant-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nAssistant\nNew dialog\nSelected textbook only\nAsk\nStop\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "graph",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/graph-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nGenesis: Кант\nRecipe\nGenesis\nConsequences\nPolemic\nContext\nDepth 3 of 3\nShallower\nDeeper\nSelected textbook only\nExtend with the model\nNot in my textbook\nSave image\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Dashes and diamond: added by the model, not confirmed by sources"
+  },
+  {
+   "screen": "settings",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/settings-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nSettings\n\nSettings are kept only in this browser and are sent with each request.\n\nAppearance\nTheme\nLight\nDark\nSystem\nInterface language\nRU\nEN\nAnswers and cards\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\n\nWithout generation the graph is not extended by the model, cards have no model descriptions, and the assistant shows only what sources confirm.\n\nSources\nAll sources\nSelected textbook only\nAbout marks and question processing\nData in this browser\n\nSettings, reading places and assistant dialogs are kept only here.\n\nDelete all data"
+  },
+  {
+   "screen": "library",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/library-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "chapter",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/chapter-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "card",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/card-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nPerson\n1711–1776\nSelected textbook only\nNot in my textbook\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nLife and places\nlifespan: 1711–1776\n — according to: common opinion\nInfluences\ninfluenced by: Локк\ninfluenced: Кантin the textbook — according to: Теория познания: демонстрационный учебник1\nWhere to read\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 mentions\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 mentions\nGenesis\nConsequences\nPolemic\nContext\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "assistant",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/assistant-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nAssistant\nNew dialog\nSelected textbook only\nAsk\nStop\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "graph",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/graph-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nGenesis: Кант\nRecipe\nGenesis\nConsequences\nPolemic\nContext\nDepth 3 of 3\nShallower\nDeeper\nSelected textbook only\nExtend with the model\nNot in my textbook\nSave image\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Dashes and diamond: added by the model, not confirmed by sources"
+  },
+  {
+   "screen": "settings",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/settings-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "light",
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nSettings\n\nSettings are kept only in this browser and are sent with each request.\n\nAppearance\nTheme\nLight\nDark\nSystem\nInterface language\nRU\nEN\nAnswers and cards\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\n\nWithout generation the graph is not extended by the model, cards have no model descriptions, and the assistant shows only what sources confirm.\n\nSources\nAll sources\nSelected textbook only\nAbout marks and question processing\nData in this browser\n\nSettings, reading places and assistant dialogs are kept only here.\n\nDelete all data"
+  },
+  {
+   "screen": "library",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/library-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "chapter",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/chapter-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "card",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/card-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nПерсона\n1711–1776\nТолько выбранный учебник\nНет в моём учебнике\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nГоды и места жизни\nгоды жизни: 1711–1776\n — так считает: распространённое мнение\nВлияния\nиспытал влияние: Локк\nповлиял на: Кантесть в учебнике — так считает: Теория познания: демонстрационный учебник1\nГде читать\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 упоминания\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 упоминания\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "assistant",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/assistant-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nАссистент\nНовый диалог\nТолько выбранный учебник\nСпросить\nОстановить\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "graph",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/graph-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nГенезис: Кант\nРецепт\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлубина 3 из 3\nМельче\nГлубже\nТолько выбранный учебник\nДостраивать моделью\nНет в моём учебнике\nСохранить изображение\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Пунктир и ромб — достроено моделью, не подтверждено источниками"
+  },
+  {
+   "screen": "settings",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/settings-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nНастройки\n\nНастройки хранятся только в этом браузере и уходят с каждым запросом.\n\nОформление\nТема\nСветлая\nТёмная\nКак в системе\nЯзык интерфейса\nRU\nEN\nОтветы и карточки\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\n\nБез генерации граф не достраивается моделью, карточки показываются без описаний модели, а ассистент показывает только то, что подтверждено источниками.\n\nИсточники\nВсе источники\nТолько выбранный учебник\nО пометках и обработке вопросов\nДанные в этом браузере\n\nНастройки, места чтения и диалоги с ассистентом хранятся только здесь.\n\nСбросить все данные"
+  },
+  {
+   "screen": "library",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/library-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "chapter",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/chapter-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "card",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/card-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nПерсона\n1711–1776\nТолько выбранный учебник\nНет в моём учебнике\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nГоды и места жизни\nгоды жизни: 1711–1776\n — так считает: распространённое мнение\nВлияния\nиспытал влияние: Локк\nповлиял на: Кантесть в учебнике — так считает: Теория познания: демонстрационный учебник1\nГде читать\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 упоминания\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 упоминания\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "assistant",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/assistant-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nАссистент\n\nОглавление\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nАссистент\nНовый диалог\nТолько выбранный учебник\nСпросить\nОстановить\nГлава 3. Ответ Канта\n\nс. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nПредыдущая глава"
+  },
+  {
+   "screen": "graph",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/graph-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nГенезис: Кант\nРецепт\nГенезис\nПоследствия\nПолемика\nКонтекст\nГлубина 3 из 3\nМельче\nГлубже\nТолько выбранный учебник\nДостраивать моделью\nНет в моём учебнике\nСохранить изображение\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Пунктир и ромб — достроено моделью, не подтверждено источниками"
+  },
+  {
+   "screen": "settings",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/settings-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nТеория познания: демонстрационный учебник\nНастройки\nRU\nEN\nНастройки\n\nНастройки хранятся только в этом браузере и уходят с каждым запросом.\n\nОформление\nТема\nСветлая\nТёмная\nКак в системе\nЯзык интерфейса\nRU\nEN\nОтветы и карточки\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\n\nБез генерации граф не достраивается моделью, карточки показываются без описаний модели, а ассистент показывает только то, что подтверждено источниками.\n\nИсточники\nВсе источники\nТолько выбранный учебник\nО пометках и обработке вопросов\nДанные в этом браузере\n\nНастройки, места чтения и диалоги с ассистентом хранятся только здесь.\n\nСбросить все данные"
+  },
+  {
+   "screen": "library",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/library-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "chapter",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/chapter-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "card",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/card-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nPerson\n1711–1776\nSelected textbook only\nNot in my textbook\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nLife and places\nlifespan: 1711–1776\n — according to: common opinion\nInfluences\ninfluenced by: Локк\ninfluenced: Кантin the textbook — according to: Теория познания: демонстрационный учебник1\nWhere to read\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 mentions\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 mentions\nGenesis\nConsequences\nPolemic\nContext\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "assistant",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/assistant-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nAssistant\nNew dialog\nSelected textbook only\nAsk\nStop\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "graph",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/graph-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nGenesis: Кант\nRecipe\nGenesis\nConsequences\nPolemic\nContext\nDepth 3 of 3\nShallower\nDeeper\nSelected textbook only\nExtend with the model\nNot in my textbook\nSave image\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Dashes and diamond: added by the model, not confirmed by sources"
+  },
+  {
+   "screen": "settings",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/settings-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nSettings\n\nSettings are kept only in this browser and are sent with each request.\n\nAppearance\nTheme\nLight\nDark\nSystem\nInterface language\nRU\nEN\nAnswers and cards\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\n\nWithout generation the graph is not extended by the model, cards have no model descriptions, and the assistant shows only what sources confirm.\n\nSources\nAll sources\nSelected textbook only\nAbout marks and question processing\nData in this browser\n\nSettings, reading places and assistant dialogs are kept only here.\n\nDelete all data"
+  },
+  {
+   "screen": "library",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/library-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/library-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "chapter",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/chapter-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/chapter-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "card",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/card-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/card-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nЮ\nЮм\nPerson\n1711–1776\nSelected textbook only\nNot in my textbook\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nLife and places\nlifespan: 1711–1776\n — according to: common opinion\nInfluences\ninfluenced by: Локк\ninfluenced: Кантin the textbook — according to: Теория познания: демонстрационный учебник1\nWhere to read\nГлава 2. Юм и проблема индукции\nТеория познания: демонстрационный учебник, 3 mentions\nГлава 3. Ответ Канта\nТеория познания: демонстрационный учебник, 2 mentions\nGenesis\nConsequences\nPolemic\nContext\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "assistant",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/assistant-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": "\"Literata Variable\", Literata, \"PT Serif\", Georgia, serif",
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/assistant-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nAssistant\n\nContents\n\nГлава 1. Опыт и врождённые идеи\nГлава 2. Юм и проблема индукции\nПривычка и ожидание\nГлава 3. Ответ Канта\nAssistant\nNew dialog\nSelected textbook only\nAsk\nStop\nГлава 3. Ответ Канта\n\np. 45Кант признавал, что именно Юм пробудил его от догматического сна.\n\nОтвет Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта.\n\nPrevious chapter"
+  },
+  {
+   "screen": "graph",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/graph-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "SELECT.pg-input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/graph-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nGenesis: Кант\nRecipe\nGenesis\nConsequences\nPolemic\nContext\nDepth 3 of 3\nShallower\nDeeper\nSelected textbook only\nExtend with the model\nNot in my textbook\nSave image\nЛокк\n1632–1704\nЛейбниц\n1646–1716\nЮм\n1711–1776\nКант\n1724–1804\nНовые опыты о человеческом разумении\n1765\n•\n◇\n◇\n◇\n◇ Dashes and diamond: added by the model, not confirmed by sources"
+  },
+  {
+   "screen": "settings",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/settings-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": "dark",
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4,
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.seg-radio__input appearance=auto",
+     "INPUT.seg-radio__input appearance=auto"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/settings-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nТеория познания: демонстрационный учебник\nSettings\nRU\nEN\nSettings\n\nSettings are kept only in this browser and are sent with each request.\n\nAppearance\nTheme\nLight\nDark\nSystem\nInterface language\nRU\nEN\nAnswers and cards\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\n\nWithout generation the graph is not extended by the model, cards have no model descriptions, and the assistant shows only what sources confirm.\n\nSources\nAll sources\nSelected textbook only\nAbout marks and question processing\nData in this browser\n\nSettings, reading places and assistant dialogs are kept only here.\n\nDelete all data"
+  },
+  {
+   "screen": "notice",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/notice-light-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": null,
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-light-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nПрежде чем начать\n\nPhiloGraph — учебник по истории философии: главы источников, карточки понятий и людей, граф происхождения идей и ассистент, который отвечает со ссылками на абзацы.\n\nВсё, что модель написала без опоры на источники, помечено значком и рамкой: пример сгенерированной строки. Такие строки — подсказка модели, а не установленный факт.\n\nГенерация без опоры на источники включена. Её можно выключить здесь или в настройках.\n\nВопросы ассистенту, описания карточек и достройку графа обрабатывает внешний провайдер языковых моделей по своим правилам. Не пишите в вопросах личные данные.\n\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\nПонятно\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "notice",
+   "theme": "light",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/notice-light-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": null,
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 500",
+     "Onest 600"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-light-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nПрежде чем начать\n\nPhiloGraph — учебник по истории философии: главы источников, карточки понятий и людей, граф происхождения идей и ассистент, который отвечает со ссылками на абзацы.\n\nВсё, что модель написала без опоры на источники, помечено значком и рамкой: пример сгенерированной строки. Такие строки — подсказка модели, а не установленный факт.\n\nГенерация без опоры на источники включена. Её можно выключить здесь или в настройках.\n\nВопросы ассистенту, описания карточек и достройку графа обрабатывает внешний провайдер языковых моделей по своим правилам. Не пишите в вопросах личные данные.\n\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\nПонятно\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "notice",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1440,
+   "shot": "round-2/notice-dark-ru-1440.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": null,
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-dark-ru-1440.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nПрежде чем начать\n\nPhiloGraph — учебник по истории философии: главы источников, карточки понятий и людей, граф происхождения идей и ассистент, который отвечает со ссылками на абзацы.\n\nВсё, что модель написала без опоры на источники, помечено значком и рамкой: пример сгенерированной строки. Такие строки — подсказка модели, а не установленный факт.\n\nГенерация без опоры на источники включена. Её можно выключить здесь или в настройках.\n\nВопросы ассистенту, описания карточек и достройку графа обрабатывает внешний провайдер языковых моделей по своим правилам. Не пишите в вопросах личные данные.\n\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\nПонятно\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "notice",
+   "theme": "dark",
+   "lang": "ru",
+   "width": 1024,
+   "shot": "round-2/notice-dark-ru-1024.png",
+   "checks": {
+    "lang": "ru",
+    "dataTheme": null,
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 500",
+     "Onest 500",
+     "Onest 600"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-dark-ru-1024.txt",
+   "text": "PhiloGraph\nБиблиотека\nНастройки\nRU\nEN\nПрежде чем начать\n\nPhiloGraph — учебник по истории философии: главы источников, карточки понятий и людей, граф происхождения идей и ассистент, который отвечает со ссылками на абзацы.\n\nВсё, что модель написала без опоры на источники, помечено значком и рамкой: пример сгенерированной строки. Такие строки — подсказка модели, а не установленный факт.\n\nГенерация без опоры на источники включена. Её можно выключить здесь или в настройках.\n\nВопросы ассистенту, описания карточек и достройку графа обрабатывает внешний провайдер языковых моделей по своим правилам. Не пишите в вопросах личные данные.\n\nГенерация без опоры на источники\nМодель дописывает описания и связи; такие места помечены.\nТолько по источникам\nАссистент показывает лишь то, что подтверждают абзацы.\nПонятно\nБиблиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\nУчебник\nПервоисточник\nСправочное издание\nЯзык\nанглийский\nрусский\nEmpiricism: a demonstration reader\nАвтор\nPhiloGraph project\nГод\n2026\nЯзык\nанглийский\nВид\nПервоисточник\nЛицензия\nCC BY 4.0\nЧитать\nТеория познания: демонстрационный учебник\nПо умолчанию\nАвтор\nПроект PhiloGraph\nГод\n2026\nЯзык\nрусский\nВид\nУчебник\nЛицензия\nCC BY 4.0\nЧитать"
+  },
+  {
+   "screen": "notice",
+   "theme": "light",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/notice-light-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": null,
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-light-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nBefore you start\n\nPhiloGraph is a textbook on the history of philosophy: source chapters, cards for concepts and people, a graph of how ideas originated, and an assistant that answers with links to paragraphs.\n\nEverything the model wrote without support from sources is marked with an icon and a frame: an example of a generated line. Such lines are the model’s suggestion, not an established fact.\n\nGeneration without sources is on. You can turn it off here or in settings.\n\nQuestions to the assistant, card descriptions and graph extension are processed by an external language model provider under its own rules. Do not include personal data in questions.\n\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\nGot it\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "notice",
+   "theme": "light",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/notice-light-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": null,
+    "bodyBg": "rgb(239, 241, 236)",
+    "bodyColor": "rgb(26, 34, 47)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-light-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nBefore you start\n\nPhiloGraph is a textbook on the history of philosophy: source chapters, cards for concepts and people, a graph of how ideas originated, and an assistant that answers with links to paragraphs.\n\nEverything the model wrote without support from sources is marked with an icon and a frame: an example of a generated line. Such lines are the model’s suggestion, not an established fact.\n\nGeneration without sources is on. You can turn it off here or in settings.\n\nQuestions to the assistant, card descriptions and graph extension are processed by an external language model provider under its own rules. Do not include personal data in questions.\n\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\nGot it\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "notice",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1440,
+   "shot": "round-2/notice-dark-en-1440.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": null,
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 400",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-dark-en-1440.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nBefore you start\n\nPhiloGraph is a textbook on the history of philosophy: source chapters, cards for concepts and people, a graph of how ideas originated, and an assistant that answers with links to paragraphs.\n\nEverything the model wrote without support from sources is marked with an icon and a frame: an example of a generated line. Such lines are the model’s suggestion, not an established fact.\n\nGeneration without sources is on. You can turn it off here or in settings.\n\nQuestions to the assistant, card descriptions and graph extension are processed by an external language model provider under its own rules. Do not include personal data in questions.\n\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\nGot it\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  },
+  {
+   "screen": "notice",
+   "theme": "dark",
+   "lang": "en",
+   "width": 1024,
+   "shot": "round-2/notice-dark-en-1024.png",
+   "checks": {
+    "lang": "en",
+    "dataTheme": null,
+    "bodyBg": "rgb(19, 23, 30)",
+    "bodyColor": "rgb(231, 230, 223)",
+    "overflowX": 0,
+    "overlaps": [],
+    "linkGaps": [
+     4
+    ],
+    "clipped": [],
+    "native": [
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.pg-switch__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none",
+     "INPUT.filter__input appearance=none"
+    ],
+    "fontsLoaded": [
+     "Onest 400",
+     "Onest 500",
+     "Onest 600",
+     "Literata Variable 200 900"
+    ],
+    "fontFamilies": {
+     "reading": null,
+     "button": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif",
+     "topbarLink": "Onest, \"Segoe UI\", system-ui, -apple-system, Roboto, sans-serif"
+    },
+    "hosts": [
+     "127.0.0.1:8099"
+    ]
+   },
+   "text_file": "text/notice-dark-en-1024.txt",
+   "text": "PhiloGraph\nLibrary\nSettings\nRU\nEN\nBefore you start\n\nPhiloGraph is a textbook on the history of philosophy: source chapters, cards for concepts and people, a graph of how ideas originated, and an assistant that answers with links to paragraphs.\n\nEverything the model wrote without support from sources is marked with an icon and a frame: an example of a generated line. Such lines are the model’s suggestion, not an established fact.\n\nGeneration without sources is on. You can turn it off here or in settings.\n\nQuestions to the assistant, card descriptions and graph extension are processed by an external language model provider under its own rules. Do not include personal data in questions.\n\nGeneration without sources\nThe model adds descriptions and links; such places are marked.\nFrom sources only\nThe assistant shows only what paragraphs confirm.\nGot it\nLibrary\n\nTextbooks, primary sources and reference works. Choose a source to read its chapters.\n\nStart reading\nKind\nTextbook\nPrimary source\nReference work\nLanguage\nEnglish\nRussian\nEmpiricism: a demonstration reader\nAuthor\nPhiloGraph project\nYear\n2026\nLanguage\nEnglish\nKind\nPrimary source\nLicense\nCC BY 4.0\nRead\nТеория познания: демонстрационный учебник\nDefault\nAuthor\nПроект PhiloGraph\nYear\n2026\nLanguage\nRussian\nKind\nTextbook\nLicense\nCC BY 4.0\nRead"
+  }
+ ],
+ "errors": [],
+ "focus": {
+  "library": {
+   "tag": "A",
+   "cls": "topbar__link",
+   "text": "Библиотека",
+   "shadow": "rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px 0px 4px",
+   "outline": "none",
+   "focusVisible": true
+  }
+ },
+ "system_theme": {
+  "light": {
+   "bodyBg": "rgb(239, 241, 236)",
+   "dataTheme": null
+  },
+  "dark": {
+   "bodyBg": "rgb(19, 23, 30)",
+   "dataTheme": null
+  }
+ },
+ "hosts": {
+  "light-ru-1440": [
+   "127.0.0.1:8099"
+  ],
+  "light-ru-1024": [
+   "127.0.0.1:8099"
+  ],
+  "light-en-1440": [
+   "127.0.0.1:8099"
+  ],
+  "light-en-1024": [
+   "127.0.0.1:8099"
+  ],
+  "dark-ru-1440": [
+   "127.0.0.1:8099"
+  ],
+  "dark-ru-1024": [
+   "127.0.0.1:8099"
+  ],
+  "dark-en-1440": [
+   "127.0.0.1:8099"
+  ],
+  "dark-en-1024": [
+   "127.0.0.1:8099"
+  ]
+ },
+ "console_errors": {
+  "light-ru-1440": [],
+  "light-ru-1024": [],
+  "light-en-1440": [],
+  "light-en-1024": [],
+  "dark-ru-1440": [],
+  "dark-ru-1024": [],
+  "dark-en-1440": [],
+  "dark-en-1024": []
+ }
+}

@@ -1,0 +1,191 @@
+{
+ "D3-ru-RU": {
+  "columns": "560px 560px 0px",
+  "gridRight": 1288,
+  "firstRowRight": 1288,
+  "cards": 2,
+  "emptyRight": 0
+ },
+ "D3-en-US": {
+  "columns": "560px 560px 0px",
+  "gridRight": 1288,
+  "firstRowRight": 1288,
+  "cards": 2,
+  "emptyRight": 0
+ },
+ "D4-ru-RU-1440": {
+  "position": "static",
+  "boxShadow": "none",
+  "background": "rgb(219, 231, 249)",
+  "top": 80,
+  "height": 354,
+  "belowTopbar": true,
+  "overlapsCards": 0,
+  "dismissButton": true
+ },
+ "D4-ru-RU-1024": {
+  "position": "static",
+  "boxShadow": "none",
+  "background": "rgb(219, 231, 249)",
+  "top": 80,
+  "height": 354,
+  "belowTopbar": true,
+  "overlapsCards": 0,
+  "dismissButton": true
+ },
+ "D4-en-US-1440": {
+  "position": "static",
+  "boxShadow": "none",
+  "background": "rgb(219, 231, 249)",
+  "top": 80,
+  "height": 354,
+  "belowTopbar": true,
+  "overlapsCards": 0,
+  "dismissButton": true
+ },
+ "D4-en-US-1024": {
+  "position": "static",
+  "boxShadow": "none",
+  "background": "rgb(219, 231, 249)",
+  "top": 80,
+  "height": 354,
+  "belowTopbar": true,
+  "overlapsCards": 0,
+  "dismissButton": true
+ },
+ "D4-assistant-light": {
+  "notice": [
+   32,
+   80,
+   928,
+   354
+  ],
+  "assistant": [
+   992,
+   56,
+   448,
+   844
+  ],
+  "noticeOverlapsAssistant": false,
+  "noticeOverlapsChapter": false,
+  "sendDisabled": false
+ },
+ "D4-assistant-dark": {
+  "notice": [
+   32,
+   80,
+   928,
+   354
+  ],
+  "assistant": [
+   992,
+   56,
+   448,
+   844
+  ],
+  "noticeOverlapsAssistant": false,
+  "noticeOverlapsChapter": false,
+  "sendDisabled": false
+ },
+ "D5-ru": [
+  "RU",
+  "EN",
+  "RU",
+  "EN"
+ ],
+ "D6-graph": {
+  "with_spaces": [],
+  "no_spaces": [
+   "1632–1704",
+   "1646–1716",
+   "1711–1776",
+   "1724–1804"
+  ]
+ },
+ "D6-card-ru": {
+  "with_spaces": [],
+  "no_spaces": [
+   "1711–1776",
+   "1711–1776"
+  ]
+ },
+ "D1-card-en": {
+  "russian_phrases": [],
+  "cyrillic_lines": [
+   "Теория познания: демонстрационный учебник",
+   "Глава 1. Опыт и врождённые идеи",
+   "Глава 2. Юм и проблема индукции",
+   "Привычка и ожидание",
+   "Глава 3. Ответ Канта",
+   "Ю",
+   "Юм",
+   "Философ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.",
+   "influenced by: Локк",
+   "influenced: Кантin the textbook — according to: Теория познания: демонстрационный учебник1",
+   "Глава 2. Юм и проблема индукции",
+   "Теория познания: демонстрационный учебник, 3 mentions"
+  ],
+  "З2_config_text": false
+ },
+ "D2-graph-en": {
+  "cyrillic_lines": [
+   "Genesis: Кант",
+   "Локк",
+   "Лейбниц",
+   "Юм",
+   "Кант",
+   "Новые опыты о человеческом разумении"
+  ],
+  "has_genesis_en": true
+ },
+ "З2-card-ru": {
+  "config_text": false
+ },
+ "assistant-en": {
+  "cyrillic_lines": []
+ },
+ "contrast-notice-light": {
+  "body": [
+   "rgb(26, 34, 47)",
+   12.8
+  ],
+  "title": [
+   "rgb(26, 34, 47)",
+   12.8
+  ],
+  "button": [
+   "rgb(72, 80, 93)",
+   6.51
+  ],
+  "hint": [
+   "rgb(26, 34, 47)",
+   12.8
+  ]
+ },
+ "contrast-notice-dark": {
+  "body": [
+   "rgb(231, 230, 223)",
+   10.57
+  ],
+  "title": [
+   "rgb(231, 230, 223)",
+   10.57
+  ],
+  "button": [
+   "rgb(191, 190, 181)",
+   7.09
+  ],
+  "hint": [
+   "rgb(231, 230, 223)",
+   10.57
+  ]
+ },
+ "hosts": [
+  "127.0.0.1:8099"
+ ],
+ "console_errors": [],
+ "З1": {
+  "googleapis_import": false,
+  "first_line": "/* PhiloGraph: компоненты. Все цвета, отступы, радиусы и длительности берутся из"
+ }
+}

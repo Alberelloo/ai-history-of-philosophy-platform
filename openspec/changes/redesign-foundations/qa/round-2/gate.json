@@ -1,0 +1,30 @@
+{
+ "ru-light": {
+  "notice_class": "pg-notice first-run attention",
+  "assistant_request_sent": 0,
+  "overlapsAssistant": false,
+  "bg": "rgb(219, 231, 249)",
+  "panel_text_head": "Ассистент\nНовый диалог\nТолько выбранный учебник\nПрочитайте уведомление о том, как обрабатываются вопросы, и закройте его.\nСпросить\nОстановить"
+ },
+ "ru-dark": {
+  "notice_class": "pg-notice first-run attention",
+  "assistant_request_sent": 0,
+  "overlapsAssistant": false,
+  "bg": "rgb(37, 48, 69)",
+  "panel_text_head": "Ассистент\nНовый диалог\nТолько выбранный учебник\nПрочитайте уведомление о том, как обрабатываются вопросы, и закройте его.\nСпросить\nОстановить"
+ },
+ "en-light": {
+  "notice_class": "pg-notice first-run attention",
+  "assistant_request_sent": 0,
+  "overlapsAssistant": false,
+  "bg": "rgb(219, 231, 249)",
+  "panel_text_head": "Assistant\nNew dialog\nSelected textbook only\nRead the notice about how questions are processed and close it.\nAsk\nStop"
+ },
+ "en-dark": {
+  "notice_class": "pg-notice first-run attention",
+  "assistant_request_sent": 0,
+  "overlapsAssistant": false,
+  "bg": "rgb(37, 48, 69)",
+  "panel_text_head": "Assistant\nNew dialog\nSelected textbook only\nRead the notice about how questions are processed and close it.\nAsk\nStop"
+ }
+}
