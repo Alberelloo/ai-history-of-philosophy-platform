@@ -108,6 +108,7 @@ def test_catalog_keys_checked_by_typescript(tmp_path):
     config.write_text(
         '{"compilerOptions": {"strict": true, "noEmit": true, "target": "ES2022",'
         ' "module": "ESNext", "moduleResolution": "Bundler", "skipLibCheck": true,'
+        ' "resolveJsonModule": true,'
         ' "types": []}, "include": ["i18n"]}',
         encoding="utf-8",
     )
@@ -124,6 +125,40 @@ def test_catalog_keys_checked_by_typescript(tmp_path):
     en.write_text(text.replace('    library: "Library",\n', "", 1), encoding="utf-8")
     broken = check()
     assert broken.returncode != 0 and "library" in broken.stdout, broken.stdout
+
+
+@req(VD, "Язык интерфейса")
+def test_ontology_names_in_both_catalogs():
+    """Названия разделов карточки, связей и рецептов есть на обоих языках и совпадают с реестром."""
+    import json
+
+    from philograph.knowledge import registry_data
+    from philograph.knowledge.cards import MISCONCEPTIONS_TITLE, SECTIONS
+
+    ru = json.loads((WEB / "src" / "i18n" / "ontology.ru.json").read_text(encoding="utf-8"))
+    en = json.loads((WEB / "src" / "i18n" / "ontology.en.json").read_text(encoding="utf-8"))
+    sections = {code: title for items in SECTIONS.values() for code, title, *_ in items}
+    sections["misconceptions"] = MISCONCEPTIONS_TITLE
+    relations = {r["code"]: r for r in registry_data.RELATIONS}
+    recipes = {r[0]: r[1] for r in registry_data.RECIPES}
+
+    assert ru["sections"] == sections
+    assert ru["recipes"] == recipes
+    assert set(ru["relations"]) == set(relations)
+    for code, spec in relations.items():
+        expected = {"title": spec["title"]}
+        if spec["inverse_title"]:
+            expected["inverse"] = spec["inverse_title"]
+        assert ru["relations"][code] == expected, code
+
+    cyrillic = re.compile("[а-яё]", re.IGNORECASE)
+    for group in ("sections", "recipes", "relations"):
+        assert set(en[group]) == set(ru[group]), group
+    texts = [*en["sections"].values(), *en["recipes"].values()]
+    for code, names in en["relations"].items():
+        assert set(names) == set(ru["relations"][code]), code  # inverse там же, где в реестре
+        texts += names.values()
+    assert all(text.strip() and not cyrillic.search(text) for text in texts), texts
 
 
 @req(VD, "Визуальная проверка")
