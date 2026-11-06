@@ -57,8 +57,8 @@ export function App() {
           <div>{t.app.storageUnavailable}</div>
         </div>
       )}
-      <Page parts={parts} search={search} hash={hash} />
       <FirstRunNotice />
+      <Page parts={parts} search={search} hash={hash} />
     </>
   );
 }

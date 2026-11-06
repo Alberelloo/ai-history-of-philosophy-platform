@@ -1138,43 +1138,45 @@ blockquote.block {
   color: var(--ink-2);
 }
 
-/* ---------- Уведомление при первом входе ---------- */
+/* ---------- Уведомление при первом входе: сообщение в потоке под верхней панелью ---------- */
 .first-run {
-  position: fixed;
-  left: var(--space-6); /* справа открывается панель ассистента */
-  bottom: var(--space-6);
-  z-index: var(--z-popover);
-  display: grid;
-  gap: var(--space-4);
-  width: min(30rem, calc(100vw - 2 * var(--space-6)));
-  max-height: calc(100vh - var(--topbar) - 2 * var(--space-6));
-  overflow: auto;
-  padding: var(--space-5);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: var(--shadow-pop);
-  font: var(--type-ui-body-sm);
-  animation: pg-pop-in var(--dur-base) var(--ease-out) both;
+  width: calc(100% - 2 * var(--space-8));
+  max-width: calc(1200px - 2 * var(--space-8));
+  margin: var(--space-6) auto 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid transparent;
+}
+
+/* Пока открыта боковая панель, уведомление не заходит под неё: кнопка «Понятно» доступна. */
+:root[data-panel="open"] .first-run {
+  width: auto;
+  max-width: none;
+  margin-left: var(--space-8);
+  margin-right: calc(var(--panel) + var(--space-8));
+}
+
+/* На подложке accent-soft подсказки — ink-2: ink-3 читается только на paper и surface. */
+.first-run .pg-switch__hint {
+  color: var(--ink-2);
 }
 
 .first-run:focus-visible {
-  box-shadow: var(--shadow-pop), var(--focus-ring);
+  box-shadow: var(--focus-ring);
 }
 
 .first-run.attention {
   border-color: var(--accent);
-  box-shadow: var(--shadow-pop), 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.first-run__body {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 72ch;
 }
 
 .first-run__title {
-  font: var(--type-ui-title);
-  letter-spacing: var(--type-ui-title-tracking);
-}
-
-.first-run__actions {
-  display: flex;
-  justify-content: flex-end;
+  font: var(--type-ui-heading);
 }
 
 .notice-text {
@@ -1315,8 +1317,7 @@ blockquote.block {
 @media (prefers-reduced-motion: reduce) {
   .assistant,
   .card-popup,
-  .note-popup,
-  .first-run {
+  .note-popup {
     animation: pg-fade var(--dur-quick) linear both !important;
   }
 

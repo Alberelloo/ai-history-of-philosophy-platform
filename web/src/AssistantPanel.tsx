@@ -104,6 +104,13 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     paragraphs.current = selectionParagraphs;
   }, [selection, selectionParagraphs]);
   useEffect(() => storage.saveDialog(turns), [turns]);
+  // Открытая панель: сообщения в потоке страницы (уведомление) сужаются и не уходят под неё.
+  useEffect(() => {
+    document.documentElement.dataset.panel = "open";
+    return () => {
+      delete document.documentElement.dataset.panel;
+    };
+  }, []);
 
   const update = (index: number, change: (t: Turn) => Turn) =>
     setTurns((all) => all.map((turn, i) => (i === index ? change(turn) : turn)));

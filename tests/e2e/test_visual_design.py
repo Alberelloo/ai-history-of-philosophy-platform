@@ -450,8 +450,43 @@ def test_first_run_notice_snapshot(browser, site, ids):
     context, page = open_context(browser, accepted=False)
     try:
         library(page, site, ids)
-        page.get_by_role("dialog", name="О пометках и обработке вопросов").wait_for()
+        page.get_by_role("region", name="О пометках и обработке вопросов").wait_for()
         check_screen(page, "light")
         visual.snap(page, "notice-light-1280")
+    finally:
+        context.close()
+
+
+@req(VD, "Раскладка без наложений")
+@pytest.mark.parametrize("width", [1024, 1280])
+def test_first_run_notice_in_flow(browser, site, ids, width):
+    """Уведомление при первом входе стоит в потоке страницы и ничего не закрывает."""
+    theme = "dark" if width == 1024 else "light"
+    context, page = open_context(browser, theme=theme, width=width, accepted=False)
+    try:
+        for open_screen in (library, chapter):
+            open_screen(page, site, ids)
+            notice = page.get_by_role("region", name="О пометках и обработке вопросов")
+            notice.wait_for()
+            visual.settle(page)
+            visual.assert_no_overlap(page, [".topbar", ".first-run", "main, .reader"])
+            visual.assert_no_horizontal_scroll(page)
+            if open_screen is library and width == 1024:
+                check_screen(page, theme)
+                visual.snap(page, "notice-dark-1024")
+            # В потоке, а не закреплено: при прокрутке уходит вместе со страницей.
+            page.set_viewport_size({"width": width, "height": 420})
+            before = page.evaluate(
+                "document.querySelector('.first-run').getBoundingClientRect().top"
+            )
+            page.evaluate("window.scrollTo(0, 200)")
+            page.wait_for_function("window.scrollY > 0")
+            scrolled = page.evaluate("window.scrollY")
+            after = page.evaluate(
+                "document.querySelector('.first-run').getBoundingClientRect().top"
+            )
+            assert after == pytest.approx(before - scrolled, abs=1), (before, scrolled, after)
+            page.set_viewport_size({"width": width, "height": 860})
+            page.evaluate("window.scrollTo(0, 0)")
     finally:
         context.close()

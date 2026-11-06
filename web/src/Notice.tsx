@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useT } from "./i18n";
 import { setScope, useScope } from "./scope";
 import { storage, useStored } from "./storage";
-import { Generated, Switch } from "./ui";
+import { Generated, Icon, Switch } from "./ui";
 
 // Уведомление при первом входе: как помечено сгенерированное и кто обрабатывает вопросы.
 // Версия меняется при существенном изменении текста (например, смене провайдера моделей) —
@@ -65,30 +65,40 @@ export function FirstRunNotice() {
   useEffect(() => {
     const show = () => {
       setAttention(true);
-      box.current?.focus();
+      box.current?.focus({ preventScroll: true });
+      box.current?.scrollIntoView({ block: "nearest" });
     };
     window.addEventListener(ATTENTION, show);
     return () => window.removeEventListener(ATTENTION, show);
   }, []);
 
+  const accept = () => {
+    // Сообщение стоит в потоке над страницей: после закрытия текст не должен прыгнуть.
+    const height = box.current?.offsetHeight ?? 0;
+    const scrolled = window.scrollY > 0;
+    storage.acceptNotice(NOTICE_VERSION);
+    if (scrolled && height) window.scrollBy(0, -height);
+  };
+
   if (accepted) return null;
-  // Не модальное: читать можно сразу, а вопрос ассистенту уйдёт только после закрытия.
+  // Сообщение в потоке страницы (Notice): не всплывает и не закрывает контент. Читать можно
+  // сразу, а вопрос ассистенту уйдёт только после «Понятно».
   return (
-    <aside
+    <section
       ref={box}
       tabIndex={-1}
-      className={attention ? "first-run attention" : "first-run"}
-      role="dialog"
+      className={attention ? "pg-notice first-run attention" : "pg-notice first-run"}
       aria-label={t.notice.label}
     >
-      <h2 className="first-run__title">{t.notice.title}</h2>
-      <NoticeText />
-      <GenerationSettings />
-      <div className="first-run__actions">
-        <button className="pg-btn pg-btn--primary" onClick={() => storage.acceptNotice(NOTICE_VERSION)}>
-          {t.notice.accept}
-        </button>
+      <Icon name="info" />
+      <div className="first-run__body">
+        <h2 className="first-run__title">{t.notice.title}</h2>
+        <NoticeText />
+        <GenerationSettings />
       </div>
-    </aside>
+      <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={accept}>
+        {t.notice.accept}
+      </button>
+    </section>
   );
 }
