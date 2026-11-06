@@ -19,7 +19,7 @@
 | 5.3 Заглушки необработанных частей | сделан: extract — blank_page и missing, parse — блоки unrendered с пояснением, Wikisource v3 пишет красные ссылки с missing, CatalogFetch отдаёт заглушку, схема каталога; оформление unrendered в клиенте; PIPELINE_VERSION 3, STEP_VERSIONS 3; тесты tests/library/test_unrendered_parts.py, tests/library/catalog/test_missing_subpages.py |
 | 6.1 Прослеживаемость RENAMED/REMOVED | сделан: check_traceability понимает RENAMED (FROM) и REMOVED; тест tests/platform/test_runtime.py::test_traceability_follows_renamed_and_removed |
 | 6.2 | сделан: helpers sidenav/via_sidebar и ключ v3; test_settings (разделы и оглавление, перенос v2); test_site (открытые книги); test_visual_design (панель на каждом экране, клавиатура и Esc, закрепление, 1024/1280/1440/1920, тема по кругу, разделы в разработке); tests/web (фильтры, ширина поиска, регресс устаревшей главы, заглушка в тексте); tests/library (сервер, PDF, Wikisource). Прослеживаемость 315 из 315 |
-| 6.3 Визуальные эталоны | не начат |
+| 6.3 Визуальные эталоны | сделан: все 22 снимка просмотрены и сверены с layout.md, Sidebar.md, FilterMenu.md, затем visual_check.py --update; проверка без --update — 35 passed; эталоны компонентов docs/design/reference/Sidebar-{light,dark}.png, FilterMenu-{light,dark}.png |
 | 6.4 Итоговый прогон | не начат |
 
 ## Решения
@@ -30,11 +30,11 @@
 
 ## Сейчас
 
-Пункт 6.2 закрыт. Все тесты, кроме сравнения снимков, зелёные (tests/web, tests/e2e, tests/library). Язык и тема в панели — одни и те же кнопки в свёрнутом и раскрытом виде (Sidebar.md, design.md); фокус раскрывает панель только с клавиатуры.
+Пункт 6.3 закрыт: эталоны снимков обновлены после просмотра.
 
 ## Следующий шаг
 
-6.3 — посмотреть снимки, обновить эталоны и эталонные снимки компонентов.
+6.4 — итоговый прогон.
 
 ## Известные проблемы
 
