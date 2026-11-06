@@ -243,7 +243,7 @@ class Wikisource:
         prefix = page.replace(" ", "_") + "/"
         subpages: list[str] = []
         for href in re.findall(rb'href="\./([^"#?]+)', body):
-            title = unquote(href.decode("utf-8"))
+            title = unquote(href.decode("utf-8")).rstrip("/")
             if title.startswith(prefix) and title not in subpages:
                 subpages.append(title)
         result = [{"name": page, "url": main, "clean": "wikisource", "api": True}]

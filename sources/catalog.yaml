@@ -3,4 +3,1556 @@
 # harvested пишет адаптер (python -m philograph.library.catalog harvest),
 # override и review — человек.
 version: 1
-entries: []
+entries:
+- id: plato-theaetetus-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/1726
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:53+00:00'
+    adapter_version: 1
+    metadata:
+      title: Theaetetus
+      authors:
+      - name: Plato
+        death_year: -348
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: Benjamin Jowett
+        death_year: 1893
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg1726.epub
+      url: https://www.gutenberg.org/ebooks/1726.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: plato-meno-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/1643
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:53+00:00'
+    adapter_version: 1
+    metadata:
+      title: Meno
+      authors:
+      - name: Plato
+        death_year: -348
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: Benjamin Jowett
+        death_year: 1893
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg1643.epub
+      url: https://www.gutenberg.org/ebooks/1643.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: plato-republic-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/1497
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:54+00:00'
+    adapter_version: 1
+    metadata:
+      title: The Republic
+      authors:
+      - name: Plato
+        death_year: -348
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: Benjamin Jowett
+        death_year: 1893
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg1497.epub
+      url: https://www.gutenberg.org/ebooks/1497.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: locke-essay-concerning-humane-understanding-volume
+  landing_url: https://www.gutenberg.org/ebooks/10615
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:55+00:00'
+    adapter_version: 1
+    metadata:
+      title: An Essay Concerning Humane Understanding, Volume 1 MDCXC, Based on the 2nd Edition, Books
+        1 and 2
+      authors:
+      - name: John Locke
+        death_year: 1704
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg10615.epub
+      url: https://www.gutenberg.org/ebooks/10615.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override:
+    metadata:
+      year: 1690
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; John Locke ум. 1704'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: locke-essay-concerning-humane-understanding-volume-2
+  landing_url: https://www.gutenberg.org/ebooks/10616
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:56+00:00'
+    adapter_version: 1
+    metadata:
+      title: An Essay Concerning Humane Understanding, Volume 2 MDCXC, Based on the 2nd Edition, Books
+        3 and 4
+      authors:
+      - name: John Locke
+        death_year: 1704
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg10616.epub
+      url: https://www.gutenberg.org/ebooks/10616.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override:
+    metadata:
+      year: 1690
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; John Locke ум. 1704'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: berkeley-treatise-concerning-principles-human-knowledge
+  landing_url: https://www.gutenberg.org/ebooks/4723
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:58+00:00'
+    adapter_version: 1
+    metadata:
+      title: A Treatise Concerning the Principles of Human Knowledge
+      authors:
+      - name: George Berkeley
+        death_year: 1753
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg4723.epub
+      url: https://www.gutenberg.org/ebooks/4723.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; George Berkeley ум. 1753'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: berkeley-three-dialogues-between-hylas-philonous
+  landing_url: https://www.gutenberg.org/ebooks/4724
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:01:59+00:00'
+    adapter_version: 1
+    metadata:
+      title: Three Dialogues Between Hylas and Philonous in Opposition to Sceptics and Atheists
+      authors:
+      - name: George Berkeley
+        death_year: 1753
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg4724.epub
+      url: https://www.gutenberg.org/ebooks/4724.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; George Berkeley ум. 1753'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: hume-enquiry-concerning-human-understanding-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/9662
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:00+00:00'
+    adapter_version: 1
+    metadata:
+      title: An Enquiry Concerning Human Understanding
+      authors:
+      - name: David Hume
+        death_year: 1776
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg9662.epub
+      url: https://www.gutenberg.org/ebooks/9662.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; David Hume ум. 1776'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: hume-treatise-human-nature-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/4705
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:00+00:00'
+    adapter_version: 1
+    metadata:
+      title: A Treatise of Human Nature
+      authors:
+      - name: David Hume
+        death_year: 1776
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg4705.epub
+      url: https://www.gutenberg.org/ebooks/4705.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; David Hume ум. 1776'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: kant-critique-pure-reason-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/4280
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:02+00:00'
+    adapter_version: 1
+    metadata:
+      title: The Critique of Pure Reason
+      authors:
+      - name: Immanuel Kant
+        death_year: 1804
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: J. M. D. Meiklejohn
+        death_year: 1902
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg4280.epub
+      url: https://www.gutenberg.org/ebooks/4280.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Immanuel Kant ум. 1804; J. M. D. Meiklejohn ум. 1902'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: kant-s-prolegomena-to-any-future
+  landing_url: https://www.gutenberg.org/ebooks/52821
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:02+00:00'
+    adapter_version: 1
+    metadata:
+      title: Kant's Prolegomena to Any Future Metaphysics
+      authors:
+      - name: Immanuel Kant
+        death_year: 1804
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg52821.epub
+      url: https://www.gutenberg.org/ebooks/52821.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override:
+    metadata:
+      year: 1783
+      translator:
+        name: Paul Carus
+        death_year: 1919
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Immanuel Kant ум. 1804'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: descartes-discourse-method-rightly-conducting-one
+  landing_url: https://www.gutenberg.org/ebooks/59
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:04+00:00'
+    adapter_version: 1
+    metadata:
+      title: Discourse on the Method of Rightly Conducting One's Reason and of Seeking Truth in the Sciences
+      authors:
+      - name: René Descartes
+        death_year: 1650
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: John Veitch
+        death_year: 1894
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg59.epub
+      url: https://www.gutenberg.org/ebooks/59.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; René Descartes ум. 1650; John Veitch ум. 1894'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: descartes-six-metaphysical-meditations-b-wherein
+  landing_url: https://www.gutenberg.org/ebooks/70091
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:05+00:00'
+    adapter_version: 1
+    metadata:
+      title: Six metaphysical meditations $b Wherein it is proved that there is a God and that mans mind
+        is really distinct from his body
+      authors:
+      - name: René Descartes
+        death_year: 1650
+        wikidata: null
+      language: en
+      year: null
+      translator:
+        name: William Molyneux
+        death_year: 1698
+        wikidata: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg70091.epub
+      url: https://www.gutenberg.org/ebooks/70091.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override:
+    metadata:
+      title: Six Metaphysical Meditations
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; René Descartes ум. 1650; William Molyneux ум. 1698'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: mill-system-logic-ratiocinative-inductive-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/27942
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:06+00:00'
+    adapter_version: 1
+    metadata:
+      title: A System of Logic, Ratiocinative and Inductive
+      authors:
+      - name: John Stuart Mill
+        death_year: 1873
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg27942.epub
+      url: https://www.gutenberg.org/ebooks/27942.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; John Stuart Mill ум. 1873'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: james-pragmatism-new-name-for-some
+  landing_url: https://www.gutenberg.org/ebooks/5116
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:07+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Pragmatism: A New Name for Some Old Ways of Thinking'
+      authors:
+      - name: William James
+        death_year: 1910
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg5116.epub
+      url: https://www.gutenberg.org/ebooks/5116.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; William James ум. 1910'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: russell-problems-philosophy-gutenberg
+  landing_url: https://www.gutenberg.org/ebooks/5827
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:08+00:00'
+    adapter_version: 1
+    metadata:
+      title: The Problems of Philosophy
+      authors:
+      - name: Bertrand Russell
+        death_year: 1970
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg5827.epub
+      url: https://www.gutenberg.org/ebooks/5827.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override: {}
+  license:
+    kind: pd-site
+    basis: open_license
+    evidence: 'Project Gutenberg: Public domain in the USA'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: peirce-chance-love-logic-philosophical-essays
+  landing_url: https://www.gutenberg.org/ebooks/65274
+  adapter: gutenberg
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:09+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Chance, Love, and Logic: Philosophical Essays'
+      authors:
+      - name: Charles S. Peirce
+        death_year: 1914
+        wikidata: null
+      language: en
+      year: null
+      translator: null
+      publisher: Project Gutenberg
+    files:
+    - name: pg65274.epub
+      url: https://www.gutenberg.org/ebooks/65274.epub3.images
+      clean: gutenberg
+    license_hint: Public domain in the USA.
+  override:
+    metadata:
+      editor: Morris R. Cohen (1880–1947)
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Public domain in the USA.; Charles S. Peirce ум. 1914'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: reid-inquiry-into-human-mind-principles
+  landing_url: https://en.wikisource.org/wiki/An_Inquiry_into_the_Human_Mind
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:12+00:00'
+    adapter_version: 2
+    metadata:
+      title: 'An Inquiry into the Human Mind: on the Principles of Common Sense'
+      authors:
+      - name: Thomas Reid
+        death_year: 1796
+        wikidata: Q316347
+      language: en
+      year: 1764
+      translator: null
+      publisher: en.wikisource.org
+    files:
+    - name: An Inquiry into the Human Mind
+      url: https://en.wikisource.org/api/rest_v1/page/html/An_Inquiry_into_the_Human_Mind
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Thomas Reid ум. 1796'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: aristotle-soul-en-wikisource
+  landing_url: https://en.wikisource.org/wiki/On_the_Soul_(Aristotle)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:16+00:00'
+    adapter_version: 2
+    metadata:
+      title: On the Soul (Aristotle)
+      authors:
+      - name: Aristotle
+        death_year: -322
+        wikidata: Q868
+      language: en
+      year: null
+      translator: null
+      publisher: en.wikisource.org
+    files:
+    - name: On the Soul (Aristotle)
+      url: https://en.wikisource.org/api/rest_v1/page/html/On_the_Soul_%28Aristotle%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      translator:
+        name: J. A. Smith
+        death_year: 1939
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Aristotle ум. -322'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: aristotle-organon-owen-en-wikisource
+  landing_url: https://en.wikisource.org/wiki/Organon_(Owen)/The_Posterior_Analytics
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:21+00:00'
+    adapter_version: 2
+    metadata:
+      title: '[[Organon (Owen)'
+      authors:
+      - name: Aristotle
+        death_year: -322
+        wikidata: Q868
+      language: en
+      year: null
+      translator:
+        name: Octavius Freire Owen
+        death_year: 1873
+        wikidata: Q18912394
+      publisher: en.wikisource.org
+    files:
+    - name: Organon (Owen)/The Posterior Analytics
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics
+      clean: wikisource
+      api: true
+    - name: Organon (Owen)/The Posterior Analytics/Book 1
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics%2FBook_1
+      clean: wikisource
+      api: true
+    - name: Organon (Owen)/The Posterior Analytics/Book 2
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics%2FBook_2
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: The Posterior Analytics
+    files:
+    - name: Organon (Owen)/The Posterior Analytics
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics
+      clean: wikisource
+      api: true
+    - name: Organon (Owen)/The Posterior Analytics/Book 1
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics%2FBook_1
+      clean: wikisource
+      api: true
+    - name: Organon (Owen)/The Posterior Analytics/Book 2
+      url: https://en.wikisource.org/api/rest_v1/page/html/Organon_%28Owen%29%2FThe_Posterior_Analytics%2FBook_2
+      clean: wikisource
+      api: true
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Aristotle ум. -322; Octavius Freire Owen ум. 1873'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: hegel-phenomenology-mind-en-wikisource
+  landing_url: https://en.wikisource.org/wiki/The_Phenomenology_of_Mind
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:26+00:00'
+    adapter_version: 2
+    metadata:
+      title: The Phenomenology of Mind
+      authors:
+      - name: Georg Wilhelm Friedrich Hegel
+        death_year: 1831
+        wikidata: Q9235
+      language: en
+      year: null
+      translator:
+        name: James Black Baillie
+        death_year: 1940
+        wikidata: Q1680038
+      publisher: en.wikisource.org
+    files:
+    - name: The Phenomenology of Mind
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Preface
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPreface
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Introduction
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FIntroduction
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 1
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_1
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 2
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_2
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 3
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_3
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 4
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_4
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 5
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_5
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 6
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_6
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 7
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_7
+      clean: wikisource
+      api: true
+    - name: The Phenomenology of Mind/Part 8
+      url: https://en.wikisource.org/api/rest_v1/page/html/The_Phenomenology_of_Mind%2FPart_8
+      clean: wikisource
+      api: true
+    license_hint: PD-old, PD/US
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: PD-old, PD/US; Georg Wilhelm Friedrich Hegel ум. 1831; James Black Baillie ум. 1940'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: teetet-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Теэтет_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:28+00:00'
+    adapter_version: 2
+    metadata:
+      title: Теэтет (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Теэтет (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B5%D1%8D%D1%82%D0%B5%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Теэтет
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: null
+      translator:
+        name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), Платон ум. -348'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: menon-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Менон_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:31+00:00'
+    adapter_version: 2
+    metadata:
+      title: Менон (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Менон (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B5%D0%BD%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Менон
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: null
+      translator:
+        name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), Платон ум. -348'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: chernyshevskiy-kharakter-chelovecheskogo-znaniya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Характер_человеческого_знания_(Чернышевский)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:35+00:00'
+    adapter_version: 2
+    metadata:
+      title: Характер человеческого знания
+      authors:
+      - name: Николай Гаврилович Чернышевский
+        death_year: 1889
+        wikidata: Q192331
+      language: ru
+      year: 1885
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Характер человеческого знания (Чернышевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A5%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: kireevskiy-neobkhodimosti-vozmozhnosti-novykh-nachal-dlya
+  landing_url: https://ru.wikisource.org/wiki/О_необходимости_и_возможности_новых_начал_для_философии_(Киреевский)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:39+00:00'
+    adapter_version: 2
+    metadata:
+      title: О необходимости и возможности новых начал для философии
+      authors:
+      - name: Иван Васильевич Киреевский
+        death_year: 1856
+        wikidata: Q981960
+      language: ru
+      year: 1856
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О необходимости и возможности новых начал для философии (Киреевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8_%D0%B8_%D0%B2%D0%BE%D0%B7%D0%BC%D0%BE%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D0%BD%D0%BE%D0%B2%D1%8B%D1%85_%D0%BD%D0%B0%D1%87%D0%B0%D0%BB_%D0%B4%D0%BB%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: mikhaylovich-uchenie-kanta-poznanii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_познании_(Лопатин)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:43+00:00'
+    adapter_version: 2
+    metadata:
+      title: Учение Канта о познании
+      authors:
+      - name: Лопатин, Лев Михайлович
+        death_year: 1920
+        wikidata: Q4266616
+      language: ru
+      year: 1904
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Учение Канта о познании (Лопатин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A3%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%D0%BE_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B8_%28%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Лев Михайлович Лопатин
+        death_year: 1920
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: introduction-to-philosophyweb-pdf
+  landing_url: https://assets.openstax.org/oscms-prodcms/media/documents/Introduction_to_Philosophy-WEB.pdf
+  adapter: direct
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-05T23:55:32+00:00'
+    adapter_version: 1
+    metadata: {}
+    files:
+    - name: Introduction_to_Philosophy-WEB.pdf
+      url: https://assets.openstax.org/oscms-prodcms/media/documents/Introduction_to_Philosophy-WEB.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Introduction to Philosophy
+      authors:
+      - name: Nathan Smith
+        death_year: null
+        wikidata: null
+      - name: Gregory Browne
+        death_year: null
+        wikidata: null
+      - name: Parish Conkling
+        death_year: null
+        wikidata: null
+      - name: Naomi Friedman
+        death_year: null
+        wikidata: null
+      - name: Allison Fritz
+        death_year: null
+        wikidata: null
+      - name: Daniel Garro
+        death_year: null
+        wikidata: null
+      - name: Jeremy Gallegos
+        death_year: null
+        wikidata: null
+      - name: Jon Gill
+        death_year: null
+        wikidata: null
+      - name: Gayle Horton
+        death_year: null
+        wikidata: null
+      - name: Maryellen Lo Bosco
+        death_year: null
+        wikidata: null
+      - name: Rebecca A. Longtin
+        death_year: null
+        wikidata: null
+      - name: Corey McCall
+        death_year: null
+        wikidata: null
+      - name: Kurt Stuke
+        death_year: null
+        wikidata: null
+      year: 2022
+      language: en
+      publisher: OpenStax
+  license:
+    kind: cc-by-nc-sa-4.0
+    basis: open_license
+    evidence: 'openstax.org/details/books/introduction-philosophy: CC BY-NC-SA 4.0 (не CC BY, как предполагалось);
+      PDF из CMS API (pdf_url)'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: manual
+- id: falckenberg-history-modern-philosophy-smaller-en
+  landing_url: https://en.wikisource.org/wiki/History_of_Modern_Philosophy
+  adapter: wikisource
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:47+00:00'
+    adapter_version: 2
+    metadata:
+      title: History of Modern Philosophy{{smaller
+      authors:
+      - name: Richard Falckenberg
+        death_year: 1920
+        wikidata: Q89206
+      language: en
+      year: null
+      translator:
+        name: Andrew Campbell Armstrong
+        death_year: 1935
+        wikidata: Q15948287
+      publisher: en.wikisource.org
+    files:
+    - name: History of Modern Philosophy
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Translator's Preface
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FTranslator%27s_Preface
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Preface 1st German edition
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FPreface_1st_German_edition
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Preface 2nd German edition
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FPreface_2nd_German_edition
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Introduction
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FIntroduction
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 1
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_1
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 2
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_2
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 3
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_3
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 4
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_4
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 5
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_5
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 6
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_6
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 7
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_7
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 8
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_8
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 9
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_9
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 10
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_10
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 11
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_11
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 12
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_12
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 13
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_13
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 14
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_14
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 15
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_15
+      clean: wikisource
+      api: true
+    - name: History of Modern Philosophy/Chapter 16
+      url: https://en.wikisource.org/api/rest_v1/page/html/History_of_Modern_Philosophy%2FChapter_16
+      clean: wikisource
+      api: true
+    license_hint: PD/US
+  override:
+    metadata:
+      title: History of Modern Philosophy
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: PD/US; Richard Falckenberg ум. 1920; Andrew Campbell Armstrong ум. 1935'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: h-ffding-brief-history-modern-philosophy
+  landing_url: https://en.wikisource.org/wiki/A_Brief_History_of_Modern_Philosophy
+  adapter: wikisource
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:52+00:00'
+    adapter_version: 2
+    metadata:
+      title: A Brief History of Modern Philosophy
+      authors:
+      - name: Harald Høffding
+        death_year: 1931
+        wikidata: Q703531
+      language: en
+      year: 1912
+      translator:
+        name: Charles Finley Sanders
+        death_year: 1959
+        wikidata: Q23304112
+      publisher: en.wikisource.org
+    files:
+    - name: A Brief History of Modern Philosophy
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Preface
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FPreface
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Introduction
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FIntroduction
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 1
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_1
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 2
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_2
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 3
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_3
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 4
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_4
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 5
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_5
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 6
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_6
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 7
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_7
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 8
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_8
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Book 9
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FBook_9
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Chronology
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FChronology
+      clean: wikisource
+      api: true
+    - name: A Brief History of Modern Philosophy/Index
+      url: https://en.wikisource.org/api/rest_v1/page/html/A_Brief_History_of_Modern_Philosophy%2FIndex
+      clean: wikisource
+      api: true
+    license_hint: PD-US
+  override: {}
+  license:
+    kind: pd-site
+    basis: open_license
+    evidence: 'en.wikisource.org: PD-US, издание 1912'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: ivanovich-uchebnik-logiki-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Учебник_логики_(Челпанов)
+  adapter: wikisource
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:55+00:00'
+    adapter_version: 2
+    metadata:
+      title: Учебник логики
+      authors:
+      - name: Челпанов, Георгий Иванович
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Учебник логики (Челпанов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B8%D0%BA_%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8_%28%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: esbe-gnoseologiya-ili-gnozeologiya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Гносеология_или_гнозеология
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:02:58+00:00'
+    adapter_version: 2
+    metadata:
+      title: ЭСБЕ/Гносеология или гнозеология
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: ЭСБЕ/Гносеология или гнозеология
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%93%D0%BD%D0%BE%D1%81%D0%B5%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D0%B8%D0%BB%D0%B8_%D0%B3%D0%BD%D0%BE%D0%B7%D0%B5%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Без подписи
+        death_year: null
+        wikidata: null
+  license:
+    kind: pd-site
+    basis: open_license
+    evidence: 'ru.wikisource.org: статья ЭСБЕ 1890–1907 без подписи, PD-шаблон сайта'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: esbe-poznanie-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Познание
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:03:01+00:00'
+    adapter_version: 2
+    metadata:
+      title: ЭСБЕ/Познание
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: ЭСБЕ/Познание
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%9F%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license: null
+  review:
+    status: rejected
+    by: null
+    at: null
+    note: Страница-перенаправление («см. Философия»), самостоятельного текста нет.
+  publish: auto
+- id: 1911-encyclop-dia-britannica-epistemology-en
+  landing_url: https://en.wikisource.org/wiki/1911_Encyclopædia_Britannica/Epistemology
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:03:03+00:00'
+    adapter_version: 2
+    metadata:
+      title: 1911 Encyclopædia Britannica/Epistemology
+      authors: []
+      language: en
+      year: null
+      translator: null
+      publisher: en.wikisource.org
+    files:
+    - name: 1911 Encyclopædia Britannica/Epistemology
+      url: https://en.wikisource.org/api/rest_v1/page/html/1911_Encyclop%C3%A6dia_Britannica%2FEpistemology
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Без подписи
+        death_year: null
+        wikidata: null
+  license:
+    kind: pd-site
+    basis: open_license
+    evidence: 'en.wikisource.org: EB1911, PD-US'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: esbe-teoriya-poznaniya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Теория_познания
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:03:06+00:00'
+    adapter_version: 2
+    metadata:
+      title: ЭСБЕ/Теория познания
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: ЭСБЕ/Теория познания
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Теория познания
+      authors:
+      - name: Николай Григорьевич Дебольский
+        death_year: 1918
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: статья ЭСБЕ, подпись «Н. Г. Дебольский» (1842–1918)'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: esbe-sensualizm-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Сенсуализм
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:03:09+00:00'
+    adapter_version: 2
+    metadata:
+      title: ЭСБЕ/Сенсуализм
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: ЭСБЕ/Сенсуализм
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%A1%D0%B5%D0%BD%D1%81%D1%83%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Без подписи
+        death_year: null
+        wikidata: null
+  license:
+    kind: pd-site
+    basis: open_license
+    evidence: 'ru.wikisource.org: статья ЭСБЕ, подпись «Э. Р.», PD-шаблон сайта'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
+- id: esbe-skeptitsizm-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Скептицизм
+  adapter: wikisource
+  kind: reference
+  section: epistemology
+  harvested:
+    at: '2026-11-06T00:03:11+00:00'
+    adapter_version: 2
+    metadata:
+      title: ЭСБЕ/Скептицизм
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: ЭСБЕ/Скептицизм
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%A1%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Скептицизм
+      authors:
+      - name: Эрнест Леопольдович Радлов
+        death_year: 1928
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: статья ЭСБЕ, подпись «Э. Радлов» (1854–1928)'
+  review:
+    status: approved
+    by: claude (пробная загрузка)
+    at: '2026-11-06'
+    note: пробная проверка конвейера; перед запуском пересмотреть
+  publish: auto
