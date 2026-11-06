@@ -1,0 +1,962 @@
+[
+ {
+  "shot": "lib-collapsed-light-ru-1440.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-expanded-light-ru-1440.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-kind-light-ru-1440.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-lang-light-ru-1440.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-collapsed-light-ru-1440.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-expanded-light-ru-1440.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-pinned-light-ru-1440.png",
+  "ok": true,
+  "screen": "reader-pinned",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-card-light-ru-1440.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-assistant-light-ru-1440.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "books-two-light-ru-1440.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "settings-appearance-light-ru-1440.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "settings-books-light-ru-1440.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "soon-graph-light-ru-1440.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "soon-assistant-light-ru-1440.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-collapsed-light-en-1440.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-expanded-light-en-1440.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-kind-light-en-1440.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-lang-light-en-1440.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-collapsed-light-en-1440.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-expanded-light-en-1440.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-pinned-light-en-1440.png",
+  "ok": true,
+  "screen": "reader-pinned",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-card-light-en-1440.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-assistant-light-en-1440.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "books-two-light-en-1440.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "settings-appearance-light-en-1440.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "settings-books-light-en-1440.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "soon-graph-light-en-1440.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "soon-assistant-light-en-1440.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-collapsed-dark-ru-1440.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-expanded-dark-ru-1440.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-kind-dark-ru-1440.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-lang-dark-ru-1440.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-collapsed-dark-ru-1440.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-expanded-dark-ru-1440.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-pinned-dark-ru-1440.png",
+  "ok": true,
+  "screen": "reader-pinned",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-card-dark-ru-1440.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "reader-assistant-dark-ru-1440.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "books-two-dark-ru-1440.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "settings-appearance-dark-ru-1440.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "settings-books-dark-ru-1440.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "soon-graph-dark-ru-1440.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "soon-assistant-dark-ru-1440.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "lib-collapsed-dark-en-1440.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-expanded-dark-en-1440.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-kind-dark-en-1440.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-filter-lang-dark-en-1440.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-collapsed-dark-en-1440.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-expanded-dark-en-1440.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-pinned-dark-en-1440.png",
+  "ok": true,
+  "screen": "reader-pinned",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-card-dark-en-1440.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "reader-assistant-dark-en-1440.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "books-two-dark-en-1440.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "settings-appearance-dark-en-1440.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "settings-books-dark-en-1440.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "soon-graph-dark-en-1440.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "soon-assistant-dark-en-1440.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "notice-light-ru-1440.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "notice-light-en-1440.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "light",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "notice-dark-ru-1440.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1440
+ },
+ {
+  "shot": "notice-dark-en-1440.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1440
+ },
+ {
+  "shot": "lib-collapsed-light-ru-1024.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-expanded-light-ru-1024.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-kind-light-ru-1024.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-lang-light-ru-1024.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-collapsed-light-ru-1024.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-expanded-light-ru-1024.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-pin-disabled-light-ru-1024.png",
+  "ok": true,
+  "screen": "reader-pin-disabled",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-card-light-ru-1024.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-assistant-light-ru-1024.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "books-two-light-ru-1024.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "settings-appearance-light-ru-1024.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "settings-books-light-ru-1024.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "soon-graph-light-ru-1024.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "soon-assistant-light-ru-1024.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-collapsed-light-en-1024.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-expanded-light-en-1024.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-kind-light-en-1024.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-lang-light-en-1024.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-collapsed-light-en-1024.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-expanded-light-en-1024.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-pin-disabled-light-en-1024.png",
+  "ok": true,
+  "screen": "reader-pin-disabled",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-card-light-en-1024.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-assistant-light-en-1024.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "books-two-light-en-1024.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "settings-appearance-light-en-1024.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "settings-books-light-en-1024.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "soon-graph-light-en-1024.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "soon-assistant-light-en-1024.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-collapsed-dark-ru-1024.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-expanded-dark-ru-1024.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-kind-dark-ru-1024.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-lang-dark-ru-1024.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-collapsed-dark-ru-1024.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-expanded-dark-ru-1024.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-pin-disabled-dark-ru-1024.png",
+  "ok": true,
+  "screen": "reader-pin-disabled",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-card-dark-ru-1024.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "reader-assistant-dark-ru-1024.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "books-two-dark-ru-1024.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "settings-appearance-dark-ru-1024.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "settings-books-dark-ru-1024.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "soon-graph-dark-ru-1024.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "soon-assistant-dark-ru-1024.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "lib-collapsed-dark-en-1024.png",
+  "ok": true,
+  "screen": "lib-collapsed",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-expanded-dark-en-1024.png",
+  "ok": true,
+  "screen": "lib-expanded",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-kind-dark-en-1024.png",
+  "ok": true,
+  "screen": "lib-filter-kind",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "lib-filter-lang-dark-en-1024.png",
+  "ok": true,
+  "screen": "lib-filter-lang",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-collapsed-dark-en-1024.png",
+  "ok": true,
+  "screen": "reader-collapsed",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-expanded-dark-en-1024.png",
+  "ok": true,
+  "screen": "reader-expanded",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-pin-disabled-dark-en-1024.png",
+  "ok": true,
+  "screen": "reader-pin-disabled",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-card-dark-en-1024.png",
+  "ok": true,
+  "screen": "reader-card",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "reader-assistant-dark-en-1024.png",
+  "ok": true,
+  "screen": "reader-assistant",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "books-two-dark-en-1024.png",
+  "ok": true,
+  "screen": "books-two",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "settings-appearance-dark-en-1024.png",
+  "ok": true,
+  "screen": "settings-appearance",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "settings-books-dark-en-1024.png",
+  "ok": true,
+  "screen": "settings-books",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "soon-graph-dark-en-1024.png",
+  "ok": true,
+  "screen": "soon-graph",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "soon-assistant-dark-en-1024.png",
+  "ok": true,
+  "screen": "soon-assistant",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "notice-light-ru-1024.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "light",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "notice-light-en-1024.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "light",
+  "lang": "en",
+  "width": 1024
+ },
+ {
+  "shot": "notice-dark-ru-1024.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "dark",
+  "lang": "ru",
+  "width": 1024
+ },
+ {
+  "shot": "notice-dark-en-1024.png",
+  "ok": true,
+  "screen": "notice",
+  "theme": "dark",
+  "lang": "en",
+  "width": 1024
+ }
+]

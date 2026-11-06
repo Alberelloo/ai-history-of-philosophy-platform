@@ -223,6 +223,10 @@ def extract_html(
     def visit(el: etree._Element, note_id: str | None, inherited: str | None = None) -> None:
         if not isinstance(el.tag, str) or el.tag in ("script", "style", "head"):
             return
+        if el.get("data-philograph") == "missing":
+            # Подстраница, которой нет на сайте (каталог, «красная» ссылка Wikisource).
+            pages[-1].lines.append(RawLine("", block_break=True, kind="missing"))
+            return
         if "pagebreak" in _epub_type(el) or el.get("role") == "doc-pagebreak":
             new_page(el.get("title") or (el.text or "").strip() or None)
             return
@@ -398,6 +402,10 @@ def extract_pdf(
             elif not lines:
                 image = page.get_pixmap(dpi=300, clip=clip).tobytes("png")
                 raw.lines, raw.ocr_confidence = ocr.recognize(image, languages)
+            if not any(line.text.strip() or line.kind == "figure" for line in raw.lines):
+                # Ни текста, ни иллюстраций: страница не пропадает молча — на её месте в тексте
+                # будет заглушка «текст не распознан».
+                raw.lines.append(RawLine("", block_break=True, kind="blank_page"))
             pages.append(raw)
             if on_page is not None:
                 on_page(raw)

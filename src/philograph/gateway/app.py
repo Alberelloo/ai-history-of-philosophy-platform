@@ -150,7 +150,11 @@ def build_app(
         )
 
     async def proxy(request: Request, target: str, path: str) -> Response:
-        url = f"{upstreams[target].rstrip('/')}/{path}"
+        # Строка запроса уходит как есть: разбор и сборка заново теряли повторяющиеся ключи
+        # (kind=textbook&kind=primary превращалось в kind=primary).
+        url = httpx.URL(f"{upstreams[target].rstrip('/')}/{path}").copy_with(
+            query=request.scope["query_string"]
+        )
         body = await guard(request, await request.body())
         if isinstance(body, Response):
             return body
@@ -165,7 +169,6 @@ def build_app(
         upstream = client.build_request(
             request.method,
             url,
-            params=request.query_params,
             headers=headers,
             content=body,
         )

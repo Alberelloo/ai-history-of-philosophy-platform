@@ -26,18 +26,27 @@ def asgi_transport(app: FastAPI) -> httpx.BaseTransport:
     return Transport()
 
 
-def topnav(page):
-    """Навигация верхней панели: библиотека, текущий источник, настройки."""
+def sidenav(page):
+    """Навигация боковой панели, раскрытой наведением: подписи и список открытых книг видны."""
+    page.locator(".sidebar__brand").hover()
+    page.locator('.sidebar[data-state="expanded"], .sidebar[data-state="pinned"]').wait_for()
     return page.get_by_role("navigation", name="Разделы")
+
+
+def via_sidebar(page, name: str) -> None:
+    """Переход по пункту боковой панели; указатель уходит, и панель сворачивается."""
+    sidenav(page).get_by_role("link", name=name).first.click()
+    size = page.viewport_size or {"width": 1280, "height": 800}
+    page.mouse.move(size["width"] - 5, size["height"] - 5)
 
 
 # Версия уведомления при первом входе (web/src/Notice.tsx). Браузерные сценарии, кроме самих
 # сценариев уведомления, идут от читателя, который его уже закрыл.
 NOTICE_VERSION = "2026-11"
-STORAGE_KEY = "philograph:v2"
+STORAGE_KEY = "philograph:v3"
 _ACCEPTED = f"""
 if (!localStorage.getItem("{STORAGE_KEY}")) {{
-  localStorage.setItem("{STORAGE_KEY}", JSON.stringify({{version: 2, notice: "{NOTICE_VERSION}"}}));
+  localStorage.setItem("{STORAGE_KEY}", JSON.stringify({{version: 3, notice: "{NOTICE_VERSION}"}}));
 }}
 """
 

@@ -30,15 +30,15 @@ body {
   transition: background-color var(--dur-quick) var(--ease-out), border-color var(--dur-quick) var(--ease-out),
     color var(--dur-quick) var(--ease-out), transform 80ms var(--ease-out);
 }
-.pg-btn:active:not([disabled]) { transform: translateY(1px); }
+.pg-btn:active:not([disabled]):not([aria-disabled="true"]) { transform: translateY(1px); }
 .pg-btn:focus-visible { box-shadow: var(--focus-ring); }
-.pg-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.pg-btn[disabled], .pg-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
 .pg-btn--primary { background: var(--accent); color: var(--on-accent); }
-.pg-btn--primary:hover:not([disabled]) { background: var(--accent-hover); }
+.pg-btn--primary:hover:not([disabled]):not([aria-disabled="true"]) { background: var(--accent-hover); }
 .pg-btn--secondary { background: var(--surface); border-color: var(--line-strong); }
-.pg-btn--secondary:hover:not([disabled]) { background: var(--sunken); }
+.pg-btn--secondary:hover:not([disabled]):not([aria-disabled="true"]) { background: var(--sunken); }
 .pg-btn--ghost { color: var(--ink-2); }
-.pg-btn--ghost:hover:not([disabled]) { background: var(--sunken); color: var(--ink); }
+.pg-btn--ghost:hover:not([disabled]):not([aria-disabled="true"]) { background: var(--sunken); color: var(--ink); }
 .pg-btn--sm { height: var(--control-sm); padding: 0 var(--space-3); font-size: 13px; line-height: 18px; }
 .pg-btn--icon { width: var(--control); padding: 0; }
 .pg-btn--icon.pg-btn--sm { width: var(--control-sm); }
