@@ -134,7 +134,7 @@ def _is_note_container(el: etree._Element, note_targets: set[str]) -> bool:
             (
                 c.get("id")
                 for c in el.iterchildren()
-                if isinstance(c.tag, str) and c.get("id") in note_targets
+                if c.tag == "a" and c.get("id") in note_targets
             ),
             None,
         )

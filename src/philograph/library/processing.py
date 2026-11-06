@@ -36,8 +36,8 @@ from philograph.platform import context, events
 from philograph.platform.clock import Clock, SystemClock
 from philograph.platform.files import FileStore, fingerprint
 
-PIPELINE_VERSION = "1"
-STEP_VERSIONS = {"extract": "1", "parse": "1"}
+PIPELINE_VERSION = "2"  # 2: сноски HTML/EPUB, обложки PDF, выбросы номеров страниц
+STEP_VERSIONS = {"extract": "2", "parse": "2"}
 FORMATS = ("txt", "html", "epub", "pdf")
 ORDER = ["created", "files_received", "text_extracted", "quality_passed", "structured", "checked"]
 

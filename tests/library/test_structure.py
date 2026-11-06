@@ -437,3 +437,18 @@ def test_footnotes_of_gutenberg_and_wikisource_html():
         assert [n.text for n in notes] == [expected], [b.text for _, b in doc.blocks()]
         assert notes[0].linked
         assert all(expected not in b.text for _, b in doc.blocks())
+
+
+@req(DS, "Страницы печатного издания")
+def test_page_label_outlier_from_running_footer_is_ignored():
+    from philograph.library.model import RawDocument, RawPage
+    from philograph.library.parse import ParseSettings, infer_labels
+
+    # колонтитул с годом «2022» дал ложный номер между 107 и 109
+    labels = ["105", "106", "107", "2022", "109", "110"]
+    raw = RawDocument(
+        pages=[RawPage(i, [], printed_label=x) for i, x in enumerate(labels)],
+        fmt="pdf",
+        paginated=True,
+    )
+    assert infer_labels(raw, ParseSettings()) == ["105", "106", "107", "108", "109", "110"]
