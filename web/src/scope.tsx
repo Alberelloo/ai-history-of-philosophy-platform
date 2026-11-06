@@ -1,4 +1,6 @@
+import { useT } from "./i18n";
 import { storage, useStored, type Settings } from "./storage";
+import { Switch } from "./ui";
 
 // Переключатель источников «только выбранный учебник / все источники» и настройки генерации.
 // Значение общее для графа, карточек, ассистента и экрана настроек: изменение в одном месте
@@ -15,16 +17,17 @@ export function useScope(): Settings {
 }
 
 export function ScopeToggle({ textbook }: { textbook?: string }) {
+  const t = useT();
   const scope = useScope();
   return (
-    <label className="scope-toggle" title={textbook ? undefined : "Сначала выберите учебник в библиотеке"}>
-      <input
-        type="checkbox"
+    <span className="scope-toggle">
+      <Switch
+        label={t.scope.onlyTextbook}
         checked={scope.onlyTextbook && Boolean(textbook)}
         disabled={!textbook}
-        onChange={(e) => setScope({ onlyTextbook: e.target.checked })}
+        title={textbook ? undefined : t.scope.chooseFirst}
+        onChange={(value) => setScope({ onlyTextbook: value })}
       />
-      Только выбранный учебник
-    </label>
+    </span>
   );
 }

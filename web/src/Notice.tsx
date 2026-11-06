@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useT } from "./i18n";
 import { setScope, useScope } from "./scope";
 import { storage, useStored } from "./storage";
+import { Generated, Icon, Switch } from "./ui";
 
 // Уведомление при первом входе: как помечено сгенерированное и кто обрабатывает вопросы.
 // Версия меняется при существенном изменении текста (например, смене провайдера моделей) —
@@ -18,56 +20,44 @@ export function requestNotice(): void {
 }
 
 export function NoticeText() {
+  const t = useT();
   return (
     <div className="notice-text">
+      <p>{t.notice.about}</p>
       <p>
-        PhiloGraph — учебник по истории философии: главы источников, карточки понятий и людей, граф
-        происхождения идей и ассистент, который отвечает со ссылками на абзацы.
+        {t.notice.markedBefore}{" "}
+        <Generated className="card-description ungrounded notice-example">{t.notice.example}</Generated>
+        {t.notice.markedAfter}
       </p>
-      <p>
-        Всё, что модель написала без опоры на источники, помечено значком и рамкой:{" "}
-        <span className="card-description ungrounded notice-example">
-          <span className="ungrounded-mark" role="img" aria-label="Сгенерировано">
-            ◇
-          </span>
-          пример сгенерированной строки
-        </span>
-        . Такие строки — подсказка модели, а не установленный факт.
-      </p>
-      <p>Генерация без опоры на источники включена. Её можно выключить здесь или в настройках.</p>
-      <p>
-        Вопросы ассистенту, описания карточек и достройку графа обрабатывает внешний провайдер языковых моделей по
-        своим правилам. Не пишите в вопросах личные данные.
-      </p>
+      <p>{t.notice.generationOn}</p>
+      <p>{t.notice.provider}</p>
     </div>
   );
 }
 
 export function GenerationSettings() {
+  const t = useT();
   const scope = useScope();
   return (
     <div className="generation-settings">
-      <label>
-        <input
-          type="checkbox"
-          checked={scope.generation}
-          onChange={(e) => setScope({ generation: e.target.checked })}
-        />
-        Генерация без опоры на источники
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={scope.sourcesOnly}
-          onChange={(e) => setScope({ sourcesOnly: e.target.checked })}
-        />
-        Только по источникам
-      </label>
+      <Switch
+        label={t.notice.generation}
+        hint={t.notice.generationHint}
+        checked={scope.generation}
+        onChange={(value) => setScope({ generation: value })}
+      />
+      <Switch
+        label={t.notice.sourcesOnly}
+        hint={t.notice.sourcesOnlyHint}
+        checked={scope.sourcesOnly}
+        onChange={(value) => setScope({ sourcesOnly: value })}
+      />
     </div>
   );
 }
 
 export function FirstRunNotice() {
+  const t = useT();
   const accepted = useNoticeAccepted();
   const [attention, setAttention] = useState(false);
   const box = useRef<HTMLElement>(null);
@@ -75,28 +65,40 @@ export function FirstRunNotice() {
   useEffect(() => {
     const show = () => {
       setAttention(true);
-      box.current?.focus();
+      box.current?.focus({ preventScroll: true });
+      box.current?.scrollIntoView({ block: "nearest" });
     };
     window.addEventListener(ATTENTION, show);
     return () => window.removeEventListener(ATTENTION, show);
   }, []);
 
+  const accept = () => {
+    // Сообщение стоит в потоке над страницей: после закрытия текст не должен прыгнуть.
+    const height = box.current?.offsetHeight ?? 0;
+    const scrolled = window.scrollY > 0;
+    storage.acceptNotice(NOTICE_VERSION);
+    if (scrolled && height) window.scrollBy(0, -height);
+  };
+
   if (accepted) return null;
-  // Не модальное: читать можно сразу, а вопрос ассистенту уйдёт только после закрытия.
+  // Сообщение в потоке страницы (Notice): не всплывает и не закрывает контент. Читать можно
+  // сразу, а вопрос ассистенту уйдёт только после «Понятно».
   return (
-    <aside
+    <section
       ref={box}
       tabIndex={-1}
-      className={attention ? "first-run attention" : "first-run"}
-      role="dialog"
-      aria-label="О пометках и обработке вопросов"
+      className={attention ? "pg-notice first-run attention" : "pg-notice first-run"}
+      aria-label={t.notice.label}
     >
-      <h2>Прежде чем начать</h2>
-      <NoticeText />
-      <GenerationSettings />
-      <button className="primary" onClick={() => storage.acceptNotice(NOTICE_VERSION)}>
-        Понятно
+      <Icon name="info" />
+      <div className="first-run__body">
+        <h2 className="first-run__title">{t.notice.title}</h2>
+        <NoticeText />
+        <GenerationSettings />
+      </div>
+      <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={accept}>
+        {t.notice.accept}
       </button>
-    </aside>
+    </section>
   );
 }

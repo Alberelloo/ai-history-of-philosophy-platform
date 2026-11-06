@@ -36,7 +36,7 @@ export function FootnoteRef({ note }: { note: Footnote }) {
     <span className="note" onMouseEnter={show} onMouseLeave={hide}>
       <button
         type="button"
-        className="note-ref"
+        className="note-ref pg-note-ref"
         aria-describedby={open ? id : undefined}
         aria-expanded={open}
         onFocus={show}
@@ -46,7 +46,7 @@ export function FootnoteRef({ note }: { note: Footnote }) {
         {note.marker}
       </button>
       {open && (
-        <span role="tooltip" id={id} className="note-popup" onFocus={show} onBlur={hide}>
+        <span role="tooltip" id={id} className="note-popup pg-sidenote-pop" onFocus={show} onBlur={hide}>
           {withLinks(note.text)}
         </span>
       )}

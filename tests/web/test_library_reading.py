@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from ..helpers import reader_context
+from ..helpers import reader_context, topnav
 
 req = pytest.mark.req
 SL = "source-library"
@@ -125,7 +125,7 @@ def test_choose_source_makes_it_current(page, site):
     page.locator(".source", has_text="Critique").get_by_role("button", name="Читать").click()
     page.wait_for_selector(".chapter p")
     assert f"/read/{site.ids['primary']}" in page.url
-    page.get_by_role("button", name="← Библиотека").click()
+    topnav(page).get_by_role("link", name="Библиотека").click()
     page.wait_for_selector(".source.current")
     current = page.locator(".source.current")
     assert "Critique of Pure Reason" in current.inner_text() and "Текущий" in current.inner_text()
@@ -202,12 +202,12 @@ def test_chapter_text_as_in_source(page, site, events):
 def test_previous_and_next(page, site):
     open_textbook(page, site)
     nav = page.get_by_role("navigation", name="Главы")
-    assert nav.get_by_role("button", name="← Предыдущая глава").count() == 0
-    nav.get_by_role("button", name="Следующая глава →").click()
+    assert nav.get_by_role("button", name="Предыдущая глава").count() == 0
+    nav.get_by_role("button", name="Следующая глава").click()
     page.wait_for_selector("h1:text('Глава 2. Рассудок')")
-    nav.get_by_role("button", name="Следующая глава →").click()
+    nav.get_by_role("button", name="Следующая глава").click()
     page.wait_for_selector("h1:text('Глава 3. Разум')")
-    assert nav.get_by_role("button", name="Следующая глава →").count() == 0
+    assert nav.get_by_role("button", name="Следующая глава").count() == 0
 
 
 @req(CR, "Запоминание места чтения")
@@ -228,8 +228,12 @@ def test_reading_position_per_source(browser, site):
     page.wait_for_selector(".chapter p")
     page.goto(f"{site.url}/read/{site.ids['textbook']}")
     page.wait_for_selector("h1:text('Глава 2. Рассудок')")
-    first_visible = page.evaluate("""() => [...document.querySelectorAll('p.block')]
-        .find(p => p.getBoundingClientRect().bottom > 0).dataset.paragraph""")
+    # Под закреплённой верхней панелью текста не видно: считаем от отступа прокрутки.
+    first_visible = page.evaluate("""() => {
+        const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+        return [...document.querySelectorAll('p.block')]
+            .find(p => p.getBoundingClientRect().bottom > top).dataset.paragraph;
+    }""")
     assert first_visible == saved["paragraphId"]
     chapter_start = page.locator("p.block").first.get_attribute("data-paragraph")
     assert saved["paragraphId"] != chapter_start  # место в середине главы, а не её начало

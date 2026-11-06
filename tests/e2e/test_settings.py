@@ -7,6 +7,7 @@ import json
 import httpx
 import pytest
 
+from ..helpers import topnav
 from .conftest import NOTICE_VERSION, reader_context, wait_logs
 
 req = pytest.mark.req
@@ -50,7 +51,7 @@ def test_first_run_notice_choice_and_once(browser, stack):
     context = reader_context(browser, accepted=False)
     page = context.new_page()
     page.goto(stack.url + "/")
-    notice = page.get_by_role("dialog", name=NOTICE)
+    notice = page.get_by_role("region", name=NOTICE)
     notice.wait_for()
     assert "внешний провайдер" in notice.inner_text()
     assert notice.locator(".ungrounded").get_by_role("img", name="Сгенерировано").count() == 1
@@ -58,21 +59,21 @@ def test_first_run_notice_choice_and_once(browser, stack):
     assert generation.is_checked() and not notice.get_by_label("Только по источникам").is_checked()
     generation.uncheck()
     notice.get_by_role("button", name="Понятно").click()
-    assert page.get_by_role("dialog", name=NOTICE).count() == 0
-    page.get_by_role("button", name="Настройки").click()
+    assert page.get_by_role("region", name=NOTICE).count() == 0
+    topnav(page).get_by_role("link", name="Настройки").click()
     page.wait_for_selector("h1:text('Настройки')")
     assert not page.get_by_label("Генерация без опоры на источники").is_checked()
     # Второй визит — без уведомления; новая версия текста — снова с ним.
     page.goto(stack.url + "/")
     page.wait_for_selector(".source")
-    assert page.get_by_role("dialog", name=NOTICE).count() == 0
+    assert page.get_by_role("region", name=NOTICE).count() == 0
     assert stored(page)["notice"] == NOTICE_VERSION
     page.evaluate(
         f"localStorage.setItem('{KEY}', JSON.stringify("
         f"{{...JSON.parse(localStorage.getItem('{KEY}')), notice: '2020-01'}}))"
     )
     page.reload()
-    page.get_by_role("dialog", name=NOTICE).wait_for()
+    page.get_by_role("region", name=NOTICE).wait_for()
     context.close()
 
 
@@ -99,7 +100,7 @@ def test_question_waits_for_notice(browser, stack):
         wait_logs(stack, "assistant", lambda e: e["event"] == "assistant.question.received", 1)
     )
     assert after == before  # вопрос провайдеру не ушёл
-    page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
+    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     panel.get_by_role("button", name="Спросить").click()
     panel.locator(".fragment").first.wait_for()
     context.close()
@@ -115,7 +116,7 @@ def test_settings_defaults_and_effect(page, stack):
     assert page.get_by_label("Все источники").is_checked()
     page.get_by_label("Генерация без опоры на источники").uncheck()
     # Без перезагрузки: переход внутри приложения.
-    page.get_by_role("button", name="← Библиотека").click()
+    topnav(page).get_by_role("link", name="Библиотека").click()
     page.locator(".source", has_text="Теория познания").get_by_role("button", name="Читать").click()
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.get_by_role("button", name="Ассистент", exact=True).click()
@@ -159,7 +160,7 @@ def test_old_format_migrated(browser, stack):
     data = stored(page)
     assert data["version"] == 2 and data["settings"]["generation"] is False
     assert page.evaluate("localStorage.getItem('philograph:v1')") is None
-    page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
+    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.get_by_role("button", name="Ассистент", exact=True).click()
     assert "старый вопрос" in page.get_by_role("complementary", name="Ассистент").inner_text()
     context.close()
@@ -172,7 +173,7 @@ def test_corrupted_storage_resets(browser, stack):
     page = context.new_page()
     page.goto(stack.url + "/")
     page.wait_for_selector(".source")
-    page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
+    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.goto(stack.url + "/settings")
     assert page.get_by_label("Генерация без опоры на источники").is_checked()
     assert stored(page)["version"] == 2
@@ -190,8 +191,8 @@ def test_private_mode_without_storage(browser, stack):
     page.goto(stack.url + "/")
     page.wait_for_selector(".source")
     assert "не сохранятся" in page.locator(".storage-warning").inner_text()
-    page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
-    page.get_by_role("button", name="Настройки").click()
+    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
+    topnav(page).get_by_role("link", name="Настройки").click()
     page.get_by_label("Только по источникам").check()  # в пределах вкладки работает
     assert page.get_by_label("Только по источникам").is_checked()
     context.close()
@@ -202,7 +203,7 @@ def test_reset_all_data(browser, stack):
     context = reader_context(browser, accepted=False)
     page = context.new_page()
     page.goto(stack.url + "/settings")
-    page.get_by_role("dialog", name=NOTICE).get_by_role("button", name="Понятно").click()
+    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.get_by_label("Только по источникам").check()
     page.get_by_role("button", name="Сбросить все данные").click()
     page.get_by_role("alertdialog").get_by_role("button", name="Отмена").click()
@@ -212,7 +213,7 @@ def test_reset_all_data(browser, stack):
     page.get_by_role("status").filter(has_text="Данные удалены").wait_for()
     assert page.evaluate(f"localStorage.getItem('{KEY}')") is None
     page.reload()
-    page.get_by_role("dialog", name=NOTICE).wait_for()
+    page.get_by_role("region", name=NOTICE).wait_for()
     assert not page.get_by_label("Только по источникам").first.is_checked()
     context.close()
 

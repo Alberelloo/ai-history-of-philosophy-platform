@@ -16,9 +16,15 @@ export const MAX_DIALOG_CHARS = 200_000;
 
 export type Position = { chapterId: string; paragraphId?: string };
 export type Settings = { generation: boolean; sourcesOnly: boolean; onlyTextbook: boolean };
+export type Theme = "light" | "dark" | "system";
+export type Lang = "ru" | "en";
+export const THEMES: Theme[] = ["light", "dark", "system"];
+export const LANGS: Lang[] = ["ru", "en"];
 export type State = {
   version: 2;
   settings: Settings;
+  theme: Theme; // «как в системе» — по умолчанию
+  lang?: Lang; // не выбран — язык браузера
   currentSource?: string;
   positions: Record<string, Position>;
   dialogs: unknown[][]; // последний — текущий
@@ -26,7 +32,13 @@ export type State = {
 };
 
 export const DEFAULT_SETTINGS: Settings = { generation: true, sourcesOnly: false, onlyTextbook: false };
-const empty = (): State => ({ version: 2, settings: { ...DEFAULT_SETTINGS }, positions: {}, dialogs: [[]] });
+const empty = (): State => ({
+  version: 2,
+  settings: { ...DEFAULT_SETTINGS },
+  theme: "system",
+  positions: {},
+  dialogs: [[]],
+});
 
 let memory: State = empty();
 let persistent = probe();
@@ -69,6 +81,8 @@ function normalize(raw: unknown): State {
       sourcesOnly: bool(settings.sourcesOnly, DEFAULT_SETTINGS.sourcesOnly),
       onlyTextbook: bool(settings.onlyTextbook, DEFAULT_SETTINGS.onlyTextbook),
     },
+    theme: THEMES.includes(data.theme as Theme) ? (data.theme as Theme) : "system",
+    lang: LANGS.includes(data.lang as Lang) ? (data.lang as Lang) : undefined,
     currentSource: typeof data.currentSource === "string" ? data.currentSource : undefined,
     positions,
     dialogs: dialogs.length ? (dialogs as unknown[][]) : [[]],
@@ -182,6 +196,12 @@ export const storage = {
   },
   newDialog(): void {
     update((s) => (s.dialogs[s.dialogs.length - 1]?.length ? { ...s, dialogs: [...s.dialogs, []] } : s));
+  },
+  setTheme(theme: Theme): void {
+    update((s) => ({ ...s, theme }));
+  },
+  setLang(lang: Lang): void {
+    update((s) => ({ ...s, lang }));
   },
   notice: (): string | undefined => read().notice,
   acceptNotice(version: string): void {

@@ -1,0 +1,42 @@
+PhiloGraph
+Library
+Settings
+RU
+EN
+Library
+
+Textbooks, primary sources and reference works. Choose a source to read its chapters.
+
+Start reading
+Kind
+Textbook
+Primary source
+Reference work
+Language
+English
+Russian
+Empiricism: a demonstration reader
+Author
+PhiloGraph project
+Year
+2026
+Language
+English
+Kind
+Primary source
+License
+CC BY 4.0
+Read
+Теория познания: демонстрационный учебник
+Default
+Author
+Проект PhiloGraph
+Year
+2026
+Language
+Russian
+Kind
+Textbook
+License
+CC BY 4.0
+Read

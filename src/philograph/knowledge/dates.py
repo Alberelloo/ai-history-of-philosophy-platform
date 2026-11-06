@@ -91,6 +91,11 @@ def parse(text: str) -> FuzzyDate:
     )
 
 
+# Годы жизни через короткое тире без пробелов: 1724–1804 (docs/design/system/content.md).
+LIFESPAN_DASH = "–"
+OLD_LIFESPAN_DASH = " – "  # запись до миграции knowledge:5
+
+
 def lifespan(birth: str, death: str) -> FuzzyDate:
     b, d = parse(birth), parse(death)
     return FuzzyDate(
@@ -99,5 +104,5 @@ def lifespan(birth: str, death: str) -> FuzzyDate:
         d.earliest_end,
         d.latest_end,
         "year" if b.precision == d.precision == "year" else "approx",
-        f"{birth} – {death}",
+        f"{birth}{LIFESPAN_DASH}{death}",
     )

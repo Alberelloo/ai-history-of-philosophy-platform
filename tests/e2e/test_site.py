@@ -5,6 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
+from ..helpers import topnav
 from .conftest import reader_context, wait_logs
 
 req = pytest.mark.req
@@ -49,7 +50,7 @@ def test_reading_journey(page, stack):
     assert "белой бумаге" in popup.inner_text()
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/tabula-rasa"
     page.get_by_role("navigation", name="Главы").get_by_role(
-        "button", name="Следующая глава →"
+        "button", name="Следующая глава"
     ).click()
     page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
     toc = page.get_by_role("navigation", name="Оглавление")
@@ -169,15 +170,16 @@ def test_mention_opens_card_and_navigates(page, stack):
     card = page.get_by_role("dialog", name="Карточка")
     card.locator("h3:text('Юм')").wait_for()
     assert page.evaluate("window.scrollY") == scroll  # глава не сдвигается
-    assert "1711" in card.locator(".card-dates").inner_text()
+    assert card.locator(".card-dates").inner_text() == "1711–1776"  # тире без пробелов
     influence = card.locator("[data-section=influence]")
     assert "так считает" in influence.inner_text()
     # Описание дописывается потоком и помечено как сгенерированное.
     card.locator(".card-description.ungrounded").get_by_role("img", name="Сгенерировано").wait_for()
-    assert "демонстрационный" in card.locator(".card-description").inner_text()
+    description = card.locator(".card-description").inner_text().strip()
+    assert description and "config/" not in description  # описание, а не служебный текст
     influence.get_by_role("button", name="Кант", exact=True).click()
     card.locator("h3:text('Кант')").wait_for()
-    card.get_by_role("button", name="← Назад").click()
+    card.get_by_role("button", name="Назад").click()
     card.locator("h3:text('Юм')").wait_for()
     # Подтверждающий абзац из строки ведёт к абзацу учебника.
     card.get_by_role("button", name="Кант", exact=True).click()
@@ -261,6 +263,8 @@ def test_genesis_graph_from_card(page, stack, tmp_path):
     page.wait_for_selector("h1:text('Генезис: Кант')")
     # Сохранённая связь видна сразу, достроенные приходят следом и помечены.
     page.locator(".graph-edge[data-generated=false]").first.wait_for()
+    kant_dates = page.locator(".graph-node[aria-label='Кант'] .graph-dates")
+    assert kant_dates.text_content() == "1724–1804"
     page.wait_for_function(
         "document.querySelectorAll('.graph-edge[data-generated=true]').length === 2"
     )
@@ -326,7 +330,7 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
     card = page.get_by_role("dialog", name="Карточка")
     assert card.get_by_label("Только выбранный учебник").is_checked()
     card.get_by_role("button", name="Закрыть карточку").click()
-    page.get_by_role("button", name="← К чтению").click()
+    topnav(page).get_by_role("link", name=TEXTBOOK).click()
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.evaluate("""() => {
         const p = document.querySelector('p.block');

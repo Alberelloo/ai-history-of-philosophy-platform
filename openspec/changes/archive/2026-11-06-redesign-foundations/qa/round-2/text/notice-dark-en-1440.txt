@@ -1,0 +1,57 @@
+PhiloGraph
+Library
+Settings
+RU
+EN
+Before you start
+
+PhiloGraph is a textbook on the history of philosophy: source chapters, cards for concepts and people, a graph of how ideas originated, and an assistant that answers with links to paragraphs.
+
+Everything the model wrote without support from sources is marked with an icon and a frame: an example of a generated line. Such lines are the model’s suggestion, not an established fact.
+
+Generation without sources is on. You can turn it off here or in settings.
+
+Questions to the assistant, card descriptions and graph extension are processed by an external language model provider under its own rules. Do not include personal data in questions.
+
+Generation without sources
+The model adds descriptions and links; such places are marked.
+From sources only
+The assistant shows only what paragraphs confirm.
+Got it
+Library
+
+Textbooks, primary sources and reference works. Choose a source to read its chapters.
+
+Start reading
+Kind
+Textbook
+Primary source
+Reference work
+Language
+English
+Russian
+Empiricism: a demonstration reader
+Author
+PhiloGraph project
+Year
+2026
+Language
+English
+Kind
+Primary source
+License
+CC BY 4.0
+Read
+Теория познания: демонстрационный учебник
+Default
+Author
+Проект PhiloGraph
+Year
+2026
+Language
+Russian
+Kind
+Textbook
+License
+CC BY 4.0
+Read

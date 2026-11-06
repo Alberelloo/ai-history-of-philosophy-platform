@@ -1,0 +1,28 @@
+<!-- @dsCard group="Окна" height=424 -->
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>SidePanel</title></head>
+<body>
+<div class="pg-demo pg-demo--col" style="align-items:stretch">
+  <button class="pg-btn pg-btn--primary pg-btn--sm" id="toggle" style="align-self:flex-start"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M14.5 4.5v15"/></svg>Открыть карточку</button>
+  <div class="pg-shell" data-panel="closed">
+    <div class="pg-shell__main"><div class="pg-reading"><p>Кант признавал, что именно Юм пробудил его от догматического сна. Ответ Канта Юму: причинность — априорная категория рассудка, условие возможности самого опыта. Без неё мы не могли бы связать восприятия в единый опыт.</p></div></div>
+    <aside class="pg-panel" aria-label="Карточка"><div class="pg-panel__inner">
+      <div class="pg-panel__head"><h3 class="pg-panel__title">Дэвид Юм</h3>
+        <button class="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label="Развернуть"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4.5h5.5V10M10 19.5H4.5V14M19.5 4.5 13 11M4.5 19.5 11 13"/></svg></button>
+        <button class="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label="Закрыть" id="close"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"/></svg></button></div>
+      <div class="pg-panel__body">
+        <div class="pg-entity-head"><div class="pg-portrait" style="--size:56px"><div class="pg-portrait__disc"><img src="PORTRAIT.jpg" alt="Дэвид Юм"></div></div>
+          <div><div class="pg-entity-head__meta" style="margin:0"><span class="pg-chip" data-family="people">Персона</span><span>1711–1776</span><span>Эдинбург</span></div></div></div>
+        <dl class="pg-facts"><div><dt>Повлиял на</dt><dd><a href="#">Кант</a></dd></div><div><dt>Учение</dt><dd><a href="#">Скептицизм</a></dd></div></dl>
+      </div></div></aside>
+  </div>
+</div>
+<script>
+var shell = document.querySelector('.pg-shell'), btn = document.getElementById('toggle');
+function set(open) { shell.setAttribute('data-panel', open ? 'open' : 'closed'); btn.lastChild.textContent = open ? 'Закрыть карточку' : 'Открыть карточку'; }
+btn.onclick = function () { set(shell.getAttribute('data-panel') !== 'open'); };
+document.getElementById('close').onclick = function () { set(false); };
+</script>
+</body>
+</html>

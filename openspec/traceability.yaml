@@ -34,4 +34,5 @@ enforce:
   - backup-and-recovery
   - operational-alerts
   - deployment
+  - visual-design
   - source-catalog

@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
 import { api, SourceList } from "./api";
 import { navigate } from "./App";
+import { pick, useT } from "./i18n";
 import { storage } from "./storage";
+import { rememberTitles } from "./TopBar";
+import { Icon } from "./ui";
 
-const KINDS: [string, string][] = [
-  ["textbook", "Учебник"],
-  ["primary", "Первоисточник"],
-  ["reference", "Справочное издание"],
-];
-const KIND_NAME = Object.fromEntries(KINDS);
-const LANGUAGE_NAME: Record<string, string> = {
-  ru: "русский",
-  en: "английский",
-  de: "немецкий",
-  fr: "французский",
-  la: "латынь",
-  grc: "древнегреческий",
-};
-const NOT_SET = "не указано";
+const KINDS = ["textbook", "primary", "reference"];
 
 function toggle(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
+// Фильтр-метка: настоящий флажок внутри подписи, оформленный по токенам.
+function Filter({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+  return (
+    <label className="filter">
+      <input className="filter__input" type="checkbox" checked={checked} onChange={onChange} />
+      {label}
+    </label>
+  );
+}
+
 export function LibraryPage() {
+  const t = useT();
   const [kinds, setKinds] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [query, setQuery] = useState("");
@@ -31,11 +31,14 @@ export function LibraryPage() {
   const [allLanguages, setAllLanguages] = useState<string[]>([]);
   const [openLicense, setOpenLicense] = useState<string | null>(null);
   const current = storage.currentSource();
+  const notSet = t.library.notSet;
+  const languageName = (code: string) => pick(t.library.languages, code) ?? code;
 
   useEffect(() => {
     let cancelled = false;
     api.sources({ kinds, languages, query }).then((result) => {
       if (cancelled) return;
+      rememberTitles(result.sources);
       setData(result);
       setAllLanguages(result.languages);
     });
@@ -56,100 +59,110 @@ export function LibraryPage() {
   const filtered = kinds.length > 0 || languages.length > 0 || query !== "";
 
   return (
-    <main className="library">
-      <header className="library-header">
-        <h1>Библиотека</h1>
-        <button className="link" onClick={() => navigate("/settings")}>
-          Настройки
-        </button>
-        <button className="primary" onClick={() => navigate("/read")}>
-          Перейти к чтению
+    <main className="page library">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">{t.library.title}</h1>
+          <p className="page-lead">{t.library.lead}</p>
+        </div>
+        <button className="pg-btn pg-btn--primary" onClick={() => navigate("/read")}>
+          <Icon name="book" />
+          {t.library.startReading}
         </button>
       </header>
 
-      <section className="filters" aria-label="Поиск и фильтры">
-        <input
-          type="search"
-          aria-label="Поиск по названию и автору"
-          placeholder="Название или автор"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <fieldset>
-          <legend>Вид</legend>
-          {KINDS.map(([value, label]) => (
-            <label key={value}>
-              <input
-                type="checkbox"
-                checked={kinds.includes(value)}
-                onChange={() => setKinds(toggle(kinds, value))}
-              />
-              {label}
-            </label>
+      <section className="filters" aria-label={t.library.filters}>
+        <div className="pg-field filters__search">
+          <div className="pg-field__control">
+            <Icon name="search" />
+            <input
+              className="pg-input"
+              type="search"
+              aria-label={t.library.searchLabel}
+              placeholder={t.library.searchPlaceholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        <fieldset className="filters__group">
+          <legend>{t.library.kind}</legend>
+          {KINDS.map((value) => (
+            <Filter
+              key={value}
+              label={pick(t.library.kinds, value) ?? value}
+              checked={kinds.includes(value)}
+              onChange={() => setKinds(toggle(kinds, value))}
+            />
           ))}
         </fieldset>
-        <fieldset>
-          <legend>Язык</legend>
+        <fieldset className="filters__group">
+          <legend>{t.library.language}</legend>
           {allLanguages.map((value) => (
-            <label key={value}>
-              <input
-                type="checkbox"
-                checked={languages.includes(value)}
-                onChange={() => setLanguages(toggle(languages, value))}
-              />
-              {LANGUAGE_NAME[value] ?? value}
-            </label>
+            <Filter
+              key={value}
+              label={languageName(value)}
+              checked={languages.includes(value)}
+              onChange={() => setLanguages(toggle(languages, value))}
+            />
           ))}
         </fieldset>
         {filtered && (
-          <button className="link" onClick={reset}>
-            Сбросить поиск и фильтры
+          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={reset}>
+            <Icon name="close" small />
+            {t.library.reset}
           </button>
         )}
       </section>
 
       {data && data.sources.length === 0 && (
-        <p className="empty" role="status">
-          Подходящих источников нет.{" "}
-          <button className="link" onClick={reset}>
-            Сбросить поиск и фильтры
+        <div className="pg-notice empty" role="status">
+          <Icon name="info" />
+          <div>{t.library.empty}</div>
+          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={reset}>
+            {t.library.reset}
           </button>
-        </p>
+        </div>
       )}
 
       <ul className="sources">
         {data?.sources.map((s) => (
           <li key={s.id} className={s.id === current ? "source current" : "source"}>
             <div className="source-main">
-              <h2>{s.title}</h2>
-              {s.id === current && <span className="badge">Текущий</span>}
-              {s.id === data.default_source_id && <span className="badge muted">По умолчанию</span>}
+              <div className="source-head">
+                <h2>{s.title}</h2>
+                <div className="source-badges">
+                  {s.id === current && <span className="badge badge--accent">{t.library.current}</span>}
+                  {s.id === data.default_source_id && <span className="badge">{t.library.byDefault}</span>}
+                </div>
+              </div>
               <dl>
-                <dt>Автор</dt>
-                <dd>{s.authors.length ? s.authors.join(", ") : NOT_SET}</dd>
-                <dt>Год</dt>
-                <dd>{s.year ?? NOT_SET}</dd>
-                <dt>Язык</dt>
-                <dd>{LANGUAGE_NAME[s.language] ?? s.language ?? NOT_SET}</dd>
-                <dt>Вид</dt>
-                <dd>{KIND_NAME[s.kind] ?? NOT_SET}</dd>
-                <dt>Лицензия</dt>
+                <dt>{t.library.author}</dt>
+                <dd>{s.authors.length ? s.authors.join(", ") : notSet}</dd>
+                <dt>{t.library.year}</dt>
+                <dd className="num">{s.year ?? notSet}</dd>
+                <dt>{t.library.language}</dt>
+                <dd>{s.language ? languageName(s.language) : notSet}</dd>
+                <dt>{t.library.kind}</dt>
+                <dd>{pick(t.library.kinds, s.kind) ?? notSet}</dd>
+                <dt>{t.library.license}</dt>
                 <dd>
                   <button
-                    className="link"
+                    className="pg-btn pg-btn--ghost pg-btn--sm license-toggle"
                     aria-expanded={openLicense === s.id}
                     onClick={() => setOpenLicense(openLicense === s.id ? null : s.id)}
                   >
-                    {s.license.title ?? NOT_SET}
+                    {s.license.title ?? notSet}
+                    <Icon name="chevronDown" small className="license-toggle__chevron" />
                   </button>
                   {openLicense === s.id && (
                     <span className="license-details" role="note">
-                      {s.license.title ?? NOT_SET}
+                      {s.license.title ?? notSet}
                       {s.license.url && (
                         <>
                           {" — "}
                           <a href={s.license.url} target="_blank" rel="noreferrer">
-                            текст лицензии
+                            {t.library.licenseText}
                           </a>
                         </>
                       )}
@@ -158,9 +171,11 @@ export function LibraryPage() {
                 </dd>
               </dl>
             </div>
-            <button className="primary" onClick={() => choose(s.id)}>
-              Читать
-            </button>
+            <div className="source-actions">
+              <button className="pg-btn pg-btn--secondary" onClick={() => choose(s.id)}>
+                {t.library.read}
+              </button>
+            </div>
           </li>
         ))}
       </ul>

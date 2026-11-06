@@ -1,0 +1,35 @@
+PhiloGraph
+Library
+Теория познания: демонстрационный учебник
+Settings
+RU
+EN
+Settings
+
+Settings are kept only in this browser and are sent with each request.
+
+Appearance
+Theme
+Light
+Dark
+System
+Interface language
+RU
+EN
+Answers and cards
+Generation without sources
+The model adds descriptions and links; such places are marked.
+From sources only
+The assistant shows only what paragraphs confirm.
+
+Without generation the graph is not extended by the model, cards have no model descriptions, and the assistant shows only what sources confirm.
+
+Sources
+All sources
+Selected textbook only
+About marks and question processing
+Data in this browser
+
+Settings, reading places and assistant dialogs are kept only here.
+
+Delete all data

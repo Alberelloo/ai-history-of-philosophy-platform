@@ -1,0 +1,38 @@
+<!-- @dsCard group="Окна" height=404 -->
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>Popover</title></head>
+<body>
+<div class="pg-demo pg-demo--col">
+  <button class="pg-btn pg-btn--ghost pg-btn--sm" id="replay">Показать появление ещё раз</button>
+  
+<div class="pg-popover" data-state="open" role="dialog" aria-label="Иммануил Кант">
+  <div class="pg-entity-head">
+    <div class="pg-portrait" style="--size:56px"><div class="pg-portrait__disc"><img src="PORTRAIT.jpg" alt="Иммануил Кант"></div></div>
+    <div>
+      <h3 class="pg-entity-head__name">Иммануил Кант</h3>
+      <div class="pg-entity-head__meta"><span class="pg-chip" data-family="people">Персона</span><span>1724–1804</span><span>Кёнигсберг</span></div>
+    </div>
+  </div>
+  <p class="pg-desc"><span class="pg-generated"><svg class="pg-generated__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Сгенерировано"><path d="M12 4.5 19.5 12 12 19.5 4.5 12Z"/></svg>Немецкий философ, автор критической философии: исследовал условия и границы познания.</span></p>
+  <dl class="pg-facts">
+    <div><dt>Повлияли</dt><dd><a href="#">Юм</a>, <a href="#">Лейбниц</a> <span class="pg-status pg-status--verified pg-status--icon-only" title="Проверено"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span></dd></div>
+    <div><dt>Учение</dt><dd><a href="#">Трансцендентальный идеализм</a></dd></div>
+    <div><dt>Где читать</dt><dd>Глава 3, 2 упоминания</dd></div>
+  </dl>
+  <div class="pg-popover__actions">
+    <button class="pg-btn pg-btn--secondary pg-btn--sm"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4.5h5.5V10M10 19.5H4.5V14M19.5 4.5 13 11M4.5 19.5 11 13"/></svg>Открыть карточку</button>
+    <button class="pg-btn pg-btn--ghost pg-btn--sm"><svg class="pg-ico pg-ico--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="17.5" cy="7.5" r="2.5"/><circle cx="17.5" cy="17" r="2"/><path d="m8.4 14.8 7.2-5.6M9 16.7h6.5"/></svg>Генезис</button>
+  </div>
+</div>
+
+</div>
+<script>
+document.getElementById('replay').onclick = function () {
+  var p = document.querySelector('.pg-popover');
+  p.setAttribute('data-state', 'closing');
+  setTimeout(function () { p.removeAttribute('data-state'); void p.offsetWidth; p.setAttribute('data-state', 'open'); }, 160);
+};
+</script>
+</body>
+</html>

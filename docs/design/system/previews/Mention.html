@@ -1,0 +1,23 @@
+<!-- @dsCard group="Чтение" height=236 -->
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>Mention</title></head>
+<body>
+<div class="pg-demo pg-demo--col">
+  <div class="pg-seg" role="group" aria-label="Упоминания">
+    <button class="pg-seg__item" aria-pressed="true" data-mode="visible">Подчёркивать</button><button class="pg-seg__item" aria-pressed="false" data-mode="quiet">При наведении</button>
+  </div>
+  <div class="pg-reading" data-mentions="visible" style="max-width:36em">
+    <p><button class="pg-mention" data-family="people">Кант</button> признавал, что именно <button class="pg-mention" data-family="people" aria-expanded="true">Юм</button> пробудил его от догматического сна. Ответ на <button class="pg-mention" data-family="teachings">скептицизм</button>: <button class="pg-mention" data-family="ideas">причинность</button> — априорная категория рассудка, о чём подробно сказано в <button class="pg-mention" data-family="texts">«Критике чистого разума»</button>, вышедшей в эпоху <button class="pg-mention" data-family="history">Просвещения</button>.</p>
+  </div>
+</div>
+<script>
+var seg = document.querySelector('.pg-seg'), text = document.querySelector('.pg-reading');
+seg.addEventListener('click', function (e) {
+  var b = e.target.closest('.pg-seg__item'); if (!b) return;
+  seg.querySelectorAll('.pg-seg__item').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+  text.setAttribute('data-mentions', b.dataset.mode);
+});
+</script>
+</body>
+</html>

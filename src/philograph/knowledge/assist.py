@@ -215,6 +215,7 @@ class AssistantKnowledge:
                 graph = {
                     "entity_id": entity["id"],
                     "recipe": code,
+                    "label": entity["label"],  # клиент собирает подпись на языке интерфейса
                     "title": f"Открыть граф: {spec['title'].lower()} — {entity['label']}",
                 }
                 return line[: self.max_statements], graph

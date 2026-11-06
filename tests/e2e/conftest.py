@@ -57,6 +57,11 @@ class ComposeStack:
         return events
 
 
+# Тесты открывают сотни страниц с одного адреса, каждая со своими шрифтами и без кэша
+# браузера: общий лимит частоты шлюза на стенде тестов поднят, иначе он срабатывает на статике.
+TEST_RATE_BURST = "2000"
+
+
 @pytest.fixture(scope="session")
 def stack(tmp_path_factory):
     if os.environ.get("PHILOGRAPH_E2E_URL"):
@@ -78,6 +83,7 @@ def stack(tmp_path_factory):
         pytest.skip("клиент не собран: npm run build в web/")
     import dev_stack
 
+    os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
     running = dev_stack.start(tmp_path_factory.mktemp("stack"))
     yield running
     running.stop()

@@ -69,7 +69,7 @@ export class ApiError extends Error {
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`/api/v1${path}`);
   const body = await response.json();
-  if (!response.ok) throw new ApiError(body.error ?? "Ошибка", body.kind ?? "error");
+  if (!response.ok) throw new ApiError(body.error ?? "", body.kind ?? "error");
   return body as T;
 }
 
