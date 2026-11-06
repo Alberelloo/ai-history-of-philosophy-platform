@@ -114,7 +114,7 @@ _BLOCK_TAGS = {
     "dd": None,
     "dt": None,
 }
-_NOTE_CLASS_RE = re.compile(r"foot-?note|endnote|\bnote\b|сноска", re.IGNORECASE)
+_NOTE_CLASS_RE = re.compile(r"foot-?note|endnote|cite_note|\bnote\b|сноска", re.IGNORECASE)
 
 
 def _epub_type(el: etree._Element) -> str:
@@ -128,10 +128,21 @@ def _is_note_container(el: etree._Element, note_targets: set[str]) -> bool:
     if "footnote" in _epub_type(el) or "endnote" in _epub_type(el) or el.tag == "aside":
         return True
     ident = el.get("id")
+    if not (ident and ident in note_targets):
+        # Project Gutenberg: <p class="footnote"><a id="fn1.3"/> … — якорь внутри абзаца
+        ident = next(
+            (
+                c.get("id")
+                for c in el.iterchildren()
+                if isinstance(c.tag, str) and c.get("id") in note_targets
+            ),
+            None,
+        )
     return bool(
         ident
         and ident in note_targets
-        and _NOTE_CLASS_RE.search((el.get("class") or "") + " " + el.tag)
+        # Wikisource (Parsoid): <li id="cite_note-1"> — признак сноски в идентификаторе
+        and _NOTE_CLASS_RE.search((el.get("class") or "") + " " + el.tag + " " + ident)
     )
 
 
@@ -183,6 +194,12 @@ def extract_html(
     data = re.sub(r"^\s*<\?xml[^>]*\?>", "", data)
     root = html.fromstring(data)
     body = root.find("body") if root.find("body") is not None else root
+    # Обратная ссылка из сноски на её знак («[3]» в начале сноски Gutenberg) — не текст.
+    ref_ids = {a.get("id") for a in body.iter("a") if a.get("id") and "#" in (a.get("href") or "")}
+    for a in list(body.iter("a")):
+        target = (a.get("href") or "").split("#", 1)[1] if "#" in (a.get("href") or "") else None
+        if target in ref_ids and a.get("id") not in ref_ids:
+            a.drop_tree()
     note_targets = {
         a.get("href").split("#", 1)[1]
         for a in body.iter("a")

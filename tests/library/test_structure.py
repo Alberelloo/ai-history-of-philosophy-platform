@@ -407,3 +407,33 @@ def test_checks_errors_and_warnings():
     clean.warn("unlinked_note", "Текст сноски «2» без знака")
     issues = checks.check(clean)
     assert not checks.has_errors(issues) and len(issues) == 2
+
+
+@req(DS, "Сноски")
+def test_footnotes_of_gutenberg_and_wikisource_html():
+    from philograph.library.extract import extract_html
+    from philograph.library.model import RawDocument
+
+    gutenberg = (
+        "<html><body><h2>PART I</h2>"
+        '<p>Mr. Locke has proved it<a href="ch1.xhtml#fn1.3" id="fnref1.3">[3]</a> long ago.</p>'
+        '<p class="footnote"><a id="fn1.3"/> <a href="ch1.xhtml#fnref1.3">[3]</a> '
+        "Dr. Berkeley, Introduction.</p></body></html>"
+    )
+    wikisource = (
+        "<html><body><h2>Essay 1</h2>"
+        '<p>Philosophy may be treated<sup class="mw-ref reference">'
+        '<a href="./Essays#cite_note-1">[1]</a></sup> after two manners.</p>'
+        '<ol class="mw-references references"><li id="cite_note-1">'
+        '<span class="mw-reference-text">See the Treatise.</span></li></ol></body></html>'
+    )
+    for page, expected in (
+        (gutenberg, "Dr. Berkeley, Introduction."),
+        (wikisource, "See the Treatise."),
+    ):
+        pages, _ = extract_html(page)
+        doc = parse_raw(RawDocument(pages=pages, fmt="html", paginated=False))
+        notes = [f for s in doc.sections for f in s.footnotes]
+        assert [n.text for n in notes] == [expected], [b.text for _, b in doc.blocks()]
+        assert notes[0].linked
+        assert all(expected not in b.text for _, b in doc.blocks())
