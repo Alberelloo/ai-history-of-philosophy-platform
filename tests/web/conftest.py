@@ -29,27 +29,26 @@ from ..library.builders import epub
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "web" / "dist"
 
-TEXTBOOK = epub(
-    [
-        (
-            "Глава 1. Опыт",
-            "<p>Всякое знание начинается с опыта, говорит Кант.</p>"
-            '<span epub:type="pagebreak" title="41"/>'
-            '<p>Кант пишет о вещи в себе<a href="#n1" epub:type="noteref">1</a>'
-            " весьма подробно.</p>"
-            '<aside epub:type="footnote" id="n1"><p>Критика чистого разума, B XXVI. '
-            "См. https://example.org/kant</p></aside>"
-            '<span epub:type="pagebreak" title="42"/>'
-            + "".join(f"<p>Абзац {i} о чувственности и опыте познания.</p>" for i in range(40)),
-        ),
-        (
-            "Глава 2. Рассудок",
-            "<p>Рассудок даёт правила явлениям.</p><h2>Схематизм</h2>"
-            + "".join(f"<p>Схема {i} связывает категории и созерцания.</p>" for i in range(30)),
-        ),
-        ("Глава 3. Разум", "<p>Разум стремится к безусловному.</p>"),
-    ]
-)
+TEXTBOOK_CHAPTERS = [
+    (
+        "Глава 1. Опыт",
+        "<p>Всякое знание начинается с опыта, говорит Кант.</p>"
+        '<span epub:type="pagebreak" title="41"/>'
+        '<p>Кант пишет о вещи в себе<a href="#n1" epub:type="noteref">1</a>'
+        " весьма подробно.</p>"
+        '<aside epub:type="footnote" id="n1"><p>Критика чистого разума, B XXVI. '
+        "См. https://example.org/kant</p></aside>"
+        '<span epub:type="pagebreak" title="42"/>'
+        + "".join(f"<p>Абзац {i} о чувственности и опыте познания.</p>" for i in range(40)),
+    ),
+    (
+        "Глава 2. Рассудок",
+        "<p>Рассудок даёт правила явлениям.</p><h2>Схематизм</h2>"
+        + "".join(f"<p>Схема {i} связывает категории и созерцания.</p>" for i in range(30)),
+    ),
+    ("Глава 3. Разум", "<p>Разум стремится к безусловному.</p>"),
+]
+TEXTBOOK = epub(TEXTBOOK_CHAPTERS)
 PRIMARY = b"Chapter 1\n\nAll our knowledge begins with experience.\n"
 REFERENCE = "Статья «Познание»\n\nПознание — процесс постижения мира.\n".encode()
 

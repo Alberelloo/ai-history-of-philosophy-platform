@@ -244,6 +244,13 @@ svg :where(g[tabindex]):focus-visible {
 }
 
 .sidebar__nav {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar__scroll {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden auto;
@@ -553,6 +560,10 @@ svg :where(g[tabindex]):focus-visible {
 .pg-filter__count {
   margin-left: calc(var(--space-1) * -1);
   color: var(--ink-2);
+}
+
+.pg-filter__count.is-empty {
+  visibility: hidden;
 }
 
 .pg-filter__chevron {

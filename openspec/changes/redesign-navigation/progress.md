@@ -18,7 +18,7 @@
 | 5.2 Клиент: устойчивое чтение | сделан: ReaderPage на chapter_not_found ищет сохранённый абзац (или абзац из адреса), иначе первую главу; уведомление в потоке; раздел по адресу → глава с прокруткой; ApiError.details |
 | 5.3 Заглушки необработанных частей | сделан: extract — blank_page и missing, parse — блоки unrendered с пояснением, Wikisource v3 пишет красные ссылки с missing, CatalogFetch отдаёт заглушку, схема каталога; оформление unrendered в клиенте; PIPELINE_VERSION 3, STEP_VERSIONS 3; тесты tests/library/test_unrendered_parts.py, tests/library/catalog/test_missing_subpages.py |
 | 6.1 Прослеживаемость RENAMED/REMOVED | сделан: check_traceability понимает RENAMED (FROM) и REMOVED; тест tests/platform/test_runtime.py::test_traceability_follows_renamed_and_removed |
-| 6.2 Тесты требований | не начат |
+| 6.2 | в работе: helpers (sidenav/via_sidebar, v3), test_settings, test_site, tests/web (фильтры, ширина поиска, регресс устаревшей главы, заглушка в тексте) переведены; осталось test_visual_design и открытые книги |
 | 6.3 Визуальные эталоны | не начат |
 | 6.4 Итоговый прогон | не начат |
 

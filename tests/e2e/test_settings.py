@@ -7,14 +7,15 @@ import json
 import httpx
 import pytest
 
-from ..helpers import topnav
+from ..helpers import via_sidebar
 from .conftest import NOTICE_VERSION, reader_context, wait_logs
 
 req = pytest.mark.req
 FR = "first-run-notice"
 RS = "reader-settings"
 pytestmark = pytest.mark.e2e
-KEY = "philograph:v2"
+KEY = "philograph:v3"
+V2 = "philograph:v2"
 NOTICE = "О пометках и обработке вопросов"
 
 
@@ -60,7 +61,7 @@ def test_first_run_notice_choice_and_once(browser, stack):
     generation.uncheck()
     notice.get_by_role("button", name="Понятно").click()
     assert page.get_by_role("region", name=NOTICE).count() == 0
-    topnav(page).get_by_role("link", name="Настройки").click()
+    via_sidebar(page, "Настройки")
     page.wait_for_selector("h1:text('Настройки')")
     assert not page.get_by_label("Генерация без опоры на источники").is_checked()
     # Второй визит — без уведомления; новая версия текста — снова с ним.
@@ -116,7 +117,7 @@ def test_settings_defaults_and_effect(page, stack):
     assert page.get_by_label("Все источники").is_checked()
     page.get_by_label("Генерация без опоры на источники").uncheck()
     # Без перезагрузки: переход внутри приложения.
-    topnav(page).get_by_role("link", name="Библиотека").click()
+    via_sidebar(page, "Библиотека")
     page.locator(".source", has_text="Теория познания").get_by_role("button", name="Читать").click()
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.get_by_role("button", name="Ассистент", exact=True).click()
@@ -139,6 +140,74 @@ def test_settings_defaults_and_effect(page, stack):
     assert page.locator(".card-description").count() == 0
 
 
+@req(RS, "Набор настроек")
+def test_settings_sections_and_toc(page, stack):
+    """Разделы настроек с оглавлением: переход, адрес раздела, отметка видимого раздела."""
+    page.set_viewport_size({"width": 1280, "height": 720})
+    page.goto(stack.url + "/settings")
+    main = page.get_by_role("main")
+    toc = main.get_by_role("navigation", name="Разделы настроек")
+    names = toc.get_by_role("link").all_inner_texts()
+    assert names == [
+        "Внешний вид",
+        "Ответы ассистента",
+        "Источники ответов",
+        "Открытые книги",
+        "О проекте",
+        "Данные",
+    ]
+    for name in names:
+        assert main.get_by_role("region", name=name).is_visible()
+    assert toc.locator("[aria-current=true]").inner_text() == "Внешний вид"
+    toc.get_by_role("link", name="Данные").click()
+    page.wait_for_url("**/settings#data")
+    page.wait_for_function(
+        "() => document.querySelector('nav[aria-label=\"Разделы настроек\"] [aria-current=true]')"
+        "?.textContent === 'Данные'"
+    )
+    data = main.get_by_role("region", name="Данные")
+    assert data.get_by_role("group", name="Опасная зона").is_visible()
+    box = data.bounding_box()
+    assert box and 0 <= box["y"] < 720, box  # раздел на экране
+    # Оглавление закреплено: видно и после прокрутки к последнему разделу.
+    assert 0 <= toc.bounding_box()["y"] < 200
+    # Адрес раздела открывает экран на нём.
+    page.goto(stack.url + "/settings#books")
+    books = main.get_by_role("region", name="Открытые книги")
+    page.wait_for_function(
+        "() => Math.abs(document.getElementById('books').getBoundingClientRect().top - 24) < 4"
+    )
+    assert books.is_visible()
+    assert toc.locator("[aria-current=true]").inner_text() == "Открытые книги"
+
+
+@req(RS, "Единое хранилище в браузере")
+def test_format_2_migrated_to_open_books(browser, stack):
+    """Формат 2: выбранный источник становится первой открытой книгой, места чтения на месте."""
+    source, chapter = textbook_and_chapter(stack, "Глава 3. Ответ Канта")
+    context = reader_context(browser, accepted=False)
+    seed_once(
+        context,
+        f"""
+        localStorage.setItem('{V2}', JSON.stringify({{version: 2, theme: 'dark',
+            notice: '{NOTICE_VERSION}', currentSource: '{source}',
+            settings: {{generation: false, sourcesOnly: false, onlyTextbook: false}},
+            positions: {{'{source}': {{chapterId: '{chapter}'}}}}}}));
+        """,
+    )
+    page = context.new_page()
+    page.goto(stack.url + "/read")
+    page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")  # место чтения перенесено
+    data = stored(page)
+    assert data["version"] == 3 and data["theme"] == "dark"
+    assert data["settings"]["generation"] is False
+    assert [o["id"] for o in data["openSources"]] == [source] and data["currentSource"] == source
+    assert data["sidebarPinned"] is False
+    assert page.evaluate(f"localStorage.getItem('{V2}')") is None
+    assert page.evaluate("document.documentElement.dataset.theme") == "dark"
+    context.close()
+
+
 @req(RS, "Единое хранилище в браузере")
 def test_old_format_migrated(browser, stack):
     source, chapter = textbook_and_chapter(stack, "Глава 3. Ответ Канта")
@@ -158,7 +227,7 @@ def test_old_format_migrated(browser, stack):
     page.goto(stack.url + "/read")
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")  # место чтения перенесено
     data = stored(page)
-    assert data["version"] == 2 and data["settings"]["generation"] is False
+    assert data["version"] == 3 and data["settings"]["generation"] is False
     assert page.evaluate("localStorage.getItem('philograph:v1')") is None
     page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.get_by_role("button", name="Ассистент", exact=True).click()
@@ -176,7 +245,7 @@ def test_corrupted_storage_resets(browser, stack):
     page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.goto(stack.url + "/settings")
     assert page.get_by_label("Генерация без опоры на источники").is_checked()
-    assert stored(page)["version"] == 2
+    assert stored(page)["version"] == 3
     context.close()
 
 
@@ -192,7 +261,7 @@ def test_private_mode_without_storage(browser, stack):
     page.wait_for_selector(".source")
     assert "не сохранятся" in page.locator(".storage-warning").inner_text()
     page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
-    topnav(page).get_by_role("link", name="Настройки").click()
+    via_sidebar(page, "Настройки")
     page.get_by_label("Только по источникам").check()  # в пределах вкладки работает
     assert page.get_by_label("Только по источникам").is_checked()
     context.close()
@@ -223,7 +292,7 @@ def test_old_dialogs_dropped_over_limit(browser, stack):
     context = reader_context(browser, accepted=False)
     big = json.dumps(
         {
-            "version": 2,
+            "version": 3,
             "notice": NOTICE_VERSION,
             "dialogs": [
                 [{"question": f"диалог {i} " + "x" * 60_000, "fragments": [], "status": "done"}]

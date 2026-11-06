@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from ..helpers import topnav
+from ..helpers import via_sidebar
 from .conftest import reader_context, wait_logs
 
 req = pytest.mark.req
@@ -29,6 +29,7 @@ def test_library_search_filter_and_choose(page, stack):
     page.wait_for_function("document.querySelectorAll('.source').length === 1")
     assert page.locator(".source h2").inner_text() == TEXTBOOK
     page.get_by_label("Поиск по названию и автору").fill("")
+    page.get_by_role("main").get_by_role("button", name="Вид").click()
     page.get_by_label("Первоисточник").check()
     page.wait_for_selector(".source h2:text('Empiricism: a demonstration reader')")
     page.wait_for_function("document.querySelectorAll('.source').length === 1")
@@ -330,7 +331,7 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
     card = page.get_by_role("dialog", name="Карточка")
     assert card.get_by_label("Только выбранный учебник").is_checked()
     card.get_by_role("button", name="Закрыть карточку").click()
-    topnav(page).get_by_role("link", name=TEXTBOOK).click()
+    via_sidebar(page, TEXTBOOK)
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.evaluate("""() => {
         const p = document.querySelector('p.block');

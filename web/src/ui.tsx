@@ -416,7 +416,8 @@ export function FilterMenu({
         onClick={() => setOpen(!open)}
       >
         {label}
-        {count > 0 && <span className="pg-filter__count num">· {count}</span>}
+        {/* Место под число есть всегда: кнопка не меняет ширину, строка фильтров не прыгает. */}
+        <span className={count > 0 ? "pg-filter__count num" : "pg-filter__count num is-empty"}>· {count}</span>
         <Icon name="chevronDown" small className="pg-filter__chevron" />
       </button>
       {open && (

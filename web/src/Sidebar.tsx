@@ -140,135 +140,138 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
         </span>
         <span className="sidebar__label sidebar__name">PhiloGraph</span>
       </a>
+      {/* Навигация — и список разделов, и низ панели с настройками: одна область «Разделы». */}
       <nav className="sidebar__nav" aria-label={t.nav.label}>
-        <p className="sidebar__group">
-          <span>{t.sidebar.read}</span>
-        </p>
-        <Item href="/" icon="library" label={t.nav.library} current={active === "library"} />
-        <Item
-          href={continueHref}
-          icon="books"
-          label={t.sidebar.openBooks}
-          count={books.length}
-          title={books.length ? t.sidebar.openBooksCount(books.length) : undefined}
-          current={active === "reading" && !books.some((b) => b.id === sourceId)}
-        />
-        <ul className="sidebar__books" aria-label={t.sidebar.openBooks}>
-          {books.length === 0 && <li className="sidebar__empty">{t.sidebar.noOpenBooks}</li>}
-          {books.map(({ id }) => {
-            const book = info[id]!;
-            const reading = active === "reading" && sourceId === id;
-            return (
-              <li key={id} className={id === current ? "sidebar__book is-current" : "sidebar__book"}>
-                <a
-                  className="sidebar__item sidebar__item--book"
-                  href={`/read/${id}`}
-                  onClick={go(`/read/${id}`)}
-                  aria-current={reading ? "page" : id === current ? "true" : undefined}
-                >
-                  <span className="sidebar__icon">
-                    <Icon name={KIND_ICON[book.kind] ?? "book"} small />
-                  </span>
-                  <span className="sidebar__label sidebar__book-text">
-                    <span className="sidebar__book-title">{book.title}</span>
-                    {book.authors.length > 0 && (
-                      <span className="sidebar__book-author">{book.authors.join(", ")}</span>
-                    )}
-                    <span className="visually-hidden">{pick(t.library.kinds, book.kind)}</span>
-                  </span>
-                </a>
-                <button
-                  type="button"
-                  className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm sidebar__close"
-                  aria-label={t.sidebar.closeBook(book.title)}
-                  title={t.sidebar.closeBook(book.title)}
-                  onClick={() => close(id)}
-                >
-                  <Icon name="close" small />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-        {(["explore", "mine"] as const).map((group) => (
-          <div key={group} className="sidebar__section">
-            <p className="sidebar__group">
-              <span>{t.sidebar[group]}</span>
-            </p>
-            {SOON.filter((s) => s.group === group).map((s) => {
-              const text = t.soon.sections[s.code];
+        <div className="sidebar__scroll">
+          <p className="sidebar__group">
+            <span>{t.sidebar.read}</span>
+          </p>
+          <Item href="/" icon="library" label={t.nav.library} current={active === "library"} />
+          <Item
+            href={continueHref}
+            icon="books"
+            label={t.sidebar.openBooks}
+            count={books.length}
+            title={books.length ? t.sidebar.openBooksCount(books.length) : undefined}
+            current={active === "reading" && !books.some((b) => b.id === sourceId)}
+          />
+          <ul className="sidebar__books" aria-label={t.sidebar.openBooks}>
+            {books.length === 0 && <li className="sidebar__empty">{t.sidebar.noOpenBooks}</li>}
+            {books.map(({ id }) => {
+              const book = info[id]!;
+              const reading = active === "reading" && sourceId === id;
               return (
-                <Item
-                  key={s.code}
-                  href={`/soon/${s.code}`}
-                  icon={s.icon}
-                  label={text.title}
-                  soon
-                  title={text.hint}
-                  current={active === s.code}
-                />
+                <li key={id} className={id === current ? "sidebar__book is-current" : "sidebar__book"}>
+                  <a
+                    className="sidebar__item sidebar__item--book"
+                    href={`/read/${id}`}
+                    onClick={go(`/read/${id}`)}
+                    aria-current={reading ? "page" : id === current ? "true" : undefined}
+                  >
+                    <span className="sidebar__icon">
+                      <Icon name={KIND_ICON[book.kind] ?? "book"} small />
+                    </span>
+                    <span className="sidebar__label sidebar__book-text">
+                      <span className="sidebar__book-title">{book.title}</span>
+                      {book.authors.length > 0 && (
+                        <span className="sidebar__book-author">{book.authors.join(", ")}</span>
+                      )}
+                      <span className="visually-hidden">{pick(t.library.kinds, book.kind)}</span>
+                    </span>
+                  </a>
+                  <button
+                    type="button"
+                    className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm sidebar__close"
+                    aria-label={t.sidebar.closeBook(book.title)}
+                    title={t.sidebar.closeBook(book.title)}
+                    onClick={() => close(id)}
+                  >
+                    <Icon name="close" small />
+                  </button>
+                </li>
               );
             })}
+          </ul>
+          {(["explore", "mine"] as const).map((group) => (
+            <div key={group} className="sidebar__section">
+              <p className="sidebar__group">
+                <span>{t.sidebar[group]}</span>
+              </p>
+              {SOON.filter((s) => s.group === group).map((s) => {
+                const text = t.soon.sections[s.code];
+                return (
+                  <Item
+                    key={s.code}
+                    href={`/soon/${s.code}`}
+                    icon={s.icon}
+                    label={text.title}
+                    soon
+                    title={text.hint}
+                    current={active === s.code}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="sidebar__foot">
+          <Item href="/settings" icon="settings" label={t.nav.settings} current={active === "settings"} />
+          <div className="sidebar__tools sidebar__tools--full">
+            <Seg<Lang>
+              label={t.lang.label}
+              value={lang}
+              onChange={(value) => storage.setLang(value)}
+              items={[
+                { value: "ru", label: t.lang.ru },
+                { value: "en", label: t.lang.en },
+              ]}
+            />
+            <Seg<Theme>
+              label={t.theme.label}
+              value={theme}
+              onChange={(value) => storage.setTheme(value)}
+              items={[
+                { value: "light", label: t.theme.light, icon: "sun", iconOnly: true },
+                { value: "dark", label: t.theme.dark, icon: "moon", iconOnly: true },
+                { value: "system", label: t.theme.system, icon: "system", iconOnly: true },
+              ]}
+            />
           </div>
-        ))}
+          <div className="sidebar__tools sidebar__tools--compact">
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
+              aria-label={t.sidebar.langToggle(t.lang[otherLang])}
+              title={t.sidebar.langToggle(t.lang[otherLang])}
+              onClick={() => storage.setLang(otherLang)}
+            >
+              {t.lang[lang]}
+            </button>
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
+              aria-label={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
+              title={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
+              onClick={() => storage.setTheme(nextTheme)}
+            >
+              <Icon name={theme === "light" ? "sun" : theme === "dark" ? "moon" : "system"} />
+            </button>
+          </div>
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost sidebar__item sidebar__pin"
+            aria-pressed={pinnedChoice}
+            disabled={!wide}
+            title={wide ? undefined : t.sidebar.pinNarrow}
+            onClick={() => storage.setSidebarPinned(!pinnedChoice)}
+          >
+            <span className="sidebar__icon">
+              <Icon name="pin" />
+            </span>
+            <span className="sidebar__label">{t.sidebar.pin}</span>
+          </button>
+        </div>
       </nav>
-      <div className="sidebar__foot">
-        <Item href="/settings" icon="settings" label={t.nav.settings} current={active === "settings"} />
-        <div className="sidebar__tools sidebar__tools--full">
-          <Seg<Lang>
-            label={t.lang.label}
-            value={lang}
-            onChange={(value) => storage.setLang(value)}
-            items={[
-              { value: "ru", label: t.lang.ru },
-              { value: "en", label: t.lang.en },
-            ]}
-          />
-          <Seg<Theme>
-            label={t.theme.label}
-            value={theme}
-            onChange={(value) => storage.setTheme(value)}
-            items={[
-              { value: "light", label: t.theme.light, icon: "sun", iconOnly: true },
-              { value: "dark", label: t.theme.dark, icon: "moon", iconOnly: true },
-              { value: "system", label: t.theme.system, icon: "system", iconOnly: true },
-            ]}
-          />
-        </div>
-        <div className="sidebar__tools sidebar__tools--compact">
-          <button
-            type="button"
-            className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
-            aria-label={t.sidebar.langToggle(t.lang[otherLang])}
-            title={t.sidebar.langToggle(t.lang[otherLang])}
-            onClick={() => storage.setLang(otherLang)}
-          >
-            {t.lang[lang]}
-          </button>
-          <button
-            type="button"
-            className="pg-btn pg-btn--ghost pg-btn--icon sidebar__tool"
-            aria-label={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
-            title={t.sidebar.themeCycle(themeName(theme), themeName(nextTheme))}
-            onClick={() => storage.setTheme(nextTheme)}
-          >
-            <Icon name={theme === "light" ? "sun" : theme === "dark" ? "moon" : "system"} />
-          </button>
-        </div>
-        <button
-          type="button"
-          className="pg-btn pg-btn--ghost sidebar__item sidebar__pin"
-          aria-pressed={pinnedChoice}
-          disabled={!wide}
-          title={wide ? undefined : t.sidebar.pinNarrow}
-          onClick={() => storage.setSidebarPinned(!pinnedChoice)}
-        >
-          <span className="sidebar__icon">
-            <Icon name="pin" />
-          </span>
-          <span className="sidebar__label">{t.sidebar.pin}</span>
-        </button>
-      </div>
     </div>
   );
 }
