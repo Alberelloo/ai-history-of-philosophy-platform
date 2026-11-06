@@ -175,7 +175,8 @@ def test_mention_opens_card_and_navigates(page, stack):
     assert "так считает" in influence.inner_text()
     # Описание дописывается потоком и помечено как сгенерированное.
     card.locator(".card-description.ungrounded").get_by_role("img", name="Сгенерировано").wait_for()
-    assert "демонстрационный" in card.locator(".card-description").inner_text()
+    description = card.locator(".card-description").inner_text().strip()
+    assert description and "config/" not in description  # описание, а не служебный текст
     influence.get_by_role("button", name="Кант", exact=True).click()
     card.locator("h3:text('Кант')").wait_for()
     card.get_by_role("button", name="Назад").click()

@@ -27,7 +27,7 @@
 | D6 Годы без пробелов вокруг тире, миграция 5 | сделан: `dates.py`, миграция `knowledge:5` (только `lifespan` и копия дат), тесты в `tests/knowledge`, `test_site.py` |
 | D1 Карточка: названия онтологии по коду | сделан: сервер отдаёт `inverse`, `attributions[].kind`, `label`; клиент — `ontology.{ru,en}.json`, `onto` в каталогах, помощники в `i18n/index.ts` |
 | D2 Граф и ассистент: рецепты и связи по коду | сделан: `GraphPage.tsx` (рецепты, связи, «распространённое мнение»), подсказка ассистента из `recipe` и `label`; тесты `test_ontology_names_in_both_catalogs`, `test_english_card_and_graph` |
-| З2 Описание заглушки модели в карточке | не начат |
+| З2 Описание заглушки модели в карточке | сделан: `card.description` в `fake_replies` (`config/llm.demo.yaml`), проверка в `test_site.py` |
 | D4 Уведомление в потоке страницы | не начат |
 | Эталоны снимков | не начат |
 
