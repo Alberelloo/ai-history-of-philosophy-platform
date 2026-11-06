@@ -138,6 +138,10 @@ export const en: Catalog = {
     epoch: "Epoch",
     place: "Place",
   },
+  filter: {
+    selectAll: "Select all",
+    clearAll: "Clear all",
+  },
   library: {
     title: "Library",
     lead: "Textbooks, primary sources and reference works. Choose a source to read its chapters.",

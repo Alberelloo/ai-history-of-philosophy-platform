@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useT } from "./i18n";
 
 // Обёртки над компонентами дизайн-системы (docs/design/system/components.css, классы pg-*).
@@ -358,6 +358,104 @@ export function Portrait({ name, size = 56 }: { name: string; size?: number }) {
       <div className="pg-portrait__disc" role="img" aria-label={t.card.noImage(name)}>
         {monogram(name)}
       </div>
+    </div>
+  );
+}
+
+export type FilterItem = { value: string; label: string };
+
+// Выпадающий фильтр с флажками (docs/design/system/components/FilterMenu.md): кнопка с числом
+// выбранных, «Выбрать все» и «Снять все». Пустой выбор означает «все значения».
+export function FilterMenu({
+  label,
+  items,
+  selected,
+  onChange,
+}: {
+  label: string;
+  items: FilterItem[];
+  selected: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const count = selected.length;
+  const all = items.length > 0 && items.every((item) => selected.includes(item.value));
+
+  useEffect(() => {
+    if (!open) return;
+    menu.current?.querySelector<HTMLElement>("button:not([disabled]), input")?.focus();
+    const outside = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "Escape" || !open) return;
+    e.stopPropagation();
+    setOpen(false);
+    button.current?.focus();
+  };
+  const toggle = (value: string) =>
+    onChange(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]);
+
+  return (
+    <div className="pg-filter" ref={root} onKeyDown={onKeyDown}>
+      <button
+        ref={button}
+        type="button"
+        className="pg-btn pg-btn--secondary pg-filter__button"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen(!open)}
+      >
+        {label}
+        {count > 0 && <span className="pg-filter__count num">· {count}</span>}
+        <Icon name="chevronDown" small className="pg-filter__chevron" />
+      </button>
+      {open && (
+        <div id={id} ref={menu} className="pg-filter-menu" role="group" aria-label={label}>
+          <div className="pg-filter-menu__actions">
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--sm"
+              disabled={all}
+              onClick={() => onChange(items.map((item) => item.value))}
+            >
+              {t.filter.selectAll}
+            </button>
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--sm"
+              disabled={count === 0}
+              onClick={() => onChange([])}
+            >
+              {t.filter.clearAll}
+            </button>
+          </div>
+          <ul className="pg-filter-menu__list">
+            {items.map((item) => (
+              <li key={item.value}>
+                <label className="pg-filter-menu__option">
+                  <input
+                    className="filter__input"
+                    type="checkbox"
+                    checked={selected.includes(item.value)}
+                    onChange={() => toggle(item.value)}
+                  />
+                  {item.label}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
