@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigate } from "./App";
 import { CardPopup } from "./CardPopup";
-import { errorText, pick, useT } from "./i18n";
+import { errorText, pick, recipeTitle, relationTitle, useT, whoLabel } from "./i18n";
 import { ScopeToggle, setScope, useScope } from "./scope";
 import { storage } from "./storage";
 import { familyOf, Generated, Icon, StatusMark, Switch } from "./ui";
@@ -22,7 +22,7 @@ type GEdge = {
   pending: boolean;
   consensus: string;
   qualifiers: Record<string, unknown>;
-  attributions: { who: string; stance: string; place: string | null }[];
+  attributions: { who: string; kind?: string; stance: string; place: string | null }[];
   evidence: { paragraph_id: string; quote: string; link: string }[];
   in_textbook: boolean | null;
 };
@@ -222,14 +222,15 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
         d: `M${a.x},${a.y} Q${c.x},${c.y} ${b.x},${b.y}`,
         mid: { x: (a.x + 2 * c.x + b.x) / 4, y: (a.y + 2 * c.y + b.y) / 4 },
         stroke: STROKE_CLASS[e.status] ?? "graph-stroke-sourced",
-        name: `${label(e.subject)} — ${e.title} — ${label(e.object)}`,
+        // У ребра графа направление всегда «субъект → объект»: прямая подпись связи.
+        name: `${label(e.subject)} — ${relationTitle(t, e.type, false, e.title)} — ${label(e.object)}`,
       },
     ];
   });
   const edge = state?.edges.find((e) => e.id === selected.edge);
   const node = selected.node ? state?.nodes[selected.node] : undefined;
   const start = state?.nodes[entityId];
-  const recipeTitle = state?.recipes.find((r) => r.code === recipe)?.title ?? t.graph.title;
+  const currentRecipe = recipeTitle(t, recipe, state?.recipes.find((r) => r.code === recipe)?.title);
   const notice = state?.notice ? (pick(t.graph.notices, state.extension) ?? state.notice) : null;
 
   function download() {
@@ -244,7 +245,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
   return (
     <main className="page graph-page">
       <header className="page-header graph-header">
-        <h1 className="page-title">{start ? t.graph.heading(recipeTitle, start.label) : t.graph.title}</h1>
+        <h1 className="page-title">{start ? t.graph.heading(currentRecipe, start.label) : t.graph.title}</h1>
       </header>
       <div className="graph-controls">
         <div className="pg-field graph-recipe">
@@ -260,7 +261,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
             >
               {(state?.recipes ?? [{ code: recipe, title: recipe, depth: 1 }]).map((r) => (
                 <option key={r.code} value={r.code}>
-                  {r.title}
+                  {recipeTitle(t, r.code, r.title)}
                 </option>
               ))}
             </select>
@@ -316,7 +317,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
               <div className="actions">
                 {problem.suggestions.map((r) => (
                   <button key={r.code} className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setRecipe(r.code)}>
-                    {r.title}
+                    {recipeTitle(t, r.code, r.title)}
                   </button>
                 ))}
               </div>
@@ -355,7 +356,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
               .filter((r) => r.code !== recipe)
               .map((r) => (
                 <button key={r.code} className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setRecipe(r.code)}>
-                  {t.graph.tryRecipe(r.title)}
+                  {t.graph.tryRecipe(recipeTitle(t, r.code, r.title))}
                 </button>
               ))}
           </div>
@@ -450,7 +451,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
         {edge && (
           <aside className="graph-details" role="region" aria-label={t.graph.edge}>
             <h2 className="section-title">
-              {label(edge.subject)} — {edge.title} — {label(edge.object)}
+              {label(edge.subject)} — {relationTitle(t, edge.type, false, edge.title)} — {label(edge.object)}
             </h2>
             <p className="graph-details__status">
               <span className="muted">{t.graph.statusLabel}:</span>{" "}
@@ -479,7 +480,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
               <ul className="graph-who">
                 {edge.attributions.map((a, i) => (
                   <li key={i}>
-                    {t.card.believes(a.who)} ({pick(t.graph.stance, a.stance) ?? a.stance}
+                    {t.card.believes(whoLabel(t, a))} ({pick(t.graph.stance, a.stance) ?? a.stance}
                     {a.place ? `, ${a.place}` : ""})
                   </li>
                 ))}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "./App";
-import { pick, useT, type Catalog } from "./i18n";
+import { pick, recipeTitle, useT, type Catalog } from "./i18n";
 import { ru } from "./i18n/ru";
 import { requestNotice, useNoticeAccepted } from "./Notice";
 import { ScopeToggle, useScope } from "./scope";
@@ -20,7 +20,7 @@ type Citation = {
 };
 type Contradiction = { kind: string; entity: string; expected: string; found: string };
 type Fragment = { text: string; grounded: boolean; citations: Citation[]; contradicts?: Contradiction[] };
-type Suggestion = { entity_id: string; recipe: string; title: string };
+type Suggestion = { entity_id: string; recipe: string; label?: string; title: string };
 // Сообщение к ответу: код сервера (reason, kind или тип события) — переводится по каталогу,
 // текст сервера — запасной вариант для неизвестного кода.
 type Message = { code?: string; text?: string; minutes?: number };
@@ -284,7 +284,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                       onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}
                     >
                       <Icon name="graph" small />
-                      {turn.suggestion.title}
+                      {turn.suggestion.label
+                        ? t.assistant.openGraph(recipeTitle(t, turn.suggestion.recipe), turn.suggestion.label)
+                        : turn.suggestion.title}
                     </button>
                   )}
                   {turn.status === "error" && (
