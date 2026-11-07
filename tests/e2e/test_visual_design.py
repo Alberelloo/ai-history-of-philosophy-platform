@@ -373,17 +373,29 @@ def test_english_card_and_graph(browser, site, ids):
         card.locator("h3:text('Юм')").wait_for()
         card.locator(".card-recipe").first.wait_for()
         labels = [
-            *card.locator(".card-section h4").all_inner_texts(),
             *card.locator(".card-row__relation").all_inner_texts(),
             *card.locator(".card-recipe").all_inner_texts(),
         ]
         assert labels and not [text for text in labels if cyrillic.search(text)], labels
-        assert "common opinion" in card.locator(".card-section").first.inner_text()
+        # Рецепт графа — из компактного окна у упоминания.
         card.locator(".card-recipe", has_text="Genesis").click()
         page.wait_for_selector("h1:text('Genesis: Юм')")
         page.locator(".graph-edge").first.wait_for()
         options = page.locator("#graph-recipe option").all_inner_texts()
         assert options and not [text for text in options if cyrillic.search(text)], options
+        # Полная карточка в панели: разделы на английском.
+        page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
+        page.locator("p.block", has_text="догматического сна").locator(
+            ".mention", has_text="Юм"
+        ).click()
+        page.get_by_role("dialog", name="Card").get_by_role("button", name="Open card").click()
+        panel = page.get_by_role("complementary", name="Card")
+        panel.locator(".card-section h4").first.wait_for()
+        section_labels = panel.locator(".card-section h4").all_inner_texts()
+        assert section_labels and not [text for text in section_labels if cyrillic.search(text)], (
+            section_labels
+        )
+        assert "common opinion" in panel.locator(".card-section").first.inner_text()
         page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
         page.get_by_role("button", name="Кант — influenced by — Юм").click()
         details = page.get_by_role("region", name="Link")

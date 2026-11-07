@@ -99,7 +99,9 @@ export function App() {
               onClose={() => setPanel(null)}
             />
           )}
-          {panel.mode === "card" && panel.entityId && <FullCard entityId={panel.entityId} />}
+          {panel.mode === "card" && panel.entityId && (
+            <FullCard entityId={panel.entityId} onClose={() => setPanel(null)} />
+          )}
         </SidePanel>
       )}
     </>

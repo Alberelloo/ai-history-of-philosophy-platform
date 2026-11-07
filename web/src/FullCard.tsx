@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "./App";
-import { pick, recipeTitle, relationTitle, useT } from "./i18n";
+import { pick, recipeTitle, relationTitle, sectionTitle, useT, whoLabel } from "./i18n";
 import { useScope } from "./scope";
 import { storage } from "./storage";
 import { familyOf, Generated, Icon, Portrait, StatusMark } from "./ui";
@@ -54,7 +54,21 @@ function value(row: Row): string {
   return v ? String(v) : "";
 }
 
-export function FullCard({ entityId, onNavigate }: { entityId: string; onNavigate?: () => void }) {
+function believers(t: ReturnType<typeof useT>, row: Row): string[] {
+  return row.attributions
+    ? [...new Set(row.attributions.map((a) => whoLabel(t, a)))]
+    : row.attributed_to;
+}
+
+export function FullCard({
+  entityId,
+  onClose,
+  onNavigate,
+}: {
+  entityId: string;
+  onClose: () => void;
+  onNavigate?: () => void;
+}) {
   const t = useT();
   const [card, setCard] = useState<Card | null>(null);
   const [problem, setProblem] = useState<"not_found" | "failed" | null>(null);
@@ -98,6 +112,14 @@ export function FullCard({ entityId, onNavigate }: { entityId: string; onNavigat
     <>
       <div className="pg-panel__head">
         <h2 className="pg-panel__title">{t.card.label}</h2>
+        <button
+          className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+          aria-label={t.card.close}
+          title={t.card.close}
+          onClick={onClose}
+        >
+          <Icon name="close" small />
+        </button>
       </div>
       <div className="pg-panel__body">
         {problem === "not_found" && (
@@ -138,7 +160,7 @@ export function FullCard({ entityId, onNavigate }: { entityId: string; onNavigat
               ))}
             {card.sections.map((section) => (
               <section key={section.code} className="card-section" data-section={section.code}>
-                <h4>{section.title}</h4>
+                <h4>{sectionTitle(t, section.code, section.title)}</h4>
                 <ul>
                   {section.rows.map((row) => (
                     <li key={row.statement_id} className={row.generated ? "card-row ungrounded" : "card-row"}>
@@ -158,6 +180,9 @@ export function FullCard({ entityId, onNavigate }: { entityId: string; onNavigat
                       {row.status === "verified" && <StatusMark status="verified" iconOnly />}
                       {row.generated && <StatusMark status="generated" iconOnly />}
                       {row.disputed && <StatusMark status="disputed" iconOnly />}
+                      {believers(t, row).length > 0 && (
+                        <span className="card-who"> — {t.card.believes(believers(t, row).join(", "))}</span>
+                      )}
                       {row.evidence.map((e, i) => (
                         <a
                           key={e.paragraph_id}
