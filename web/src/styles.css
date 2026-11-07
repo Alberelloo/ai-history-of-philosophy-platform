@@ -2142,6 +2142,15 @@ a.settings__label {
   gap: var(--space-3);
   width: clamp(36rem, 50vw, 46rem);
   align-content: start;
+  min-height: 100%;
+}
+
+.assistant-page .assistant__form {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  background: var(--paper);
+  padding-top: var(--space-2);
 }
 
 .assistant-page__subtitle {

@@ -102,16 +102,18 @@ type Props = {
   onBack?: () => void;
   backLabel?: string;
   mode?: "book" | "library";
+  pending?: PendingHandoff | null;
+  initialQuestion?: string;
   settings?: { sourcesOnly: boolean; generation: boolean; scope: "all" | "current" };
 };
 
-export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", settings }: Props) {
+export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", pending = null, initialQuestion, settings }: Props) {
   const t = useT();
   const [set, setSet] = useState<DialogSet>(() =>
     mode === "library" ? storage.libraryDialogs() : storage.dialogsFor(sourceId),
   );
   const accepted = useNoticeAccepted();
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(initialQuestion ?? "");
   const [problem, setProblem] = useState<Message | null>(null);
   const [sessionsOpen, setSessionsOpen] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -207,6 +209,8 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     selected?: string,
     sessionId = active.id,
     handoff?: { declined: boolean; reason: string },
+    handoffId?: string,
+    from?: { sourceId: string; chapterId?: string },
   ) {
     setProblem(null);
     if (!accepted) {
@@ -222,7 +226,15 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       .filter((m) => m.status === "done")
       .map((m) => ({ question: m.question, answer: answerText(m) }));
     const turnId = newId();
-    const turn: Turn = { id: turnId, question: text, selection: selected, fragments: [], status: "streaming" };
+    const turn: Turn = {
+      id: turnId,
+      question: text,
+      selection: selected,
+      fragments: [],
+      status: "streaming",
+      handoffId,
+      from,
+    };
     patchSession(sessionId, (s) => ({ ...s, updatedAt: Date.now(), messages: [...s.messages, turn] }));
     setQuestion("");
     setSelectionDraft(null);
@@ -320,6 +332,18 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     }
   }
 
+  // Поручение перехода из панели (5.10): обмен с handoffId добавляется и отправляется один раз.
+  useEffect(() => {
+    if (!pending) return;
+    const state = window.history.state as { consumed?: boolean } | null;
+    if (state?.consumed) return;
+    if (set.sessions.some((s) => s.messages.some((m) => m.handoffId === pending.id))) return;
+    send(pending.question, pending.selection, active.id, undefined, pending.id, { sourceId: pending.from });
+    window.history.replaceState({ ...state, consumed: true }, "");
+    clearPendingHandoff();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending]);
+
   const streaming = active.messages.filter((m) => m.status === "streaming");
   const streamingTurn = streaming[streaming.length - 1];
 
@@ -332,10 +356,10 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
               <Icon name="arrowLeft" small />
               {backLabel ?? t.panel.backToAssistant}
             </button>
-          ) : (
+          ) : mode === "library" ? null : (
             <h2 className="pg-panel__title">{t.assistant.label}</h2>
           )}
-          <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>
+          {mode !== "library" && <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>}
         </div>
         <button
           className="pg-btn pg-btn--ghost pg-btn--sm"
@@ -348,9 +372,11 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
         <button className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.session.new} title={t.assistant.session.new} onClick={createSession}>
           <Icon name="plus" small />
         </button>
-        <button className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.close} title={t.assistant.close} onClick={onClose}>
-          <Icon name="close" small />
-        </button>
+        {mode !== "library" && (
+          <button className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.close} title={t.assistant.close} onClick={onClose}>
+            <Icon name="close" small />
+          </button>
+        )}
       </div>
       <div className="pg-panel__body assistant__body">
         {sessionsOpen && (
@@ -505,8 +531,8 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                           e.preventDefault();
                           patchTurn(active.id, turn.id, (t) => ({ ...t, handoff: { reason: t.handoff!.reason, choice: "library" } }));
                           setPendingHandoff({ id: turn.id, question: turn.question, selection: turn.selection, selectionParagraphs, from: sourceId });
-                          window.history.pushState({ handoff: turn.id }, "", `/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`);
-                          navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`);
+                          onClose();
+                          navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`, { handoff: turn.id });
                         }}
                       >
                         {t.assistant.handoff.link}
@@ -514,6 +540,21 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                     </div>
                     <p className="handoff-block__note">{t.assistant.handoff.note}</p>
                   </div>
+                )}
+                {turn.handoff?.choice === "book" && (
+                  <span className="status-mark pg-status handoff-declined">{t.assistant.handoff.declined}</span>
+                )}
+                {turn.handoff?.choice === "library" && (
+                  <a
+                    className="pg-btn pg-btn--ghost pg-btn--sm handoff-open"
+                    href="/assistant"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate("/assistant");
+                    }}
+                  >
+                    {t.assistant.handoff.open}
+                  </a>
                 )}
                 <div className="turn__actions">
                   {turn.suggestion && (
@@ -539,7 +580,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             );
           })}
         </ol>
-        {active.messages.length === 0 && <p className="assistant__empty">{t.assistant.empty}</p>}
+        {active.messages.length === 0 && (
+          <p className="assistant__empty">{mode === "library" ? t.assistantPage.empty : t.assistant.empty}</p>
+        )}
         {problem && (
           <div className="assistant-notice pg-notice pg-notice--warning" role="alert">
             <Icon name="info" />

@@ -1,20 +1,16 @@
-import { useEffect } from "react";
-import { AssistantPanel, takePendingHandoff } from "./AssistantPanel";
+import { useMemo } from "react";
+import { AssistantPanel, takePendingHandoff, type PendingHandoff } from "./AssistantPanel";
 import { useT } from "./i18n";
 
 // Страница раздела «Ассистент» (reader-panels.md, 5.10): диалог по всей библиотеке.
-// Ссылка из панели книги несёт поручение; вопрос отправляется один раз при первом открытии.
-export function AssistantPage() {
+// Ссылка из панели книги несёт поручение в history.state; вопрос отправляется один раз.
+export function AssistantPage({ search = "" }: { search?: string }) {
   const t = useT();
-  useEffect(() => {
+  const pending = useMemo<PendingHandoff | null>(() => {
     const state = window.history.state as { handoff?: string } | null;
-    const pending = state?.handoff ? takePendingHandoff(state.handoff) : null;
-    if (pending) {
-      // Поручение принято; отправка выполняется AssistantPanel в режиме библиотеки.
-      sessionStorage.setItem("philograph:pending-handoff", JSON.stringify(pending));
-      window.history.replaceState({ ...state, consumed: true }, "");
-    }
+    return state?.handoff ? takePendingHandoff(state.handoff) : null;
   }, []);
+  const q = useMemo(() => new URLSearchParams(search).get("q") ?? "", [search]);
   return (
     <main className="assistant-page" id="content">
       <div className="assistant-page__col">
@@ -28,6 +24,8 @@ export function AssistantPage() {
           selection={null}
           selectionParagraphs={[]}
           onClose={() => {}}
+          pending={pending}
+          initialQuestion={q || undefined}
         />
       </div>
     </main>

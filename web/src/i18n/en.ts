@@ -125,6 +125,10 @@ export const en: Catalog = {
   assistantPage: {
     subtitle:
       "Questions across the whole library. Ask about a specific book in the panel while reading: each book has its own dialogue.",
+    empty:
+      "Ask a question across the whole library: comparing authors, the history of an idea, the context of an era. Answers link to book passages.",
+    pending: (book: string) =>
+      `The question was moved from “${book}” and has not been sent yet. Sending it is a new request to the assistant.`,
   },
   family: {
     person: "Person",

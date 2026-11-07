@@ -23,8 +23,8 @@ import { Icon } from "./ui";
 //         /graph/:entity?recipe=… — граф по запросу
 //         /settings[#раздел]  — настройки читателя
 //         /soon/:раздел       — раздел в разработке
-export function navigate(path: string): void {
-  window.history.pushState(null, "", path);
+export function navigate(path: string, state?: unknown): void {
+  window.history.pushState(state ?? null, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
@@ -152,7 +152,7 @@ function Page({
     }
     return <SoonPage key={parts[1]} code={parts[1]} />;
   }
-  if (parts[0] === "assistant") return <AssistantPage />;
+  if (parts[0] === "assistant") return <AssistantPage search={search} />;
   if (parts[0] === "graph" && parts[1]) {
     return <GraphPage key={parts[1]} entityId={parts[1]} query={new URLSearchParams(search)} />;
   }
