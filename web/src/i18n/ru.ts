@@ -275,6 +275,13 @@ export const ru = {
     budget_exhausted: "Сегодня ассистент недоступен, он заработает завтра. Чтение и карточки работают.",
     llm_unavailable: "Ассистент временно недоступен. Чтение и карточки работают.",
   },
+  panel: {
+    collapse: "Свернуть",
+    expandAssistant: "Развернуть ассистента",
+    expandCard: "Развернуть карточку",
+    backToAssistant: "Назад к ассистенту",
+    backToCard: (name: string) => `Назад: ${name}`,
+  },
   graph: {
     title: "Граф",
     heading: (recipe: string, entity: string) => `${recipe}: ${entity}`,

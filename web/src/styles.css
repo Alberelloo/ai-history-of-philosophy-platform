@@ -991,8 +991,10 @@ blockquote.block {
   box-shadow: var(--shadow-pop);
 }
 
-/* ---------- Ассистент: панель справа на всю высоту ---------- */
-.assistant {
+/* ---------- Правая панель: каркас (reader-panels.md 2.3) ---------- */
+/* На ≥1280 панель сдвигает колонки; на 1024–1279 живёт в полоске у правого края и разворачивается
+   поверх текста. Содержимое (ассистент, карточка) кладётся внутрь через pg-panel__head/__body. */
+.side-panel {
   position: fixed;
   top: 0;
   right: 0;
@@ -1001,7 +1003,15 @@ blockquote.block {
   width: var(--panel);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-panel);
   animation: panel-in var(--dur-slow) var(--ease-standard) both;
+}
+
+/* Развёрнутая полоска (<1280) ложится поверх текста; сдвига нет. */
+.side-panel[data-mode="strip"] {
+  box-shadow: var(--shadow-panel);
 }
 
 @keyframes panel-in {
@@ -1015,8 +1025,45 @@ blockquote.block {
   }
 }
 
-.assistant .pg-panel__head {
+.side-panel .pg-panel__head {
   gap: var(--space-2);
+}
+
+/* Полоска 48px у правого края: цель щелчка для разворота панели. */
+.side-panel__strip {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-panel);
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: var(--space-3);
+  width: var(--panel-strip);
+  padding: var(--space-3) 0 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.side-panel__strip:hover {
+  background: var(--sunken);
+  color: var(--accent);
+}
+
+/* Ручка «Свернуть» на левой кромке развёрнутой полоски. */
+.side-panel__collapse {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-raise);
 }
 
 .assistant__body {
@@ -1785,7 +1832,7 @@ a.settings__label {
     transition: none;
   }
 
-  .assistant,
+  .side-panel,
   .card-popup,
   .note-popup,
   .pg-filter-menu {

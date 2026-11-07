@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AssistantPanel } from "./AssistantPanel";
 import { GraphPage } from "./GraphPage";
 import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
@@ -8,6 +9,7 @@ import { ReaderPage } from "./ReaderPage";
 import { ReviewPage } from "./ReviewPage";
 import { SettingsPage } from "./SettingsPage";
 import { Sidebar } from "./Sidebar";
+import { SidePanel } from "./SidePanel";
 import { SoonPage } from "./SoonPage";
 import { storage } from "./storage";
 import { useDocumentAppearance } from "./theme";
@@ -48,6 +50,18 @@ function activeItem(parts: string[]): string {
   return "other";
 }
 
+// Состояние правой панели живёт выше ReaderPage, чтобы переживать переходы между главами и
+// книгами (docs/design/features/reader-panels.md, этап 1). Стек «Назад» появится в этапе 3;
+// пока панель хранит один элемент и его содержимое.
+export type PanelState = {
+  mode: "assistant" | "card";
+  sourceId: string;
+  selection: string | null;
+  selectionParagraphs: string[];
+  entityId?: string;
+  stripExpanded: boolean;
+};
+
 export function App() {
   const t = useT();
   useDocumentAppearance();
@@ -55,6 +69,7 @@ export function App() {
   const [beforeHash, hash = ""] = location.split("#");
   const [path, search = ""] = beforeHash.split("?");
   const parts = path.split("/").filter(Boolean);
+  const [panel, setPanel] = useState<PanelState | null>(null);
   return (
     <>
       <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} />
@@ -67,13 +82,41 @@ export function App() {
           </div>
         )}
         <FirstRunNotice />
-        <Page parts={parts} search={search} hash={hash} />
+        <Page parts={parts} search={search} hash={hash} panel={panel} setPanel={setPanel} />
       </div>
+      {panel && (
+        <SidePanel
+          expanded={panel.stripExpanded}
+          onExpand={(stripExpanded) => setPanel({ ...panel, stripExpanded })}
+          ariaLabel={panel.mode === "assistant" ? t.assistant.label : t.card.label}
+        >
+          {panel.mode === "assistant" && (
+            <AssistantPanel
+              sourceId={panel.sourceId}
+              selection={panel.selection}
+              selectionParagraphs={panel.selectionParagraphs}
+              onClose={() => setPanel(null)}
+            />
+          )}
+        </SidePanel>
+      )}
     </>
   );
 }
 
-function Page({ parts, search, hash }: { parts: string[]; search: string; hash: string }) {
+function Page({
+  parts,
+  search,
+  hash,
+  panel,
+  setPanel,
+}: {
+  parts: string[];
+  search: string;
+  hash: string;
+  panel: PanelState | null;
+  setPanel: (panel: PanelState | null) => void;
+}) {
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
   if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;
   if (parts[0] === "settings") return <SettingsPage hash={hash} />;
@@ -82,7 +125,9 @@ function Page({ parts, search, hash }: { parts: string[]; search: string; hash: 
     return <GraphPage key={parts[1]} entityId={parts[1]} query={new URLSearchParams(search)} />;
   }
   if (parts[0] === "read") {
-    return <ReaderPage sourceId={parts[1]} chapterId={parts[2]} anchor={hash} />;
+    return (
+      <ReaderPage sourceId={parts[1]} chapterId={parts[2]} anchor={hash} panel={panel} setPanel={setPanel} />
+    );
   }
   return <LibraryPage />;
 }

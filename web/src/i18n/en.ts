@@ -262,6 +262,13 @@ export const en: Catalog = {
     budget_exhausted: "The assistant is unavailable today and will be back tomorrow. Reading and cards still work.",
     llm_unavailable: "The assistant is temporarily unavailable. Reading and cards still work.",
   },
+  panel: {
+    collapse: "Collapse",
+    expandAssistant: "Expand assistant",
+    expandCard: "Expand card",
+    backToAssistant: "Back to assistant",
+    backToCard: (name: string) => `Back: ${name}`,
+  },
   graph: {
     title: "Graph",
     heading: (recipe: string, entity: string) => `${recipe}: ${entity}`,

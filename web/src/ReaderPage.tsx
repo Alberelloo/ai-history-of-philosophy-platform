@@ -1,14 +1,19 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
-import { navigate } from "./App";
-import { AssistantPanel } from "./AssistantPanel";
+import { navigate, type PanelState } from "./App";
 import { CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { errorText, useT, type Catalog } from "./i18n";
 import { storage } from "./storage";
 import { Icon } from "./ui";
 
-type Props = { sourceId?: string; chapterId?: string; anchor: string };
+type Props = {
+  sourceId?: string;
+  chapterId?: string;
+  anchor: string;
+  panel: PanelState | null;
+  setPanel: (panel: PanelState | null) => void;
+};
 
 function replace(path: string) {
   window.history.replaceState(null, "", path);
@@ -142,7 +147,7 @@ function Toc({ items, sourceId, current }: { items: TocItem[]; sourceId: string;
   );
 }
 
-export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
+export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Props) {
   const t = useT();
   const [toc, setToc] = useState<TocItem[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -150,17 +155,36 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   const [previousUnavailable, setPreviousUnavailable] = useState(false);
   const [relocated, setRelocated] = useState<Relocated | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [selection, setSelection] = useState<{ text: string; paragraphs: string[]; top: number } | null>(
     null,
   );
-  const [asked, setAsked] = useState<{ text: string; paragraphs: string[] } | null>(null);
   const [mentions, setMentions] = useState<Record<string, Mention[]>>({});
   const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
   const openCard: OpenMention = (id, x, y) => setCard({ id, x, y });
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
+
+  // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
+  const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) =>
+    setPanel({
+      mode: "assistant",
+      sourceId: sourceId ?? "",
+      selection: sel?.text ?? null,
+      selectionParagraphs: sel?.paragraphs ?? [],
+      stripExpanded: true,
+    });
+  // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
+  const collapsePanel = () => {
+    if (panel) setPanel({ ...panel, stripExpanded: false });
+  };
+  // Панель остаётся открытой при переходе в другую главу/книгу: диалог следует за книгой.
+  useEffect(() => {
+    if (panel?.mode === "assistant" && sourceId && panel.sourceId !== sourceId) {
+      setPanel({ ...panel, sourceId });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceId]);
 
   // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
   useEffect(() => {
@@ -331,10 +355,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
       <nav className="toc" aria-label={t.reader.toc}>
         <button
           className="pg-btn pg-btn--secondary toc__assistant"
-          onClick={() => {
-            setAsked(null);
-            setAssistantOpen(true);
-          }}
+          onClick={() => openAssistant(null)}
         >
           <Icon name="chat" />
           {t.reader.assistant}
@@ -348,8 +369,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           style={{ top: selection.top + 8 }}
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            setAsked({ text: selection.text, paragraphs: selection.paragraphs });
-            setAssistantOpen(true);
+            openAssistant(selection);
             setSelection(null);
           }}
         >
@@ -358,15 +378,7 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         </button>
       )}
       {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
-      {assistantOpen && (
-        <AssistantPanel
-          sourceId={sourceId}
-          selection={asked?.text ?? null}
-          selectionParagraphs={asked?.paragraphs ?? []}
-          onClose={() => setAssistantOpen(false)}
-        />
-      )}
-      <article className="chapter pg-reading" ref={textRef}>
+      <article className="chapter pg-reading" ref={textRef} onMouseDown={collapsePanel} onFocusCapture={collapsePanel}>
         {relocated && relocated.chapterId === chapter.chapter_id && (
           <div className="pg-notice notice relocated" role="status">
             <Icon name="info" />
