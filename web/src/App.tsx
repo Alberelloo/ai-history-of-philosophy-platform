@@ -72,7 +72,7 @@ export function App() {
   const [panel, setPanel] = useState<PanelState | null>(null);
   return (
     <>
-      <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} />
+      <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} panelOpen={panel !== null} />
       {/* Область содержимого: сюда переходит фокус, когда Esc сворачивает боковую панель. */}
       <div id="content" className="app-content" tabIndex={-1}>
         {!storage.persistent() && (

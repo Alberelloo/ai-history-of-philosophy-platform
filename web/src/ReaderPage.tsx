@@ -4,7 +4,8 @@ import { navigate, type PanelState } from "./App";
 import { CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { errorText, useT, type Catalog } from "./i18n";
-import { storage } from "./storage";
+import { computeLayout, type Layout } from "./layout";
+import { storage, useStored } from "./storage";
 import { Icon } from "./ui";
 
 type Props = {
@@ -14,6 +15,40 @@ type Props = {
   panel: PanelState | null;
   setPanel: (panel: PanelState | null) => void;
 };
+
+// Ширина окна: раскладка K1–K4 пересчитывается при её изменении.
+function useWindowWidth(): number {
+  const [width, setWidth] = useState(() => window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
+
+// Раскладка по свободной ширине (2.2). Корневой кегль и ширина 1ch измеряются: на окнах шире
+// 1920px кегль растёт (9.7), и все величины в rem/ch масштабируются.
+function useReaderLayout(panelOpen: boolean): Layout {
+  const width = useWindowWidth();
+  const pinned = useStored((s) => s.sidebarPinned);
+  const [metrics, setMetrics] = useState({ root: 16, ch: 11 });
+  useEffect(() => {
+    const measure = () => {
+      const root = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const probe = document.createElement("span");
+      probe.style.cssText = "position:absolute;visibility:hidden;width:1ch;font:var(--type-read-body);";
+      document.body.appendChild(probe);
+      const ch = probe.getBoundingClientRect().width || 11;
+      probe.remove();
+      setMetrics({ root, ch });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  return computeLayout({ root: metrics.root, ch: metrics.ch, width, pinned, panelOpen });
+}
 
 function replace(path: string) {
   window.history.replaceState(null, "", path);
@@ -119,7 +154,17 @@ function copyLink(paragraphId: string, onDone: () => void) {
   navigator.clipboard?.writeText(url).then(onDone, onDone);
 }
 
-function Toc({ items, sourceId, current }: { items: TocItem[]; sourceId: string; current: string }) {
+function Toc({
+  items,
+  sourceId,
+  current,
+  onNavigate,
+}: {
+  items: TocItem[];
+  sourceId: string;
+  current: string;
+  onNavigate?: () => void;
+}) {
   return (
     <ul>
       {items.map((item) => {
@@ -135,11 +180,14 @@ function Toc({ items, sourceId, current }: { items: TocItem[]; sourceId: string;
               onClick={(e) => {
                 e.preventDefault();
                 navigate(target);
+                onNavigate?.();
               }}
             >
               {item.title}
             </a>
-            {item.children.length > 0 && <Toc items={item.children} sourceId={sourceId} current={current} />}
+            {item.children.length > 0 && (
+              <Toc items={item.children} sourceId={sourceId} current={current} onNavigate={onNavigate} />
+            )}
           </li>
         );
       })}
@@ -164,6 +212,8 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
+  const [tocOpen, setTocOpen] = useState(false);
+  const layout = useReaderLayout(panel !== null);
 
   // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
   const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) =>
@@ -350,19 +400,48 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   if (!sourceId || !chapter) return <main className="page loading">{t.app.loading}</main>;
 
   const go = (id: string) => navigate(`/read/${sourceId}/${id}`);
+  const readerStyle = {
+    ["--rl-pad-left" as string]: `${layout.offsetLeft}px`,
+    ["--rl-pad-right" as string]: `${layout.offsetRight}px`,
+  };
+  const tocNav = (
+    <nav className="toc" aria-label={t.reader.toc} style={{ width: layout.toc, flexBasis: layout.toc }}>
+      <button className="pg-btn pg-btn--secondary toc__assistant" onClick={() => openAssistant(null)}>
+        <Icon name="chat" />
+        {t.reader.assistant}
+      </button>
+      <p className="toc__title">{t.reader.toc}</p>
+      <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
+    </nav>
+  );
+  const rail = (
+    <div className="rail">
+      <button
+        type="button"
+        className="pg-btn pg-btn--ghost pg-btn--icon"
+        aria-expanded={tocOpen}
+        aria-controls="reader-toc-layer"
+        aria-label={t.reader.toc}
+        title={t.reader.toc}
+        onClick={() => setTocOpen((v) => !v)}
+      >
+        <Icon name="index" />
+      </button>
+      <button
+        type="button"
+        className="pg-btn pg-btn--ghost pg-btn--icon"
+        aria-label={t.reader.assistant}
+        title={t.reader.assistant}
+        onClick={() => openAssistant(null)}
+      >
+        <Icon name="chat" />
+      </button>
+    </div>
+  );
   return (
-    <div className="reader">
-      <nav className="toc" aria-label={t.reader.toc}>
-        <button
-          className="pg-btn pg-btn--secondary toc__assistant"
-          onClick={() => openAssistant(null)}
-        >
-          <Icon name="chat" />
-          {t.reader.assistant}
-        </button>
-        <p className="toc__title">{t.reader.toc}</p>
-        <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
-      </nav>
+    <div className="reader" data-layout={layout.mode} style={readerStyle}>
+      {(layout.mode === "K1" || layout.mode === "K2") && tocNav}
+      {layout.mode === "K3" && rail}
       {selection && (
         <button
           className="ask-selection pg-btn pg-btn--primary pg-btn--sm"
@@ -378,7 +457,13 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
         </button>
       )}
       {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
-      <article className="chapter pg-reading" ref={textRef} onMouseDown={collapsePanel} onFocusCapture={collapsePanel}>
+      <article
+        className="chapter pg-reading"
+        ref={textRef}
+        onMouseDown={collapsePanel}
+        onFocusCapture={collapsePanel}
+        style={{ width: layout.text, flexBasis: layout.text }}
+      >
         {relocated && relocated.chapterId === chapter.chapter_id && (
           <div className="pg-notice notice relocated" role="status">
             <Icon name="info" />
@@ -390,6 +475,12 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
             <Icon name="info" />
             <div>{t.reader.previousUnavailable}</div>
           </div>
+        )}
+        {layout.mode === "K4" && (
+          <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm toc-open" onClick={() => setTocOpen(true)}>
+            <Icon name="index" small />
+            {t.reader.toc}
+          </button>
         )}
         <h1>{chapter.title}</h1>
         {chapter.blocks.map((block) => {
@@ -460,6 +551,18 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           )}
         </nav>
       </article>
+      {layout.mode === "K1" && <aside className="margin-col" aria-hidden="true" />}
+      {tocOpen && (
+        <div
+          id="reader-toc-layer"
+          className="toc-layer pg-popover"
+          role="dialog"
+          aria-modal="false"
+          aria-label={t.reader.toc}
+        >
+          <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} onNavigate={() => setTocOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

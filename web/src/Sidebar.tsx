@@ -70,7 +70,7 @@ function Item({ href, icon, label, current, soon, title, count }: ItemProps) {
   );
 }
 
-export function Sidebar({ active, sourceId }: { active: string; sourceId?: string }) {
+export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourceId?: string; panelOpen: boolean }) {
   const t = useT();
   const lang = useLang();
   const theme = useTheme();
@@ -78,7 +78,11 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
   const open = useStored((s) => s.openSources);
   const current = useStored((s) => s.currentSource);
   const wide = useMedia(PIN_MEDIA);
-  const pinned = pinnedChoice && wide;
+  // Временное сворачивание (2.2): закреплённая навигация + открытая панель не помещаются на
+  // ширине 1280–1471px — навигация сворачивается до 56px, пока панель открыта; выбор сохраняется.
+  const roomy = useMedia("(min-width: 1472px)");
+  const blocked = wide && panelOpen && !roomy;
+  const pinned = pinnedChoice && wide && !blocked;
   const [hover, setHover] = useState(false);
   const [focused, setFocused] = useState(false);
   // Esc свернул панель: она не раскроется снова, пока указатель или фокус не уйдут и не вернутся.
@@ -90,12 +94,12 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
   const info = useSources(open.map((o) => o.id));
   const books = open.filter((o) => info[o.id]);
 
-  // Отступ содержимого — по выбору читателя; ширина окна решает в CSS (index.html ставит его
-  // до первой отрисовки).
+  // Отступ содержимого — по фактическому состоянию панели (с учётом временного сворачивания):
+  // при временном сворачивании содержимое сдвигается только на 56px, как у свёрнутой панели.
   useEffect(() => {
-    if (pinnedChoice) document.documentElement.dataset.sidebar = "pinned";
+    if (pinned) document.documentElement.dataset.sidebar = "pinned";
     else delete document.documentElement.dataset.sidebar;
-  }, [pinnedChoice]);
+  }, [pinned]);
 
   // Раскрывает только фокус с клавиатуры: после щелчка мышью фокус остаётся на пункте, и панель
   // не должна висеть поверх текста, когда указатель ушёл.
@@ -254,9 +258,13 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
             type="button"
             className="pg-btn pg-btn--ghost sidebar__item sidebar__pin"
             aria-pressed={pinnedChoice}
+            aria-disabled={blocked || undefined}
             disabled={!wide}
-            title={wide ? undefined : t.sidebar.pinNarrow}
-            onClick={() => storage.setSidebarPinned(!pinnedChoice)}
+            title={blocked ? t.reader.pinBlocked : wide ? undefined : t.sidebar.pinNarrow}
+            onClick={() => {
+              if (blocked) return;
+              storage.setSidebarPinned(!pinnedChoice);
+            }}
           >
             <span className="sidebar__icon">
               <Icon name="pin" />

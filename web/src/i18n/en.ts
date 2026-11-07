@@ -194,6 +194,7 @@ export const en: Catalog = {
     next: "Next chapter",
     previousUnavailable: "The previous source is unavailable; the default textbook is open.",
     noDefault: "The library has no default textbook yet.",
+    pinBlocked: "The right panel needs the space. Pinning returns when you close it.",
   },
   paragraph: {
     removed: "Paragraph not found: the new version of the source no longer has it.",

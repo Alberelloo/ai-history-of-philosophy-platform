@@ -745,21 +745,21 @@ svg :where(g[tabindex]):focus-visible {
 }
 
 /* ---------- Чтение ---------- */
+/* Раскладка K1–K4 (reader-panels.md, 2.2): точные ширины колонок и внешние отступы считает
+   layout.ts, сюда приходят через --rl-pad-* и инлайновые ширины. */
 .reader {
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  gap: var(--space-12);
-  padding: var(--space-10) var(--space-8) var(--space-20);
+  padding: var(--space-10) var(--rl-pad-right, var(--space-8)) var(--space-20) var(--rl-pad-left, var(--space-8));
 }
 
 .toc {
   position: sticky;
   top: var(--space-6);
-  flex: 0 1 var(--toc);
-  min-width: 208px;
+  flex: 0 0 auto;
   max-height: calc(100vh - var(--space-12));
   overflow: auto;
+  margin-right: var(--space-12);
   padding: 2px 4px var(--space-4) 2px;
   font: var(--type-ui-body-sm);
 }
@@ -808,12 +808,47 @@ svg :where(g[tabindex]):focus-visible {
   font-weight: 600;
 }
 
-/* Колонка текста: Literata 19/31, ширина в знаках шрифта чтения. */
+/* Колонка текста: Literata 19/31, ширина в знаках шрифта чтения (считает layout.ts). */
 .chapter {
   position: relative;
-  flex: 0 1 var(--measure);
+  flex: 0 0 auto;
   min-width: 0;
-  max-width: var(--measure);
+}
+
+/* Полоса оглавления (K3): две кнопки-значка. */
+.rail {
+  position: sticky;
+  top: var(--space-6);
+  flex: 0 0 auto;
+  display: grid;
+  gap: var(--space-2);
+  width: var(--rail);
+  margin-right: var(--space-10);
+}
+
+/* Поле сносок (K1): резервирует место справа от текста; сноски появятся в этапе 5. */
+.margin-col {
+  flex: 0 0 auto;
+  width: var(--margin-col);
+  margin-left: var(--space-10);
+}
+
+/* Кнопка «Оглавление» над заголовком главы (K4). */
+.toc-open {
+  margin-bottom: var(--space-4);
+}
+
+/* Слой оглавления поверх текста (K3/K4). */
+.toc-layer {
+  position: fixed;
+  top: var(--space-6);
+  left: calc(var(--sidebar-space) + var(--space-6));
+  z-index: var(--z-popover);
+  width: var(--toc);
+  max-height: calc(100vh - var(--space-6) * 2);
+  overflow: auto;
+  padding: var(--space-3);
+  font: var(--type-ui-body-sm);
 }
 
 .chapter h1 {
