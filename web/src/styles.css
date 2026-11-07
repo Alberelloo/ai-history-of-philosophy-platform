@@ -1215,6 +1215,26 @@ blockquote.block {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.card-loading {
+  margin: 0;
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+.card-popup__facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card-popup__empty {
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+}
+
 .card-scope {
   display: grid;
   gap: var(--space-2);

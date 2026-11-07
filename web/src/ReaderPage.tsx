@@ -6,7 +6,7 @@ import { FootnoteRef } from "./Footnote";
 import { errorText, useT, type Catalog } from "./i18n";
 import { computeLayout, type Layout } from "./layout";
 import { storage, useStored } from "./storage";
-import { Icon } from "./ui";
+import { familyOf, Icon } from "./ui";
 
 type Props = {
   sourceId?: string;
@@ -58,8 +58,15 @@ function replace(path: string) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-type Mention = { target_id: string; entity_id: string; start: number; end: number };
-type OpenMention = (entityId: string, x: number, y: number) => void;
+type Mention = {
+  target_id: string;
+  entity_id: string;
+  entity_type?: string;
+  start: number;
+  end: number;
+};
+// Открыть окно карточки у упоминания: анкор — сам элемент упоминания (положение считает окно).
+type OpenMention = (entityId: string, entityType: string | undefined, anchor: HTMLElement) => void;
 // Что показать вместо главы: код ошибки сервера (переводится) и запасной текст.
 type Problem = { kind: string; text?: string };
 // Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
@@ -115,15 +122,23 @@ function renderText(
     const mention = mentions.find((m) => m.start <= a && b <= m.end);
     parts.push(
       mention ? (
-        <button
+        <span
           key={`m${a}`}
-          type="button"
+          role="button"
+          tabIndex={0}
           className="mention pg-mention"
           data-entity={mention.entity_id}
-          onClick={(e) => open(mention.entity_id, e.pageX, e.pageY + 12)}
+          data-family={familyOf(mention.entity_type)}
+          onClick={(e) => open(mention.entity_id, mention.entity_type, e.currentTarget)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open(mention.entity_id, mention.entity_type, e.currentTarget);
+            }
+          }}
         >
           {piece}
-        </button>
+        </span>
       ) : (
         piece
       ),
@@ -210,13 +225,14 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     null,
   );
   const [mentions, setMentions] = useState<Record<string, Mention[]>>({});
-  const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
-  const openCard: OpenMention = (id, x, y) => setCard({ id, x, y });
+  const [card, setCard] = useState<{ id: string; anchor: HTMLElement } | null>(null);
+  const openCard: OpenMention = (id, _type, anchorEl) => setCard({ id, anchor: anchorEl });
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
   const [tocOpen, setTocOpen] = useState(false);
   const layout = useReaderLayout(panel !== null);
+  const mentionsView = useStored((s) => s.mentions);
 
   // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
   const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) =>
@@ -481,10 +497,21 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           {t.reader.askSelection}
         </button>
       )}
-      {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
+      {card && (
+        <CardPopup
+          entityId={card.id}
+          anchor={card.anchor}
+          onClose={() => setCard(null)}
+          onOpenFull={(id) => {
+            setCard(null);
+            setPanel({ mode: "card", sourceId: sourceId ?? "", selection: null, selectionParagraphs: [], entityId: id, stripExpanded: true });
+          }}
+        />
+      )}
       <article
         className="chapter pg-reading"
         ref={textRef}
+        data-mentions={mentionsView === "hover" ? "quiet" : undefined}
         onMouseDown={collapsePanel}
         onFocusCapture={collapsePanel}
         style={{ width: layout.text, flexBasis: layout.text }}

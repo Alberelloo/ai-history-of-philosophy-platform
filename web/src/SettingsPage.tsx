@@ -76,6 +76,7 @@ export function SettingsPage({ hash }: { hash: string }) {
   const scope = useScope();
   const theme = useTheme();
   const lang = useLang();
+  const mentions = useStored((s) => s.mentions);
   const open = useStored((s) => s.openSources);
   const info = useSources(open.map((o) => o.id));
   const books = open.filter((o) => info[o.id]);
@@ -148,6 +149,17 @@ export function SettingsPage({ hash }: { hash: string }) {
                 items={[
                   { value: "ru", label: t.lang.ru },
                   { value: "en", label: t.lang.en },
+                ]}
+              />
+            </Row>
+            <Row label={t.settings.mentions} hint={t.settings.mentionsHint}>
+              <Seg<"underline" | "hover">
+                label={t.settings.mentions}
+                value={mentions}
+                onChange={(value) => storage.setMentionsView(value)}
+                items={[
+                  { value: "underline", label: t.settings.mentionsUnderline },
+                  { value: "hover", label: t.settings.mentionsHover },
                 ]}
               />
             </Row>

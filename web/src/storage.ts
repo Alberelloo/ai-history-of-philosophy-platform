@@ -35,6 +35,7 @@ export type State = {
   sidebarPinned: boolean;
   positions: Record<string, Position>;
   dialogs: unknown[][]; // последний — текущий
+  mentions: "underline" | "hover"; // вид упоминаний в тексте
   notice?: string; // версия закрытого уведомления
 };
 
@@ -47,6 +48,7 @@ const empty = (): State => ({
   sidebarPinned: false,
   positions: {},
   dialogs: [[]],
+  mentions: "underline",
 });
 
 let memory: State = empty();
@@ -107,6 +109,7 @@ function normalize(raw: unknown): State {
     sidebarPinned: bool(data.sidebarPinned, false),
     positions,
     dialogs: dialogs.length ? (dialogs as unknown[][]) : [[]],
+    mentions: data.mentions === "hover" ? "hover" : "underline",
     notice: typeof data.notice === "string" ? data.notice : undefined,
   };
 }
@@ -250,6 +253,10 @@ export const storage = {
   settings: (): Settings => read().settings,
   setSettings(change: Partial<Settings>): void {
     update((s) => ({ ...s, settings: { ...s.settings, ...change } }));
+  },
+  mentionsView: (): "underline" | "hover" => read().mentions,
+  setMentionsView(mentions: "underline" | "hover"): void {
+    update((s) => ({ ...s, mentions }));
   },
   dialog: (): unknown[] => {
     const dialogs = read().dialogs;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AssistantPanel } from "./AssistantPanel";
+import { FullCard } from "./FullCard";
 import { GraphPage } from "./GraphPage";
 import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
@@ -98,6 +99,7 @@ export function App() {
               onClose={() => setPanel(null)}
             />
           )}
+          {panel.mode === "card" && panel.entityId && <FullCard entityId={panel.entityId} />}
         </SidePanel>
       )}
     </>
