@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from philograph import __version__
 from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, ndjson
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import RegistryError
@@ -183,9 +184,14 @@ def build_app(
             generation: bool = True,
             textbook: str | None = None,
         ) -> dict[str, Any]:
-            return cards.card(
-                entity_id, attributed_to=attributed_to, generation=generation, textbook=textbook
-            )
+            try:
+                return cards.card(
+                    entity_id, attributed_to=attributed_to, generation=generation, textbook=textbook
+                )
+            except EntityNotFound as exc:
+                raise UserFacingError(
+                    "Карточка не найдена", status=404, kind="entity_not_found"
+                ) from exc
 
         @router.post("/entities/{entity_id}/description")
         def describe(entity_id: str, generation: bool = True) -> StreamingResponse:

@@ -315,10 +315,12 @@ class Mentions:
                 .mappings()
                 .all()
             )
+        types = self.entities.types([r["entity_id"] for r in rows])
         return [
             {
                 "target_id": r["target_id"],
                 "entity_id": self.entities.resolve(r["entity_id"]),
+                "entity_type": types.get(r["entity_id"]),
                 "start": r["start"],
                 "end": r["end"],
                 "kind": r["target_kind"],
