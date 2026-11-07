@@ -10,6 +10,8 @@ html {
   background: var(--paper);
   color: var(--ink);
   scroll-padding-top: var(--space-6);
+  /* Привязку места чтения делает ReaderPage (2.5): встроенная привязка браузера не спорит с ней. */
+  overflow-anchor: none;
 }
 
 body {

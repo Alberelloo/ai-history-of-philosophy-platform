@@ -358,6 +358,28 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     }
   }, [chapter, anchor]);
 
+  // Привязка места чтения при перестройке раскладки (2.5): опорный абзац остаётся на прежнем
+  // расстоянии от верха окна. Колонки меняют ширину одним шагом, прокрутка выставляется в том же
+  // кадре, до отрисовки.
+  const layoutAnchor = useRef<{ el: HTMLElement; top: number } | null>(null);
+  const layoutKey = useRef("");
+  useLayoutEffect(() => {
+    if (!chapter) return;
+    const key = `${layout.mode}:${Math.round(layout.text)}:${layout.navWidth}`;
+    if (layoutKey.current !== key) {
+      const saved = layoutAnchor.current;
+      if (saved && saved.el.isConnected) {
+        const delta = saved.el.getBoundingClientRect().top - saved.top;
+        if (Math.abs(delta) > 4) window.scrollBy(0, delta);
+      }
+      layoutKey.current = key;
+    }
+    const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const paragraphs = textRef.current?.querySelectorAll<HTMLElement>("[data-paragraph]") ?? [];
+    const el = Array.from(paragraphs).find((p) => p.getBoundingClientRect().bottom > top);
+    if (el) layoutAnchor.current = { el, top: el.getBoundingClientRect().top };
+  }, [layout, chapter]);
+
   // Запоминание места: первый видимый абзац главы.
   useEffect(() => {
     if (!chapter || !sourceId) return;
