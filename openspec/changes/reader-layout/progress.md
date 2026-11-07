@@ -6,8 +6,9 @@
 
 ## Статус задач (`tasks.md`)
 
-- 1.1 Изменение OpenSpec — в работе: созданы `proposal.md`, `design.md`, `tasks.md`, дельты `visual-design` и `assistant-dialog`, `qa/cases.md`, `progress.md`. `openspec validate` не запускался.
-- 1.2–6.3 — не начаты.
+- 1.1 Изменение OpenSpec — готово: `openspec validate reader-layout` → valid.
+- 2.1 Токены — готово: `measure-min`, `panel-strip`; размеры и шрифты в `rem`; корневой кегль `clamp(100%, 53.1% + 0.39vw, 116%)`; `tokens.css` перегенерирован (`design_tokens.py --check` → ok). `tsc --noEmit` → ok.
+- 1.2, 2.2–6.3 — не начаты.
 
 ## Этап 0 (предусловие)
 
@@ -27,7 +28,7 @@
 
 ## Известные проблемы
 
-- `pnpm` не установлен; сборка клиента — `cd web && npm run build` (npm есть, node v24).
+- Сборка `vite build` в песочнице падает на `spawn EPERM` (esbuild запускает дочерний процесс с piped stdio — задокументированная граница песочницы). `tsc --noEmit` и Python-проверки работают; для визуальных/e2e прогонов нужен запуск вне этой границы.
 - Эталонные снимки раскладки K1–K4 ещё не сделаны (будут после просмотра в разделе 6.2).
 
 ## Как проверить
