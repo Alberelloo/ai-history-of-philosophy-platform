@@ -293,7 +293,7 @@ function migrate(): State | undefined {
   const v2 = window.localStorage.getItem(V2);
   if (v2 !== null) {
     window.localStorage.removeItem(V2);
-    return fromV3(normalizeV3Fields(v2));
+    return fromV3(normalizeV3Fields(parse(v2)));
   }
   const old = object(parse(window.localStorage.getItem(LEGACY.state)));
   const scope = object(parse(window.localStorage.getItem(LEGACY.scope)));

@@ -22,7 +22,7 @@ from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 req = pytest.mark.req
 VD = "visual-design"
 pytestmark = pytest.mark.e2e
-KEY = "philograph:v3"
+KEY = "philograph:v4"
 TEXTBOOK = "Теория познания: демонстрационный учебник"
 LIGHT_PAPER, DARK_PAPER = "#eff1ec", "#13171e"
 
