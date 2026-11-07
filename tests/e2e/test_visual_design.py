@@ -582,8 +582,9 @@ def test_future_sections_marked_and_described(browser, site, ids):
         library(page, site, ids)
         visual.expand_sidebar(page)
         nav = page.get_by_role("navigation", name="Разделы")
+        # Раздел «Ассистент» реализован (этап 6): без метки «скоро».
+        assert "скоро" not in nav.get_by_role("link", name="Ассистент").inner_text()
         future = [
-            "Ассистент",
             "Граф",
             "Справочник",
             "Эпохи и контекст",
@@ -613,8 +614,10 @@ def test_future_sections_marked_and_described(browser, site, ids):
         text = main.inner_text()
         assert "Позже" in text and "Сценарий У1" in text and "сопоставление трактовок" in text
         assert main.locator(".source, .graph-edge, .card-row").count() == 0  # без данных
+        # Заглушка «Ассистент» снята (этап 6): адрес заменяется на /assistant.
         page.goto(site.url + "/soon/assistant")
-        assert "В разработке" in page.get_by_role("main").inner_text()
+        page.wait_for_url("**/assistant")
+        assert "В разработке" not in page.get_by_role("main").inner_text()
         # Граф: поиск сущности ведёт на её граф.
         page.goto(site.url + "/soon/graph")
         page.get_by_label("Найти сущность").fill("Кант")

@@ -113,7 +113,9 @@ events.define(
     required=("type", "fragments"),
 )
 events.define("assistant.stopped", "info", "Читатель остановил ответ", required=("fragments",))
-events.define("assistant.handoff", "info", "Граница книги: вопрос шире источника", required=("reason",))
+events.define(
+    "assistant.handoff", "info", "Граница книги: вопрос шире источника", required=("reason",)
+)
 
 STATUS_TITLES = {"verified": "проверено", "sourced": "по источникам", "generated": "сгенерировано"}
 
