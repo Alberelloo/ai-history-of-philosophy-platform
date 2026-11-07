@@ -65,7 +65,7 @@ def test_tokens_layout_by_theme():
     assert "@media (prefers-color-scheme: dark)" in css
     assert ':root:not([data-theme="light"])' in css and "--paper: #13171e;" in css
     assert '--font-read: "Literata Variable", Literata' in css
-    for name in ("--space-4: 16px;", "--radius-sm: 8px;", "--dur-quick: 120ms;", "--sidebar: 56px"):
+    for name in ("--space-4: 1rem;", "--radius-sm: 8px;", "--dur-quick: 120ms;", "--sidebar: 3.5rem;"):
         assert name in css
 
 
