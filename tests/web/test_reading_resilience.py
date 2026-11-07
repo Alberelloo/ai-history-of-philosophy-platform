@@ -16,7 +16,7 @@ from .conftest import TEXTBOOK_CHAPTERS
 
 req = pytest.mark.req
 CR = "chapter-reading"
-KEY = "philograph:v3"
+KEY = "philograph:v4"
 RENAMED = "Глава 2. Рассудок и его правила"
 
 

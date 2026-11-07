@@ -186,6 +186,7 @@ class Cards:
             "title": self.entities.label(entity_id),
             "names": entity["names"],
             "dates": entity["primary"].get("dates"),
+            "portraits": [],  # N3 (этап 3) отложен: без портретов клиент показывает монограмму
             "description": self._row(description, entity_id) if description else None,
             "description_pending": description is None
             and generation

@@ -279,6 +279,14 @@ def test_card_not_found_returns_404(mx):
     assert response.json()["kind"] == "entity_not_found"
 
 
+@req(EC, "Портреты в карточке")
+def test_card_has_portraits_field(mx):
+    mx.publish()
+    card = mx.cards.card(mx.ids["kant"])
+    # N3 отложен: поле есть и пустое, клиент показывает монограмму и «Изображений нет».
+    assert card["portraits"] == []
+
+
 @req(EC, "Разделы карточки по типу")
 def test_sections_by_type(mx):
     mx.publish()

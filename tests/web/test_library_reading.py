@@ -347,7 +347,7 @@ def test_reading_position_per_source(browser, site):
     page.mouse.wheel(0, 1)
     page.wait_for_timeout(400)
     saved = page.evaluate(
-        f"JSON.parse(localStorage['philograph:v3']).positions['{site.ids['textbook']}']"
+        f"JSON.parse(localStorage['philograph:v4']).positions['{site.ids['textbook']}']"
     )
     page.goto(f"{site.url}/read/{site.ids['primary']}")
     page.wait_for_selector(".chapter p")
@@ -382,7 +382,7 @@ def test_paragraph_link_opens_and_highlights(page, site, events):
     page.wait_for_selector(f"#p-{primary_pid}")
     assert site.ids["primary"] in page.url
     assert (
-        page.evaluate("JSON.parse(localStorage['philograph:v3']).currentSource")
+        page.evaluate("JSON.parse(localStorage['philograph:v4']).currentSource")
         == (site.ids["primary"])
     )
 

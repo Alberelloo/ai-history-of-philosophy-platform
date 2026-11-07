@@ -89,6 +89,17 @@ def test_ask_about_selection(page, server, events):
     assert searched["scope"] == "current"
 
 
+@req(AD, "Панель действий над выделением")
+def test_selection_toolbar(page, server):
+    url, bot = server
+    open_reader(page, url, bot)
+    select_text(page, "привычка ума")
+    toolbar = page.get_by_role("toolbar", name="Действия с выделенным")
+    toolbar.wait_for()
+    assert toolbar.get_by_role("button", name="Спросить ассистента").is_visible()
+    assert toolbar.get_by_role("button", name="Скопировать ссылку на абзац").is_visible()
+
+
 @req(AD, "Ограничение длины")
 def test_length_limit(bot, events):
     items = bot.ask(question="что это?", selection="а" * 5000)
@@ -165,7 +176,7 @@ def test_dialog_memory(page, server, bot, events):
     page.reload()
     page.get_by_role("button", name="Ассистент").click()
     assert panel.locator(".turn").count() == 2  # диалог в браузере
-    panel.get_by_role("button", name="Новый диалог").click()
+    panel.get_by_role("button", name="Новая сессия").click()
     assert panel.locator(".turn").count() == 0
     long_history = [{"question": f"вопрос {i}", "answer": "ответ"} for i in range(6)]
     bot.ask(question="и ещё?", history=long_history)
@@ -213,3 +224,42 @@ def test_error_mid_answer_keeps_marks(page, server):
     assert panel.locator(".fragment").count() == 2
     assert panel.locator(".fragment.ungrounded").count() == 1  # пометка не потерялась
     assert "оборвался" in panel.locator(".assistant-notice").inner_text()
+
+
+@req(AD, "Память диалога")
+def test_sessions_are_separate(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.answers.append(["Юм считал причинность привычкой [1]. "])
+    panel.get_by_label("Вопрос ассистенту").fill("что Юм думал о причинности?")
+    panel.get_by_role("button", name="Спросить").click()
+    panel.locator(".turn").first.locator(".fragment").wait_for()
+    # «+» — вторая сессия, пустая; «+» при пустой активной не плодит третью.
+    panel.get_by_role("button", name="Новая сессия").click()
+    assert panel.locator(".turn").count() == 0
+    panel.get_by_role("button", name="Новая сессия").click()
+    assert panel.locator(".assistant__sessions .assistant__session").count() == 2
+    # Возврат к первой сессии по списку: там только первый вопрос.
+    panel.get_by_role("button", name="Сессии").click()
+    panel.locator(".assistant__session-title").first.click()
+    assert panel.locator(".turn").count() == 1
+    assert "причинности" in panel.locator(".turn").first.inner_text()
+
+
+@req(AD, "Ход ответа")
+def test_answer_stages_visible(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.answers.append(["Юм пишет о привычке [1]. ", 1.0, "Кант ответил [1]. "])
+    panel.get_by_label("Вопрос ассистенту").fill("что пишет Юм?")
+    panel.get_by_role("button", name="Спросить").click()
+    # Стадия видна во время потока; номер «N из 4», без процента и счётчика слов.
+    panel.locator(".assistant__stage").first.wait_for()
+    stage_text = panel.locator(".assistant__stage").first.inner_text()
+    assert "из 4" in stage_text
+    assert "%" not in stage_text and "слов" not in stage_text
+    panel.locator(".fragment").first.wait_for()

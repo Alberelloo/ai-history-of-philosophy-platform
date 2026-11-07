@@ -73,6 +73,9 @@ type Problem = { kind: string; text?: string };
 // Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
 type Relocated = { chapterId: string; reason: "saved" | "link" };
 
+// Предел длины выделенного фрагмента (assistant-dialog «Ограничение длины»).
+const MAX_SELECTION = 4000;
+
 // Положить элемент наверх стека панели (4.6): повторное открытие того же — не растит; глубина ≤ 20.
 function samePanelItem(a: PanelItem | undefined, b: PanelItem): boolean {
   if (!a) return false;
@@ -392,25 +395,41 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceId]);
 
-  // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
+  // Выделение в тексте главы: панель действий над выделением через 120 мс (раздел 7).
   useEffect(() => {
+    let pending = 0;
     const onUp = () => {
-      const sel = window.getSelection();
-      const text = sel?.toString().trim() ?? "";
-      if (!sel || !text || !textRef.current?.contains(sel.anchorNode)) {
-        setSelection(null);
-        return;
-      }
-      const ids = new Set<string>();
-      const range = sel.getRangeAt(0);
-      textRef.current.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
-        if (range.intersectsNode(el)) ids.add(el.dataset.paragraph!);
-      });
-      const rect = range.getBoundingClientRect();
-      setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
+      window.clearTimeout(pending);
+      pending = window.setTimeout(() => {
+        const sel = window.getSelection();
+        const text = sel?.toString().trim() ?? "";
+        const article = textRef.current;
+        if (
+          !sel ||
+          !text ||
+          !article ||
+          !article.contains(sel.anchorNode) ||
+          !article.contains(sel.focusNode)
+        ) {
+          setSelection(null);
+          return;
+        }
+        const ids = new Set<string>();
+        const range = sel.getRangeAt(0);
+        article.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
+          if (range.intersectsNode(el)) ids.add(el.dataset.paragraph!);
+        });
+        const rect = range.getBoundingClientRect();
+        setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
+      }, 120);
     };
     document.addEventListener("mouseup", onUp);
-    return () => document.removeEventListener("mouseup", onUp);
+    document.addEventListener("keyup", onUp);
+    return () => {
+      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener("keyup", onUp);
+      window.clearTimeout(pending);
+    };
   }, []);
 
   // Какой источник открыть, если он не указан: запомненный или учебник по умолчанию.
@@ -621,18 +640,39 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       {(layout.mode === "K1" || layout.mode === "K2") && tocNav}
       {layout.mode === "K3" && rail}
       {selection && (
-        <button
-          className="ask-selection pg-btn pg-btn--primary pg-btn--sm"
+        <div
+          className="selection-toolbar pg-popover"
+          role="toolbar"
+          aria-label={t.reader.selectionActions}
           style={{ top: selection.top + 8 }}
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            openAssistant(selection);
-            setSelection(null);
-          }}
         >
-          <Icon name="chat" small />
-          {t.reader.askSelection}
-        </button>
+          <button
+            className="pg-btn pg-btn--primary pg-btn--sm"
+            aria-disabled={selection.text.length > MAX_SELECTION || undefined}
+            title={selection.text.length > MAX_SELECTION ? t.reader.selectionTooLong(MAX_SELECTION) : t.reader.assistantHint}
+            onClick={() => {
+              if (selection.text.length <= MAX_SELECTION) {
+                openAssistant(selection);
+                setSelection(null);
+              }
+            }}
+          >
+            <Icon name="chat" small />
+            {t.reader.askSelection}
+          </button>
+          <button
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.reader.copyLink}
+            title={t.reader.copyLink}
+            onClick={() => {
+              const id = selection.paragraphs[0];
+              if (id) copyLink(id, () => setCopied(id));
+            }}
+          >
+            <Icon name="link" small />
+          </button>
+        </div>
       )}
       {card && (
         <CardPopup
