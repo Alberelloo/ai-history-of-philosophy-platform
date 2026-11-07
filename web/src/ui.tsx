@@ -362,6 +362,109 @@ export function Portrait({ name, size = 56 }: { name: string; size?: number }) {
   );
 }
 
+export type PortraitItem = {
+  url: string;
+  width: number;
+  height: number;
+  author?: string;
+  year?: string;
+  license?: string;
+  source_url?: string;
+};
+
+// Галерея портретов персоны (docs/design/features/reader-panels.md, 4.5): до 7 изображений,
+// одно главное, счётчик, точки, листание кнопками, точками и стрелками. Без изображений —
+// монограмма и «Изображений нет».
+export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]; name: string }) {
+  const t = useT();
+  const [index, setIndex] = useState(0);
+  const shown = portraits.slice(0, 7);
+  if (shown.length === 0) {
+    return (
+      <div className="pg-portrait-gallery pg-portrait-gallery--empty">
+        <Portrait name={name} />
+        <p className="pg-portrait-gallery__empty">{t.card.noImages}</p>
+      </div>
+    );
+  }
+  const current = shown[Math.min(index, shown.length - 1)];
+  const move = (delta: number) => setIndex((i) => (i + delta + shown.length) % shown.length);
+  return (
+    <div
+      className="pg-portrait-gallery"
+      role="region"
+      aria-roledescription="галерея"
+      aria-label={t.card.gallery(name)}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") move(-1);
+        if (e.key === "ArrowRight") move(1);
+      }}
+    >
+      <img
+        className="pg-portrait-gallery__image"
+        src={current.url}
+        width={current.width}
+        height={current.height}
+        alt={name}
+        aria-label={shown.length > 1 ? t.card.slide(index + 1, shown.length) : undefined}
+        loading="lazy"
+        decoding="async"
+      />
+      {(current.author || current.year) && (
+        <p className="pg-portrait-gallery__credit">
+          {[current.author, current.year].filter(Boolean).join(", ")}
+        </p>
+      )}
+      {shown.length > 1 && (
+        <div className="pg-portrait-gallery__nav">
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.card.previousPortrait}
+            onClick={() => move(-1)}
+          >
+            <Icon name="arrowLeft" small />
+          </button>
+          <span className="pg-portrait-gallery__count num">{t.card.slide(index + 1, shown.length)}</span>
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.card.nextPortrait}
+            onClick={() => move(1)}
+          >
+            <Icon name="arrowRight" small />
+          </button>
+        </div>
+      )}
+      {shown.length > 1 && (
+        <div className="pg-portrait-gallery__dots" role="group" aria-label={t.card.gallery(name)}>
+          {shown.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === index ? "pg-portrait-gallery__dot is-active" : "pg-portrait-gallery__dot"}
+              aria-label={t.card.slide(i + 1, shown.length)}
+              aria-current={i === index ? "true" : undefined}
+              onClick={() => setIndex(i)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Линия жизни персоны с датами (4.5): годы на горизонтальной оси.
+export function Lifeline({ dates }: { dates: { original: string } }) {
+  return (
+    <div className="pg-lifeline">
+      <span className="pg-lifeline__life" aria-hidden="true" />
+      <span className="pg-lifeline__dates">{dates.original}</span>
+    </div>
+  );
+}
+
 export type FilterItem = { value: string; label: string };
 
 // Выпадающий фильтр с флажками (docs/design/system/components/FilterMenu.md): кнопка с числом

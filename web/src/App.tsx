@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { AssistantPanel } from "./AssistantPanel";
 import { FullCard } from "./FullCard";
 import { GraphPage } from "./GraphPage";
@@ -52,14 +52,13 @@ function activeItem(parts: string[]): string {
 }
 
 // Состояние правой панели живёт выше ReaderPage, чтобы переживать переходы между главами и
-// книгами (docs/design/features/reader-panels.md, этап 1). Стек «Назад» появится в этапе 3;
-// пока панель хранит один элемент и его содержимое.
+// книгами. Стек «Назад» (4.6): элементы «ассистент» и «карточка X», верхний — текущий.
+export type PanelItem = { kind: "assistant" } | { kind: "card"; entityId: string; title: string };
 export type PanelState = {
-  mode: "assistant" | "card";
+  stack: PanelItem[];
   sourceId: string;
   selection: string | null;
   selectionParagraphs: string[];
-  entityId?: string;
   stripExpanded: boolean;
 };
 
@@ -89,19 +88,38 @@ export function App() {
         <SidePanel
           expanded={panel.stripExpanded}
           onExpand={(stripExpanded) => setPanel({ ...panel, stripExpanded })}
-          ariaLabel={panel.mode === "assistant" ? t.assistant.label : t.card.label}
+          ariaLabel={panel.stack[panel.stack.length - 1].kind === "assistant" ? t.assistant.label : t.card.label}
         >
-          {panel.mode === "assistant" && (
-            <AssistantPanel
-              sourceId={panel.sourceId}
-              selection={panel.selection}
-              selectionParagraphs={panel.selectionParagraphs}
-              onClose={() => setPanel(null)}
-            />
-          )}
-          {panel.mode === "card" && panel.entityId && (
-            <FullCard entityId={panel.entityId} onClose={() => setPanel(null)} />
-          )}
+          {(() => {
+            const top = panel.stack[panel.stack.length - 1];
+            const below = panel.stack[panel.stack.length - 2];
+            const back = below
+              ? {
+                  onClick: () => setPanel({ ...panel, stack: panel.stack.slice(0, -1) }),
+                  label: below.kind === "card" ? t.panel.backToCard(below.title) : t.panel.backToAssistant,
+                }
+              : undefined;
+            if (top.kind === "assistant") {
+              return (
+                <AssistantPanel
+                  sourceId={panel.sourceId}
+                  selection={panel.selection}
+                  selectionParagraphs={panel.selectionParagraphs}
+                  onClose={() => setPanel(null)}
+                  onBack={back?.onClick}
+                  backLabel={back?.label}
+                />
+              );
+            }
+            return (
+              <FullCard
+                entityId={top.entityId}
+                onClose={() => setPanel(null)}
+                onBack={back?.onClick}
+                backLabel={back?.label}
+              />
+            );
+          })()}
         </SidePanel>
       )}
     </>
@@ -119,7 +137,7 @@ function Page({
   search: string;
   hash: string;
   panel: PanelState | null;
-  setPanel: (panel: PanelState | null) => void;
+  setPanel: Dispatch<SetStateAction<PanelState | null>>;
 }) {
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
   if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;

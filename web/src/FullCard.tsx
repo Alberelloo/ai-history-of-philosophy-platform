@@ -1,13 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { navigate } from "./App";
 import { pick, recipeTitle, relationTitle, sectionTitle, useT, whoLabel } from "./i18n";
-import { useScope } from "./scope";
+import { ScopeToggle, useScope } from "./scope";
 import { storage } from "./storage";
-import { familyOf, Generated, Icon, Portrait, StatusMark } from "./ui";
+import {
+  familyOf,
+  Generated,
+  Icon,
+  Lifeline,
+  PortraitGallery,
+  StatusMark,
+  Switch,
+  type PortraitItem,
+} from "./ui";
 
-// Полная карточка в правой панели (docs/design/features/reader-panels.md, 4.5). В этапе 3 сюда
-// добавляются галерея портретов, линия жизни, переключатели источников и сводка природы знания;
-// сейчас — карточка целиком: голова, описание, разделы, «Где читать», рецепты графа.
+// Полная карточка в правой панели (docs/design/features/reader-panels.md, 4.5–4.6): галерея
+// портретов, линия жизни, переключатели источников, сводка природы знания, описание целиком,
+// все разделы с атрибуцией каждой строки, «Где читать» и рецепты графа.
 
 type Who = { who: string; kind?: string; stance?: string };
 type Row = {
@@ -34,6 +43,7 @@ type Card = {
   dates: { original: string } | null;
   description: Row | null;
   description_pending: boolean;
+  portraits?: PortraitItem[];
   sections: { code: string; title: string; rows: Row[] }[];
   where_to_read: {
     source_id: string;
@@ -60,18 +70,38 @@ function believers(t: ReturnType<typeof useT>, row: Row): string[] {
     : row.attributed_to;
 }
 
+function disputers(t: ReturnType<typeof useT>, row: Row): string[] {
+  return row.attributions
+    ? row.attributions.filter((a) => a.stance === "disputes").map((a) => whoLabel(t, a))
+    : row.disputed_by;
+}
+
+// Сводка природы знания (4.5): числа по строкам карточки; нулевые части не показываются.
+function natureSummary(card: Card): { verified: number; sourced: number; generated: number } {
+  const rows = card.sections.flatMap((s) => s.rows);
+  return {
+    verified: rows.filter((r) => r.status === "verified").length,
+    sourced: rows.filter((r) => r.status !== "verified" && r.evidence.length > 0 && !r.generated)
+      .length,
+    generated: rows.filter((r) => r.generated).length,
+  };
+}
+
 export function FullCard({
   entityId,
   onClose,
-  onNavigate,
+  onBack,
+  backLabel,
 }: {
   entityId: string;
   onClose: () => void;
-  onNavigate?: () => void;
+  onBack?: () => void;
+  backLabel?: string;
 }) {
   const t = useT();
   const [card, setCard] = useState<Card | null>(null);
   const [problem, setProblem] = useState<"not_found" | "failed" | null>(null);
+  const [notInTextbook, setNotInTextbook] = useState(false);
   const scope = useScope();
   const textbook = storage.currentSource();
   const onlyTextbook = scope.onlyTextbook && Boolean(textbook);
@@ -107,10 +137,21 @@ export function FullCard({
 
   const family = familyOf(card?.type);
   const typeName = pick(t.family, card?.type);
+  // «Нет в моём учебнике» не оставляет пустых разделов.
+  const sections = (card?.sections ?? [])
+    .map((s) => ({ ...s, rows: notInTextbook ? s.rows.filter((r) => r.in_textbook === false) : s.rows }))
+    .filter((s) => s.rows.length > 0);
+  const summary = card ? natureSummary(card) : null;
 
   return (
     <>
       <div className="pg-panel__head">
+        {onBack && (
+          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={onBack}>
+            <Icon name="arrowLeft" small />
+            {backLabel ?? t.card.back}
+          </button>
+        )}
         <h2 className="pg-panel__title">{t.card.label}</h2>
         <button
           className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
@@ -136,8 +177,11 @@ export function FullCard({
         )}
         {card && (
           <>
+            {family === "people" && (
+              <PortraitGallery portraits={card.portraits ?? []} name={card.title} />
+            )}
             <div className="pg-entity-head">
-              {family === "people" ? <Portrait name={card.title} size={56} /> : <span />}
+              {family !== "people" && <span />}
               <div>
                 <h3 className="pg-entity-head__name">{card.title}</h3>
                 <div className="pg-entity-head__meta">
@@ -150,6 +194,16 @@ export function FullCard({
                 </div>
               </div>
             </div>
+            {family === "people" && card.dates && <Lifeline dates={card.dates} />}
+            <div className="card-scope">
+              <ScopeToggle textbook={textbook} />
+              {textbook && !onlyTextbook && (
+                <Switch label={t.scope.notInTextbook} checked={notInTextbook} onChange={setNotInTextbook} />
+              )}
+            </div>
+            {summary && (summary.verified || summary.sourced || summary.generated) > 0 && (
+              <p className="card-summary">{t.card.summary(summary.verified, summary.sourced, summary.generated)}</p>
+            )}
             {card.description &&
               (card.description.generated ? (
                 <p className="pg-desc">
@@ -158,46 +212,59 @@ export function FullCard({
               ) : (
                 <p className="pg-desc card-description">{value(card.description)}</p>
               ))}
-            {card.sections.map((section) => (
+            {sections.map((section) => (
               <section key={section.code} className="card-section" data-section={section.code}>
                 <h4>{sectionTitle(t, section.code, section.title)}</h4>
                 <ul>
-                  {section.rows.map((row) => (
-                    <li key={row.statement_id} className={row.generated ? "card-row ungrounded" : "card-row"}>
-                      <span className="card-row__relation">
-                        {relationTitle(t, row.type, Boolean(row.inverse), row.relation)}:{" "}
-                      </span>
-                      {row.entity_id ? (
-                        <button
-                          className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
-                          onClick={() => onNavigate?.()}
-                        >
-                          {row.label}
-                        </button>
-                      ) : (
-                        value(row)
-                      )}
-                      {row.status === "verified" && <StatusMark status="verified" iconOnly />}
-                      {row.generated && <StatusMark status="generated" iconOnly />}
-                      {row.disputed && <StatusMark status="disputed" iconOnly />}
-                      {believers(t, row).length > 0 && (
-                        <span className="card-who"> — {t.card.believes(believers(t, row).join(", "))}</span>
-                      )}
-                      {row.evidence.map((e, i) => (
-                        <a
-                          key={e.paragraph_id}
-                          className="citation pg-cite"
-                          href={e.link}
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                            navigate(e.link);
-                          }}
-                        >
-                          {i + 1}
-                        </a>
-                      ))}
-                    </li>
-                  ))}
+                  {section.rows.map((row) => {
+                    const who = believers(t, row);
+                    const against = disputers(t, row);
+                    return (
+                      <li key={row.statement_id} className={row.generated ? "card-row ungrounded" : "card-row"}>
+                        <span className="card-row__relation">
+                          {relationTitle(t, row.type, Boolean(row.inverse), row.relation)}:{" "}
+                        </span>
+                        {row.entity_id ? (
+                          <button className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity">
+                            {row.label}
+                          </button>
+                        ) : (
+                          value(row)
+                        )}
+                        {row.status === "verified" && <StatusMark status="verified" />}
+                        {row.status !== "verified" && row.evidence.length > 0 && !row.generated && (
+                          <StatusMark status="sourced" />
+                        )}
+                        {row.generated && <StatusMark status="generated" />}
+                        {row.disputed && (
+                          <span className="card-disputed">
+                            <StatusMark status="disputed" />
+                            {against.length > 0 && (
+                              <span className="card-who"> {t.card.disagree(against.join(", "))}</span>
+                            )}
+                          </span>
+                        )}
+                        {who.length > 0 && (
+                          <span className="card-who"> — {t.card.believes(who.join(", "))}</span>
+                        )}
+                        {row.in_textbook === true && <span className="badge">{t.scope.inTextbook}</span>}
+                        {row.evidence.map((e, i) => (
+                          <a
+                            key={e.paragraph_id}
+                            className="citation pg-cite"
+                            href={e.link}
+                            aria-label={t.card.evidence(i + 1)}
+                            onClick={(ev) => {
+                              ev.preventDefault();
+                              navigate(e.link);
+                            }}
+                          >
+                            {i + 1}
+                          </a>
+                        ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             ))}

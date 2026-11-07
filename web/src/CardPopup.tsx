@@ -51,7 +51,7 @@ type Props = {
   x?: number;
   y?: number;
   onClose: () => void;
-  onOpenFull?: (entityId: string) => void;
+  onOpenFull?: (entityId: string, title: string) => void;
 };
 
 const API = "/api/knowledge/v1";
@@ -351,7 +351,7 @@ export function CardPopup({ entityId, anchor, x, y, onClose, onOpenFull }: Props
           )}
           <div className="pg-popover__actions">
             {onOpenFull && (
-              <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => onOpenFull(current)}>
+              <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => onOpenFull(current, card?.title ?? current)}>
                 <Icon name="expand" small />
                 {t.card.open}
               </button>

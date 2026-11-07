@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
-import { navigate, type PanelState } from "./App";
+import { navigate, type PanelItem, type PanelState } from "./App";
 import { CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
+import { FieldNote } from "./Footnote";
 import { errorText, useT, type Catalog } from "./i18n";
 import { computeLayout, type Layout } from "./layout";
 import { storage, useStored } from "./storage";
@@ -13,7 +14,7 @@ type Props = {
   chapterId?: string;
   anchor: string;
   panel: PanelState | null;
-  setPanel: (panel: PanelState | null) => void;
+  setPanel: Dispatch<SetStateAction<PanelState | null>>;
 };
 
 // Ширина окна: раскладка K1–K4 пересчитывается при её изменении.
@@ -71,6 +72,21 @@ type OpenMention = (entityId: string, entityType: string | undefined, anchor: HT
 type Problem = { kind: string; text?: string };
 // Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
 type Relocated = { chapterId: string; reason: "saved" | "link" };
+
+// Положить элемент наверх стека панели (4.6): повторное открытие того же — не растит; глубина ≤ 20.
+function samePanelItem(a: PanelItem | undefined, b: PanelItem): boolean {
+  if (!a) return false;
+  if (a.kind === "assistant") return b.kind === "assistant";
+  return b.kind === "card" && a.entityId === b.entityId;
+}
+
+function pushPanelItem(stack: PanelItem[] | undefined, item: PanelItem): PanelItem[] {
+  const items = stack ? [...stack] : [];
+  const top = items[items.length - 1];
+  if (samePanelItem(top, item)) items[items.length - 1] = item;
+  else items.push(item);
+  return items.slice(-20);
+}
 
 // Ближайшее место вместо пропавшей главы: глава сохранённого абзаца, иначе первая глава.
 async function nearestPlace(
@@ -147,24 +163,143 @@ function renderText(
   return parts;
 }
 
-function blockPoints(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter, t: Catalog) {
+function blockPoints(
+  block: Extract<ChapterBlock, { type: "block" }>,
+  chapter: Chapter,
+  t: Catalog,
+  field: boolean,
+  noteActive: string | null,
+  setNoteActive: (id: string | null) => void,
+) {
+  const pageAnchor = (at: number) => `${block.id}-${at}`;
   return [
     ...block.pages.map(([at, label]) => ({
       at,
       skip: 0,
-      node: (key: string) => (
-        <span key={key} className="page-mark" data-page={label}>
-          {t.reader.page(label)}
-        </span>
-      ),
+      node: (key: string) =>
+        field ? (
+          // В K1 номер страницы на поле: в тексте — невидимая метка, к которой он привязывается.
+          <span key={key} className="page-anchor" data-page-anchor={pageAnchor(at)} aria-hidden="true" />
+        ) : (
+          <span key={key} className="page-mark" data-page={label} data-nontext>
+            {t.reader.page(label)}
+          </span>
+        ),
     })),
     ...block.notes.flatMap(([at, id]) => {
       const note = chapter.footnotes[id];
       if (!note) return [];
       const skip = block.text.startsWith(note.marker, at) ? note.marker.length : 0;
-      return [{ at, skip, node: (key: string) => <FootnoteRef key={key} note={note} /> }];
+      return [
+        {
+          at,
+          skip,
+          node: (key: string) => (
+            <FootnoteRef
+              key={key}
+              note={note}
+              noteId={id}
+              field={field}
+              active={noteActive === id}
+              onActive={setNoteActive}
+            />
+          ),
+        },
+      ];
     }),
   ];
+}
+
+// Что стоит на поле сносок в K1: номера страниц и сноски в порядке строк главы.
+type FieldItem =
+  | { kind: "page"; key: string; label: string; anchor: string }
+  | { kind: "note"; key: string; note: Chapter["footnotes"][string]; noteId: string };
+
+function fieldItems(chapter: Chapter): FieldItem[] {
+  const items: FieldItem[] = [];
+  for (const block of chapter.blocks) {
+    if (block.type !== "block") continue;
+    const per = [
+      ...block.pages.map(([at, label]) => ({ offset: at, kind: "page" as const, label, anchor: `${block.id}-${at}` })),
+      ...block.notes.map(([at, id]) => ({ offset: at, kind: "note" as const, id })),
+    ].sort((a, b) => a.offset - b.offset);
+    for (const item of per) {
+      if (item.kind === "page") {
+        items.push({ kind: "page", key: `pg-${item.anchor}`, label: item.label, anchor: item.anchor });
+      } else {
+        const note = chapter.footnotes[item.id];
+        if (note) items.push({ kind: "note", key: `nt-${item.id}`, note, noteId: item.id });
+      }
+    }
+  }
+  return items;
+}
+
+// Пояснение неразобранной части по коду (N7); без кода (старая версия) — подпись сервера.
+function unrenderedDetail(t: Catalog, block: Extract<ChapterBlock, { type: "block" }>): string | null {
+  if (block.detail_code === "blank_page") return t.unrendered.blank_page(block.page ?? "");
+  if (block.detail_code === "missing") return t.unrendered.missing;
+  return block.detail;
+}
+
+// Поле сносок (K1): элементы встают верхом на уровне своих строк; при наезде сдвигаются вниз
+// каскадом до промежутка 12px. Положения считаются одним проходом после отрисовки.
+function MarginCol({
+  items,
+  noteActive,
+  onActive,
+}: {
+  items: FieldItem[];
+  noteActive: string | null;
+  onActive: (id: string | null) => void;
+}) {
+  const root = useRef<HTMLElement>(null);
+  const [tops, setTops] = useState<Record<string, number>>({});
+  const [shifted, setShifted] = useState<Record<string, boolean>>({});
+  useLayoutEffect(() => {
+    const article = document.querySelector<HTMLElement>(".chapter");
+    if (!article) return;
+    const articleTop = article.getBoundingClientRect().top;
+    const nextTops: Record<string, number> = {};
+    const nextShifted: Record<string, boolean> = {};
+    let prevBottom = -Infinity;
+    for (const item of items) {
+      const el = root.current?.querySelector<HTMLElement>(`[data-field-key="${item.key}"]`);
+      if (!el) continue;
+      const anchor =
+        item.kind === "note"
+          ? document.querySelector<HTMLElement>(`[data-note-id="${item.noteId}"]`)
+          : document.querySelector<HTMLElement>(`[data-page-anchor="${item.anchor}"]`);
+      const naturalTop = anchor ? anchor.getBoundingClientRect().top - articleTop : 0;
+      const top = Math.max(naturalTop, prevBottom + 12);
+      nextTops[item.key] = top;
+      nextShifted[item.key] = top - naturalTop > 240;
+      prevBottom = top + el.offsetHeight;
+    }
+    setTops(nextTops);
+    setShifted(nextShifted);
+  }, [items]);
+  return (
+    <aside className="margin-col">
+      {items.map((item) =>
+        item.kind === "note" ? (
+          <div key={item.key} className="field-item" data-field-key={item.key} style={{ transform: `translateY(${tops[item.key] ?? 0}px)` }}>
+            <FieldNote
+              note={item.note}
+              noteId={item.noteId}
+              active={noteActive === item.noteId}
+              onActive={onActive}
+              shifted={shifted[item.key] ?? false}
+            />
+          </div>
+        ) : (
+          <div key={item.key} className="field-item field-page" data-field-key={item.key} style={{ transform: `translateY(${tops[item.key] ?? 0}px)` }}>
+            <span className="num">{item.label}</span>
+          </div>
+        ),
+      )}
+    </aside>
+  );
 }
 
 function copyLink(paragraphId: string, onDone: () => void) {
@@ -233,23 +368,25 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   const [tocOpen, setTocOpen] = useState(false);
   const layout = useReaderLayout(panel !== null);
   const mentionsView = useStored((s) => s.mentions);
+  const [noteActive, setNoteActive] = useState<string | null>(null);
 
   // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
   const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) =>
-    setPanel({
-      mode: "assistant",
-      sourceId: sourceId ?? "",
+    setPanel((p) => ({
+      stack: pushPanelItem(p?.stack, { kind: "assistant" }),
+      sourceId: sourceId ?? p?.sourceId ?? "",
       selection: sel?.text ?? null,
       selectionParagraphs: sel?.paragraphs ?? [],
       stripExpanded: true,
-    });
+    }));
   // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
   const collapsePanel = () => {
     if (panel) setPanel({ ...panel, stripExpanded: false });
   };
   // Панель остаётся открытой при переходе в другую главу/книгу: диалог следует за книгой.
   useEffect(() => {
-    if (panel?.mode === "assistant" && sourceId && panel.sourceId !== sourceId) {
+    const top = panel?.stack[panel.stack.length - 1];
+    if (panel && top?.kind === "assistant" && sourceId && panel.sourceId !== sourceId) {
       setPanel({ ...panel, sourceId });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -502,9 +639,15 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           entityId={card.id}
           anchor={card.anchor}
           onClose={() => setCard(null)}
-          onOpenFull={(id) => {
+          onOpenFull={(id, title) => {
             setCard(null);
-            setPanel({ mode: "card", sourceId: sourceId ?? "", selection: null, selectionParagraphs: [], entityId: id, stripExpanded: true });
+            setPanel((p) => ({
+              stack: pushPanelItem(p?.stack, { kind: "card", entityId: id, title }),
+              sourceId: sourceId ?? p?.sourceId ?? "",
+              selection: p?.selection ?? null,
+              selectionParagraphs: p?.selectionParagraphs ?? [],
+              stripExpanded: true,
+            }));
           }}
         />
       )}
@@ -546,11 +689,13 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           }
           if (block.kind === "unrendered") {
             return (
-              <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered">
+              <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered" data-nontext>
                 <Icon name="info" className="unrendered__icon" />
                 <div className="unrendered__body">
                   <span className="unrendered__label">{t.reader.unrendered}</span>
-                  {block.detail && <span className="unrendered__detail">{block.detail}</span>}
+                  {unrenderedDetail(t, block) && (
+                    <span className="unrendered__detail">{unrenderedDetail(t, block)}</span>
+                  )}
                   {block.text && <figcaption>{block.text}</figcaption>}
                 </div>
               </figure>
@@ -565,7 +710,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
               lang={block.lang}
               className={`block ${block.kind}`}
             >
-              {renderText(block.text, blockPoints(block, chapter, t), mentions[block.id] ?? [], openCard)}
+              {renderText(block.text, blockPoints(block, chapter, t, layout.mode === "K1", noteActive, setNoteActive), mentions[block.id] ?? [], openCard)}
               <button
                 type="button"
                 className="copy-link pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
@@ -603,7 +748,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           )}
         </nav>
       </article>
-      {layout.mode === "K1" && <aside className="margin-col" aria-hidden="true" />}
+      {layout.mode === "K1" && <MarginCol items={fieldItems(chapter)} noteActive={noteActive} onActive={setNoteActive} />}
       {tocOpen && (
         <div
           id="reader-toc-layer"
