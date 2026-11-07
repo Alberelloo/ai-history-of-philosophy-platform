@@ -4,49 +4,28 @@ import { pick, recipeTitle, useT, type Catalog } from "./i18n";
 import { ru } from "./i18n/ru";
 import { requestNotice, useNoticeAccepted } from "./Notice";
 import { ScopeToggle, useScope } from "./scope";
-import { storage } from "./storage";
+import {
+  newId,
+  storage,
+  type DialogSet,
+  type Fragment,
+  type Message,
+  type Session,
+  type Suggestion,
+  type Turn,
+} from "./storage";
 import { GeneratedMark, Icon, StatusMark } from "./ui";
 
-// Панель ассистента рядом с текстом. Ответ приходит потоком событий NDJSON; каждый фрагмент
-// уже проверен сервером: со ссылками на абзацы или с пометкой «без опоры на источники».
-
-type Citation = {
-  kind?: "paragraph" | "statement";
-  paragraph_id: string | null;
-  statement_id?: string | null;
-  source_id: string;
-  chapter_id: string | null;
-  title: string;
-};
-type Contradiction = { kind: string; entity: string; expected: string; found: string };
-type Fragment = { text: string; grounded: boolean; citations: Citation[]; contradicts?: Contradiction[] };
-type Suggestion = { entity_id: string; recipe: string; label?: string; title: string };
-// Сообщение к ответу: код сервера (reason, kind или тип события) — переводится по каталогу,
-// текст сервера — запасной вариант для неизвестного кода.
-type Message = { code?: string; text?: string; minutes?: number };
-type Turn = {
-  question: string;
-  selection?: string;
-  fragments: Fragment[];
-  status: "streaming" | "done" | "stopped" | "error";
-  notice?: string;
-  message?: Message;
-  suggestion?: Suggestion;
-};
+// Панель ассистента (docs/design/features/reader-panels.md, 5.2–5.9): набор сессий на книгу,
+// ответ потоком со стадиями и временем, «Остановить» только в потоке, «Повторить», тайм-аут 45 с.
 
 const MAX_SELECTION = 4000;
 const MAX_QUESTION = 2000;
+const TIMEOUT_MS = 45_000;
+// Стадии ответа (5.3): 0 — разбор вопроса, 1 — поиск, 2 — составление, 3 — текст.
+const STAGE_NAMES = ["routing", "searching", "composing", "writing"] as const;
 
-// Диалоги хранятся в общем хранилище браузера; самые старые удаляются при пределе объёма.
-function loadDialog(): Turn[] {
-  return storage.dialog().filter((t): t is Turn => typeof (t as Turn)?.question === "string");
-}
-
-// Ответ одной строкой: для истории диалога (уходит модели, пометка всегда по-русски, как в
-// подсказках сервера) и для копирования (пометка на языке интерфейса).
-export function answerText(turn: Turn, mark: string = ru.assistant.ungroundedMark): string {
-  return turn.fragments.map((f) => (f.grounded ? f.text : `${mark} ${f.text}`)).join(" ");
-}
+type StageState = { step: number; found?: number; startedAt: number };
 
 const SERVER_CODES = [
   "too_long",
@@ -63,13 +42,13 @@ function messageText(t: Catalog, message: Message | undefined, legacy?: string):
   if (!message) return legacy;
   if (message.code === "visitor_limit" && message.minutes) return t.assistant.visitor_limit(message.minutes);
   if (message.code === "read_notice") return t.assistant.readNoticeFirst;
+  if (message.code === "timeout") return t.assistant.timeout;
   if (message.code === "unavailable") return t.assistant.unavailable;
   if (message.code === "broken") return t.assistant.broken;
   if (SERVER_CODES.includes(message.code as ServerCode)) return t.assistant[message.code as ServerCode];
   return pick(t.errors, message.code) ?? (message.text || t.assistant.unavailable);
 }
 
-// Код события потока: причина отказа, вид пояснения или сам тип события.
 function eventMessage(event: Record<string, unknown>): Message {
   const code = (event.reason ?? event.kind ?? event.type) as string | undefined;
   const seconds = Number(event.retry_after_seconds ?? 0);
@@ -80,38 +59,127 @@ function eventMessage(event: Record<string, unknown>): Message {
   };
 }
 
+// Ответ одной строкой: для истории диалога (пометка всегда по-русски) и для копирования.
+export function answerText(turn: Turn, mark: string = ru.assistant.ungroundedMark): string {
+  return turn.fragments.map((f) => (f.grounded ? f.text : `${mark} ${f.text}`)).join(" ");
+}
+
+// Название сессии: заданное читателем или первая фраза первого вопроса (до 60 знаков).
+function sessionTitle(session: Session, fallback: string): string {
+  if (session.title) return session.title;
+  const first = session.messages.find((m) => m.question);
+  if (!first) return fallback;
+  const phrase = first.question.split(/[.!?]/)[0].trim();
+  return phrase.length > 60 ? `${phrase.slice(0, 57).trimEnd()}…` : phrase;
+}
+
 type Props = {
   sourceId: string;
   selection: string | null;
   selectionParagraphs: string[];
   onClose: () => void;
+  onBack?: () => void;
+  backLabel?: string;
   settings?: { sourcesOnly: boolean; generation: boolean; scope: "all" | "current" };
 };
 
-export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, settings }: Props) {
+export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, settings }: Props) {
   const t = useT();
-  const [turns, setTurns] = useState<Turn[]>(loadDialog);
+  const [set, setSet] = useState<DialogSet>(() => storage.dialogsFor(sourceId));
   const accepted = useNoticeAccepted();
   const [question, setQuestion] = useState("");
   const [problem, setProblem] = useState<Message | null>(null);
-  const abort = useRef<AbortController | null>(null);
-  const current = useRef<string | undefined>(selection ?? undefined);
-  const paragraphs = useRef<string[]>(selectionParagraphs);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [selectionDraft, setSelectionDraft] = useState<{ text: string; paragraphs: string[] } | null>(
+    selection ? { text: selection, paragraphs: selectionParagraphs } : null,
+  );
+  const [streams, setStreams] = useState<Record<string, StageState>>({});
+  const aborts = useRef<Record<string, AbortController>>({});
   const scope = useScope();
 
+  const activeId = set.activeId;
+  const active = set.sessions.find((s) => s.id === activeId) ?? set.sessions[0];
+
+  // Внешнее выделение заменяет фрагмент (5.2): новое выделение не добавляет второй.
   useEffect(() => {
-    current.current = selection ?? undefined;
-    paragraphs.current = selectionParagraphs;
+    if (selection) setSelectionDraft({ text: selection, paragraphs: selectionParagraphs });
   }, [selection, selectionParagraphs]);
-  useEffect(() => storage.saveDialog(turns), [turns]);
 
-  const update = (index: number, change: (t: Turn) => Turn) =>
-    setTurns((all) => all.map((turn, i) => (i === index ? change(turn) : turn)));
+  // Каждое изменение набора сохраняется в хранилище этой книги.
+  useEffect(() => {
+    storage.saveDialogs(sourceId, set);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [set, sourceId]);
 
-  async function send(text: string, selected?: string) {
+  const patchSession = (id: string, change: (s: Session) => Session) =>
+    setSet((prev) => ({
+      ...prev,
+      updatedAt: Date.now(),
+      sessions: prev.sessions.map((s) => (s.id === id ? change(s) : s)),
+    }));
+
+  const patchTurn = (sessionId: string, turnId: string, change: (t: Turn) => Turn) =>
+    patchSession(sessionId, (s) => ({
+      ...s,
+      updatedAt: Date.now(),
+      messages: s.messages.map((m) => (m.id === turnId ? change(m) : m)),
+    }));
+
+  const switchSession = (id: string) => {
+    setSet((prev) => ({ ...prev, activeId: id }));
+    setSessionsOpen(false);
+    // Пустая сессия без названия, с которой ушли, удаляется сама (5.8).
+    setSet((prev) => {
+      const left = prev.sessions.find((s) => s.id === prev.activeId);
+      if (left && left.id !== id && left.messages.length === 0 && !left.title) {
+        return {
+          ...prev,
+          activeId: id,
+          sessions: prev.sessions.filter((s) => s.id !== left.id),
+        };
+      }
+      return { ...prev, activeId: id };
+    });
+  };
+
+  const createSession = () => {
+    if (active.messages.length === 0 && !active.title) {
+      setSessionsOpen(false);
+      return; // пустая сессия не плодится — фокус остаётся в поле вопроса
+    }
+    const session: Session = { id: newId(), title: "", createdAt: Date.now(), updatedAt: Date.now(), messages: [] };
+    setSet((prev) => ({ updatedAt: Date.now(), activeId: session.id, sessions: [...prev.sessions, session] }));
+    setSessionsOpen(false);
+  };
+
+  const renameSession = (id: string) => {
+    const name = renameDraft.trim();
+    patchSession(id, (s) => ({ ...s, title: name })); // пустое — «название по первой фразе»
+    setRenaming(null);
+  };
+
+  const deleteSession = (id: string) => {
+    const controller = aborts.current[id];
+    controller?.abort();
+    delete aborts.current[id];
+    setSet((prev) => {
+      const sessions = prev.sessions.filter((s) => s.id !== id);
+      if (!sessions.length) {
+        const fresh = { id: newId(), title: "", createdAt: Date.now(), updatedAt: Date.now(), messages: [] };
+        return { updatedAt: Date.now(), activeId: fresh.id, sessions: [fresh] };
+      }
+      const activeId = prev.activeId === id ? sessions[sessions.length - 1].id : prev.activeId;
+      return { updatedAt: Date.now(), activeId, sessions };
+    });
+    setConfirming(null);
+  };
+
+  async function send(text: string, selected?: string, sessionId = active.id) {
     setProblem(null);
     if (!accepted) {
-      // Сначала читатель видит, что вопросы обрабатывает внешний провайдер.
       setProblem({ code: "read_notice" });
       requestNotice();
       return;
@@ -120,14 +188,22 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       setProblem({ code: "too_long" });
       return;
     }
-    const history = turns
-      .filter((turn) => turn.status === "done")
-      .map((turn) => ({ question: turn.question, answer: answerText(turn) }));
-    const index = turns.length;
-    setTurns((all) => [...all, { question: text, selection: selected, fragments: [], status: "streaming" }]);
+    const history = active.messages
+      .filter((m) => m.status === "done")
+      .map((m) => ({ question: m.question, answer: answerText(m) }));
+    const turnId = newId();
+    const turn: Turn = { id: turnId, question: text, selection: selected, fragments: [], status: "streaming" };
+    patchSession(sessionId, (s) => ({ ...s, updatedAt: Date.now(), messages: [...s.messages, turn] }));
     setQuestion("");
+    setSelectionDraft(null);
+    setStreams((m) => ({ ...m, [turnId]: { step: 0, startedAt: Date.now() } }));
     const controller = new AbortController();
-    abort.current = controller;
+    aborts.current[turnId] = controller;
+    let timer: number | undefined = window.setTimeout(() => controller.abort("timeout"), TIMEOUT_MS);
+    const resetTimer = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => controller.abort("timeout"), TIMEOUT_MS);
+    };
     try {
       const response = await fetch("/api/assistant/v1/ask", {
         method: "POST",
@@ -136,20 +212,18 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
         body: JSON.stringify({
           question: text,
           selection: selected ?? null,
-          selection_paragraphs: selected ? paragraphs.current : [],
+          selection_paragraphs: selected ? selectionParagraphs : [],
           source_id: sourceId,
           history,
           sources_only: settings?.sourcesOnly ?? scope.sourcesOnly,
           generation: settings?.generation ?? scope.generation,
-          // Общий переключатель источников: «только выбранный учебник» — поиск только в нём.
           scope: settings?.scope ?? (scope.onlyTextbook ? "current" : "all"),
         }),
       });
       if (!response.ok) {
-        // Отказ шлюза (например, нет токена страницы) приходит обычным JSON.
         const body = await response.json().catch(() => ({}));
-        update(index, (turn) => ({
-          ...turn,
+        patchTurn(sessionId, turnId, (t) => ({
+          ...t,
           status: "done",
           message: { code: body.kind ?? "unavailable", text: body.error },
         }));
@@ -161,80 +235,180 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       for (;;) {
         const { value, done } = await reader.read();
         if (done) break;
+        resetTimer();
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
         for (const line of lines) {
           if (!line.trim()) continue;
           const event = JSON.parse(line);
-          if (event.type === "fragment") {
-            update(index, (turn) => ({ ...turn, fragments: [...turn.fragments, event] }));
+          if (event.type === "stage") {
+            if (event.name === "searching") setStreams((m) => ({ ...m, [turnId]: { ...m[turnId], step: 1 } }));
+            else if (event.name === "composing")
+              setStreams((m) => ({ ...m, [turnId]: { ...m[turnId], step: 2, found: Number(event.found ?? 0) } }));
+          } else if (event.type === "fragment") {
+            setStreams((m) => ({ ...m, [turnId]: { ...m[turnId], step: 3 } }));
+            patchTurn(sessionId, turnId, (t) => ({ ...t, fragments: [...t.fragments, event as Fragment] }));
           } else if (event.type === "suggestion") {
-            update(index, (turn) => ({ ...turn, suggestion: event as Suggestion }));
+            patchTurn(sessionId, turnId, (t) => ({ ...t, suggestion: event as Suggestion }));
           } else if (event.type === "done") {
-            update(index, (turn) => ({ ...turn, status: "done" }));
+            patchTurn(sessionId, turnId, (t) => ({ ...t, status: "done" }));
           } else if (event.type === "error") {
-            update(index, (turn) => ({ ...turn, status: "error", message: eventMessage(event) }));
+            patchTurn(sessionId, turnId, (t) => ({ ...t, status: "error", message: eventMessage(event) }));
           } else {
-            // notice, refused, unavailable, no_answer — понятное сообщение читателю
-            update(index, (turn) => ({
-              ...turn,
+            patchTurn(sessionId, turnId, (t) => ({
+              ...t,
               message: eventMessage(event),
-              status: event.type === "notice" ? turn.status : "done",
+              status: event.type === "notice" ? t.status : "done",
             }));
           }
         }
       }
-      update(index, (turn) => (turn.status === "streaming" ? { ...turn, status: "done" } : turn));
+      patchTurn(sessionId, turnId, (t) => (t.status === "streaming" ? { ...t, status: "done" } : t));
     } catch (e) {
-      // Остановка читателем: браузер может сообщить о ней разными ошибками, судим по сигналу.
-      if (controller.signal.aborted || (e as Error).name === "AbortError")
-        update(index, (turn) => ({ ...turn, status: "stopped" }));
-      else update(index, (turn) => ({ ...turn, status: "error", message: { code: "broken" } }));
+      const aborted = controller.signal.aborted;
+      if (aborted && controller.signal.reason === "timeout") {
+        patchTurn(sessionId, turnId, (t) => ({ ...t, status: "error", message: { code: "timeout" } }));
+      } else if (aborted || (e as Error).name === "AbortError") {
+        patchTurn(sessionId, turnId, (t) => ({ ...t, status: "stopped" }));
+      } else {
+        patchTurn(sessionId, turnId, (t) => ({ ...t, status: "error", message: { code: "broken" } }));
+      }
+    } finally {
+      window.clearTimeout(timer);
+      delete aborts.current[turnId];
+      setStreams((m) => {
+        const next = { ...m };
+        delete next[turnId];
+        return next;
+      });
     }
   }
+
+  const streaming = active.messages.filter((m) => m.status === "streaming");
+  const streamingTurn = streaming[streaming.length - 1];
 
   return (
     <>
       <div className="pg-panel__head">
-        <h2 className="pg-panel__title">{t.assistant.label}</h2>
+        {onBack ? (
+          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={onBack}>
+            <Icon name="arrowLeft" small />
+            {backLabel ?? t.panel.backToAssistant}
+          </button>
+        ) : (
+          <h2 className="pg-panel__title">{t.assistant.label}</h2>
+        )}
+        <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>
         <button
           className="pg-btn pg-btn--ghost pg-btn--sm"
-          onClick={() => {
-            storage.newDialog();
-            setTurns([]);
-          }}
+          aria-expanded={sessionsOpen}
+          onClick={() => setSessionsOpen((v) => !v)}
         >
-          <Icon name="newDialog" small />
-          {t.assistant.newDialog}
+          <Icon name="index" small />
+          {t.assistant.session.list}
         </button>
-        <button
-          className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
-          aria-label={t.assistant.close}
-          title={t.assistant.close}
-          onClick={onClose}
-        >
+        <button className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.session.new} title={t.assistant.session.new} onClick={createSession}>
+          <Icon name="plus" small />
+        </button>
+        <button className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.close} title={t.assistant.close} onClick={onClose}>
           <Icon name="close" small />
         </button>
       </div>
       <div className="pg-panel__body assistant__body">
+        {sessionsOpen && (
+          <ul className="assistant__sessions" role="list" aria-label={t.assistant.session.list}>
+            {set.sessions.map((s) => {
+              const running = s.messages.some((m) => m.status === "streaming");
+              return (
+                <li key={s.id} className={s.id === activeId ? "assistant__session is-active" : "assistant__session"} aria-current={s.id === activeId ? "true" : undefined}>
+                  {renaming === s.id ? (
+                    <input
+                      className="pg-input"
+                      aria-label={t.assistant.session.renameLabel}
+                      value={renameDraft}
+                      onChange={(e) => setRenameDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") renameSession(s.id);
+                        if (e.key === "Escape") setRenaming(null);
+                      }}
+                      onBlur={() => setRenaming(null)}
+                      autoFocus
+                    />
+                  ) : confirming === s.id ? (
+                    <span className="assistant__session-confirm" role="group">
+                      <span className="assistant__session-confirm-text">
+                        {running ? t.assistant.session.deleteRunning : t.assistant.session.deleteConfirm}
+                      </span>
+                      <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => deleteSession(s.id)}>
+                        {t.assistant.session.delete}
+                      </button>
+                      <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setConfirming(null)}>
+                        {t.assistant.session.cancel}
+                      </button>
+                    </span>
+                  ) : (
+                    <>
+                      <button className="pg-btn pg-btn--ghost assistant__session-title" onClick={() => switchSession(s.id)}>
+                        {running && <span className="assistant__dot" aria-label={t.panel.answering} />}
+                        {sessionTitle(s, t.assistant.session.new)}
+                      </button>
+                      <button
+                        className="pg-btn pg-btn--ghost pg-btn--sm"
+                        aria-label={`${t.assistant.session.rename}: ${sessionTitle(s, t.assistant.session.new)}`}
+                        title={t.assistant.session.rename}
+                        onClick={() => {
+                          setRenaming(s.id);
+                          setRenameDraft(s.title);
+                        }}
+                      >
+                        {t.assistant.session.rename}
+                      </button>
+                      <button
+                        className="pg-btn pg-btn--ghost pg-btn--sm"
+                        aria-label={`${t.assistant.session.delete}: ${sessionTitle(s, t.assistant.session.new)}`}
+                        title={t.assistant.session.delete}
+                        onClick={() => setConfirming(s.id)}
+                      >
+                        {t.assistant.session.delete}
+                      </button>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
         <ScopeToggle textbook={sourceId} />
+        {((settings?.sourcesOnly ?? scope.sourcesOnly) || !(settings?.generation ?? scope.generation)) && (
+          <p className="assistant__sources-only">
+            {t.assistant.sourcesOnlyNote}{" "}
+            <a href="/settings#assistant" onClick={(e) => { e.preventDefault(); navigate("/settings#assistant"); }}>
+              {t.assistant.changeInSettings}
+            </a>
+          </p>
+        )}
         <ol className="turns">
-          {turns.map((turn, i) => {
-            const notice = messageText(t, turn.message, turn.notice);
+          {active.messages.map((turn) => {
+            const notice = messageText(t, turn.message);
+            const isStreaming = turn.status === "streaming";
+            const st = isStreaming ? streams[turn.id] : undefined;
             return (
-              <li key={i} className="turn">
+              <li key={turn.id} className="turn">
                 {turn.selection && <blockquote className="selection-context">{turn.selection}</blockquote>}
                 <p className="question">{turn.question}</p>
+                {isStreaming && st && (
+                  <StageLine t={t} stage={st} />
+                )}
                 {notice && (
-                  <div
-                    className={
-                      turn.status === "error" ? "assistant-notice pg-notice pg-notice--danger" : "assistant-notice pg-notice"
-                    }
-                    role="status"
-                  >
+                  <div className={turn.status === "error" ? "assistant-notice pg-notice pg-notice--danger" : "assistant-notice pg-notice"} role="status">
                     <Icon name={turn.status === "error" ? "warning" : "info"} />
                     <div>{notice}</div>
+                    {turn.message?.code === "read_notice" && (
+                      <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => requestNotice()}>
+                        {t.assistant.showNotice}
+                      </button>
+                    )}
                   </div>
                 )}
                 <div className="answer" data-status={turn.status}>
@@ -243,10 +417,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                     return (
                       <span key={j} className={f.grounded ? "fragment" : "fragment ungrounded pg-generated"}>
                         {contradicts && (
-                          <span
-                            className="contradiction-mark"
-                            title={f.contradicts!.map((c) => t.assistant.contradiction(c.entity, c.expected)).join("; ")}
-                          >
+                          <span className="contradiction-mark" title={f.contradicts!.map((c) => t.assistant.contradiction(c.entity, c.expected)).join("; ")}>
                             <StatusMark status="contradiction" iconOnly />
                           </span>
                         )}
@@ -258,7 +429,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                               key={c.statement_id ?? c.paragraph_id}
                               className="citation pg-cite"
                               href={`/p/${c.paragraph_id}`}
-                              title={c.title || t.assistant.source}
+                              title={c.source_title || c.title || t.assistant.citationFallback}
                               onClick={(e) => {
                                 e.preventDefault();
                                 navigate(`/p/${c.paragraph_id}`);
@@ -279,27 +450,19 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                 </div>
                 <div className="turn__actions">
                   {turn.suggestion && (
-                    <button
-                      className="pg-btn pg-btn--secondary pg-btn--sm"
-                      onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}
-                    >
+                    <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}>
                       <Icon name="graph" small />
-                      {turn.suggestion.label
-                        ? t.assistant.openGraph(recipeTitle(t, turn.suggestion.recipe), turn.suggestion.label)
-                        : turn.suggestion.title}
+                      {turn.suggestion.label ? t.assistant.openGraph(recipeTitle(t, turn.suggestion.recipe), turn.suggestion.label) : turn.suggestion.title}
                     </button>
                   )}
-                  {turn.status === "error" && (
-                    <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => send(turn.question, turn.selection)}>
+                  {(turn.status === "error" || turn.status === "stopped") && (
+                    <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => send(turn.question, turn.selection, active.id)}>
                       <Icon name="retry" small />
                       {t.assistant.retry}
                     </button>
                   )}
                   {turn.status !== "streaming" && turn.fragments.length > 0 && (
-                    <button
-                      className="pg-btn pg-btn--ghost pg-btn--sm copy-answer"
-                      onClick={() => navigator.clipboard?.writeText(answerText(turn, t.assistant.ungroundedMark))}
-                    >
+                    <button className="pg-btn pg-btn--ghost pg-btn--sm copy-answer" onClick={() => navigator.clipboard?.writeText(answerText(turn, t.assistant.ungroundedMark))}>
                       <Icon name="copy" small />
                       {t.assistant.copy}
                     </button>
@@ -309,21 +472,34 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             );
           })}
         </ol>
+        {active.messages.length === 0 && <p className="assistant__empty">{t.assistant.empty}</p>}
         {problem && (
           <div className="assistant-notice pg-notice pg-notice--warning" role="alert">
             <Icon name="info" />
             <div>{messageText(t, problem)}</div>
+            {problem.code === "read_notice" && (
+              <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => requestNotice()}>
+                {t.assistant.showNotice}
+              </button>
+            )}
           </div>
         )}
         <form
           className="assistant__form"
           onSubmit={(e) => {
             e.preventDefault();
-            send(question, current.current);
-            current.current = undefined;
+            if (question.length > MAX_QUESTION) return;
+            send(question, selectionDraft?.text, active.id);
           }}
         >
-          {current.current && <blockquote className="selection-context">{current.current}</blockquote>}
+          {selectionDraft && (
+            <blockquote className="selection-context">
+              {selectionDraft.text}
+              <button type="button" className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.removeFragment} title={t.assistant.removeFragment} onClick={() => setSelectionDraft(null)}>
+                <Icon name="close" small />
+              </button>
+            </blockquote>
+          )}
           <textarea
             className="pg-input"
             aria-label={t.assistant.question}
@@ -331,17 +507,45 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={t.assistant.placeholder}
           />
+          {question.length > MAX_QUESTION * 0.8 && (
+            <p className={question.length > MAX_QUESTION ? "assistant__counter is-over" : "assistant__counter"}>
+              {question.length > MAX_QUESTION ? t.assistant.questionTooLong(MAX_QUESTION) : t.assistant.counter(question.length, MAX_QUESTION)}
+            </p>
+          )}
           <div className="assistant-actions">
-            <button type="submit" className="pg-btn pg-btn--primary">
+            <button type="submit" className="pg-btn pg-btn--primary" aria-disabled={question.length > MAX_QUESTION || undefined}>
               {t.assistant.ask}
             </button>
-            <button type="button" className="pg-btn pg-btn--ghost" onClick={() => abort.current?.abort()}>
-              <Icon name="stop" small />
-              {t.assistant.stop}
-            </button>
+            {streamingTurn && (
+              <button type="button" className="pg-btn pg-btn--ghost" onClick={() => aborts.current[streamingTurn.id]?.abort()}>
+                <Icon name="stop" small />
+                {t.assistant.stop}
+              </button>
+            )}
           </div>
         </form>
       </div>
     </>
+  );
+}
+
+function StageLine({ t, stage }: { t: Catalog; stage: StageState }) {
+  const [elapsed, setElapsed] = useState(() => Math.floor((Date.now() - stage.startedAt) / 1000));
+  useEffect(() => {
+    const timer = window.setInterval(() => setElapsed(Math.floor((Date.now() - stage.startedAt) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [stage.startedAt]);
+  const name = STAGE_NAMES[Math.min(stage.step, 3)];
+  return (
+    <p className="assistant__stage" role="status" aria-live="polite">
+      <span className="assistant__dot" aria-hidden="true" />
+      <span>{t.assistant.stage[name]}</span>
+      <span className="assistant__stage-meta">
+        {t.assistant.stage.step(stage.step + 1, 4)} · {t.assistant.elapsed(elapsed)}
+      </span>
+      {stage.step >= 2 && (
+        <span className="assistant__stage-found">{stage.found ? t.assistant.stage.found(stage.found) : t.assistant.stage.foundNone}</span>
+      )}
+    </p>
   );
 }
