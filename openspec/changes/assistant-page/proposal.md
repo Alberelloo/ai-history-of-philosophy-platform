@@ -18,7 +18,7 @@
 
 ### New Capabilities
 
-- `assistant-page` (страница раздела «Ассистент» и перенос общего вопроса).
+Нет.
 
 ### Modified Capabilities
 

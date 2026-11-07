@@ -264,3 +264,32 @@ def test_answer_stages_visible(page, server, bot):
     assert "из 4" in stage_text
     assert "%" not in stage_text and "слов" not in stage_text
     panel.locator(".fragment").first.wait_for()
+
+
+@req(AD, "Раздел «Ассистент»")
+def test_assistant_page_and_stub(page, server):
+    url, _ = server
+    page.goto(f"{url}/assistant")
+    page.wait_for_selector(".assistant-page")
+    assert "по всей библиотеке" in page.locator(".assistant-page__subtitle").inner_text()
+    # Старая закладка /soon/assistant заменяется на /assistant.
+    page.goto(f"{url}/soon/assistant")
+    page.wait_for_url("**/assistant")
+
+
+@req(AD, "Переход с вопросом из панели")
+def test_handoff_block_and_transfer_link(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.routes.append({"type": "other_authors", "confidence": 0.9, "names": []})
+    panel.get_by_label("Вопрос ассистенту").fill("а что думали другие авторы?")
+    panel.get_by_role("button", name="Спросить").click()
+    panel.locator(".handoff-block").wait_for()
+    assert "выходит за границы" in panel.locator(".handoff-block").inner_text()
+    link = panel.locator(".handoff-block a")
+    assert "/assistant?q=" in (link.get_attribute("href") or "")
+    # Кнопка «Продолжить в рамках этого источника» отправляет новый обмен с handoff_declined.
+    panel.locator(".handoff-block button", has_text="Продолжить").click()
+    panel.locator(".handoff-block").wait_for(state="detached")
