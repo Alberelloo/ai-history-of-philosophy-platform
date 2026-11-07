@@ -4,6 +4,7 @@ import { pick, recipeTitle, useT, type Catalog } from "./i18n";
 import { ru } from "./i18n/ru";
 import { requestNotice, useNoticeAccepted } from "./Notice";
 import { ScopeToggle, useScope } from "./scope";
+import { useSources } from "./sources";
 import {
   newId,
   storage,
@@ -104,10 +105,11 @@ type Props = {
   mode?: "book" | "library";
   pending?: PendingHandoff | null;
   initialQuestion?: string;
+  pendingFrom?: string;
   settings?: { sourcesOnly: boolean; generation: boolean; scope: "all" | "current" };
 };
 
-export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", pending = null, initialQuestion, settings }: Props) {
+export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", pending = null, initialQuestion, pendingFrom, settings }: Props) {
   const t = useT();
   const [set, setSet] = useState<DialogSet>(() =>
     mode === "library" ? storage.libraryDialogs() : storage.dialogsFor(sourceId),
@@ -125,6 +127,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const [streams, setStreams] = useState<Record<string, StageState>>({});
   const aborts = useRef<Record<string, AbortController>>({});
   const scope = useScope();
+  const sources = useSources(mode === "library" ? [] : [sourceId]);
 
   const activeId = set.activeId;
   const active = set.sessions.find((s) => s.id === activeId) ?? set.sessions[0];
@@ -255,7 +258,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           question: text,
           selection: selected ?? null,
           selection_paragraphs: selected ? selectionParagraphs : [],
-          source_id: sourceId,
+          source_id: from?.sourceId ?? sourceId,
           history,
           sources_only: settings?.sourcesOnly ?? scope.sourcesOnly,
           generation: settings?.generation ?? scope.generation,
@@ -359,7 +362,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           ) : mode === "library" ? null : (
             <h2 className="pg-panel__title">{t.assistant.label}</h2>
           )}
-          {mode !== "library" && <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>}
+          {mode !== "library" && <span className="assistant__book">{t.assistant.bookDialog(sources[sourceId]?.title ?? sourceId)}</span>}
         </div>
         <button
           className="pg-btn pg-btn--ghost pg-btn--sm"
@@ -529,7 +532,17 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                         href={`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`}
                         onClick={(e) => {
                           e.preventDefault();
-                          patchTurn(active.id, turn.id, (t) => ({ ...t, handoff: { reason: t.handoff!.reason, choice: "library" } }));
+                          const choice = { reason: turn.handoff!.reason, choice: "library" as const };
+                          patchTurn(active.id, turn.id, (t) => ({ ...t, handoff: choice }));
+                          // Синхронно сохранить выбор до размонтирования панели (5.10, T41).
+                          storage.saveDialogs(sourceId, {
+                            ...set,
+                            sessions: set.sessions.map((s) =>
+                              s.id === active.id
+                                ? { ...s, messages: s.messages.map((m) => (m.id === turn.id ? { ...m, handoff: choice } : m)) }
+                                : s,
+                            ),
+                          });
                           setPendingHandoff({ id: turn.id, question: turn.question, selection: turn.selection, selectionParagraphs, from: sourceId });
                           onClose();
                           navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`, { handoff: turn.id });
@@ -592,6 +605,15 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                 {t.assistant.showNotice}
               </button>
             )}
+          </div>
+        )}
+        {mode === "library" && initialQuestion && !set.sessions.some((s) => s.messages.some((m) => m.question === initialQuestion)) && (
+          <div className="assistant-notice pg-notice" role="status">
+            <Icon name="info" />
+            <div>{t.assistantPage.pending(pendingFrom ?? "")}</div>
+            <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setQuestion("")}>
+              {t.assistantPage.clear}
+            </button>
           </div>
         )}
         <form

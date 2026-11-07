@@ -11,6 +11,7 @@ export function AssistantPage({ search = "" }: { search?: string }) {
     return state?.handoff ? takePendingHandoff(state.handoff) : null;
   }, []);
   const q = useMemo(() => new URLSearchParams(search).get("q") ?? "", [search]);
+  const from = useMemo(() => new URLSearchParams(search).get("from") ?? "", [search]);
   return (
     <main className="assistant-page" id="content">
       <div className="assistant-page__col">
@@ -26,6 +27,7 @@ export function AssistantPage({ search = "" }: { search?: string }) {
           onClose={() => {}}
           pending={pending}
           initialQuestion={q || undefined}
+          pendingFrom={from || undefined}
         />
       </div>
     </main>

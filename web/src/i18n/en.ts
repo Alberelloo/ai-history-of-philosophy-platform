@@ -129,6 +129,8 @@ export const en: Catalog = {
       "Ask a question across the whole library: comparing authors, the history of an idea, the context of an era. Answers link to book passages.",
     pending: (book: string) =>
       `The question was moved from “${book}” and has not been sent yet. Sending it is a new request to the assistant.`,
+    clear: "Clear",
+    asked: "This question has already been asked — see the answer above.",
   },
   family: {
     person: "Person",
