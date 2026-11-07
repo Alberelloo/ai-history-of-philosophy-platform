@@ -52,7 +52,10 @@ def test_reading_journey(page, stack):
     assert page.locator(".field-page").all_inner_texts()[:2] == ["11", "12"]
     page.locator(".note-ref").first.hover()
     assert "белой бумаге" in page.locator(".field-note").first.inner_text()
-    assert page.locator(".field-note a").first.get_attribute("href") == "https://example.org/tabula-rasa"
+    assert (
+        page.locator(".field-note a").first.get_attribute("href")
+        == "https://example.org/tabula-rasa"
+    )
     page.get_by_role("navigation", name="Главы").get_by_role(
         "button", name="Следующая глава"
     ).click()

@@ -325,9 +325,7 @@ def test_old_dialogs_dropped_over_limit(browser, stack):
     assert len(encoded) <= 200_000
     # Старейшие диалоги библиотеки вытеснены, новый вопрос сохранён.
     questions = [
-        m["question"]
-        for s in state["libraryDialogs"]["sessions"]
-        for m in s["messages"]
+        m["question"] for s in state["libraryDialogs"]["sessions"] for m in s["messages"]
     ] + [
         m["question"]
         for ds in state["dialogs"].values()
