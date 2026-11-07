@@ -160,6 +160,20 @@ def test_per_fragment_marking(bot):
     assert [f.text for f in stream.finish()] == ["Второе"]
 
 
+@req("assistant-dialog", "Ход ответа")
+def test_answer_stage_events(bot):
+    bot.model.answers.append(["Юм говорил о привычке [1]. ", "Кант ответил Юму [2]. "])
+    items = bot.ask(question="Что Юм говорил о причинности?")
+    stages = [i for i in items if i["type"] == "stage"]
+    assert [s["name"] for s in stages] == ["searching", "composing"], stages
+    assert stages[1]["found"] >= 1
+    # Порядок: stage searching → stage composing → fragment → done.
+    kinds = [i["type"] for i in items]
+    assert kinds.index("stage") < kinds.index("fragment") < kinds.index("done")
+    done = items[-1]
+    assert done["type"] == "done" and done["answer_language"] in ("русский", "английский")
+
+
 @req(AG, "Режим «только по источникам»")
 def test_sources_only_mode(bot, events):
     bot.model.answers.append(["Юм говорил о привычке [1]. ", "А это без опоры. "])
@@ -168,7 +182,7 @@ def test_sources_only_mode(bot, events):
     events.clear()
     calls = len([c for c in bot.gateway.store.calls() if c["operation"] == "answer"])
     items = bot.ask(question="добродетель благо стоики", sources_only=True)
-    assert items[0]["type"] == "no_answer"
+    assert next(i for i in items if i["type"] != "stage")["type"] == "no_answer"
     assert len([c for c in bot.gateway.store.calls() if c["operation"] == "answer"]) == calls
 
 
@@ -176,7 +190,7 @@ def test_sources_only_mode(bot, events):
 def test_default_answers_without_sources_marked(bot):
     bot.model.answers.append(["Стоики учили о добродетели. "])
     items = bot.ask(question="добродетель благо стоики")
-    assert items[0] == {
+    assert next(i for i in items if i["type"] != "stage") == {
         "type": "notice",
         "kind": "no_library_support",
         "message": "Ответ составлен без опоры на библиотеку.",

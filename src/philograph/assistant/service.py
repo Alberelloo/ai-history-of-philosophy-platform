@@ -354,6 +354,7 @@ class Assistant:
             }
             return
         ctx = self._ontology(kind, request, names)
+        yield {"type": "stage", "name": "searching"}
         try:
             results = self._gather(kind, request, names, ctx)
         except ServiceUnavailable:
@@ -381,6 +382,8 @@ class Assistant:
                 r.get("section_title") or "",
                 r["text"],
                 quoting=r.get("quoting", True),
+                source_title=r.get("source_title"),
+                paragraph_start=r["text"][:120],
             )
             for i, r in enumerate(results)
         }
@@ -397,6 +400,7 @@ class Assistant:
                 kind="statement",
                 statement_id=s["id"],
                 grounds=s["status"] in ("verified", "sourced"),
+                entity_id=s.get("entity_id"),
             )
         paragraphs = [p for p in passages.values() if p.kind == "paragraph"]
         if kind == "other_authors":
@@ -460,6 +464,7 @@ class Assistant:
                     metrics.observe("assistant.first_fragment_ms", first_ms)
                 yield {"type": "fragment", **fragment.to_json()}
 
+        yield {"type": "stage", "name": "composing", "found": len(passages)}
         try:
             try:
                 for item in self.llm.stream("main", CHAINS[kind]["template"], data, "answer"):
@@ -490,7 +495,11 @@ class Assistant:
             yield {
                 "type": "no_answer",
                 "message": "В источниках ответа не нашлось.",
-                "suggestions": [p.title for p in passages.values()][:3],
+                "suggestions": [
+                    {"paragraph_id": p.paragraph_id, "title": p.title}
+                    for p in passages.values()
+                    if p.kind == "paragraph"
+                ][:3],
             }
         if ctx is not None and ctx.graph and stats["fragments"]:
             yield {"type": "suggestion", "kind": "graph", **ctx.graph}
@@ -512,6 +521,7 @@ class Assistant:
             "llm_calls": calls,
             "first_fragment_ms": first_ms,
             "total_ms": total,
+            "answer_language": answer_language(request.question),
         }
 
     @staticmethod
