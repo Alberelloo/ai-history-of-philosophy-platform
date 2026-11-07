@@ -228,6 +228,8 @@ def test_mentions_endpoint_and_degradation(mx):
     p = mx.paragraph("Согласно Канту")
     response = client.get("/v1/mentions", params={"targets": p.id})
     assert response.status_code == 200 and response.json()
+    kant = next(m for m in response.json() if m["entity_id"] == mx.ids["kant"])
+    assert kant["entity_type"] == "person"  # N1: клиент красит подчёркивание цветом семьи
     # Без сервиса знаний клиент получает ошибку соединения и показывает главу без выделений:
     # это проверяет сквозной тест; здесь — что неизвестные абзацы дают пустой список.
     assert client.get("/v1/mentions", params={"targets": "nope"}).json() == []
@@ -267,6 +269,14 @@ def test_card_navigation_links(mx):
     card = mx.cards.card(mx.ids["hume"])
     row = next(r for s in card["sections"] for r in s["rows"] if r["entity_id"] == mx.ids["kant"])
     assert row["label"] == "Кант" and row["relation"] == "подвергся критике"
+
+
+@req(EC, "Карточка рядом с текстом")
+def test_card_not_found_returns_404(mx):
+    client = TestClient(build_app(mx.onto.statements, cards=mx.cards, mentions=mx.mentions))
+    response = client.get("/v1/entities/nonexistent/card")
+    assert response.status_code == 404
+    assert response.json()["kind"] == "entity_not_found"
 
 
 @req(EC, "Разделы карточки по типу")
