@@ -44,6 +44,8 @@ events.define(
 )
 
 AUTO_REMOVED_SHARE = 0.02  # доля удалённых абзацев, до которой обновление публикуется само
+# Поля файла, которые уходят в реестр источника; missing — подстраницы нет на сайте.
+FILE_KEYS = ("name", "url", "clean", "api", "missing")
 
 
 @dataclass
@@ -225,8 +227,7 @@ class CatalogService:
             **fields,
             "license": model.license_of(entry),
             "files": [
-                {k: v for k, v in f.items() if k in ("name", "url", "clean", "api") and v}
-                for f in model.files(entry)
+                {k: v for k, v in f.items() if k in FILE_KEYS and v} for f in model.files(entry)
             ],
             "settings": {"languages": [fields["language"]]},
         }

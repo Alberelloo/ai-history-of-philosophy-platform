@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from philograph import __version__
-from philograph.library.reading import Internal, NotVisible, Reading
+from philograph.library.reading import ChapterNotFound, Internal, NotVisible, Reading
 from philograph.platform.health import Health
 from philograph.platform.web import UserFacingError, create_app
 
@@ -56,8 +56,14 @@ def build_app(
             raise UserFacingError(
                 "Источник недоступен", status=404, kind="source_unavailable"
             ) from exc
-        except KeyError as exc:
-            raise UserFacingError("Глава не найдена", status=404, kind="chapter_not_found") from exc
+        except ChapterNotFound as exc:
+            # Первая глава — чтобы клиент остался в книге, а не показывал ошибку.
+            raise UserFacingError(
+                "Глава не найдена",
+                status=404,
+                kind="chapter_not_found",
+                details={"first_chapter_id": exc.first},
+            ) from exc
 
     @router.get("/paragraphs/{paragraph_id}")
     def paragraph(paragraph_id: str) -> dict[str, Any]:

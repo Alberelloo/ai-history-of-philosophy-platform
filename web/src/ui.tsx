@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useT } from "./i18n";
 
 // Обёртки над компонентами дизайн-системы (docs/design/system/components.css, классы pg-*).
@@ -93,6 +93,69 @@ const ICONS = {
     <>
       <path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5Z" />
       <path d="M12 8v6M9 11h6" />
+    </>
+  ),
+  // Боковая панель: разделы продукта и виды источников.
+  library: (
+    <>
+      <path d="M4.5 4.5h3.5v15H4.5ZM10 4.5h3.5v15H10Z" />
+      <path d="m15.4 5.6 3.3-.9 3.1 14.1-3.3.9Z" />
+    </>
+  ),
+  books: (
+    <>
+      <path d="M6.5 3.5h11a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-11a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" />
+      <path d="M4.5 17.5a2 2 0 0 1 2-2h12M9 7.5h6" />
+    </>
+  ),
+  quill: (
+    <>
+      <path d="M19.5 4.5C12.5 5 7.5 10 6 19.5" />
+      <path d="M19.5 4.5c-.5 5.5-4 9-9.6 9.8" />
+    </>
+  ),
+  bookmark: <path d="M6.5 4.5h11v15L12 15.5l-5.5 4Z" />,
+  index: (
+    <>
+      <rect x="5" y="4" width="14" height="16" rx="1.5" />
+      <path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4" />
+    </>
+  ),
+  timeline: (
+    <>
+      <path d="M3.5 12h17" />
+      <circle cx="7.5" cy="12" r="2" />
+      <circle cx="15" cy="12" r="2" />
+      <path d="M11.2 8v8M18.8 9v6" />
+    </>
+  ),
+  route: (
+    <>
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <path d="M8 18h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7" />
+    </>
+  ),
+  upload: <path d="M12 15.5v-11M7 9l5-4.5L17 9M5 19.5h14" />,
+  share: (
+    <>
+      <circle cx="17" cy="6" r="2.5" />
+      <circle cx="7" cy="12" r="2.5" />
+      <circle cx="17" cy="18" r="2.5" />
+      <path d="m9.2 10.8 5.6-3.4M9.2 13.2l5.6 3.4" />
+    </>
+  ),
+  settings: (
+    <>
+      <path d="M10.3 3.5h3.4l.5 2.4 1.9 1.1 2.3-.8 1.7 2.9-1.8 1.6v2.6l1.8 1.6-1.7 2.9-2.3-.8-1.9 1.1-.5 2.4h-3.4l-.5-2.4-1.9-1.1-2.3.8-1.7-2.9 1.8-1.6v-2.6L3.9 8.9l1.7-2.9 2.3.8 1.9-1.1Z" />
+      <circle cx="12" cy="12" r="2.8" />
+    </>
+  ),
+  pin: <path d="M9 4.5h6M10 4.5V10l-3 3.5h10L14 10V4.5M12 13.5v6" />,
+  sidebar: (
+    <>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="1.5" />
+      <path d="M9 4.5v15" />
     </>
   ),
 };
@@ -295,6 +358,113 @@ export function Portrait({ name, size = 56 }: { name: string; size?: number }) {
       <div className="pg-portrait__disc" role="img" aria-label={t.card.noImage(name)}>
         {monogram(name)}
       </div>
+    </div>
+  );
+}
+
+export type FilterItem = { value: string; label: string };
+
+// Выпадающий фильтр с флажками (docs/design/system/components/FilterMenu.md): кнопка с числом
+// выбранных, «Выбрать все» и «Снять все». Пустой выбор означает «все значения».
+export function FilterMenu({
+  label,
+  items,
+  selected,
+  onChange,
+}: {
+  label: string;
+  items: FilterItem[];
+  selected: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const count = selected.length;
+  const all = items.length > 0 && items.every((item) => selected.includes(item.value));
+
+  useEffect(() => {
+    if (!open) return;
+    menu.current
+      ?.querySelector<HTMLElement>('button:not([disabled]):not([aria-disabled="true"]), input')
+      ?.focus();
+    const outside = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "Escape" || !open) return;
+    e.stopPropagation();
+    setOpen(false);
+    button.current?.focus();
+  };
+  const toggle = (value: string) =>
+    onChange(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]);
+
+  return (
+    <div className="pg-filter" ref={root} onKeyDown={onKeyDown}>
+      <button
+        ref={button}
+        type="button"
+        className="pg-btn pg-btn--secondary pg-filter__button"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen(!open)}
+      >
+        {label}
+        {/* Место под число есть всегда: кнопка не меняет ширину, строка фильтров не прыгает. */}
+        <span className={count > 0 ? "pg-filter__count num" : "pg-filter__count num is-empty"}>· {count}</span>
+        <Icon name="chevronDown" small className="pg-filter__chevron" />
+      </button>
+      {open && (
+        <div id={id} ref={menu} className="pg-filter-menu" role="group" aria-label={label}>
+          <div className="pg-filter-menu__actions">
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--sm"
+              // Неактивна через aria-disabled, а не disabled: кнопка, на которой фокус, не
+              // теряет его (иначе Esc не закрыл бы окно, а Tab начинал бы страницу сначала).
+              aria-disabled={all || undefined}
+              onClick={() => {
+                if (!all) onChange(items.map((item) => item.value));
+              }}
+            >
+              {t.filter.selectAll}
+            </button>
+            <button
+              type="button"
+              className="pg-btn pg-btn--ghost pg-btn--sm"
+              aria-disabled={count === 0 || undefined}
+              onClick={() => {
+                if (count > 0) onChange([]);
+              }}
+            >
+              {t.filter.clearAll}
+            </button>
+          </div>
+          <ul className="pg-filter-menu__list">
+            {items.map((item) => (
+              <li key={item.value}>
+                <label className="pg-filter-menu__option">
+                  <input
+                    className="filter__input"
+                    type="checkbox"
+                    checked={selected.includes(item.value)}
+                    onChange={() => toggle(item.value)}
+                  />
+                  {item.label}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

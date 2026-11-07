@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import httpx
 import pytest
 
-from ..helpers import reader_context, topnav
+from ..helpers import aside, reader_context, via_sidebar
 
 req = pytest.mark.req
 SL = "source-library"
@@ -59,24 +60,114 @@ def test_source_description_and_missing_fields(page, site):
     assert link.get_attribute("href") == "https://example.org/public-domain"
 
 
+def filter_menu(page, name: str):
+    """Открывает выпадающий фильтр библиотеки: кнопка и окно со флажками."""
+    main = page.get_by_role("main")
+    button = main.get_by_role("button", name=name)
+    if button.get_attribute("aria-expanded") != "true":
+        button.click()
+    return button, main.get_by_role("group", name=name, exact=True)
+
+
+def count(page, n: int) -> None:
+    page.wait_for_function(f"document.querySelectorAll('.source').length === {n}")
+
+
 @req(SL, "Фильтр по виду источника")
 def test_kind_filter(page, site):
     open_library(page, site)
-    page.get_by_label("Учебник").check()
-    page.wait_for_function("document.querySelectorAll('.source').length === 1")
+    button, menu = filter_menu(page, "Вид")
+    menu.get_by_label("Учебник").check()
+    count(page, 1)
     assert titles(page) == ["История теории познания"]
-    page.get_by_label("Первоисточник").check()
-    page.wait_for_function("document.querySelectorAll('.source').length === 2")
+    menu.get_by_label("Первоисточник").check()
+    count(page, 2)
     assert "Философский словарь" not in titles(page)
+    assert button.inner_text().split() == ["Вид", "·", "2"]  # число выбранных видов
+
+
+@req(SL, "Фильтр по виду источника")
+def test_several_kinds_in_one_request(site):
+    """Учебник и первоисточник одним запросом через шлюз: в ответе оба, справочника нет."""
+    response = httpx.get(
+        site.url + "/api/v1/sources", params=[("kind", "textbook"), ("kind", "primary")]
+    )
+    assert response.status_code == 200
+    titles = {s["title"] for s in response.json()["sources"]}
+    assert titles == {"История теории познания", "Critique of Pure Reason"}
+    three = httpx.get(
+        site.url + "/api/v1/sources?kind=textbook&kind=primary&kind=reference&lang=ru&lang=en"
+    ).json()["sources"]
+    assert len(three) == 3
+
+
+@req(SL, "Фильтр по виду источника")
+def test_kind_filter_select_all_clear_all_and_closing(page, site):
+    open_library(page, site)
+    button, menu = filter_menu(page, "Вид")
+    boxes = menu.get_by_role("checkbox")
+    assert boxes.count() == 3
+    menu.get_by_role("button", name="Выбрать все").click()
+    assert all(boxes.nth(i).is_checked() for i in range(3))
+    count(page, 3)  # все виды — все источники
+    assert button.inner_text().split() == ["Вид", "·", "3"]
+    assert menu.get_by_role("button", name="Выбрать все").is_disabled()
+    menu.get_by_role("button", name="Снять все").click()
+    assert not any(boxes.nth(i).is_checked() for i in range(3))
+    count(page, 3)  # пустой выбор — тоже все
+    assert button.inner_text().strip() == "Вид"
+    # Esc закрывает окно и возвращает фокус на кнопку
+    menu.get_by_label("Учебник").check()
+    page.keyboard.press("Escape")
+    assert menu.count() == 0
+    assert button.evaluate("el => el === document.activeElement")
+    # щелчок вне окна закрывает его, выбор сохраняется
+    button.click()
+    assert menu.is_visible() and menu.get_by_label("Учебник").is_checked()
+    page.get_by_role("heading", name="Библиотека", exact=True).click()
+    assert menu.count() == 0
+    count(page, 1)
+    assert button.inner_text().split() == ["Вид", "·", "1"]
+
+
+@req(SL, "Фильтр по виду источника")
+@req(SL, "Фильтр по языку")
+@pytest.mark.parametrize("name", ["Вид", "Язык"])
+@pytest.mark.parametrize("action", ["Выбрать все", "Снять все"])
+def test_escape_after_select_all_and_clear_all(page, site, name, action):
+    """Esc сразу после «Выбрать все» или «Снять все» закрывает окно, фокус — на кнопке фильтра.
+
+    Кнопка, которая после нажатия стала неактивной, не теряет фокус: иначе Esc уходил бы
+    в пустоту, а Tab начинал обход страницы сначала.
+    """
+    open_library(page, site)
+    button, menu = filter_menu(page, name)
+    select_all = menu.get_by_role("button", name="Выбрать все")
+    clear_all = menu.get_by_role("button", name="Снять все")
+    if action == "Снять все":
+        select_all.click()
+        page.wait_for_function(
+            "() => [...document.querySelectorAll('.pg-filter-menu input')].every(i => i.checked)"
+        )
+    target = select_all if action == "Выбрать все" else clear_all
+    target.click()
+    # Кнопка теперь ничего не изменит: неактивна, но в фокусе (aria-disabled, не disabled).
+    assert target.get_attribute("aria-disabled") == "true"
+    assert target.evaluate("el => el === document.activeElement")
+    page.keyboard.press("Escape")
+    assert menu.count() == 0
+    assert button.evaluate("el => el === document.activeElement")
 
 
 @req(SL, "Фильтр по языку")
 def test_language_filter_offers_available_languages(page, site):
     open_library(page, site)
-    languages = page.locator("fieldset", has_text="Язык").locator("label").all_inner_texts()
+    _, menu = filter_menu(page, "Язык")
+    languages = menu.locator(".pg-filter-menu__option").all_inner_texts()
     assert sorted(languages) == ["английский", "русский"]
-    page.get_by_label("английский").check()
-    page.wait_for_function("document.querySelectorAll('.source').length === 1")
+    assert menu.get_by_role("button", name="Выбрать все").is_visible()
+    menu.get_by_label("английский").check()
+    count(page, 1)
     assert titles(page) == ["Critique of Pure Reason"]
 
 
@@ -106,17 +197,51 @@ def test_search_by_title_and_author(page, site, events):
 @req(SL, "Сочетание поиска и фильтров")
 def test_search_and_filters_combined_and_reset(page, site):
     open_library(page, site)
-    page.get_by_label("Первоисточник").check()
+    reset = page.locator(".filters").get_by_role("button", name="Сбросить поиск и фильтры")
+    assert reset.is_disabled()  # сбрасывать нечего, но кнопка на месте
+    _, menu = filter_menu(page, "Вид")
+    menu.get_by_label("Первоисточник").check()
     page.get_by_label("Поиск по названию и автору").fill("kant")
-    page.wait_for_function("document.querySelectorAll('.source').length === 1")
+    count(page, 1)
     assert titles(page) == ["Critique of Pure Reason"]
+    assert reset.is_enabled()
     page.get_by_label("Поиск по названию и автору").fill("гегель")
     status = page.get_by_role("status")
     assert "Подходящих источников нет" in status.inner_text()
     status.get_by_role("button", name="Сбросить поиск и фильтры").click()
-    page.wait_for_function("document.querySelectorAll('.source').length === 3")
+    count(page, 3)
     assert page.get_by_label("Поиск по названию и автору").input_value() == ""
-    assert not page.get_by_label("Первоисточник").is_checked()
+    assert reset.is_disabled()
+    _, menu = filter_menu(page, "Вид")
+    assert not menu.get_by_label("Первоисточник").is_checked()
+
+
+@req(SL, "Сочетание поиска и фильтров")
+def test_search_width_constant(page, site):
+    """Ширина поиска и место кнопки сброса не меняются при выборе фильтров и вводе запроса."""
+    open_library(page, site)
+
+    def measure():
+        return page.evaluate("""() => {
+            const search = document.querySelector('.filters__search').getBoundingClientRect();
+            const reset = document.querySelector('.filters__reset').getBoundingClientRect();
+            return {width: search.width, left: search.left, reset: reset.left, top: reset.top};
+        }""")
+
+    before = measure()
+    _, menu = filter_menu(page, "Вид")
+    menu.get_by_label("Учебник").check()
+    menu.get_by_label("Первоисточник").check()
+    page.keyboard.press("Escape")
+    _, menu = filter_menu(page, "Язык")
+    menu.get_by_label("русский").check()
+    page.keyboard.press("Escape")
+    page.get_by_label("Поиск по названию и автору").fill("история теории познания")
+    count(page, 1)
+    after = measure()
+    assert after["width"] == before["width"] and after["left"] == before["left"], (before, after)
+    assert after["top"] == before["top"]  # кнопка сброса не переехала на другую строку
+    assert abs(after["reset"] - before["reset"]) <= 1, (before, after)
 
 
 @req(SL, "Выбор источника для чтения")
@@ -125,7 +250,7 @@ def test_choose_source_makes_it_current(page, site):
     page.locator(".source", has_text="Critique").get_by_role("button", name="Читать").click()
     page.wait_for_selector(".chapter p")
     assert f"/read/{site.ids['primary']}" in page.url
-    topnav(page).get_by_role("link", name="Библиотека").click()
+    via_sidebar(page, "Библиотека")
     page.wait_for_selector(".source.current")
     current = page.locator(".source.current")
     assert "Critique of Pure Reason" in current.inner_text() and "Текущий" in current.inner_text()
@@ -222,13 +347,13 @@ def test_reading_position_per_source(browser, site):
     page.mouse.wheel(0, 1)
     page.wait_for_timeout(400)
     saved = page.evaluate(
-        f"JSON.parse(localStorage['philograph:v2']).positions['{site.ids['textbook']}']"
+        f"JSON.parse(localStorage['philograph:v3']).positions['{site.ids['textbook']}']"
     )
     page.goto(f"{site.url}/read/{site.ids['primary']}")
     page.wait_for_selector(".chapter p")
     page.goto(f"{site.url}/read/{site.ids['textbook']}")
     page.wait_for_selector("h1:text('Глава 2. Рассудок')")
-    # Под закреплённой верхней панелью текста не видно: считаем от отступа прокрутки.
+    # Видимое — ниже отступа прокрутки: туда абзац встаёт при возврате к месту.
     first_visible = page.evaluate("""() => {
         const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
         return [...document.querySelectorAll('p.block')]
@@ -257,7 +382,7 @@ def test_paragraph_link_opens_and_highlights(page, site, events):
     page.wait_for_selector(f"#p-{primary_pid}")
     assert site.ids["primary"] in page.url
     assert (
-        page.evaluate("JSON.parse(localStorage['philograph:v2']).currentSource")
+        page.evaluate("JSON.parse(localStorage['philograph:v3']).currentSource")
         == (site.ids["primary"])
     )
 
@@ -325,7 +450,7 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     page.wait_for_timeout(300)
     assert popup.is_visible()  # окно не закрылось, пока указатель в нём
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/kant"
-    page.mouse.move(5, 5)
+    aside(page)  # не 5,5: указатель в левом верхнем углу раскрыл бы боковую панель
     page.wait_for_timeout(400)
     assert page.get_by_role("tooltip").count() == 0
     ref.focus()
