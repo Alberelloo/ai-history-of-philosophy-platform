@@ -15,6 +15,7 @@ import re
 import httpx
 import pytest
 
+from ..helpers import aside
 from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
@@ -70,6 +71,7 @@ def open_context(
     )
     page = context.new_page()
     page.set_default_timeout(15000)
+    aside(page)  # указатель не должен начинать страницу над боковой панелью
     return context, page
 
 
@@ -86,6 +88,7 @@ def chapter(page, site, ids):
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
     page.locator(".mention").first.wait_for()
     page.locator(".sidebar__count").wait_for()  # открытая книга в боковой панели
+    aside(page)  # перед кликом по кнопкам над текстом: панель раскрывается наведением
 
 
 def card(page, site, ids):
@@ -123,7 +126,7 @@ def graph(page, site, ids):
     )
     page.get_by_role("button", name="Кант — испытал влияние — Юм").click()
     page.get_by_role("region", name="Связь").wait_for()
-    page.mouse.move(0, 0)
+    aside(page)  # не 0,0: указатель в левом верхнем углу раскрыл бы боковую панель
 
 
 def settings(page, site, ids):

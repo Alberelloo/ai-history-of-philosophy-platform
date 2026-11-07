@@ -7,7 +7,7 @@ import json
 import httpx
 import pytest
 
-from ..helpers import via_sidebar
+from ..helpers import aside, via_sidebar
 from .conftest import NOTICE_VERSION, reader_context, wait_logs
 
 req = pytest.mark.req
@@ -41,6 +41,7 @@ def textbook_and_chapter(stack, title: str) -> tuple[str, str]:
 def open_assistant(page, stack):
     page.goto(stack.url + "/read")
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
+    aside(page)  # перед кликом по кнопке над текстом: панель раскрывается наведением
     page.get_by_role("button", name="Ассистент", exact=True).click()
     return page.get_by_role("complementary", name="Ассистент")
 
@@ -54,6 +55,7 @@ def test_first_run_notice_choice_and_once(browser, stack):
     page.goto(stack.url + "/")
     notice = page.get_by_role("region", name=NOTICE)
     notice.wait_for()
+    aside(page)  # переключатель слева: раскрытая от наведения панель перекрыла бы его
     assert "внешний провайдер" in notice.inner_text()
     assert notice.locator(".ungrounded").get_by_role("img", name="Сгенерировано").count() == 1
     generation = notice.get_by_label("Генерация без опоры на источники")

@@ -11,6 +11,7 @@ from philograph.library.app import build_app as library_app
 from philograph.llm.providers import TransientProviderError
 
 from ..assistant.conftest import bot  # noqa: F401 — стенд ассистента как фикстура
+from ..helpers import aside
 from ..search.conftest import rig as search_rig  # noqa: F401
 from .conftest import DIST, _free_port
 
@@ -55,6 +56,7 @@ def server(bot):
 def open_reader(page, url, bot):
     page.goto(f"{url}/read/{bot.rig.ids['ru']}")
     page.wait_for_selector(".chapter p")
+    aside(page)  # перед кликом по кнопке над текстом: панель раскрывается наведением
 
 
 def select_text(page, needle):

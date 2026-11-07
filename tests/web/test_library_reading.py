@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from ..helpers import reader_context, via_sidebar
+from ..helpers import aside, reader_context, via_sidebar
 
 req = pytest.mark.req
 SL = "source-library"
@@ -450,7 +450,7 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     page.wait_for_timeout(300)
     assert popup.is_visible()  # окно не закрылось, пока указатель в нём
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/kant"
-    page.mouse.move(5, 5)
+    aside(page)  # не 5,5: указатель в левом верхнем углу раскрыл бы боковую панель
     page.wait_for_timeout(400)
     assert page.get_by_role("tooltip").count() == 0
     ref.focus()
