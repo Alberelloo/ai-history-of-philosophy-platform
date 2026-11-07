@@ -44,6 +44,9 @@ function useReaderLayout(panelOpen: boolean): Layout {
       setMetrics({ root, ch });
     };
     measure();
+    // До загрузки Literata ширина 1ch берётся из запасного шрифта и отличается: после
+    // загрузки шрифта раскладка пересчитывается (document.fonts.ready).
+    document.fonts?.ready.then(measure).catch(() => {});
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
