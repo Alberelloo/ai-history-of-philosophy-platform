@@ -75,6 +75,32 @@ def open_context(
     return context, page
 
 
+def reader_columns(page) -> list[str]:
+    """Колонки экрана чтения, которые сейчас на экране (по выбранной раскладке K1–K4)."""
+    mode = page.locator(".reader").get_attribute("data-layout")
+    columns = [".sidebar", ".chapter"]
+    if mode in ("K1", "K2"):
+        columns.append(".toc")
+    elif mode == "K3":
+        columns.append(".rail")
+    if mode == "K1":
+        columns.append(".margin-col")
+    return columns
+
+
+def chapter_measure(page) -> float:
+    """Ширина колонки текста в ch шрифта чтения."""
+    return page.evaluate(
+        "() => { const c = document.querySelector('.chapter');"
+        " const el = document.createElement('span');"
+        " el.style.cssText = 'position:absolute;visibility:hidden;width:1ch;"
+        "font:var(--type-read-body)';"
+        " document.body.appendChild(el);"
+        " const ch = el.getBoundingClientRect().width; el.remove();"
+        " return c.getBoundingClientRect().width / ch; }"
+    )
+
+
 # --- экраны ---------------------------------------------------------------------------
 
 
@@ -188,14 +214,10 @@ def test_layout_at_supported_widths(browser, site, ids, width):
         chapter(page, site, ids)
         visual.settle(page)
         visual.assert_no_horizontal_scroll(page)
-        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+        visual.assert_no_overlap(page, reader_columns(page))
         visual.assert_no_clipped_text(page)
-        measure = page.evaluate(
-            "() => { const c = document.querySelector('.chapter');"
-            " const ch = parseFloat(getComputedStyle(c).fontSize) * 0.5;"
-            " return c.getBoundingClientRect().width / ch; }"
-        )
-        assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f}"
+        measure = chapter_measure(page)
+        assert measure >= 62, f"колонка текста уже 62ch: {measure:.0f}"
         if width != 1280:
             snaps(page, f"chapter-light-{width}")
         library(page, site, ids)
@@ -483,7 +505,7 @@ def test_sidebar_pin_persists_and_shifts_content(browser, site, ids):
         page.wait_for_function(
             "() => document.querySelector('.reader').getBoundingClientRect().left >= 280"
         )
-        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+        visual.assert_no_overlap(page, reader_columns(page))
         page.reload()
         page.wait_for_selector(".chapter p")
         assert visual.sidebar_state(page) == "pinned"
@@ -512,15 +534,11 @@ def test_sidebar_never_covers_chapter(browser, site, ids, width):
             visual.settle(page)
             state = visual.sidebar_state(page)
             assert state == ("pinned" if pinned and width >= 1280 else "collapsed"), state
-            visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+            visual.assert_no_overlap(page, reader_columns(page))
             visual.assert_no_horizontal_scroll(page)
             visual.assert_no_clipped_text(page)
-            measure = page.evaluate(
-                "() => { const c = document.querySelector('.chapter');"
-                " const ch = parseFloat(getComputedStyle(c).fontSize) * 0.5;"
-                " return c.getBoundingClientRect().width / ch; }"
-            )
-            assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f} ({state})"
+            measure = chapter_measure(page)
+            assert measure >= 62, f"колонка текста уже 62ch: {measure:.0f} ({state})"
         finally:
             context.close()
 

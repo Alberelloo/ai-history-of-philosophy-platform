@@ -26,7 +26,8 @@ def text_ch(page) -> float:
     return page.evaluate(
         "() => {"
         "  const el = document.createElement('span');"
-        "  el.style.cssText = 'position:absolute;visibility:hidden;width:1ch;font:var(--type-read-body)';"
+        "  el.style.cssText = 'position:absolute;visibility:hidden;width:1ch;"
+        "font:var(--type-read-body)';"
         "  document.body.appendChild(el);"
         "  const w = el.getBoundingClientRect().width;"
         "  el.remove();"
@@ -55,7 +56,9 @@ def test_layout_modes_and_text_measure(browser, site):
             open_chapter(page, site)
             expect(page.locator(".reader")).to_have_attribute("data-layout", mode)
             ch = text_ch(page)
-            text_w = page.locator("article.chapter").evaluate("el => el.getBoundingClientRect().width")
+            text_w = page.locator("article.chapter").evaluate(
+                "el => el.getBoundingClientRect().width"
+            )
             assert 62 * ch - 1 <= text_w <= 68 * ch + 1, f"{width}px: {text_w / ch:.1f}ch"
             assert_no_horizontal_scroll(page, width)
         finally:
@@ -71,9 +74,13 @@ def test_panel_shifts_columns_on_wide_screen(browser, site):
         page.locator(".toc__assistant").click()
         page.wait_for_selector(".side-panel")
         # Панель сдвигает колонки: правый край текста не заходит под левый край панели.
-        text_right = page.locator("article.chapter").evaluate("el => el.getBoundingClientRect().right")
+        text_right = page.locator("article.chapter").evaluate(
+            "el => el.getBoundingClientRect().right"
+        )
         panel_left = page.locator(".side-panel").evaluate("el => el.getBoundingClientRect().left")
-        assert text_right <= panel_left + 1, f"текст {text_right:.0f} заходит под панель {panel_left:.0f}"
+        assert text_right <= panel_left + 1, (
+            f"текст {text_right:.0f} заходит под панель {panel_left:.0f}"
+        )
         assert_no_horizontal_scroll(page, 1440)
     finally:
         context.close()

@@ -28,7 +28,7 @@ MAX_DIFF_RATIO = 0.005
 # Разница канала, которую ещё списываем на сглаживание шрифтов и краёв.
 CHANNEL_TOLERANCE = 40
 
-WIDTHS = (1024, 1280, 1600, 1920)
+WIDTHS = (1024, 1280, 1440, 1920)
 # Ширины проверки боковой панели: свёрнутая и закреплённая не закрывают текст главы.
 SIDEBAR_WIDTHS = (1024, 1280, 1440, 1920)
 
@@ -203,11 +203,13 @@ def expand_sidebar(page) -> None:
     """Раскрывает боковую панель наведением и ждёт конца анимации ширины."""
     page.locator(".sidebar__brand").hover()
     page.wait_for_function(
-        "() => { const s = document.querySelector('.sidebar');"
-        " return s.dataset.state !== 'collapsed'"
-        " && Math.abs(s.getBoundingClientRect().width"
-        " - parseFloat(getComputedStyle(document.documentElement).getPropertyValue("
-        "s.dataset.state === 'pinned' ? '--sidebar-pinned' : '--sidebar-open'))) < 1; }"
+        """() => { const s = document.querySelector('.sidebar');
+            const root = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const toPx = v => v.endsWith('rem') ? parseFloat(v) * root : parseFloat(v);
+            return s.dataset.state !== 'collapsed'
+            && Math.abs(s.getBoundingClientRect().width
+            - toPx(getComputedStyle(document.documentElement).getPropertyValue(
+            s.dataset.state === 'pinned' ? '--sidebar-pinned' : '--sidebar-open'))) < 1; }"""
     )
 
 
