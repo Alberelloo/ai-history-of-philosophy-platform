@@ -2,13 +2,13 @@
 
 ## 1. Задача и документы
 
-- [ ] 1.1 Изменение OpenSpec: `proposal.md`, `tasks.md`, дельты `entity-mentions`, `entity-cards`, `reader-settings`, `progress.md`, `qa/cases.md`; `openspec validate`
+- [x] 1.1 Изменение OpenSpec: `proposal.md`, `tasks.md`, дельты `entity-mentions`, `entity-cards`, `reader-settings`, `progress.md`, `qa/cases.md`; `openspec validate`
 - [ ] 1.2 Документ дизайна: `components/Popover.md` (до двух утверждений, без переключателей, только щелчок)
 
 ## 2. Сервер
 
-- [ ] 2.1 N1: `/mentions` отдаёт `entity_type` у каждого упоминания
-- [ ] 2.2 N2: `/entities/{id}/card` отвечает 404 `kind: "entity_not_found"` на неизвестную сущность
+- [x] 2.1 N1: `/mentions` отдаёт `entity_type` у каждого упоминания
+- [x] 2.2 N2: `/entities/{id}/card` отвечает 404 `kind: "entity_not_found"` на неизвестную сущность
 
 ## 3. Упоминания
 
