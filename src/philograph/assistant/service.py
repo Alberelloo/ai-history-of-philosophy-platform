@@ -113,6 +113,7 @@ events.define(
     required=("type", "fragments"),
 )
 events.define("assistant.stopped", "info", "Читатель остановил ответ", required=("fragments",))
+events.define("assistant.handoff", "info", "Граница книги: вопрос шире источника", required=("reason",))
 
 STATUS_TITLES = {"verified": "проверено", "sourced": "по источникам", "generated": "сгенерировано"}
 
@@ -128,6 +129,9 @@ class AskRequest:
     sources_only: bool = False
     generation: bool = True  # генерация без опоры на источники (по умолчанию включена)
     scope: str = "all"  # переключатель источников: all | current
+    context: str = "library"  # N12: "book" | "library" (по умолчанию library — старые клиенты)
+    handoff_declined: bool = False  # читатель выбрал «Продолжить в рамках этого источника»
+    handoff_reason: str | None = None  # broader | outside_book — для журнала
 
 
 @dataclass
@@ -344,6 +348,20 @@ class Assistant:
         except LlmUnavailable:
             yield from self._unavailable("budget_exhausted")
             return
+        # N12: вопрос шире книги — граница без составления ответа (5.10).
+        if request.context == "book" and kind == "other_authors" and not request.handoff_declined:
+            events.emit("assistant.handoff", reason="broader")
+            yield {"type": "handoff", "reason": "broader"}
+            yield {
+                "type": "done",
+                "kind": kind,
+                "stats": {"fragments": 0, "grounded": 0, "ungrounded": 0, "hidden": 0},
+                "passages": 0,
+                "llm_calls": 0,
+                "total_ms": round((time.perf_counter() - started) * 1000, 2),
+                "answer_language": answer_language(request.question),
+            }
+            return
         calls = 1
         if CHAINS[kind].get("refuse"):
             events.emit("assistant.refused", reason="off_topic")
@@ -441,9 +459,10 @@ class Assistant:
         first_ms = -1.0
         calls += 1
         assert calls <= self.settings.max_llm_calls
+        cited_book = False  # N12: хоть один фрагмент опёрся на абзац книги панели
 
         def emit_fragments(fragments) -> Iterator[dict[str, Any]]:
-            nonlocal first_ms
+            nonlocal first_ms, cited_book
             for fragment in fragments:
                 stats["removed_citations"] += fragment.removed_citations
                 stats["removed_quotes"] += fragment.removed_quotes
@@ -459,6 +478,10 @@ class Assistant:
                     continue
                 stats["fragments"] += 1
                 stats["grounded" if fragment.grounded else "ungrounded"] += 1
+                if request.source_id and any(
+                    p.source_id == request.source_id for p in fragment.citations
+                ):
+                    cited_book = True
                 if first_ms < 0:
                     first_ms = round((time.perf_counter() - started) * 1000, 2)
                     metrics.observe("assistant.first_fragment_ms", first_ms)
@@ -503,6 +526,16 @@ class Assistant:
             }
         if ctx is not None and ctx.graph and stats["fragments"]:
             yield {"type": "suggestion", "kind": "graph", **ctx.graph}
+        # N12: ответ составлен, но ни один фрагмент не опёрся на абзацы книги (5.10).
+        if (
+            request.context == "book"
+            and request.source_id
+            and stats["fragments"] > 0
+            and not cited_book
+            and not request.handoff_declined
+        ):
+            events.emit("assistant.handoff", reason="outside_book")
+            yield {"type": "handoff", "reason": "outside_book"}
         total = round((time.perf_counter() - started) * 1000, 2)
         events.emit(
             "assistant.answer.completed",
