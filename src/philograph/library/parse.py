@@ -291,6 +291,8 @@ class _Draft:
     page_pos: int = 0  # страница, где блок начинается
     heading_level: int | None = None
     detail: str | None = None
+    detail_code: str | None = None
+    page: str | None = None
 
 
 def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None) -> list[_Draft]:
@@ -327,12 +329,25 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 # Отметка начала страницы достанется первому блоку после заголовка.
                 continue
             if line.kind in PLACEHOLDERS:
+                blank = line.kind == "blank_page"
+                page = str(label) if (label and blank) else (str(pos + 1) if blank else None)
                 detail = (
-                    f"страница {label or pos + 1}: текст не распознан"
-                    if line.kind == "blank_page"
+                    f"страница {page}: текст не распознан"
+                    if blank
                     else "глава не оцифрована на сайте"
                 )
-                drafts.append(_Draft("unrendered", "", [], [], page_pos=pos, detail=detail))
+                drafts.append(
+                    _Draft(
+                        "unrendered",
+                        "",
+                        [],
+                        [],
+                        page_pos=pos,
+                        detail=detail,
+                        detail_code="blank_page" if blank else "missing",
+                        page=page,
+                    )
+                )
                 current = None
                 continue
             if line.kind in ("figure", "table") and not (line.kind == "table" and line.text):
@@ -346,6 +361,8 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                         [],
                         page_pos=pos,
                         detail=f"{what}{where}",
+                        detail_code=line.kind,
+                        page=str(label) if label else None,
                     )
                 )
                 current = None
@@ -460,6 +477,8 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
             lang.detect(draft.text, settings.language),
             pages=draft.pages,
             detail=draft.detail,
+            detail_code=draft.detail_code,
+            page=draft.page,
         )
         block.notes = [NoteRef(offset, key) for offset, key, _, _ in draft.notes]
         ref_pages.update({(block.id, offset): page for offset, _, page, _ in draft.notes})

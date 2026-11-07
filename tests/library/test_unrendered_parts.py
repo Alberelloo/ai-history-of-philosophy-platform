@@ -31,6 +31,8 @@ def test_blank_pdf_page_leaves_placeholder(lib):
     blocks = [b for _, b in lib.registry.load_document(version).blocks()]
     placeholders = [b for b in blocks if b.kind == "unrendered"]
     assert [b.detail for b in placeholders] == ["страница 5: текст не распознан"]
+    assert [b.detail_code for b in placeholders] == ["blank_page"]  # N7: код пояснения
+    assert [b.page for b in placeholders] == ["5"]  # N7: номер страницы отдельно
     # заглушка стоит на месте пятой страницы: между текстом соседних страниц
     at = blocks.index(placeholders[0])
     assert "Page 4." in blocks[at - 1].text and "Page 5." in blocks[at + 1].text
@@ -54,5 +56,5 @@ def test_placeholder_survives_furniture_and_uses_printed_label():
 
 def test_pipeline_version_raised_for_placeholders():
     """Источники обрабатываются заново, чтобы заглушки появились и в опубликованных книгах."""
-    assert PIPELINE_VERSION == "3"
-    assert STEP_VERSIONS == {"extract": "3", "parse": "3"}
+    assert PIPELINE_VERSION == "4"
+    assert STEP_VERSIONS == {"extract": "3", "parse": "4"}

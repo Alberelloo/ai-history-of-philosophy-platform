@@ -37,9 +37,10 @@ from philograph.platform.clock import Clock, SystemClock
 from philograph.platform.files import FileStore, fingerprint
 
 # 2: сноски HTML/EPUB, обложки PDF, выбросы номеров страниц;
-# 3: заглушки пустых страниц PDF и неоцифрованных подстраниц
-PIPELINE_VERSION = "3"
-STEP_VERSIONS = {"extract": "3", "parse": "3"}
+# 3: заглушки пустых страниц PDF и неоцифрованных подстраниц;
+# 4: коды пояснений неразобранных частей (detail_code, page)
+PIPELINE_VERSION = "4"
+STEP_VERSIONS = {"extract": "3", "parse": "4"}
 FORMATS = ("txt", "html", "epub", "pdf")
 ORDER = ["created", "files_received", "text_extracted", "quality_passed", "structured", "checked"]
 
