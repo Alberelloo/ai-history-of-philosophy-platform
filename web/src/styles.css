@@ -2128,3 +2128,49 @@ a.settings__label {
 [data-nontext] {
   user-select: none;
 }
+
+/* ---------- Страница раздела «Ассистент» (reader-panels.md, 5.10) ---------- */
+.assistant-page {
+  display: grid;
+  justify-content: center;
+  min-height: 100%;
+  padding: var(--space-4) var(--space-3);
+}
+
+.assistant-page__col {
+  display: grid;
+  gap: var(--space-3);
+  width: clamp(36rem, 50vw, 46rem);
+  align-content: start;
+}
+
+.assistant-page__subtitle {
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+}
+
+/* ---------- Блок границы книги S7a (5.10) ---------- */
+.handoff-block {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--sunken);
+}
+
+.handoff-block p {
+  margin: 0;
+}
+
+.handoff-block__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.handoff-block__note {
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+}

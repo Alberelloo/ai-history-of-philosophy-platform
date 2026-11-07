@@ -122,6 +122,10 @@ export const en: Catalog = {
     rejected: "Rejected",
     ungrounded: "Not grounded in sources",
   },
+  assistantPage: {
+    subtitle:
+      "Questions across the whole library. Ask about a specific book in the panel while reading: each book has its own dialogue.",
+  },
   family: {
     person: "Person",
     group: "Group",
@@ -293,6 +297,18 @@ export const en: Catalog = {
     empty:
       "Select a passage and press “Ask the assistant”, or type a question below. Answers link to paragraphs; anything written without sources is marked with a diamond.",
     removeFragment: "Remove passage",
+    handoff: {
+      broader:
+        "Your answer goes beyond this source. We recommend asking in the general chat, which has access to all materials for a fuller answer.",
+      outside:
+        "This book has no answer. The Assistant section answers it from the whole library.",
+      link: "Go to the Assistant and continue across all sources",
+      decline: "Continue within this source only",
+      declined: "The answer is from this book only",
+      note: "The question will be sent as a new request when you follow the link.",
+      open: "Open the answer in the Assistant section",
+      deleted: "The answer was deleted in the Assistant section",
+    },
     bookDialog: (title: string) => `Conversation about “${title}”`,
     counter: (n: number, max: number) => `${n.toLocaleString("en-US")} / ${max.toLocaleString("en-US")}`,
     questionTooLong: (max: number) => `The question is longer than ${max.toLocaleString("en-US")} characters. Shorten it.`,

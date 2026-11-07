@@ -207,14 +207,15 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
               </p>
               {SOON.filter((s) => s.group === group).map((s) => {
                 const text = t.soon.sections[s.code];
+                const isAssistant = s.code === "assistant";
                 return (
                   <Item
                     key={s.code}
-                    href={`/soon/${s.code}`}
+                    href={isAssistant ? "/assistant" : `/soon/${s.code}`}
                     icon={s.icon}
                     label={text.title}
-                    soon
-                    title={text.hint}
+                    soon={!isAssistant}
+                    title={isAssistant ? undefined : text.hint}
                     current={active === s.code}
                   />
                 );

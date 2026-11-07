@@ -16,6 +16,27 @@ import {
 } from "./storage";
 import { GeneratedMark, Icon, StatusMark } from "./ui";
 
+// Поручение перехода с вопросом из панели в раздел «Ассистент» (5.10): живёт только в памяти
+// вкладки, не в хранилище; вопрос отправляется один раз, когда страница раздела видит его.
+export type PendingHandoff = {
+  id: string;
+  question: string;
+  selection?: string;
+  selectionParagraphs: string[];
+  from: string;
+};
+
+let pending: PendingHandoff | null = null;
+export function setPendingHandoff(value: PendingHandoff): void {
+  pending = value;
+}
+export function takePendingHandoff(id: string): PendingHandoff | null {
+  return pending && pending.id === id ? pending : null;
+}
+export function clearPendingHandoff(): void {
+  pending = null;
+}
+
 // Панель ассистента (docs/design/features/reader-panels.md, 5.2–5.9): набор сессий на книгу,
 // ответ потоком со стадиями и временем, «Остановить» только в потоке, «Повторить», тайм-аут 45 с.
 
@@ -80,12 +101,15 @@ type Props = {
   onClose: () => void;
   onBack?: () => void;
   backLabel?: string;
+  mode?: "book" | "library";
   settings?: { sourcesOnly: boolean; generation: boolean; scope: "all" | "current" };
 };
 
-export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, settings }: Props) {
+export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", settings }: Props) {
   const t = useT();
-  const [set, setSet] = useState<DialogSet>(() => storage.dialogsFor(sourceId));
+  const [set, setSet] = useState<DialogSet>(() =>
+    mode === "library" ? storage.libraryDialogs() : storage.dialogsFor(sourceId),
+  );
   const accepted = useNoticeAccepted();
   const [question, setQuestion] = useState("");
   const [problem, setProblem] = useState<Message | null>(null);
@@ -108,11 +132,12 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     if (selection) setSelectionDraft({ text: selection, paragraphs: selectionParagraphs });
   }, [selection, selectionParagraphs]);
 
-  // Каждое изменение набора сохраняется в хранилище этой книги.
+  // Каждое изменение набора сохраняется в хранилище этой книги или раздела «Ассистент».
   useEffect(() => {
-    storage.saveDialogs(sourceId, set);
+    if (mode === "library") storage.saveLibraryDialogs(set);
+    else storage.saveDialogs(sourceId, set);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [set, sourceId]);
+  }, [set, sourceId, mode]);
 
   const patchSession = (id: string, change: (s: Session) => Session) =>
     setSet((prev) => ({
@@ -177,7 +202,12 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     setConfirming(null);
   };
 
-  async function send(text: string, selected?: string, sessionId = active.id) {
+  async function send(
+    text: string,
+    selected?: string,
+    sessionId = active.id,
+    handoff?: { declined: boolean; reason: string },
+  ) {
     setProblem(null);
     if (!accepted) {
       setProblem({ code: "read_notice" });
@@ -218,6 +248,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           sources_only: settings?.sourcesOnly ?? scope.sourcesOnly,
           generation: settings?.generation ?? scope.generation,
           scope: settings?.scope ?? (scope.onlyTextbook ? "current" : "all"),
+          context: mode === "library" ? "library" : "book",
+          handoff_declined: handoff?.declined ?? false,
+          handoff_reason: handoff?.reason ?? null,
         }),
       });
       if (!response.ok) {
@@ -251,6 +284,8 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             patchTurn(sessionId, turnId, (t) => ({ ...t, fragments: [...t.fragments, event as Fragment] }));
           } else if (event.type === "suggestion") {
             patchTurn(sessionId, turnId, (t) => ({ ...t, suggestion: event as Suggestion }));
+          } else if (event.type === "handoff") {
+            patchTurn(sessionId, turnId, (t) => ({ ...t, handoff: { reason: event.reason } }));
           } else if (event.type === "done") {
             patchTurn(sessionId, turnId, (t) => ({ ...t, status: "done" }));
           } else if (event.type === "error") {
@@ -450,6 +485,36 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                   })}
                   {turn.status === "stopped" && <span className="status-mark pg-status">{t.assistant.stopped}</span>}
                 </div>
+                {turn.handoff && !turn.handoff.choice && (
+                  <div className="handoff-block">
+                    <p>{turn.handoff.reason === "broader" ? t.assistant.handoff.broader : t.assistant.handoff.outside}</p>
+                    <div className="handoff-block__actions">
+                      <button
+                        className="pg-btn pg-btn--secondary pg-btn--sm"
+                        onClick={() => {
+                          patchTurn(active.id, turn.id, (t) => ({ ...t, handoff: { reason: t.handoff!.reason, choice: "book" } }));
+                          send(turn.question, turn.selection, active.id, { declined: true, reason: turn.handoff!.reason });
+                        }}
+                      >
+                        {t.assistant.handoff.decline}
+                      </button>
+                      <a
+                        className="pg-btn pg-btn--primary pg-btn--sm"
+                        href={`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          patchTurn(active.id, turn.id, (t) => ({ ...t, handoff: { reason: t.handoff!.reason, choice: "library" } }));
+                          setPendingHandoff({ id: turn.id, question: turn.question, selection: turn.selection, selectionParagraphs, from: sourceId });
+                          window.history.pushState({ handoff: turn.id }, "", `/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`);
+                          navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`);
+                        }}
+                      >
+                        {t.assistant.handoff.link}
+                      </a>
+                    </div>
+                    <p className="handoff-block__note">{t.assistant.handoff.note}</p>
+                  </div>
+                )}
                 <div className="turn__actions">
                   {turn.suggestion && (
                     <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}>

@@ -1,5 +1,6 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { AssistantPanel } from "./AssistantPanel";
+import { AssistantPage } from "./AssistantPage";
 import { FullCard } from "./FullCard";
 import { GraphPage } from "./GraphPage";
 import { useT } from "./i18n";
@@ -47,6 +48,7 @@ function activeItem(parts: string[]): string {
   if (parts.length === 0) return "library";
   if (parts[0] === "read" || parts[0] === "p") return "reading";
   if (parts[0] === "soon") return parts[1] ?? "other";
+  if (parts[0] === "assistant") return "assistant";
   if (parts[0] === "settings" || parts[0] === "graph") return parts[0];
   return "other";
 }
@@ -142,7 +144,15 @@ function Page({
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
   if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;
   if (parts[0] === "settings") return <SettingsPage hash={hash} />;
-  if (parts[0] === "soon" && parts[1]) return <SoonPage key={parts[1]} code={parts[1]} />;
+  if (parts[0] === "soon" && parts[1]) {
+    if (parts[1] === "assistant") {
+      // Старая закладка на заглушку раздела «Ассистент» (5.10): замена без записи в историю.
+      window.history.replaceState(null, "", "/assistant");
+      return <AssistantPage />;
+    }
+    return <SoonPage key={parts[1]} code={parts[1]} />;
+  }
+  if (parts[0] === "assistant") return <AssistantPage />;
   if (parts[0] === "graph" && parts[1]) {
     return <GraphPage key={parts[1]} entityId={parts[1]} query={new URLSearchParams(search)} />;
   }
