@@ -3,7 +3,7 @@
 ## 1. Задача и документы
 
 - [ ] 1.1 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, дельты `visual-design` и `assistant-dialog`, `progress.md`, `qa/cases.md`; `openspec validate`
-- [ ] 1.2 Документы дизайна: `layout.md`, `components/SidePanel.md`, `brandbook.md` («Движение»), `components/Sidebar.md` (временное сворачивание закрепления)
+- [x] 1.2 Документы дизайна: `layout.md`, `components/SidePanel.md`, `brandbook.md` («Движение»), `components/Sidebar.md` (временное сворачивание закрепления)
 
 ## 2. Токены и масштаб
 
