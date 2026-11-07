@@ -131,6 +131,8 @@ export const en: Catalog = {
       `The question was moved from “${book}” and has not been sent yet. Sending it is a new request to the assistant.`,
     clear: "Clear",
     asked: "This question has already been asked — see the answer above.",
+    showAnswer: "Show the answer",
+    fromBook: (book: string) => `From the book “${book}”`,
   },
   family: {
     person: "Person",

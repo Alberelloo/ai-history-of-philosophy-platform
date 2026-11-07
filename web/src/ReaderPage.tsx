@@ -381,6 +381,8 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       selection: sel?.text ?? null,
       selectionParagraphs: sel?.paragraphs ?? [],
       stripExpanded: true,
+      chapterId: chapter?.chapter_id ?? p?.chapterId,
+      chapterTitle: chapter?.title ?? p?.chapterTitle,
     }));
   // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
   const collapsePanel = () => {
@@ -390,7 +392,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   useEffect(() => {
     const top = panel?.stack[panel.stack.length - 1];
     if (panel && top?.kind === "assistant" && sourceId && panel.sourceId !== sourceId) {
-      setPanel({ ...panel, sourceId });
+      setPanel({ ...panel, sourceId, chapterId: chapter?.chapter_id, chapterTitle: chapter?.title });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceId]);

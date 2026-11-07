@@ -2133,22 +2133,28 @@ a.settings__label {
 .assistant-page {
   display: grid;
   justify-content: center;
-  min-height: 100dvh;
+  height: 100dvh;
   padding: var(--space-4) var(--space-3);
 }
 
 .assistant-page__col {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: var(--space-3);
   width: clamp(36rem, 50vw, 46rem);
-  min-height: 100dvh;
-  align-content: stretch;
+  height: 100dvh;
+  min-height: 0;
+}
+
+.assistant-page .pg-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .assistant-page .assistant__form {
   position: sticky;
   bottom: 0;
+  flex-shrink: 0;
   margin-top: auto;
   background: var(--paper);
   padding-top: var(--space-2);

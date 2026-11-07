@@ -25,6 +25,7 @@ export type PendingHandoff = {
   selection?: string;
   selectionParagraphs: string[];
   from: string;
+  chapter?: { id: string; title: string };
 };
 
 let pending: PendingHandoff | null = null;
@@ -106,10 +107,12 @@ type Props = {
   pending?: PendingHandoff | null;
   initialQuestion?: string;
   pendingFrom?: string;
+  chapterId?: string;
+  chapterTitle?: string;
   settings?: { sourcesOnly: boolean; generation: boolean; scope: "all" | "current" };
 };
 
-export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", pending = null, initialQuestion, pendingFrom, settings }: Props) {
+export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClose, onBack, backLabel, mode = "book", pending = null, initialQuestion, pendingFrom, chapterId, chapterTitle, settings }: Props) {
   const t = useT();
   const [set, setSet] = useState<DialogSet>(() =>
     mode === "library" ? storage.libraryDialogs() : storage.dialogsFor(sourceId),
@@ -127,7 +130,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const [streams, setStreams] = useState<Record<string, StageState>>({});
   const aborts = useRef<Record<string, AbortController>>({});
   const scope = useScope();
-  const sources = useSources(mode === "library" ? [] : [sourceId]);
+  const sources = useSources(mode === "library" ? (pendingFrom ? [pendingFrom] : []) : [sourceId]);
 
   const activeId = set.activeId;
   const active = set.sessions.find((s) => s.id === activeId) ?? set.sessions[0];
@@ -341,7 +344,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     const state = window.history.state as { consumed?: boolean } | null;
     if (state?.consumed) return;
     if (set.sessions.some((s) => s.messages.some((m) => m.handoffId === pending.id))) return;
-    send(pending.question, pending.selection, active.id, undefined, pending.id, { sourceId: pending.from });
+    send(pending.question, pending.selection, active.id, undefined, pending.id, { sourceId: pending.from, chapterId: pending.chapter?.id });
     window.history.replaceState({ ...state, consumed: true }, "");
     clearPendingHandoff();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -463,6 +466,19 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
               <li key={turn.id} className="turn">
                 {turn.selection && <blockquote className="selection-context">{turn.selection}</blockquote>}
                 <p className="question">{turn.question}</p>
+                {turn.from && (
+                  <p className="handoff-from">
+                    <a
+                      href={`/read/${turn.from.sourceId}${turn.from.chapterId ? `/${turn.from.chapterId}` : ""}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/read/${turn.from!.sourceId}${turn.from!.chapterId ? `/${turn.from!.chapterId}` : ""}`);
+                      }}
+                    >
+                      {t.assistantPage.fromBook(sources[turn.from.sourceId]?.title ?? "")}
+                    </a>
+                  </p>
+                )}
                 {isStreaming && st && (
                   <StageLine t={t} stage={st} />
                 )}
@@ -529,7 +545,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                       </button>
                       <a
                         className="pg-btn pg-btn--primary pg-btn--sm"
-                        href={`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`}
+                        href={`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}${chapterId ? `&chapter=${encodeURIComponent(chapterId)}` : ""}`}
                         onClick={(e) => {
                           e.preventDefault();
                           const choice = { reason: turn.handoff!.reason, choice: "library" as const };
@@ -543,9 +559,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                                 : s,
                             ),
                           });
-                          setPendingHandoff({ id: turn.id, question: turn.question, selection: turn.selection, selectionParagraphs, from: sourceId });
+                          setPendingHandoff({ id: turn.id, question: turn.question, selection: turn.selection, selectionParagraphs, from: sourceId, chapter: chapterId ? { id: chapterId, title: chapterTitle ?? "" } : undefined });
                           onClose();
-                          navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}`, { handoff: turn.id });
+                          navigate(`/assistant?q=${encodeURIComponent(turn.question)}&from=${encodeURIComponent(sourceId)}${chapterId ? `&chapter=${encodeURIComponent(chapterId)}` : ""}`, { handoff: turn.id });
                         }}
                       >
                         {t.assistant.handoff.link}
@@ -607,15 +623,36 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
             )}
           </div>
         )}
-        {mode === "library" && initialQuestion && !set.sessions.some((s) => s.messages.some((m) => m.question === initialQuestion)) && (
-          <div className="assistant-notice pg-notice" role="status">
-            <Icon name="info" />
-            <div>{t.assistantPage.pending(pendingFrom ?? "")}</div>
-            <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setQuestion("")}>
-              {t.assistantPage.clear}
-            </button>
-          </div>
-        )}
+        {mode === "library" && initialQuestion && (() => {
+          const asked = set.sessions.some((s) => s.messages.some((m) => m.question === initialQuestion));
+          if (asked && !pending) {
+            return (
+              <div className="assistant-notice pg-notice" role="status">
+                <Icon name="info" />
+                <div>{t.assistantPage.asked}</div>
+                <button
+                  type="button"
+                  className="pg-btn pg-btn--secondary pg-btn--sm"
+                  onClick={() => document.querySelector(".turn")?.scrollIntoView({ block: "start" })}
+                >
+                  {t.assistantPage.showAnswer}
+                </button>
+              </div>
+            );
+          }
+          if (!asked && pendingFrom) {
+            return (
+              <div className="assistant-notice pg-notice" role="status">
+                <Icon name="info" />
+                <div>{t.assistantPage.pending(sources[pendingFrom]?.title ?? "")}</div>
+                <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => setQuestion("")}>
+                  {t.assistantPage.clear}
+                </button>
+              </div>
+            );
+          }
+          return null;
+        })()}
         <form
           className="assistant__form"
           onSubmit={(e) => {

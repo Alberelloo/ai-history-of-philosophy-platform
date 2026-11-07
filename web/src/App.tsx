@@ -62,6 +62,8 @@ export type PanelState = {
   selection: string | null;
   selectionParagraphs: string[];
   stripExpanded: boolean;
+  chapterId?: string;
+  chapterTitle?: string;
 };
 
 export function App() {
@@ -110,6 +112,8 @@ export function App() {
                   onClose={() => setPanel(null)}
                   onBack={back?.onClick}
                   backLabel={back?.label}
+                  chapterId={panel.chapterId}
+                  chapterTitle={panel.chapterTitle}
                 />
               );
             }
