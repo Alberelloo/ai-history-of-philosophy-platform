@@ -443,7 +443,7 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     before = page.evaluate("window.scrollY")
     ref = page.locator(".note-ref").first
     ref.hover()
-    popup = page.get_by_role("tooltip")
+    popup = page.locator(".note-popup")
     assert "Критика чистого разума" in popup.inner_text()
     assert page.evaluate("window.scrollY") == before
     popup.hover()
@@ -452,6 +452,6 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/kant"
     aside(page)  # не 5,5: указатель в левом верхнем углу раскрыл бы боковую панель
     page.wait_for_timeout(400)
-    assert page.get_by_role("tooltip").count() == 0
+    assert page.locator(".note-popup").count() == 0
     ref.focus()
-    assert "Критика чистого разума" in page.get_by_role("tooltip").inner_text()
+    assert "Критика чистого разума" in page.locator(".note-popup").inner_text()

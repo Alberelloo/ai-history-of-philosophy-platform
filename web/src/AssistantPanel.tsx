@@ -291,15 +291,17 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   return (
     <>
       <div className="pg-panel__head">
-        {onBack ? (
-          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={onBack}>
-            <Icon name="arrowLeft" small />
-            {backLabel ?? t.panel.backToAssistant}
-          </button>
-        ) : (
-          <h2 className="pg-panel__title">{t.assistant.label}</h2>
-        )}
-        <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>
+        <div className="pg-panel__title-wrap">
+          {onBack ? (
+            <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={onBack}>
+              <Icon name="arrowLeft" small />
+              {backLabel ?? t.panel.backToAssistant}
+            </button>
+          ) : (
+            <h2 className="pg-panel__title">{t.assistant.label}</h2>
+          )}
+          <span className="assistant__book">{t.assistant.bookDialog(sourceId)}</span>
+        </div>
         <button
           className="pg-btn pg-btn--ghost pg-btn--sm"
           aria-expanded={sessionsOpen}

@@ -1931,14 +1931,18 @@ a.settings__label {
 }
 
 /* ---------- Ассистент (этап 4) ---------- */
+.pg-panel__title-wrap {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
 .assistant__book {
   margin: 0;
-  overflow: hidden;
   color: var(--ink-3);
   font: var(--type-ui-caption);
   letter-spacing: var(--type-ui-caption-tracking);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .assistant__sessions {

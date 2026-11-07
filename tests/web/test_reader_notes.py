@@ -38,7 +38,7 @@ def test_footnotes_on_field_in_k1(browser, site):
         assert note_top <= sign_top + 4
         # Наведение на знак подсвечивает пару.
         sign.hover()
-        assert "is-active" in page.locator(".field-note").first.get_attribute("class", "")
+        assert "is-active" in (page.locator(".field-note").first.get_attribute("class") or "")
     finally:
         context.close()
 
@@ -106,8 +106,8 @@ def test_unrendered_plate_localized(browser, site):
         },
     )
     for lang, expect in (
-        ("ru", "страница 5: текст не распознан"),
-        ("en", "page 5: text not recognized"),
+        ("ru", "Страница 5: текст не распознан"),
+        ("en", "Page 5: text not recognized"),
     ):
         context = reader_context(browser, locale="en-US" if lang == "en" else "ru-RU")
         page = context.new_page()
