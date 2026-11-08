@@ -141,6 +141,8 @@ function withTitle(format: (title: string) => string, source: SourceItem | undef
 
 type Live = { key: string; sessionId: string; stage: StageState; controller: AbortController };
 const live = new Map<string, Live>();
+// Лимит посетителя: до этого момента «Спросить» неактивна.
+let limitedUntil = 0;
 const streamListeners = new Set<() => void>();
 let streamsVersion = 0;
 
@@ -295,6 +297,10 @@ async function ask(a: Ask): Promise<void> {
           finish((t) => ({ ...t, status: "error", message: eventMessage(event) }));
         } else {
           const message = eventMessage(event);
+          if (event.reason === "visitor_limit" && Number(event.retry_after_seconds) > 0) {
+            // «Спросить» неактивна до конца срока (5.7).
+            limitedUntil = Date.now() + Number(event.retry_after_seconds) * 1000;
+          }
           if (event.type === "notice") patch((t) => ({ ...t, message }));
           else finish((t) => ({ ...t, message, status: "done" }));
         }
@@ -629,6 +635,13 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const sorted = [...set.sessions].sort((a, b) => b.updatedAt - a.updatedAt);
   const question = draft.question;
   const fragment = draft.fragment;
+  const limited = Date.now() < limitedUntil;
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!limited) return;
+    const timer = window.setTimeout(() => setTick((n) => n + 1), limitedUntil - Date.now() + 50);
+    return () => window.clearTimeout(timer);
+  }, [limited]);
 
   const onListKey = (e: ReactKeyboardEvent) => {
     if (e.key !== "Escape") return;
@@ -1044,7 +1057,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
           className="assistant__form"
           onSubmit={(e) => {
             e.preventDefault();
-            if (question.length > MAX_QUESTION) return;
+            if (question.length > MAX_QUESTION || limited) return;
             if (!question.trim() && !fragment) return;
             send(question, fragment, mode === "library" && pendingFrom && question === initialQuestion ? { sourceId: pendingFrom } : {});
           }}
@@ -1087,7 +1100,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                 {t.assistant.stop}
               </button>
             ) : (
-              <button type="submit" className="pg-btn pg-btn--primary" aria-disabled={question.length > MAX_QUESTION || undefined}>
+              <button type="submit" className="pg-btn pg-btn--primary" aria-disabled={question.length > MAX_QUESTION || limited || undefined}>
                 {t.assistant.ask}
               </button>
             )}

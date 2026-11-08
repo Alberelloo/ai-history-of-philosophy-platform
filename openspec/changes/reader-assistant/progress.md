@@ -1,53 +1,50 @@
 # Progress: reader-assistant
 
-Этап 4 из 6. Актуализировано 2026-11-08 по коду. Готовность: около 70% (хранилище, сессии, стадии и сервер работают; не хватает Alt+Q, перехода между книгами Р13, метки главы и большей части тестов T17–T48). Этапы 4 и 6 выходят к читателям вместе.
+Этап 4 из 6. Ведёт поток A (`claude/reader-wt-assistant`), обновлено 2026-11-08. Готовность: около 90% (Р13, Alt+Q, метка главы, N4 сделаны, тесты T21–T25, T38–T40, T48 зелёные; ждут подключения интегратором Alt+Q и правки сервиса знаний для N5). Этапы 4 и 6 выходят к читателям вместе.
 
 ## Статус по пунктам
 
 | Пункт | Статус | Чем подтверждено |
 | --- | --- | --- |
 | 1.1 OpenSpec | сделано | `openspec validate reader-assistant` — valid |
-| 2.1–2.4 Хранилище v4, сессии | сделано | `web/src/storage.ts`, `tests/e2e/test_settings.py` (`test_old_format_migrated`, `test_old_dialogs_dropped_over_limit`) |
-| 3.1 N13 стадии | сделано | `tests/assistant/test_routing_grounding.py:167` |
-| 3.2 N4 ссылки | частично | `source_title` и начало абзаца есть (`service.py:405-406`), `chapter_title` нет |
-| 3.3 N5 `entity_id` | частично | поле передаётся (`service.py:423`), значение не проверено тестом |
-| 3.4 N6 `paragraph_id` в suggestions | сделано | `test_routing_grounding.py` |
-| 3.5 N8 `answer_language` | сделано | `service.py:364, 439`, `test_routing_grounding.py:174` |
-| 4.1 Сессии в панели | сделано | `AssistantPanel.tsx`, `test_sessions_are_separate` (переименование и удаление без теста) |
-| 4.2 Стадии | сделано | `test_answer_stages_visible` |
-| 4.3 Остановить, Повторить, 45 с | сделано | `AssistantPanel.tsx:47`, `test_stream_and_stop`, `test_error_mid_answer_keeps_marks` |
-| 4.4 Ссылки, пометки, только по источникам, S12 | сделано | `AssistantPanel.tsx:453, 490`, `test_question_waits_for_notice` |
-| 4.5 Метка главы у обмена | не начато | `chapterId`/`chapterTitle` приходят в панель, в `Turn` не сохраняются |
-| 4.6 Alt+Q | не начато | `altKey` в `web/src` нет |
-| 4.7 Р13 «Вы пришли из диалога» | не начато | строки в `web/src` нет |
-| 5.1 Тесты критерия | частично | см. `docs/process/reader-handoff.md`, таблица T1–T48 |
-| 5.2 Снимки S6–S10, S12 | не начато | эталонов по 14.3 нет |
+| 2.1–2.4 Хранилище v4, сессии | сделано | `web/src/storage.ts`; `test_t40_v3_to_v4_migration` (v3, v2, v1) |
+| 3.1 N13 стадии | сделано | `tests/assistant/test_routing_grounding.py` |
+| 3.2 N4 ссылки | сделано | `chapter_title` из оглавления библиотеки, `tests/assistant/test_citation_details.py` (3 теста) |
+| 3.3 N5 `entity_id` | ждёт поток B | ассистент передаёт поле (`test_statement_citation_carries_entity_id`); сервис знаний не отдаёт (`xfail` `test_knowledge_service_sends_statement_entity_id`) |
+| 3.4 N6, 3.5 N8 | сделано | `test_routing_grounding.py`; «Близкое в библиотеке» со ссылками — `test_t23_sources_only_line_and_nearby` |
+| 4.1 Сессии | сделано | `test_t48_sessions_in_book_panel`, `test_t48_sessions_on_assistant_page` |
+| 4.2 Стадии | сделано | `test_answer_stages_visible`; итог хода ответа — `.assistant__summary` |
+| 4.3 Остановить, Повторить, 45 с | сделано | `test_stream_and_stop`, `test_t24_messages_by_code`, `test_t24_client_timeout` |
+| 4.4 Ссылки, пометки, S12 | сделано | `test_t21_…`, `test_t22_…`, `test_t25_…`, `test_question_waits_for_notice` |
+| 4.5 Метка главы | сделано | `Turn.chapterId/chapterTitle`, `.assistant__chapter-label` |
+| 4.6 Alt+Q | сделано, ждёт подключения | `web/src/hooks/useAssistantShortcut.ts`; `test_t17_alt_q_with_and_without_selection` пропускается, пока хук не подключён (с подключением проверен локально: зелёный) |
+| 4.7 Р13 | сделано | `test_t39_link_to_other_book_switches_dialog_and_back` |
+| 4.8–4.10 Найдено при работе | сделано | см. `tasks.md` |
+| 5.1 Тесты критерия | частично | зелёные T21–T25, T38–T40, T48; остались T17 (после подключения), T18–T20 полностью, T35 |
+| 5.2 Снимки S6–S10, S12 | не начато | снимки делает интегратор после слияния |
 
-## Сейчас
+## Для интегратора
 
-Панель ассистента и сессии работают, серверные N6, N8, N13 закрыты. Прежний текст `progress.md` и `tasks.md` считал 4.5 «нужен chapterId от lead» — теперь `chapterId` приходит, поэтому пункт переведён из блокера в обычную задачу. Остальное ниже.
+Строки подключения (файлы не потока A):
 
-## Следующий шаг
-
-1. Р13 (T39): при переходе по ссылке на абзац другой книги переключать набор сессий и показывать `Notice` «Вы пришли из диалога по книге „…“» с «Вернуться».
-2. Alt+Q и «Спросить об абзаце» (T17, T18).
-3. Метка главы у обмена (4.5): поле `chapterId`/`chapterTitle` в `Turn`.
-4. N4 `chapter_title` (сервис поиска) и проверка значения N5 `entity_id` (сервис знаний).
-5. Тесты: T21, T22, T23, T25, T35 (reduced-motion для стадий), T38, T39, T40 полностью, T48; затем снимки S6–S10, S12.
+- `web/src/ReaderPage.tsx` (поток B): `import { useAssistantShortcut } from "./hooks/useAssistantShortcut";` и в теле `ReaderPage` после `openAssistant`: `useAssistantShortcut(textRef, openAssistant);`
+- `compose.yaml`, сервис `assistant`, `environment`: `PHILOGRAPH_LIBRARY_URL: http://library:8001` (без него ассистент работает, но `chapter_title` в ссылках пустой).
+- `web/src/main.tsx`: уже добавлено `import "./styles/assistant.css";` после `./styles.css`.
+- `src/philograph/knowledge/assist.py` (поток B), `describe()`: добавить `"entity_id": s["subject"]` — тогда N5 закрыт, и `xfail` в `tests/assistant/test_ontology_retrieval.py` нужно снять.
+- `ReaderPage` (поток B): `panel.chapterId/chapterTitle` обновляются только при смене книги (эффект по `[sourceId]`, `chapter` в нём ещё прежний). Панель поэтому берёт главу из адреса и заголовка `article.chapter h1`; правильнее обновлять их при смене главы.
+- Кнопка «Спросить об абзаце» (5.1) — разметка абзаца в `ReaderPage` (поток B); панель принимает фрагмент как от выделения (`openAssistant({text, paragraphs: [id]})`).
 
 ## Известные проблемы
 
-- Прежняя запись «317/319 прослеживаемость» устарела: сейчас 322 из 322.
-- Тесты многие объединены в один и не названы по Tn; сопоставление с T1–T48 выполнено по сценариям (см. handoff).
-- Нет эталонов снимков состояний ассистента по схеме 14.3.
+- `useDialogSet` читает и разбирает хранилище при каждой отрисовке панели (до 200 000 знаков). На потоке это раз на фрагмент; при заметных задержках — кэшировать разобранное состояние в `storage.ts`.
+- Обмен в статусе `streaming`, чей поток идёт в другой вкладке, в этой вкладке показывается «остановлено» (поток виден только своей вкладке); по `done` статус исправляется.
+- Ссылка на утверждение онтологии пока не нажимается: нужен N5 и открытие карточки в стеке панели (`App.tsx`).
 
 ## Как проверить
 
 ```bash
-export TMP="$(pwd -W)/.stack/tmp"; export TEMP="$TMP"; mkdir -p "$TMP"
-/c/Users/Ivano/AppData/Local/Programs/openspec/openspec validate reader-assistant
-.venv/Scripts/python -m pytest -q tests/assistant tests/web/test_assistant_panel.py
-.venv/Scripts/python -m pytest -q tests/e2e/test_settings.py
-.venv/Scripts/python scripts/check_traceability.py
-cd web && npx tsc --noEmit
+export TMP="$(pwd -W)/.stack/tmp" TEMP="$TMP"; mkdir -p "$TMP"; export PYTHONPATH="$(pwd)/src"
+cd web && npx tsc --noEmit && npm run build && cd ..
+python -m pytest -q tests/assistant tests/web/test_assistant_panel.py tests/web/test_assistant_dialogs.py
+python scripts/check_traceability.py
 ```
