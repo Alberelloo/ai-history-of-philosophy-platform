@@ -1790,7 +1790,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Проверка 2026-11-09: в оглавлении есть страница «Комментарии»; чьи они (переводчика В. П. Карпова или советских редакторов 1936 г.) не установлено. Не одобрять, пока авторство комментариев не выяснено; без неё текст можно оставить, если страницу «Комментарии» убрать из files.'
+    note: 'Проверка 2026-11-09: в оглавлении есть страница «Комментарии»; чьи они (переводчика В. П. Карпова
+      или советских редакторов 1936 г.) не установлено. Не одобрять, пока авторство комментариев не выяснено;
+      без неё текст можно оставить, если страницу «Комментарии» убрать из files.'
   publish: auto
 - id: protagor-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Карпов)
@@ -1831,10 +1833,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: evtidem-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Эвтидем_(Платон;_Карпов)
@@ -1869,10 +1872,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lakhes-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Лахес_(Платон;_Карпов)
@@ -1907,10 +1911,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kharmid-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Хармид_(Платон;_Карпов)
@@ -1945,10 +1950,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ippias-menshiy-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Иппиас_меньший_(Платон;_Карпов)
@@ -1983,10 +1989,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: evtifron-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Эвтифрон_(Платон;_Карпов)
@@ -2021,10 +2028,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: apologiya-sokrata-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Апология_Сократа_(Платон;_Карпов)
@@ -2059,10 +2067,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kriton-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Карпов)
@@ -2097,10 +2106,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: fedon-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Федон_(Платон;_Карпов)
@@ -2135,10 +2145,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gorgias-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Горгиас_(Платон;_Карпов)
@@ -2173,10 +2184,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: alkiviad-pervyy-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Алкивиад_Первый_(Платон;_Карпов)
@@ -2211,10 +2223,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: alkiviad-vtoroy-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Алкивиад_Второй_(Платон;_Карпов)
@@ -2249,10 +2262,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: fedr-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Федр_(Платон;_Карпов)
@@ -2287,10 +2301,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: pir-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Пир_(Платон;_Карпов)
@@ -2325,10 +2340,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lizis-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Лизис_(Платон;_Карпов)
@@ -2363,10 +2379,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ippias-bolshiy-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Иппиас_больший_(Платон;_Карпов)
@@ -2401,10 +2418,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: meneksen-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Менексен_(Платон;_Карпов)
@@ -2439,10 +2457,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ion-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Ион_(Платон;_Карпов)
@@ -2477,10 +2496,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: feag-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Феаг_(Платон;_Карпов)
@@ -2515,10 +2535,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: soperniki-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Соперники_(Платон;_Карпов)
@@ -2553,10 +2574,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ipparkh-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Иппарх_(Платон;_Карпов)
@@ -2591,10 +2613,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: klitofon-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Клитофон_(Платон;_Карпов)
@@ -2629,10 +2652,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: fileb-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Филеб_(Платон;_Карпов)
@@ -2667,10 +2691,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kratil-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Кратил_(Платон;_Карпов)
@@ -2705,10 +2730,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: sofist-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Софист_(Платон;_Карпов)
@@ -2743,10 +2769,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: politik-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Политик_(Платон;_Карпов)
@@ -2781,10 +2808,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: parmenid-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Парменид_(Платон;_Карпов)
@@ -2819,10 +2847,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: timey-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Тимей_(Платон;_Карпов)
@@ -2857,10 +2886,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kritias-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Критиас_(Платон;_Карпов)
@@ -2895,10 +2925,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: minos-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Минос_(Платон;_Карпов)
@@ -2933,10 +2964,11 @@ entries:
     evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
       э.; срок 70 лет истёк у обоих'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: platon-politika-ili-gosudarstvo-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Политика_или_государство_(Платон;_Карпов)
@@ -2977,12 +3009,11 @@ entries:
     evidence: ru.wikisource (Политика или государство, пер. В. Н. Карпова, 1863); Платон ум. 348 до н.
       э.; В. Н. Карпов ум. 1867; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Адаптер собрал только оглавление и версию /ДО: книги лежат на отдельных страницах ''Политика
-      или государство. Книга первая (Платон; Карпов)'' и т. д. и не вошли в files; перед одобрением собрать
-      вручную'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: platon-apologiya-sokrata-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Апология_Сократа_(Платон;_Соловьёв)
@@ -3022,7 +3053,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Проверка 2026-11-09: на странице есть раздел «Примечания», набор указан по изданию «Мысль», 1990 (Собр. соч. в 4 т.). Примечания и возможная правка текста могут принадлежать редакторам издания. Есть перевод Карпова (дубль). Не одобрять без проверки.'
+    note: 'Проверка 2026-11-09: на странице есть раздел «Примечания», набор указан по изданию «Мысль»,
+      1990 (Собр. соч. в 4 т.). Примечания и возможная правка текста могут принадлежать редакторам издания.
+      Есть перевод Карпова (дубль). Не одобрять без проверки.'
   publish: auto
 - id: platon-kriton-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Соловьёв)
@@ -3062,7 +3095,8 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Проверка 2026-11-09: страница ссылается на издание 1965 г. как источник набора, внизу сноски. Возможна редакторская правка текста. Есть перевод Карпова (дубль). Не одобрять без проверки.'
+    note: 'Проверка 2026-11-09: страница ссылается на издание 1965 г. как источник набора, внизу сноски.
+      Возможна редакторская правка текста. Есть перевод Карпова (дубль). Не одобрять без проверки.'
   publish: auto
 - id: platon-platonovy-razgovory-zakonakh-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Платоновы_разговоры_о_законах_(Платон;_Оболенский)
@@ -3206,10 +3240,11 @@ entries:
     evidence: ru.wikisource (Платоновы разговоры о законах, пер. В. И. Оболенского, 1827); Платон ум.
       348 до н. э.; В. И. Оболенский ум. 1847; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: platon-sofist-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Софист_(Платон;_Ананьин)
@@ -3303,10 +3338,11 @@ entries:
     evidence: ru.wikisource (Протагор, пер. А. В. Добиаша, 1890); Платон ум. 348 до н. э.; А. В. Добиаш
       ум. 1911; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: platon-teetet-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Теэтет_(Платон;_Добиаш)
@@ -3351,10 +3387,11 @@ entries:
     evidence: ru.wikisource (Теэтет, пер. А. В. Добиаша, 1891); Платон ум. 348 до н. э.; А. В. Добиаш
       ум. 1911; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shopengauer-mir-kak-volya-predstavlenie-ru
   landing_url: https://ru.wikisource.org/wiki/Мир_как_воля_и_представление_(Шопенгауэр;_Айхенвальд)
@@ -3971,10 +4008,11 @@ entries:
     evidence: ru.wikisource (О четверояком корне, пер. Ю. И. Айхенвальда, Полн. собр. соч., М., 1910);
       Шопенгауэр ум. 1860; Ю. И. Айхенвальд ум. 1928; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shopengauer-vvedenie-filosofiyu-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Введение_в_философию_(Шопенгауэр;_Самсонов)
@@ -4011,10 +4049,11 @@ entries:
     evidence: ru.wikisource (Введение в философию, пер. Н. В. Самсонова, Полн. собр. соч., т. IV, М.,
       1910); Шопенгауэр ум. 1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shopengauer-vole-prirode-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/О_воле_в_природе_(Шопенгауэр;_Самсонов)
@@ -4095,10 +4134,11 @@ entries:
     evidence: ru.wikisource (О воле в природе, пер. Н. В. Самсонова, Полн. собр. соч., М., 1910); Шопенгауэр
       ум. 1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shopengauer-eristicheskaya-dialektika-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Эристическая_диалектика,_или_Искусство_побеждать_в_спорах_(Шопенгауэр;_Самсонов)
@@ -4135,10 +4175,11 @@ entries:
     evidence: ru.wikisource (Эристическая диалектика, пер. Н. В. Самсонова, М., 1910); Шопенгауэр ум.
       1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: karpov-vvedenie-filosofiyu-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Введение_в_философию_(Карпов)
@@ -4172,10 +4213,11 @@ entries:
     evidence: ru.wikisource (Введение в философию, В. Н. Карпов, 1840); оригинальное русское сочинение,
       автор ум. 1867, срок 70 лет истёк (Wikidata Q4215786)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: karinskiy-klassifikatsiya-vyvodov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Классификация_выводов_(Каринский)
@@ -4392,10 +4434,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
       ум. 1900; Юлий Михайлович Антоновский ум. 1913; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: aristotel-politika-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Политика_(Аристотель)
@@ -4504,10 +4547,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Эрнест Леопольдович
       Радлов ум. 1928; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nitsshe-rozhdenie-tragedii-ili-ellinstvo-pessimizm
   landing_url: https://ru.wikisource.org/wiki/Рождение_трагедии,_или_Эллинство_и_пессимизм_(Ницше;_Рачинский)
@@ -4543,10 +4587,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
       ум. 1900; Григорий Алексеевич Рачинский ум. 1939; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nitsshe-ecce-homo-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Ecce_Homo_(Ницше)
@@ -4582,10 +4627,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
       ум. 1900; Юлий Михайлович Антоновский ум. 1913; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nitsshe-shopengauer-kak-vospitatel-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Шопенгауэр_как_воспитатель_(Ницше)
@@ -4661,10 +4707,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
       ум. 1900; Берман, Яков Александрович ум. 1934; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: bulgakov-filosofiya-khozyaystva-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Философия_хозяйства_(Булгаков)
@@ -4808,10 +4855,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Николаевич
       Страхов ум. 1896; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gertsen-pisma-ob-izuchenii-prirody-ru
   landing_url: https://ru.wikisource.org/wiki/Письма_об_изучении_природы_(Герцен)
@@ -4844,10 +4892,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Александр Иванович
       Герцен ум. 1870; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chaadaev-filosoficheskie-pisma-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Философические_письма_(Чаадаев)
@@ -4880,10 +4929,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Яковлевич
       Чаадаев ум. 1856; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nikolaevich-filosofiya-nitsshe-kriticheskiy-ocherk-ru
   landing_url: https://ru.wikisource.org/wiki/Философия_Ницше._Критический_очерк_(Трубецкой)
@@ -4916,10 +4966,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Трубецкой, Евгений
       Николаевич ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: khvostov-etika-nitsshe-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Этика_Ницше_(Хвостов)
@@ -4952,10 +5003,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Вениамин Михайлович
       Хвостов ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-krizis-zapadnoy-filosofii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Кризис_западной_философии_(Соловьев)
@@ -4988,10 +5040,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Владимир Сергеевич
       Соловьёв ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-smysl-lyubvi-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Смысл_любви_(Соловьев)
@@ -5024,10 +5077,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Владимир Сергеевич
       Соловьёв ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovich-vopros-svobode-voli-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Вопрос_о_свободе_воли_(Лопатин)
@@ -5060,10 +5114,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лопатин, Лев Михайлович
       ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovich-filosofskoe-mirosozertsanie-s-soloveva-ru
   landing_url: https://ru.wikisource.org/wiki/Философское_миросозерцание_В._С._Соловьева_(Лопатин)
@@ -5096,10 +5151,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лопатин, Лев Михайлович
       ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-prakticheskaya-filosofiya-gegelya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Практическая_философия_Гегеля_(Лавров)
@@ -5132,10 +5188,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-tri-besedy-sovremennom-znachenii-filosofii
   landing_url: https://ru.wikisource.org/wiki/Три_беседы_о_современном_значении_философии_(Лавров)
@@ -5168,10 +5225,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-istoricheskie-pisma-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Исторические_письма_(Лавров)
@@ -5204,10 +5262,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-ocherki-voprosov-prakticheskoy-filosofii-ru
   landing_url: https://ru.wikisource.org/wiki/Очерки_вопросов_практической_философии_(Лавров)
@@ -5240,10 +5299,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-gegelizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Гегелизм_(Лавров)
@@ -5276,10 +5336,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-zadachi-pozitivizma-ikh-reshenie-ru
   landing_url: https://ru.wikisource.org/wiki/Задачи_позитивизма_и_их_решение_(Лавров)
@@ -5312,10 +5373,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
       Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: vvedenskiy-uchenie-kanta-prostranstve-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_пространстве_(Введенский)
@@ -5348,10 +5410,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Александр Иванович
       Введенский ум. 1925; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: karpov-filosofskiy-ratsionalizm-noveyshego-vremeni-ru
   landing_url: https://ru.wikisource.org/wiki/Философский_рационализм_новейшего_времени_(Карпов)
@@ -5384,10 +5447,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Василий Николаевич
       Карпов ум. 1867; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: yurkevich-razum-po-ucheniyu-platona-opyt
   landing_url: https://ru.wikisource.org/wiki/Разум_по_учению_Платона_и_опыт_по_учению_Канта_(Юркевич)
@@ -5420,10 +5484,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Памфил Данилович
       Юркевич ум. 1874; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gilyarov-platonizm-kak-osnovanie-sovremennogo-mirosozertsaniya
   landing_url: https://ru.wikisource.org/wiki/Платонизм_как_основание_современного_миросозерцания_в_связи_с_вопросом_о_задачах_и_судьбах_философии_(Гиляров)
@@ -5566,10 +5631,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Новгородцев, Павел
       Иванович ум. 1924; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: silvestrovich-kant-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Кант_(Гогоцкий)
@@ -5602,10 +5668,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Гогоцкий, Сильвестр
       Сильвестрович ум. 1889; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-sola-fide-tolko-veroyu-ru
   landing_url: https://ru.wikisource.org/wiki/Sola_fide_-_Только_верою_(Шестов)
@@ -5638,10 +5705,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
       Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-apofeoz-bespochvennosti-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Апофеоз_беспочвенности_(Шестов)
@@ -5674,10 +5742,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
       Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-dostoevskiy-nitsshe-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Достоевский_и_Ницше_(Шестов)
@@ -5710,10 +5779,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
       Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-dobro-uchenii-gr-tolstogo-nitsshe
   landing_url: https://ru.wikisource.org/wiki/Добро_в_учении_гр._Толстого_и_Ницше_(Шестов)
@@ -5746,10 +5816,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
       Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: berdyaev-smysl-tvorchestva-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Смысл_творчества_(Бердяев)
@@ -6189,10 +6260,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Яковлевич
       Грот ум. 1899; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: stepanovich-nachertanie-logiki-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Начертание_логики_(Лубкин)
@@ -6225,10 +6297,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лубкин, Александр
       Степанович ум. 1815; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nikolaevich-istoriya-politicheskikh-ucheniy-pervaya-chast
   landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Первая_часть._Древний_мир_и_Средние_века_(Чичерин)
@@ -6261,10 +6334,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
       Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nikolaevich-istoriya-politicheskikh-ucheniy-chast-vtoraya
   landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Часть_вторая._Новое_время_(Чичерин)
@@ -6297,10 +6371,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
       Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nikolaevich-istoriya-politicheskikh-ucheniy-chast-tretya
   landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Часть_третья._Новое_время_(продолжение)_(Чичерин)
@@ -6333,10 +6408,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
       Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gegel-nauka-logiki-t-1-archive
   landing_url: https://archive.org/details/1_20200203_20200203_0850
@@ -6382,7 +6458,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Лицензия одобрена владельцем 2026-11-09, но у archive.org-записи нет пригодного файла: в item только DjVu без текстового слоя (нет EPUB, PDF, djvu.txt), адаптер вернул files: []. Вернуть в одобренные после появления файла (например, OCR или другой item).'
+    note: 'Лицензия одобрена владельцем 2026-11-09, но у archive.org-записи нет пригодного файла: в item
+      только DjVu без текстового слоя (нет EPUB, PDF, djvu.txt), адаптер вернул files: []. Вернуть в одобренные
+      после появления файла (например, OCR или другой item).'
   publish: auto
 - id: gegel-nauka-logiki-t-2-archive
   landing_url: https://archive.org/details/2_20200203_20200203
@@ -6520,10 +6598,11 @@ entries:
       Аристотель ум. 322 до н. э.; переводчик Э. Л. Радлов ум. 1928 (изд. 1891, указан в описании); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: aristotel-katigorii-archive
   landing_url: https://archive.org/details/20200320_20200320_0823
@@ -6610,10 +6689,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Л. И. Шестов ум. 1938; изд. Париж, 1929; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: l-nachala-kontsy-archive
   landing_url: https://archive.org/details/20200408_20200408_1108
@@ -6652,10 +6732,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Л. И. Шестов ум. 1938; изд. 1908; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: l-potestas-clavium-archive
   landing_url: https://archive.org/details/potestasclavium
@@ -6694,10 +6775,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Л. И. Шестов ум. 1938; изд. 1915; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: l-razrushayushchiy-sozidayushchiy-miry-archive
   landing_url: https://archive.org/details/20200329_20200329_1713
@@ -6736,10 +6818,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Л. И. Шестов ум. 1938; изд. 1909; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: berdiaev-sub-specie-aeternitatis-pyty-filosofskie
   landing_url: https://archive.org/details/subspecieaeterni00berduoft
@@ -6821,10 +6904,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. Н. Страхов ум. 1896; изд. Харьков, 1901; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: svetilin-uchebnik-logiki-archive
   landing_url: https://archive.org/details/svietilin_uczebnik_logiki_13_izd
@@ -6863,10 +6947,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. Е. Светилин ум. 1887; 13-е изд. 1908; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: uchebnik-formalnoy-logiki-archive
   landing_url: https://archive.org/details/20200203_20200203_1007
@@ -6905,10 +6990,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. Е. Светилин ум. 1887; изд. 1871; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lektsii-po-logik-archive
   landing_url: https://archive.org/details/20200203_20200203_0644
@@ -6947,10 +7033,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. И. Введенский ум. 1925; изд. 1896; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: logika-dlya-gimnaziy-archive
   landing_url: https://archive.org/details/20200203_20200203_0702
@@ -6989,10 +7076,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. И. Введенский ум. 1925; изд. 1915; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: logika-kak-chast-teorii-poznaniya-archive
   landing_url: https://archive.org/details/20200203_20200203_0707
@@ -7031,10 +7119,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. И. Введенский ум. 1925; изд. 1917; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-uchebnik-logiki-archive
   landing_url: https://archive.org/details/20200203_20200203_0816
@@ -7074,10 +7163,11 @@ entries:
       Г. И. Челпанов ум. 1936; изд. 1917; на ru.wikisource есть отдельная запись того же учебника; срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-dopolnitelnyy-kurs-logiki-archive
   landing_url: https://archive.org/details/20200203_20200203_0812
@@ -7116,10 +7206,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Г. И. Челпанов ум. 1936; изд. 1909; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: karpov-sistematicheskoe-izlozhenie-logiki-archive
   landing_url: https://archive.org/details/20200203_20200203_0945
@@ -7205,10 +7296,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       М. И. Владиславлев ум. 1890; изд. 1905; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nachalnyya-osnovaniya-logiki-archive
   landing_url: https://archive.org/details/davydov_logic
@@ -7248,10 +7340,11 @@ entries:
       И. И. Давыдов (1794–1863, Wikidata Q15933737; идентификация с автором по имени); изд. 1821; срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-filosofiya-plotina-archive
   landing_url: https://archive.org/details/20200321_20200321_0856
@@ -7333,10 +7426,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. М. Минский ум. 1937 (изд. 1905, указан в метаданных 1855–1937); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nekrasov-vera-znaniya-opyt-archive
   landing_url: https://archive.org/details/vera_znaniya_i_opyt
@@ -7375,10 +7469,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       П. А. Некрасов ум. 1924; изд. 1912; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: m-bezkonechnoe-anaksimandra-archive
   landing_url: https://archive.org/details/20201119_karinskij_anaximandr
@@ -7417,10 +7512,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       М. И. Каринский ум. 1917; изд. 1890; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: s-sobranie-sochineniy-t-1-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom1
@@ -7938,10 +8034,11 @@ entries:
     evidence: ru.wikisource (пер. Г. А. Рачинского, указан на странице); Ф. Ницше ум. 1900; Г. А. Рачинский
       ум. 1939; срок 70 лет истёк у обоих
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gosudar-makiavelli-kurochkin-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_(%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8;_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD)
@@ -8000,11 +8097,11 @@ entries:
     evidence: ru.wikisource (пер. Н. С. Курочкина, изд. 1869); Н. Макиавелли ум. 1527; Н. С. Курочкин
       ум. 1884; срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: страница-оглавление ведёт на три орфографических варианта одного издания 1869 г. (ДО, ВТ, ВТ:Ё);
-      в files оставлен только вариант ВТ (современная орфография); автор/переводчик/годы заданы вручную
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: geksli-evolyutsiya-etika-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%AD%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_(%D0%93%D0%B5%D0%BA%D1%81%D0%BB%D0%B8)/%D0%94%D0%9E
@@ -8051,11 +8148,11 @@ entries:
     evidence: ru.wikisource (речь 1893 г., пер. К. А. Тимирязева, «Русская мысль»); Т. Г. Гексли ум. 1895;
       К. А. Тимирязев ум. 1920; срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: год издания перевода (журнал «Русская мысль») не установлен; в оригинале речь произнесена 18
-      мая 1893 г.; переводчик К. А. Тимирязев указан на странице
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shiller-pisma-ob-esteticheskom-vospitanii-cheloveka
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE%D0%B1_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%B2%D0%BE%D1%81%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%A8%D0%B8%D0%BB%D0%BB%D0%B5%D1%80)/%D0%94%D0%9E
@@ -8144,10 +8241,11 @@ entries:
     evidence: ru.wikisource (пер. П. Г. Ганзена, 1886); С. Кьеркегор ум. 1855; П. Г. Ганзен ум. 1930;
       срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kerkegor-dnevnik-obolstitelya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%BD%D0%B5%D0%B2%D0%BD%D0%B8%D0%BA_%D0%BE%D0%B1%D0%BE%D0%BB%D1%8C%D1%81%D1%82%D0%B8%D1%82%D0%B5%D0%BB%D1%8F_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80;_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD)
@@ -8184,10 +8282,11 @@ entries:
     evidence: ru.wikisource (пер. П. Г. Ганзена, 1885); С. Кьеркегор ум. 1855; П. Г. Ганзен ум. 1930;
       срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kerkegor-neschastneyshiy-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B5%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B5%D0%B9%D1%88%D0%B8%D0%B9_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80)
@@ -8336,7 +8435,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Проверка 2026-11-09: страница — не издание 1931 г., а текст изд. ГИХЛ 1960 г.: «Редакция перевода С. П. Маркиша», «Статья и комментарии Л. Е. Пинского». Редакция и комментарии 1960 г. защищены, перевод П. К. Губера сам свободен. Не одобрять; искать издание 1931 г. (Academia) без комментариев.'
+    note: 'Проверка 2026-11-09: страница — не издание 1931 г., а текст изд. ГИХЛ 1960 г.: «Редакция перевода
+      С. П. Маркиша», «Статья и комментарии Л. Е. Пинского». Редакция и комментарии 1960 г. защищены,
+      перевод П. К. Губера сам свободен. Не одобрять; искать издание 1931 г. (Academia) без комментариев.'
   publish: auto
 - id: lessing-laokoon-ili-granitsakh-zhivopisi-poezii
   landing_url: https://ru.wikisource.org/wiki/%D0%9B%D0%B0%D0%BE%D0%BA%D0%BE%D0%BE%D0%BD,_%D0%B8%D0%BB%D0%B8_%D0%9E_%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0%D1%85_%D0%B6%D0%B8%D0%B2%D0%BE%D0%BF%D0%B8%D1%81%D0%B8_%D0%B8_%D0%BF%D0%BE%D1%8D%D0%B7%D0%B8%D0%B8_(%D0%9B%D0%B5%D1%81%D1%81%D0%B8%D0%BD%D0%B3;_%D0%AD%D0%B4%D0%B5%D0%BB%D1%8C%D1%81%D0%BE%D0%BD)
@@ -8383,10 +8484,11 @@ entries:
     evidence: ru.wikisource (пер. Е. Н. Эдельсона); Г. Э. Лессинг ум. 1781; Е. Н. Эдельсон ум. 1868; срок
       70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: veyninger-pol-kharakter-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BB_%D0%B8_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80_(%D0%92%D0%B0%D0%B9%D0%BD%D0%B8%D0%BD%D0%B3%D0%B5%D1%80)
@@ -8434,10 +8536,11 @@ entries:
     evidence: ru.wikisource (пер. В. О. Лихтенштадта, изд. 1908); О. Вейнингер ум. 1903; В. О. Лихтенштадт
       (Мазин) ум. 1919 по странице автора на ru.wikisource; срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: epiktet-pravila-epikteta-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0_%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82%D0%B0_(%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82)/%D0%94%D0%9E
@@ -8476,10 +8579,11 @@ entries:
     evidence: ru.wikisource (пер. М. А. Энгельгардта, 1901, дореформенная орфография); Эпиктет ум. ок.
       138; М. А. Энгельгардт ум. 1915; срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chaadaev-apologiya-sumasshedshego-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%90%D0%BF%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D1%81%D1%83%D0%BC%D0%B0%D1%81%D1%88%D0%B5%D0%B4%D1%88%D0%B5%D0%B3%D0%BE_(%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2)
@@ -8511,10 +8615,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Яковлевич Чаадаев ум. 1856'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chaadaev-otryvki-raznye-mysli-1828-1850
   landing_url: https://ru.wikisource.org/wiki/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_%D0%B8_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D0%B5_%D0%BC%D1%8B%D1%81%D0%BB%D0%B8_(1828_-_1850_%D0%B5_%D0%B3%D0%BE%D0%B4%D1%8B)_(%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2)
@@ -8546,10 +8651,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Яковлевич Чаадаев ум. 1856'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kireevskiy-rech-shellinga-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B5%D1%87%D1%8C_%D0%A8%D0%B5%D0%BB%D0%BB%D0%B8%D0%BD%D0%B3%D0%B0_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8581,10 +8687,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kireevskiy-otryvki-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8616,10 +8723,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kireevskiy-otvet-s-khomyakovu-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%92_%D0%BE%D1%82%D0%B2%D0%B5%D1%82_%D0%90._%D0%A1._%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2%D1%83_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8651,10 +8759,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: khomyakov-neskolko-slov-filosoficheskom-pisme-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE_%D1%81%D0%BB%D0%BE%D0%B2_%D0%BE_%C2%AB%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BF%D0%B8%D1%81%D1%8C%D0%BC%D0%B5%C2%BB_(%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2)
@@ -8686,10 +8795,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Алексей Степанович Хомяков ум. 1860'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chernyshevskiy-esteticheskie-otnosheniya-iskusstva-k-deystvitelnosti
   landing_url: https://ru.wikisource.org/wiki/%D0%AD%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BE%D1%82%D0%BD%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_%D0%BA_%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8721,10 +8831,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chernyshevskiy-kritika-filosofskikh-predubezhdeniy-protiv-obshchinnogo
   landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D0%BF%D1%80%D0%B5%D0%B4%D1%83%D0%B1%D0%B5%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9_%D0%BF%D1%80%D0%BE%D1%82%D0%B8%D0%B2_%D0%BE%D0%B1%D1%89%D0%B8%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B2%D0%BB%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8756,10 +8867,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: chernyshevskiy-proiskhozhdenie-teorii-blagotvornosti-borby-za
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%BE%D0%B8%D1%81%D1%85%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%B1%D0%BB%D0%B0%D0%B3%D0%BE%D1%82%D0%B2%D0%BE%D1%80%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D1%8B_%D0%B7%D0%B0_%D0%B6%D0%B8%D0%B7%D0%BD%D1%8C_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8791,10 +8903,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: pisarev-idealizm-platona-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B4%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0_(%D0%9F%D0%B8%D1%81%D0%B0%D1%80%D0%B5%D0%B2)
@@ -8826,10 +8939,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Дмитрий Иванович Писарев ум. 1868'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovskiy-borba-za-individualnost-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%91%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D0%B8%D0%BD%D0%B4%D0%B8%D0%B2%D0%B8%D0%B4%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C_(%D0%9C%D0%B8%D1%85%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8861,10 +8975,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Константинович Михайловский ум. 1904'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: sukhovokobylin-filosofiya-dukha-ili-sotsiologiya-uchenie
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B4%D1%83%D1%85%D0%B0_%D0%B8%D0%BB%D0%B8_%D1%81%D0%BE%D1%86%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_(%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%92%D1%81%D0%B5%D0%BC%D0%B8%D1%80%D0%B0)_(%D0%A1%D1%83%D1%85%D0%BE%D0%B2%D0%BE-%D0%9A%D0%BE%D0%B1%D1%8B%D0%BB%D0%B8%D0%BD)
@@ -8896,10 +9011,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Александр Васильевич Сухово-Кобылин ум. 1903'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: odoevskiy-russkie-nochi-ili-neobkhodimosti-novoy
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B5_%D0%BD%D0%BE%D1%87%D0%B8,_%D0%B8%D0%BB%D0%B8_%D0%BE_%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B3%D0%BE_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_(%D0%9E%D0%B4%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8931,10 +9047,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Фёдорович Одоевский ум. 1869'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-lyudvig-feyerbakh-istoricheskiy-etyud-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9B%D1%8E%D0%B4%D0%B2%D0%B8%D0%B3_%D0%A4%D0%B5%D0%B9%D0%B5%D1%80%D0%B1%D0%B0%D1%85._%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%8D%D1%82%D1%8E%D0%B4_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
@@ -8966,10 +9083,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-sotsializm-borba-za-sushchestvovanie-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
@@ -9001,10 +9119,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-kriticheskaya-istoriya-filosofii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
@@ -9036,10 +9155,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lavrov-postepennoe-razvitie-drevnikh-filosofskikh-ucheniy
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%81%D1%82%D0%B5%D0%BF%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5_%D0%B4%D1%80%D0%B5%D0%B2%D0%BD%D0%B8%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%D0%BC_%D1%8F%D0%B7%D1%8B%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D0%B2%D0%B5%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
@@ -9071,10 +9191,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-pisma-filosofii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)
@@ -9106,10 +9227,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-vremeni-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)
@@ -9141,10 +9263,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-znachenie-gegelevskoy-filosofii-nastoyashchee-vremya
   landing_url: https://ru.wikisource.org/wiki/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B3%D0%B5%D0%B3%D0%B5%D0%BB%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%B2_%D0%BD%D0%B0%D1%81%D1%82%D0%BE%D1%8F%D1%89%D0%B5%D0%B5_%D0%B2%D1%80%D0%B5%D0%BC%D1%8F_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -9176,10 +9299,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-zadachakh-istorii-filosofii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -9211,10 +9335,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-glavnaya-cherta-myshleniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%87%D0%B5%D1%80%D1%82%D0%B0_%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -9246,10 +9371,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: strakhov-chistoempiricheskom-metode-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%87%D0%B8%D1%81%D1%82%D0%BE-%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B5_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -9281,10 +9407,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-istoricheskie-dela-filosofii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%B4%D0%B5%D0%BB%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2)
@@ -9316,10 +9443,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-ponyatie-boge-zashchitu-filosofii-spinozy
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D0%B5_%D0%BE_%D0%91%D0%BE%D0%B3%D0%B5_(%D0%B2_%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D1%83_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B)_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -9351,10 +9479,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-ideya-chelovechestva-u-avgusta-konta
   landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B4%D0%B5%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0_%D1%83_%D0%90%D0%B2%D0%B3%D1%83%D1%81%D1%82%D0%B0_%D0%9A%D0%BE%D0%BD%D1%82%D0%B0_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -9386,10 +9515,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-na-puti-k-istinnoy-filosofii
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -9421,10 +9551,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovich-nravstvennoe-uchenie-kanta-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_(%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD)
@@ -9456,10 +9587,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovich-vera-znanie-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%92%D0%B5%D1%80%D0%B0_%D0%B8_%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD)/%D0%A0%D0%9C_1883_(%D0%94%D0%9E)
@@ -9491,10 +9623,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: vvedenskiy-novoe-legkoe-dokazatelstvo-filosofskogo-krititsizma
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%BE%D0%B2%D0%BE%D0%B5_%D0%B8_%D0%BB%D0%B5%D0%B3%D0%BA%D0%BE%D0%B5_%D0%B4%D0%BE%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B0_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
@@ -9526,10 +9659,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: vvedenskiy-mistitsizme-krititsizme-teorii-poznaniya-s
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BC%D0%B8%D1%81%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B8_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D0%92._%D0%A1._%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%D0%B0_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
@@ -9561,10 +9695,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: vvedenskiy-ob-ateizme-filosofii-spinozy-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9E%D0%B1_%D0%B0%D1%82%D0%B5%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
@@ -9596,10 +9731,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: grot-znachenie-chuvstva-poznanii-deyatelnosti-cheloveka
   landing_url: https://ru.wikisource.org/wiki/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D1%87%D1%83%D0%B2%D1%81%D1%82%D0%B2%D0%B0_%D0%B2_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B8_%D0%B8_%D0%B4%D0%B5%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%93%D1%80%D0%BE%D1%82)
@@ -9631,10 +9767,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: grot-dushe-svyazi-s-sovremennymi-ucheniyami
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B4%D1%83%D1%88%D0%B5_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%D0%BC%D0%B8_%D0%BE_%D1%81%D0%B8%D0%BB%D0%B5_(%D0%93%D1%80%D0%BE%D1%82)
@@ -9666,10 +9803,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: grot-dzhordano-bruno-panteizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B6%D0%BE%D1%80%D0%B4%D0%B0%D0%BD%D0%BE_%D0%91%D1%80%D1%83%D0%BD%D0%BE_%D0%B8_%D0%BF%D0%B0%D0%BD%D1%82%D0%B5%D0%B8%D0%B7%D0%BC_(%D0%93%D1%80%D0%BE%D1%82)
@@ -9701,10 +9839,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: grot-k-voprosu-ob-istinnykh-zadachakh
   landing_url: https://ru.wikisource.org/wiki/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE%D0%B1_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%93%D1%80%D0%BE%D1%82)/%D0%94%D0%9E
@@ -9736,10 +9875,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ern-kritika-kantovskogo-ponyatiya-istiny-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%BA%D0%B0%D0%BD%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D1%8F_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D1%8B_(%D0%AD%D1%80%D0%BD)
@@ -9771,10 +9911,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ern-sushchnost-nemetskogo-fenomenalizma-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A1%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%BE%D0%B3%D0%BE_%D1%84%D0%B5%D0%BD%D0%BE%D0%BC%D0%B5%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B0_(%D0%AD%D1%80%D0%BD)
@@ -9806,10 +9947,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ern-na-puti-k-logizmu-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%BB%D0%BE%D0%B3%D0%B8%D0%B7%D0%BC%D1%83_(%D0%AD%D1%80%D0%BD)
@@ -9841,10 +9983,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ern-velikolepii-skeptitsizme-k-kharakteristike-adogmatizma
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B2%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%BB%D0%B5%D0%BF%D0%B8%D0%B8_%D0%B8_%D1%81%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_(%D0%BA_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B5_%D0%B0%D0%B4%D0%BE%D0%B3%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%BC%D0%B0)_(%D0%AD%D1%80%D0%BD)
@@ -9876,10 +10019,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: berdyaev-metafizika-pola-lyubvi-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%B5%D1%82%D0%B0%D1%84%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%D0%BF%D0%BE%D0%BB%D0%B0_%D0%B8_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -10019,10 +10163,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-pokhvala-gluposti-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D0%B0_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -10054,10 +10199,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-filosofiya-teoriya-poznaniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -10089,10 +10235,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-nikolay-berdyaev-gnozis-ekzistentsialnaya-filosofiya
   landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B8%D0%BA%D0%BE%D0%BB%D0%B0%D0%B9_%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2._%D0%93%D0%BD%D0%BE%D0%B7%D0%B8%D1%81_%D0%B8_%D1%8D%D0%BA%D0%B7%D0%B8%D1%81%D1%82%D0%B5%D0%BD%D1%86%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -10124,10 +10271,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: lyudvigovich-religiya-nauka-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_%D0%B8_%D0%BD%D0%B0%D1%83%D0%BA%D0%B0_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
@@ -10267,10 +10415,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Трубецкой, Евгений Николаевич ум. 1920'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: nikolaevich-politicheskoe-mirosozertsanie-epokhi-vozrozhdeniya-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%D1%8D%D0%BF%D0%BE%D1%85%D0%B8_%D0%92%D0%BE%D0%B7%D1%80%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9)
@@ -10302,10 +10451,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Трубецкой, Евгений Николаевич ум. 1920'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ivanovich-svobode-voli-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_%D0%B2%D0%BE%D0%BB%D0%B8_(%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -10337,10 +10487,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ivanovich-k-voprosu-materializme-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE_%D0%BC%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B5_(%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2)/%D0%94%D0%9E
@@ -10372,10 +10523,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: viktorovich-chto-takoe-nauchnaya-filosofiya-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%A7%D1%82%D0%BE_%D1%82%D0%B0%D0%BA%D0%BE%D0%B5_%D0%BD%D0%B0%D1%83%D1%87%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%3F_(%D0%9B%D0%B5%D1%81%D0%B5%D0%B2%D0%B8%D1%87)/%D0%94%D0%9E
@@ -10407,10 +10559,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лесевич, Владимир Викторович ум. 1905'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: fedorov-filosofiya-obshchego-dela-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%BE%D0%B1%D1%89%D0%B5%D0%B3%D0%BE_%D0%B4%D0%B5%D0%BB%D0%B0_(%D0%A4%D0%B5%D0%B4%D0%BE%D1%80%D0%BE%D0%B2)
@@ -10480,10 +10633,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Дмитрий Сергеевич Аничков ум. 1788'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: anichkov-rassuzhdenie-iz-naturalnoy-bogoslovii-nachale
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8%D0%B7_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9_%D0%B1%D0%BE%D0%B3%D0%BE%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B8_%D0%BE_%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B5_%D0%B8_%D0%BF%D1%80%D0%BE%D0%B8%D1%81%D1%88%D0%B5%D1%81%D1%82%D0%B2%D0%B8%D0%B8_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B1%D0%BE%D0%B3%D0%BE%D0%BF%D0%BE%D1%87%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F..._(%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2)
@@ -10516,10 +10670,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Дмитрий Сергеевич Аничков ум. 1788'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ivanovich-opyt-nauki-izyashchnogo-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E%D0%BF%D1%8B%D1%82_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8%D0%B7%D1%8F%D1%89%D0%BD%D0%BE%D0%B3%D0%BE_(%D0%93%D0%B0%D0%BB%D0%B8%D1%87)
@@ -10551,10 +10706,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Галич, Александр Иванович ум. 1848'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: osipovskiy-rassuzhdenie-dinamicheskoy-sisteme-kanta-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BE_%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9_%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_(%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -10586,10 +10742,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Тимофей Федорович Осиповский ум. 1831'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: osipovskiy-prostranstve-vremeni-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B5_%D0%B8_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_(%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
@@ -10621,10 +10778,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Тимофей Федорович Осиповский ум. 1831'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: plekhanov-materialismus-militans-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Materialismus_militans_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
@@ -10946,10 +11104,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Яковлевич Данилевский ум. 1885'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: bulgakov-svet-nevecherniy-sozertsaniya-umozreniya-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%A1%D0%B2%D0%B5%D1%82_%D0%9D%D0%B5%D0%B2%D0%B5%D1%87%D0%B5%D1%80%D0%BD%D0%B8%D0%B9_(%D0%91%D1%83%D0%BB%D0%B3%D0%B0%D0%BA%D0%BE%D0%B2)
@@ -11061,10 +11220,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: fisher-zhizn-trudy-solomona-maymona-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%96%D0%B8%D0%B7%D0%BD%D1%8C_%D0%B8_%D1%82%D1%80%D1%83%D0%B4%D1%8B_%D0%A1%D0%BE%D0%BB%D0%BE%D0%BC%D0%BE%D0%BD%D0%B0_%D0%9C%D0%B0%D0%B9%D0%BC%D0%BE%D0%BD%D0%B0_(%D0%9A%D1%83%D0%BD%D0%BE_%D0%A4%D0%B8%D1%88%D0%B5%D1%80)
@@ -11136,10 +11296,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: berdyaev-metafizicheskaya-problema-svobody-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%B5%D1%82%D0%B0%D1%84%D0%B8%D0%B7%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%BF%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D1%8B_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11534,10 +11695,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-logika-religioznogo-tvorchestva-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9B%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0_%D1%80%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D0%BE%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE_%D1%82%D0%B2%D0%BE%D1%80%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -11569,10 +11731,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: shestov-predposlednie-slova-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%B5%D0%B4%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5_%D1%81%D0%BB%D0%BE%D0%B2%D0%B0_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -11604,10 +11767,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-zhiznennaya-drama-platona-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F_%D0%B4%D1%80%D0%B0%D0%BC%D0%B0_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -11639,10 +11803,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: solovev-russkaya-ideya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B0%D1%8F_%D0%B8%D0%B4%D0%B5%D1%8F_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -11674,10 +11839,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gertsen-diletantizm-nauke-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B8%D0%BB%D0%B5%D1%82%D0%B0%D0%BD%D1%82%D0%B8%D0%B7%D0%BC_%D0%B2_%D0%BD%D0%B0%D1%83%D0%BA%D0%B5_(%D0%93%D0%B5%D1%80%D1%86%D0%B5%D0%BD)
@@ -11709,10 +11875,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Александр Иванович Герцен ум. 1870'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kritika-chistago-razuma-archive
   landing_url: https://archive.org/details/20200404_20200404_1407
@@ -11756,11 +11923,11 @@ entries:
       И. Кант ум. 1804; перевод М. И. Владиславлева (СПб., Тиблен, 1867), Владиславлев ум. 1890 (Wikidata
       Q4113335); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Первый русский перевод КЧР. Размер EPUB/PDF большой (PDF 130 МБ, EPUB 43 МБ). OCR дореформенной
-      орфографии (ѣ, і), удовлетворительный.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: kritika-sposobnosti-suzhdeniya-archive
   landing_url: https://archive.org/details/20200404_20200404_1235
@@ -11851,10 +12018,11 @@ entries:
       Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1862), Страхов ум. 1896 (Wikidata Q2636293);
       срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том 1 из 4; тома 2-4 отдельными записями.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: k-istoriya-novoy-filosofii-t-2
   landing_url: https://archive.org/details/2_20200408_20200408
@@ -11899,10 +12067,11 @@ entries:
       Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1863), Страхов ум. 1896; срок 70 лет
       истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том 2 из 4.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: k-istoriya-novoy-filosofii-t-3
   landing_url: https://archive.org/details/3_20200408_20200408
@@ -11947,10 +12116,11 @@ entries:
       Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1864), Страхов ум. 1896; срок 70 лет
       истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том 3 из 4.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: k-istoriya-novoy-filosofii-t-4
   landing_url: https://archive.org/details/4_20200408
@@ -11994,10 +12164,11 @@ entries:
       Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1865), Страхов ум. 1896; срок 70 лет
       истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том 4 из 4.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: deduktivnaya-induktivnaya-logika-archive
   landing_url: https://archive.org/details/20200203_20200203_1026
@@ -12251,10 +12422,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; А. И. Введенский ум. 1925 (Wikidata Q732458);
       СПб., 1896 (лекции на Высших женских курсах); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Литографированное издание лекций; в ПБ.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: markovich-rukovodstvo-k-logike-sostavlennoe-ordinarnym
   landing_url: https://archive.org/details/rukovodstvoklogikesostavlennoeordinarny92
@@ -12296,10 +12468,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; О. М. Новицкий ум. 1884 (Wikidata Q16681249);
       Киев, 1841; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Скан Google/ПБ, OCR с ошибками (ѣ→ф).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: gavriil-voskresenskiy-n-istoriya-filosofii-ch
   landing_url: https://archive.org/details/gavriilvoskresenskijvnistorijafilos49
@@ -12380,11 +12553,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Л. М. Лопатин ум. 1920 (Wikidata Q4266616);
       М., Кушнерев, 1911; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Скан Google/LoC (микрофильм), OCR удовлетворительный; какой части (1/2) соответствует экземпляр
-      — уточнить.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: debolskii-vvedenie-uchenie-poznanii-archive
   landing_url: https://archive.org/details/vvedenievuchenie00debo
@@ -12423,10 +12596,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. Г. Дебольский ум. 1918 (Wikidata Q4156289); СПб., Неклюдов, 1870; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Метаданные archive.org романизированные; название и автор сверены по титульному листу OCR частично.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: struve-lementarnai-logika-archive
   landing_url: https://archive.org/details/lementarnaialogi00stru
@@ -12465,10 +12639,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Г. Е. Струве ум. 1912 (Wikidata Q130387);
       СПб., Карбасников, 1907 (13-е изд.); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Учебник для гимназий и духовных семинарий.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: trubetsko-mirosozertsanie-vl-s-soloveva-archive
   landing_url: https://archive.org/details/mirosozertsaniev00trub
@@ -12553,11 +12728,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Г. И. Челпанов ум. 1936 (Wikidata Q1377656); М., 1916 (6-е изд.); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: EPUB 584 МБ превышает лимит 200 МБ — файл заменён на DjVu TXT через override.files. Есть и 7-е
-      изд. 1918 (item 20200329_20200329_1610, без текстового слоя).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-mozg-dusha-archive
   landing_url: https://archive.org/details/20200329_20200329_1635
@@ -12596,10 +12771,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Г. И. Челпанов ум. 1936 (Wikidata Q1377656); М., Кушнерев, 1912; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Критика материализма; есть и другой экземпляр 5988941-1912.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-chelpanov-uchebnik-psikhologii-dlya-gimnaziy
   landing_url: https://archive.org/details/915167-1910
@@ -12638,10 +12814,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
       1910; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Только DjVu TXT.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-chelpanov-psikhologiya-osnovnoy-kurs-chitannyy
   landing_url: https://archive.org/details/1908963-1909
@@ -12680,10 +12857,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
       1909 (литографированные лекции); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: OCR средний.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-chelpanov-kurs-lektsiy-po-logike
   landing_url: https://archive.org/details/17901416-1901
@@ -12722,10 +12900,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
       1901 (литографированные лекции); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: OCR местами плохой (схемы).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: g-chelpanov-problema-vospriyatiya-prostranstva-chast
   landing_url: https://archive.org/details/25123-1904641
@@ -12764,10 +12943,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
       1904; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Ч. 2 («Теории»); ч. 1 не найдена.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: khvostov-teoriya-istoricheskogo-protsessa-ocherki-po
   landing_url: https://archive.org/details/teoriya_istoricheskogo_processa
@@ -12809,10 +12989,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. М. Хвостов ум. 1920 (Wikidata Q4496962); М., Леман и Плетнёв, 1914 (2-е изд.); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: EPUB 542 МБ превышает лимит; файл заменён на PDF (16 МБ) через override.files.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: leontev-k-n-vizantizm-slavyanstvo-m
   landing_url: https://archive.org/details/leontevknvizantizmislavjanstvom1823
@@ -12851,10 +13032,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; К. Н. Леонтьев ум. 1891 (Wikidata Q542090);
       М., 1876; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Оттиск из «Чтений в Обществе любителей российской словесности»; OCR средний.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: leontev-k-n-sobranie-sochineniy-m
   landing_url: https://archive.org/details/leontevknsobraniesochinenijm191215
@@ -12933,10 +13115,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. Н. Радищев ум. 1802; М., Саблин, 1907; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том определён по тексту OCR (т. 1 или 2 — уточнить); Google-скан, OCR средний.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: radishchev-polnoe-sobrani-e-sochineni-n-2
   landing_url: https://archive.org/details/polnoesobranies00kallgoog
@@ -13017,10 +13200,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. И. Кареев ум. 1931 (Wikidata Q7258532); СПб., Карбасников, 1895; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Google-скан, OCR средний.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: mikhaylovich-sredniy-period-istorii-filosofii-archive
   landing_url: https://archive.org/details/srednijperiodistoriifilosofii82
@@ -13112,10 +13296,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; В. В. Розанов ум. 1919 (Wikidata Q719418);
       М., Лисснер и Ю. Роман, 1886; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Файл — PDF (EPUB 2,4 МБ тоже есть).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: ivanovich-emmanuil-kant-17241804-archive
   landing_url: https://archive.org/details/emmanuilkant1724180459
@@ -13154,11 +13339,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; А. И. Введенский ум. 1925 (Wikidata Q732458);
       литографированные лекции, СПб., 1903; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Не путать с протоиереем А. И. Введенским (церковь и государство) — метаданные библиотеки ПБ
-      указывают философа 1856-1925.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: n-metod-estestvennykh-nauk-archive
   landing_url: https://archive.org/details/strahov_method
@@ -13197,10 +13382,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. Н. Страхов ум. 1896 (Wikidata Q2636293); СПб., Прац, 1865; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Страхов «Мир как целое» уже есть в каталоге из ru.wikisource.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii
   landing_url: https://archive.org/details/1_redkin_philosophy
@@ -13243,11 +13429,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1889 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 1 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-2
   landing_url: https://archive.org/details/2_redkin_philosophy
@@ -13290,11 +13476,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1889 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 2 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-3
   landing_url: https://archive.org/details/3_redkin_philosophy
@@ -13337,11 +13523,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 3 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-4
   landing_url: https://archive.org/details/4_redkin_philosophy
@@ -13384,11 +13570,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 4 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-5
   landing_url: https://archive.org/details/5_redkin_philosophy
@@ -13431,11 +13617,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 5 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-6
   landing_url: https://archive.org/details/6_redkin_philosophy
@@ -13478,11 +13664,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1891 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 6 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: p-g-iz-lektsiy-po-istorii-7
   landing_url: https://archive.org/details/7_redkin_philosophy
@@ -13525,11 +13711,11 @@ entries:
       П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1891 (посмертное издание лекций); срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 7 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
-      в связи с историей философии вообще.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: aristotel-politika-archive
   landing_url: https://archive.org/details/aristotel_politika
@@ -13622,11 +13808,11 @@ entries:
       (ru.wikipedia, Платонова, Надежда Николаевна), СПб., Типография Балашева, 1894; срок 70 лет по переводчику
       истёк (1998). Отметка Public Domain Mark не считается доказательством.
   review:
-    status: draft
-    by: null
-    at: null
-    note: Переводчица установлена по титулу («с греческаго перевела Надежда Платонова»). Есть вступительная
-      статья.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: aristotel-pervaya-analitika-archive
   landing_url: https://archive.org/details/20200321_20200321_0821
@@ -13673,11 +13859,11 @@ entries:
       Балашева, 1894; срок 70 лет по переводчику истёк (1992). Отметка Public Domain Mark не считается
       доказательством.
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Переводчик установлен по титулу (оглавление и титул: «Н. Н. Ланге»). EPUB заменён на DjVu TXT
-      (EPUB 151 МБ). Логика (силлогистика).'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено пачкой. Замечаний по лицензии нет: годы смерти автора и переводчика
+      указаны, срок 70 лет истёк до 1955 г.'
   publish: auto
 - id: blonskiy-p-problema-realnosti-u-berkli
   landing_url: https://archive.org/details/1907-2074426-1103
