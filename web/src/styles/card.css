@@ -1,0 +1,16 @@
+/* Карточка сущности: окно у упоминания и полная карточка в панели (поток B, этапы 2–3).
+   Правила прежних этапов остаются в styles.css; здесь — только новое. */
+
+/* Голова при загрузке полной карточки (4.7): имя и «Загружаем карточку…» без пустой колонки. */
+.card-panel__loading > span:empty {
+  display: none;
+}
+
+.card-panel__loading {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Сгенерированная строка в полной карточке: значение-ссылка внутри pg-generated. */
+.card-row__value .card-row__entity {
+  vertical-align: baseline;
+}

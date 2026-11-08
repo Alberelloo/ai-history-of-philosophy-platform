@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type MouseEvent as ReactMouseEvent, type ReactNode, type SetStateAction } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
 import { navigate, type PanelItem, type PanelState } from "./App";
-import { CardPopup } from "./CardPopup";
+import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
+import { OPEN_CARD_EVENT } from "./FullCard";
 import { FootnoteRef } from "./Footnote";
 import { FieldNote } from "./Footnote";
 import { errorText, useT, type Catalog } from "./i18n";
@@ -66,8 +67,39 @@ type Mention = {
   start: number;
   end: number;
 };
-// Открыть окно карточки у упоминания: анкор — сам элемент упоминания (положение считает окно).
-type OpenMention = (entityId: string, entityType: string | undefined, anchor: HTMLElement) => void;
+// Открыть окно карточки у упоминания: анкор — сам элемент упоминания (положение считает окно),
+// ``line`` — строка упоминания, по которой щёлкнули, ``keyboard`` — открыто Enter/Space.
+type OpenMention = (
+  entityId: string,
+  entityType: string | undefined,
+  anchor: HTMLElement,
+  opts: { line: number; keyboard: boolean },
+) => void;
+type OpenCard = { id: string; anchor: HTMLElement; line: number; keyboard: boolean; name: string };
+
+// Сервер знаний принимает до 500 абзацев за запрос (`targets[:500]`); главу длиннее
+// запрашиваем частями параллельно (N11, раздел 13 дока).
+const MENTIONS_CHUNK = 500;
+
+// Щелчок, а не протяжка выделения: указатель сдвинулся меньше чем на 4px и выделение пусто (4.2).
+let pointerDownAt: { x: number; y: number } | null = null;
+function isClick(e: ReactMouseEvent): boolean {
+  const start = pointerDownAt;
+  pointerDownAt = null;
+  if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) >= 4) return false;
+  const sel = window.getSelection();
+  return !sel || sel.isCollapsed || sel.toString().trim() === "";
+}
+
+// Строка упоминания, по которой щёлкнули: прямоугольник из getClientRects() под указателем.
+function clickedLine(el: HTMLElement, e: ReactMouseEvent): number {
+  const rects = Array.from(el.getClientRects());
+  const i = rects.findIndex(
+    (r) =>
+      e.clientX >= r.left - 1 && e.clientX <= r.right + 1 && e.clientY >= r.top - 1 && e.clientY <= r.bottom + 1,
+  );
+  return i < 0 ? 0 : i;
+}
 // Что показать вместо главы: код ошибки сервера (переводится) и запасной текст.
 type Problem = { kind: string; text?: string };
 // Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
@@ -145,14 +177,24 @@ function renderText(
           key={`m${a}`}
           role="button"
           tabIndex={0}
+          aria-haspopup="dialog"
           className="mention pg-mention"
           data-entity={mention.entity_id}
           data-family={familyOf(mention.entity_type)}
-          onClick={(e) => open(mention.entity_id, mention.entity_type, e.currentTarget)}
+          onPointerDown={(e) => {
+            pointerDownAt = { x: e.clientX, y: e.clientY };
+          }}
+          onClick={(e) => {
+            if (!isClick(e)) return;
+            open(mention.entity_id, mention.entity_type, e.currentTarget, {
+              line: clickedLine(e.currentTarget, e),
+              keyboard: false,
+            });
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              open(mention.entity_id, mention.entity_type, e.currentTarget);
+              open(mention.entity_id, mention.entity_type, e.currentTarget, { line: 0, keyboard: true });
             }
           }}
         >
@@ -363,8 +405,42 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     null,
   );
   const [mentions, setMentions] = useState<Record<string, Mention[]>>({});
-  const [card, setCard] = useState<{ id: string; anchor: HTMLElement } | null>(null);
-  const openCard: OpenMention = (id, _type, anchorEl) => setCard({ id, anchor: anchorEl });
+  const [card, setCard] = useState<OpenCard | null>(null);
+  // Повторный щелчок по тому же упоминанию закрывает окно (4.2).
+  const openCard: OpenMention = (id, _type, anchorEl, opts) =>
+    setCard((c) =>
+      c && c.anchor === anchorEl && !opts.keyboard
+        ? null
+        : { id, anchor: anchorEl, name: anchorEl.textContent ?? "", ...opts },
+    );
+  // Упоминание открытого окна: aria-expanded и aria-controls (10.2).
+  useEffect(() => {
+    if (!card) return;
+    const el = card.anchor;
+    el.setAttribute("aria-expanded", "true");
+    el.setAttribute("aria-controls", CARD_POPUP_ID);
+    return () => {
+      el.setAttribute("aria-expanded", "false");
+      el.removeAttribute("aria-controls");
+    };
+  }, [card]);
+  // Переход по связи в полной карточке (FullCard): карточка ложится наверх стека панели.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const detail = (e as CustomEvent<{ entityId: string; title: string }>).detail;
+      if (!detail) return;
+      setPanel((p) =>
+        p
+          ? {
+              ...p,
+              stack: pushPanelItem(p.stack, { kind: "card", entityId: detail.entityId, title: detail.title }),
+            }
+          : p,
+      );
+    };
+    window.addEventListener(OPEN_CARD_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CARD_EVENT, onOpen);
+  }, [setPanel]);
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
@@ -507,19 +583,32 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     };
   }, [sourceId, chapterId]);
 
-  // Упоминания сущностей главы. Без онтологии глава показывается без них.
+  // Упоминания сущностей главы. Без онтологии глава показывается без них. Абзацев больше 500 —
+  // запросы частями по 500 параллельно (N11); часть, на которую сервер не ответил, остаётся без
+  // упоминаний. Ответ для прежней главы отбрасывается.
   useEffect(() => {
     setMentions({});
+    setCard(null);
     if (!chapter) return;
-    const targets = chapter.blocks.map((b) => (b.type === "block" ? b.id : b.section_id));
-    fetch(`/api/knowledge/v1/mentions?targets=${targets.join(",")}`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((items: Mention[]) => {
-        const map: Record<string, Mention[]> = {};
-        items.forEach((m) => (map[m.target_id] ??= []).push(m));
-        setMentions(map);
-      })
-      .catch(() => setMentions({}));
+    const controller = new AbortController();
+    const targets = [...new Set(chapter.blocks.map((b) => (b.type === "block" ? b.id : b.section_id)))];
+    const chunks: string[][] = [];
+    for (let i = 0; i < targets.length; i += MENTIONS_CHUNK) chunks.push(targets.slice(i, i + MENTIONS_CHUNK));
+    Promise.all(
+      chunks.map((part) =>
+        fetch(`/api/knowledge/v1/mentions?targets=${part.map(encodeURIComponent).join(",")}`, {
+          signal: controller.signal,
+        })
+          .then((r) => (r.ok ? (r.json() as Promise<Mention[]>) : []))
+          .catch(() => [] as Mention[]),
+      ),
+    ).then((parts) => {
+      if (controller.signal.aborted) return;
+      const map: Record<string, Mention[]> = {};
+      parts.flat().forEach((m) => (map[m.target_id] ??= []).push(m));
+      setMentions(map);
+    });
+    return () => controller.abort();
   }, [chapter]);
 
   // Прокрутка к абзацу или разделу из адреса, подсветка абзаца.
@@ -680,7 +769,14 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
         <CardPopup
           entityId={card.id}
           anchor={card.anchor}
-          onClose={() => setCard(null)}
+          line={card.line}
+          name={card.name}
+          keyboard={card.keyboard}
+          onClose={(opts) => {
+            const el = card.anchor;
+            setCard(null);
+            if (opts?.restoreFocus && el.isConnected) el.focus({ preventScroll: true });
+          }}
           onOpenFull={(id, title) => {
             setCard(null);
             setPanel((p) => ({
