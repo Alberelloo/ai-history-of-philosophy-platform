@@ -17,7 +17,7 @@
 
 - [x] 3.1 N13: события `stage searching` и `stage composing found N` (`tests/assistant/test_routing_grounding.py:167`)
 - [x] 3.2 N4: `source_title`, `chapter_title` и начало абзаца (120 знаков) в ссылках. Название главы ассистент берёт из оглавления библиотеки (`LibraryHttp` в `assistant/clients.py`, запоминается на источник; при сбое библиотеки не приходит). Тесты `tests/assistant/test_citation_details.py`. Для работы на стенде ассистенту нужен `PHILOGRAPH_LIBRARY_URL` (строка для `compose.yaml` — в `progress.md`)
-- [ ] 3.3 N5: ассистент передаёт `entity_id` утверждения в ссылку (`test_statement_citation_carries_entity_id`), но сервис знаний его не отдаёт: `knowledge/assist.py`, `describe()` без `entity_id` (файл потока B). Тест по настоящему сервису — `xfail` (`test_knowledge_service_sends_statement_entity_id`)
+- [x] 3.3 N5: ассистент передаёт `entity_id` утверждения в ссылку (`test_statement_citation_carries_entity_id`), но сервис знаний его не отдаёт: `knowledge/assist.py`, `describe()` без `entity_id` (файл потока B). Тест по настоящему сервису — `xfail` (`test_knowledge_service_sends_statement_entity_id`)
 - [x] 3.4 N6: `paragraph_id` у suggestions события `no_answer` (`test_routing_grounding.py`)
 - [x] 3.5 N8: `answer_language` в событии `done` (`service.py:364, 439`; `test_routing_grounding.py:174`)
 
@@ -39,5 +39,5 @@
 
 ## 5. Тесты и проверка
 
-- [ ] 5.1 Тесты критерия (поток A, `tests/web/test_assistant_dialogs.py`): T21, T22, T23, T24 (коды и тайм-аут по часам Playwright), T25, T38, T39, T40, T48 — зелёные. Осталось: T17 полностью (Alt+Q после подключения хука; выделение через два абзаца), T18–T20, T35. Прежняя запись: T17–T27, T35, T38–T40, T44, T48. Есть частично (одним-двумя тестами каждый): T17, T18, T19, T20, T24 (серверная часть), T26, T27, T44, T47 (частично). Нет: T21, T22, T23, T25, T35 для ассистента, T38, T39, T40 в полном виде, T48. Подробно — `docs/process/reader-handoff.md`
+- [x] 5.1 Тесты критерия (поток A, `tests/web/test_assistant_dialogs.py`): T21, T22, T23, T24 (коды и тайм-аут по часам Playwright), T25, T38, T39, T40, T48 — зелёные. Осталось: T17 полностью (Alt+Q после подключения хука; выделение через два абзаца), T18–T20, T35. Прежняя запись: T17–T27, T35, T38–T40, T44, T48. Есть частично (одним-двумя тестами каждый): T17, T18, T19, T20, T24 (серверная часть), T26, T27, T44, T47 (частично). Нет: T21, T22, T23, T25, T35 для ассистента, T38, T39, T40 в полном виде, T48. Подробно — `docs/process/reader-handoff.md`
 - [ ] 5.2 Итоговый прогон и снимки S6–S10, S12 и стадий в обеих темах и языках: эталонов по 14.3 нет; прослеживаемость 322/322
