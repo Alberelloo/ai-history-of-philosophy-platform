@@ -575,11 +575,10 @@ def test_t40_v3_to_v4_migration(browser, site):
 
 
 def sessions_list(box):
-    if (
-        box.get_by_role("button", name="Сессии", exact=True).get_attribute("aria-expanded")
-        != "true"
-    ):
-        box.get_by_role("button", name="Сессии", exact=True).click()
+    """Список сессий: на странице всегда открыт, в панели — развёрнут, если был свёрнут."""
+    toggle = box.get_by_role("button", name="Сессии", exact=True)
+    if toggle.count() and toggle.get_attribute("aria-expanded") != "true":
+        toggle.click()
     return box.get_by_role("list", name="Сессии", exact=True)
 
 

@@ -13,23 +13,23 @@ export function AssistantPage({ search = "" }: { search?: string }) {
   const q = useMemo(() => new URLSearchParams(search).get("q") ?? "", [search]);
   const from = useMemo(() => new URLSearchParams(search).get("from") ?? "", [search]);
   return (
-    <main className="assistant-page" id="content">
-      <div className="assistant-page__col">
-        <header className="assistant-page__head">
-          <h1 className="pg-display">{t.assistant.label}</h1>
-          <p className="assistant-page__subtitle">{t.assistantPage.subtitle}</p>
-        </header>
-        <AssistantPanel
-          mode="library"
-          sourceId=""
-          selection={null}
-          selectionParagraphs={[]}
-          onClose={() => {}}
-          pending={pending}
-          initialQuestion={q || undefined}
-          pendingFrom={from || undefined}
-        />
-      </div>
+    // Рабочая область на всю высоту окна: колонка сессий слева, диалог справа на всю ширину
+    // (строка ответа ограничена для чтения), поле вопроса прижато к низу области.
+    <main className="assistant-page">
+      <header className="assistant-page__head">
+        <h1 className="pg-display">{t.assistant.label}</h1>
+        <p className="assistant-page__subtitle">{t.assistantPage.subtitle}</p>
+      </header>
+      <AssistantPanel
+        mode="library"
+        sourceId=""
+        selection={null}
+        selectionParagraphs={[]}
+        onClose={() => {}}
+        pending={pending}
+        initialQuestion={q || undefined}
+        pendingFrom={from || undefined}
+      />
     </main>
   );
 }

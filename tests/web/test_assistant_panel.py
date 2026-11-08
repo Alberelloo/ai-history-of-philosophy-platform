@@ -176,7 +176,7 @@ def test_dialog_memory(page, server, bot, events):
     page.reload()
     page.get_by_role("button", name="Ассистент").click()
     assert panel.locator(".turn").count() == 2  # диалог в браузере
-    panel.get_by_role("button", name="Новая сессия").click()
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
     assert panel.locator(".turn").count() == 0
     long_history = [{"question": f"вопрос {i}", "answer": "ответ"} for i in range(6)]
     bot.ask(question="и ещё?", history=long_history)
@@ -237,11 +237,10 @@ def test_sessions_are_separate(page, server, bot):
     panel.get_by_role("button", name="Спросить").click()
     panel.locator(".turn").first.locator(".fragment").wait_for()
     # «+» — вторая сессия, пустая; «+» при пустой активной не плодит третью.
-    panel.get_by_role("button", name="Новая сессия").click()
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
     assert panel.locator(".turn").count() == 0
-    panel.get_by_role("button", name="Новая сессия").click()
-    # Список сессий: две строки.
-    panel.get_by_role("button", name="Сессии").click()
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
+    # Список сессий всегда на виду: две строки.
     assert panel.locator(".assistant__sessions .assistant__session").count() == 2
     # Возврат к первой сессии по списку (сначала новые, 5.8): там только первый вопрос.
     panel.locator(".assistant__session-title", has_text="причинности").click()

@@ -1125,10 +1125,6 @@ blockquote.block {
   box-shadow: var(--shadow-raise);
 }
 
-.assistant__body {
-  align-content: start;
-}
-
 .turns {
   display: grid;
   gap: var(--space-6);
@@ -1200,8 +1196,6 @@ blockquote.block {
 .assistant__form {
   display: grid;
   gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--line);
 }
 
 .assistant-actions {
@@ -1963,10 +1957,10 @@ a.settings__label {
 
 .assistant__sessions {
   display: grid;
+  align-content: start;
   gap: 0.125rem;
   margin: 0;
-  padding: 0 0 var(--space-3);
-  border-bottom: 1px solid var(--line);
+  padding: 0;
   list-style: none;
 }
 
@@ -2146,36 +2140,7 @@ a.settings__label {
 }
 
 /* ---------- Страница раздела «Ассистент» (reader-panels.md, 5.10) ---------- */
-.assistant-page {
-  display: grid;
-  justify-content: center;
-  height: 100dvh;
-  padding: var(--space-4) var(--space-3);
-}
-
-.assistant-page__col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: clamp(36rem, 50vw, 46rem);
-  height: 100dvh;
-  min-height: 0;
-}
-
-.assistant-page .pg-panel__body {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.assistant-page .assistant__form {
-  position: sticky;
-  bottom: 0;
-  flex-shrink: 0;
-  margin-top: auto;
-  background: var(--paper);
-  padding-top: var(--space-2);
-}
-
+/* Раскладка рабочей области — в styles/assistant.css. */
 .assistant-page__subtitle {
   margin: 0;
   color: var(--ink-2);

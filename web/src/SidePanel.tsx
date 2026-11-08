@@ -8,7 +8,7 @@ import { Icon } from "./ui";
 
 const COMPACT_MEDIA = "(max-width: 1279px)";
 
-function useMedia(query: string): boolean {
+export function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
   useEffect(() => {
     const list = window.matchMedia(query);
