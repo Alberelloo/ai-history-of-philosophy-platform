@@ -145,3 +145,26 @@ docker compose -f compose.yaml -f compose.e2e.yaml up -d --build --wait   # http
 - Сопоставление тестов с T1–T48 здесь выполнено вручную: в самих тестах номеров нет. При написании новых тестов стоит указывать Tn в имени или докстринге.
 - В дельтах OpenSpec `assistant-page` MODIFIED-блоки должны содержать все сценарии текущей спецификации (иначе валидация падает); это нужно помнить и при новых изменениях.
 - В `reader-panels.md` (15) открытых вопросов нет; сомнения остаются у реализации, а не у дизайна: производительность поля сносок (один проход после `document.fonts.ready`) и загрузка упоминаний больших глав.
+
+## 9. Параллельная работа потоками (с 2026-11-08)
+
+Остаток ведут три потока, каждый в своём git worktree от ветки `claude/reader-integration`. Интегратор (основная сессия) сливает потоки по одному и подключает общие места.
+
+| Поток | Ветка | Этапы | Владеет файлами |
+| --- | --- | --- | --- |
+| A. Ассистент | `claude/reader-wt-assistant` | 4 + 6 | `web/src/AssistantPanel.tsx`, `AssistantPage.tsx`, `web/src/storage.ts` (диалоги), `src/philograph/assistant/*`, `tests/assistant/*`, `tests/web/test_assistant_*`, `tests/e2e/test_assistant_page.py`; новые файлы `web/src/hooks/useAssistantShortcut.ts`, `web/src/styles/assistant.css` |
+| B. Упоминания и карточка | `claude/reader-wt-cards` | 2 + 3 | `web/src/CardPopup.tsx`, `FullCard.tsx`, `web/src/ReaderPage.tsx` (загрузка упоминаний), `src/philograph/knowledge/*`, `tests/knowledge/*`; новый `web/src/styles/card.css` |
+| C. Раскладка и сноски | `claude/reader-wt-layout` | 1 + 5 | `web/src/Footnote.tsx`, `Sidebar.tsx`, `SidePanel.tsx`, `web/src/styles.css` (rem-перевод), `tests/web/test_reader_notes.py`, `tests/e2e/test_reader_layout.py`; новый `web/src/styles/notes.css` |
+
+Правила для потоков:
+
+1. Править можно только свои файлы. Чужой файл — остановиться, записать в `progress.md`, дальше решает интегратор.
+2. `web/src/ReaderPage.tsx` принадлежит потоку B. Потоки A и C не правят его: они кладут готовые хуки и компоненты в новые файлы и описывают в `progress.md` одну строку подключения. Подключает интегратор.
+3. Переводы `web/src/i18n/ru.ts` и `en.ts`: каждый поток правит только свою группу ключей (A — `assistant.*`, B — `card.*` и `mentions.*`, C — `notes.*` и `layout.*`), одинаково в обоих файлах.
+4. Новый CSS только в новых файлах `web/src/styles/<компонент>.css`, подключаются из `web/src/main.tsx` одной строкой в конце списка импортов (конфликт тривиальный, решает интегратор). Правки существующих правил `styles.css` делает только поток C.
+5. Тесты в своих файлах. В `tests/e2e/test_visual_design.py` и `tests/e2e/visual.py` потоки не пишут.
+6. Эталонные снимки не коммитит никто из потоков. Их пересоздаёт интегратор после слияния и просмотра.
+7. Миграции: `library` — следующий номер 5 только у потока B, если нужно хранение портретов; `knowledge` — следующий номер 6 только у потока B. Остальные потоки миграций не создают.
+8. OpenSpec: у каждого этапа своя папка. Дельты MODIFIED разных потоков не пересекаются. Архивирует и правит `openspec/traceability.yaml` только интегратор.
+9. Запуск тестов: `export TMP="$(pwd -W)/.stack/tmp" TEMP="$(pwd -W)/.stack/tmp"; mkdir -p "$TMP"`; в worktree `PYTHONPATH="$(pwd)/src"` и `<путь к основному репозиторию>/.venv/Scripts/python`; клиент — `cd web && npm ci && npm run build` (у worktree свой `node_modules`). Браузерные тесты запускать точечно (`-k`, свои файлы). Полный прогон делает интегратор.
+10. После каждого пункта `tasks.md` — обновить `progress.md`, коммит `wip(<этап>): …`, пуш.
