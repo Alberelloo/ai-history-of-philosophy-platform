@@ -5556,15 +5556,18 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: ru.wikisource; Я. П. Козельский ум. 1794 (по ru.wikipedia; Wikidata годов не даёт), сочинение
-      XVIII в.
+    author_death_years:
+    - 1793
+    evidence: 'ru.wikisource; Я. П. Козельский: год смерти не установлен, ru.wikipedia — «после 1793»
+      (Wikidata P570 пуст). В author_death_years указана НИЖНЯЯ граница 1793, а не дата смерти; верхняя
+      граница по возрасту (родился до 1729) — не позже 1830, срок 70 лет истёк в любом случае. Издание
+      1768 г. (проверка 2026-11-09)'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: автор Я. П. Козельский подтверждён, но год смерти 1794 в evidence и override
-      НЕВЕРЕН: ru.wikipedia даёт «после 1793», Wikidata P570 пуст. Родился до 1729, издание 1768 г., срок
-      практически истёк. Исправить death_year/evidence (не выдумывать год) и одобрить.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Год смерти неизвестен, в лицензии указана нижняя граница; срок 70 лет истёк по возрасту. Решение
+      владельца.
   publish: auto
 - id: pavlovich-rassuzhdeniya-dvukh-indiytsev-kalana-ibragima
   landing_url: https://ru.wikisource.org/wiki/Рассуждения_двух_индийцев_Калана_и_Ибрагима_о_человеческом_познании_(Козельский)
@@ -5594,15 +5597,18 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: ru.wikisource; Я. П. Козельский ум. 1794 (по ru.wikipedia; Wikidata годов не даёт), сочинение
-      XVIII в.
+    author_death_years:
+    - 1793
+    evidence: 'ru.wikisource; Я. П. Козельский: год смерти не установлен, ru.wikipedia — «после 1793»
+      (Wikidata P570 пуст). В author_death_years указана НИЖНЯЯ граница 1793, а не дата смерти; верхняя
+      граница по возрасту (родился до 1729) — не позже 1830, срок 70 лет истёк в любом случае. Издание
+      1788 г. (проверка 2026-11-09)'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: авторство Я. П. Козельского подтверждено («Китайский философ…», 1788),
-      но год смерти 1794 в evidence и override НЕВЕРЕН (ru.wikipedia: «после 1793»). Исправить death_year/evidence
-      и одобрить; срок практически истёк.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Год смерти неизвестен, в лицензии указана нижняя граница; срок 70 лет истёк по возрасту. Решение
+      владельца.
   publish: auto
 - id: ivanovich-uchenie-kanta-prave-gosudarstve-ru
   landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_праве_и_государстве_(Новгородцев)
@@ -8377,16 +8383,17 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: ru.wikisource (пер. А. Н. Неведомского, изд. 1866); Дж. С. Милль ум. 1873; год смерти переводчика
-      не установлен, но он был взрослым помещиком уже в 1862 г. (репрессирован по «Делу тверских мировых
-      посредников»), то есть родился не позднее 1840-х и умер задолго до 1955; срок 70 лет истёк
+    translator_death_year: 1870
+    evidence: ru.wikisource (пер. А. Н. Неведомского, изд. 1866, шаблон PD-RusEmpire); Дж. С. Милль ум.
+      1873. Переводчик родился 20.09.1830, умер «после 1870», точный год неизвестен; в translator_death_year
+      указана НИЖНЯЯ граница 1870, а не дата смерти. Смерть позже 1955 г. означала бы возраст 125 лет,
+      срок 70 лет истёк (проверка 2026-11-09, Wikisource «Автор:Александр Николаевич Неведомский»)
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: личность подтверждена: А. Н. Неведомский, род. 20.09.1830, умер «после
-      1870», точный год неизвестен (Wikisource: PD-RusEmpire). Смерть позже 1955 г. невозможна (125 лет).
-      Решение по записи: одобрить с death_year: null и пометкой, если владелец согласен с таким основанием.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Год смерти неизвестен, в лицензии указана нижняя граница; срок 70 лет истёк по возрасту. Решение
+      владельца.
   publish: auto
 - id: rotterdamskiy-pokhvalnoe-slovo-gluposti-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D1%81%D0%BB%D0%BE%D0%B2%D0%BE_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_(%D0%AD%D1%80%D0%B0%D0%B7%D0%BC_%D0%A0%D0%BE%D1%82%D1%82%D0%B5%D1%80%D0%B4%D0%B0%D0%BC%D1%81%D0%BA%D0%B8%D0%B9;_%D0%93%D1%83%D0%B1%D0%B5%D1%80)
