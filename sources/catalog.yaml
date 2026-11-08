@@ -1790,7 +1790,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: Советский перевод 1936 г.; проверить, что комментарии и предисловие не принадлежат правообладателю
+    note: 'Проверка 2026-11-09: в оглавлении есть страница «Комментарии»; чьи они (переводчика В. П. Карпова или советских редакторов 1936 г.) не установлено. Не одобрять, пока авторство комментариев не выяснено; без неё текст можно оставить, если страницу «Комментарии» убрать из files.'
   publish: auto
 - id: protagor-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Карпов)
@@ -3022,8 +3022,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: Страница ссылается на издание 1990 г. (Мысль) как источник набора; проверить, что текст не модернизирован
-      редакторами после 1903 г.
+    note: 'Проверка 2026-11-09: на странице есть раздел «Примечания», набор указан по изданию «Мысль», 1990 (Собр. соч. в 4 т.). Примечания и возможная правка текста могут принадлежать редакторам издания. Есть перевод Карпова (дубль). Не одобрять без проверки.'
   publish: auto
 - id: platon-kriton-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Соловьёв)
@@ -3063,8 +3062,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: Страница ссылается на издание 1965 г. как источник набора; проверить, что текст не модернизирован
-      редакторами после 1903 г.
+    note: 'Проверка 2026-11-09: страница ссылается на издание 1965 г. как источник набора, внизу сноски. Возможна редакторская правка текста. Есть перевод Карпова (дубль). Не одобрять без проверки.'
   publish: auto
 - id: platon-platonovy-razgovory-zakonakh-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Платоновы_разговоры_о_законах_(Платон;_Оболенский)
@@ -3256,10 +3254,11 @@ entries:
     evidence: ru.wikisource (Софист, пер. С. А. Ананьина, 1907; на странице шаблон PD-old-70); Платон
       ум. 348 до н. э.; С. А. Ананьин ум. 1942; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: platon-protagor-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Добиаш)
@@ -3892,10 +3891,10 @@ entries:
     evidence: ru.wikisource (Мир как воля и представление, пер. Ю. И. Айхенвальда, Полн. собр. соч., М.,
       1910); Шопенгауэр ум. 1860; Ю. И. Айхенвальд ум. 1928; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: Страница-оглавление; в files 126 страниц, полноту проверить
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: shopengauer-chetveroyakom-korne-zakona-dostatochnogo-osnovaniya
   landing_url: https://ru.wikisource.org/wiki/О_четверояком_корне_закона_достаточного_основания_(Шопенгауэр;_Айхенвальд)
@@ -4239,10 +4238,10 @@ entries:
     evidence: ru.wikisource (Классификация выводов, СПб., 1880; на странице шаблон PD-Russia-expired);
       М. И. Каринский ум. 1917 (Wikidata Q1483866), срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Проверено: редакционных примечаний и предисловий правообладателей на странице не найдено.'
   publish: auto
 - id: lenin-materializm-empiriokrititsizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Материализм_и_эмпириокритицизм_(Ленин)
@@ -4326,11 +4325,10 @@ entries:
     evidence: ru.wikisource (Материализм и эмпириокритицизм, 1909; набор по ПСС 1967, т. 18); В. И. Ленин
       ум. 1924, срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: Текст Ленина свободен; в ПСС 1967 есть редакционные примечания советских издателей, их права
-      не проверялись
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Проверено: редакционных примечаний и предисловий правообладателей на странице не найдено.'
   publish: auto
 - id: nitsshe-tak-govoril-zaratustra-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Так_говорил_Заратустра_(Ницше;_Антоновский)
@@ -4464,15 +4462,16 @@ entries:
     license_hint: PD-simple-translate
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: PD-simple-translate; Аристотель ум. -322; Сергей Александрович Жебелёв ум. 1941;
       годы смерти по Wikidata, срок 70 лет истёк у всех'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: radlov-ocherk-istorii-russkoy-filosofii-ru
   landing_url: https://ru.wikisource.org/wiki/Очерк_истории_русской_философии_(Радлов)
@@ -4617,15 +4616,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
       ум. 1900; Франк, Семён Людвигович ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: nitsshe-polze-vrede-istorii-dlya-zhizni
   landing_url: https://ru.wikisource.org/wiki/О_пользе_и_вреде_истории_для_жизни_(Ницше)
@@ -4697,10 +4697,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Сергей Николаевич
       Булгаков ум. 1944; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: bulgakov-osnovnye-problemy-teorii-progressa-ru
   landing_url: https://ru.wikisource.org/wiki/Основные_проблемы_теории_прогресса_(Булгаков)
@@ -4733,10 +4734,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Сергей Николаевич
       Булгаков ум. 1944; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: uspenskiy-tertium-organum-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Tertium_Organum
@@ -4769,10 +4771,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Демьянович
       Успенский ум. 1947; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: strakhov-mir-kak-tseloe-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Мир_как_целое_(Страхов)
@@ -5779,10 +5782,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-russkaya-ideya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Русская_идея_(Бердяев)
@@ -5810,15 +5814,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-tvorchestvo-obektivatsiya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Творчество_и_объективация_(Бердяев)
@@ -5846,15 +5851,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-mirosozertsanie-dostoevskogo-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Миросозерцание_Достоевского_(Бердяев)
@@ -5887,10 +5893,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-samopoznanie-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Самопознание_(Бердяев)
@@ -5918,15 +5925,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-konstantin-leontev-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Константин_Леонтьев_(Бердяев)
@@ -5959,10 +5967,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-aleksey-stepanovich-khomyakov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Алексей_Степанович_Хомяков_(Бердяев)
@@ -5995,10 +6004,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
       Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-nepostizhimoe-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Непостижимое_(Франк)
@@ -6026,15 +6036,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
       ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-realnost-chelovek-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Реальность_и_человек_(Франк)
@@ -6062,15 +6073,16 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
       ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-smysl-zhizni-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Смысл_жизни_(Франк)
@@ -6103,10 +6115,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
       ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-krushenie-kumirov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Крушение_кумиров_(Франк)
@@ -6139,10 +6152,11 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
       ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: grot-osnovnye-momenty-razvitii-novoy-filosofii
   landing_url: https://ru.wikisource.org/wiki/Основные_моменты_в_развитии_новой_философии_(Грот)
@@ -6368,9 +6382,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
-      (изд. 1916, Стасюлевич); перевод назван на ru.wikisource (Наука логики (Гегель; Дебольский)), на
-      странице archive.org переводчик не указан'
+    note: 'Лицензия одобрена владельцем 2026-11-09, но у archive.org-записи нет пригодного файла: в item только DjVu без текстового слоя (нет EPUB, PDF, djvu.txt), адаптер вернул files: []. Вернуть в одобренные после появления файла (например, OCR или другой item).'
   publish: auto
 - id: gegel-nauka-logiki-t-2-archive
   landing_url: https://archive.org/details/2_20200203_20200203
@@ -6414,11 +6426,10 @@ entries:
       Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918 (изд. 1916, Стасюлевич); переводчик на archive.org
       не указан, установлен по изданию; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
-      (изд. 1916, Стасюлевич); переводчик на archive.org не указан, установлен по изданию'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: gegel-nauka-logiki-t-3-archive
   landing_url: https://archive.org/details/3_20200203
@@ -6462,11 +6473,10 @@ entries:
       Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918 (изд. 1916, Стасюлевич); переводчик на archive.org
       не указан, установлен по изданию; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
-      (изд. 1916, Стасюлевич); переводчик на archive.org не указан, установлен по изданию'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: aristotel-ob-istolkovanii-archive
   landing_url: https://archive.org/details/20200321_20200321_0818
@@ -6768,10 +6778,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       Н. А. Бердяев ум. 1948; изд. 1907; сканы Университета Торонто; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: n-ocherk-istorii-filosofii-archive
   landing_url: https://archive.org/details/strahov_philosophy
@@ -7279,10 +7290,11 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       П. П. Блонский ум. 1941 (Wikidata Q2624489); изд. 1918; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: minski-religiia-budushchago-filosofskie-razgovory-archive
   landing_url: https://archive.org/details/religiiabudushch00mins
@@ -7447,11 +7459,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1911 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-2-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom2
@@ -7490,11 +7501,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1911 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-3-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom3
@@ -7533,11 +7543,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1912 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-4-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom4
@@ -7576,11 +7585,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-5-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom5
@@ -7619,11 +7627,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-6-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom6
@@ -7662,11 +7669,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-7-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom7
@@ -7705,11 +7711,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-8-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom8
@@ -7748,11 +7753,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-9-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom9
@@ -7791,11 +7795,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1913 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: s-sobranie-sochineniy-t-10-archive
   landing_url: https://archive.org/details/solovevsobraniesochinenijtom10
@@ -7834,11 +7837,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
-      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: nitsshe-chelovecheskoe-slishkom-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A7%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5,_%D1%81%D0%BB%D0%B8%D1%88%D0%BA%D0%BE%D0%BC_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_(%D0%9D%D0%B8%D1%86%D1%88%D0%B5)
@@ -7880,15 +7882,16 @@ entries:
         wikidata: null
       language: ru
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (пер. С. Л. Франка, указан на странице); Ф. Ницше ум. 1900; С. Л. Франк ум.
       1950; срок 70 лет истёк у обоих
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: nitsshe-david-shtraus-ispovednik-pisatel-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B0%D0%B2%D0%B8%D0%B4_%D0%A8%D1%82%D1%80%D0%B0%D1%83%D1%81,_%D0%B8%D1%81%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA_%D0%B8_%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C_(%D0%9D%D0%B8%D1%86%D1%88%D0%B5)
@@ -8220,15 +8223,16 @@ entries:
         death_year: 1944
         wikidata: null
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource (пер. Ю. Балтрушайтиса); С. Кьеркегор ум. 1855; Ю. К. Балтрушайтис ум. 1944;
       срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: mill-svobode-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_(%D0%9C%D0%B8%D0%BB%D0%BB%D1%8C;_%D0%9D%D0%B5%D0%B2%D0%B5%D0%B4%D0%BE%D0%BC%D1%81%D0%BA%D0%B8%D0%B9)
@@ -8332,8 +8336,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'издание 1931 г. (советское, «Academia»): редакционные примечания и комментарии не проверялись,
-      возможны правообладатели (редакторы, комментаторы)'
+    note: 'Проверка 2026-11-09: страница — не издание 1931 г., а текст изд. ГИХЛ 1960 г.: «Редакция перевода С. П. Маркиша», «Статья и комментарии Л. Е. Пинского». Редакция и комментарии 1960 г. защищены, перевод П. К. Губера сам свободен. Не одобрять; искать издание 1931 г. (Academia) без комментариев.'
   publish: auto
 - id: lessing-laokoon-ili-granitsakh-zhivopisi-poezii
   landing_url: https://ru.wikisource.org/wiki/%D0%9B%D0%B0%D0%BE%D0%BA%D0%BE%D0%BE%D0%BD,_%D0%B8%D0%BB%D0%B8_%D0%9E_%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0%D1%85_%D0%B6%D0%B8%D0%B2%D0%BE%D0%BF%D0%B8%D1%81%D0%B8_%D0%B8_%D0%BF%D0%BE%D1%8D%D0%B7%D0%B8%D0%B8_(%D0%9B%D0%B5%D1%81%D1%81%D0%B8%D0%BD%D0%B3;_%D0%AD%D0%B4%D0%B5%D0%BB%D1%8C%D1%81%D0%BE%D0%BD)
@@ -9908,10 +9911,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-moe-filosofskoe-mirosozertsanie-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%BE%D0%B5_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -9939,15 +9943,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1948; срок 70 лет по ст. 1281 ГК РФ истёк с 1 января 2019; публикация эмигрантская,
-      посмертные редакторы не проверялись
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-knige-s-l-franka-nepostizhimoe
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BA%D0%BD%D0%B8%D0%B3%D0%B5_%D0%A1._%D0%9B._%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%D0%B0_%C2%AB%D0%9D%D0%B5%D0%BF%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5%C2%BB_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -9975,14 +9979,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1948; срок 70 лет истёк; публикация эмигрантская 1938 г.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: shestov-velikie-kanuny-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%B8%D0%B5_%D0%BA%D0%B0%D0%BD%D1%83%D0%BD%D1%8B_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -10150,15 +10155,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1950; срок 70 лет истёк с 1 января 2021; если издание посмертное (1950+), проверить
-      редактора
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-filosofiya-religiya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%80%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
@@ -10190,10 +10195,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: lyudvigovich-fridrikh-nitsshe-etika-lyubvi-k
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D1%80%D0%B8%D0%B4%D1%80%D0%B8%D1%85_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_%D0%BA_%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B5%D0%BC%D1%83_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
@@ -10225,10 +10231,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: nikolaevich-dekart-spinoza-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B5%D0%BA%D0%B0%D1%80%D1%82_%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D0%B0_(%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9)
@@ -10649,11 +10656,10 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1918; страница ru.wikisource может воспроизводить советское издание — редакционные
-      примечания не проверялись
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Проверено: редакционных примечаний и предисловий правообладателей на странице не найдено.'
   publish: auto
 - id: plekhanov-filosofskaya-evolyutsiya-marksa-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B0%D1%8F_%D1%8D%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%9C%D0%B0%D1%80%D0%BA%D1%81%D0%B0_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
@@ -10685,11 +10691,10 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1918; страница может воспроизводить советское издание — редакционные примечания не
-      проверялись
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Проверено: редакционных примечаний и предисловий правообладателей на странице не найдено.'
   publish: auto
 - id: plekhanov-maks-shtirner-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%B0%D0%BA%D1%81_%D0%A8%D1%82%D0%B8%D1%80%D0%BD%D0%B5%D1%80_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
@@ -10721,11 +10726,10 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
   review:
-    status: draft
-    by: null
-    at: null
-    note: автор ум. 1918; страница может воспроизводить советское издание — редакционные примечания не
-      проверялись
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Проверено: редакционных примечаний и предисловий правообладателей на странице не найдено.'
   publish: auto
 - id: vekhi-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%92%D0%B5%D1%85%D0%B8._%D0%A1%D0%B1%D0%BE%D1%80%D0%BD%D0%B8%D0%BA_%D1%81%D1%82%D0%B0%D1%82%D0%B5%D0%B9_%D0%BE_%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%B9_%D0%B8%D0%BD%D1%82%D0%B5%D0%BB%D0%BB%D0%B8%D0%B3%D0%B5%D0%BD%D1%86%D0%B8%D0%B8_(1909)
@@ -10823,12 +10827,11 @@ entries:
       ум. 1925, Кистяковский ум. 1920, Струве ум. 1944, Франк ум. 1950, Изгоев (Ланде) ум. 1935 (годы
       по общеизвестным данным, в Wikidata не сопоставлялись); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'сборник собран вручную: адаптер взял только оглавление; в override.files — предисловие и 7
-      статей на отдельных страницах (существование страниц проверено через API); годы смерти Изгоева (Ланде),
-      Кистяковского, Гершензона, Струве проверить по независимому источнику'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: danilevskiy-rossiya-evropa-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F_%D0%B8_%D0%95%D0%B2%D1%80%D0%BE%D0%BF%D0%B0
@@ -11022,11 +11025,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Сергей Николаевич Булгаков ум. 1944'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'религиозно-философский труд (граница с богословием): решить, включать ли; автор ум. 1944, издание
-      1917'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: solovev-chteniya-bogochelovechestve-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A7%D1%82%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BE_%D0%B1%D0%BE%D0%B3%D0%BE%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
@@ -11096,11 +11099,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Куно Фишер ум. 1907; Пётр Бернгардович Струве ум. 1944'
   review:
-    status: draft
-    by: null
-    at: null
-    note: перевод П. Б. Струве (ум. 1944) в составе «Истории новой философии» (СПб., Жуковский, 1901–1909);
-      автор Куно Фишер ум. 1907; идентификацию переводчика проверить
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: solovev-tri-razgovora-voyne-progresse-kontse
   landing_url: https://ru.wikisource.org/wiki/%D0%A2%D1%80%D0%B8_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B0_%D0%BE_%D0%B2%D0%BE%D0%B9%D0%BD%D0%B5,_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B5_%D0%B8_%D0%BA%D0%BE%D0%BD%D1%86%D0%B5_%D0%B2%D1%81%D0%B5%D0%BC%D0%B8%D1%80%D0%BD%D0%BE%D0%B9_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2)
@@ -11168,10 +11171,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-poznanie-obshchenie-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%BE%D0%B1%D1%89%D0%B5%D0%BD%D0%B8%D0%B5_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11199,14 +11203,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-problema-cheloveka-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11234,14 +11239,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-opyt-filosofskogo-opravdaniya-khristianstva-ru
   landing_url: https://ru.wikisource.org/wiki/%D0%9E%D0%BF%D1%8B%D1%82_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%B4%D0%B0%D0%BD%D0%B8%D1%8F_%D1%85%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B0_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11273,10 +11279,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-dva-tipa-mirosozertsaniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B2%D0%B0_%D1%82%D0%B8%D0%BF%D0%B0_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D1%8F_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11308,10 +11315,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-iz-etyudov-ya-beme-etyud
   landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B7_%D1%8D%D1%82%D1%8E%D0%B4%D0%BE%D0%B2_%D0%BE_%D0%AF._%D0%91%D0%B5%D0%BC%D0%B5._%D0%AD%D1%82%D1%8E%D0%B4_I._%D0%A3%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BE%D0%B1_Ungrund_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11343,10 +11351,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-kharaktere-russkoy-religioznoy-mysli-xix
   landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B5_%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%B9_%D1%80%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D0%BE%D0%B7%D0%BD%D0%BE%D0%B9_%D0%BC%D1%8B%D1%81%D0%BB%D0%B8_XIX_%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11374,14 +11383,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-chelovek-mashina-zheleznyy-iron-man
   landing_url: https://ru.wikisource.org/wiki/%D0%A7%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA_%D0%B8_%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%B0_(%D0%BF%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0_%D1%81%D0%BE%D1%86%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B8_%D0%B8_%D0%BC%D0%B5%D1%82%D0%B0%D1%84%D0%B8%D0%B7%D0%B8%D0%BA%D0%B8_%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D0%BA%D0%B8)_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11411,16 +11421,16 @@ entries:
     metadata:
       title: Человек и машина (проблема социологии и метафизики техники)
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: ru.wikisource («Путь», 1933, № 38); Н. А. Бердяев ум. 1948; срок 70 лет истёк с 1 января
       2019
   review:
-    status: draft
-    by: null
-    at: null
-    note: эмигрантская публикация 1933 г.; название страницы содержит вставку «железный человек IRON MAN»,
-      в title убрана
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-iz-razmyshleniy-teoditsee-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B7_%D1%80%D0%B0%D0%B7%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9_%D0%BE_%D1%82%D0%B5%D0%BE%D0%B4%D0%B8%D1%86%D0%B5%D0%B5_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11452,10 +11462,11 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: berdyaev-personalizm-marksizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%B5%D1%80%D1%81%D0%BE%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D0%BC%D0%B0%D1%80%D0%BA%D1%81%D0%B8%D0%B7%D0%BC_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
@@ -11483,14 +11494,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
   review:
-    status: draft
-    by: null
-    at: null
-    note: null
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: shestov-umozrenie-apokalipsis-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%A3%D0%BC%D0%BE%D0%B7%D1%80%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%B0%D0%BF%D0%BE%D0%BA%D0%B0%D0%BB%D0%B8%D0%BF%D1%81%D0%B8%D1%81_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
@@ -12068,11 +12080,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Н. А. Бердяев ум. 1948; изд. М., 1911; срок
       70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Ранее падение адаптера (нет лицензии в метаданных) — исправлено. Метаданные archive.org без
-      автора и издателя.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: trubetskoy-e-filosofiya-nitsshe-kriticheskiy-ocherk
   landing_url: https://archive.org/details/1904-523478-20260120
@@ -12153,11 +12165,11 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; И. А. Ильин ум. 21.12.1954 (Wikidata Q1282198);
       срок 70 лет по ст. 1281 ГК РФ истёк 31.12.2024; изд. Париж, YMCA-Press'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Граничный случай: автор умер в 1954, срок истёк только в 2025. Нужна ручная проверка. Ранее
-      падение адаптера — исправлено.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: m-elementy-logiki-archive
   landing_url: https://archive.org/details/troitskij_logic
@@ -12326,11 +12338,10 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; архим. Гавриил (Воскресенский) ум. 1868;
       Казань, 1839-1840; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Ч. 4-6 из 6; ч. 1-3 не проверялись. Автор — духовное лицо, но труд — университетский учебник
-      истории философии. OCR средний.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: lopatin-polozhitel-nyia-zadachi-filosofii-microform
   landing_url: https://archive.org/details/polozhitelnyiaza00lopa
@@ -12497,10 +12508,10 @@ entries:
       в метаданных archive.org; по памяти/архиву, сверить с Wikidata); М., изд. автора, 1913; срок 70
       лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 1 (возможно, есть т. 2 отдельным item) — проверить.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: g-vvedenie-filosofiyu-archive
   landing_url: https://archive.org/details/b_20200329
@@ -12880,10 +12891,10 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; К. Н. Леонтьев ум. 1891 (Wikidata Q542090);
       М., 1912; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Т. 5 из 9 (других томов не проверяли).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: radishchev-polnoe-sobrani-e-sochineni-n
   landing_url: https://archive.org/details/polnoesobranies01kallgoog
@@ -12964,11 +12975,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       А. Н. Радищев ум. 1802; М., Саблин, 1907; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Том определён по тексту OCR (т. 1 или 2 — уточнить); содержит «О человеке, о его смертности
-      и бессмертии» (проверить).
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: kareev-istorikofilosofskie-sot-s-iologicheskie-ti
   landing_url: https://archive.org/details/istorikofilosof00karegoog
@@ -13056,11 +13066,10 @@ entries:
       студенческая запись лекций 1880-81; срок 70 лет истёк (составители записи — по метаданным В. В.
       Розанов ум. 1919, М. К. Любавский ум. 1936)'
   review:
-    status: draft
-    by: null
-    at: null
-    note: В том же томе — «История новой философии» по лекциям Троицкого (составитель записи неясен).
-      Проверить год издания.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено. Состав тома/полнота не проверялись (вопрос качества, не прав).'
   publish: auto
 - id: vasilevich-ponimanii-archive
   landing_url: https://archive.org/details/oponimanii86
@@ -13546,9 +13555,9 @@ entries:
     license_hint: http://creativecommons.org/publicdomain/mark/1.0/
   override:
     metadata:
-      title: 'Политика'
+      title: Политика
       authors:
-      - name: 'Аристотель'
+      - name: Аристотель
         death_year: -322
         wikidata: null
       year: 1865
@@ -13560,12 +13569,16 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Аристотель ум. 322 до н. э.; перевод с греческого Н. Е. Скворцова (М., Университетская типография, 1865; Скворцов 1836-1902 по ru.wikipedia, список однофамильцев; проверить по справочнику); срок 70 лет истёк. Отметка Public Domain Mark на archive.org не считается доказательством.'
+    evidence: Аристотель ум. 322 до н. э.; перевод с греческого Н. Е. Скворцова (М., Университетская типография,
+      1865; Скворцов 1836-1902 по ru.wikipedia, список однофамильцев; проверить по справочнику); срок
+      70 лет истёк. Отметка Public Domain Mark на archive.org не считается доказательством.
   review:
     status: draft
     by: null
     at: null
-    note: 'Перевод с греческого с примечаниями и двумя экскурсами об учении Аристотеля о праве и воспитании. Переводчик установлен по титулу. Годы жизни переводчика (1836-1902) взяты из ru.wikipedia (дизамбиг), пометка: проверить. EPUB 0,7 МБ, текстовый слой есть; OCR хороший.'
+    note: 'Перевод с греческого с примечаниями и двумя экскурсами об учении Аристотеля о праве и воспитании.
+      Переводчик установлен по титулу. Годы жизни переводчика (1836-1902) взяты из ru.wikipedia (дизамбиг),
+      пометка: проверить. EPUB 0,7 МБ, текстовый слой есть; OCR хороший.'
   publish: auto
 - id: aristotel-ritorika-archive
   landing_url: https://archive.org/details/aristotle_rhetoric
@@ -13591,9 +13604,9 @@ entries:
     license_hint: https://creativecommons.org/publicdomain/mark/1.0/
   override:
     metadata:
-      title: 'Риторика'
+      title: Риторика
       authors:
-      - name: 'Аристотель'
+      - name: Аристотель
         death_year: -322
         wikidata: null
       year: 1894
@@ -13605,12 +13618,15 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Аристотель ум. 322 до н. э.; перевод с греческого Н. Н. Платоновой (Шамониной), 1861-1928 (ru.wikipedia, Платонова, Надежда Николаевна), СПб., Типография Балашева, 1894; срок 70 лет по переводчику истёк (1998). Отметка Public Domain Mark не считается доказательством.'
+    evidence: Аристотель ум. 322 до н. э.; перевод с греческого Н. Н. Платоновой (Шамониной), 1861-1928
+      (ru.wikipedia, Платонова, Надежда Николаевна), СПб., Типография Балашева, 1894; срок 70 лет по переводчику
+      истёк (1998). Отметка Public Domain Mark не считается доказательством.
   review:
     status: draft
     by: null
     at: null
-    note: 'Переводчица установлена по титулу («с греческаго перевела Надежда Платонова»). Есть вступительная статья.'
+    note: Переводчица установлена по титулу («с греческаго перевела Надежда Платонова»). Есть вступительная
+      статья.
   publish: auto
 - id: aristotel-pervaya-analitika-archive
   landing_url: https://archive.org/details/20200321_20200321_0821
@@ -13636,9 +13652,9 @@ entries:
     license_hint: http://creativecommons.org/publicdomain/mark/1.0/
   override:
     metadata:
-      title: 'Первая аналитика'
+      title: Первая аналитика
       authors:
-      - name: 'Аристотель'
+      - name: Аристотель
         death_year: -322
         wikidata: null
       year: 1894
@@ -13648,17 +13664,20 @@ entries:
         death_year: 1921
         wikidata: null
     files:
-    - name: 'Аристотель. Первая аналитика_djvu.txt'
+    - name: Аристотель. Первая аналитика_djvu.txt
       url: https://archive.org/download/20200321_20200321_0821/%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C.%20%D0%9F%D0%B5%D1%80%D0%B2%D0%B0%D1%8F%20%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_djvu.txt
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Аристотель ум. 322 до н. э.; перевод Н. Н. Ланге (1858-1921, ru.wikipedia), СПб., Типография Балашева, 1894; срок 70 лет по переводчику истёк (1992). Отметка Public Domain Mark не считается доказательством.'
+    evidence: Аристотель ум. 322 до н. э.; перевод Н. Н. Ланге (1858-1921, ru.wikipedia), СПб., Типография
+      Балашева, 1894; срок 70 лет по переводчику истёк (1992). Отметка Public Domain Mark не считается
+      доказательством.
   review:
     status: draft
     by: null
     at: null
-    note: 'Переводчик установлен по титулу (оглавление и титул: «Н. Н. Ланге»). EPUB заменён на DjVu TXT (EPUB 151 МБ). Логика (силлогистика).'
+    note: 'Переводчик установлен по титулу (оглавление и титул: «Н. Н. Ланге»). EPUB заменён на DjVu TXT
+      (EPUB 151 МБ). Логика (силлогистика).'
   publish: auto
 - id: blonskiy-p-problema-realnosti-u-berkli
   landing_url: https://archive.org/details/1907-2074426-1103
@@ -13681,25 +13700,28 @@ entries:
     license_hint: null
   override:
     metadata:
-      title: 'Проблема реальности у Беркли'
+      title: Проблема реальности у Беркли
       authors:
-      - name: 'Павел Петрович Блонский'
+      - name: Павел Петрович Блонский
         death_year: 1941
         wikidata: null
       year: 1907
       language: ru
     files:
-    - name: 'Блонский П.П. Проблема реальности у Беркли (1907)_djvu.txt'
+    - name: Блонский П.П. Проблема реальности у Беркли (1907)_djvu.txt
       url: https://archive.org/download/1907-2074426-1103/%D0%91%D0%BB%D0%BE%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%20%D0%9F.%D0%9F.%20%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0%20%D1%80%D0%B5%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20%D1%83%20%D0%91%D0%B5%D1%80%D0%BA%D0%BB%D0%B8%20%281907%29_djvu.txt
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Автор П. П. Блонский (1884-1941, ru.wikipedia), оригинальная русская работа (оттиск из Университетских известий Киевского университета, 1907, Типография Корчак-Новицкого); срок 70 лет истёк (2012). Отметка archive.org отсутствует; текст из публичного архива.'
+    evidence: Автор П. П. Блонский (1884-1941, ru.wikipedia), оригинальная русская работа (оттиск из Университетских
+      известий Киевского университета, 1907, Типография Корчак-Новицкого); срок 70 лет истёк (2012). Отметка
+      archive.org отсутствует; текст из публичного архива.
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Оригинальная русская монография (не перевод). Авторы вписаны вручную (Wikidata не сопоставлена). OCR средний (дореформенная орфография).'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: platon-zakonakh-archive
   landing_url: https://archive.org/details/20200324_20200324_1144
@@ -13725,9 +13747,9 @@ entries:
     license_hint: http://creativecommons.org/publicdomain/mark/1.0/
   override:
     metadata:
-      title: 'О законах'
+      title: О законах
       authors:
-      - name: 'Платон'
+      - name: Платон
         death_year: -347
         wikidata: null
       year: 1827
@@ -13737,17 +13759,21 @@ entries:
         death_year: null
         wikidata: null
     files:
-    - name: 'Платон. О законах_djvu.txt'
+    - name: Платон. О законах_djvu.txt
       url: https://archive.org/download/20200324_20200324_1144/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD.%20%D0%9E%20%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_djvu.txt
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Платон ум. 347 до н. э.; перевод В. Оболенского (М., Типография С. Селивановского, 1827), годы жизни переводчика не найдены: издание вышло в 1827, поэтому он не мог умереть позже ~1930 (вывод по возрасту, не по источнику); срок 70 лет истёк. Отметка Public Domain Mark не считается доказательством.'
+    evidence: 'Платон ум. 347 до н. э.; перевод В. Оболенского (М., Типография С. Селивановского, 1827),
+      годы жизни переводчика не найдены: издание вышло в 1827, поэтому он не мог умереть позже ~1930 (вывод
+      по возрасту, не по источнику); срок 70 лет истёк. Отметка Public Domain Mark не считается доказательством.'
   review:
     status: draft
     by: null
     at: null
-    note: 'Требует ручной проверки: личность переводчика («В. Оболенский») не установлена. Скан Google Books, в начале текста английская и русская заметки Google, дореформенная орфография, OCR средний. PDF 19 МБ заменён на DjVu TXT. Тексты 1827 г., старая орфография.'
+    note: 'Требует ручной проверки: личность переводчика («В. Оболенский») не установлена. Скан Google
+      Books, в начале текста английская и русская заметки Google, дореформенная орфография, OCR средний.
+      PDF 19 МБ заменён на DjVu TXT. Тексты 1827 г., старая орфография.'
   publish: auto
 - id: zakony-myshleniya-formy-poznaniya-archive
   landing_url: https://archive.org/details/lapshin_thinking
@@ -13773,25 +13799,28 @@ entries:
     license_hint: https://creativecommons.org/publicdomain/mark/1.0/
   override:
     metadata:
-      title: 'Законы мышления и формы познания'
+      title: Законы мышления и формы познания
       authors:
-      - name: 'Иван Иванович Лапшин'
+      - name: Иван Иванович Лапшин
         death_year: 1952
         wikidata: null
       year: 1906
       language: ru
     files:
-    - name: 'Лапшин. Законы мышления и формы познания_djvu.txt'
+    - name: Лапшин. Законы мышления и формы познания_djvu.txt
       url: https://archive.org/download/lapshin_thinking/%D0%9B%D0%B0%D0%BF%D1%88%D0%B8%D0%BD.%20%D0%97%D0%B0%D0%BA%D0%BE%D0%BD%D1%8B%20%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%B8%20%D1%84%D0%BE%D1%80%D0%BC%D1%8B%20%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_djvu.txt
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Автор И. И. Лапшин (1870-1952, ru.wikipedia; умер в Ленинграде, не репрессирован), оригинальная русская работа 1906 (СПб.); срок 70 лет по смерти автора истёк 1 января 2023 (граница: умер в 1952, проверить). Отметка Public Domain Mark не считается доказательством.'
+    evidence: 'Автор И. И. Лапшин (1870-1952, ru.wikipedia; умер в Ленинграде, не репрессирован), оригинальная
+      русская работа 1906 (СПб.); срок 70 лет по смерти автора истёк 1 января 2023 (граница: умер в 1952,
+      проверить). Отметка Public Domain Mark не считается доказательством.'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Оригинальная русская работа (не перевод). Начало файла: английская заметка Google, затем средний OCR. Автор умер в 1952: граница срока, проверить вручную.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: 'Решение владельца: одобрено только для показа в РФ (ст. 1281 ГК РФ: 70 лет после смерти автора
+      и переводчика). За пределами РФ не показывать до отдельной проверки.'
   publish: auto
 - id: n-mir-kak-ts-loe-archive
   landing_url: https://archive.org/details/strahov_world
@@ -13819,7 +13848,7 @@ entries:
     metadata:
       title: 'Мир как целое: черты из науки о природе'
       authors:
-      - name: 'Николай Николаевич Страхов'
+      - name: Николай Николаевич Страхов
         death_year: 1896
         wikidata: null
       year: 1872
@@ -13827,10 +13856,12 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Автор Н. Н. Страхов (1828-1896), оригинальная русская работа 1872 (СПб.); срок 70 лет истёк. Отметка Public Domain Mark не считается доказательством.'
+    evidence: Автор Н. Н. Страхов (1828-1896), оригинальная русская работа 1872 (СПб.); срок 70 лет истёк.
+      Отметка Public Domain Mark не считается доказательством.
   review:
     status: draft
     by: null
     at: null
-    note: 'Оригинальная русская работа (не перевод): философия природы. Годы жизни Страхова по памяти/ЭСБЕ, проверить. OCR средний.'
+    note: 'Оригинальная русская работа (не перевод): философия природы. Годы жизни Страхова по памяти/ЭСБЕ,
+      проверить. OCR средний.'
   publish: auto
