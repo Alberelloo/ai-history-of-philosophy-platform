@@ -1,0 +1,33 @@
+# Прогресс: русские источники, третий проход по archive.org
+
+Ветка `claude/ru-sources-archive-3` (от `origin/claude/ru-sources-wikisource-2`). Только черновики (`review.status: draft`), без `approve`. Журналы: `docs/progress-ru-sources.md`, `docs/progress-ru-sources-2.md`.
+
+## Как проверить
+
+`PYTHONPATH=src python -m philograph.library.catalog validate`. Записи третьего прохода — последние в `sources/catalog.yaml` после 269-й (`id` из журнала ниже).
+
+## Часть 1. Адаптер (сделано)
+
+Причина падения: `suggest_license` в `adapters.py` вызывал `.endswith` у `publisher`, а у archive.org без издателя там `None` (не «нет лицензии» как таковой: если подсказка лицензии есть и совпадает с PD, `or` обрывал проверку раньше). Исправлено `(publisher or "")`; тест `tests/library/catalog/test_archive_org.py` (без сети). Без лицензии: `license_hint: null`, лицензия не предлагается.
+
+Предупреждение: сопоставление автора по имени с Wikidata для archive.org даёт неверные годы смерти (Гегель 1876 и т. п.); код не менялся, авторы и годы задаются вручную в `override.metadata`.
+
+## Статус
+
+(заполняется по мере работы)
+
+## Просмотренные запросы и авторы
+
+(заполняется)
+
+## Отклонено / сомнительно
+
+(заполняется)
+
+## Проблемы
+
+- Python/urllib не проходит проверку сертификата archive.org; метаданные через curl.
+
+## Текущий шаг / следующий шаг
+
+Текущий: часть 1 завершена; далее поиск кандидатов.

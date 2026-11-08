@@ -491,7 +491,7 @@ def suggest_license(harvest: Harvest, year: int) -> dict[str, Any] | None:
             return {"kind": code, "basis": "open_license", "evidence": f"сайт: {hint}"}
     if re.search(
         r"public domain|PD-|publicdomain|NOT_IN_COPYRIGHT", hint, re.I
-    ) or harvest.metadata.get("publisher", "").endswith("wikisource.org"):
+    ) or (harvest.metadata.get("publisher") or "").endswith("wikisource.org"):
         people = list(harvest.metadata.get("authors") or [])
         if harvest.metadata.get("translator"):
             people.append(harvest.metadata["translator"])
