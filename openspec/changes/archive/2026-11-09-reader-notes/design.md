@@ -1,6 +1,6 @@
 # Design
 
-Задание и все величины — [docs/design/features/reader-panels.md](../../../docs/design/features/reader-panels.md), этап 5 (разделы 6.1–6.3). Здесь — решения по коду.
+Задание и все величины — [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 5 (разделы 6.1–6.3). Здесь — решения по коду.
 
 ## Поле сносок в K1
 

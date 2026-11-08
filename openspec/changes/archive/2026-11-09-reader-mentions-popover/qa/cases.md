@@ -1,6 +1,6 @@
 # Кейсы: reader-mentions-popover
 
-Источник задания: [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 2 (разделы 4.1–4.7). Кейсы T6–T11, T15 — из раздела 14.2 документа.
+Источник задания: [docs/design/features/reader-panels.md](../../../../../docs/design/features/reader-panels.md), этап 2 (разделы 4.1–4.7). Кейсы T6–T11, T15 — из раздела 14.2 документа.
 
 ## Требования
 

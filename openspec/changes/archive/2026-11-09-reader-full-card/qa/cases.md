@@ -1,6 +1,6 @@
 # Кейсы: reader-full-card
 
-Источник задания: [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 3 (разделы 4.5–4.6). Кейсы T10, T12–T14, T16 — из раздела 14.2.
+Источник задания: [docs/design/features/reader-panels.md](../../../../../docs/design/features/reader-panels.md), этап 3 (разделы 4.5–4.6). Кейсы T10, T12–T14, T16 — из раздела 14.2.
 
 ## Требования
 

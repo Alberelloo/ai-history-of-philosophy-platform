@@ -1,6 +1,6 @@
 # Кейсы: reader-assistant
 
-Источник задания: [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 4 (разделы 5.2–5.9, 7, 12.3). Кейсы T17–T27, T35, T38–T40, T44, T48 — из раздела 14.2. T18 (панель действий над выделением) — в `ReaderPage.tsx`, ведёт lead.
+Источник задания: [docs/design/features/reader-panels.md](../../../../../docs/design/features/reader-panels.md), этап 4 (разделы 5.2–5.9, 7, 12.3). Кейсы T17–T27, T35, T38–T40, T44, T48 — из раздела 14.2. T18 (панель действий над выделением) — в `ReaderPage.tsx`, ведёт lead.
 
 ## Требования
 

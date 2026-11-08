@@ -168,3 +168,7 @@ docker compose -f compose.yaml -f compose.e2e.yaml up -d --build --wait   # http
 8. OpenSpec: у каждого этапа своя папка. Дельты MODIFIED разных потоков не пересекаются. Архивирует и правит `openspec/traceability.yaml` только интегратор.
 9. Запуск тестов: `export TMP="$(pwd -W)/.stack/tmp" TEMP="$(pwd -W)/.stack/tmp"; mkdir -p "$TMP"`; в worktree `PYTHONPATH="$(pwd)/src"` и `<путь к основному репозиторию>/.venv/Scripts/python`; клиент — `cd web && npm ci && npm run build` (у worktree свой `node_modules`). Браузерные тесты запускать точечно (`-k`, свои файлы). Полный прогон делает интегратор.
 10. После каждого пункта `tasks.md` — обновить `progress.md`, коммит `wip(<этап>): …`, пуш.
+
+## 10. Итог на 2026-11-09
+
+Потоки A, B, C слиты в `claude/reader-integration` (PR #32), этапы 1–6 заархивированы в `openspec/changes/archive/2026-11-09-*`. Снимки состояний чтения S0–S13 и обновлённые эталоны добавлены; раунды тестировщика (браузер, снимки) пройдены, замечания закрыты (диагнозы в архивных `progress.md`). Не сделано: настоящий отбор портретов (`openspec/changes/portrait-sourcing`), проверка в Docker с настоящим DeepSeek, `source-quality-followups`, `pilot-launch`.

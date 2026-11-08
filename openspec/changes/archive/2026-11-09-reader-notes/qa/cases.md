@@ -1,6 +1,6 @@
 # Кейсы: reader-notes
 
-Источник задания: [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 5 (разделы 6.1–6.3). Кейсы T28–T30 — из раздела 14.2 документа.
+Источник задания: [docs/design/features/reader-panels.md](../../../../../docs/design/features/reader-panels.md), этап 5 (разделы 6.1–6.3). Кейсы T28–T30 — из раздела 14.2 документа.
 
 ## Требования
 

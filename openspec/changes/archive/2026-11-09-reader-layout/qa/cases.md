@@ -1,6 +1,6 @@
 # Кейсы: reader-layout
 
-Источник задания: [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md), этап 1 (разделы 2, 8.1, 9.7). Кейсы T1–T5, T31–T33, T37, T45 — из раздела 14.2 документа.
+Источник задания: [docs/design/features/reader-panels.md](../../../../../docs/design/features/reader-panels.md), этап 1 (разделы 2, 8.1, 9.7). Кейсы T1–T5, T31–T33, T37, T45 — из раздела 14.2 документа.
 
 ## Требования
 

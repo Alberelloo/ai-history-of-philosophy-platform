@@ -1,6 +1,6 @@
 # Design
 
-Задание и все величины — в [docs/design/features/reader-panels.md](../../../docs/design/features/reader-panels.md) (этап 1, раздел 16). Здесь — решения по коду, которых нет в документе.
+Задание и все величины — в [docs/design/features/reader-panels.md](../../../../docs/design/features/reader-panels.md) (этап 1, раздел 16). Здесь — решения по коду, которых нет в документе.
 
 ## Контекст
 
