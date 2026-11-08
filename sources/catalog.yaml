@@ -1464,3 +1464,2871 @@ entries:
     at: '2026-11-06'
     note: пробная проверка конвейера; перед запуском пересмотреть
   publish: auto
+- id: aristotel-fizika-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Физика_(Аристотель;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:02:54+00:00'
+    adapter_version: 3
+    metadata:
+      title: Физика
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: Q868
+      language: ru
+      year: 1936
+      translator:
+        name: Владимир Порфирьевич Карпов
+        death_year: 1943
+        wikidata: Q15720298
+      publisher: ru.wikisource.org
+    files:
+    - name: Физика (Аристотель; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 11
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_11
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 12
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_12
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 13
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_13
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 14
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_14
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Комментарии
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B8
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Физика, пер. В. П. Карпова, 1936); Аристотель ум. 322 до н. э.; переводчик
+      Владимир Порфирьевич Карпов ум. 1943 (Wikidata Q15720298), срок 70 лет истёк (2013)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Советский перевод 1936 г.; проверить, что комментарии и предисловие не принадлежат правообладателю
+  publish: auto
+- id: protagor-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:15+00:00'
+    adapter_version: 3
+    metadata:
+      title: Протагор (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Протагор (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%BE%D1%82%D0%B0%D0%B3%D0%BE%D1%80_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Протагор
+      authors: &id001
+      - name: Платон
+        death_year: -348
+        wikidata: null
+      translator: &id002
+        name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: null
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: evtidem-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Эвтидем_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:21+00:00'
+    adapter_version: 3
+    metadata:
+      title: Эвтидем (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Эвтидем (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%B2%D1%82%D0%B8%D0%B4%D0%B5%D0%BC_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Эвтидем
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lakhes-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Лахес_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Лахес (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Лахес (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9B%D0%B0%D1%85%D0%B5%D1%81_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Лахес
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kharmid-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Хармид_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:31+00:00'
+    adapter_version: 3
+    metadata:
+      title: Хармид (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Хармид (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A5%D0%B0%D1%80%D0%BC%D0%B8%D0%B4_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Хармид
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ippias-menshiy-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Иппиас_меньший_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:36+00:00'
+    adapter_version: 3
+    metadata:
+      title: Иппиас меньший (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Иппиас меньший (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%BF%D0%BF%D0%B8%D0%B0%D1%81_%D0%BC%D0%B5%D0%BD%D1%8C%D1%88%D0%B8%D0%B9_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Иппиас меньший
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: evtifron-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Эвтифрон_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:40+00:00'
+    adapter_version: 3
+    metadata:
+      title: Эвтифрон (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Эвтифрон (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%B2%D1%82%D0%B8%D1%84%D1%80%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Эвтифрон
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: apologiya-sokrata-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Апология_Сократа_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:44+00:00'
+    adapter_version: 3
+    metadata:
+      title: Апология Сократа (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Апология Сократа (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BF%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D0%A1%D0%BE%D0%BA%D1%80%D0%B0%D1%82%D0%B0_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Апология Сократа
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kriton-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:48+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критон (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Критон (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Критон
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: fedon-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Федон_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:04:55+00:00'
+    adapter_version: 3
+    metadata:
+      title: Федон (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Федон (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B5%D0%B4%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Федон
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: gorgias-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Горгиас_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:02+00:00'
+    adapter_version: 3
+    metadata:
+      title: Горгиас (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Горгиас (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%80%D0%B3%D0%B8%D0%B0%D1%81_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Горгиас
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: alkiviad-pervyy-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Алкивиад_Первый_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:08+00:00'
+    adapter_version: 3
+    metadata:
+      title: Алкивиад Первый (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Алкивиад Первый (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BB%D0%BA%D0%B8%D0%B2%D0%B8%D0%B0%D0%B4_%D0%9F%D0%B5%D1%80%D0%B2%D1%8B%D0%B9_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Алкивиад Первый
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: alkiviad-vtoroy-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Алкивиад_Второй_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:13+00:00'
+    adapter_version: 3
+    metadata:
+      title: Алкивиад Второй (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Алкивиад Второй (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BB%D0%BA%D0%B8%D0%B2%D0%B8%D0%B0%D0%B4_%D0%92%D1%82%D0%BE%D1%80%D0%BE%D0%B9_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Алкивиад Второй
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: fedr-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Федр_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:19+00:00'
+    adapter_version: 3
+    metadata:
+      title: Федр (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Федр (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B5%D0%B4%D1%80_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Федр
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: pir-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Пир_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:25+00:00'
+    adapter_version: 3
+    metadata:
+      title: Пир (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Пир (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%B8%D1%80_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Пир
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lizis-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Лизис_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:29+00:00'
+    adapter_version: 3
+    metadata:
+      title: Лизис (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Лизис (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9B%D0%B8%D0%B7%D0%B8%D1%81_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Лизис
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ippias-bolshiy-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Иппиас_больший_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:34+00:00'
+    adapter_version: 3
+    metadata:
+      title: Иппиас больший (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Иппиас больший (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%BF%D0%BF%D0%B8%D0%B0%D1%81_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%B8%D0%B9_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Иппиас больший
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: meneksen-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Менексен_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:40+00:00'
+    adapter_version: 3
+    metadata:
+      title: Менексен (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Менексен (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B5%D0%BD%D0%B5%D0%BA%D1%81%D0%B5%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Менексен
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ion-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Ион_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:44+00:00'
+    adapter_version: 3
+    metadata:
+      title: Ион (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Ион (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Ион
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: feag-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Феаг_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:49+00:00'
+    adapter_version: 3
+    metadata:
+      title: Феаг (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Феаг (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B5%D0%B0%D0%B3_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Феаг
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: soperniki-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Соперники_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:53+00:00'
+    adapter_version: 3
+    metadata:
+      title: Соперники (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Соперники (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BE%D0%BF%D0%B5%D1%80%D0%BD%D0%B8%D0%BA%D0%B8_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Соперники
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ipparkh-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Иппарх_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:05:57+00:00'
+    adapter_version: 3
+    metadata:
+      title: Иппарх (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Иппарх (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%BF%D0%BF%D0%B0%D1%80%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Иппарх
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: klitofon-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Клитофон_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:01+00:00'
+    adapter_version: 3
+    metadata:
+      title: Клитофон (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Клитофон (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B8%D1%82%D0%BE%D1%84%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Клитофон
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: fileb-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Филеб_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:09+00:00'
+    adapter_version: 3
+    metadata:
+      title: Филеб (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Филеб (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%B5%D0%B1_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Филеб
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kratil-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Кратил_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:16+00:00'
+    adapter_version: 3
+    metadata:
+      title: Кратил (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Кратил (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B0%D1%82%D0%B8%D0%BB_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Кратил
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: sofist-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Софист_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:23+00:00'
+    adapter_version: 3
+    metadata:
+      title: Софист (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Софист (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BE%D1%84%D0%B8%D1%81%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Софист
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: politik-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Политик_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:29+00:00'
+    adapter_version: 3
+    metadata:
+      title: Политик (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Политик (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Политик
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: parmenid-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Парменид_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:36+00:00'
+    adapter_version: 3
+    metadata:
+      title: Парменид (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Парменид (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%B0%D1%80%D0%BC%D0%B5%D0%BD%D0%B8%D0%B4_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Парменид
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: timey-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Тимей_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:42+00:00'
+    adapter_version: 3
+    metadata:
+      title: Тимей (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Тимей (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B8%D0%BC%D0%B5%D0%B9_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Тимей
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kritias-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Критиас_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:47+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критиас (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Критиас (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%B0%D1%81_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Критиас
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: minos-platon-karpov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Минос_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:52+00:00'
+    adapter_version: 3
+    metadata:
+      title: Минос (Платон; Карпов)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Минос (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D0%BD%D0%BE%D1%81_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Минос
+      authors: *id001
+      translator: *id002
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), издание XIX в.; Платон ум. 348 до н.
+      э.; срок 70 лет истёк у обоих'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: platon-politika-ili-gosudarstvo-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Политика_или_государство_(Платон;_Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:06:58+00:00'
+    adapter_version: 3
+    metadata:
+      title: Политика или государство
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: null
+      translator:
+        name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: Q4215786
+      publisher: ru.wikisource.org
+    files:
+    - name: Политика или государство (Платон; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%B8%D0%BB%D0%B8_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%BE_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    - name: Политика или государство (Платон; Карпов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%B8%D0%BB%D0%B8_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%BE_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Политика или государство, пер. В. Н. Карпова, 1863); Платон ум. 348 до н.
+      э.; В. Н. Карпов ум. 1867; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'Адаптер собрал только оглавление и версию /ДО: книги лежат на отдельных страницах ''Политика
+      или государство. Книга первая (Платон; Карпов)'' и т. д. и не вошли в files; перед одобрением собрать
+      вручную'
+  publish: auto
+- id: platon-apologiya-sokrata-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Апология_Сократа_(Платон;_Соловьёв)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:11:31+00:00'
+    adapter_version: 3
+    metadata:
+      title: Апология Сократа
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1903
+      translator:
+        name: Михаил Сергеевич Соловьёв
+        death_year: 1903
+        wikidata: Q4428070
+      publisher: ru.wikisource.org
+    files:
+    - name: Апология Сократа (Платон; Соловьёв)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BF%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D0%A1%D0%BE%D0%BA%D1%80%D0%B0%D1%82%D0%B0_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Апология Сократа, пер. М. С. Соловьёва, изд. 1903); Платон ум. 348 до н.
+      э.; М. С. Соловьёв ум. 1903; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Страница ссылается на издание 1990 г. (Мысль) как источник набора; проверить, что текст не модернизирован
+      редакторами после 1903 г.
+  publish: auto
+- id: platon-kriton-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Соловьёв)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:11:37+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критон
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1903
+      translator:
+        name: Михаил Сергеевич Соловьёв
+        death_year: 1903
+        wikidata: Q4428070
+      publisher: ru.wikisource.org
+    files:
+    - name: Критон (Платон; Соловьёв)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%BE%D0%BD_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Критон, пер. М. С. Соловьёва, изд. 1903); Платон ум. 348 до н. э.; М. С.
+      Соловьёв ум. 1903; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Страница ссылается на издание 1965 г. как источник набора; проверить, что текст не модернизирован
+      редакторами после 1903 г.
+  publish: auto
+- id: platon-platonovy-razgovory-zakonakh-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Платоновы_разговоры_о_законах_(Платон;_Оболенский)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:11:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Платоновы разговоры о законах
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1827
+      translator:
+        name: Оболенский, Василий Иванович
+        death_year: 1847
+        wikidata: Q15140682
+      publisher: ru.wikisource.org
+    files:
+    - name: Платоновы разговоры о законах (Платон; Оболенский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/1/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F1%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F1
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/2/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F2%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F2
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/3/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F3%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F3
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/4/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F4%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F4
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/5/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F5%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F5
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/6/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F6%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F6
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/7/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F7%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F7
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/8/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F8%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F8
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/9/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F9%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F9
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/10/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F10%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F10
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/11/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F11%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/11
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F11
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/12/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F12%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Платоновы разговоры о законах (Платон; Оболенский)/12
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%8B_%D1%80%D0%B0%D0%B7%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D1%8B_%D0%BE_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0%D1%85_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%9E%D0%B1%D0%BE%D0%BB%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F12
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: Q859
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Платоновы разговоры о законах, пер. В. И. Оболенского, 1827); Платон ум.
+      348 до н. э.; В. И. Оболенский ум. 1847; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: platon-sofist-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Софист_(Платон;_Ананьин)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:11:54+00:00'
+    adapter_version: 3
+    metadata:
+      title: Софист
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1907
+      translator:
+        name: Ананьин, Степан Андреевич
+        death_year: 1942
+        wikidata: Q4064830
+      publisher: ru.wikisource.org
+    files:
+    - name: Софист (Платон; Ананьин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BE%D1%84%D0%B8%D1%81%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%90%D0%BD%D0%B0%D0%BD%D1%8C%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    - name: Софист (Платон; Ананьин)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BE%D1%84%D0%B8%D1%81%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%90%D0%BD%D0%B0%D0%BD%D1%8C%D0%B8%D0%BD%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: Q859
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Софист, пер. С. А. Ананьина, 1907; на странице шаблон PD-old-70); Платон
+      ум. 348 до н. э.; С. А. Ананьин ум. 1942; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: platon-protagor-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Добиаш)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:03+00:00'
+    adapter_version: 3
+    metadata:
+      title: Протагор
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1890
+      translator:
+        name: Антон Вячеславович Добиаш
+        death_year: 1911
+        wikidata: Q56868721
+      publisher: ru.wikisource.org
+    files:
+    - name: Протагор (Платон; Добиаш)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%BE%D1%82%D0%B0%D0%B3%D0%BE%D1%80_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%94%D0%BE%D0%B1%D0%B8%D0%B0%D1%88%29
+      clean: wikisource
+      api: true
+    - name: Протагор (Платон; Добиаш)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%BE%D1%82%D0%B0%D0%B3%D0%BE%D1%80_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%94%D0%BE%D0%B1%D0%B8%D0%B0%D1%88%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: Q859
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Протагор, пер. А. В. Добиаша, 1890); Платон ум. 348 до н. э.; А. В. Добиаш
+      ум. 1911; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: platon-teetet-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Теэтет_(Платон;_Добиаш)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:12:12+00:00'
+    adapter_version: 3
+    metadata:
+      title: Теэтет
+      authors:
+      - name: Платон
+        death_year: -347
+        wikidata: Q859
+      language: ru
+      year: 1891
+      translator:
+        name: Антон Вячеславович Добиаш
+        death_year: 1911
+        wikidata: Q56868721
+      publisher: ru.wikisource.org
+    files:
+    - name: Теэтет (Платон; Добиаш)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B5%D1%8D%D1%82%D0%B5%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%94%D0%BE%D0%B1%D0%B8%D0%B0%D1%88%29
+      clean: wikisource
+      api: true
+    - name: Теэтет (Платон; Добиаш)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B5%D1%8D%D1%82%D0%B5%D1%82_%28%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%3B_%D0%94%D0%BE%D0%B1%D0%B8%D0%B0%D1%88%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      authors:
+      - name: Платон
+        death_year: -348
+        wikidata: Q859
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Теэтет, пер. А. В. Добиаша, 1891); Платон ум. 348 до н. э.; А. В. Добиаш
+      ум. 1911; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shopengauer-mir-kak-volya-predstavlenie-ru
+  landing_url: https://ru.wikisource.org/wiki/Мир_как_воля_и_представление_(Шопенгауэр;_Айхенвальд)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:18+00:00'
+    adapter_version: 3
+    metadata:
+      title: Мир как воля и представление
+      authors:
+      - name: Артур Шопенгауэр
+        death_year: 1860
+        wikidata: Q38193
+      language: ru
+      year: null
+      translator:
+        name: Юлий Исаевич Айхенвальд
+        death_year: 1928
+        wikidata: Q1957978
+      publisher: ru.wikisource.org
+    files:
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Предисловие к первому изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA_%D0%BF%D0%B5%D1%80%D0%B2%D0%BE%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Предисловие ко второму изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA%D0%BE_%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Предисловие к третьему изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA_%D1%82%D1%80%D0%B5%D1%82%D1%8C%D0%B5%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_1
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_2
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_3
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_4
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_5
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_6
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_7
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_8
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_9
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_10
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 11
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_11
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 12
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_12
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 13
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_13
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 14
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_14
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 15
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_15
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 16
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_16
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 17
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_17
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 18
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_18
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 19
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_19
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 20
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_20
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 21
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_21
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 22
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_22
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 23
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_23
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 24
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_24
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 25
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_25
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 26
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_26
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 27
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_27
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 28
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_28
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 29
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_29
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 30
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_30
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 31
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_31
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 32
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_32
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 33
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_33
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 34
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_34
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 35
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_35
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 36
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_36
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 37
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_37
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 38
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_38
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 39
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_39
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 40
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_40
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 41
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_41
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 42
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_42
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 43
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_43
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 44
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_44
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 45
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_45
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 46
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_46
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 47
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_47
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 48
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_48
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 49
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_49
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 50
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_50
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 51
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_51
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 52
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_52
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 53
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_53
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 54
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_54
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 55
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_55
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 56
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_56
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 57
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_57
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 58
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_58
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 59
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_59
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 60
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_60
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 61
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_61
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 62
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_62
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 63
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_63
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 64
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_64
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 65
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_65
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 66
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_66
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 67
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_67
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 68
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_68
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 69
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_69
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 70
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_70
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/§ 71
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%C2%A7_71
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том I/Критика кантовской философии
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_I%2F%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%BA%D0%B0%D0%BD%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава I
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_I
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава II
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_II
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава III
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_III
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава IV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_IV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава V
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_V
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава VI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава VII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава VIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава IX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_IX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава X
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_X
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XIV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XIV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XVI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XVI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XVII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XVII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XVIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XVIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XIX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XIX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXIV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXIV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXVI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXVI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXVII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXVII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXVIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXVIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXIX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXIX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXIV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXIV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXVI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXVI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXVII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXVII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXVIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXVIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XXXIX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XXXIX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XL
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XL
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLIV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLIV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLV
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLVI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLVI
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLVII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLVII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLVIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLVIII
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава XLIX
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_XLIX
+      clean: wikisource
+      api: true
+    - name: Мир как воля и представление (Шопенгауэр; Айхенвальд)/Том II/Глава L
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D0%BB%D1%8F_%D0%B8_%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%A2%D0%BE%D0%BC_II%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_L
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Мир как воля и представление, пер. Ю. И. Айхенвальда, Полн. собр. соч., М.,
+      1910); Шопенгауэр ум. 1860; Ю. И. Айхенвальд ум. 1928; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Страница-оглавление; в files 126 страниц, полноту проверить
+  publish: auto
+- id: shopengauer-chetveroyakom-korne-zakona-dostatochnogo-osnovaniya
+  landing_url: https://ru.wikisource.org/wiki/О_четверояком_корне_закона_достаточного_основания_(Шопенгауэр;_Айхенвальд)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:12:24+00:00'
+    adapter_version: 3
+    metadata:
+      title: О четверояком корне закона достаточного основания
+      authors:
+      - name: Артур Шопенгауэр
+        death_year: 1860
+        wikidata: Q38193
+      language: ru
+      year: null
+      translator:
+        name: Юлий Исаевич Айхенвальд
+        death_year: 1928
+        wikidata: Q1957978
+      publisher: ru.wikisource.org
+    files:
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/От переводчика
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%9E%D1%82_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4%D1%87%D0%B8%D0%BA%D0%B0
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Предисловие автора
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава I
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_I
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава II
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_II
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава III
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_III
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава IV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_IV
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава V
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_V
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава VI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VI
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава VII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VII
+      clean: wikisource
+      api: true
+    - name: О четверояком корне закона достаточного основания (Шопенгауэр; Айхенвальд)/Глава VIII
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D0%BE%D1%8F%D0%BA%D0%BE%D0%BC_%D0%BA%D0%BE%D1%80%D0%BD%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BE%D0%BD%D0%B0_%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%90%D0%B9%D1%85%D0%B5%D0%BD%D0%B2%D0%B0%D0%BB%D1%8C%D0%B4%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VIII
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (О четверояком корне, пер. Ю. И. Айхенвальда, Полн. собр. соч., М., 1910);
+      Шопенгауэр ум. 1860; Ю. И. Айхенвальд ум. 1928; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shopengauer-vvedenie-filosofiyu-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Введение_в_философию_(Шопенгауэр;_Самсонов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:32+00:00'
+    adapter_version: 3
+    metadata:
+      title: Введение в философию
+      authors:
+      - name: Артур Шопенгауэр
+        death_year: 1860
+        wikidata: Q38193
+      language: ru
+      year: null
+      translator:
+        name: Самсонов, Николай Васильевич
+        death_year: 1921
+        wikidata: Q4407047
+      publisher: ru.wikisource.org
+    files:
+    - name: Введение в философию (Шопенгауэр; Самсонов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8E_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Введение в философию, пер. Н. В. Самсонова, Полн. собр. соч., т. IV, М.,
+      1910); Шопенгауэр ум. 1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shopengauer-vole-prirode-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/О_воле_в_природе_(Шопенгауэр;_Самсонов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:38+00:00'
+    adapter_version: 3
+    metadata:
+      title: О воле в природе
+      authors:
+      - name: Артур Шопенгауэр
+        death_year: 1860
+        wikidata: Q38193
+      language: ru
+      year: null
+      translator:
+        name: Самсонов, Николай Васильевич
+        death_year: 1921
+        wikidata: Q4407047
+      publisher: ru.wikisource.org
+    files:
+    - name: О воле в природе (Шопенгауэр; Самсонов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Предисловие ко второму изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA%D0%BE_%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Введение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Физиология и патология
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A4%D0%B8%D0%B7%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D0%B8_%D0%BF%D0%B0%D1%82%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Сравнительная анатомия
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D0%B0%D0%BD%D0%B0%D1%82%D0%BE%D0%BC%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Физиология растений
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A4%D0%B8%D0%B7%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D1%82%D0%B5%D0%BD%D0%B8%D0%B9
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Физическая астрономия
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A4%D0%B8%D0%B7%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%BD%D0%BE%D0%BC%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Языковедение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%AF%D0%B7%D1%8B%D0%BA%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Животный магнетизм и магия
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%96%D0%B8%D0%B2%D0%BE%D1%82%D0%BD%D1%8B%D0%B9_%D0%BC%D0%B0%D0%B3%D0%BD%D0%B5%D1%82%D0%B8%D0%B7%D0%BC_%D0%B8_%D0%BC%D0%B0%D0%B3%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Синология
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A1%D0%B8%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Ссылка на этику
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%A1%D1%81%D1%8B%D0%BB%D0%BA%D0%B0_%D0%BD%D0%B0_%D1%8D%D1%82%D0%B8%D0%BA%D1%83
+      clean: wikisource
+      api: true
+    - name: О воле в природе (Шопенгауэр; Самсонов)/Заключение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%BE%D0%BB%D0%B5_%D0%B2_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D0%B5_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29%2F%D0%97%D0%B0%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (О воле в природе, пер. Н. В. Самсонова, Полн. собр. соч., М., 1910); Шопенгауэр
+      ум. 1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shopengauer-eristicheskaya-dialektika-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Эристическая_диалектика,_или_Искусство_побеждать_в_спорах_(Шопенгауэр;_Самсонов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Эристическая диалектика
+      authors:
+      - name: Артур Шопенгауэр
+        death_year: 1860
+        wikidata: Q38193
+      language: ru
+      year: null
+      translator:
+        name: Самсонов, Николай Васильевич
+        death_year: 1921
+        wikidata: Q4407047
+      publisher: ru.wikisource.org
+    files:
+    - name: Эристическая диалектика, или Искусство побеждать в спорах (Шопенгауэр; Самсонов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D1%80%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%B4%D0%B8%D0%B0%D0%BB%D0%B5%D0%BA%D1%82%D0%B8%D0%BA%D0%B0%2C_%D0%B8%D0%BB%D0%B8_%D0%98%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%BE_%D0%BF%D0%BE%D0%B1%D0%B5%D0%B6%D0%B4%D0%B0%D1%82%D1%8C_%D0%B2_%D1%81%D0%BF%D0%BE%D1%80%D0%B0%D1%85_%28%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80%3B_%D0%A1%D0%B0%D0%BC%D1%81%D0%BE%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Эристическая диалектика, пер. Н. В. Самсонова, М., 1910); Шопенгауэр ум.
+      1860; Н. В. Самсонов ум. 1921; срок 70 лет истёк у обоих (по Wikidata)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: karpov-vvedenie-filosofiyu-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Введение_в_философию_(Карпов)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:12:52+00:00'
+    adapter_version: 3
+    metadata:
+      title: Введение в философию
+      authors:
+      - name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: Q4215786
+      language: ru
+      year: 1840
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Введение в философию (Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8E_%28%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Введение в философию, В. Н. Карпов, 1840); оригинальное русское сочинение,
+      автор ум. 1867, срок 70 лет истёк (Wikidata Q4215786)
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: karinskiy-klassifikatsiya-vyvodov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Классификация_выводов_(Каринский)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:12:58+00:00'
+    adapter_version: 3
+    metadata:
+      title: Классификация выводов
+      authors:
+      - name: Михаил Иванович Каринский
+        death_year: 1917
+        wikidata: Q1483866
+      language: ru
+      year: 1880
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Классификация выводов (Каринский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Введение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Классификация выводов
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Классификация выводов/Понятие о выводе и общее разделение
+        выводов
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%2F%D0%9F%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D0%B5_%D0%BE_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B5_%D0%B8_%D0%BE%D0%B1%D1%89%D0%B5%D0%B5_%D1%80%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Классификация выводов/A
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%2FA
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Классификация выводов/B
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%2FB
+      clean: wikisource
+      api: true
+    - name: Классификация выводов (Каринский)/Классификация выводов/Общее заключение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2_%28%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9A%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2%2F%D0%9E%D0%B1%D1%89%D0%B5%D0%B5_%D0%B7%D0%B0%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Классификация выводов, СПб., 1880; на странице шаблон PD-Russia-expired);
+      М. И. Каринский ум. 1917 (Wikidata Q1483866), срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lenin-materializm-empiriokrititsizm-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Материализм_и_эмпириокритицизм_(Ленин)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:13:04+00:00'
+    adapter_version: 3
+    metadata:
+      title: Материализм и эмпириокритицизм
+      authors:
+      - name: Владимир Ильич Ленин
+        death_year: 1924
+        wikidata: Q1394
+      language: ru
+      year: 1909
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Материализм и эмпириокритицизм (Ленин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Предисловие к первому изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA_%D0%BF%D0%B5%D1%80%D0%B2%D0%BE%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Предисловие ко второму изданию
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%BA%D0%BE_%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D0%BC%D1%83_%D0%B8%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8E
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Вместо введения
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%92%D0%BC%D0%B5%D1%81%D1%82%D0%BE_%D0%B2%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава I
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_I
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава II
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_II
+      clean: wikisource
+      api: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава III
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_III
+      clean: wikisource
+      api: true
+      missing: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава IV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_IV
+      clean: wikisource
+      api: true
+      missing: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава V
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_V
+      clean: wikisource
+      api: true
+      missing: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Глава VI
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_VI
+      clean: wikisource
+      api: true
+      missing: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Заключение
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%97%D0%B0%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+      missing: true
+    - name: Материализм и эмпириокритицизм (Ленин)/Добавление к § 1-му главы IV
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D0%BE%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%29%2F%D0%94%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BA_%C2%A7_1-%D0%BC%D1%83_%D0%B3%D0%BB%D0%B0%D0%B2%D1%8B_IV
+      clean: wikisource
+      api: true
+      missing: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Материализм и эмпириокритицизм, 1909; набор по ПСС 1967, т. 18); В. И. Ленин
+      ум. 1924, срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Текст Ленина свободен; в ПСС 1967 есть редакционные примечания советских издателей, их права
+      не проверялись
+  publish: auto
