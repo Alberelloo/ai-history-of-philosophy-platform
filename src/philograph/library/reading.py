@@ -45,6 +45,14 @@ class NotVisible(Exception):
     """Источник не опубликован или не виден читателю."""
 
 
+class ChapterNotFound(KeyError):
+    """Такой главы или раздела нет в опубликованной версии; ``first`` — первая глава."""
+
+    def __init__(self, chapter_id: str, first: str | None) -> None:
+        super().__init__(chapter_id)
+        self.first = first
+
+
 def _norm(text: str) -> str:
     return " ".join(normalize_word(w) for w in words(text))
 
@@ -218,9 +226,16 @@ class Reading:
         _, doc = self._document(source_id, reader)
         chapters = self.chapters(doc)
         index = next((i for i, c in enumerate(chapters) if c.id == chapter_id), None)
+        anchor = None
         if index is None:
-            raise KeyError(chapter_id)
+            # Раздел внутри главы: отдаём его главу и место, куда прокрутить.
+            owner = self.chapter_of(doc, chapter_id)
+            if owner is None:
+                raise ChapterNotFound(chapter_id, chapters[0].id if chapters else None)
+            index = next(i for i, c in enumerate(chapters) if c.id == owner)
+            anchor = chapter_id
         chapter = chapters[index]
+        chapter_id = chapter.id
         blocks: list[dict[str, Any]] = []
         footnotes: dict[str, dict[str, Any]] = {}
 
@@ -275,6 +290,7 @@ class Reading:
             "previous": chapters[index - 1].id if index > 0 else None,
             "next": chapters[index + 1].id if index + 1 < len(chapters) else None,
             "first": chapters[0].id,
+            "anchor": anchor,
         }
 
     def chapter_of(self, doc: Document, section_id: str) -> str | None:

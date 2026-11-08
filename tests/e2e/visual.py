@@ -29,6 +29,8 @@ MAX_DIFF_RATIO = 0.005
 CHANNEL_TOLERANCE = 40
 
 WIDTHS = (1024, 1280, 1600, 1920)
+# Ширины проверки боковой панели: свёрнутая и закреплённая не закрывают текст главы.
+SIDEBAR_WIDTHS = (1024, 1280, 1440, 1920)
 
 
 # --- подготовка страницы -------------------------------------------------------------
@@ -36,7 +38,10 @@ WIDTHS = (1024, 1280, 1600, 1920)
 
 def settle(page) -> None:
     """Ждёт шрифтов и конца перестроек: снимок и измерения стабильны."""
-    page.mouse.move(0, 0)  # наведение после клика меняло бы вид кнопок
+    # Наведение после клика меняло бы вид кнопок; угол — справа внизу: слева боковая панель,
+    # и указатель над ней раскрыл бы её.
+    size = page.viewport_size or {"width": 1280, "height": 800}
+    page.mouse.move(size["width"] - 1, size["height"] - 1)
     page.wait_for_load_state("networkidle")
     page.evaluate("document.fonts.ready.then(() => true)")
     page.evaluate(
@@ -169,6 +174,54 @@ def assert_separated(page, selector: str, min_gap: float = 4.0) -> None:
         assert left_b - right_a >= min_gap, f"слиплись: {name_a!r} и {name_b!r} ({rects})"
 
 
+def assert_stacked(page, selector: str, min_gap: float = 0.0) -> None:
+    """Видимые элементы в колонке идут друг под другом и не перекрываются по высоте."""
+    rects = page.evaluate(
+        """s => [...document.querySelectorAll(s)].filter(e => e.getClientRects().length)
+            .map(e => { const r = e.getBoundingClientRect();
+                        return [e.textContent.trim().slice(0, 30), r.top, r.bottom]; })
+            .sort((a, b) => a[1] - b[1])""",
+        selector,
+    )
+    assert len(rects) >= 2, rects
+    for (name_a, _, bottom_a), (name_b, top_b, _) in itertools.pairwise(rects):
+        assert top_b - bottom_a >= min_gap - 0.5, f"наложились: {name_a!r} и {name_b!r} ({rects})"
+
+
+# --- боковая панель -------------------------------------------------------------------
+
+
+def sidebar_state(page) -> str:
+    return page.locator(".sidebar").get_attribute("data-state")
+
+
+def sidebar_width(page) -> float:
+    return page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
+
+
+def expand_sidebar(page) -> None:
+    """Раскрывает боковую панель наведением и ждёт конца анимации ширины."""
+    page.locator(".sidebar__brand").hover()
+    page.wait_for_function(
+        "() => { const s = document.querySelector('.sidebar');"
+        " return s.dataset.state !== 'collapsed'"
+        " && Math.abs(s.getBoundingClientRect().width"
+        " - parseFloat(getComputedStyle(document.documentElement).getPropertyValue("
+        "s.dataset.state === 'pinned' ? '--sidebar-pinned' : '--sidebar-open'))) < 1; }"
+    )
+
+
+def collapse_sidebar(page) -> None:
+    """Указатель уходит с панели: она сворачивается (если не закреплена)."""
+    size = page.viewport_size or {"width": 1280, "height": 800}
+    page.mouse.move(size["width"] - 5, size["height"] - 5)
+    page.wait_for_function(
+        "() => { const s = document.querySelector('.sidebar');"
+        " return s.dataset.state !== 'expanded' && (s.dataset.state === 'pinned'"
+        " || s.getBoundingClientRect().width <= 57); }"
+    )
+
+
 def assert_fills_width(page, selector: str) -> None:
     """Первый ряд сетки доходит до её правого края: справа нет пустой дорожки."""
     edges = page.evaluate(
@@ -184,17 +237,21 @@ def assert_fills_width(page, selector: str) -> None:
 
 
 def clipped_text(page) -> list[str]:
-    """Видимые элементы, у которых текст не помещается и обрезан (overflow hidden/clip)."""
+    """Видимые элементы, у которых текст не помещается и обрезан: по ширине (overflow
+    hidden/clip, многоточие) или по высоте (overflow-y hidden/clip, ограничение строк)."""
     return page.evaluate(
         """() => [...document.querySelectorAll('body *')].filter(el => {
             if (!el.getClientRects().length || el.closest('svg')) return false;
             const st = getComputedStyle(el);
             if (st.visibility === 'hidden') return false;
-            const clips = ['hidden', 'clip'].includes(st.overflowX)
+            const clipsX = ['hidden', 'clip'].includes(st.overflowX)
                 || st.textOverflow === 'ellipsis';
-            if (!clips) return false;
+            const clamp = st.webkitLineClamp && st.webkitLineClamp !== 'none';
+            const clipsY = ['hidden', 'clip'].includes(st.overflowY) || clamp;
+            if (!clipsX && !clipsY) return false;
             const hasText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
-            return hasText && el.scrollWidth > el.clientWidth + 1;
+            return hasText && ((clipsX && el.scrollWidth > el.clientWidth + 1)
+                || (clipsY && el.scrollHeight > el.clientHeight + 1));
         }).map(el => el.className + ': ' + el.textContent.trim().slice(0, 60))"""
     )
 

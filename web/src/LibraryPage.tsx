@@ -3,24 +3,10 @@ import { api, SourceList } from "./api";
 import { navigate } from "./App";
 import { pick, useT } from "./i18n";
 import { storage } from "./storage";
-import { rememberTitles } from "./TopBar";
-import { Icon } from "./ui";
+import { rememberSources } from "./sources";
+import { FilterMenu, Icon } from "./ui";
 
 const KINDS = ["textbook", "primary", "reference"];
-
-function toggle(list: string[], value: string): string[] {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-}
-
-// Фильтр-метка: настоящий флажок внутри подписи, оформленный по токенам.
-function Filter({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
-  return (
-    <label className="filter">
-      <input className="filter__input" type="checkbox" checked={checked} onChange={onChange} />
-      {label}
-    </label>
-  );
-}
 
 export function LibraryPage() {
   const t = useT();
@@ -38,7 +24,7 @@ export function LibraryPage() {
     let cancelled = false;
     api.sources({ kinds, languages, query }).then((result) => {
       if (cancelled) return;
-      rememberTitles(result.sources);
+      rememberSources(result.sources);
       setData(result);
       setAllLanguages(result.languages);
     });
@@ -85,34 +71,28 @@ export function LibraryPage() {
             />
           </div>
         </div>
-        <fieldset className="filters__group">
-          <legend>{t.library.kind}</legend>
-          {KINDS.map((value) => (
-            <Filter
-              key={value}
-              label={pick(t.library.kinds, value) ?? value}
-              checked={kinds.includes(value)}
-              onChange={() => setKinds(toggle(kinds, value))}
-            />
-          ))}
-        </fieldset>
-        <fieldset className="filters__group">
-          <legend>{t.library.language}</legend>
-          {allLanguages.map((value) => (
-            <Filter
-              key={value}
-              label={languageName(value)}
-              checked={languages.includes(value)}
-              onChange={() => setLanguages(toggle(languages, value))}
-            />
-          ))}
-        </fieldset>
-        {filtered && (
-          <button className="pg-btn pg-btn--ghost pg-btn--sm" onClick={reset}>
-            <Icon name="close" small />
-            {t.library.reset}
-          </button>
-        )}
+        <FilterMenu
+          label={t.library.kind}
+          items={KINDS.map((value) => ({ value, label: pick(t.library.kinds, value) ?? value }))}
+          selected={kinds}
+          onChange={setKinds}
+        />
+        <FilterMenu
+          label={t.library.language}
+          items={allLanguages.map((value) => ({ value, label: languageName(value) }))}
+          selected={languages}
+          onChange={setLanguages}
+        />
+        {/* Сброс всегда на своём месте: строка не прыгает, когда фильтры выбирают и снимают.
+            Неактивна через aria-disabled: после нажатия фокус остаётся на кнопке. */}
+        <button
+          className="pg-btn pg-btn--ghost pg-btn--sm filters__reset"
+          onClick={() => filtered && reset()}
+          aria-disabled={!filtered || undefined}
+        >
+          <Icon name="close" small />
+          {t.library.reset}
+        </button>
       </section>
 
       {data && data.sources.length === 0 && (

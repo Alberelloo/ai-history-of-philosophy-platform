@@ -223,3 +223,44 @@ def test_traceability_check_detects_missing_test(tmp_path, monkeypatch, capsys):
     assert tr.main() == 1
     output = capsys.readouterr().out
     assert "Забытое" in output and "1 из 2" in output
+
+
+@req("service-runtime", "Прослеживаемость требований тестами")
+def test_traceability_follows_renamed_and_removed(tmp_path, monkeypatch, capsys):
+    """Переименованное или удалённое изменением требование больше не ждёт теста."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import check_traceability as tr
+
+    main = tmp_path / "openspec" / "specs" / "demo" / "spec.md"
+    main.parent.mkdir(parents=True)
+    main.write_text(
+        "### Requirement: Старое имя\n\n### Requirement: Лишнее\n\n### Requirement: Прочее\n",
+        encoding="utf-8",
+    )
+    change = tmp_path / "openspec" / "changes" / "c1" / "specs" / "demo" / "spec.md"
+    change.parent.mkdir(parents=True)
+    change.write_text(
+        "## RENAMED Requirements\n\n- FROM: `### Requirement: Старое имя`\n"
+        "- TO: `### Requirement: Новое имя`\n\n"
+        "## MODIFIED Requirements\n\n### Requirement: Новое имя\n\n"
+        "## REMOVED Requirements\n\n### Requirement: Лишнее\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "openspec" / "traceability.yaml").write_text("enforce: [demo]\n", encoding="utf-8")
+    (tmp_path / "tests").mkdir()
+    test = tmp_path / "tests" / "test_demo.py"
+    test.write_text(
+        'import pytest\n\n@pytest.mark.req("demo", "Новое имя")\n'
+        '@pytest.mark.req("demo", "Прочее")\ndef test_x():\n    pass\n',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(tr, "ROOT", tmp_path)
+    assert set(tr.spec_requirements("demo")) == {"Новое имя", "Прочее"}
+    assert tr.main() == 0
+    assert "2 из 2" in capsys.readouterr().out
+    # маркер на прежнее имя — ошибка
+    test.write_text(
+        test.read_text(encoding="utf-8").replace("Прочее", "Старое имя"), encoding="utf-8"
+    )
+    assert tr.main() == 1
+    assert "несуществующее требование «Старое имя»" in capsys.readouterr().out

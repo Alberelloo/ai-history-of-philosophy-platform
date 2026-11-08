@@ -75,6 +75,10 @@ def _shape(text: str) -> str:
     return re.sub(r"\d+", "#", text.strip().lower())
 
 
+# Строки-заглушки извлечения: то, что не передано текстом, и почему.
+PLACEHOLDERS = ("blank_page", "missing")
+
+
 def strip_furniture(raw: RawDocument, settings: ParseSettings) -> None:
     """Убирает колонтитулы и номера страниц; номера запоминает как номера страниц."""
     patterns = [re.compile(p) for p in settings.header_patterns]
@@ -95,6 +99,9 @@ def strip_furniture(raw: RawDocument, settings: ParseSettings) -> None:
     for page in raw.pages:
         kept: list[RawLine] = []
         for position, line in enumerate(page.lines):
+            if line.kind in PLACEHOLDERS:
+                kept.append(line)  # заглушка не колонтитул, даже если таких страниц много
+                continue
             text = line.text.strip()
             edge = position < 2 or position >= len(page.lines) - 2
             if any(p.search(text) for p in patterns):
@@ -318,6 +325,15 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 drafts.append(current)
                 current = None
                 # Отметка начала страницы достанется первому блоку после заголовка.
+                continue
+            if line.kind in PLACEHOLDERS:
+                detail = (
+                    f"страница {label or pos + 1}: текст не распознан"
+                    if line.kind == "blank_page"
+                    else "глава не оцифрована на сайте"
+                )
+                drafts.append(_Draft("unrendered", "", [], [], page_pos=pos, detail=detail))
+                current = None
                 continue
             if line.kind in ("figure", "table") and not (line.kind == "table" and line.text):
                 what = "иллюстрация" if line.kind == "figure" else "таблица"

@@ -1,0 +1,128 @@
+{
+ "N1-kind": {
+  "Выбрать все": {
+   "focus_after_click": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm",
+    "text": "Выбрать все",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "select_all_aria_disabled": "true",
+   "clear_all_aria_disabled": null,
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "menu_open_after_esc": false,
+   "focus_after_esc": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--secondary pg-filter__button",
+    "text": "Вид· 3",
+    "disabled": false,
+    "ariaDisabled": null
+   }
+  },
+  "Снять все": {
+   "focus_after_click": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm",
+    "text": "Снять все",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "select_all_aria_disabled": null,
+   "clear_all_aria_disabled": "true",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "menu_open_after_esc": false,
+   "focus_after_esc": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--secondary pg-filter__button",
+    "text": "Вид· 0",
+    "disabled": false,
+    "ariaDisabled": null
+   }
+  }
+ },
+ "N1-lang": {
+  "Выбрать все": {
+   "focus_after_click": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm",
+    "text": "Выбрать все",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "select_all_aria_disabled": "true",
+   "clear_all_aria_disabled": null,
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "menu_open_after_esc": false,
+   "focus_after_esc": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--secondary pg-filter__button",
+    "text": "Язык· 2",
+    "disabled": false,
+    "ariaDisabled": null
+   }
+  },
+  "Снять все": {
+   "focus_after_click": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm",
+    "text": "Снять все",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "select_all_aria_disabled": null,
+   "clear_all_aria_disabled": "true",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "menu_open_after_esc": false,
+   "focus_after_esc": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--secondary pg-filter__button",
+    "text": "Язык· 0",
+    "disabled": false,
+    "ariaDisabled": null
+   }
+  }
+ },
+ "reset": {
+  "before": {
+   "enabled": true,
+   "aria_disabled": null
+  },
+  "after": {
+   "focus": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm filters__reset",
+    "text": "Сбросить поиск и фильтры",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "search": "",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "url": "http://127.0.0.1:8099/",
+   "reset_aria_disabled": "true",
+   "enter_when_empty_focus": {
+    "tag": "BUTTON",
+    "cls": "pg-btn pg-btn--ghost pg-btn--sm filters__reset",
+    "text": "Сбросить поиск и фильтры",
+    "disabled": false,
+    "ariaDisabled": "true"
+   },
+   "url_after_enter": "http://127.0.0.1:8099/"
+  }
+ }
+}

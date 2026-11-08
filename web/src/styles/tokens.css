@@ -172,7 +172,9 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
-  --topbar: 56px;
+  --sidebar: 56px;
+  --sidebar-open: 260px;
+  --sidebar-pinned: 280px;
   --rail: 56px;
   --toc: 272px;
   --measure: 68ch;
@@ -186,12 +188,13 @@
   --bp-wide: 1600px;
   --dur-quick: 120ms;
   --dur-base: 180ms;
+  --dur-sidebar: 160ms;
   --dur-slow: 240ms;
   --dur-flash: 2400ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-standard: cubic-bezier(0.3, 0, 0, 1);
-  --z-topbar: 20;
+  --z-sidebar: 20;
   --z-panel: 30;
   --z-popover: 40;
   --z-tooltip: 60;

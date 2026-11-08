@@ -1,0 +1,161 @@
+{
+ "D1": {
+  "all": [
+   "Empiricism: a demonstration reader",
+   "Теория познания: демонстрационный учебник"
+  ],
+  "kind_select_all": {
+   "count_badge": "· 3",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "kind_clear_all": {
+   "count_badge": "",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "kind_textbook_primary": {
+   "count_badge": "· 2",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "kind_textbook_only": {
+   "count_badge": "· 1",
+   "sources": [
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "lang_select_all": {
+   "count_badge": "· 2",
+   "sources": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "lang_en_only": {
+   "count_badge": "· 1",
+   "sources": [
+    "Empiricism: a demonstration reader"
+   ]
+  },
+  "lang_ru_and_en": {
+   "count_badge": "· 1",
+   "sources": [
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "kind_textbook_and_lang_ru": {
+   "sources": [
+    "Теория познания: демонстрационный учебник"
+   ]
+  },
+  "kind_textbook_and_lang_en": {
+   "sources": [],
+   "empty_text": "Библиотека\n\nУчебники, первоисточники и справочные издания. Выберите источник, чтобы читать его главы.\n\nПерейти к чтению\nВид\n· 1\nЯзык\n· 1\nСбросить поиск и фильтр"
+  }
+ },
+ "D2": {
+  "light-1024": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(72, 80, 93)",
+   "currentBg": "rgb(219, 231, 249)",
+   "state": "expanded",
+   "overflowX": 0,
+   "author_contrast": 6.51
+  },
+  "dark-1024": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(191, 190, 181)",
+   "currentBg": "rgb(37, 48, 69)",
+   "state": "expanded",
+   "overflowX": 0,
+   "author_contrast": 7.09
+  },
+  "light-1440": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(72, 80, 93)",
+   "currentBg": "rgb(219, 231, 249)",
+   "state": "pinned",
+   "overflowX": 0,
+   "author_contrast": 6.51
+  },
+  "dark-1440": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(191, 190, 181)",
+   "currentBg": "rgb(37, 48, 69)",
+   "state": "pinned",
+   "overflowX": 0,
+   "author_contrast": 7.09
+  },
+  "light-1920": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(72, 80, 93)",
+   "currentBg": "rgb(219, 231, 249)",
+   "state": "pinned",
+   "overflowX": 0,
+   "author_contrast": 6.51
+  },
+  "dark-1920": {
+   "text": "Теория познания: демонстрационный учебник",
+   "lineH": 18,
+   "clientH": 54,
+   "scrollH": 54,
+   "rectH": 54,
+   "clipped": false,
+   "ellipsis": "clip",
+   "clamp": "none",
+   "author": "Проект PhiloGraph",
+   "authorColor": "rgb(191, 190, 181)",
+   "currentBg": "rgb(37, 48, 69)",
+   "state": "pinned",
+   "overflowX": 0,
+   "author_contrast": 7.09
+  }
+ }
+}
