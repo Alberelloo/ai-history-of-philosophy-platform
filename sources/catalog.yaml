@@ -4332,3 +4332,1995 @@ entries:
     note: Текст Ленина свободен; в ПСС 1967 есть редакционные примечания советских издателей, их права
       не проверялись
   publish: auto
+- id: nitsshe-tak-govoril-zaratustra-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Так_говорил_Заратустра_(Ницше;_Антоновский)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:17:09+00:00'
+    adapter_version: 3
+    metadata:
+      title: Так говорил Заратустра
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: 1913
+      translator:
+        name: Юлий Михайлович Антоновский
+        death_year: 1913
+        wikidata: Q4067522
+      publisher: ru.wikisource.org
+    files:
+    - name: Так говорил Заратустра (Ницше; Антоновский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/От переводчика
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%9E%D1%82_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4%D1%87%D0%B8%D0%BA%D0%B0
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/Часть первая/Предисловие Заратустры
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D0%BF%D0%B5%D1%80%D0%B2%D0%B0%D1%8F%2F%D0%9F%D1%80%D0%B5%D0%B4%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B5_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D1%8B
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/Часть первая/Речи Заратустры
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D0%BF%D0%B5%D1%80%D0%B2%D0%B0%D1%8F%2F%D0%A0%D0%B5%D1%87%D0%B8_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D1%8B
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/Часть вторая
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D0%B2%D1%82%D0%BE%D1%80%D0%B0%D1%8F
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/Часть третья
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D1%82%D1%80%D0%B5%D1%82%D1%8C%D1%8F
+      clean: wikisource
+      api: true
+    - name: Так говорил Заратустра (Ницше; Антоновский)/Часть четвертая, и последняя
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B0%D0%BA_%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D0%BB_%D0%97%D0%B0%D1%80%D0%B0%D1%82%D1%83%D1%81%D1%82%D1%80%D0%B0_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%90%D0%BD%D1%82%D0%BE%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29%2F%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D1%87%D0%B5%D1%82%D0%B2%D0%B5%D1%80%D1%82%D0%B0%D1%8F%2C_%D0%B8_%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
+      ум. 1900; Юлий Михайлович Антоновский ум. 1913; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: aristotel-politika-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Политика_(Аристотель)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:17:16+00:00'
+    adapter_version: 3
+    metadata:
+      title: Политика
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: Q868
+      language: ru
+      year: null
+      translator:
+        name: Сергей Александрович Жебелёв
+        death_year: 1941
+        wikidata: Q7274018
+      publisher: ru.wikisource.org
+    files:
+    - name: Политика (Аристотель)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/О том, что такое государство
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%9E_%D1%82%D0%BE%D0%BC%2C_%D1%87%D1%82%D0%BE_%D1%82%D0%B0%D0%BA%D0%BE%D0%B5_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%BE
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/О домохозяйстве и рабстве
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%9E_%D0%B4%D0%BE%D0%BC%D0%BE%D1%85%D0%BE%D0%B7%D1%8F%D0%B9%D1%81%D1%82%D0%B2%D0%B5_%D0%B8_%D1%80%D0%B0%D0%B1%D1%81%D1%82%D0%B2%D0%B5
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Об искусстве наживать состояние
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%9E%D0%B1_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B5_%D0%BD%D0%B0%D0%B6%D0%B8%D0%B2%D0%B0%D1%82%D1%8C_%D1%81%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B5
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Разбор политических проектов Платона
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%A0%D0%B0%D0%B7%D0%B1%D0%BE%D1%80_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%BE%D0%B2_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Разбор проектов Фалея и Гипподама
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%A0%D0%B0%D0%B7%D0%B1%D0%BE%D1%80_%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%BE%D0%B2_%D0%A4%D0%B0%D0%BB%D0%B5%D1%8F_%D0%B8_%D0%93%D0%B8%D0%BF%D0%BF%D0%BE%D0%B4%D0%B0%D0%BC%D0%B0
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Разбор государственного устройства лакедемонян
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%A0%D0%B0%D0%B7%D0%B1%D0%BE%D1%80_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0_%D0%BB%D0%B0%D0%BA%D0%B5%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%8F%D0%BD
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Разбор государственного устройства критян и карфагенян
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%A0%D0%B0%D0%B7%D0%B1%D0%BE%D1%80_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0_%D0%BA%D1%80%D0%B8%D1%82%D1%8F%D0%BD_%D0%B8_%D0%BA%D0%B0%D1%80%D1%84%D0%B0%D0%B3%D0%B5%D0%BD%D1%8F%D0%BD
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Г
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%D0%93
+      clean: wikisource
+      api: true
+    - name: Политика (Аристотель)/Δ
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%29%2F%CE%94
+      clean: wikisource
+      api: true
+    license_hint: PD-simple-translate
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: PD-simple-translate; Аристотель ум. -322; Сергей Александрович Жебелёв ум. 1941;
+      годы смерти по Wikidata, срок 70 лет истёк у всех'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: radlov-ocherk-istorii-russkoy-filosofii-ru
+  landing_url: https://ru.wikisource.org/wiki/Очерк_истории_русской_философии_(Радлов)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:17:23+00:00'
+    adapter_version: 3
+    metadata:
+      title: Очерк истории русской философии
+      authors:
+      - name: Эрнест Леопольдович Радлов
+        death_year: 1928
+        wikidata: Q4387760
+      language: ru
+      year: 1912
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Очерк истории русской философии (Радлов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%87%D0%B5%D1%80%D0%BA_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A0%D0%B0%D0%B4%D0%BB%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Эрнест Леопольдович
+      Радлов ум. 1928; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nitsshe-rozhdenie-tragedii-ili-ellinstvo-pessimizm
+  landing_url: https://ru.wikisource.org/wiki/Рождение_трагедии,_или_Эллинство_и_пессимизм_(Ницше;_Рачинский)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:22:49+00:00'
+    adapter_version: 3
+    metadata:
+      title: Рождение трагедии, или Эллинство и пессимизм
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: 1912
+      translator:
+        name: Григорий Алексеевич Рачинский
+        death_year: 1939
+        wikidata: Q21857173
+      publisher: ru.wikisource.org
+    files:
+    - name: Рождение трагедии, или Эллинство и пессимизм (Ницше; Рачинский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D1%80%D0%B0%D0%B3%D0%B5%D0%B4%D0%B8%D0%B8%2C_%D0%B8%D0%BB%D0%B8_%D0%AD%D0%BB%D0%BB%D0%B8%D0%BD%D1%81%D1%82%D0%B2%D0%BE_%D0%B8_%D0%BF%D0%B5%D1%81%D1%81%D0%B8%D0%BC%D0%B8%D0%B7%D0%BC_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%3B_%D0%A0%D0%B0%D1%87%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
+      ум. 1900; Григорий Алексеевич Рачинский ум. 1939; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nitsshe-ecce-homo-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Ecce_Homo_(Ницше)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:22:56+00:00'
+    adapter_version: 3
+    metadata:
+      title: Ecce Homo
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: 1911
+      translator:
+        name: Юлий Михайлович Антоновский
+        death_year: 1913
+        wikidata: Q4067522
+      publisher: ru.wikisource.org
+    files:
+    - name: Ecce Homo (Ницше)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/Ecce_Homo_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
+      ум. 1900; Юлий Михайлович Антоновский ум. 1913; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nitsshe-shopengauer-kak-vospitatel-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Шопенгауэр_как_воспитатель_(Ницше)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:03+00:00'
+    adapter_version: 3
+    metadata:
+      title: Шопенгауэр как воспитатель
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: null
+      translator:
+        name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      publisher: ru.wikisource.org
+    files:
+    - name: Шопенгауэр как воспитатель (Ницше)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A8%D0%BE%D0%BF%D0%B5%D0%BD%D0%B3%D0%B0%D1%83%D1%8D%D1%80_%D0%BA%D0%B0%D0%BA_%D0%B2%D0%BE%D1%81%D0%BF%D0%B8%D1%82%D0%B0%D1%82%D0%B5%D0%BB%D1%8C_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
+      ум. 1900; Франк, Семён Людвигович ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nitsshe-polze-vrede-istorii-dlya-zhizni
+  landing_url: https://ru.wikisource.org/wiki/О_пользе_и_вреде_истории_для_жизни_(Ницше)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:10+00:00'
+    adapter_version: 3
+    metadata:
+      title: О пользе и вреде истории для жизни
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: null
+      translator:
+        name: Берман, Яков Александрович
+        death_year: 1934
+        wikidata: Q28358861
+      publisher: ru.wikisource.org
+    files:
+    - name: О пользе и вреде истории для жизни (Ницше)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%B5_%D0%B8_%D0%B2%D1%80%D0%B5%D0%B4%D0%B5_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_%D0%B4%D0%BB%D1%8F_%D0%B6%D0%B8%D0%B7%D0%BD%D0%B8_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Фридрих Ницше
+      ум. 1900; Берман, Яков Александрович ум. 1934; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: bulgakov-filosofiya-khozyaystva-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Философия_хозяйства_(Булгаков)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:20+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия хозяйства
+      authors:
+      - name: Сергей Николаевич Булгаков
+        death_year: 1944
+        wikidata: Q332535
+      language: ru
+      year: 1912
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия хозяйства (Булгаков)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D1%85%D0%BE%D0%B7%D1%8F%D0%B9%D1%81%D1%82%D0%B2%D0%B0_%28%D0%91%D1%83%D0%BB%D0%B3%D0%B0%D0%BA%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Сергей Николаевич
+      Булгаков ум. 1944; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: bulgakov-osnovnye-problemy-teorii-progressa-ru
+  landing_url: https://ru.wikisource.org/wiki/Основные_проблемы_теории_прогресса_(Булгаков)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Основные проблемы теории прогресса
+      authors:
+      - name: Сергей Николаевич Булгаков
+        death_year: 1944
+        wikidata: Q332535
+      language: ru
+      year: 1902
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Основные проблемы теории прогресса (Булгаков)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5_%D0%BF%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B5%D1%81%D1%81%D0%B0_%28%D0%91%D1%83%D0%BB%D0%B3%D0%B0%D0%BA%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Сергей Николаевич
+      Булгаков ум. 1944; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: uspenskiy-tertium-organum-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Tertium_Organum
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: Tertium Organum
+      authors:
+      - name: Пётр Демьянович Успенский
+        death_year: 1947
+        wikidata: Q434266
+      language: ru
+      year: 1911
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Tertium Organum
+      url: https://ru.wikisource.org/api/rest_v1/page/html/Tertium_Organum
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Демьянович
+      Успенский ум. 1947; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-mir-kak-tseloe-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Мир_как_целое_(Страхов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:44+00:00'
+    adapter_version: 3
+    metadata:
+      title: Мир как целое
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1872
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Мир как целое (Страхов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80_%D0%BA%D0%B0%D0%BA_%D1%86%D0%B5%D0%BB%D0%BE%D0%B5_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Николаевич
+      Страхов ум. 1896; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: gertsen-pisma-ob-izuchenii-prirody-ru
+  landing_url: https://ru.wikisource.org/wiki/Письма_об_изучении_природы_(Герцен)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:51+00:00'
+    adapter_version: 3
+    metadata:
+      title: Письма об изучении природы
+      authors:
+      - name: Александр Иванович Герцен
+        death_year: 1870
+        wikidata: Q201221
+      language: ru
+      year: 1846
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Письма об изучении природы (Герцен)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE%D0%B1_%D0%B8%D0%B7%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B8_%D0%BF%D1%80%D0%B8%D1%80%D0%BE%D0%B4%D1%8B_%28%D0%93%D0%B5%D1%80%D1%86%D0%B5%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Александр Иванович
+      Герцен ум. 1870; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chaadaev-filosoficheskie-pisma-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Философические_письма_(Чаадаев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:23:58+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философические письма
+      authors:
+      - name: Пётр Яковлевич Чаадаев
+        death_year: 1856
+        wikidata: Q471220
+      language: ru
+      year: 1836
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философические письма (Чаадаев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BF%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%28%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Яковлевич
+      Чаадаев ум. 1856; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-filosofiya-nitsshe-kriticheskiy-ocherk-ru
+  landing_url: https://ru.wikisource.org/wiki/Философия_Ницше._Критический_очерк_(Трубецкой)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:05+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия Ницше. Критический очерк
+      authors:
+      - name: Трубецкой, Евгений Николаевич
+        death_year: 1920
+        wikidata: Q4464161
+      language: ru
+      year: 1903
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия Ницше. Критический очерк (Трубецкой)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%9D%D0%B8%D1%86%D1%88%D0%B5._%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D0%BE%D1%87%D0%B5%D1%80%D0%BA_%28%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Трубецкой, Евгений
+      Николаевич ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: khvostov-etika-nitsshe-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Этика_Ницше_(Хвостов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:11+00:00'
+    adapter_version: 3
+    metadata:
+      title: Этика Ницше
+      authors:
+      - name: Вениамин Михайлович Хвостов
+        death_year: 1920
+        wikidata: Q4496962
+      language: ru
+      year: 1905
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Этика Ницше (Хвостов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D1%82%D0%B8%D0%BA%D0%B0_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%28%D0%A5%D0%B2%D0%BE%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Вениамин Михайлович
+      Хвостов ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-krizis-zapadnoy-filosofii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Кризис_западной_философии_(Соловьев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:20+00:00'
+    adapter_version: 3
+    metadata:
+      title: Кризис западной философии
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1874
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Кризис западной философии (Соловьев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D0%B7%D0%B8%D1%81_%D0%B7%D0%B0%D0%BF%D0%B0%D0%B4%D0%BD%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Владимир Сергеевич
+      Соловьёв ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-smysl-lyubvi-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Смысл_любви_(Соловьев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Смысл любви
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1884
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Смысл любви (Соловьев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BC%D1%8B%D1%81%D0%BB_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Владимир Сергеевич
+      Соловьёв ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mikhaylovich-vopros-svobode-voli-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Вопрос_о_свободе_воли_(Лопатин)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:24:32+00:00'
+    adapter_version: 3
+    metadata:
+      title: Вопрос о свободе воли
+      authors:
+      - name: Лопатин, Лев Михайлович
+        death_year: 1920
+        wikidata: Q4266616
+      language: ru
+      year: 1889
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Вопрос о свободе воли (Лопатин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92%D0%BE%D0%BF%D1%80%D0%BE%D1%81_%D0%BE_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_%D0%B2%D0%BE%D0%BB%D0%B8_%28%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лопатин, Лев Михайлович
+      ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mikhaylovich-filosofskoe-mirosozertsanie-s-soloveva-ru
+  landing_url: https://ru.wikisource.org/wiki/Философское_миросозерцание_В._С._Соловьева_(Лопатин)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:38+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философское миросозерцание В. С. Соловьева
+      authors:
+      - name: Лопатин, Лев Михайлович
+        death_year: 1920
+        wikidata: Q4266616
+      language: ru
+      year: 1901
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философское миросозерцание В. С. Соловьева (Лопатин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%D0%92._%D0%A1._%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%D0%B0_%28%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лопатин, Лев Михайлович
+      ум. 1920; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-prakticheskaya-filosofiya-gegelya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Практическая_философия_Гегеля_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:48+00:00'
+    adapter_version: 3
+    metadata:
+      title: Практическая философия Гегеля
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1859
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Практическая философия Гегеля (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%93%D0%B5%D0%B3%D0%B5%D0%BB%D1%8F_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-tri-besedy-sovremennom-znachenii-filosofii
+  landing_url: https://ru.wikisource.org/wiki/Три_беседы_о_современном_значении_философии_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:24:54+00:00'
+    adapter_version: 3
+    metadata:
+      title: Три беседы о современном значении философии
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1860
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Три беседы о современном значении философии (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D1%80%D0%B8_%D0%B1%D0%B5%D1%81%D0%B5%D0%B4%D1%8B_%D0%BE_%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%BE%D0%BC_%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B8_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-istoricheskie-pisma-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Исторические_письма_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:02+00:00'
+    adapter_version: 3
+    metadata:
+      title: Исторические письма
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1869
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Исторические письма (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BF%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-ocherki-voprosov-prakticheskoy-filosofii-ru
+  landing_url: https://ru.wikisource.org/wiki/Очерки_вопросов_практической_философии_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:08+00:00'
+    adapter_version: 3
+    metadata:
+      title: Очерки вопросов практической философии
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1859
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Очерки вопросов практической философии (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%87%D0%B5%D1%80%D0%BA%D0%B8_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2_%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-gegelizm-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Гегелизм_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:15+00:00'
+    adapter_version: 3
+    metadata:
+      title: Гегелизм
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1858
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Гегелизм (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%B5%D0%B3%D0%B5%D0%BB%D0%B8%D0%B7%D0%BC_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-zadachi-pozitivizma-ikh-reshenie-ru
+  landing_url: https://ru.wikisource.org/wiki/Задачи_позитивизма_и_их_решение_(Лавров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:20+00:00'
+    adapter_version: 3
+    metadata:
+      title: Задачи позитивизма и их решение
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1868
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Задачи позитивизма и их решение (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B8_%D0%BF%D0%BE%D0%B7%D0%B8%D1%82%D0%B8%D0%B2%D0%B8%D0%B7%D0%BC%D0%B0_%D0%B8_%D0%B8%D1%85_%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Пётр Лаврович
+      Лавров ум. 1900; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: vvedenskiy-uchenie-kanta-prostranstve-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_пространстве_(Введенский)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:25:27+00:00'
+    adapter_version: 3
+    metadata:
+      title: Учение Канта о пространстве
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: Q732458
+      language: ru
+      year: 1895
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Учение Канта о пространстве (Введенский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A3%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%D0%BE_%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B5_%28%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Александр Иванович
+      Введенский ум. 1925; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: karpov-filosofskiy-ratsionalizm-noveyshego-vremeni-ru
+  landing_url: https://ru.wikisource.org/wiki/Философский_рационализм_новейшего_времени_(Карпов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:36+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философский рационализм новейшего времени
+      authors:
+      - name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: Q4215786
+      language: ru
+      year: 1860
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философский рационализм новейшего времени (Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D0%B9_%D1%80%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%BD%D0%BE%D0%B2%D0%B5%D0%B9%D1%88%D0%B5%D0%B3%D0%BE_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_%28%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Василий Николаевич
+      Карпов ум. 1867; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: yurkevich-razum-po-ucheniyu-platona-opyt
+  landing_url: https://ru.wikisource.org/wiki/Разум_по_учению_Платона_и_опыт_по_учению_Канта_(Юркевич)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:25:43+00:00'
+    adapter_version: 3
+    metadata:
+      title: Разум по учению Платона и опыт по учению Канта
+      authors:
+      - name: Памфил Данилович Юркевич
+        death_year: 1874
+        wikidata: Q1047388
+      language: ru
+      year: 1866
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Разум по учению Платона и опыт по учению Канта (Юркевич)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B0%D0%B7%D1%83%D0%BC_%D0%BF%D0%BE_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8E_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0_%D0%B8_%D0%BE%D0%BF%D1%8B%D1%82_%D0%BF%D0%BE_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8E_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%28%D0%AE%D1%80%D0%BA%D0%B5%D0%B2%D0%B8%D1%87%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Памфил Данилович
+      Юркевич ум. 1874; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: gilyarov-platonizm-kak-osnovanie-sovremennogo-mirosozertsaniya
+  landing_url: https://ru.wikisource.org/wiki/Платонизм_как_основание_современного_миросозерцания_в_связи_с_вопросом_о_задачах_и_судьбах_философии_(Гиляров)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:49+00:00'
+    adapter_version: 3
+    metadata:
+      title: Платонизм как основание современного миросозерцания в связи с вопросом о задачах и судьбах
+        философии
+      authors:
+      - name: Алексей Никитич Гиляров
+        death_year: 1938
+        wikidata: Q12098945
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Платонизм как основание современного миросозерцания в связи с вопросом о задачах и судьбах
+        философии (Гиляров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B8%D0%B7%D0%BC_%D0%BA%D0%B0%D0%BA_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D1%8F_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%BC_%D0%BE_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D0%B8_%D1%81%D1%83%D0%B4%D1%8C%D0%B1%D0%B0%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%93%D0%B8%D0%BB%D1%8F%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Алексей Никитич
+      Гиляров ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'Гиляров А. Н. ум. 1938 по Wikidata: проверить дату и отсутствие репрессий/реабилитации'
+  publish: auto
+- id: pavlovich-filosoficheskie-predlozheniya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Философические_предложения..._(Козельский)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:25:56+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философические предложения…
+      authors:
+      - name: Козельский, Яков Павлович
+        death_year: null
+        wikidata: Q4226525
+      language: ru
+      year: 1768
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философические предложения... (Козельский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BF%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F..._%28%D0%9A%D0%BE%D0%B7%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource; Я. П. Козельский ум. 1794 (по ru.wikipedia; Wikidata годов не даёт), сочинение
+      XVIII в.
+  review:
+    status: draft
+    by: null
+    at: null
+    note: год смерти автора не получен из Wikidata, проверить вручную
+  publish: auto
+- id: pavlovich-rassuzhdeniya-dvukh-indiytsev-kalana-ibragima
+  landing_url: https://ru.wikisource.org/wiki/Рассуждения_двух_индийцев_Калана_и_Ибрагима_о_человеческом_познании_(Козельский)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:26:04+00:00'
+    adapter_version: 3
+    metadata:
+      title: Рассуждения двух индийцев Калана и Ибрагима о человеческом познании
+      authors:
+      - name: Козельский, Яков Павлович
+        death_year: null
+        wikidata: Q4226525
+      language: ru
+      year: 1788
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Рассуждения двух индийцев Калана и Ибрагима о человеческом познании (Козельский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B2%D1%83%D1%85_%D0%B8%D0%BD%D0%B4%D0%B8%D0%B9%D1%86%D0%B5%D0%B2_%D0%9A%D0%B0%D0%BB%D0%B0%D0%BD%D0%B0_%D0%B8_%D0%98%D0%B1%D1%80%D0%B0%D0%B3%D0%B8%D0%BC%D0%B0_%D0%BE_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B8_%28%D0%9A%D0%BE%D0%B7%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource; Я. П. Козельский ум. 1794 (по ru.wikipedia; Wikidata годов не даёт), сочинение
+      XVIII в.
+  review:
+    status: draft
+    by: null
+    at: null
+    note: год смерти автора не получен из Wikidata, проверить вручную
+  publish: auto
+- id: ivanovich-uchenie-kanta-prave-gosudarstve-ru
+  landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_праве_и_государстве_(Новгородцев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:11+00:00'
+    adapter_version: 3
+    metadata:
+      title: Учение Канта о праве и государстве
+      authors:
+      - name: Новгородцев, Павел Иванович
+        death_year: 1924
+        wikidata: Q4322534
+      language: ru
+      year: 1901
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Учение Канта о праве и государстве (Новгородцев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A3%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%D0%BE_%D0%BF%D1%80%D0%B0%D0%B2%D0%B5_%D0%B8_%D0%B3%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%B5_%28%D0%9D%D0%BE%D0%B2%D0%B3%D0%BE%D1%80%D0%BE%D0%B4%D1%86%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Новгородцев, Павел
+      Иванович ум. 1924; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: silvestrovich-kant-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Кант_(Гогоцкий)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:18+00:00'
+    adapter_version: 3
+    metadata:
+      title: Кант
+      authors:
+      - name: Гогоцкий, Сильвестр Сильвестрович
+        death_year: 1889
+        wikidata: Q4141067
+      language: ru
+      year: 1886
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Кант (Гогоцкий)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%B0%D0%BD%D1%82_%28%D0%93%D0%BE%D0%B3%D0%BE%D1%86%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Гогоцкий, Сильвестр
+      Сильвестрович ум. 1889; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-sola-fide-tolko-veroyu-ru
+  landing_url: https://ru.wikisource.org/wiki/Sola_fide_-_Только_верою_(Шестов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:25+00:00'
+    adapter_version: 3
+    metadata:
+      title: Sola fide - Только верою
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1914
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Sola fide - Только верою (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/Sola_fide_-_%D0%A2%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE_%D0%B2%D0%B5%D1%80%D0%BE%D1%8E_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
+      Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-apofeoz-bespochvennosti-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Апофеоз_беспочвенности_(Шестов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:32+00:00'
+    adapter_version: 3
+    metadata:
+      title: Апофеоз беспочвенности
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1905
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Апофеоз беспочвенности (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BF%D0%BE%D1%84%D0%B5%D0%BE%D0%B7_%D0%B1%D0%B5%D1%81%D0%BF%D0%BE%D1%87%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
+      Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-dostoevskiy-nitsshe-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Достоевский_и_Ницше_(Шестов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:38+00:00'
+    adapter_version: 3
+    metadata:
+      title: Достоевский и Ницше
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1902
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Достоевский и Ницше (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9_%D0%B8_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
+      Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-dobro-uchenii-gr-tolstogo-nitsshe
+  landing_url: https://ru.wikisource.org/wiki/Добро_в_учении_гр._Толстого_и_Ницше_(Шестов)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:44+00:00'
+    adapter_version: 3
+    metadata:
+      title: Добро в учении гр. Толстого и Ницше
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1889
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Добро в учении гр. Толстого и Ницше (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%BE%D0%B1%D1%80%D0%BE_%D0%B2_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B8_%D0%B3%D1%80._%D0%A2%D0%BE%D0%BB%D1%81%D1%82%D0%BE%D0%B3%D0%BE_%D0%B8_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лев Исаакович
+      Шестов ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-smysl-tvorchestva-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Смысл_творчества_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:26:56+00:00'
+    adapter_version: 3
+    metadata:
+      title: Смысл творчества
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1927
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Смысл творчества (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BC%D1%8B%D1%81%D0%BB_%D1%82%D0%B2%D0%BE%D1%80%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-russkaya-ideya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Русская_идея_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:03+00:00'
+    adapter_version: 3
+    metadata:
+      title: Русская идея
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1948
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Русская идея (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B0%D1%8F_%D0%B8%D0%B4%D0%B5%D1%8F_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-tvorchestvo-obektivatsiya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Творчество_и_объективация_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:11+00:00'
+    adapter_version: 3
+    metadata:
+      title: Творчество и объективация
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1947
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Творчество и объективация (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A2%D0%B2%D0%BE%D1%80%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE_%D0%B8_%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%B8%D0%B2%D0%B0%D1%86%D0%B8%D1%8F_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-mirosozertsanie-dostoevskogo-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Миросозерцание_Достоевского_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:18+00:00'
+    adapter_version: 3
+    metadata:
+      title: Миросозерцание Достоевского
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1921
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Миросозерцание Достоевского (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-samopoznanie-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Самопознание_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:25+00:00'
+    adapter_version: 3
+    metadata:
+      title: Самопознание
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1949
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Самопознание (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%B0%D0%BC%D0%BE%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-konstantin-leontev-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Константин_Леонтьев_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:32+00:00'
+    adapter_version: 3
+    metadata:
+      title: Константин Леонтьев
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1926
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Константин Леонтьев (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D0%B8%D0%BD_%D0%9B%D0%B5%D0%BE%D0%BD%D1%82%D1%8C%D0%B5%D0%B2_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-aleksey-stepanovich-khomyakov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Алексей_Степанович_Хомяков_(Бердяев)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:39+00:00'
+    adapter_version: 3
+    metadata:
+      title: Алексей Степанович Хомяков
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1913
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Алексей Степанович Хомяков (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B9_%D0%A1%D1%82%D0%B5%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%D0%B8%D1%87_%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Александрович
+      Бердяев ум. 1948; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-nepostizhimoe-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Непостижимое_(Франк)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:47+00:00'
+    adapter_version: 3
+    metadata:
+      title: Непостижимое
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1939
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Непостижимое (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B5%D0%BF%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
+      ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-realnost-chelovek-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Реальность_и_человек_(Франк)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:27:55+00:00'
+    adapter_version: 3
+    metadata:
+      title: Реальность и человек
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1949
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Реальность и человек (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B5%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
+      ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-smysl-zhizni-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Смысл_жизни_(Франк)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:01+00:00'
+    adapter_version: 3
+    metadata:
+      title: Смысл жизни
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1925
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Смысл жизни (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BC%D1%8B%D1%81%D0%BB_%D0%B6%D0%B8%D0%B7%D0%BD%D0%B8_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
+      ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-krushenie-kumirov-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Крушение_кумиров_(Франк)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:07+00:00'
+    adapter_version: 3
+    metadata:
+      title: Крушение кумиров
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1923
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Крушение кумиров (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D1%83%D1%88%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BA%D1%83%D0%BC%D0%B8%D1%80%D0%BE%D0%B2_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Франк, Семён Людвигович
+      ум. 1950; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: grot-osnovnye-momenty-razvitii-novoy-filosofii
+  landing_url: https://ru.wikisource.org/wiki/Основные_моменты_в_развитии_новой_философии_(Грот)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:14+00:00'
+    adapter_version: 3
+    metadata:
+      title: Основные моменты в развитии новой философии
+      authors:
+      - name: Николай Яковлевич Грот
+        death_year: 1899
+        wikidata: Q4150348
+      language: ru
+      year: 1894
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Основные моменты в развитии новой философии (Грот)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5_%D0%BC%D0%BE%D0%BC%D0%B5%D0%BD%D1%82%D1%8B_%D0%B2_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%93%D1%80%D0%BE%D1%82%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Николай Яковлевич
+      Грот ум. 1899; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: stepanovich-nachertanie-logiki-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Начертание_логики_(Лубкин)
+  adapter: wikisource
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:28:21+00:00'
+    adapter_version: 3
+    metadata:
+      title: Начертание логики
+      authors:
+      - name: Лубкин, Александр Степанович
+        death_year: 1815
+        wikidata: Q15071343
+      language: ru
+      year: 1807
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Начертание логики (Лубкин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B0%D1%87%D0%B5%D1%80%D1%82%D0%B0%D0%BD%D0%B8%D0%B5_%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8_%28%D0%9B%D1%83%D0%B1%D0%BA%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Лубкин, Александр
+      Степанович ум. 1815; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-istoriya-politicheskikh-ucheniy-pervaya-chast
+  landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Первая_часть._Древний_мир_и_Средние_века_(Чичерин)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:29+00:00'
+    adapter_version: 3
+    metadata:
+      title: История политических учений. Первая часть. Древний мир и Средние века
+      authors:
+      - name: Чичерин, Борис Николаевич
+        death_year: 1904
+        wikidata: Q2619530
+      language: ru
+      year: 1869
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: История политических учений. Первая часть. Древний мир и Средние века (Чичерин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9._%D0%9F%D0%B5%D1%80%D0%B2%D0%B0%D1%8F_%D1%87%D0%B0%D1%81%D1%82%D1%8C._%D0%94%D1%80%D0%B5%D0%B2%D0%BD%D0%B8%D0%B9_%D0%BC%D0%B8%D1%80_%D0%B8_%D0%A1%D1%80%D0%B5%D0%B4%D0%BD%D0%B8%D0%B5_%D0%B2%D0%B5%D0%BA%D0%B0_%28%D0%A7%D0%B8%D1%87%D0%B5%D1%80%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
+      Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-istoriya-politicheskikh-ucheniy-chast-vtoraya
+  landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Часть_вторая._Новое_время_(Чичерин)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:40+00:00'
+    adapter_version: 3
+    metadata:
+      title: История политических учений. Часть вторая. Новое время
+      authors:
+      - name: Чичерин, Борис Николаевич
+        death_year: 1904
+        wikidata: Q2619530
+      language: ru
+      year: 1872
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: История политических учений. Часть вторая. Новое время (Чичерин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9._%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D0%B2%D1%82%D0%BE%D1%80%D0%B0%D1%8F._%D0%9D%D0%BE%D0%B2%D0%BE%D0%B5_%D0%B2%D1%80%D0%B5%D0%BC%D1%8F_%28%D0%A7%D0%B8%D1%87%D0%B5%D1%80%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
+      Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-istoriya-politicheskikh-ucheniy-chast-tretya
+  landing_url: https://ru.wikisource.org/wiki/История_политических_учений._Часть_третья._Новое_время_(продолжение)_(Чичерин)
+  adapter: wikisource
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:28:50+00:00'
+    adapter_version: 3
+    metadata:
+      title: История политических учений. Часть третья. Новое время (продолжение)
+      authors:
+      - name: Чичерин, Борис Николаевич
+        death_year: 1904
+        wikidata: Q2619530
+      language: ru
+      year: 1874
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: История политических учений. Часть третья. Новое время (продолжение) (Чичерин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9._%D0%A7%D0%B0%D1%81%D1%82%D1%8C_%D1%82%D1%80%D0%B5%D1%82%D1%8C%D1%8F._%D0%9D%D0%BE%D0%B2%D0%BE%D0%B5_%D0%B2%D1%80%D0%B5%D0%BC%D1%8F_%28%D0%BF%D1%80%D0%BE%D0%B4%D0%BE%D0%BB%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5%29_%28%D0%A7%D0%B8%D1%87%D0%B5%D1%80%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Чичерин, Борис
+      Николаевич ум. 1904; годы смерти по Wikidata, срок 70 лет истёк у всех
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
