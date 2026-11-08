@@ -48,20 +48,32 @@ export type Fragment = {
   contradicts?: Contradiction[];
 };
 export type Suggestion = { entity_id: string; recipe: string; label?: string; title: string };
-export type Message = { code?: string; text?: string; minutes?: number };
-export type Handoff = { reason: "broader" | "outside_book"; choice?: "book" | "library" };
+export type Message = {
+  code?: string;
+  text?: string;
+  minutes?: number;
+  suggestions?: { title: string; paragraph_id?: string | null }[]; // «Близкое в библиотеке» (5.6)
+};
+// sent — вопрос по ссылке уже отправлен в разделе «Ассистент» (5.10).
+export type Handoff = { reason: "broader" | "outside_book"; choice?: "book" | "library"; sent?: boolean };
+// Итог хода ответа (5.3): время, число найденных абзацев, стадия, на которой ответ закончился.
+export type TurnStats = { seconds: number; found?: number; stage?: number };
 export type Turn = {
   id: string;
   question: string;
   selection?: string;
+  selectionParagraphs?: string[];
   fragments: Fragment[];
   status: "streaming" | "done" | "stopped" | "error";
   message?: Message;
   suggestion?: Suggestion;
+  // Глава, в которой задан вопрос (5.8): у вопроса из другой главы — подпись с её названием.
   chapterId?: string;
+  chapterTitle?: string;
   handoff?: Handoff;
   handoffId?: string;
   from?: { sourceId: string; chapterId?: string };
+  stats?: TurnStats;
 };
 export type Session = {
   id: string;
@@ -88,6 +100,11 @@ export type State = {
 };
 
 export const DEFAULT_SETTINGS: Settings = { generation: true, sourcesOnly: false, onlyTextbook: false };
+
+// Ключ набора сессий раздела «Ассистент» среди ключей книг (``dialogs``).
+export const LIBRARY = "library:";
+// Обмены, поток которых идёт в этой вкладке: остальные «streaming» при чтении — «остановлено».
+export const liveTurns = new Set<string>();
 
 export function newId(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -145,14 +162,21 @@ function normalizeTurn(raw: unknown): Turn | null {
     id: typeof t.id === "string" ? t.id : newId(),
     question: t.question,
     selection: typeof t.selection === "string" ? t.selection : undefined,
+    selectionParagraphs: Array.isArray(t.selectionParagraphs)
+      ? t.selectionParagraphs.filter((p): p is string => typeof p === "string")
+      : undefined,
     fragments: Array.isArray(t.fragments) ? (t.fragments as Fragment[]) : [],
-    status,
+    // Обмен, который при перезагрузке шёл, восстанавливается как «остановлено» (5.8): поток
+    // принадлежал закрытой вкладке и уже не допишется.
+    status: status === "streaming" && !liveTurns.has(t.id as string) ? "stopped" : status,
     message: object(t.message).code || object(t.message).text ? (t.message as Message) : undefined,
     suggestion: object(t.suggestion).entity_id ? (t.suggestion as Suggestion) : undefined,
     chapterId: typeof t.chapterId === "string" ? t.chapterId : undefined,
+    chapterTitle: typeof t.chapterTitle === "string" ? t.chapterTitle : undefined,
     handoff: t.handoff ? (t.handoff as Handoff) : undefined,
     handoffId: typeof t.handoffId === "string" ? t.handoffId : undefined,
     from: object(t.from).sourceId ? (t.from as Turn["from"]) : undefined,
+    stats: typeof object(t.stats).seconds === "number" ? (t.stats as TurnStats) : undefined,
   };
 }
 
@@ -426,6 +450,47 @@ export function useStored<T>(select: (state: State) => T): T {
   return value;
 }
 
+// Набор сессий книги, которой ещё нет в хранилище: один и тот же до первой записи, чтобы
+// активная сессия не менялась от чтения к чтению.
+const unsaved = new Map<string, DialogSet>();
+
+function dialogSetOf(state: State, key: string): DialogSet {
+  if (key === LIBRARY) return state.libraryDialogs;
+  const set = state.dialogs[key];
+  if (set) {
+    unsaved.delete(key);
+    return set;
+  }
+  if (!unsaved.has(key)) unsaved.set(key, emptyDialogSet());
+  return unsaved.get(key)!;
+}
+
+// Запись меняет только набор своей книги (или раздела) поверх свежего состояния: две вкладки
+// с разными книгами и поток, дописывающий ответ в прежнюю книгу, друг друга не затирают (5.8).
+function updateDialogs(key: string, change: (set: DialogSet) => DialogSet): void {
+  update((s) => {
+    const next = change(dialogSetOf(s, key));
+    if (key === LIBRARY) return { ...s, libraryDialogs: next };
+    unsaved.delete(key);
+    return { ...s, dialogs: { ...s.dialogs, [key]: next } };
+  });
+}
+
+// Набор сессий книги или раздела; обновляется при любой записи в этой и других вкладках.
+export function useDialogSet(key: string): DialogSet {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const refresh = () => setTick((n) => n + 1);
+    window.addEventListener(EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+  return dialogSetOf(read(), key);
+}
+
 export const storage = {
   persistent: (): boolean => persistent,
   read,
@@ -460,20 +525,20 @@ export const storage = {
   setMentionsView(mentions: "underline" | "hover"): void {
     update((s) => ({ ...s, mentions }));
   },
-  // Диалоги книги и раздела «Ассистент».
-  dialogsFor(sourceId: string): DialogSet {
-    const set = read().dialogs[sourceId];
-    return set ? { ...set, sessions: set.sessions.map((s) => ({ ...s })) } : emptyDialogSet();
+  // Диалоги книги и раздела «Ассистент» (ключ LIBRARY).
+  dialogsFor(key: string): DialogSet {
+    return dialogSetOf(read(), key);
   },
-  saveDialogs(sourceId: string, set: DialogSet): void {
-    update((s) => ({ ...s, dialogs: { ...s.dialogs, [sourceId]: set } }));
+  saveDialogs(key: string, set: DialogSet): void {
+    updateDialogs(key, () => set);
   },
   libraryDialogs(): DialogSet {
     return read().libraryDialogs;
   },
   saveLibraryDialogs(set: DialogSet): void {
-    update((s) => ({ ...s, libraryDialogs: set }));
+    updateDialogs(LIBRARY, () => set);
   },
+  updateDialogs: (key: string, change: (set: DialogSet) => DialogSet): void => updateDialogs(key, change),
   setTheme(theme: Theme): void {
     update((s) => ({ ...s, theme }));
   },
@@ -494,6 +559,7 @@ export const storage = {
       }
     }
     memory = empty();
+    unsaved.clear();
     window.dispatchEvent(new Event(EVENT));
   },
 };

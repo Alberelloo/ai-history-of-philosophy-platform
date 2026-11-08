@@ -243,8 +243,8 @@ def test_sessions_are_separate(page, server, bot):
     # Список сессий: две строки.
     panel.get_by_role("button", name="Сессии").click()
     assert panel.locator(".assistant__sessions .assistant__session").count() == 2
-    # Возврат к первой сессии по списку: там только первый вопрос.
-    panel.locator(".assistant__session-title").first.click()
+    # Возврат к первой сессии по списку (сначала новые, 5.8): там только первый вопрос.
+    panel.locator(".assistant__session-title", has_text="причинности").click()
     assert panel.locator(".turn").count() == 1
     assert "причинности" in panel.locator(".turn").first.inner_text()
 
