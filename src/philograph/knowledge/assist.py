@@ -100,6 +100,7 @@ class AssistantKnowledge:
         sources += [e["source_id"] for e in s["evidence"] if e["source_id"] and not e["lost"]]
         return {
             "id": s["id"],
+            "entity_id": s["subject"],
             "text": f"{self.entities.label(s['subject'])} — {spec['title']} — {other}",
             "type": s["type"],
             "status": s["status"],

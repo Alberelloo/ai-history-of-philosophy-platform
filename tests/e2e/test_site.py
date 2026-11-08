@@ -61,7 +61,7 @@ def test_reading_journey(page, stack):
     ).click()
     page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
     toc = page.get_by_role("navigation", name="Оглавление")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 2. Юм и проблема индукции"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 2. Юм и проблема индукции"
     toc.get_by_role("link", name="Глава 3. Ответ Канта").click()
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
     toc.get_by_role("link", name="Привычка и ожидание").click()

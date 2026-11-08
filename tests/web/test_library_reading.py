@@ -302,10 +302,10 @@ def open_textbook(page, site, suffix=""):
 def test_toc_navigation_and_current_mark(page, site):
     open_textbook(page, site)
     toc = page.get_by_role("navigation", name="Оглавление")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 1. Опыт"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 1. Опыт"
     toc.get_by_role("link", name="Глава 3. Разум").click()
     page.wait_for_selector("h1:text('Глава 3. Разум')")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 3. Разум"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 3. Разум"
     toc.get_by_role("link", name="Схематизм").click()
     page.wait_for_selector("h1:text('Глава 2. Рассудок')")
     heading = page.locator("h2", has_text="Схематизм")

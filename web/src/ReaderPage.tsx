@@ -4,7 +4,11 @@ import { navigate, type PanelItem, type PanelState } from "./App";
 import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
 import { OPEN_CARD_EVENT } from "./FullCard";
 import { FootnoteRef } from "./Footnote";
-import { FieldNote } from "./Footnote";
+import { fieldItems, MarginCol } from "./Footnote";
+import { useAssistantShortcut } from "./hooks/useAssistantShortcut";
+import { useReadingAnchor } from "./hooks/useReadingAnchor";
+import { useTocLocation } from "./hooks/useTocLocation";
+import { Toc } from "./ReaderToc";
 import { errorText, useT, type Catalog } from "./i18n";
 import { computeLayout, type Layout } from "./layout";
 import { storage, useStored } from "./storage";
@@ -255,32 +259,6 @@ function blockPoints(
   ];
 }
 
-// Что стоит на поле сносок в K1: номера страниц и сноски в порядке строк главы.
-type FieldItem =
-  | { kind: "page"; key: string; label: string; anchor: string }
-  | { kind: "note"; key: string; note: Chapter["footnotes"][string]; noteId: string };
-
-function fieldItems(chapter: Chapter): FieldItem[] {
-  const items: FieldItem[] = [];
-  for (const block of chapter.blocks) {
-    if (block.type !== "block") continue;
-    const per = [
-      ...block.pages.map(([at, label]) => ({ offset: at, kind: "page" as const, label, anchor: `${block.id}-${at}` })),
-      ...block.notes.map(([at, id]) => ({ offset: at, kind: "note" as const, id })),
-    ].sort((a, b) => a.offset - b.offset);
-    for (const item of per) {
-      if (item.kind === "page") {
-        items.push({ kind: "page", key: `pg-${item.anchor}`, label: item.label, anchor: item.anchor });
-      } else {
-        const note = chapter.footnotes[item.id];
-        if (note) items.push({ kind: "note", key: `nt-${item.id}`, note, noteId: item.id });
-      }
-    }
-  }
-  return items;
-}
-
-// Пояснение неразобранной части по коду (N7); без кода (старая версия) — подпись сервера.
 function unrenderedDetail(t: Catalog, block: Extract<ChapterBlock, { type: "block" }>): string | null {
   if (block.detail_code === "blank_page") return t.unrendered.blank_page(block.page ?? "");
   if (block.detail_code === "missing") return t.unrendered.missing;
@@ -289,108 +267,9 @@ function unrenderedDetail(t: Catalog, block: Extract<ChapterBlock, { type: "bloc
 
 // Поле сносок (K1): элементы встают верхом на уровне своих строк; при наезде сдвигаются вниз
 // каскадом до промежутка 12px. Положения считаются одним проходом после отрисовки.
-function MarginCol({
-  items,
-  noteActive,
-  onActive,
-}: {
-  items: FieldItem[];
-  noteActive: string | null;
-  onActive: (id: string | null) => void;
-}) {
-  const root = useRef<HTMLElement>(null);
-  const [tops, setTops] = useState<Record<string, number>>({});
-  const [shifted, setShifted] = useState<Record<string, boolean>>({});
-  useLayoutEffect(() => {
-    const article = document.querySelector<HTMLElement>(".chapter");
-    if (!article) return;
-    const articleTop = article.getBoundingClientRect().top;
-    const nextTops: Record<string, number> = {};
-    const nextShifted: Record<string, boolean> = {};
-    let prevBottom = -Infinity;
-    for (const item of items) {
-      const el = root.current?.querySelector<HTMLElement>(`[data-field-key="${item.key}"]`);
-      if (!el) continue;
-      const anchor =
-        item.kind === "note"
-          ? document.querySelector<HTMLElement>(`[data-note-id="${item.noteId}"]`)
-          : document.querySelector<HTMLElement>(`[data-page-anchor="${item.anchor}"]`);
-      const naturalTop = anchor ? anchor.getBoundingClientRect().top - articleTop : 0;
-      const top = Math.max(naturalTop, prevBottom + 12);
-      nextTops[item.key] = top;
-      nextShifted[item.key] = top - naturalTop > 240;
-      prevBottom = top + el.offsetHeight;
-    }
-    setTops(nextTops);
-    setShifted(nextShifted);
-  }, [items]);
-  return (
-    <aside className="margin-col">
-      {items.map((item) =>
-        item.kind === "note" ? (
-          <div key={item.key} className="field-item" data-field-key={item.key} style={{ transform: `translateY(${tops[item.key] ?? 0}px)` }}>
-            <FieldNote
-              note={item.note}
-              noteId={item.noteId}
-              active={noteActive === item.noteId}
-              onActive={onActive}
-              shifted={shifted[item.key] ?? false}
-            />
-          </div>
-        ) : (
-          <div key={item.key} className="field-item field-page" data-field-key={item.key} style={{ transform: `translateY(${tops[item.key] ?? 0}px)` }}>
-            <span className="num">{item.label}</span>
-          </div>
-        ),
-      )}
-    </aside>
-  );
-}
-
 function copyLink(paragraphId: string, onDone: () => void) {
   const url = `${window.location.origin}/p/${paragraphId}`;
   navigator.clipboard?.writeText(url).then(onDone, onDone);
-}
-
-function Toc({
-  items,
-  sourceId,
-  current,
-  onNavigate,
-}: {
-  items: TocItem[];
-  sourceId: string;
-  current: string;
-  onNavigate?: () => void;
-}) {
-  return (
-    <ul>
-      {items.map((item) => {
-        const isChapter = item.chapter_id === item.id;
-        const target = isChapter
-          ? `/read/${sourceId}/${item.id}`
-          : `/read/${sourceId}/${item.chapter_id}#s-${item.id}`;
-        return (
-          <li key={item.id}>
-            <a
-              href={target}
-              aria-current={item.id === current ? "true" : undefined}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(target);
-                onNavigate?.();
-              }}
-            >
-              {item.title}
-            </a>
-            {item.children.length > 0 && (
-              <Toc items={item.children} sourceId={sourceId} current={current} onNavigate={onNavigate} />
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
 }
 
 export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Props) {
@@ -460,6 +339,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       chapterId: chapter?.chapter_id ?? p?.chapterId,
       chapterTitle: chapter?.title ?? p?.chapterTitle,
     }));
+  useAssistantShortcut(textRef, openAssistant);
   // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
   const collapsePanel = () => {
     if (panel) setPanel({ ...panel, stripExpanded: false });
@@ -624,27 +504,8 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     }
   }, [chapter, anchor]);
 
-  // Привязка места чтения при перестройке раскладки (2.5): опорный абзац остаётся на прежнем
-  // расстоянии от верха окна. Колонки меняют ширину одним шагом, прокрутка выставляется в том же
-  // кадре, до отрисовки.
-  const layoutAnchor = useRef<{ el: HTMLElement; top: number } | null>(null);
-  const layoutKey = useRef("");
-  useLayoutEffect(() => {
-    if (!chapter) return;
-    const key = `${layout.mode}:${Math.round(layout.text)}:${layout.navWidth}`;
-    if (layoutKey.current !== key) {
-      const saved = layoutAnchor.current;
-      if (saved && saved.el.isConnected) {
-        const delta = saved.el.getBoundingClientRect().top - saved.top;
-        if (Math.abs(delta) > 4) window.scrollBy(0, delta);
-      }
-      layoutKey.current = key;
-    }
-    const top = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-    const paragraphs = textRef.current?.querySelectorAll<HTMLElement>("[data-paragraph]") ?? [];
-    const el = Array.from(paragraphs).find((p) => p.getBoundingClientRect().bottom > top);
-    if (el) layoutAnchor.current = { el, top: el.getBoundingClientRect().top };
-  }, [layout, chapter]);
+  useReadingAnchor(textRef, chapter ? `${layout.mode}:${Math.round(layout.text)}:${layout.navWidth}` : null);
+  const tocSection = useTocLocation(textRef, chapter?.chapter_id ?? null, anchor);
 
   // Запоминание места: первый видимый абзац главы.
   useEffect(() => {
@@ -699,7 +560,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
         {t.reader.assistant}
       </button>
       <p className="toc__title">{t.reader.toc}</p>
-      <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
+      <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} section={tocSection} />
     </nav>
   );
   const rail = (
@@ -895,7 +756,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
           aria-modal="false"
           aria-label={t.reader.toc}
         >
-          <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} onNavigate={() => setTocOpen(false)} />
+          <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} section={tocSection} onNavigate={() => setTocOpen(false)} />
         </div>
       )}
     </div>
