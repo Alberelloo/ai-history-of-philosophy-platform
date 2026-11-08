@@ -6324,3 +6324,1519 @@ entries:
     at: null
     note: null
   publish: auto
+- id: gegel-nauka-logiki-t-1-archive
+  landing_url: https://archive.org/details/1_20200203_20200203_0850
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:29:54+00:00'
+    adapter_version: 1
+    metadata:
+      title: Наука логики. Т.1
+      authors:
+      - name: Гегель
+        death_year: 1876
+        wikidata: Q8861656
+      language: ru
+      year: 1916
+      translator: null
+      publisher: null
+    files: []
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Наука логики. Т.1
+      authors:
+      - name: Георг Вильгельм Фридрих Гегель
+        death_year: 1831
+        wikidata: null
+      translator:
+        name: Николай Григорьевич Дебольский
+        death_year: 1918
+        wikidata: null
+      year: 1916
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918 (изд. 1916, Стасюлевич); перевод назван на
+      ru.wikisource (Наука логики (Гегель; Дебольский)), на странице archive.org переводчик не указан;
+      срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
+      (изд. 1916, Стасюлевич); перевод назван на ru.wikisource (Наука логики (Гегель; Дебольский)), на
+      странице archive.org переводчик не указан'
+  publish: auto
+- id: gegel-nauka-logiki-t-2-archive
+  landing_url: https://archive.org/details/2_20200203_20200203
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:30:19+00:00'
+    adapter_version: 1
+    metadata:
+      title: Наука логики. Т.2
+      authors:
+      - name: Гегель
+        death_year: 1876
+        wikidata: Q8861656
+      language: ru
+      year: 1916
+      translator: null
+      publisher: null
+    files:
+    - name: Гегель. Наука логики. Т.2.epub
+      url: https://archive.org/download/2_20200203_20200203/%D0%93%D0%B5%D0%B3%D0%B5%D0%BB%D1%8C.%20%D0%9D%D0%B0%D1%83%D0%BA%D0%B0%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.%20%D0%A2.2.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Наука логики. Т.2
+      authors:
+      - name: Георг Вильгельм Фридрих Гегель
+        death_year: 1831
+        wikidata: null
+      translator:
+        name: Николай Григорьевич Дебольский
+        death_year: 1918
+        wikidata: null
+      year: 1916
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918 (изд. 1916, Стасюлевич); переводчик на archive.org
+      не указан, установлен по изданию; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
+      (изд. 1916, Стасюлевич); переводчик на archive.org не указан, установлен по изданию'
+  publish: auto
+- id: gegel-nauka-logiki-t-3-archive
+  landing_url: https://archive.org/details/3_20200203
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:30:25+00:00'
+    adapter_version: 1
+    metadata:
+      title: Наука логики. Т.3
+      authors:
+      - name: Гегель
+        death_year: 1876
+        wikidata: Q8861656
+      language: ru
+      year: 1916
+      translator: null
+      publisher: null
+    files:
+    - name: Гегель. Наука логики. Т.3.pdf
+      url: https://archive.org/download/3_20200203/%D0%93%D0%B5%D0%B3%D0%B5%D0%BB%D1%8C.%20%D0%9D%D0%B0%D1%83%D0%BA%D0%B0%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.%20%D0%A2.3.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Наука логики. Т.3
+      authors:
+      - name: Георг Вильгельм Фридрих Гегель
+        death_year: 1831
+        wikidata: null
+      translator:
+        name: Николай Григорьевич Дебольский
+        death_year: 1918
+        wikidata: null
+      year: 1916
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918 (изд. 1916, Стасюлевич); переводчик на archive.org
+      не указан, установлен по изданию; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'проверить личность автора/переводчика: Гегель ум. 1831; переводчик Н. Г. Дебольский ум. 1918
+      (изд. 1916, Стасюлевич); переводчик на archive.org не указан, установлен по изданию'
+  publish: auto
+- id: aristotel-ob-istolkovanii-archive
+  landing_url: https://archive.org/details/20200321_20200321_0818
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:30:30+00:00'
+    adapter_version: 1
+    metadata:
+      title: Объ истолкованiи
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: Q868
+      language: ru
+      year: 1891
+      translator: null
+      publisher: null
+    files:
+    - name: Аристотель. Об истолковании.pdf
+      url: https://archive.org/download/20200321_20200321_0818/%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C.%20%D0%9E%D0%B1%20%D0%B8%D1%81%D1%82%D0%BE%D0%BB%D0%BA%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B8.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Об истолковании
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: null
+      translator:
+        name: Эрнест Леопольдович Радлов
+        death_year: 1928
+        wikidata: null
+      year: 1891
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Аристотель ум. 322 до н. э.; переводчик Э. Л. Радлов ум. 1928 (изд. 1891, указан в описании); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: aristotel-katigorii-archive
+  landing_url: https://archive.org/details/20200320_20200320_0823
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:30:34+00:00'
+    adapter_version: 1
+    metadata:
+      title: Катигорiи
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: Q868
+      language: ru
+      year: 1859
+      translator: null
+      publisher: null
+    files:
+    - name: Аристотель. Категории.pdf
+      url: https://archive.org/download/20200320_20200320_0823/%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C.%20%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D0%B8.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Категории
+      authors:
+      - name: Аристотель
+        death_year: -322
+        wikidata: null
+      translator:
+        name: Михаил Иванович Касторский
+        death_year: 1866
+        wikidata: null
+      year: 1859
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Аристотель ум. 322 до н. э.; перевод и пояснения М. Н. [И.] Касторского ум. 1866 по Wikidata (в
+      описании инициалы «М.Н.», проверить личность); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'проверить личность автора/переводчика: Аристотель ум. 322 до н. э.; перевод и пояснения М.
+      Н. [И.] Касторского ум. 1866 по Wikidata (в описании инициалы «М.Н.», проверить личность)'
+  publish: auto
+- id: l-na-sakh-iova-archive
+  landing_url: https://archive.org/details/20200404_20200404_1516
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:30:39+00:00'
+    adapter_version: 1
+    metadata:
+      title: На вѣсахъ Iова
+      authors:
+      - name: Шестов Л.
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1929
+      translator: null
+      publisher: null
+    files:
+    - name: Шестов. На весах Иова.pdf
+      url: https://archive.org/download/20200404_20200404_1516/%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2.%20%D0%9D%D0%B0%20%D0%B2%D0%B5%D1%81%D0%B0%D1%85%20%D0%98%D0%BE%D0%B2%D0%B0.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: На весах Иова (Странствования по душам)
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: null
+      year: 1929
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Л. И. Шестов ум. 1938; изд. Париж, 1929; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: l-nachala-kontsy-archive
+  landing_url: https://archive.org/details/20200408_20200408_1108
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:30:44+00:00'
+    adapter_version: 1
+    metadata:
+      title: Начала и концы
+      authors:
+      - name: Шестов Л.
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1908
+      translator: null
+      publisher: null
+    files:
+    - name: Шестов. Начала и концы_text.pdf
+      url: https://archive.org/download/20200408_20200408_1108/%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2.%20%D0%9D%D0%B0%D1%87%D0%B0%D0%BB%D0%B0%20%D0%B8%20%D0%BA%D0%BE%D0%BD%D1%86%D1%8B_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Начала и концы
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: null
+      year: 1908
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Л. И. Шестов ум. 1938; изд. 1908; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: l-potestas-clavium-archive
+  landing_url: https://archive.org/details/potestasclavium
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:30:54+00:00'
+    adapter_version: 1
+    metadata:
+      title: Potestas Clavium
+      authors:
+      - name: Шестов Л.
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1915
+      translator: null
+      publisher: null
+    files:
+    - name: Шестов. Potestas clavium.pdf
+      url: https://archive.org/download/potestasclavium/%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2.%20Potestas%20clavium.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Potestas Clavium
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: null
+      year: 1915
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Л. И. Шестов ум. 1938; изд. 1915; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: l-razrushayushchiy-sozidayushchiy-miry-archive
+  landing_url: https://archive.org/details/20200329_20200329_1713
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:30:59+00:00'
+    adapter_version: 1
+    metadata:
+      title: Разрушающiй и созидающiй мiры
+      authors:
+      - name: Шестов Л.
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1909
+      translator: null
+      publisher: null
+    files:
+    - name: Шестов. Разрушающий и созидающий миры_text.pdf
+      url: https://archive.org/download/20200329_20200329_1713/%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2.%20%D0%A0%D0%B0%D0%B7%D1%80%D1%83%D1%88%D0%B0%D1%8E%D1%89%D0%B8%D0%B9%20%D0%B8%20%D1%81%D0%BE%D0%B7%D0%B8%D0%B4%D0%B0%D1%8E%D1%89%D0%B8%D0%B9%20%D0%BC%D0%B8%D1%80%D1%8B_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Разрушающий и созидающий миры
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: null
+      year: 1909
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Л. И. Шестов ум. 1938; изд. 1909; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdiaev-sub-specie-aeternitatis-pyty-filosofskie
+  landing_url: https://archive.org/details/subspecieaeterni00berduoft
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:31:11+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Sub specie aeternitatis : ópyty filosofskie, sotsialnye i literaturnye (1900-1906 g.)'
+      authors:
+      - name: Nikola Berdiaev
+        death_year: 1948
+        wikidata: null
+      language: ru
+      year: 1907
+      translator: null
+      publisher: 'S.-Peterburg : Izd. M.V. Pirozhkova'
+    files:
+    - name: subspecieaeterni00berduoft.pdf
+      url: https://archive.org/download/subspecieaeterni00berduoft/subspecieaeterni00berduoft.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: 'Sub specie aeternitatis: опыты философские, социальные и литературные (1900–1906)'
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: null
+      year: 1907
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. А. Бердяев ум. 1948; изд. 1907; сканы Университета Торонто; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: n-ocherk-istorii-filosofii-archive
+  landing_url: https://archive.org/details/strahov_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T13:31:15+00:00'
+    adapter_version: 1
+    metadata:
+      title: Очеркъ исторiи философiи
+      authors:
+      - name: Страхов Н.
+        death_year: 1978
+        wikidata: Q18635157
+      language: ru
+      year: 1901
+      translator: null
+      publisher: null
+    files:
+    - name: Страхов. Очерк истории философии.pdf
+      url: https://archive.org/download/strahov_philosophy/%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2.%20%D0%9E%D1%87%D0%B5%D1%80%D0%BA%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8.pdf
+    license_hint: https://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Очерк истории философии
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+      year: 1901
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. Н. Страхов ум. 1896; изд. Харьков, 1901; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: svetilin-uchebnik-logiki-archive
+  landing_url: https://archive.org/details/svietilin_uczebnik_logiki_13_izd
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:20+00:00'
+    adapter_version: 1
+    metadata:
+      title: Учебникъ логики
+      authors:
+      - name: Александр Емельянович Светилин
+        death_year: 1887
+        wikidata: Q70874345
+      language: ru
+      year: 1908
+      translator: null
+      publisher: null
+    files:
+    - name: А. Свѣтилинъ — Учебникъ логики_text.pdf
+      url: https://archive.org/download/svietilin_uczebnik_logiki_13_izd/%D0%90.%20%D0%A1%D0%B2%D1%A3%D1%82%D0%B8%D0%BB%D0%B8%D0%BD%D1%8A%20%E2%80%94%20%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B8%D0%BA%D1%8A%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8_text.pdf
+    license_hint: https://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Учебник логики (13-е изд.)
+      authors:
+      - name: Александр Емельянович Светилин
+        death_year: 1887
+        wikidata: null
+      year: 1908
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. Е. Светилин ум. 1887; 13-е изд. 1908; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: uchebnik-formalnoy-logiki-archive
+  landing_url: https://archive.org/details/20200203_20200203_1007
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:27+00:00'
+    adapter_version: 1
+    metadata:
+      title: Учебникъ формальной логики
+      authors:
+      - name: Светилин А.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1871
+      translator: null
+      publisher: null
+    files:
+    - name: Светилин. Учебник формальной логики.epub
+      url: https://archive.org/download/20200203_20200203_1007/%D0%A1%D0%B2%D0%B5%D1%82%D0%B8%D0%BB%D0%B8%D0%BD.%20%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B8%D0%BA%20%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Учебник формальной логики
+      authors:
+      - name: Александр Емельянович Светилин
+        death_year: 1887
+        wikidata: null
+      year: 1871
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. Е. Светилин ум. 1887; изд. 1871; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lektsii-po-logik-archive
+  landing_url: https://archive.org/details/20200203_20200203_0644
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:31+00:00'
+    adapter_version: 1
+    metadata:
+      title: Лекцiи по логикѣ
+      authors:
+      - name: Введенский А.И
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1896
+      translator: null
+      publisher: null
+    files:
+    - name: Введенский. Лекции по логике_text.pdf
+      url: https://archive.org/download/20200203_20200203_0644/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9.%20%D0%9B%D0%B5%D0%BA%D1%86%D0%B8%D0%B8%20%D0%BF%D0%BE%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B5_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Лекции по логике
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: null
+      year: 1896
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. И. Введенский ум. 1925; изд. 1896; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: logika-dlya-gimnaziy-archive
+  landing_url: https://archive.org/details/20200203_20200203_0702
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:43+00:00'
+    adapter_version: 1
+    metadata:
+      title: Логика для гимназiй
+      authors:
+      - name: Введенский А.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1915
+      translator: null
+      publisher: null
+    files:
+    - name: Введенский. Логика для гимназий_text.pdf
+      url: https://archive.org/download/20200203_20200203_0702/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9.%20%D0%9B%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0%20%D0%B4%D0%BB%D1%8F%20%D0%B3%D0%B8%D0%BC%D0%BD%D0%B0%D0%B7%D0%B8%D0%B9_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Логика для гимназий
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: null
+      year: 1915
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. И. Введенский ум. 1925; изд. 1915; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: logika-kak-chast-teorii-poznaniya-archive
+  landing_url: https://archive.org/details/20200203_20200203_0707
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:51+00:00'
+    adapter_version: 1
+    metadata:
+      title: Логика как часть теорiи познанiя
+      authors:
+      - name: Введенский А.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1917
+      translator: null
+      publisher: null
+    files:
+    - name: Введенский. Логика, как часть теории познания.epub
+      url: https://archive.org/download/20200203_20200203_0707/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9.%20%D0%9B%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0%2C%20%D0%BA%D0%B0%D0%BA%20%D1%87%D0%B0%D1%81%D1%82%D1%8C%20%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8%20%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Логика как часть теории познания
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: null
+      year: 1917
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. И. Введенский ум. 1925; изд. 1917; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: g-uchebnik-logiki-archive
+  landing_url: https://archive.org/details/20200203_20200203_0816
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:31:57+00:00'
+    adapter_version: 1
+    metadata:
+      title: Учебникъ логики
+      authors:
+      - name: Челпанов Г.
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1917
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов. Учебник логики.epub
+      url: https://archive.org/download/20200203_20200203_0816/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2.%20%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B8%D0%BA%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Учебник логики (9-е изд.)
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1917
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Г. И. Челпанов ум. 1936; изд. 1917; на ru.wikisource есть отдельная запись того же учебника; срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: g-dopolnitelnyy-kurs-logiki-archive
+  landing_url: https://archive.org/details/20200203_20200203_0812
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:32:06+00:00'
+    adapter_version: 1
+    metadata:
+      title: Дополнительный курсъ логики
+      authors:
+      - name: Челпанов Г.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1909
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов. Дополнительный курс логики.epub
+      url: https://archive.org/download/20200203_20200203_0812/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2.%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BA%D1%83%D1%80%D1%81%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Дополнительный курс логики
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1909
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Г. И. Челпанов ум. 1936; изд. 1909; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: karpov-sistematicheskoe-izlozhenie-logiki-archive
+  landing_url: https://archive.org/details/20200203_20200203_0945
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:32:16+00:00'
+    adapter_version: 1
+    metadata:
+      title: Систематическое изложенiе логики
+      authors:
+      - name: Карпов
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1856
+      translator: null
+      publisher: null
+    files:
+    - name: Карпов. Систематическое изложение логики.epub
+      url: https://archive.org/download/20200203_20200203_0945/%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2.%20%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%20%D0%B8%D0%B7%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Систематическое изложение логики
+      authors:
+      - name: Василий Николаевич Карпов
+        death_year: 1867
+        wikidata: null
+      year: 1856
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. Н. Карпов ум. 1867 (инициалы на archive.org не раскрыты; фамилия Карпов и год 1856 соответствуют
+      логике В. Н. Карпова, проверить); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'проверить личность автора/переводчика: В. Н. Карпов ум. 1867 (инициалы на archive.org не раскрыты;
+      фамилия Карпов и год 1856 соответствуют логике В. Н. Карпова, проверить)'
+  publish: auto
+- id: vladislavlev-uchebnik-logiki-m-vladislavleva-archive
+  landing_url: https://archive.org/details/uchebniklogikimv01vlad
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:32:26+00:00'
+    adapter_version: 1
+    metadata:
+      title: Uchebnik logiki / M. Vladislavleva
+      authors:
+      - name: M. Vladislavlev
+        death_year: 1890
+        wikidata: null
+      - name: М. Владиславлев
+        death_year: 1890
+        wikidata: null
+      language: ru
+      year: 1905
+      translator: null
+      publisher: 'Moskva : Tipo-litografīi͡a T-va Kushnerev i K.'
+    files:
+    - name: uchebniklogikimv01vlad.epub
+      url: https://archive.org/download/uchebniklogikimv01vlad/uchebniklogikimv01vlad.epub
+    license_hint: null
+  override:
+    metadata:
+      title: Учебник логики
+      authors:
+      - name: Михаил Иванович Владиславлев
+        death_year: 1890
+        wikidata: null
+      year: 1905
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      М. И. Владиславлев ум. 1890; изд. 1905; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nachalnyya-osnovaniya-logiki-archive
+  landing_url: https://archive.org/details/davydov_logic
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:32:30+00:00'
+    adapter_version: 1
+    metadata:
+      title: Начальныя основанiя логики
+      authors:
+      - name: Давыдов И.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1821
+      translator: null
+      publisher: null
+    files:
+    - name: Давыдов. Начальные основания логики_text.pdf
+      url: https://archive.org/download/davydov_logic/%D0%94%D0%B0%D0%B2%D1%8B%D0%B4%D0%BE%D0%B2.%20%D0%9D%D0%B0%D1%87%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8_text.pdf
+    license_hint: https://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Начальные основания логики
+      authors:
+      - name: Иван Иванович Давыдов
+        death_year: 1863
+        wikidata: null
+      year: 1821
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      И. И. Давыдов (1794–1863, Wikidata Q15933737; идентификация с автором по имени); изд. 1821; срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: p-filosofiya-plotina-archive
+  landing_url: https://archive.org/details/20200321_20200321_0856
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:32:36+00:00'
+    adapter_version: 1
+    metadata:
+      title: Философiя Плотина
+      authors:
+      - name: Блонский П.П.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1918
+      translator: null
+      publisher: null
+    files:
+    - name: Блонский. Философия Плотина_text.pdf
+      url: https://archive.org/download/20200321_20200321_0856/%D0%91%D0%BB%D0%BE%D0%BD%D1%81%D0%BA%D0%B8%D0%B9.%20%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%20%D0%9F%D0%BB%D0%BE%D1%82%D0%B8%D0%BD%D0%B0_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Философия Плотина
+      authors:
+      - name: Павел Петрович Блонский
+        death_year: 1941
+        wikidata: null
+      year: 1918
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. П. Блонский ум. 1941 (Wikidata Q2624489); изд. 1918; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: minski-religiia-budushchago-filosofskie-razgovory-archive
+  landing_url: https://archive.org/details/religiiabudushch00mins
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:32:46+00:00'
+    adapter_version: 1
+    metadata:
+      title: Religiia budushchago; filosofskie razgovory
+      authors:
+      - name: N. M. Minski
+        death_year: 1937
+        wikidata: null
+      language: ru
+      year: 1905
+      translator: null
+      publisher: S.-Peterburg, Izd. M.B. Pirozhkova
+    files:
+    - name: religiiabudushch00mins.pdf
+      url: https://archive.org/download/religiiabudushch00mins/religiiabudushch00mins.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: 'Религия будущего: философские разговоры'
+      authors:
+      - name: Николай Максимович Минский
+        death_year: 1937
+        wikidata: null
+      year: 1905
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. М. Минский ум. 1937 (изд. 1905, указан в метаданных 1855–1937); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nekrasov-vera-znaniya-opyt-archive
+  landing_url: https://archive.org/details/vera_znaniya_i_opyt
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T13:32:50+00:00'
+    adapter_version: 1
+    metadata:
+      title: Вера, знания и опыт
+      authors:
+      - name: Павел Алексеевич Некрасов
+        death_year: 1924
+        wikidata: null
+      language: ru
+      year: 1912
+      translator: null
+      publisher: null
+    files:
+    - name: Некрасов П. А. Вера, знания и опыт.epub
+      url: https://archive.org/download/vera_znaniya_i_opyt/%D0%9D%D0%B5%D0%BA%D1%80%D0%B0%D1%81%D0%BE%D0%B2%20%D0%9F.%20%D0%90.%20%D0%92%D0%B5%D1%80%D0%B0%2C%20%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B8%20%D0%BE%D0%BF%D1%8B%D1%82.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Вера, знания и опыт
+      authors:
+      - name: Павел Алексеевич Некрасов
+        death_year: 1924
+        wikidata: null
+      year: 1912
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. А. Некрасов ум. 1924; изд. 1912; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: m-bezkonechnoe-anaksimandra-archive
+  landing_url: https://archive.org/details/20201119_karinskij_anaximandr
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:32:59+00:00'
+    adapter_version: 1
+    metadata:
+      title: Безконечное Анаксимандра
+      authors:
+      - name: Каринский М.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1890
+      translator: null
+      publisher: null
+    files:
+    - name: Каринский. Бесконечное Анаксимандра.epub
+      url: https://archive.org/download/20201119_karinskij_anaximandr/%D0%9A%D0%B0%D1%80%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B9.%20%D0%91%D0%B5%D1%81%D0%BA%D0%BE%D0%BD%D0%B5%D1%87%D0%BD%D0%BE%D0%B5%20%D0%90%D0%BD%D0%B0%D0%BA%D1%81%D0%B8%D0%BC%D0%B0%D0%BD%D0%B4%D1%80%D0%B0.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Бесконечное Анаксимандра
+      authors:
+      - name: Михаил Иванович Каринский
+        death_year: 1917
+        wikidata: null
+      year: 1890
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      М. И. Каринский ум. 1917; изд. 1890; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: s-sobranie-sochineniy-t-1-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom1
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:05+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.1
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1911
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_1.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom1/Solovev_Sobranie_sochinenij_tom_1.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.1 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1911
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1911 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-2-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom2
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:10+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.2
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1911
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_2.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom2/Solovev_Sobranie_sochinenij_tom_2.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.2 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1911
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1911 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-3-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom3
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:17+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.3
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1912
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_3.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom3/Solovev_Sobranie_sochinenij_tom_3.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.3 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1912
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1912 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-4-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom4
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:24+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.4
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_4.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom4/Solovev_Sobranie_sochinenij_tom_4.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.4 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-5-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom5
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:29+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.5
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_5.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom5/Solovev_Sobranie_sochinenij_tom_5.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.5 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-6-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom6
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:35+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.6
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_6.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom6/Solovev_Sobranie_sochinenij_tom_6.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.6 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-7-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom7
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:45+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.7
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_7.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom7/Solovev_Sobranie_sochinenij_tom_7.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.7 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-8-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom8
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:34:50+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.8
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_8.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom8/Solovev_Sobranie_sochinenij_tom_8.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.8 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-9-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom9
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:35:01+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.9
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1913
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_9.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom9/Solovev_Sobranie_sochinenij_tom_9.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.9 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1913
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1913 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
+- id: s-sobranie-sochineniy-t-10-archive
+  landing_url: https://archive.org/details/solovevsobraniesochinenijtom10
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:35:11+00:00'
+    adapter_version: 1
+    metadata:
+      title: Собранiе сочиненiй. Т.10
+      authors:
+      - name: Соловьев В.С.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: null
+    files:
+    - name: Solovev_Sobranie_sochinenij_tom_10.pdf
+      url: https://archive.org/download/solovevsobraniesochinenijtom10/Solovev_Sobranie_sochinenij_tom_10.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Собрание сочинений. Т.10 (2-е изд.)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: null
+      year: 1914
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. С. Соловьёв ум. 1900 (изд. 1914 г., посмертное собрание сочинений); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
+      1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
+  publish: auto
