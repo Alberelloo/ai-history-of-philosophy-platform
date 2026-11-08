@@ -1,6 +1,6 @@
 # Progress: reader-layout
 
-Этап 1 из 6 (`docs/design/features/reader-panels.md`, раздел 16). Актуализировано 2026-11-08 по коду. Готовность: около 85%.
+Этап 1 из 6 (`docs/design/features/reader-panels.md`, раздел 16). Ведёт поток C (`claude/reader-wt-layout`). Обновлено 2026-11-08. Код и тесты закрыты; T4 и T32 ждут подключения в `ReaderPage.tsx` интегратором; снимки — после слияния.
 
 ## Статус по пунктам
 
@@ -8,38 +8,68 @@
 | --- | --- | --- |
 | 1.1 Изменение OpenSpec | сделано | `openspec validate reader-layout` — valid |
 | 1.2 Документы дизайна | сделано | `docs/design/system/layout.md`, `components/SidePanel.md` |
-| 2.1 Токены и rem | сделано | `web/src/styles/tokens.css` (`--margin-col: 18rem`), `tests/web/test_design_system.py` |
-| 2.2 Общие экраны на rem | не начато | в стилях библиотеки, графа, настроек остались px; Р9 и T45 не закрыты |
-| 3.1–3.3 Каркас панели | сделано | `web/src/SidePanel.tsx`, `App.tsx` (стек `panel.stack`), `test_panel_strip_on_narrow_screen` |
-| 4.1–4.4 Раскладка K1–K4 | сделано | `web/src/layout.ts`, `test_layout_modes_and_text_measure` (1920/1440 K1, 1280 K2, 1024 K3, 62–68ch) |
-| 5.1 Место чтения | частично | код есть; `test_reading_position_kept` не проверяет смену ширины и полную карточку (T4) |
-| 5.2 Колонки без анимации | частично | в коде; теста T37 нет |
-| 6.1 Тесты | частично | есть T1–T3; нет T5, T37, T45, T32 |
-| 6.2 Снимки S0/S5/полоска | не начато | эталонов `reader-*` нет, 2560 не снимается |
-| 6.3 Итоговый прогон | частично | tsc, ruff, прослеживаемость 322/322 зелёные; полный pytest не перезапускался |
+| 2.1 Токены и rem | сделано | `web/src/styles/tokens.css`, `tests/web/test_design_system.py` |
+| 2.2 Общие экраны на rem | сделано в `styles.css` | `test_styles_sizes_in_rem`, `test_scale_across_product[library/graph/settings/chapter]` (1280, 1920, 2560) |
+| 3.1–3.3 Каркас панели | сделано | `web/src/SidePanel.tsx`, `test_panel_strip_on_narrow_screen` |
+| 4.1–4.4 Раскладка K1–K4 | сделано | `web/src/layout.ts`, `test_layout_modes_and_text_measure`; 4.4 — `test_pinned_sidebar_folds_while_panel_open` (T5) |
+| 5.1 Место чтения | сделано в `hooks/useReadingAnchor.ts`, ждёт подключения | `test_reading_place_kept` (T4) |
+| 5.2 Колонки без анимации | сделано | `test_columns_do_not_animate` (T37) |
+| 6.1 Тесты | сделано | T1–T3 `tests/web/test_reader_layout.py`; T4, T5, T32, T37, T45 `tests/e2e/test_reader_layout.py` |
+| 6.2 Снимки S0/S5/полоска | не начато | эталоны пересоздаёт интегратор после слияния (правило 6); 2560 в `visual.WIDTHS` не добавлен — `visual.py` потокам закрыт |
+| 6.3 Итоговый прогон | сделано (см. ниже) | |
 
-## Сейчас
+## Что сделано потоком C
 
-Раскладка и каркас панели работают и лежат в ветке `claude/reader-implementation`. Расхождение документов с кодом было в отметках тестов и снимков: в тексте они значились как готовые, а их нет.
+- `web/src/styles.css`: все размеры, кроме линий, радиусов, теней, `transform` и 1px, переведены из px в rem (библиотека, граф, настройки, навигация, экран чтения, уведомление). Значения при корневом кегле 16px те же (кратны 1/16 rem), поэтому до 1920 ничего не сдвинулось: `tests/e2e/test_visual_design.py` вместе со сравнением эталонов — 27 passed. Точки перестройки в `@media` остались в px (9.7, п. 4).
+- Окно сноски ставится под строкой знака (`top: calc(100% + var(--space-1))` вместо `1.6em`, которое на части строк наезжало на строку на 1–2px).
+- Отметка оглавления: `.toc a[aria-current="page"]` (глава) и `[aria-current="location"]` (раздел у верхнего края, полоса 2px `accent`); прежний `"true"` пока оставлен в селекторе до подключения `ReaderToc.tsx`.
+- Новые файлы: `web/src/hooks/useReadingAnchor.ts` (T4), `web/src/hooks/useTocLocation.ts` и `web/src/ReaderToc.tsx` (T32).
 
-## Следующий шаг
+## Найденные ошибки
 
-1. Тесты T5 (временное сворачивание навигации при открытой панели на 1440), T37 (ширина `article.chapter` во время открытия панели принимает два значения), T32 (слой оглавления на 1024), T4 в полном виде (20-й абзац, смена ширины 1440 → 1280).
-2. 2.2 и T45: перевести библиотеку, граф, настройки на rem-токены, добавить 2560 в `visual.WIDTHS`.
-3. Эталоны S0, S5, полоски по 14.3 и их просмотр человеком.
+1. **T4, место чтения.** В `ReaderPage.tsx` (эффект «Привязка места чтения при перестройке раскладки») опорный абзац запоминался только при смене раскладки. После прокрутки опорным оставался абзац с прошлой перестройки (обычно первый), и открытие панели прокручивало страницу назад: в тесте абзац уехал на 1503px. `test_reading_position_kept` этого не ловил — он не прокручивает перед открытием.
+2. **T32, оглавление.** Отметки раздела у верхнего края (`aria-current="location"`, 8.1) не было совсем; глава отмечалась `aria-current="true"` вместо `"page"`; после выбора раздела в слое оглавления фокус не переходил на заголовок.
+
+## Для интегратора: подключение в `ReaderPage.tsx` (файл потока B)
+
+Проверено локально (правка не закоммичена): `tsc --noEmit` чистый; `tests/e2e/test_reader_layout.py`, `tests/web/test_reader_notes.py`, `tests/web/test_reader_layout.py`, `tests/e2e/test_visual_design.py`, `tests/e2e/test_settings.py` — зелёные; два чужих теста требуют замены `"true"` на `"page"` (п. 5).
+
+1. Импорты: строку `import { FieldNote } from "./Footnote";` заменить на
+   ```ts
+   import { fieldItems, MarginCol } from "./Footnote";
+   import { useReadingAnchor } from "./hooks/useReadingAnchor";
+   import { useTocLocation } from "./hooks/useTocLocation";
+   import { Toc } from "./ReaderToc";
+   ```
+2. Удалить локальные `function Toc` (оглавление), `type FieldItem`, `function fieldItems`, `function MarginCol` (функцию `unrenderedDetail` между ними оставить). Подробности про `MarginCol` — `openspec/changes/reader-notes/progress.md`.
+3. Блок «// Привязка места чтения при перестройке раскладки (2.5)» (`layoutAnchor`, `layoutKey` и его `useLayoutEffect`) заменить двумя строками (до ранних `return`, на том же месте):
+   ```ts
+   useReadingAnchor(textRef, chapter ? `${layout.mode}:${Math.round(layout.text)}:${layout.navWidth}` : null);
+   const tocSection = useTocLocation(textRef, chapter?.chapter_id ?? null, anchor);
+   ```
+4. В обоих вызовах `<Toc … current={chapter.chapter_id} …/>` (полное оглавление и слой) добавить `section={tocSection}`.
+5. Чужие тесты, завязанные на прежнюю отметку главы: `tests/web/test_library_reading.py:305, 308` и `tests/e2e/test_site.py:64` — `[aria-current=true]` заменить на `[aria-current=page]` (8.1: текущая глава — `aria-current="page"`).
+
+Без этих правок в ветке потока падают `test_reading_place_kept` (T4), `test_toc_layer_marks_section`, `test_toc_marks_section_on_scroll` (T32) и 4 теста поля сносок (`reader-notes`).
+
+## Нужно вне файлов потока C (Р9 не закрыт целиком)
+
+- `web/src/styles/components.css` (общие компоненты `pg-*`: кнопки, поля, переключатели, чипы, статусы, портрет, галерея) — около 130 px-величин шрифтов, высот и отступов. На 2560 эти элементы не растут с корневым кеглем. По 9.7, п. 5 размеры задают `tokens.css` и `components.css`; владельца у файла в разделе 9 сводки нет — нужно решение интегратора (перевод тем же правилом: всё, кроме линий, радиусов и теней, в rem).
+- `web/src/GraphPage.tsx`: размеры узлов графа заданы числами в координатах SVG (`width={36}`, `rx={6}`), а холст — в px контейнера; узлы на 2560 не растут. Решение — масштаб `viewBox` от корневого кегля; файл не потока C.
+- `tests/e2e/visual.py`: ширина 2560 в `WIDTHS` и снимки 2560 по 14.3 — у интегратора.
 
 ## Известные проблемы
 
 - Без `TMP`/`TEMP` в рабочей папке Chromium не запускается, браузерные тесты молча пропускаются.
 - Пиксельный просмотр снимков человеком не проводился.
-- Старые эталоны (`chapter-light-1920.png` и др.) названы не по схеме 14.3.
+- Главы демо-учебника короткие: T4 и T32 подменяют ответ главы в браузере (`page.route`), добавляя абзацы-заполнители.
 
 ## Как проверить
 
 ```bash
 export TMP="$(pwd -W)/.stack/tmp"; export TEMP="$TMP"; mkdir -p "$TMP"
 /c/Users/Ivano/AppData/Local/Programs/openspec/openspec validate reader-layout
-.venv/Scripts/python -m pytest -q tests/web/test_reader_layout.py
+.venv/Scripts/python -m pytest -q tests/web/test_reader_layout.py tests/e2e/test_reader_layout.py
 .venv/Scripts/python scripts/check_traceability.py
 cd web && npx tsc --noEmit
 ```
