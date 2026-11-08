@@ -14,17 +14,17 @@
 
 ## 3. Сноски на поле и в окне
 
-- [x] 3.1 `Footnote.tsx`: сноска на поле в K1 (номер и текст, подсветка пары), окно в K2–K4 (`test_footnotes_on_field_in_k1`, `test_footnote_popup_in_compact`). Enter↔Esc между знаком и сноской тестом не проверен
+- [x] 3.1 `Footnote.tsx`: сноска на поле в K1 (номер и текст, подсветка пары), окно в K2–K4 (`test_footnotes_on_field_in_k1`, `test_footnote_popup_in_compact`). Клавиатура (поток C): K1 — Enter на знаке ставит фокус на сноску (`tabindex=-1`), Esc и Shift+Tab — обратно (`test_field_note_keyboard`); K2–K4 — Enter переводит фокус в окно со ссылками (`dialog`), Esc из окна закрывает и возвращает фокус на знак (`test_footnote_popup_keyboard`)
 - [x] 3.2 `ReaderPage.tsx`: в K1 поле `.margin-col` с номерами страниц и сносками, в K2–K4 номера страниц в тексте (`test_page_numbers_field_vs_text`)
-- [ ] 3.3 Каскад сносок и «↑» при сдвиге > 240px (`ReaderPage.tsx:279`, `Footnote.tsx:103-130`) есть в коде; теста на каскад трёх сносок в одном абзаце нет (T28), поэтому не отмечено
+- [x] 3.3 Каскад сносок и «↑» при сдвиге > 240px: прежний `MarginCol` в `ReaderPage.tsx` не работал (у `<aside>` не было `ref`, все элементы поля стояли наверху колонки). Исправленный `MarginCol` и `fieldItems` перенесены в `Footnote.tsx` (пересчёт после `document.fonts.ready` и по `ResizeObserver` колонки текста); подключение в `ReaderPage.tsx` делает интегратор (см. `progress.md`). Тесты `test_three_notes_cascade_on_field`, `test_field_notes_follow_width_change`
 - [x] 3.4 `styles.css`: правила поля сносок (`.field-note`, `.field-page`, `[data-nontext]`)
 
 ## 4. Неразобранные части
 
 - [x] 4.1 Плашки по `detail_code`/`page`; EN-пояснения (`i18n/en.ts` `unrendered.*`, `test_unrendered_plate_localized`)
-- [x] 4.2 `data-nontext` у плашек и номеров страниц (`ReaderPage.tsx:187, 734`; тест проверяет плашку; невхождение в выделение руками не проверялось)
+- [x] 4.2 `data-nontext` у плашек и номеров страниц (`ReaderPage.tsx:187, 734`); номер на поле K1 — `user-select: none` в `styles/notes.css`; невхождение в выделение — `test_page_numbers_level_and_not_selected`
 
 ## 5. Тесты и проверка
 
-- [ ] 5.1 Тесты T28–T30. Есть: `tests/web/test_reader_notes.py` (4 теста: поле K1, окно K2/K3, страницы, плашка RU/EN) — покрывают T28 частично, T29, T30. Не хватает: три сноски в абзаце, K2 с клавиатуры, невхождения номера страницы в выделение
+- [x] 5.1 Тесты T28–T30: `tests/web/test_reader_notes.py`, 9 тестов (поле K1, три сноски каскадом на 1920 и 1440, пересчёт при смене ширины, клавиатура K1 и K2, окно K3, страницы на поле и в тексте, невхождение номера в выделение, плашка RU/EN). 4 из них (`test_footnotes_on_field_in_k1`, `test_three_notes_cascade_on_field`, `test_field_notes_follow_width_change`, `test_page_numbers_level_and_not_selected`) проходят только после подключения `MarginCol` из `Footnote.tsx` в `ReaderPage.tsx`; с подключением проверено локально — 9 passed
 - [ ] 5.2 Снимки поля сносок (1920, 1440) и окна сноски (1280, 1024) по 14.3 и их просмотр: эталонов нет

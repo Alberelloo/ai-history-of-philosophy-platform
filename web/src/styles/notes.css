@@ -1,0 +1,19 @@
+/* Сноски (reader-panels.md, 6.1–6.2; этап 5): клавиатура и выделение. Основные правила поля
+   сносок и окна сноски — в styles.css («Сноски на поле»). */
+
+/* Enter на знаке ставит фокус на сноску на поле или внутрь окна со ссылками: кольцо фокуса
+   как у остальных элементов, без системной рамки. */
+.field-note:focus,
+.note-popup:focus {
+  outline: none;
+}
+
+.field-note:focus-visible,
+.note-popup:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* Номер страницы на поле (K1), как и «— с. 45» в тексте (K2–K4), не попадает в выделение. */
+.field-page {
+  user-select: none;
+}
