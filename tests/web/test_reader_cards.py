@@ -600,6 +600,10 @@ def test_t15_loading_not_found_and_failure(browser, site, texts, locale):
         expect(dialog.get_by_role("alert")).to_contain_text(words["failed"])
         before = knowledge.card_requests.count(EXPERIENCE)
         knowledge.card_status[EXPERIENCE] = 200
+        # Щелчок — после появления окна (анимация 9.5): иначе Playwright, не дождавшись
+        # «стабильной» кнопки, прокручивает её к краю окна, строка упоминания уходит из вида,
+        # и окно закрывается по правилу 4.3 — артефакт сценария, не продукта.
+        dialog.evaluate("e => Promise.all(e.getAnimations().map(a => a.finished))")
         dialog.get_by_role("button", name=words["retry"]).click()
         expect(dialog.locator("h3")).to_have_text("Опыт")
         assert knowledge.card_requests.count(EXPERIENCE) == before + 1

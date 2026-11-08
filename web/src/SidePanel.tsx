@@ -24,13 +24,18 @@ type Props = {
   expanded: boolean;
   onExpand: (expanded: boolean) => void;
   ariaLabel: string;
+  // Что лежит наверху стека панели: подпись кнопки полоски «Развернуть ассистента/карточку».
+  kind?: "assistant" | "card";
+  // Подпись активной стадии, пока в книге идёт ответ; null — ответа нет (точка в полоске, 2.3).
+  answering?: string | null;
   children: ReactNode;
 };
 
-export function SidePanel({ expanded, onExpand, ariaLabel, children }: Props) {
+export function SidePanel({ expanded, onExpand, ariaLabel, kind = "assistant", answering = null, children }: Props) {
   const t = useT();
   const compact = useMedia(COMPACT_MEDIA);
   const open = !compact || expanded;
+  const expandLabel = kind === "card" ? t.panel.expandCard : t.panel.expandAssistant;
 
   // На ≥1280 панель занимает место и сдвигает содержимое: уведомления над текстом сужаются,
   // чтобы не уходить под панель (правило для .first-run в styles.css).
@@ -50,12 +55,18 @@ export function SidePanel({ expanded, onExpand, ariaLabel, children }: Props) {
           className="side-panel__strip"
           aria-expanded={false}
           aria-controls="side-panel"
-          title={t.panel.expandAssistant}
-          aria-label={t.panel.expandAssistant}
+          title={answering ?? expandLabel}
           onClick={() => onExpand(true)}
         >
-          <Icon name="chat" />
-          <span className="visually-hidden">{t.panel.expandAssistant}</span>
+          <Icon name={kind === "card" ? "book" : "chat"} />
+          <span className="visually-hidden">{expandLabel}</span>
+          {/* Пока идёт ответ — точка стадии с циклом ожидания и подпись для читалок (2.3, 5.3). */}
+          {answering && (
+            <>
+              <span className="assistant__dot side-panel__dot" aria-hidden="true" />
+              <span className="visually-hidden">{t.panel.answering}</span>
+            </>
+          )}
         </button>
       )}
       {open && (

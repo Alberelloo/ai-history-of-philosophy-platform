@@ -37,13 +37,15 @@ SIDEBAR_WIDTHS = (1024, 1280, 1440, 1920)
 # --- подготовка страницы -------------------------------------------------------------
 
 
-def settle(page, *, network: bool = True) -> None:
+def settle(page, *, network: bool = True, pointer: bool = True) -> None:
     """Ждёт шрифтов и конца перестроек: снимок и измерения стабильны. ``network=False`` — не
-    ждать тишины в сети (снимок состояния, где запрос намеренно висит: «загружается»)."""
+    ждать тишины в сети (снимок состояния, где запрос намеренно висит: «загружается»);
+    ``pointer=False`` — не уводить указатель (снимаемое состояние держится наведением)."""
     # Наведение после клика меняло бы вид кнопок; угол — справа внизу: слева боковая панель,
     # и указатель над ней раскрыл бы её.
-    size = page.viewport_size or {"width": 1280, "height": 800}
-    page.mouse.move(size["width"] - 1, size["height"] - 1)
+    if pointer:
+        size = page.viewport_size or {"width": 1280, "height": 800}
+        page.mouse.move(size["width"] - 1, size["height"] - 1)
     if network:
         page.wait_for_load_state("networkidle")
     page.evaluate("document.fonts.ready.then(() => true)")
@@ -372,9 +374,10 @@ def reader_name(state: str, theme: str, lang: str, width: int) -> str:
     return f"reader-{state}-{theme}-{lang}-{width}"
 
 
-# Меняется от запуска к запуску: дата и время последнего обмена в строках сессий, время с
-# отправки в строке стадий, секунды в итоге ответа.
-UNSTABLE = (".assistant__session-meta", ".assistant__stage-meta", ".assistant__summary")
+# Меняется от запуска к запуску: дата и время последнего обмена в строках сессий, секунды
+# с отправки в строке стадий и в итоге ответа. Маска — только сами числа (``assistant__elapsed``):
+# подписи стадий, итога и текст ответа остаются на снимке.
+UNSTABLE = (".assistant__session-meta", ".assistant__elapsed")
 
 
 class SnapshotMismatch(AssertionError):
@@ -414,10 +417,16 @@ def compare(actual: Path, expected: Path, name: str) -> float:
 
 
 def snap(
-    page, name: str, *, mask: list | None = None, full_page: bool = False, network: bool = True
+    page,
+    name: str,
+    *,
+    mask: list | None = None,
+    full_page: bool = False,
+    network: bool = True,
+    pointer: bool = True,
 ) -> float | None:
     """Снимает экран и сравнивает с эталоном; возвращает долю различий или None без эталона."""
-    settle(page, network=network)
+    settle(page, network=network, pointer=pointer)
     RESULTS.mkdir(parents=True, exist_ok=True)
     actual = RESULTS / f"{name}.png"
     page.screenshot(

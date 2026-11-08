@@ -8,6 +8,7 @@ import {
   Generated,
   Icon,
   Lifeline,
+  type LifeDates,
   PortraitGallery,
   StatusMark,
   Switch,
@@ -40,7 +41,7 @@ type Card = {
   id: string;
   type?: string;
   title: string;
-  dates: { original: string } | null;
+  dates: LifeDates | null;
   description: Row | null;
   description_pending: boolean;
   portraits?: PortraitItem[];
@@ -195,13 +196,13 @@ export function FullCard({
           </div>
         )}
         {problem === "not_found" && (
-          <div className="pg-notice pg-notice--danger" role="alert">
+          <div className="pg-notice pg-notice--danger pg-notice--stacked" role="alert">
             <Icon name="warning" />
             <div>{t.card.notFound}</div>
           </div>
         )}
         {problem === "failed" && (
-          <div className="pg-notice pg-notice--danger" role="alert">
+          <div className="pg-notice pg-notice--danger pg-notice--stacked" role="alert">
             <Icon name="warning" />
             <div>{t.card.loadFailed}</div>
             <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setAttempt((n) => n + 1)}>

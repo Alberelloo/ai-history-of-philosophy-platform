@@ -455,12 +455,77 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
   );
 }
 
-// Линия жизни персоны с датами (4.5): годы на горизонтальной оси.
-export function Lifeline({ dates }: { dates: { original: string } }) {
+// Даты сущности: исходная запись и границы в астрономических годах (0 = 1 до н. э.).
+export type LifeDates = {
+  original: string;
+  earliest_start?: number;
+  latest_start?: number;
+  earliest_end?: number;
+  latest_end?: number;
+  precision?: string;
+};
+
+const ROMAN: [number, string][] = [
+  [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+  [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+];
+
+function roman(n: number): string {
+  let out = "";
+  for (const [value, sign] of ROMAN) {
+    while (n >= value) {
+      out += sign;
+      n -= value;
+    }
+  }
+  return out;
+}
+
+// Век по границе шкалы: отрезок [from, from + 100) астрономических лет. 1701–1800 — XVIII,
+// −499…−400 (500–401 до н. э.) — V до н. э.
+function centuryLabel(from: number, bce: string): string {
+  const year = from + 1; // первый год отрезка
+  return year > 0 ? roman(Math.ceil(year / 100)) : `${roman(Math.ceil((1 - year) / 100))} ${bce}`;
+}
+
+// Линия жизни персоны (4.5, Lifeline.md): шкала веков с делениями и римскими номерами, полоса
+// жизни цвета семьи, годы одной подписью над началом полосы. Годы уже есть в голове карточки,
+// поэтому для читалок шкала скрыта. Без границ лет шкалу не из чего построить — её нет.
+export function Lifeline({ dates }: { dates: LifeDates }) {
+  const t = useT();
+  const start = dates.earliest_start;
+  const end = dates.latest_end ?? dates.earliest_end;
+  if (start === undefined || end === undefined || end < start) return null;
+  const from = Math.floor((start - 1) / 100) * 100;
+  const to = Math.max(Math.ceil(end / 100) * 100, from + 100);
+  const span = to - from;
+  const at = (year: number) => ((year - from) / span) * 100;
+  const bounds: number[] = [];
+  for (let y = from; y <= to; y += 100) bounds.push(y);
+  const lifeLeft = at(start);
+  const lifeWidth = Math.max(at(end) - lifeLeft, 1);
+  const fuzzy = dates.precision !== undefined && dates.precision !== "year";
   return (
-    <div className="pg-lifeline">
-      <span className="pg-lifeline__life" aria-hidden="true" />
-      <span className="pg-lifeline__dates">{dates.original}</span>
+    <div className="pg-lifeline" aria-hidden="true">
+      <span className="pg-lifeline__rule" />
+      {bounds.map((y) => (
+        <span key={y} className="pg-lifeline__tick" style={{ left: `${at(y)}%` }} />
+      ))}
+      {bounds.slice(0, -1).map((y) => (
+        <span key={`c${y}`} className="pg-lifeline__century" style={{ left: `${at(y + 50)}%` }}>
+          {centuryLabel(y, t.card.bce)}
+        </span>
+      ))}
+      <span
+        className={fuzzy ? "pg-lifeline__life pg-lifeline__life--fuzzy" : "pg-lifeline__life"}
+        style={{ left: `${lifeLeft}%`, width: `${lifeWidth}%` }}
+      />
+      <span
+        className={lifeLeft > 60 ? "pg-lifeline__year pg-lifeline__year--end" : "pg-lifeline__year"}
+        style={{ left: `${lifeLeft > 60 ? lifeLeft + lifeWidth : lifeLeft}%` }}
+      >
+        {dates.original}
+      </span>
     </div>
   );
 }

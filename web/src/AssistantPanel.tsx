@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import type { SourceItem } from "./api";
 import { navigate } from "./App";
 import { openCardInPanel } from "./FullCard";
@@ -175,6 +175,44 @@ function useStreams(): number {
     },
     () => streamsVersion,
   );
+}
+
+// Подпись активной стадии идущего ответа в книге ``key`` или null, если ответа нет: для точки
+// в свёрнутой полоске (2.3, 5.3). Панель в полоске размонтирована, поток живёт в модуле.
+export function useAnsweringStage(key: string | null): (typeof STAGE_NAMES)[number] | null {
+  useStreams();
+  if (!key) return null;
+  let step = -1;
+  live.forEach((item) => {
+    if (item.key === key) step = Math.max(step, item.stage.step);
+  });
+  return step < 0 ? null : STAGE_NAMES[Math.min(step, 3)];
+}
+
+// Абзацы фрагмента, который ждёт отправки в панели книги (S6): текст главы отмечает их линией
+// на левом поле, пока вопрос не отправлен или фрагмент не убран.
+let fragmentMarks: { sourceId: string; paragraphs: string[] } = { sourceId: "", paragraphs: [] };
+const fragmentListeners = new Set<() => void>();
+
+function publishFragment(sourceId: string, paragraphs: string[]) {
+  const same =
+    fragmentMarks.sourceId === sourceId &&
+    fragmentMarks.paragraphs.length === paragraphs.length &&
+    fragmentMarks.paragraphs.every((p, i) => p === paragraphs[i]);
+  if (same) return;
+  fragmentMarks = { sourceId, paragraphs };
+  fragmentListeners.forEach((listener) => listener());
+}
+
+export function useFragmentParagraphs(sourceId: string | undefined): string[] {
+  const marks = useSyncExternalStore(
+    (listener) => {
+      fragmentListeners.add(listener);
+      return () => fragmentListeners.delete(listener);
+    },
+    () => fragmentMarks,
+  );
+  return sourceId && marks.sourceId === sourceId ? marks.paragraphs : [];
 }
 
 function setStage(turnId: string, change: (stage: StageState) => StageState) {
@@ -439,6 +477,14 @@ function useLocationKey(): string {
 
 type Draft = { question: string; fragment: { text: string; paragraphs: string[] } | null };
 const drafts = new Map<string, Draft>();
+
+// Цитата фрагмента длиннее 280 знаков показывается до границы слова (5.2); null — целиком.
+const FRAGMENT_PREVIEW = 280;
+function cutFragment(text: string): string | null {
+  if (text.length <= FRAGMENT_PREVIEW) return null;
+  const space = text.slice(0, FRAGMENT_PREVIEW + 1).lastIndexOf(" ");
+  return text.slice(0, space > 0 ? space : FRAGMENT_PREVIEW).trimEnd();
+}
 
 // Список сессий в панели книги всегда на виду (решение владельца 2026-11-08); на узком окне
 // (полоска, <1280) он по умолчанию свёрнут до строки активной сессии. Выбор читателя
@@ -705,6 +751,14 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const sorted = [...set.sessions].sort((a, b) => b.updatedAt - a.updatedAt);
   const question = draft.question;
   const fragment = draft.fragment;
+  // Цитата фрагмента над полем (5.2): до 280 знаков целиком, длиннее — до границы слова и
+  // кнопка «Показать целиком». Раскрытие сбрасывается со сменой фрагмента.
+  const [wholeFragment, setWholeFragment] = useState(false);
+  useEffect(() => setWholeFragment(false), [fragment?.text]);
+  const fragmentCut = fragment && !wholeFragment ? cutFragment(fragment.text) : null;
+  useEffect(() => {
+    if (mode === "book") publishFragment(sourceId, fragment?.paragraphs ?? []);
+  }, [mode, sourceId, fragment]);
   const limited = Date.now() < limitedUntil;
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -1198,12 +1252,27 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
               }}
             >
               {fragment && (
-                <blockquote className="selection-context">
-                  {fragment.text}
-                  <button type="button" className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm" aria-label={t.assistant.removeFragment} title={t.assistant.removeFragment} onClick={() => setDraft((d) => ({ ...d, fragment: null }))}>
-                    <Icon name="close" small />
-                  </button>
-                </blockquote>
+                <div className="assistant__fragment">
+                  <div className="assistant__fragment-head">
+                    {mode === "book" && (chapterNow()?.title || chapterTitle) && (
+                      <p className="assistant__fragment-from">{t.assistant.fragmentFrom(chapterNow()?.title || chapterTitle || "")}</p>
+                    )}
+                    <button type="button" className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm assistant__fragment-remove" aria-label={t.assistant.removeFragment} title={t.assistant.removeFragment} onClick={() => setDraft((d) => ({ ...d, fragment: null }))}>
+                      <Icon name="close" small />
+                    </button>
+                  </div>
+                  <blockquote className="selection-context">
+                    {fragmentCut ?? fragment.text}
+                    {fragmentCut && (
+                      <>
+                        {" "}
+                        <button type="button" className="pg-link assistant__fragment-whole" onClick={() => setWholeFragment(true)}>
+                          {t.assistant.showWhole(fragment.text.length - fragmentCut.length)}
+                        </button>
+                      </>
+                    )}
+                  </blockquote>
+                </div>
               )}
               <textarea
                 className="pg-input"
@@ -1280,12 +1349,25 @@ function StageLine({ t, stage }: { t: Catalog; stage: StageState }) {
       {/* В живую область — только смена стадии; время читалка не проговаривает каждую секунду. */}
       <span role="status">{t.assistant.stage[name]}</span>
       <span className="assistant__stage-meta">
-        {t.assistant.stage.step(stage.step + 1, 4)} · {t.assistant.elapsed(elapsed)}
+        {t.assistant.stage.step(stage.step + 1, 4)} · <span className="assistant__elapsed">{t.assistant.elapsed(elapsed)}</span>
       </span>
       {stage.step >= 2 && (
         <span className="assistant__stage-found">{stage.found ? t.assistant.stage.found(stage.found) : t.assistant.stage.foundNone}</span>
       )}
     </p>
+  );
+}
+
+// Время в строке итога — отдельным элементом: снимки скрывают только его, а не всю строку.
+function withElapsed(text: string, elapsed: string): ReactNode {
+  const at = text.lastIndexOf(elapsed);
+  if (at < 0) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <span className="assistant__elapsed">{elapsed}</span>
+      {text.slice(at + elapsed.length)}
+    </>
   );
 }
 
@@ -1300,7 +1382,7 @@ function StageSummary({ t, turn }: { t: Catalog; turn: Turn }) {
   return (
     <p className={turn.status === "error" ? "assistant__summary is-broken" : "assistant__summary"}>
       {turn.status === "error" && <Icon name="warning" small />}
-      {text}
+      {withElapsed(text, t.assistant.elapsed(stats.seconds))}
     </p>
   );
 }

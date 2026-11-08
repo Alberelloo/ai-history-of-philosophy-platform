@@ -1,5 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { AssistantPanel } from "./AssistantPanel";
+import { AssistantPanel, useAnsweringStage } from "./AssistantPanel";
 import { AssistantPage } from "./AssistantPage";
 import { FullCard, OPEN_CARD_EVENT } from "./FullCard";
 import { GraphPage } from "./GraphPage";
@@ -89,6 +89,8 @@ export function App() {
   const [path, search = ""] = beforeHash.split("?");
   const parts = path.split("/").filter(Boolean);
   const [panel, setPanel] = useState<PanelState | null>(null);
+  // Идёт ли ответ в книге панели: точка стадии в свёрнутой полоске (2.3).
+  const answering = useAnsweringStage(panel?.sourceId || null);
   // Карточка по ссылке из полной карточки (связь) или из ответа ассистента (утверждение, 5.4)
   // ложится наверх стека правой панели. На странице «Ассистент» панели может не быть —
   // тогда она открывается с одной карточкой.
@@ -125,6 +127,8 @@ export function App() {
           expanded={panel.stripExpanded}
           onExpand={(stripExpanded) => setPanel({ ...panel, stripExpanded })}
           ariaLabel={panel.stack[panel.stack.length - 1].kind === "assistant" ? t.assistant.label : t.card.label}
+          kind={panel.stack[panel.stack.length - 1].kind}
+          answering={answering ? t.assistant.stage[answering] : null}
         >
           {(() => {
             const top = panel.stack[panel.stack.length - 1];

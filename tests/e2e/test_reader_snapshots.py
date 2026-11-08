@@ -176,13 +176,16 @@ def columns(page) -> list[str]:
     return found
 
 
-def shoot(snaps, page, state, theme, lang, width=None, *, regions=None, network=True) -> None:
-    """Проверки по DOM и снимок состояния; ``network=False`` — запрос намеренно висит."""
-    visual.settle(page, network=network)
+def shoot(
+    snaps, page, state, theme, lang, width=None, *, regions=None, network=True, pointer=True
+) -> None:
+    """Проверки по DOM и снимок состояния; ``network=False`` — запрос намеренно висит,
+    ``pointer=False`` — указатель остаётся на месте (состояние держится наведением)."""
+    visual.settle(page, network=network, pointer=pointer)
     visual.assert_no_horizontal_scroll(page)
     visual.assert_no_overlap(page, regions if regions is not None else columns(page))
     width = width or page.viewport_size["width"]
-    snaps(page, visual.reader_name(state, theme, lang, width), network=network)
+    snaps(page, visual.reader_name(state, theme, lang, width), network=network, pointer=pointer)
 
 
 class StreamAsk:
@@ -231,8 +234,25 @@ def chapter_with_notes(ids) -> dict:
             "linked": True,
         },
     }
-    block["notes"] = [[len(block["text"]) // 2, "n-snap-1"], [len(block["text"]), "n-snap-2"]]
+    # Знаки — после слова «Юм» и в конце абзаца: середина строки (``len // 2``) попадала внутрь
+    # слова («Юм пр¹обудил»), и снимок показывал дефект сценария, а не продукта.
+    text = block["text"]
+    block["notes"] = [[text.index("Юм") + len("Юм"), "n-snap-1"], [len(text), "n-snap-2"]]
     return data
+
+
+NOTE_NEIGHBOURS = """() => [...document.querySelectorAll('article.chapter .note-ref')].map(ref => {
+  const host = ref.closest('.note') ?? ref;
+  const text = n => (n ? n.textContent : '');
+  return [text(host.previousSibling).slice(-1), text(host.nextSibling).slice(0, 1)];
+})"""
+
+
+def assert_notes_after_words(page) -> None:
+    """Знак сноски стоит после слова: перед ним буква или знак препинания, после — не буква."""
+    for before, after in page.evaluate(NOTE_NEIGHBOURS):
+        assert before and not before.isspace(), (before, after)
+        assert not after.isalpha(), f"знак сноски внутри слова: …{before}|{after}…"
 
 
 def route_card(page, handler) -> None:
@@ -307,10 +327,33 @@ def test_s1_s4_card(browser, site, ids, theme, lang):
             popup.get_by_role("button", name=WORDS[lang]["open_card"]).click()
             page.locator(".side-panel .card-section h4").first.wait_for()
             aside(page)
+            assert_full_card_head(page)
             shoot(snaps, page, "s4", theme, lang)
     finally:
         context.close()
     snaps.check()
+
+
+def assert_full_card_head(page) -> None:
+    """S4 (4.5, Lifeline.md): годы один раз в голове рядом с меткой семьи и линия жизни — шкала
+    с полосой и веком, а не вторая строка с теми же годами. Тело панели прокручивается само:
+    последняя кнопка графа, срезанная краем окна, достижима прокруткой."""
+    panel = page.locator(".side-panel")
+    life = panel.locator(".pg-lifeline")
+    assert life.get_attribute("aria-hidden") == "true"
+    assert life.locator(".pg-lifeline__life").bounding_box()["width"] > 20
+    assert life.locator(".pg-lifeline__century").count() >= 1
+    assert panel.locator(".card-dates").count() == 1
+    last = panel.locator(".card-section, .card-graph, button").last
+    scroller = last.evaluate(
+        """e => { for (let p = e.parentElement; p; p = p.parentElement) {
+            const s = getComputedStyle(p);
+            if (/(auto|scroll)/.test(s.overflowY) && p.scrollHeight > p.clientHeight) return true; }
+          return false; }"""
+    )
+    bottom = last.bounding_box()
+    fits = bottom["y"] + bottom["height"] <= page.viewport_size["height"]
+    assert fits or scroller, "низ полной карточки срезан, а тело панели не прокручивается"
 
 
 # --- полоска справа на 1024 ---------------------------------------------------------------
@@ -337,7 +380,19 @@ def test_strip(browser, site, ids, theme, lang):
         ask(page.locator(".side-panel"), "Что Кант взял у Юма?")
         page.locator(".side-panel .assistant__stage").wait_for()
         page.locator(".side-panel__collapse").click()
-        page.locator(".side-panel__strip").wait_for()
+        strip = page.locator(".side-panel__strip")
+        strip.wait_for()
+        # Свёрнута во время ответа (2.3): точка стадии 8px accent и подпись «Ассистент отвечает».
+        dot = strip.locator(".side-panel__dot")
+        dot.wait_for()
+        box = dot.bounding_box()
+        assert round(box["width"]) == 8 and round(box["height"]) == 8
+        visual.assert_color(
+            page, ".side-panel__strip .side-panel__dot", "background-color", "accent"
+        )
+        answering = {"ru": "Ассистент отвечает", "en": "The assistant is answering"}[lang]
+        assert answering in strip.text_content()
+        assert len(stub.requests) == 1  # сворачивание поток не останавливает
         shoot(snaps, page, "strip-streaming", theme, lang)
         stub.release(answer(fragment("Ответ.", grounded=False)))
     finally:
@@ -399,6 +454,16 @@ def test_s7_stages(browser, site, ids, theme, lang):
 # --- состояния на 1440 ------------------------------------------------------------------
 
 
+def assert_notice_readable(notice) -> None:
+    """Текст Notice в окне карточки не сжат в колонку: не уже 60% ширины Notice, действие —
+    под текстом (раунд 4: текст S3 стоял колонкой ~65px в 11 строк)."""
+    text = notice.locator(":scope > div").bounding_box()
+    whole = notice.bounding_box()
+    action = notice.locator(":scope > .pg-btn").bounding_box()
+    assert text["width"] >= 0.6 * whole["width"], (text, whole)
+    assert action["y"] >= text["y"] + text["height"] - 1, (action, text)
+
+
 def card_states(browser, site, ids, snaps, theme, lang) -> None:
     """S2 (загружается дольше 300 мс), S3 (карточки нет), S3a (не загрузилась)."""
     held: list = []
@@ -420,7 +485,9 @@ def card_states(browser, site, ids, snaps, theme, lang) -> None:
             route_card(page, fulfill(status, body))
             open_chapter(page, site, ids)
             hume(page).click()
-            page.locator(".card-popup .pg-notice").wait_for()
+            notice = page.locator(".card-popup .pg-notice")
+            notice.wait_for()
+            assert_notice_readable(notice)
             shoot(snaps, page, state, theme, lang)
     finally:
         for route in held:
@@ -438,6 +505,26 @@ def select_paragraph(page, paragraph: str) -> None:
         paragraph,
     )
     page.locator(".selection-toolbar .pg-btn--primary").click()
+
+
+def assert_s6(page, box, paragraph: str, lang: str) -> None:
+    """S6 (3.1, 5.2): подпись главы над цитатой, выделение в тексте снято, панели действий над
+    выделением нет, абзац фрагмента отмечен линией accent-soft на левом поле."""
+    caption = box.locator(".assistant__fragment-from")
+    expected = {"ru": f"Фрагмент из главы «{CHAPTER}»", "en": f"Passage from “{CHAPTER}”"}[lang]
+    assert caption.inner_text() == expected
+    page.wait_for_timeout(200)  # панель действий появляется через 120 мс после mouseup
+    assert page.evaluate("getSelection().toString()") == ""
+    assert page.locator(".selection-toolbar").count() == 0
+    marked = page.locator("article.chapter .block.is-fragment")
+    assert marked.count() == 1 and marked.get_attribute("data-paragraph") == paragraph
+    line = marked.evaluate(
+        "e => { const s = getComputedStyle(e, '::before');"
+        " return [s.content, s.borderLeftWidth, s.borderLeftColor]; }"
+    )
+    assert line[0] != "none" and line[1] == "2px"
+    soft = visual.rgba(page, visual.token(page, "accent-soft"))
+    assert visual.rgba(page, line[2])[:3] == soft[:3]
 
 
 def answer_states(browser, site, ids, snaps, theme, lang) -> None:
@@ -462,6 +549,7 @@ def answer_states(browser, site, ids, snaps, theme, lang) -> None:
         box = page.locator(".side-panel")
         box.locator(".assistant__form .selection-context").wait_for()
         aside(page)
+        assert_s6(page, box, ids["paragraphs"][1], lang)
         shoot(snaps, page, "s6", theme, lang)
         for state, body in (("s7a-broader", broader), ("s7a-outside", outside)):
             stub.reply(body)
@@ -556,7 +644,69 @@ def test_s10_s12(browser, site, ids, theme, lang):
         ask(box, "Что Кант взял у Юма?")
         box.locator(".assistant-notice").first.wait_for()
         assert stub.requests == []  # до согласия вопрос не уходит
+        # Пример пометки в уведомлении — одной строкой, точка вплотную после него (без пробела).
+        example = page.locator(".first-run .notice-example")
+        assert example.evaluate("e => e.getClientRects().length") == 1
+        wrap = page.locator(".first-run .notice-example-wrap").evaluate("e => e.textContent")
+        assert wrap.endswith(example.evaluate("e => e.textContent") + ".")
         shoot(snaps, page, "s12", theme, lang, regions=[*columns(page), ".first-run"])
+    finally:
+        context.close()
+    snaps.check()
+
+
+# --- S13: глава не оцифрована ------------------------------------------------------------
+
+
+def missing_chapter(site, ids) -> tuple[str, str, dict]:
+    """Глава 2 (у неё есть и предыдущая, и следующая) без текста: одна плашка «не оцифрована»."""
+    toc = httpx.get(f"{site.url}/api/v1/sources/{ids['source']}/toc").json()
+    item = next(i for i in toc if i["title"].startswith("Глава 2"))
+    chapter = item["chapter_id"]
+    data = httpx.get(f"{site.url}/api/v1/sources/{ids['source']}/chapters/{chapter}").json()
+    first = next(b for b in data["blocks"] if b.get("type") == "block")
+    data["blocks"] = [
+        {
+            **first,
+            "id": first["id"] + "-missing",
+            "kind": "unrendered",
+            "text": "",
+            "pages": [],
+            "notes": [],
+            "detail": "глава не оцифрована на сайте",
+            "detail_code": "missing",
+            "page": None,
+        }
+    ]
+    data["footnotes"], data["unlinked_notes"] = {}, []
+    return chapter, item["title"], data
+
+
+@req(VD, "Визуальная проверка")
+@req(CR, "Необработанные части в тексте")
+@pytest.mark.parametrize(("theme", "lang"), PAIRS)
+def test_s13_missing_chapter(browser, site, ids, theme, lang):
+    """S13 — глава не оцифрована (1440): заголовок, одна плашка, переход к соседним главам."""
+    snaps = visual.Snaps()
+    chapter, title, data = missing_chapter(site, ids)
+    context, page = open_context(browser, theme=theme, lang=lang)
+    page.route(f"**/sources/{ids['source']}/chapters/{chapter}", lambda r: r.fulfill(json=data))
+    try:
+        page.goto(f"{site.url}/read/{ids['source']}/{chapter}")
+        page.locator("h1", has_text=title).wait_for()
+        figure = page.locator("article.chapter figure.unrendered")
+        figure.wait_for()
+        assert figure.count() == 1
+        assert page.locator("article.chapter p.block").count() == 0
+        assert figure.get_attribute("data-nontext") is not None
+        label = {"ru": "Не передано в тексте", "en": "Not rendered as text"}[lang]
+        detail = {"ru": "глава не оцифрована на сайте", "en": "chapter not digitized on the site"}
+        assert label in figure.text_content() and detail[lang] in figure.text_content()
+        assert figure.locator(".ask-paragraph").count() == 0
+        nav = page.locator(".chapter-nav")
+        assert nav.locator("[rel=prev]").count() == 1 and nav.locator("[rel=next]").count() == 1
+        aside(page)
+        shoot(snaps, page, "s13", theme, lang)
     finally:
         context.close()
     snaps.check()
@@ -582,14 +732,20 @@ def test_notes(browser, site, ids, theme, lang):
             open_chapter(page, site, ids)
             page.locator(".field-note[data-note-id='n-snap-2']").wait_for()
             page.wait_for_timeout(100)  # положения на поле — после отрисовки
+            assert_notes_after_words(page)
             shoot(snaps, page, "notes-field", theme, lang)
         for width in (1280, 1024):
             resize(page, width)
             open_chapter(page, site, ids)
+            assert_notes_after_words(page)
+            # Окно открыто наведением и живёт, пока указатель на знаке: снимок не уводит указатель
+            # в угол (иначе через 200 мс окно закрывалось, и на снимке его не было).
             page.locator("button.note-ref").last.hover()
-            page.locator(".note-popup").wait_for()
-            snaps_regions = columns(page)
-            shoot(snaps, page, "notes-popup", theme, lang, regions=snaps_regions)
+            popup = page.locator(".note-popup")
+            popup.wait_for()
+            popup.evaluate("e => Promise.all(e.getAnimations().map(a => a.finished))")
+            shoot(snaps, page, "notes-popup", theme, lang, regions=columns(page), pointer=False)
+            assert popup.is_visible(), "окно сноски закрылось до снимка"
             aside(page)
     finally:
         context.close()

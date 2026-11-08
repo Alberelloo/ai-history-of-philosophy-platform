@@ -246,6 +246,7 @@ export const en: Catalog = {
     label: "Card",
     back: "Back",
     close: "Close card",
+    bce: "BCE",
     open: "Open card",
     loading: "Loading the card…",
     notFound:
@@ -307,6 +308,8 @@ export const en: Catalog = {
     empty:
       "Select a passage and press “Ask the assistant”, or type a question below. Answers link to paragraphs; anything written without sources is marked with a diamond.",
     removeFragment: "Remove passage",
+    fragmentFrom: (chapter: string) => `Passage from “${chapter}”`,
+    showWhole: (n: number) => `Show all (${n.toLocaleString("en-US")} more characters)`,
     handoff: {
       broader:
         "Your answer goes beyond this source. We recommend asking in the general chat, which has access to all materials for a fuller answer.",

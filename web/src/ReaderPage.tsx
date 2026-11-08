@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type MouseEvent as ReactMouseEvent, type ReactNode, type SetStateAction } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
 import { navigate, pushPanelItem, type PanelState } from "./App";
+import { useFragmentParagraphs } from "./AssistantPanel";
 import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { fieldItems, MarginCol } from "./Footnote";
@@ -295,9 +296,14 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   const layout = useReaderLayout(panel !== null);
   const mentionsView = useStored((s) => s.mentions);
   const [noteActive, setNoteActive] = useState<string | null>(null);
+  // Абзацы фрагмента, ждущего отправки в панели (S6): отметка на левом поле, пока панель открыта.
+  const fragmentMarks = useFragmentParagraphs(panel ? sourceId ?? undefined : undefined);
 
   // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
-  const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) =>
+  const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) => {
+    // Фрагмент ушёл в панель (S6): выделение в тексте снимается, абзацы фрагмента получают
+    // отметку на левом поле (``is-fragment``), пока вопрос не отправлен.
+    if (sel) window.getSelection()?.removeAllRanges();
     setPanel((p) => ({
       stack: pushPanelItem(p?.stack, { kind: "assistant" }),
       sourceId: sourceId ?? p?.sourceId ?? "",
@@ -307,6 +313,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       chapterId: chapter?.chapter_id ?? p?.chapterId,
       chapterTitle: chapter?.title ?? p?.chapterTitle,
     }));
+  };
   useAssistantShortcut(textRef, openAssistant);
   // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
   const collapsePanel = () => {
@@ -696,7 +703,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
               id={`p-${block.id}`}
               data-paragraph={block.id}
               lang={block.lang}
-              className={`block ${block.kind}`}
+              className={fragmentMarks.includes(block.id) ? `block ${block.kind} is-fragment` : `block ${block.kind}`}
             >
               {renderText(block.text, blockPoints(block, chapter, t, layout.mode === "K1", noteActive, setNoteActive), mentions[block.id] ?? [], openCard)}
               <button

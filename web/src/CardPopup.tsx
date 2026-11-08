@@ -451,7 +451,7 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
         </div>
       )}
       {problem === "not_found" && (
-        <div className="pg-notice pg-notice--danger" role="alert">
+        <div className="pg-notice pg-notice--danger pg-notice--stacked" role="alert">
           <Icon name="warning" />
           <div>{t.card.notFound}</div>
           <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => onClose({ restoreFocus: true })}>
@@ -460,7 +460,7 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
         </div>
       )}
       {problem === "failed" && (
-        <div className="pg-notice pg-notice--danger" role="alert">
+        <div className="pg-notice pg-notice--danger pg-notice--stacked" role="alert">
           <Icon name="warning" />
           <div>{t.card.loadFailed}</div>
           <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setAttempt((n) => n + 1)}>

@@ -1213,6 +1213,53 @@ blockquote.block {
   line-height: 1.3125rem;
 }
 
+/* Фрагмент над полем вопроса (5.2): подпись главы и «Убрать фрагмент» в строку, ниже цитата. */
+.assistant__fragment {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.assistant__fragment-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.assistant__fragment-from {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+.assistant__fragment-remove {
+  margin-left: auto;
+}
+
+.assistant__fragment-whole {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: var(--type-ui-body-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.125rem;
+  cursor: pointer;
+}
+
+/* Абзацы фрагмента, который ждёт отправки (S6): линия 2px accent-soft на левом поле. */
+.block.is-fragment::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--space-3) * -1);
+  border-left: 2px solid var(--accent-soft);
+}
+
 .assistant__form {
   display: grid;
   gap: var(--space-3);

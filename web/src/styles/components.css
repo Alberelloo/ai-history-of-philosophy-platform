@@ -299,17 +299,6 @@ a.pg-chip:focus-visible, button.pg-chip:focus-visible { box-shadow: var(--focus-
 }
 .pg-portrait-gallery__dot.is-active { background: var(--accent); }
 .pg-portrait-gallery__empty { margin: 0; color: var(--ink-3); font: var(--type-ui-caption); }
-.pg-lifeline__dates {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0.125rem;
-  text-align: center;
-  color: var(--ink-3);
-  font: 500 0.75rem/1rem var(--font-ui);
-  font-variant-numeric: tabular-nums;
-}
-
 /* ---------- ListRow: нумерованный список в духе оглавления лекций ---------- */
 .pg-list { display: grid; margin: 0; padding: 0; list-style: none; }
 .pg-list__item {
@@ -401,6 +390,10 @@ a.pg-list__item:focus-visible { box-shadow: var(--focus-ring); }
 .pg-notice--warning > .pg-ico { color: var(--generated); }
 .pg-notice--danger { background: var(--danger-tint); }
 .pg-notice--danger > .pg-ico { color: var(--danger); }
+/* В узком контейнере (окно карточки 320–368px, панель) действие уходит под текст: справа
+   от текста ему не хватает места, и текст сжимался в колонку в одно-два слова. */
+.pg-notice--stacked { grid-template-columns: 1.25rem minmax(0, 1fr); row-gap: var(--space-2); }
+.pg-notice--stacked > .pg-btn { grid-column: 2; justify-self: start; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 1ms !important; scroll-behavior: auto !important; }
