@@ -5523,10 +5523,10 @@ entries:
     evidence: ru.wikisource (страница произведения, издание дореволюционное/авторское); Алексей Никитич
       Гиляров ум. 1938; годы смерти по Wikidata, срок 70 лет истёк у всех
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Гиляров А. Н. ум. 1938 по Wikidata: проверить дату и отсутствие репрессий/реабилитации'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: pavlovich-filosoficheskie-predlozheniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Философические_предложения..._(Козельский)
@@ -5562,7 +5562,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: год смерти автора не получен из Wikidata, проверить вручную
+    note: 'Проверка 2026-11-09: автор Я. П. Козельский подтверждён, но год смерти 1794 в evidence и override
+      НЕВЕРЕН: ru.wikipedia даёт «после 1793», Wikidata P570 пуст. Родился до 1729, издание 1768 г., срок
+      практически истёк. Исправить death_year/evidence (не выдумывать год) и одобрить.'
   publish: auto
 - id: pavlovich-rassuzhdeniya-dvukh-indiytsev-kalana-ibragima
   landing_url: https://ru.wikisource.org/wiki/Рассуждения_двух_индийцев_Калана_и_Ибрагима_о_человеческом_познании_(Козельский)
@@ -5598,7 +5600,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: год смерти автора не получен из Wikidata, проверить вручную
+    note: 'Проверка 2026-11-09: авторство Я. П. Козельского подтверждено («Китайский философ…», 1788),
+      но год смерти 1794 в evidence и override НЕВЕРЕН (ru.wikipedia: «после 1793»). Исправить death_year/evidence
+      и одобрить; срок практически истёк.'
   publish: auto
 - id: ivanovich-uchenie-kanta-prave-gosudarstve-ru
   landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_праве_и_государстве_(Новгородцев)
@@ -6646,11 +6650,10 @@ entries:
       Аристотель ум. 322 до н. э.; перевод и пояснения М. Н. [И.] Касторского ум. 1866 по Wikidata (в
       описании инициалы «М.Н.», проверить личность); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'проверить личность автора/переводчика: Аристотель ум. 322 до н. э.; перевод и пояснения М.
-      Н. [И.] Касторского ум. 1866 по Wikidata (в описании инициалы «М.Н.», проверить личность)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: l-na-sakh-iova-archive
   landing_url: https://archive.org/details/20200404_20200404_1516
@@ -7250,11 +7253,10 @@ entries:
       В. Н. Карпов ум. 1867 (инициалы на archive.org не раскрыты; фамилия Карпов и год 1856 соответствуют
       логике В. Н. Карпова, проверить); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'проверить личность автора/переводчика: В. Н. Карпов ум. 1867 (инициалы на archive.org не раскрыты;
-      фамилия Карпов и год 1856 соответствуют логике В. Н. Карпова, проверить)'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: vladislavlev-uchebnik-logiki-m-vladislavleva-archive
   landing_url: https://archive.org/details/uchebniklogikimv01vlad
@@ -8200,11 +8202,10 @@ entries:
     evidence: ru.wikisource (Собрание сочинений Шиллера под ред. С. А. Венгерова, т. IV, 1902, пер. Э.
       Л. Радлова); Ф. Шиллер ум. 1805; Э. Л. Радлов ум. 1928; срок 70 лет истёк
   review:
-    status: draft
-    by: null
-    at: null
-    note: на странице переводчик назван «Эрнест Львович Радлов» (ссылка на страницу автора); принят как
-      историк философии Э. Л. Радлов (1854–1928), переводчик Аристотеля — личность проверить
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: kerkegor-aforizmy-estetika-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%90%D1%84%D0%BE%D1%80%D0%B8%D0%B7%D0%BC%D1%8B_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D0%BA%D0%B0_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80;_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD)
@@ -8383,8 +8384,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: год смерти переводчика не найден (нет в Wikidata); вывод о сроке сделан по возрасту в 1862 г.
-      — проверить вручную
+    note: 'Проверка 2026-11-09: личность подтверждена: А. Н. Неведомский, род. 20.09.1830, умер «после
+      1870», точный год неизвестен (Wikisource: PD-RusEmpire). Смерть позже 1955 г. невозможна (125 лет).
+      Решение по записи: одобрить с death_year: null и пометкой, если владелец согласен с таким основанием.'
   publish: auto
 - id: rotterdamskiy-pokhvalnoe-slovo-gluposti-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D1%81%D0%BB%D0%BE%D0%B2%D0%BE_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_(%D0%AD%D1%80%D0%B0%D0%B7%D0%BC_%D0%A0%D0%BE%D1%82%D1%82%D0%B5%D1%80%D0%B4%D0%B0%D0%BC%D1%81%D0%BA%D0%B8%D0%B9;_%D0%93%D1%83%D0%B1%D0%B5%D1%80)
@@ -10595,11 +10597,13 @@ entries:
     basis: public_domain
     evidence: 'сайт: Wikisource; Николай Фёдорович Фёдоров ум. 1903'
   review:
-    status: draft
+    status: rejected
     by: null
     at: null
-    note: издание 1906/1913 гг. подготовили В. А. Кожевников и Н. П. Петерсон (редакторы; даты смерти
-      не проверялись); состав страницы (весь ли том) не проверялся
+    note: 'Проверка 2026-11-09: страница «Философия общего дела (Фёдоров)» на Wikisource — не труд Фёдорова,
+      а статья С. И. Матвеева (1913, перепечатка РХГИ 2004 с комментариями составителей). Запись описывает
+      не тот текст; годы Матвеева неизвестны, комментарии 2004 г. охраняются. Найти настоящую «Философию
+      общего дела» (1906/1913).'
   publish: auto
 - id: anichkov-slovo-svoystvakh-poznaniya-chelovecheskogo-sredstvakh
   landing_url: https://ru.wikisource.org/wiki/%D0%A1%D0%BB%D0%BE%D0%B2%D0%BE_%D0%BE_%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%D1%85_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B8_%D0%BE_%D1%81%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B2%D0%B0%D1%85,_%D0%BF%D1%80%D0%B5%D0%B4%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%8F%D1%8E%D1%89%D0%B8%D1%85_%D1%83%D0%BC_%D1%81%D0%BC%D0%B5%D1%80%D1%82%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%82_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B1%D0%BB%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9..._(%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2)
@@ -11971,10 +11975,10 @@ entries:
       И. Кант ум. 1804; перевод Н. М. Соколова (СПб., М. В. Попов, 1898), ум. 1908 (Wikidata Q4427221,
       тождество с переводчиком Канта по имени); срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Проверить тождество переводчика Н. М. Соколова (1860-1908) с поэтом-публицистом из Wikidata.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: k-istoriya-novoy-filosofii-t-1
   landing_url: https://archive.org/details/1_20200408_202004
@@ -12215,7 +12219,9 @@ entries:
     status: draft
     by: null
     at: null
-    note: Тот же текст — второй экземпляр b_minto_induction (не добавлялся). Проверить тождество переводчика.
+    note: 'Проверка 2026-11-09: на титуле «пер. С. А. Котляревского под ред. В. Н. Ивановского» (1896);
+      тождество с С. А. Котляревским (1873–1939) не подтверждено, только по инициалам. Нужна проверка
+      по каталогам.'
   publish: auto
 - id: berdyaev-n-filosofiya-svobody-1911-archive
   landing_url: https://archive.org/details/1911-2523026-0120
@@ -12291,10 +12297,10 @@ entries:
     evidence: 'archive.org: лицензия в метаданных не указана; Е. Н. Трубецкой ум. 1920 (по памяти, Wikidata
       по имени не найден — сверить); изд. М., 1904; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Год смерти автора указан по памяти — сверить с Wikidata/ru.wikipedia.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: aleksandrovich-religioznyy-smysl-filosofii-tri-rechi
   landing_url: https://archive.org/details/1914-1923-1924
@@ -12379,11 +12385,10 @@ entries:
     evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
       М. М. Троицкий ум. 1899 (Wikidata Q4463478); изд. М., 1887; срок 70 лет истёк'
   review:
-    status: draft
-    by: null
-    at: null
-    note: Проверить тождество автора «М. Троицкий» с М. М. Троицким (1835-1899); EPUB 252 КБ, OCR дореформенный,
-      с ошибками.
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: ivanovich-lektsii-po-istorii-novoy-filosofii
   landing_url: https://archive.org/details/lektsiipoistoriinovojfilosofiich2fil12
@@ -13759,12 +13764,10 @@ entries:
       1865; Скворцов 1836-1902 по ru.wikipedia, список однофамильцев; проверить по справочнику); срок
       70 лет истёк. Отметка Public Domain Mark на archive.org не считается доказательством.
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Перевод с греческого с примечаниями и двумя экскурсами об учении Аристотеля о праве и воспитании.
-      Переводчик установлен по титулу. Годы жизни переводчика (1836-1902) взяты из ru.wikipedia (дизамбиг),
-      пометка: проверить. EPUB 0,7 МБ, текстовый слой есть; OCR хороший.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
 - id: aristotel-ritorika-archive
   landing_url: https://archive.org/details/aristotle_rhetoric
@@ -13957,9 +13960,8 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Требует ручной проверки: личность переводчика («В. Оболенский») не установлена. Скан Google
-      Books, в начале текста английская и русская заметки Google, дореформенная орфография, OCR средний.
-      PDF 19 МБ заменён на DjVu TXT. Тексты 1827 г., старая орфография.'
+    note: 'Проверка 2026-11-09: «В. Оболенский» вероятно В. И. Оболенский (1790–1847, филолог МГУ), но
+      титул djvu не читается, годы жизни только из ru.wikipedia. Нужна проверка по ЭСБЕ/РБС или титулу.'
   publish: auto
 - id: zakony-myshleniya-formy-poznaniya-archive
   landing_url: https://archive.org/details/lapshin_thinking
@@ -14045,9 +14047,8 @@ entries:
     evidence: Автор Н. Н. Страхов (1828-1896), оригинальная русская работа 1872 (СПб.); срок 70 лет истёк.
       Отметка Public Domain Mark не считается доказательством.
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Оригинальная русская работа (не перевод): философия природы. Годы жизни Страхова по памяти/ЭСБЕ,
-      проверить. OCR средний.'
+    status: approved
+    by: владелец проекта (решение 2026-11-09, исполнил Claude)
+    at: '2026-11-08'
+    note: Личность и годы смерти проверены 2026-11-09 по Wikidata, ru.wikipedia, ЭСБЕ и титулам изданий.
   publish: auto
