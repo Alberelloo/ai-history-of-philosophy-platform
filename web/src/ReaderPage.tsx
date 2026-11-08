@@ -393,8 +393,12 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
   // Какой источник открыть, если он не указан: запомненный или учебник по умолчанию.
   useEffect(() => {
     if (sourceId) return;
+    // Ответ пришёл, когда читатель уже ушёл с экрана чтения (например, закрыл книгу): адрес
+    // не трогаем и книгу снова не открываем.
+    let cancelled = false;
     const remembered = storage.currentSource();
     api.current(remembered).then((result) => {
+      if (cancelled) return;
       if (result.notice === "previous_unavailable") setPreviousUnavailable(true);
       if (!result.source_id) {
         setProblem({ kind: "no_default" });
@@ -403,16 +407,21 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       storage.setCurrentSource(result.source_id);
       replace(`/read/${result.source_id}`);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [sourceId]);
 
   // Глава не указана: место, где читатель остановился, иначе первая глава.
   useEffect(() => {
     if (!sourceId) return;
+    let cancelled = false;
     storage.setCurrentSource(sourceId);
     setProblem(null);
     api
       .toc(sourceId)
       .then((items) => {
+        if (cancelled) return;
         setToc(items);
         if (chapterId) return;
         const saved = storage.position(sourceId);
@@ -420,7 +429,12 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
         if (saved) replace(`/read/${sourceId}/${saved.chapterId}${saved.paragraphId ? `#p-${saved.paragraphId}` : ""}`);
         else if (first) replace(`/read/${sourceId}/${first}`);
       })
-      .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
+      .catch((e: ApiError) => {
+        if (!cancelled) setProblem({ kind: e.kind, text: e.message });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [sourceId, chapterId]);
 
   // Глава по адресу. Раздел внутри главы — его глава с прокруткой к разделу. Главы больше нет

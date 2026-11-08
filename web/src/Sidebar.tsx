@@ -119,15 +119,24 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
   };
   const close = (id: string) => {
     storage.closeSource(id);
+    // Закрыта книга, которую сейчас читают: к следующей открытой, а если она была последней —
+    // в библиотеку (адрес заменяется, чтобы «Назад» не открыл закрытую книгу снова).
     if (active === "reading" && sourceId === id) {
       const next = storage.currentSource();
-      navigate(next ? `/read/${next}` : "/");
+      if (next) navigate(`/read/${next}`);
+      else {
+        window.history.replaceState(null, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
     }
   };
   const nextTheme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
   const themeName = (value: Theme) => t.theme[value];
   const otherLang: Lang = lang === "ru" ? "en" : "ru";
-  const continueHref = current ? `/read/${current}` : "/read";
+  // Ни одной открытой книги: заголовок ведёт в библиотеку. Ссылка на «/read» открыла бы учебник
+  // по умолчанию, и закрытая последней книга тут же вернулась бы в список.
+  const lastOpen = current && open.some((o) => o.id === current) ? current : open[0]?.id;
+  const continueHref = lastOpen ? `/read/${lastOpen}` : "/";
 
   return (
     <div
@@ -161,7 +170,7 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
             icon="books"
             label={t.sidebar.openBooks}
             count={books.length}
-            title={books.length ? t.sidebar.openBooksCount(books.length) : undefined}
+            title={books.length ? t.sidebar.openBooksCount(books.length) : t.sidebar.noOpenBooks}
             current={active === "reading" && !books.some((b) => b.id === sourceId)}
           />
           <ul className="sidebar__books" aria-label={t.sidebar.openBooks}>
