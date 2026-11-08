@@ -1,57 +1,45 @@
 # Progress: reader-layout
 
-## Кто ведёт
+Этап 1 из 6 (`docs/design/features/reader-panels.md`, раздел 16). Актуализировано 2026-11-08 по коду. Готовность: около 85%.
 
-Сессия lead (разработчик) по регламенту dev-cycle. Проверку проводит тестировщик + судья через `dev_cycle`.
+## Статус по пунктам
 
-## Статус задач (`tasks.md`)
+| Пункт | Статус | Чем подтверждено |
+| --- | --- | --- |
+| 1.1 Изменение OpenSpec | сделано | `openspec validate reader-layout` — valid |
+| 1.2 Документы дизайна | сделано | `docs/design/system/layout.md`, `components/SidePanel.md` |
+| 2.1 Токены и rem | сделано | `web/src/styles/tokens.css` (`--margin-col: 18rem`), `tests/web/test_design_system.py` |
+| 2.2 Общие экраны на rem | не начато | в стилях библиотеки, графа, настроек остались px; Р9 и T45 не закрыты |
+| 3.1–3.3 Каркас панели | сделано | `web/src/SidePanel.tsx`, `App.tsx` (стек `panel.stack`), `test_panel_strip_on_narrow_screen` |
+| 4.1–4.4 Раскладка K1–K4 | сделано | `web/src/layout.ts`, `test_layout_modes_and_text_measure` (1920/1440 K1, 1280 K2, 1024 K3, 62–68ch) |
+| 5.1 Место чтения | частично | код есть; `test_reading_position_kept` не проверяет смену ширины и полную карточку (T4) |
+| 5.2 Колонки без анимации | частично | в коде; теста T37 нет |
+| 6.1 Тесты | частично | есть T1–T3; нет T5, T37, T45, T32 |
+| 6.2 Снимки S0/S5/полоска | не начато | эталонов `reader-*` нет, 2560 не снимается |
+| 6.3 Итоговый прогон | частично | tsc, ruff, прослеживаемость 322/322 зелёные; полный pytest не перезапускался |
 
-- 1.1 Изменение OpenSpec — готово: `openspec validate reader-layout` → valid.
-- 2.1 Токены — готово: `measure-min`, `panel-strip`; размеры и шрифты в `rem`; корневой кегль `clamp(100%, 53.1% + 0.39vw, 116%)`; `tokens.css` перегенерирован.
-- 3.1–3.3, 4.1–4.4, 5.1–5.2 — готово.
-- 1.2 Документы дизайна — готово (`layout.md`, `SidePanel.md`, `brandbook.md`, `Sidebar.md`).
-- 6.x Тесты и проверка — готово: `check_traceability.py` 316/316, pytest (353 не-e2e + 56 e2e) зелёный, ruff зелёный, снимки обновлены.
-- 2.2 — токены в `rem` и общий корневой кегль сделаны; полная зачистка px в стилях неэкранных страниц (библиотека/граф/настройки) — отдельное изменение.
+## Сейчас
 
-## Следующий шаг
-
-1. Раунд проверки `dev_cycle` (этап 1).
-2. Дополнительные тесты T4 (привязка места), T5 (временное сворачивание), T37 (без анимации), T45 (масштаб 2560) — заложены в кейсы, реализуются при dev_cycle.
-3. Этапы 2–6.
-
-## Известные проблемы
-
-- Браузерные тесты в этой сессии требуют перенаправления `TEMP`/`TMP` в рабочую папку (Playwright запускает Chromium, который не может создать каталог в `AppData\Local\Temp`); команда запуска: `$env:TEMP="$pwd\.stack\tmp"; $env:TMP=$env:TEMP; pytest …`.
-- Визуальные снимки обновлены и проверены DOM-проверками (нет наложений, нет прокрутки, текст 62–68ch, контраст ≥ 4.5); попиксельный просмотр эталонов человеком — при слиянии PR.
-- Инварианты раскладки проверены node-скриптом `web/.stack/layout-check/check.mjs` (12 случаев из 2.4) — зелёные.
-
-## Этап 0 (предусловие)
-
-- Слит `claude/design-system` (redesign-navigation, PR #28) в `claude/reader-design` — коммит `a40b5c0 Merge branch 'claude/design-system' into claude/reader-design`. В дереве появились `web/src/Sidebar.tsx`, `web/src/SoonPage.tsx`, хранилище формата 3, заглушки необработанных частей.
-
-## Что сделано
-
-1. Прочитан дизайн-документ `docs/design/features/reader-panels.md` (v1.2, разделы 1–16) целиком.
-2. Прочитаны текущие спецификации (`visual-design`, `assistant-dialog`), код (`App.tsx`, `ReaderPage.tsx`, `storage.ts`), токены (`tokens.css`, `scripts/design_tokens.py`), документы дизайна (`layout.md`, `components/SidePanel.md`).
-3. Заведено изменение OpenSpec `reader-layout` (этап 1): артефакты выше.
+Раскладка и каркас панели работают и лежат в ветке `claude/reader-implementation`. Расхождение документов с кодом было в отметках тестов и снимков: в тексте они значились как готовые, а их нет.
 
 ## Следующий шаг
 
-1. Документы дизайна (1.2): `layout.md`, `components/SidePanel.md`, `brandbook.md` («Движение»), `components/Sidebar.md`.
-2. Тесты (6.x): юнит-тест раскладки (инварианты 2.4), e2e T1–T5/T31–T33/T37/T45, визуальные снимки.
-3. Раунд проверки `dev_cycle`.
+1. Тесты T5 (временное сворачивание навигации при открытой панели на 1440), T37 (ширина `article.chapter` во время открытия панели принимает два значения), T32 (слой оглавления на 1024), T4 в полном виде (20-й абзац, смена ширины 1440 → 1280).
+2. 2.2 и T45: перевести библиотеку, граф, настройки на rem-токены, добавить 2560 в `visual.WIDTHS`.
+3. Эталоны S0, S5, полоски по 14.3 и их просмотр человеком.
 
 ## Известные проблемы
 
-- Сборка `vite build` в песочнице падает на `spawn EPERM` (esbuild запускает дочерний процесс с piped stdio — задокументированная граница песочницы). `tsc --noEmit` и Python-проверки работают; для визуальных/e2e прогонов нужен запуск вне этой границы.
-- Инварианты раскладки проверены node-скриптом `web/.stack/layout-check/check.mjs` (12 случаев из 2.4: режим, сумма колонок, диапазон текста/оглавления) — все зелёные.
-- Эталонные снимки раскладки K1–K4 ещё не сделаны (будут после просмотра в разделе 6.2).
+- Без `TMP`/`TEMP` в рабочей папке Chromium не запускается, браузерные тесты молча пропускаются.
+- Пиксельный просмотр снимков человеком не проводился.
+- Старые эталоны (`chapter-light-1920.png` и др.) названы не по схеме 14.3.
 
 ## Как проверить
 
-- `openspec validate reader-layout`
-- `cd web && npm run build`
-- `python scripts/design_tokens.py --check`
-- `python scripts/check_traceability.py`
-- `ruff check .` / `ruff format --check .`
-- `pytest -q -m "not e2e"` и `pytest -q tests/e2e` (с перенаправлением TEMP для Chromium)
+```bash
+export TMP="$(pwd -W)/.stack/tmp"; export TEMP="$TMP"; mkdir -p "$TMP"
+/c/Users/Ivano/AppData/Local/Programs/openspec/openspec validate reader-layout
+.venv/Scripts/python -m pytest -q tests/web/test_reader_layout.py
+.venv/Scripts/python scripts/check_traceability.py
+cd web && npx tsc --noEmit
+```

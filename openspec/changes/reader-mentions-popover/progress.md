@@ -1,32 +1,41 @@
 # Progress: reader-mentions-popover
 
-## Кто ведёт
+Этап 2 из 6. Актуализировано 2026-11-08 по коду. Готовность: около 70% (код около 90%, тесты и снимки около 20%).
 
-Сессия lead (разработчик) по регламенту dev-cycle.
+## Статус по пунктам
 
-## Статус задач (`tasks.md`)
+| Пункт | Статус | Чем подтверждено |
+| --- | --- | --- |
+| 1.1 OpenSpec | сделано | `openspec validate reader-mentions-popover` — valid |
+| 1.2 Popover.md | сделано | `docs/design/system/components/Popover.md` |
+| 2.1 N1 `entity_type` | сделано | `mentions.py:323`, `tests/knowledge/test_mentions_cards.py:232` |
+| 2.2 N2 404 `entity_not_found` | сделано | `test_card_not_found_returns_404` |
+| 3.1–3.3 Упоминания и настройка | сделано | `ReaderPage.tsx:146-150, 699`, `storage.ts:86`, `SettingsPage.tsx:155` |
+| 4.1–4.5 Окно карточки | сделано | `web/src/CardPopup.tsx` (кэш 50, `AbortController`) |
+| 5.1 Тесты T6–T11, T15 | частично | есть один сквозной `test_mention_opens_card_and_navigates` и серверные тесты; отдельных T6–T11, T15 нет |
+| 5.2 Снимки S1/S2/S3/S3a | не начато | в `tests/e2e/visual/baselines/` эталонов окна карточки по схеме 14.3 нет |
 
-- 1.1 Изменение OpenSpec — в работе: `proposal.md`, `tasks.md`, дельты `entity-mentions`/`entity-cards`/`reader-settings`, `qa/cases.md`, `progress.md` созданы; `openspec validate` не запускался.
-- 1.2–5.2 — не начаты.
+## Сейчас
 
-## Предусловие
-
-Этап 1 (`reader-layout`) завершён: раскладка K1–K4, каркас панели, привязка места чтения. Все тесты зелёные (353 не-e2e + 56 e2e), `check_traceability.py` 316/316.
+Клиент и сервер этапа работают. Раньше в `tasks.md` пункты 5.1 и 5.2 были отмечены без подтверждения тестами; отметки сняты.
 
 ## Следующий шаг
 
-1. `openspec validate reader-mentions-popover`.
-2. Сервер N1 (`entity_type` в `/mentions`) и N2 (404 `entity_not_found`).
-3. Упоминания `span[role=button]`, цвет семьи, настройка вида.
-4. Окно карточки: положение, состав, стек, загрузка/ошибки, кэш.
-5. Тесты и снимки.
+1. Тесты в `tests/web/` (например `test_reader_popover.py`): T6 (503 на `/mentions`: текст без упоминаний), T7 (цвет `people`/`ideas`), T8 (наведение 2 с и проход по пяти упоминаниям ничего не открывают), T9 (переворот вверх на 1280), T10 (переход «Кант» и «Назад»), T11 (до двух утверждений, нет счётчика), T15 (`route`: задержка, 404, 503; «Повторить»).
+2. Снимки S1, S2, S3, S3a и их просмотр человеком.
+3. Проверить критерий: на всех ширинах окно не пересекает строку упоминания.
 
 ## Известные проблемы
 
-- Браузерные тесты в этой сессии требуют перенаправления `TEMP`/`TMP` в рабочую папку (Chromium не создаёт каталог в `AppData\Local\Temp`).
+- N11: `/mentions` обрезает `targets[:500]` (`src/philograph/knowledge/app.py:172`), а клиент отправляет все абзацы главы одним запросом (`ReaderPage.tsx:515`). В главах больше 500 блоков упоминания пропадают. Нужно делить запрос на части по 500 в клиенте (раздел 13 дока).
+- Пока нет T8, правило «наведение ничего не открывает» тестом не закреплено.
 
 ## Как проверить
 
-- `openspec validate reader-mentions-popover`
-- `pytest -q -m "not e2e"` и `pytest -q tests/e2e` (с перенаправлением TEMP)
-- `python scripts/check_traceability.py`
+```bash
+export TMP="$(pwd -W)/.stack/tmp"; export TEMP="$TMP"; mkdir -p "$TMP"
+/c/Users/Ivano/AppData/Local/Programs/openspec/openspec validate reader-mentions-popover
+.venv/Scripts/python -m pytest -q tests/knowledge/test_mentions_cards.py
+.venv/Scripts/python -m pytest -q -k test_mention_opens_card_and_navigates
+.venv/Scripts/python scripts/check_traceability.py
+```
