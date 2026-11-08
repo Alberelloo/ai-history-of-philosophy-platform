@@ -459,9 +459,15 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const sessionsButton = useRef<HTMLButtonElement>(null);
   const scope = useScope();
   const cameFrom = mode === "book" ? (window.history.state as HistoryState)?.assistantFrom : undefined;
-  const sources = useSources(
-    [mode === "library" ? pendingFrom : sourceId, cameFrom?.sourceId].filter((x): x is string => Boolean(x)),
-  );
+  const sources = useSources([
+    ...new Set(
+      [
+        mode === "library" ? pendingFrom : sourceId,
+        cameFrom?.sourceId,
+        ...set.sessions.flatMap((s) => s.messages.map((m) => m.from?.sourceId)),
+      ].filter((x): x is string => Boolean(x)),
+    ),
+  ]);
   const effective: AskSettings = settings ?? {
     sourcesOnly: scope.sourcesOnly,
     generation: scope.generation,
@@ -830,7 +836,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                         navigate(`/read/${turn.from!.sourceId}${turn.from!.chapterId ? `/${turn.from!.chapterId}` : ""}`);
                       }}
                     >
-                      {t.assistantPage.fromBook(sources[turn.from.sourceId]?.title ?? "")}
+                      {withTitle(t.assistantPage.fromBook, sources[turn.from.sourceId], "")}
                     </a>
                   </p>
                 )}
