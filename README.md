@@ -31,10 +31,10 @@
 
 ## Запуск
 
-Без ключей провайдеров, на демо-моделях и демо-учебнике:
+Без ключей провайдеров, на демо-моделях. Демо-учебник и демо-первоисточник нужны только тестам и ручной проверке, настоящий запуск их не показывает:
 
-- **В Docker:** скопируйте `.env.example` в `.env` и заполните пароли, затем `docker compose -f compose.yaml -f compose.e2e.yaml up -d --build --wait`. Продукт откроется на http://127.0.0.1:8080.
-- **Без Docker:** `pip install -e ".[dev]"`, `cd web && npm ci && npm run build`, затем `python scripts/dev_stack.py`. Каждый сервис запускается отдельным процессом, журналы пишутся в `.stack/logs`.
+- **В Docker:** скопируйте `.env.example` в `.env` и заполните пароли, затем `docker compose -f compose.yaml -f compose.e2e.yaml up -d --build --wait` (файл `compose.e2e.yaml` добавляет демо-источники для сквозных тестов). Продукт откроется на http://127.0.0.1:8080.
+- **Без Docker:** `pip install -e ".[dev]"`, `cd web && npm ci && npm run build`, затем `python scripts/dev_stack.py` (библиотека пустая; настоящие источники — `python -m philograph.library.catalog sync`, демо-тексты — ключ `--demo`). Каждый сервис запускается отдельным процессом, журналы пишутся в `.stack/logs`.
 
 С настоящими моделями: ключ `DEEPSEEK_API_KEY` в `.env` и `docker compose up -d --build` без `compose.e2e.yaml`.
 
