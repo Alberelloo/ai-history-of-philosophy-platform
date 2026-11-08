@@ -13,6 +13,19 @@
   box-shadow: var(--focus-ring);
 }
 
+/* Окно сноски (4.3): положение и высоту задаёт FootnoteRef; не поместилось ни под строкой, ни
+   над ней — на большей стороне с прокруткой внутри окна. Над строкой — без сдвига появления
+   вниз, чтобы окно не наезжало на строку знака. */
+.note-popup {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.note-popup--above {
+  bottom: auto;
+  transform-origin: bottom left;
+}
+
 /* Номер страницы на поле (K1), как и «— с. 45» в тексте (K2–K4), не попадает в выделение. */
 .field-page {
   user-select: none;

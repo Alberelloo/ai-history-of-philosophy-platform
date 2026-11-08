@@ -18,6 +18,7 @@
 - [x] 3.2 `ReaderPage.tsx`: в K1 поле `.margin-col` с номерами страниц и сносками, в K2–K4 номера страниц в тексте (`test_page_numbers_field_vs_text`)
 - [x] 3.3 Каскад сносок и «↑» при сдвиге > 240px: прежний `MarginCol` в `ReaderPage.tsx` не работал (у `<aside>` не было `ref`, все элементы поля стояли наверху колонки). Исправленный `MarginCol` и `fieldItems` перенесены в `Footnote.tsx` (пересчёт после `document.fonts.ready` и по `ResizeObserver` колонки текста); подключение в `ReaderPage.tsx` делает интегратор (см. `progress.md`). Тесты `test_three_notes_cascade_on_field`, `test_field_notes_follow_width_change`
 - [x] 3.4 `styles.css`: правила поля сносок (`.field-note`, `.field-page`, `[data-nontext]`)
+- [x] 3.5 Окно сноски по 4.3 (K2–K4): под строкой знака; не помещается — над ней (`note-popup--above`); не помещается и там — на большей стороне с прокруткой; правый край не заходит под правую панель или полоску (−16px), левый — не левее колонки текста; строку знака не закрывает (`Footnote.tsx` `popupPlace`; `test_footnote_popup_flips_above_near_bottom`, `test_footnote_popup_below_near_top`, `test_footnote_popup_clear_of_panel[1280/1024]`)
 
 ## 4. Неразобранные части
 
@@ -27,4 +28,4 @@
 ## 5. Тесты и проверка
 
 - [x] 5.1 Тесты T28–T30: `tests/web/test_reader_notes.py`, 9 тестов (поле K1, три сноски каскадом на 1920 и 1440, пересчёт при смене ширины, клавиатура K1 и K2, окно K3, страницы на поле и в тексте, невхождение номера в выделение, плашка RU/EN). 4 из них (`test_footnotes_on_field_in_k1`, `test_three_notes_cascade_on_field`, `test_field_notes_follow_width_change`, `test_page_numbers_level_and_not_selected`) проходят только после подключения `MarginCol` из `Footnote.tsx` в `ReaderPage.tsx`; с подключением проверено локально — 9 passed
-- [ ] 5.2 Снимки поля сносок (1920, 1440) и окна сноски (1280, 1024) по 14.3 и их просмотр: эталонов нет
+- [ ] 5.2 Снимки поля сносок (1920, 1440) и окна сноски (1280, 1024) по 14.3 и их просмотр: сценарии есть в `tests/e2e/test_reader_snapshots.py` (`test_notes`), эталоны и просмотр — за интегратором

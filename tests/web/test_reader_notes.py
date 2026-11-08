@@ -377,3 +377,113 @@ def test_page_numbers_level_and_not_selected(browser, site):
         assert f"с. {label}" not in selected, selected
     finally:
         context.close()
+
+
+# --- 4.3: окно сноски переворачивается и не заходит под панель ---------------------------
+
+
+def open_note_popup(page):
+    """Окно сноски по наведению на первый знак; ждёт, пока положение рассчитано."""
+    page.locator("button.note-ref").first.hover()
+    popup = page.locator(".note-popup")
+    popup.wait_for()
+    page.wait_for_function("() => document.querySelector('.note-popup').style.top !== ''")
+    page.wait_for_timeout(250)  # появление (prefers-reduced-motion — только прозрачность)
+    return popup
+
+
+def sign_line(page) -> dict:
+    """Строка знака: высота строки абзаца вокруг середины знака."""
+    return page.locator("button.note-ref").first.evaluate(
+        "el => { const r = el.getBoundingClientRect();"
+        " const lh = parseFloat(getComputedStyle(el.closest('p')).lineHeight);"
+        " const mid = (r.top + r.bottom) / 2;"
+        " return {top: Math.min(r.top, mid - lh / 2), bottom: Math.max(r.bottom, mid + lh / 2),"
+        " left: r.left, right: r.right}; }"
+    )
+
+
+def no_horizontal_scroll(page) -> bool:
+    return page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
+@req(CR, "Сноски")
+def test_footnote_popup_flips_above_near_bottom(browser, site):
+    """4.3 (K2): знак у нижнего края окна — окно над строкой знака, целиком в окне."""
+    context = reader_context(
+        browser, viewport={"width": 1280, "height": 600}, reduced_motion="reduce"
+    )
+    page = context.new_page()
+    try:
+        # Двадцать абзацев перед абзацем со сноской: знак можно прокрутить к низу окна.
+        source, chapter_id, data, _ = chapter_with_three_notes(site)
+        data["blocks"][0:0] = [
+            {**data["blocks"][-1], "id": f"p-before-{i}", "notes": [], "pages": []}
+            for i in range(20)
+        ]
+        open_routed(page, site, source, chapter_id, data)
+        assert page.locator(".reader").get_attribute("data-layout") == "K2"
+        page.locator("button.note-ref").first.evaluate(
+            "el => window.scrollBy(0, el.getBoundingClientRect().top - (innerHeight - 60))"
+        )
+        page.wait_for_timeout(100)
+        popup = open_note_popup(page)
+        line = sign_line(page)
+        box = rect(page, ".note-popup")
+        assert box["bottom"] <= line["top"] + 0.5, (box, line)
+        assert box["top"] >= 0, box
+        assert "note-popup--above" in (popup.get_attribute("class") or "")
+        assert no_horizontal_scroll(page)
+    finally:
+        context.close()
+
+
+@req(CR, "Сноски")
+def test_footnote_popup_below_near_top(browser, site):
+    """4.3 (K2): знак вверху окна — окно под строкой знака (как раньше)."""
+    context = reader_context(
+        browser, viewport={"width": 1280, "height": 600}, reduced_motion="reduce"
+    )
+    page = context.new_page()
+    try:
+        open_chapter(page, site)
+        popup = open_note_popup(page)
+        line = sign_line(page)
+        box = rect(page, ".note-popup")
+        assert box["top"] >= line["bottom"] - 0.5, (box, line)
+        assert box["bottom"] <= 600, box
+        assert "note-popup--above" not in (popup.get_attribute("class") or "")
+    finally:
+        context.close()
+
+
+@req(CR, "Сноски")
+@pytest.mark.parametrize("width", [1280, 1024])
+def test_footnote_popup_clear_of_panel(browser, site, width):
+    """4.3: открыта панель ассистента (1280, сдвиг) или свёрнутая полоска (1024) — окно сноски
+    правее не заходит: правый край ≤ левого края панели − 16px; строку знака не закрывает."""
+    context = reader_context(
+        browser, viewport={"width": width, "height": 700}, reduced_motion="reduce"
+    )
+    page = context.new_page()
+    try:
+        open_chapter(page, site)
+        if width == 1280:
+            page.locator(".toc__assistant").click()
+            edge = ".side-panel"
+        else:
+            page.locator(".rail button").nth(1).click()
+            page.locator(".side-panel__collapse").click()
+            edge = ".side-panel__strip"
+        page.locator(edge).wait_for()
+        page.mouse.move(5, 650)
+        popup = open_note_popup(page)
+        line = sign_line(page)
+        box = rect(page, ".note-popup")
+        boundary = rect(page, edge)["left"]
+        assert box["right"] <= boundary - 16 + 0.5, (box, boundary)
+        overlaps_line = box["top"] < line["bottom"] - 0.5 and box["bottom"] > line["top"] + 0.5
+        assert not overlaps_line, (box, line)
+        assert popup.is_visible() and no_horizontal_scroll(page)
+    finally:
+        context.close()

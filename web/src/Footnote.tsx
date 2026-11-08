@@ -26,6 +26,87 @@ function withLinks(text: string) {
   );
 }
 
+// Положение окна сноски относительно ``span.note`` (в px): верх, лево, ширина и высота, если
+// окно пришлось сузить или ограничить с прокруткой.
+type PopupPlace = { top: number; left: number; width?: number; maxHeight?: number; above: boolean };
+
+const NOTE_GAP = 8; // от строки знака до окна
+const NOTE_MARGIN = 16; // от краёв окна браузера, правой панели и полоски
+
+function samePlace(a: PopupPlace, b: PopupPlace): boolean {
+  return (
+    a.above === b.above &&
+    Math.abs(a.top - b.top) < 0.5 &&
+    Math.abs(a.left - b.left) < 0.5 &&
+    a.width === b.width &&
+    a.maxHeight === b.maxHeight
+  );
+}
+
+function popupPlace(sign: HTMLElement, pop: HTMLElement, host: HTMLElement): PopupPlace {
+  // Строка знака — высота строки абзаца вокруг середины знака (сам знак ниже строки).
+  const signBox = sign.getBoundingClientRect();
+  const block = sign.closest<HTMLElement>("p, blockquote, li") ?? host;
+  const lineHeight = parseFloat(getComputedStyle(block).lineHeight) || signBox.height * 1.6;
+  const middle = (signBox.top + signBox.bottom) / 2;
+  const lineTop = Math.min(signBox.top, middle - lineHeight / 2);
+  const lineBottom = Math.max(signBox.bottom, middle + lineHeight / 2);
+  // Правая граница: левый край развёрнутой панели или полоски, иначе край окна.
+  const panel = document.querySelector<HTMLElement>(".side-panel, .side-panel__strip");
+  const panelBox = panel?.getBoundingClientRect();
+  const right = (panelBox && panelBox.width > 0 ? panelBox.left : window.innerWidth) - NOTE_MARGIN;
+  const column = sign.closest<HTMLElement>("article.chapter")?.getBoundingClientRect();
+  const left0 = Math.max(column?.left ?? NOTE_MARGIN, NOTE_MARGIN);
+  // Естественный размер окна: без прошлых ограничений и без перехода (при «уменьшении
+  // движения» переход 1ms, и замер отдал бы прежний размер).
+  const saved = [pop.style.width, pop.style.maxHeight, pop.style.transition];
+  pop.style.transition = "none";
+  pop.style.width = "";
+  pop.style.maxHeight = "";
+  let width = pop.offsetWidth;
+  let height = pop.offsetHeight;
+  [pop.style.width, pop.style.maxHeight] = saved;
+  void pop.offsetWidth;
+  pop.style.transition = saved[2];
+  let fixedWidth: number | undefined;
+  if (width > right - left0) {
+    fixedWidth = Math.max(right - left0, 0);
+    width = fixedWidth;
+    // Уже окно — выше: высота по суженной ширине.
+    pop.style.transition = "none";
+    pop.style.width = `${fixedWidth}px`;
+    pop.style.maxHeight = "";
+    height = pop.offsetHeight;
+    [pop.style.width, pop.style.maxHeight] = saved;
+    void pop.offsetWidth;
+    pop.style.transition = saved[2];
+  }
+  let left = Math.min(signBox.left, right - width);
+  left = Math.max(left, left0);
+  const viewH = window.innerHeight;
+  let top: number;
+  let maxHeight: number | undefined;
+  let above = false;
+  const below = viewH - NOTE_MARGIN - (lineBottom + NOTE_GAP);
+  const over = lineTop - NOTE_GAP - NOTE_MARGIN;
+  if (height <= below) {
+    top = lineBottom + NOTE_GAP;
+  } else if (height <= over) {
+    top = lineTop - NOTE_GAP - height;
+    above = true;
+  } else if (below >= over) {
+    top = lineBottom + NOTE_GAP;
+    maxHeight = Math.max(below, 0);
+  } else {
+    maxHeight = Math.max(over, 0);
+    top = lineTop - NOTE_GAP - maxHeight;
+    above = true;
+  }
+  // Координаты окна — от начала ``span.note`` (его первой строки).
+  const origin = host.getClientRects()[0] ?? host.getBoundingClientRect();
+  return { top: top - origin.top, left: left - origin.left, width: fixedWidth, maxHeight, above };
+}
+
 // Знак сноски в тексте. В раскладке K1 (``field``) знак — ссылка на сноску на поле; в K2–K4 —
 // кнопка, открывающая всплывающее окно при наведении и с клавиатуры (не закрывается, пока
 // указатель на знаке или в окне). Наведение/фокус подсвечивает пару знак↔сноска (``onActive``).
@@ -70,6 +151,32 @@ export function FootnoteRef({
     onActive(null);
   };
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  // Положение окна (4.3, 6.2): под строкой знака; не помещается — над ней; не помещается и там —
+  // на большей стороне с прокруткой. Справа окно не заходит под правую панель или полоску,
+  // слева — не левее колонки текста. Строку знака окно не закрывает никогда.
+  const [place, setPlace] = useState<PopupPlace | null>(null);
+  useLayoutEffect(() => {
+    if (!open || field) {
+      setPlace(null);
+      return;
+    }
+    const compute = () => {
+      const sign = button.current;
+      const pop = popup.current;
+      const host = sign?.parentElement;
+      if (!sign || !pop || !host) return;
+      const next = popupPlace(sign, pop, host);
+      setPlace((prev) => (prev && samePlace(prev, next) ? prev : next));
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    window.addEventListener("scroll", compute, { passive: true });
+    return () => {
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("scroll", compute);
+    };
+  }, [open, field]);
 
   if (field) {
     return (
@@ -134,7 +241,8 @@ export function FootnoteRef({
           ref={popup}
           role={dialog ? "dialog" : "tooltip"}
           id={id}
-          className="note-popup pg-sidenote-pop"
+          className={place?.above ? "note-popup pg-sidenote-pop note-popup--above" : "note-popup pg-sidenote-pop"}
+          style={place ? { top: place.top, left: place.left, width: place.width, maxHeight: place.maxHeight } : undefined}
           tabIndex={dialog ? -1 : undefined}
           onFocus={show}
           onBlur={hide}
