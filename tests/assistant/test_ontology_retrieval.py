@@ -329,11 +329,6 @@ def test_statement_citation_carries_entity_id(ob):
     assert citation["entity_id"] == ob.ids["kant"]
 
 
-@pytest.mark.xfail(
-    reason="N5: сервис знаний (knowledge/assist.py, describe) не отдаёт entity_id утверждения; "
-    "правка у потока B",
-    strict=False,
-)
 @req("answer-grounding", "Ссылки на абзацы")
 def test_knowledge_service_sends_statement_entity_id(ob):
     """N5 по настоящему сервису знаний: у ссылки на утверждение — сущность-подлежащее."""
