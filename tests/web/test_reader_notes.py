@@ -65,6 +65,37 @@ def test_footnote_popup_in_compact(browser, site):
         context.close()
 
 
+@req(CR, "Сноски")
+@pytest.mark.parametrize("width,mode", [(1280, "K2"), (1024, "K3")])
+def test_footnote_popup_width(browser, site, width, mode):
+    """6.2: окно сноски 352px (22rem). Появление масштабируется от 0.98 (9.5), поэтому ширина
+    меряется после конца анимации: в её начале getBoundingClientRect даёт 352 × 0.98 ≈ 345."""
+    context = reader_context(
+        browser,
+        viewport={"width": width, "height": 900},
+        locale="en-US",
+        reduced_motion="no-preference",
+    )
+    page = context.new_page()
+    try:
+        open_chapter(page, site)
+        assert page.locator(".reader").get_attribute("data-layout") == mode
+        page.locator(".note-ref").first.click()
+        popup = page.locator(".note-popup").first
+        popup.wait_for()
+        sizes = popup.evaluate(
+            "async el => { await Promise.all(el.getAnimations().map(a => a.finished));"
+            " const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);"
+            " return [el.offsetWidth, el.getBoundingClientRect().width, 22 * rem]; }"
+        )
+        offset, rect, expected = sizes
+        assert expected == 352, expected
+        assert abs(offset - expected) <= 0.5, sizes
+        assert abs(rect - expected) <= 0.5, sizes
+    finally:
+        context.close()
+
+
 @req(CR, "Страницы печатного издания")
 def test_page_numbers_field_vs_text(browser, site):
     # K1 (1920): номер страницы на поле, в тексте его нет.

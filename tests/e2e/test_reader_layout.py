@@ -403,6 +403,54 @@ def test_reading_place_kept(browser, site, ids):
         context.close()
 
 
+@e2e
+@req(AD, "Место в тексте не теряется")
+@req(VD, "Раскладка экрана чтения")
+def test_reading_place_kept_k2_to_k4_at_top(browser, site, ids):
+    """T4 на 1280 (раунд 3): глава у верха окна, панель переводит K2 → K4 — заголовок и текст
+    не сдвигаются (≤ 4px), хотя прокрутке некуда компенсировать; кнопка «Оглавление» над
+    заголовком видна и его не задевает."""
+    context, page = open_context(browser, width=1280)
+    try:
+        chapter(page, site, ids)
+        visual.settle(page)
+        assert page.evaluate("window.scrollY") == 0
+        assert page.locator(".reader").get_attribute("data-layout") == "K2"
+        heading = page.locator("article.chapter h1")
+        first = page.locator("article.chapter [data-paragraph]").first
+        before = (
+            top_of(page, "article.chapter h1"),
+            first.evaluate("el => el.getBoundingClientRect().top"),
+        )
+
+        def drift(step: str) -> None:
+            page.wait_for_function("document.querySelector('.reader').dataset.layout === 'K4'")
+            visual.settle(page)
+            now = (
+                heading.evaluate("el => el.getBoundingClientRect().top"),
+                first.evaluate("el => el.getBoundingClientRect().top"),
+            )
+            assert abs(now[0] - before[0]) <= 4, f"{step}, h1: {before[0]:.0f} → {now[0]:.0f}"
+            assert abs(now[1] - before[1]) <= 4, f"{step}, абзац: {before[1]:.0f} → {now[1]:.0f}"
+            toc = page.locator(".toc-open").bounding_box()
+            h1 = heading.bounding_box()
+            assert toc and h1 and toc["y"] >= 0 and toc["y"] + toc["height"] <= h1["y"], (toc, h1)
+
+        open_assistant(page)
+        drift("ассистент открыт")
+        close_assistant(page)
+        page.wait_for_function("document.querySelector('.reader').dataset.layout === 'K2'")
+        mention = page.locator("article.chapter .mention", has_text="Юм").first
+        mention.click()
+        card = page.get_by_role("dialog", name="Карточка")
+        card.locator("h3:text('Юм')").wait_for()
+        card.get_by_role("button", name="Открыть карточку").click()
+        page.get_by_role("complementary", name="Карточка").wait_for()
+        drift("полная карточка")
+    finally:
+        context.close()
+
+
 # --- T32: слой оглавления на 1024 ---------------------------------------------------------
 
 
