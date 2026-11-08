@@ -25,4 +25,4 @@
 ## 4. Тесты и проверка
 
 - [x] 4.1 Тесты T10, T12, T16 (+ T13/T14 серверные в `tests/knowledge/test_mentions_cards.py`): T10 `test_t10_link_and_back_in_popover_and_panel`; T12 `test_t12_nature_of_each_row[light|dark]`; T16 `test_t16_portrait_gallery` (5, 1 и 0 изображений на подменённом ответе); Р6 (после перезагрузки панель и окно не восстанавливаются) — в `test_n10_where_to_read_opens_first_paragraph`. Всё в `tests/web/test_reader_cards.py`
-- [ ] 4.2 Снимки S4 по 14.3 и просмотр: эталонов нет
+- [ ] 4.2 Снимки S4 по 14.3 и просмотр: сценарии есть в `tests/e2e/test_reader_snapshots.py`, эталоны и просмотр — за интегратором (`test_s1_s4_card`)
