@@ -34,12 +34,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+    author_death_years: [-348]
+    translator_death_year: 1893
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Платон ум. -348; Бенджамин Джоуэтт (перевод, 1871/1892) ум. 1893 по Wikidata/Wikipedia; срок 70 лет по ст. 1281 ГК РФ истёк, перевод изд. до 1930 г. (общественное достояние и в США)'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): автор ум. -348, переводчик Джоуэтт ум. 1893, перевод 1871/1892: срок истёк и в РФ, и в США'
   publish: auto
 - id: plato-meno-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/1643
@@ -71,12 +73,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+    author_death_years: [-348]
+    translator_death_year: 1893
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Платон ум. -348; Бенджамин Джоуэтт (перевод, 1871/1892) ум. 1893 по Wikidata/Wikipedia; срок 70 лет по ст. 1281 ГК РФ истёк, перевод изд. до 1930 г. (общественное достояние и в США)'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): автор ум. -348, переводчик Джоуэтт ум. 1893, перевод 1871/1892: срок истёк и в РФ, и в США'
   publish: auto
 - id: plato-republic-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/1497
@@ -108,12 +112,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Plato ум. -348; Benjamin Jowett ум. 1893'
+    author_death_years: [-348]
+    translator_death_year: 1893
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Платон ум. -348; Бенджамин Джоуэтт (перевод, 1871/1892) ум. 1893 по Wikidata/Wikipedia; срок 70 лет по ст. 1281 ГК РФ истёк, перевод изд. до 1930 г. (общественное достояние и в США)'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): автор ум. -348, переводчик Джоуэтт ум. 1893, перевод 1871/1892: срок истёк и в РФ, и в США'
   publish: auto
 - id: locke-essay-concerning-humane-understanding-volume
   landing_url: https://www.gutenberg.org/ebooks/10615
@@ -145,12 +151,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; John Locke ум. 1704'
+    author_death_years: [1704]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); John Locke ум. 1704 (Wikidata/Wikipedia); издание 1690 (текст по 2-му изд.), срок 70 лет по ст. 1281 ГК РФ истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Локк ум. 1704, издание 1690: срок истёк и в РФ, и в США'
   publish: auto
 - id: locke-essay-concerning-humane-understanding-volume-2
   landing_url: https://www.gutenberg.org/ebooks/10616
@@ -182,12 +189,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; John Locke ум. 1704'
+    author_death_years: [1704]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); John Locke ум. 1704 (Wikidata/Wikipedia); издание 1690 (текст по 2-му изд.), срок 70 лет по ст. 1281 ГК РФ истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Локк ум. 1704, издание 1690: срок истёк и в РФ, и в США'
   publish: auto
 - id: berkeley-treatise-concerning-principles-human-knowledge
   landing_url: https://www.gutenberg.org/ebooks/4723
@@ -216,12 +224,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; George Berkeley ум. 1753'
+    author_death_years: [1753]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); George Berkeley ум. 1753 (Wikidata); первое изд. 1710; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Беркли ум. 1753, первое изд. 1710: срок истёк и в РФ, и в США'
   publish: auto
 - id: berkeley-three-dialogues-between-hylas-philonous
   landing_url: https://www.gutenberg.org/ebooks/4724
@@ -250,12 +259,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; George Berkeley ум. 1753'
+    author_death_years: [1753]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); George Berkeley ум. 1753 (Wikidata); первое изд. 1713; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Беркли ум. 1753, первое изд. 1713: срок истёк и в РФ, и в США'
   publish: auto
 - id: hume-enquiry-concerning-human-understanding-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/9662
@@ -284,12 +294,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; David Hume ум. 1776'
+    author_death_years: [1776]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); David Hume ум. 1776 (Wikidata); первое изд. 1748; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Юм ум. 1776, первое изд. 1748: срок истёк и в РФ, и в США'
   publish: auto
 - id: hume-treatise-human-nature-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/4705
@@ -318,12 +329,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; David Hume ум. 1776'
+    author_death_years: [1776]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); David Hume ум. 1776 (Wikidata); первое изд. 1739-1740; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Юм ум. 1776, первое изд. 1739-1740: срок истёк и в РФ, и в США'
   publish: auto
 - id: kant-critique-pure-reason-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/4280
@@ -355,12 +367,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Immanuel Kant ум. 1804; J. M. D. Meiklejohn ум. 1902'
+    author_death_years: [1804]
+    translator_death_year: 1902
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Immanuel Kant ум. 1804; J. M. D. Meiklejohn (перевод 1855) ум. 1902 (Wikipedia); срок 70 лет истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Кант ум. 1804, переводчик Мейклджон ум. 1902, перевод 1855: срок истёк и в РФ, и в США'
   publish: auto
 - id: kant-s-prolegomena-to-any-future
   landing_url: https://www.gutenberg.org/ebooks/52821
@@ -395,12 +409,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Immanuel Kant ум. 1804'
+    author_death_years: [1804]
+    translator_death_year: 1919
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Immanuel Kant ум. 1804; Paul Carus (перевод, Open Court, 1902) ум. 1919 (Wikidata); срок 70 лет истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Кант ум. 1804, переводчик Пол Карус ум. 1919, перевод 1902: срок истёк и в РФ, и в США'
   publish: auto
 - id: descartes-discourse-method-rightly-conducting-one
   landing_url: https://www.gutenberg.org/ebooks/59
@@ -432,12 +448,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; René Descartes ум. 1650; John Veitch ум. 1894'
+    author_death_years: [1650]
+    translator_death_year: 1894
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); René Descartes ум. 1650; John Veitch (перевод 1850-х) ум. 1894 (Wikipedia); срок 70 лет истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Декарт ум. 1650, переводчик Витч ум. 1894, перевод XIX в.: срок истёк и в РФ, и в США'
   publish: auto
 - id: descartes-six-metaphysical-meditations-b-wherein
   landing_url: https://www.gutenberg.org/ebooks/70091
@@ -472,12 +490,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; René Descartes ум. 1650; William Molyneux ум. 1698'
+    author_death_years: [1650]
+    translator_death_year: 1698
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); René Descartes ум. 1650; William Molyneux (перевод 1680) ум. 1698 (Wikipedia); срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Декарт ум. 1650, переводчик Молинё ум. 1698, перевод 1680: срок истёк и в РФ, и в США'
   publish: auto
 - id: mill-system-logic-ratiocinative-inductive-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/27942
@@ -506,12 +526,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; John Stuart Mill ум. 1873'
+    author_death_years: [1873]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); John Stuart Mill ум. 1873 (Wikidata); первое изд. 1843; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Милль ум. 1873, первое изд. 1843: срок истёк и в РФ, и в США'
   publish: auto
 - id: james-pragmatism-new-name-for-some
   landing_url: https://www.gutenberg.org/ebooks/5116
@@ -540,12 +561,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; William James ум. 1910'
+    author_death_years: [1910]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); William James ум. 1910 (Wikidata); первое изд. 1907; срок 70 лет истёк (1980), до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Джеймс ум. 1910, изд. 1907: срок истёк и в РФ, и в США'
   publish: auto
 - id: russell-problems-philosophy-gutenberg
   landing_url: https://www.gutenberg.org/ebooks/5827
@@ -571,15 +593,12 @@ entries:
       clean: gutenberg
     license_hint: Public domain in the USA.
   override: {}
-  license:
-    kind: pd-site
-    basis: open_license
-    evidence: 'Project Gutenberg: Public domain in the USA'
+  license: null
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Бертран Рассел ум. 1970 (Wikidata): в РФ срок 70 лет по ст. 1281 ГК РФ истекает 31.12.2040, показывать читателям из РФ нельзя. Прежняя метка pd-site с основанием open_license была неверной («Public domain in the USA» относится только к США; издание 1912). Нужно: разрешение правообладателя (Bertrand Russell Peace Foundation / McMaster Archives) либо исключить источник; до 2041 г. вид public-domain-ru неприменим.'
   publish: auto
 - id: peirce-chance-love-logic-philosophical-essays
   landing_url: https://www.gutenberg.org/ebooks/65274
@@ -610,12 +629,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Public domain in the USA.; Charles S. Peirce ум. 1914'
+    author_death_years: [1914]
+    evidence: 'Project Gutenberg: «Public domain in the USA» (отметка сайта, не основание для РФ); Charles S. Peirce ум. 1914 (Wikidata); сборник изд. 1923 (ред. Morris R. Cohen, ум. 1947; в издание входит эссе Дьюи, ум. 1952); срок истёк, изд. до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Пирс ум. 1914, сборник 1923 (редактор Коэн ум. 1947): срок истёк и в РФ, и в США'
   publish: auto
 - id: reid-inquiry-into-human-mind-principles
   landing_url: https://en.wikisource.org/wiki/An_Inquiry_into_the_Human_Mind
@@ -645,12 +665,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Wikisource; Thomas Reid ум. 1796'
+    author_death_years: [1796]
+    evidence: 'en.wikisource.org: шаблон pd-old; Thomas Reid ум. 1796 (Wikidata); первое изд. 1764, текст по Works, 1813; срок истёк, до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Рид ум. 1796, изд. 1764/1813: срок истёк и в РФ, и в США'
   publish: auto
 - id: aristotle-soul-en-wikisource
   landing_url: https://en.wikisource.org/wiki/On_the_Soul_(Aristotle)
@@ -683,14 +704,16 @@ entries:
         death_year: 1939
         wikidata: null
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
-    evidence: 'сайт: Wikisource; Aristotle ум. -322'
+    author_death_years: [-322]
+    translator_death_year: 1939
+    evidence: 'en.wikisource.org; Аристотель ум. -322; перевод J. A. Smith (The Works of Aristotle, Oxford, 1931) — John Alexander Smith ум. 1939 (Wikidata Q6218631): 70 лет по ст. 1281 ГК РФ истекли в 2009 г.; издание 1931 г. — в США может быть защищено до 01.01.2027'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Аристотель ум. -322, переводчик Дж. А. Смит ум. 1939: в РФ срок истёк, но перевод издан в 1931 г., в США защита возможна до 2027, показывать только в РФ'
   publish: auto
 - id: aristotle-organon-owen-en-wikisource
   landing_url: https://en.wikisource.org/wiki/Organon_(Owen)/The_Posterior_Analytics
@@ -746,12 +769,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: Wikisource; Aristotle ум. -322; Octavius Freire Owen ум. 1873'
+    author_death_years: [-322]
+    translator_death_year: 1873
+    evidence: en.wikisource.org; Аристотель ум. -322; Octavius Freire Owen (перевод «Organon», 1853) ум. 1873 (Wikidata Q18912394); срок истёк, до 1930 г.
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Аристотель ум. -322, переводчик Оуэн ум. 1873, перевод 1853: срок истёк и в РФ, и в США'
   publish: auto
 - id: hegel-phenomenology-mind-en-wikisource
   landing_url: https://en.wikisource.org/wiki/The_Phenomenology_of_Mind
@@ -792,12 +817,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: PD-old, PD/US; Georg Wilhelm Friedrich Hegel ум. 1831; James Black Baillie ум. 1940'
+    author_death_years: [1831]
+    translator_death_year: 1940
+    evidence: 'en.wikisource.org: PD-old, PD/US; Hegel ум. 1831; James Black Baillie (перевод, 1910) ум. 1940 (Wikidata Q1680038); срок 70 лет истёк в 2010 г., издание до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Гегель ум. 1831, переводчик Бэйли ум. 1940, перевод 1910: срок истёк и в РФ, и в США'
   publish: auto
 - id: teetet-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Теэтет_(Платон;_Карпов)
@@ -834,12 +861,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), Платон ум. -348'
+    author_death_years: [-348]
+    translator_death_year: 1867
+    evidence: 'ru.wikisource.org; Платон ум. -348; перевод В. Н. Карпова (СПб., 1863-1879) — Карпов ум. 1867 (ru.wikipedia); срок истёк, издание до 1930 г. Примечание: шаблон заголовка страницы выдаёт ошибку Lua, но текст отдаётся полностью'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Платон ум. -348, переводчик Карпов ум. 1867, перевод 1863-1879: срок истёк и в РФ, и в США'
   publish: auto
 - id: menon-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Менон_(Платон;_Карпов)
@@ -876,12 +905,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'ru.wikisource: перевод В. Н. Карпова (1798–1867), Платон ум. -348'
+    author_death_years: [-348]
+    translator_death_year: 1867
+    evidence: 'ru.wikisource.org; Платон ум. -348; перевод В. Н. Карпова (СПб., 1863-1879) — Карпов ум. 1867 (ru.wikipedia); срок истёк, издание до 1930 г. Примечание: шаблон заголовка страницы выдаёт ошибку Lua, но текст отдаётся полностью'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Платон ум. -348, переводчик Карпов ум. 1867, перевод 1863-1879: срок истёк и в РФ, и в США'
   publish: auto
 - id: chernyshevskiy-kharakter-chelovecheskogo-znaniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Характер_человеческого_знания_(Чернышевский)
@@ -909,14 +940,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
-    evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
+    author_death_years: [1889]
+    evidence: 'ru.wikisource.org: PD-old; Н. Г. Чернышевский ум. 1889 (ru.wikipedia); текст 1885 г. Но страница набрана по изданию «Собрание сочинений в пяти томах», т. 4, М., «Правда», 1974 (общая редакция Ю. С. Мелентьева) и содержит редакторские примечания 1974 г., права на которые не истекли'
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Сам текст (Чернышевский ум. 1889) свободен, но страница содержит советские редакторские примечания 1974 г. (издание «Правда», сост. Ю. С. Мелентьев), права на них в РФ не истекли. Нужно: исключить примечания (отдельный источник/очистка) или найти издание без комментариев (напр. ПСС 1906 г.); после этого одобрить как public-domain-ru или public-domain.'
   publish: auto
 - id: kireevskiy-neobkhodimosti-vozmozhnosti-novykh-nachal-dlya
   landing_url: https://ru.wikisource.org/wiki/О_необходимости_и_возможности_новых_начал_для_философии_(Киреевский)
@@ -944,14 +976,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
-    evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
+    author_death_years: [1856]
+    evidence: 'ru.wikisource.org: PD-old; И. В. Киреевский ум. 1856 (ru.wikipedia); первая публикация: «Русская беседа», 1856; страница набрана по изданию «Критика и эстетика», М., 1979 (возможна современная орфография/редактура), поэтому показывать только в РФ'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Киреевский ум. 1856, первая публикация 1856; страница по изданию 1979 г.: срок истёк в РФ, права на издание 1979 г. не проверены, показывать только в РФ'
   publish: auto
 - id: mikhaylovich-uchenie-kanta-poznanii-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Учение_Канта_о_познании_(Лопатин)
@@ -984,14 +1017,15 @@ entries:
         death_year: 1920
         wikidata: null
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
-    evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
+    author_death_years: [1920]
+    evidence: 'ru.wikisource.org: PD-old; Л. М. Лопатин ум. 1920 (Wikidata Q4266616); речь 1904 г. Но страница набрана по сборнику «Кант: pro et contra» (СПб., РХГА, 2005) и содержит составительскую вводную/послесловие 2005 г., права на которые не истекли'
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Текст Лопатина (ум. 1920, речь 1904) свободен, но страница содержит составительский комментарий сборника «Кант: pro et contra» (СПб., РХГА, 2005), права на который не истекли. Нужно: исключить комментарий 2005 г. или взять издание 1904 г. (Вопросы философии и психологии); после этого одобрить как public-domain-ru или public-domain.'
   publish: auto
 - id: introduction-to-philosophyweb-pdf
   landing_url: https://assets.openstax.org/oscms-prodcms/media/documents/Introduction_to_Philosophy-WEB.pdf
@@ -1055,13 +1089,12 @@ entries:
   license:
     kind: cc-by-nc-sa-4.0
     basis: open_license
-    evidence: 'openstax.org/details/books/introduction-philosophy: CC BY-NC-SA 4.0 (не CC BY, как предполагалось);
-      PDF из CMS API (pdf_url)'
+    evidence: 'openstax.org (CMS API, details/books/introduction-philosophy), проверено 2026-11-09: CC BY-NC-SA 4.0, издание 2022-06-15; PDF по pdf_url из CMS API. Условия: NC (только некоммерческое использование), SA (производные на тех же условиях), BY (указание авторства); сторонние материалы внутри книги могут быть под иными лицензиями'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): лицензия CC BY-NC-SA 4.0 подтверждена страницей издателя OpenStax; применимость условия NC/SA к проекту — вопрос владельца'
   publish: manual
 - id: falckenberg-history-modern-philosophy-smaller-en
   landing_url: https://en.wikisource.org/wiki/History_of_Modern_Philosophy
@@ -1116,12 +1149,14 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'сайт: PD/US; Richard Falckenberg ум. 1920; Andrew Campbell Armstrong ум. 1935'
+    author_death_years: [1920]
+    translator_death_year: 1935
+    evidence: 'en.wikisource.org: PD/US; Richard Falckenberg ум. 1920; Andrew Campbell Armstrong (перевод, 1893) ум. 1935 (Wikidata Q15948287); срок 70 лет истёк, издание до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Фальккенберг ум. 1920, переводчик Армстронг ум. 1935, перевод 1893: срок истёк и в РФ, и в США'
   publish: auto
 - id: h-ffding-brief-history-modern-philosophy
   landing_url: https://en.wikisource.org/wiki/A_Brief_History_of_Modern_Philosophy
@@ -1203,15 +1238,12 @@ entries:
       api: true
     license_hint: PD-US
   override: {}
-  license:
-    kind: pd-site
-    basis: open_license
-    evidence: 'en.wikisource.org: PD-US, издание 1912'
+  license: null
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Автор Харальд Гёффдинг ум. 1931 (срок в РФ истёк), но переводчик Чарльз Финли Сандерс (Wikidata Q23304112) ум. 1959: в РФ срок на перевод 1912 г. истекает только 31.12.2029, показывать читателям из РФ нельзя. Прежняя метка pd-site (PD-US) честного основания для РФ не давала. Нужно: дождаться 2030 г., найти иной перевод (напр. 1900-х гг. с переводчиком, умершим до 1955), либо получить разрешение правообладателя.'
   publish: auto
 - id: ivanovich-uchebnik-logiki-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Учебник_логики_(Челпанов)
@@ -1239,14 +1271,15 @@ entries:
     license_hint: null
   override: {}
   license:
-    kind: public-domain
+    kind: public-domain-ru
     basis: public_domain
-    evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
+    author_death_years: [1936]
+    evidence: 'ru.wikisource.org (шаблона лицензии на странице нет); Г. И. Челпанов ум. 1936 (Wikidata Q1377656): срок 70 лет истёк в 2006 г.; страница набрана по изданию «Учебник логики», М.: Прогресс, 1994 (по Wikisource год первой публикации 1897), поэтому показывать только в РФ; права на возможные редакторские части издания 1994 г. не проверены (на странице их не видно)'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): Челпанов ум. 1936: срок истёк в РФ; страница по изданию 1994 г. (Прогресс), год текста по Wikisource 1897: показывать только в РФ'
   publish: auto
 - id: esbe-gnoseologiya-ili-gnozeologiya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Гносеология_или_гнозеология
@@ -1276,14 +1309,14 @@ entries:
         death_year: null
         wikidata: null
   license:
-    kind: pd-site
-    basis: open_license
-    evidence: 'ru.wikisource.org: статья ЭСБЕ 1890–1907 без подписи, PD-шаблон сайта'
+    kind: public-domain
+    basis: public_domain
+    evidence: 'ru.wikisource.org: ЭСБЕ (Брокгауз-Ефрон, 1890-1907), статья без подписи (однострочная отсылка); по п. 2 ст. 1281 ГК РФ для анонимно опубликованного произведения срок 70 лет с обнародования, он истёк; издание до 1930 г.'
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Статья ЭСБЕ без подписи (1890-1907): по существу свободна (анонимное произведение, 70 лет с обнародования истекли), но каталог требует годы смерти авторов для public-domain. Нужно решение владельца: разрешить анонимные произведения в валидаторе либо установить автора статьи; затем одобрить как public-domain.'
   publish: auto
 - id: esbe-poznanie-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Познание
@@ -1342,14 +1375,14 @@ entries:
         death_year: null
         wikidata: null
   license:
-    kind: pd-site
-    basis: open_license
-    evidence: 'en.wikisource.org: EB1911, PD-US'
+    kind: public-domain
+    basis: public_domain
+    evidence: 'en.wikisource.org: EB1911, т. 9, с. 733, статья «Epistemology» без подписи (в тексте страницы подписи нет); издание 1911 г. (анонимное/корпоративное произведение: 70 лет с обнародования в РФ истекли, в США общественное достояние)'
   review:
-    status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    status: draft
+    by: null
+    at: null
+    note: 'Статья EB1911 «Epistemology» без подписи (1911): по существу свободна (в США PD, в РФ 70 лет с обнародования истекли), но каталог требует годы смерти авторов для public-domain. Нужно решение владельца: разрешить анонимные произведения в валидаторе либо установить автора статьи по списку авторов EB1911; затем одобрить как public-domain.'
   publish: auto
 - id: esbe-teoriya-poznaniya-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Теория_познания
@@ -1382,12 +1415,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'ru.wikisource: статья ЭСБЕ, подпись «Н. Г. Дебольский» (1842–1918)'
+    author_death_years: [1918]
+    evidence: 'ru.wikisource.org: ЭСБЕ (1890-1907), подпись «Н. Г. Дебольский», ум. 1918 (Wikidata Q4156289); срок истёк, издание до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): ЭСБЕ 1890-1907, автор Дебольский ум. 1918: срок истёк; до 1930 г.'
   publish: auto
 - id: esbe-sensualizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Сенсуализм
@@ -1413,18 +1447,19 @@ entries:
   override:
     metadata:
       authors:
-      - name: Без подписи
-        death_year: null
-        wikidata: null
+      - name: Эрнест Леопольдович Радлов
+        death_year: 1928
+        wikidata: Q4387760
   license:
-    kind: pd-site
-    basis: open_license
-    evidence: 'ru.wikisource.org: статья ЭСБЕ, подпись «Э. Р.», PD-шаблон сайта'
+    kind: public-domain
+    basis: public_domain
+    author_death_years: [1928]
+    evidence: 'ru.wikisource.org: ЭСБЕ (1890-1907), подпись «Э. Р.» — Э. Л. Радлов, ум. 1928 (Wikidata Q4387760; расшифровка подписи по ЭСБЕ, атрибуция по инициалам); срок истёк, издание до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): ЭСБЕ 1890-1907, подпись «Э. Р.» (Радлов ум. 1928): срок истёк; до 1930 г.'
   publish: auto
 - id: esbe-skeptitsizm-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/ЭСБЕ/Скептицизм
@@ -1457,12 +1492,13 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'ru.wikisource: статья ЭСБЕ, подпись «Э. Радлов» (1854–1928)'
+    author_death_years: [1928]
+    evidence: 'ru.wikisource.org: ЭСБЕ (1890-1907), подпись «Э. Радлов», Эрнест Леопольдович Радлов ум. 1928 (Wikidata Q4387760); срок истёк, издание до 1930 г.'
   review:
     status: approved
-    by: claude (пробная загрузка)
-    at: '2026-11-06'
-    note: пробная проверка конвейера; перед запуском пересмотреть
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Лицензия перепроверена 2026-11-09 (агент по поручению владельца): ЭСБЕ 1890-1907, автор Радлов ум. 1928: срок истёк; до 1930 г.'
   publish: auto
 - id: aristotel-fizika-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Физика_(Аристотель;_Карпов)
