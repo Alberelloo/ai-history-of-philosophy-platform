@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { SourceItem } from "./api";
 import { navigate } from "./App";
 import { QUESTION_SELECTOR } from "./hooks/useAssistantShortcut";
@@ -457,6 +457,23 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
   const [confirming, setConfirming] = useState<string | null>(null);
   const [linkBusy, setLinkBusy] = useState<string | null>(null);
   const sessionsButton = useRef<HTMLButtonElement>(null);
+  const sessionsList = useRef<HTMLUListElement>(null);
+  // Куда вернуть фокус после перерисовки списка сессий (10.4). Кнопка, на которой был фокус,
+  // при удалении и отмене исчезает из DOM, поэтому фокус ставится в том же коммите, где уже
+  // нарисован новый список, а не по таймеру (иначе фокус успевал упасть на body).
+  const focusAfter = useRef<{ kind: "active" } | { kind: "delete"; id: string } | null>(null);
+  useLayoutEffect(() => {
+    const target = focusAfter.current;
+    const list = sessionsList.current;
+    if (!target || !list) return;
+    const el =
+      target.kind === "active"
+        ? list.querySelector<HTMLElement>(".assistant__session.is-active .assistant__session-title")
+        : list.querySelector<HTMLElement>(`[data-delete-session="${CSS.escape(target.id)}"]`);
+    if (!el) return;
+    focusAfter.current = null;
+    el.focus();
+  });
   const scope = useScope();
   const cameFrom = mode === "book" ? (window.history.state as HistoryState)?.assistantFrom : undefined;
   const sources = useSources([
@@ -598,7 +615,12 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       return { ...prev, updatedAt: Date.now(), activeId: nextActive, sessions };
     });
     setConfirming(null);
-    requestAnimationFrame(() => sessionsButton.current?.focus());
+    focusAfter.current = { kind: "active" }; // на название активной сессии (10.4)
+  };
+
+  const cancelDelete = (id: string) => {
+    setConfirming(null);
+    focusAfter.current = { kind: "delete", id }; // на «Удалить» этой строки (10.4)
   };
 
   // Поручение перехода из панели (5.10): обмен с handoffId добавляется и отправляется один раз.
@@ -700,7 +722,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       </div>
       <div className="pg-panel__body assistant__body">
         {sessionsOpen && (
-          <ul className="assistant__sessions" role="list" aria-label={t.assistant.session.list} onKeyDown={onListKey}>
+          <ul ref={sessionsList} className="assistant__sessions" role="list" aria-label={t.assistant.session.list} onKeyDown={onListKey}>
             {sorted.map((s) => {
               const running = s.messages.some((m) => m.status === "streaming" && live.has(m.id));
               const title = sessionTitle(s, t.assistant.session.new);
@@ -733,7 +755,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                       role="group"
                       aria-label={`${t.assistant.session.delete}: ${title}`}
                       onKeyDown={(e) => {
-                        if (e.key === "Escape") setConfirming(null);
+                        if (e.key === "Escape") cancelDelete(s.id);
                       }}
                     >
                       <span className="assistant__session-confirm-text">
@@ -743,7 +765,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                         <button className="pg-btn pg-btn--secondary pg-btn--sm assistant__danger" onClick={() => deleteSession(s.id)}>
                           {t.assistant.session.delete}
                         </button>
-                        <button className="pg-btn pg-btn--ghost pg-btn--sm" autoFocus onClick={() => setConfirming(null)}>
+                        <button className="pg-btn pg-btn--ghost pg-btn--sm" autoFocus onClick={() => cancelDelete(s.id)}>
                           {t.assistant.session.cancel}
                         </button>
                       </span>
@@ -783,6 +805,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                         className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
                         aria-label={`${t.assistant.session.delete}: ${title}`}
                         title={t.assistant.session.delete}
+                        data-delete-session={s.id}
                         onClick={() => setConfirming(s.id)}
                       >
                         <Icon name="close" small />

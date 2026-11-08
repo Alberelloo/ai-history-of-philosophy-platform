@@ -626,6 +626,7 @@ def session_crud(page, box, stub, key_of) -> None:
     assert "Удалить сессию? Обмены будут стёрты." in row.inner_text()
     row.get_by_role("button", name="Отмена").click()
     assert items.count() == 2
+    assert delete.evaluate("e => e === document.activeElement")  # фокус на «Удалить» (10.4)
     delete.click()
     page.keyboard.press("Escape")
     assert items.count() == 2 and sessions_list(box).is_visible()
@@ -636,7 +637,11 @@ def session_crud(page, box, stub, key_of) -> None:
     assert second not in [s["id"] for s in state["sessions"]]
     assert state["activeId"] == state["sessions"][0]["id"]  # активной стала оставшаяся
     assert "Первый вопрос" in box.locator(".turns").inner_text()
-    assert box.evaluate("(b) => b.contains(document.activeElement)")  # фокус не потерян (10.4)
+    # Фокус — на названии активной сессии в списке (10.4, «Подтверждённое удаление»).
+    assert box.evaluate(
+        "(b) => b.contains(document.activeElement) && document.activeElement.matches("
+        "'.assistant__session.is-active .assistant__session-title')"
+    )
     # Удалить единственную — пустая «Новая сессия».
     sessions_list(box)
     items.nth(0).get_by_role("button", name=re.compile("^Удалить:")).click()
