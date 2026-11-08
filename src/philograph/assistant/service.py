@@ -185,9 +185,12 @@ class Assistant:
         settings: AssistantSettings | None = None,
         clock: Clock | None = None,
         ontology: Ontology | None = None,
+        library=None,
     ) -> None:
         self.search = search
         self.llm = llm
+        # Библиотека — для названий глав в ссылках (N4); без неё название главы не приходит.
+        self.library = library
         self.settings = settings or AssistantSettings()
         self.clock = clock or SystemClock()
         self.ontology = ontology
@@ -230,6 +233,15 @@ class Assistant:
             duration_ms=duration,
         )
         return kind, names
+
+    def _chapter_title(self, result: dict[str, Any]) -> str | None:
+        """Название главы абзаца для подсказки ссылки (N4): от поиска, иначе из оглавления."""
+        if result.get("chapter_title"):
+            return result["chapter_title"]
+        chapter = result.get("chapter_id")
+        if not chapter or self.library is None:
+            return None
+        return self.library.chapter_titles(result["source_id"]).get(chapter) or None
 
     def _history_summary(self, request: AskRequest) -> str:
         earlier = (
@@ -403,6 +415,7 @@ class Assistant:
                 r["text"],
                 quoting=r.get("quoting", True),
                 source_title=r.get("source_title"),
+                chapter_title=self._chapter_title(r),
                 paragraph_start=r["text"][:120],
             )
             for i, r in enumerate(results)

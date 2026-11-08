@@ -11,6 +11,7 @@ import "./styles/tokens.css";
 import "./styles/components.css";
 import "./styles.css";
 import "./styles/notes.css";
+import "./styles/assistant.css";
 import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(
