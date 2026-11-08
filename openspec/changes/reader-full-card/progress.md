@@ -1,6 +1,6 @@
 # Progress: reader-full-card
 
-Этап 3 из 6. Актуализировано 2026-11-08 по коду (файл создан впервые). Готовность: около 60% (клиент готов, серверные N3 и N10 и тесты нет).
+Этап 3 из 6. Ведёт поток B (`claude/reader-wt-cards`). Актуализировано 2026-11-08. Готовность: около 90% (код и тесты готовы; снимки S4 и просмотр — за интегратором).
 
 ## Статус по пунктам
 
@@ -8,38 +8,38 @@
 | --- | --- | --- |
 | 1.1 OpenSpec | сделано | `openspec validate reader-full-card` — valid |
 | 1.2 Документы Portrait/PortraitGallery | сделано | `docs/design/system/components/Portrait.md`, `PortraitGallery.md`, `Lifeline.md` |
-| 2.1 N3 `portraits` | частично | поле есть, но всегда `[]`: `src/philograph/knowledge/cards.py:189`; `test_card_has_portraits_field` |
-| 2.2 N10 `first_paragraph_id` | не начато | grep по `src/` и `web/src` не находит |
-| 3.1 PortraitGallery | сделано в коде | `web/src/ui.tsx:378`, `FullCard.tsx:181`; на данных не проверялась |
-| 3.2 Lifeline | сделано | `FullCard.tsx:197` |
-| 3.3 Переключатели источников | сделано | `FullCard.tsx:107, 200`; `test_textbook_scope_shared_by_graph_card_and_assistant` |
-| 3.4 Сводка природы знания | сделано в коде | `FullCard.tsx:80, 204` |
-| 3.5 Стек «Назад» до 20 | сделано | `App.tsx:95-102`, `ReaderPage.tsx:91` |
-| 4.1 Тесты T10, T12–T14, T16 | частично | серверные аналоги T13/T14 и сквозной тест; T10, T12, T16 нет |
-| 4.2 Снимки S4 | не начато | эталонов нет |
+| 2.1 N3 `portraits` | закрыто монограммами | сервер отдаёт `[]`; отбор и хранение — черновик `openspec/changes/portrait-sourcing/` |
+| 2.2 N10 `first_paragraph_id` | сделано | `mentions.py` (`where_to_read`, `position`), миграция `knowledge` 6, `FullCard.tsx` (`whereToReadLink`); тесты в `tests/knowledge/test_mentions_cards.py` и `tests/web/test_reader_cards.py` |
+| 3.1 PortraitGallery | сделано | T16 на подменённом ответе (5, 1, 0 изображений) |
+| 3.2 Lifeline | сделано | `FullCard.tsx` |
+| 3.3 Переключатели источников | сделано | `test_textbook_scope_shared_by_graph_card_and_assistant` |
+| 3.4 Сводка природы знания | сделано | T12 |
+| 3.5 Стек «Назад» до 20 | сделано | T10 |
+| 3.6 Переход по связи в панели | сделано | T10 («Назад: Кант») |
+| 3.7 Состояния панели, `pg-generated` у строки | сделано | T12; `web/src/styles/card.css` |
+| 4.1 Тесты T10, T12, T16 | сделано | `tests/web/test_reader_cards.py` |
+| 4.2 Снимки S4 | не начато | эталоны пересоздаёт интегратор (правило 6 раздела 9 сводки) |
 
-## Сейчас
+## Решение по N3
 
-Полная карточка в панели работает со всеми блоками. Портретов нет вовсе: сервер всегда отдаёт пустой список, клиент показывает монограмму и «Изображений нет». Это допустимо по разделу 16 дока (этап закрывается с монограммами), но T16 и S4 с портретами проверить нечем.
+Этап закрыт с монограммами (раздел 16 дока: «если не успевает — этап закрывается с монограммами»). Монограмма и «Изображений нет» — штатное состояние. Клиент готов к данным: галерея проверена T16 на ответе с портретами. Чего не хватает до полной поддержки, записано в черновике `portrait-sourcing`:
 
-## Следующий шаг
+- `Portrait` в `web/src/ui.tsx` не принимает изображение: в окне у упоминания даже при непустом `portraits` показывается монограмма (T11 проверяет медальон 56px без счётчика, но не изображение).
+- Подпись `PortraitGallery` — автор и год; лицензии и ссылки на источник нет (требование «Портреты в карточке» и T16 их ждут).
 
-1. Решить судьбу N3: отдельная серверная задача (отбор и хранение портретов с лицензиями, до 7 без дублей) или закрыть этап с монограммами и записать решение.
-2. N10: `first_paragraph_id` в `where_to_read[]` (сервер знаний, `mentions.py`) и переход к абзацу в `FullCard`.
-3. Тесты: T10 в панели, T12 (проверенная, сгенерированная, спорная строка), T16 (галерея через подмену `route` ответа карточки с `portraits`), T13/T14 в браузере.
-4. Снимки S4 и их просмотр человеком.
+`web/src/ui.tsx` — общий файл, не потока B; правки — после решений владельца, через интегратора.
 
-## Известные проблемы
+## Замечания для интегратора
 
-- N9 (`lang` у строк карточки) не сделан: у строк нет языка, EN-интерфейс показывает серверный текст как есть.
-- Нет проверки, что для сущности без портрета в окне показывается монограмма 56px без счётчика (T11).
+- Миграция `knowledge` 6 (`position` у `mentions`). Старые строки без порядка: «Где читать» берёт порядок вставки; точный порядок появится после пересчёта упоминаний (новая публикация версии или `recompute_entity`).
+- `App.tsx` (чужой): у `<FullCard>` можно добавить `title={top.title}`, тогда при загрузке панель показывает имя, а не только «Загружаем карточку…». Необязательно.
+- `web/src/main.tsx`: добавлена одна строка `import "./styles/card.css";` в конце импортов стилей.
 
 ## Как проверить
 
 ```bash
-export TMP="$(pwd -W)/.stack/tmp"; export TEMP="$TMP"; mkdir -p "$TMP"
+export TMP="$(pwd -W)/.stack/tmp" TEMP="$(pwd -W)/.stack/tmp"; mkdir -p "$TMP"
+cd web && npm run build && npx tsc --noEmit && cd ..
+PYTHONPATH="$(pwd)/src" <репозиторий>/.venv/Scripts/python -m pytest -q tests/web/test_reader_cards.py tests/knowledge
 /c/Users/Ivano/AppData/Local/Programs/openspec/openspec validate reader-full-card
-.venv/Scripts/python -m pytest -q tests/knowledge/test_mentions_cards.py
-.venv/Scripts/python -m pytest -q -k "test_textbook_scope_shared or test_mention_opens_card"
-.venv/Scripts/python scripts/check_traceability.py
 ```

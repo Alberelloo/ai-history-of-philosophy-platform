@@ -266,6 +266,8 @@ mentions = Table(
     Column("start", Integer, nullable=False),
     Column("end", Integer, nullable=False),
     Column("method", String(20), nullable=False),  # name | context | model
+    # Порядок абзаца в версии (миграция 6): первый абзац с упоминанием в главе для «Где читать».
+    Column("position", Integer),
     schema=SCHEMA,
 )
 migrations.add(3, "упоминания в тексте")(migrations.create_tables("mentions"))
@@ -336,3 +338,16 @@ def _lifespan_dash(conn: Connection) -> None:
 
 
 migrations.add(5, "даты: короткое тире без пробелов")(_lifespan_dash)
+
+
+def _mention_position(conn: Connection) -> None:
+    """Столбец ``position``: старые строки остаются без порядка до пересчёта упоминаний,
+    «Где читать» для них берёт порядок вставки."""
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("mentions", schema=SCHEMA)}
+    if "position" not in columns:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.mentions ADD COLUMN position INTEGER"))
+
+
+migrations.add(6, "порядок абзаца у упоминания")(_mention_position)

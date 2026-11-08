@@ -259,16 +259,20 @@ export function FullCard({
                         <span className="card-row__relation">
                           {relationTitle(t, row.type, Boolean(row.inverse), row.relation)}:{" "}
                         </span>
-                        {row.entity_id ? (
-                          <button
-                            className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
-                            onClick={() => openCardInPanel(row.entity_id!, row.label ?? row.entity_id!)}
-                          >
-                            {row.label}
-                          </button>
-                        ) : (
-                          value(row)
-                        )}
+                        {(() => {
+                          const shown = row.entity_id ? (
+                            <button
+                              className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
+                              onClick={() => openCardInPanel(row.entity_id!, row.label ?? row.entity_id!)}
+                            >
+                              {row.label}
+                            </button>
+                          ) : (
+                            value(row)
+                          );
+                          // Сгенерированная строка — `pg-generated` с ромбом (4.5, П-4).
+                          return row.generated ? <Generated className="card-row__value">{shown}</Generated> : shown;
+                        })()}
                         {row.status === "verified" && <StatusMark status="verified" />}
                         {row.status !== "verified" && row.evidence.length > 0 && !row.generated && (
                           <StatusMark status="sourced" />

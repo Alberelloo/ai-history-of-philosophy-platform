@@ -247,6 +247,67 @@ def test_where_to_read(mx):
     assert client.get(f"/v1/entities/{mx.ids['kant']}/where").json() == where
 
 
+@req(EM, "Где читать")
+def test_where_to_read_first_paragraph(mx):
+    """N10: «Где читать» ведёт к первому абзацу главы с упоминанием, а не к началу главы."""
+    mx.publish()
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    first = mx.paragraph("Согласно Канту")
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == first.id
+    # В главе 3 Кант только в заголовке: абзаца нет, клиент ведёт к началу главы.
+    assert where["Глава 3. Кант о Юме"]["first_paragraph_id"] is None
+    # Пересчёт изменённого абзаца ниже по тексту порядок не ломает.
+    mx.lib.files["book.txt"] = TEXT.replace(
+        "Трансцендентального идеализма придерживался Кант.",
+        "Трансцендентального идеализма придерживался именно Кант.",
+    ).encode()
+    mx.publish()
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == mx.paragraph("Согласно Канту").id
+    # Карточка отдаёт то же поле.
+    card = mx.cards.card(mx.ids["kant"], generation=False)
+    assert {w["first_paragraph_id"] for w in card["where_to_read"]} == {
+        mx.paragraph("Согласно Канту").id,
+        None,
+    }
+
+
+@req(EM, "Где читать")
+def test_where_to_read_without_position(mx):
+    """Строки до миграции 6 без ``position``: первым считается вставленный раньше."""
+    from sqlalchemy import update
+
+    from philograph.knowledge import schema as ks
+
+    mx.publish()
+    with mx.onto.statements.engine.begin() as conn:
+        conn.execute(update(ks.mentions).values(position=None))
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == mx.paragraph("Согласно Канту").id
+
+
+@req(EM, "Где читать")
+def test_migration_6_adds_mention_position(tmp_path):
+    """Миграция 6 добавляет ``position`` в таблицу упоминаний прежнего вида и повторно безвредна."""
+    from sqlalchemy import inspect, text
+
+    from philograph.knowledge import schema as ks
+    from philograph.platform.db import make_engine
+
+    engine = make_engine(f"sqlite:///{(tmp_path / 'k.db').as_posix()}", [ks.SCHEMA])
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                f"CREATE TABLE {ks.SCHEMA}.mentions (id INTEGER PRIMARY KEY, target_id VARCHAR(40))"
+            )
+        )
+        ks._mention_position(conn)
+        ks._mention_position(conn)
+        columns = {c["name"] for c in inspect(conn).get_columns("mentions", schema=ks.SCHEMA)}
+    assert "position" in columns
+    assert ks.migrations.latest() == 6
+
+
 @req(EM, "Метрики упоминаний")
 def test_mention_metrics():
     expected = {("p1", 0, "kant"), ("p1", 10, "hume")}

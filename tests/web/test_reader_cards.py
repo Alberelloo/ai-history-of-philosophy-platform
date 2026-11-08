@@ -657,3 +657,211 @@ def test_n11_mentions_requested_in_parts_of_500(browser, site, long_source):
         expect(last).to_have_text("Кант")
     finally:
         context.close()
+
+
+# --- Полная карточка в панели: T12, T16, N10 -----------------------------------------------
+
+
+def open_full(page, site):
+    """Окно у «Кант» → «Открыть карточку»: полная карточка в правой панели."""
+    goto_chapter(page, site)
+    kant(page).click()
+    dialog = page.get_by_role("dialog", name="Карточка")
+    opened(dialog, "Кант")
+    dialog.get_by_role("button", name="Открыть карточку").click()
+    panel = page.get_by_role("complementary", name="Карточка")
+    panel.locator("h3.pg-entity-head__name", has_text="Кант").wait_for()
+    return panel
+
+
+@req(EC, "Природа каждой строки")
+@pytest.mark.parametrize("theme", ["light", "dark"])
+def test_t12_nature_of_each_row(browser, site, texts, theme):
+    context = reader_context(browser, viewport={"width": 1440, "height": 900}, color_scheme=theme)
+    page = context.new_page()
+    knowledge = Knowledge(page, texts)
+    knowledge.cards[KANT] = dict(
+        CARDS[KANT],
+        sections=[
+            {
+                "code": "influence",
+                "title": "Влияния",
+                "rows": [
+                    row(
+                        "v1",
+                        "influenced_by",
+                        "испытал влияние",
+                        entity_id=HUME,
+                        label="Юм",
+                        status="verified",
+                    ),
+                    row(
+                        "g1",
+                        "influenced_by",
+                        "испытал влияние",
+                        entity_id="e_leibniz",
+                        label="Лейбниц",
+                        status="generated",
+                        generated=True,
+                    ),
+                    row(
+                        "d1",
+                        "influenced_by",
+                        "испытал влияние",
+                        entity_id="e_wolff",
+                        label="Вольф",
+                        disputed=True,
+                        evidence=[{"paragraph_id": "x", "link": "/p/x"}],
+                        attributions=[
+                            {"who": "Асмус", "kind": "source", "stance": "asserts"},
+                            {"who": "Рассел", "kind": "source", "stance": "disputes"},
+                        ],
+                    ),
+                ],
+            }
+        ],
+    )
+    try:
+        panel = open_full(page, site)
+        rows = panel.locator("[data-section=influence] li.card-row")
+        expect(rows).to_have_count(3)
+        verified, generated, disputed = rows.nth(0), rows.nth(1), rows.nth(2)
+        # Проверенная — StatusMark значком и словом.
+        expect(verified.locator(".pg-status--verified")).to_have_text("Проверено")
+        assert verified.locator(".pg-generated").count() == 0
+        # Сгенерированная — pg-generated с ромбом и словом.
+        expect(generated.locator(".pg-generated")).to_have_count(1)
+        mark = generated.locator(".pg-generated").get_by_role("img", name="Сгенерировано")
+        expect(mark).to_be_visible()
+        expect(generated.locator(".pg-status--generated")).to_have_text("Сгенерировано")
+        # Спорная — «Спорно» и «не согласны: …»; кто так считает.
+        expect(disputed.locator(".card-disputed")).to_contain_text("Спорно")
+        expect(disputed).to_contain_text("не согласны: Рассел")
+        expect(disputed).to_contain_text("так считает: Асмус, Рассел")
+        # Сводка природы знания, без отдельной метки карточки (Р4).
+        expect(panel.locator(".card-summary")).to_have_text(
+            "Проверено: 1 · По источникам: 1 · Сгенерировано: 1"
+        )
+    finally:
+        context.close()
+
+
+def portraits(n: int) -> list[dict]:
+    return [
+        {
+            "url": f"/portraits/kant-{i}.jpg",
+            "width": 400,
+            "height": 500,
+            "author": f"Художник {i}",
+            "year": str(1760 + i),
+            "license": "public domain",
+            "source_url": f"https://example.org/kant-{i}",
+        }
+        for i in range(n)
+    ]
+
+
+@req(EC, "Портреты в карточке")
+def test_t16_portrait_gallery(browser, site, texts):
+    context, page, knowledge = open_reader(browser, site, texts)
+    try:
+        # Пять изображений: счётчик, точки, листание кнопками, точками, стрелками.
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(5))
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        image = gallery.locator("img")
+        count = gallery.locator(".pg-portrait-gallery__count")
+        expect(count).to_have_text("1 из 5")
+        expect(gallery.locator(".pg-portrait-gallery__dot")).to_have_count(5)
+        expect(gallery.locator(".pg-portrait-gallery__credit")).to_have_text("Художник 0, 1760")
+        seen = {image.get_attribute("src")}
+        gallery.get_by_role("button", name="Следующий портрет").click()
+        expect(count).to_have_text("2 из 5")
+        seen.add(image.get_attribute("src"))
+        gallery.focus()
+        page.keyboard.press("ArrowRight")
+        expect(count).to_have_text("3 из 5")
+        seen.add(image.get_attribute("src"))
+        gallery.locator(".pg-portrait-gallery__dot").nth(4).click()
+        expect(count).to_have_text("5 из 5")
+        seen.add(image.get_attribute("src"))
+        gallery.focus()
+        page.keyboard.press("ArrowLeft")
+        expect(count).to_have_text("4 из 5")
+        seen.add(image.get_attribute("src"))
+        gallery.get_by_role("button", name="Предыдущий портрет").click()
+        expect(count).to_have_text("3 из 5")
+        assert len(seen) == 5  # изображения различны
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Одно изображение: без счётчика и точек.
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(1))
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        expect(gallery.locator("img")).to_have_count(1)
+        assert gallery.locator(".pg-portrait-gallery__count").count() == 0
+        assert gallery.locator(".pg-portrait-gallery__dot").count() == 0
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Без изображений: монограмма и «Изображений нет».
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=[])
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        expect(gallery.locator(".pg-portrait--empty")).to_have_count(1)
+        expect(gallery).to_contain_text("Изображений нет")
+        assert gallery.locator("img").count() == 0
+    finally:
+        context.close()
+
+
+@req(EM, "Где читать")
+@req(EC, "Карточка рядом с текстом")
+def test_n10_where_to_read_opens_first_paragraph(browser, site, texts):
+    context, page, knowledge = open_reader(browser, site, texts)
+    blocks = site.paragraphs("textbook")
+    first_chapter = blocks[0][0]
+    later = [(chapter, block) for chapter, block, _ in blocks if chapter != first_chapter]
+    target_chapter, target = later[3]  # абзац в середине главы 2, не первый
+    last_chapter = blocks[-1][0]
+    source = site.ids["textbook"]
+    knowledge.cards[KANT] = dict(
+        CARDS[KANT],
+        where_to_read=[
+            {
+                "source_id": source,
+                "source_title": "История теории познания",
+                "chapter_id": target_chapter,
+                "chapter_title": "Глава 2. Рассудок",
+                "count": 2,
+                "targets": [target],
+                "first_paragraph_id": target,
+            },
+            {
+                "source_id": source,
+                "source_title": "История теории познания",
+                "chapter_id": last_chapter,
+                "chapter_title": "Глава 3. Разум",
+                "count": 1,
+                "targets": [],
+                "first_paragraph_id": None,
+            },
+        ],
+    )
+    try:
+        panel = open_full(page, site)
+        where = panel.locator("[data-section=where]")
+        where.get_by_role("button", name="Глава 2. Рассудок").click()
+        page.wait_for_url(re.compile(f"/read/{source}/{target_chapter}#p-{target}$"))
+        expect(page.locator(f"#p-{target}")).to_be_in_viewport()
+        # Без first_paragraph_id — к началу главы.
+        where.get_by_role("button", name="Глава 3. Разум").click()
+        page.wait_for_url(re.compile(f"/read/{source}/{last_chapter}$"))
+        # Панель и окно после перезагрузки не восстанавливаются (Р6).
+        page.reload()
+        page.wait_for_selector("article.chapter p.block")
+        assert page.get_by_role("complementary", name="Карточка").count() == 0
+        assert page.get_by_role("dialog").count() == 0
+    finally:
+        context.close()

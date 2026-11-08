@@ -172,6 +172,8 @@ class Mentions:
     # --- индексация ---
 
     def _targets(self, data: dict[str, Any]) -> list[dict[str, Any]]:
+        # Абзацы идут в порядке документа: их номер в списке — ``position`` (первый абзац главы
+        # с упоминанием для «Где читать»).
         targets = [
             {"id": p["id"], "kind": "paragraph", "text": p["text"], "chapter_id": p["chapter_id"]}
             for p in data["paragraphs"]
@@ -202,6 +204,8 @@ class Mentions:
         for target in targets:
             for m in self.scan(target["text"], unambiguous, longest, set()):
                 chapters[target["chapter_id"]].add(m["entity_id"])
+        for position, target in enumerate(targets):
+            target["position"] = position
         selected = [x for x in targets if only_targets is None or x["id"] in only_targets]
         count = 0
         with self.engine.begin() as conn:
@@ -231,6 +235,7 @@ class Mentions:
                             "start": m["start"],
                             "end": m["end"],
                             "method": m["method"],
+                            "position": target["position"],
                         }
                         for m in found
                     ],
@@ -329,19 +334,32 @@ class Mentions:
         ]
 
     def where_to_read(self, entity_id: str) -> list[dict[str, Any]]:
+        """Главы, где упомянута сущность, с первым абзацем упоминания (N10): «Где читать» ведёт
+        к нему, а не к началу главы. Порядок абзацев — ``position`` (строки до миграции 6 без
+        него идут после, в порядке вставки); упоминание только в заголовке или сноске абзаца
+        не даёт, тогда ``first_paragraph_id`` пуст."""
         entity_id = self.entities.resolve(entity_id)
         with self.engine.begin() as conn:
             rows = (
-                conn.execute(select(t.mentions).where(t.mentions.c.entity_id == entity_id))
+                conn.execute(
+                    select(t.mentions)
+                    .where(t.mentions.c.entity_id == entity_id)
+                    .order_by(t.mentions.c.id)
+                )
                 .mappings()
                 .all()
             )
         grouped: dict[tuple, list[str]] = defaultdict(list)
         titles: dict[tuple, tuple] = {}
+        first: dict[tuple, tuple[tuple[int, int], str]] = {}
         for r in rows:
             key = (r["source_id"], r["chapter_id"])
             grouped[key].append(r["target_id"])
             titles[key] = (r["source_title"], r["chapter_title"])
+            if r["target_kind"] == "paragraph":
+                order = (0, r["position"]) if r["position"] is not None else (1, r["id"])
+                if key not in first or order < first[key][0]:
+                    first[key] = (order, r["target_id"])
         result = [
             {
                 "source_id": s,
@@ -350,6 +368,7 @@ class Mentions:
                 "chapter_title": titles[(s, c)][1],
                 "count": len(ids),
                 "targets": ids,
+                "first_paragraph_id": first[(s, c)][1] if (s, c) in first else None,
             }
             for (s, c), ids in grouped.items()
         ]
