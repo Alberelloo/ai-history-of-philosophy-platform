@@ -306,9 +306,7 @@ def test_answers_without_ontology_when_knowledge_down(ob, events):
 
 
 def _kant_statement_answer(ob):
-    answer_with(
-        ob, lambda prompt: f"Кант испытал влияние Юма [{ob.number('Кант — испытал влияние — Юм')}]. "
-    )
+    answer_with(ob, lambda prompt: f"Кант испытал влияние Юма [{ob.number('влияние — Юм')}]. ")
     items = ob.bot.ask(question="как Кант связан с Юмом и Аристотелем?")
     return next(c for f in fragments(items) for c in f["citations"] if c["kind"] == "statement")
 
