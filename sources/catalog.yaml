@@ -13012,3 +13012,513 @@ entries:
     at: null
     note: Google-скан, OCR средний.
   publish: auto
+- id: mikhaylovich-sredniy-period-istorii-filosofii-archive
+  landing_url: https://archive.org/details/srednijperiodistoriifilosofii82
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:58:37+00:00'
+    adapter_version: 1
+    metadata:
+      title: Средний период истории философии
+      authors:
+      - name: Троицкий Матвей Михайлович
+        death_year: 1899
+        wikidata: Q4463478
+      - name: Розанов Василий Васильевич
+        death_year: 1919
+        wikidata: Q719418
+      - name: Любавский Матвей Кузьмич
+        death_year: 1936
+        wikidata: Q4271346
+      language: en
+      year: 1880
+      translator: null
+      publisher: null
+    files:
+    - name: srednijperiodistoriifilosofii82.pdf
+      url: https://archive.org/download/srednijperiodistoriifilosofii82/srednijperiodistoriifilosofii82.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Средний период истории философии (по лекциям 1880-81 уч. г.)
+      authors:
+      - name: Матвей Михайлович Троицкий
+        death_year: 1899
+        wikidata: null
+      year: 1881
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; М. М. Троицкий ум. 1899 (Wikidata Q4463478);
+      студенческая запись лекций 1880-81; срок 70 лет истёк (составители записи — по метаданным В. В.
+      Розанов ум. 1919, М. К. Любавский ум. 1936)'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: В том же томе — «История новой философии» по лекциям Троицкого (составитель записи неясен).
+      Проверить год издания.
+  publish: auto
+- id: vasilevich-ponimanii-archive
+  landing_url: https://archive.org/details/oponimanii86
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:58:43+00:00'
+    adapter_version: 1
+    metadata:
+      title: О понимании
+      authors:
+      - name: Розанов Василий Васильевич
+        death_year: 1919
+        wikidata: Q719418
+      language: en
+      year: 1886
+      translator: null
+      publisher: null
+    files:
+    - name: oponimanii86.epub
+      url: https://archive.org/download/oponimanii86/oponimanii86.epub
+    license_hint: null
+  override:
+    metadata:
+      title: 'О понимании: опыт исследования природы, границ и внутреннего строения науки как цельного
+        знания'
+      authors:
+      - name: Василий Васильевич Розанов
+        death_year: 1919
+        wikidata: null
+      year: 1886
+      language: ru
+    files:
+    - name: oponimanii86.pdf
+      url: https://archive.org/download/oponimanii86/oponimanii86.pdf
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; В. В. Розанов ум. 1919 (Wikidata Q719418);
+      М., Лисснер и Ю. Роман, 1886; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Файл — PDF (EPUB 2,4 МБ тоже есть).
+  publish: auto
+- id: ivanovich-emmanuil-kant-17241804-archive
+  landing_url: https://archive.org/details/emmanuilkant1724180459
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:58:49+00:00'
+    adapter_version: 1
+    metadata:
+      title: Эммануил Кант. (1724-1804)
+      authors:
+      - name: Введенский Александр Иванович
+        death_year: 1941
+        wikidata: Q1935543
+      language: en
+      year: 1903
+      translator: null
+      publisher: null
+    files:
+    - name: emmanuilkant1724180459.pdf
+      url: https://archive.org/download/emmanuilkant1724180459/emmanuilkant1724180459.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: 'Эммануил Кант (1724-1804): лекции по истории философии, Высшие женские курсы, 1902-1903'
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: null
+      year: 1903
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; А. И. Введенский ум. 1925 (Wikidata Q732458);
+      литографированные лекции, СПб., 1903; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Не путать с протоиереем А. И. Введенским (церковь и государство) — метаданные библиотеки ПБ
+      указывают философа 1856-1925.
+  publish: auto
+- id: n-metod-estestvennykh-nauk-archive
+  landing_url: https://archive.org/details/strahov_method
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:58:56+00:00'
+    adapter_version: 1
+    metadata:
+      title: О методѣ естественныхъ наукъ
+      authors:
+      - name: Страхов Н.
+        death_year: 1978
+        wikidata: Q18635157
+      language: ru
+      year: 1865
+      translator: null
+      publisher: null
+    files:
+    - name: Страхов. О методе естественных наук.epub
+      url: https://archive.org/download/strahov_method/%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2.%20%D0%9E%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B5%20%D0%B5%D1%81%D1%82%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D1%85%20%D0%BD%D0%B0%D1%83%D0%BA.epub
+    license_hint: https://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: О методе естественных наук и значении их в общем образовании
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+      year: 1865
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. Н. Страхов ум. 1896 (Wikidata Q2636293); СПб., Прац, 1865; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Страхов «Мир как целое» уже есть в каталоге из ru.wikisource.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii
+  landing_url: https://archive.org/details/1_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:02:31+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.1
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1889
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.1.pdf
+      url: https://archive.org/download/1_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.1.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 1
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1889
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.1_djvu.txt
+      url: https://archive.org/download/1_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.1_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1889 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 1 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-2
+  landing_url: https://archive.org/details/2_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:02:43+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.2
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1889
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.2.pdf
+      url: https://archive.org/download/2_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.2.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 2
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1889
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.2_djvu.txt
+      url: https://archive.org/download/2_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.2_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1889 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 2 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-3
+  landing_url: https://archive.org/details/3_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:02:55+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.3
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1890
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.3.pdf
+      url: https://archive.org/download/3_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.3.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 3
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1890
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.3_djvu.txt
+      url: https://archive.org/download/3_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.3_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 3 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-4
+  landing_url: https://archive.org/details/4_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:03:09+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.4
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1890
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.4.pdf
+      url: https://archive.org/download/4_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.4.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 4
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1890
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.4_djvu.txt
+      url: https://archive.org/download/4_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.4_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 4 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-5
+  landing_url: https://archive.org/details/5_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:03:19+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.5
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1890
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.5.pdf
+      url: https://archive.org/download/5_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.5.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 5
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1890
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.5_djvu.txt
+      url: https://archive.org/download/5_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.5_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1890 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 5 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-6
+  landing_url: https://archive.org/details/6_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:03:29+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.6
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1891
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.6.pdf
+      url: https://archive.org/download/6_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.6.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 6
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1891
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.6_djvu.txt
+      url: https://archive.org/download/6_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.6_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1891 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 6 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
+- id: p-g-iz-lektsiy-po-istorii-7
+  landing_url: https://archive.org/details/7_redkin_philosophy
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T15:03:40+00:00'
+    adapter_version: 1
+    metadata:
+      title: Изъ лекцiй по исторiи философiи права. Т.7
+      authors:
+      - name: Редкин П.Г.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1891
+      translator: null
+      publisher: null
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.7.pdf
+      url: https://archive.org/download/7_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.7.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Из лекций по истории философии права в связи с историей философии вообще. Т. 7
+      authors:
+      - name: Пётр Григорьевич Редкин
+        death_year: 1891
+        wikidata: null
+      year: 1891
+      language: ru
+    files:
+    - name: Редкин. Из лекций по истории философии права. Т.7_djvu.txt
+      url: https://archive.org/download/7_redkin_philosophy/%D0%A0%D0%B5%D0%B4%D0%BA%D0%B8%D0%BD.%20%D0%98%D0%B7%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B0.%20%D0%A2.7_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      П. Г. Редкин ум. 1891 (Wikidata Q4392165); СПб., Стасюлевич, 1891 (посмертное издание лекций); срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 7 из 7. PDF больше 200 МБ — файл заменён на DjVu TXT через override.files. Философия права
+      в связи с историей философии вообще.
+  publish: auto
