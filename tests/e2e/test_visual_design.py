@@ -15,7 +15,7 @@ import re
 import httpx
 import pytest
 
-from ..helpers import aside
+from ..helpers import aside, start_aside
 from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
@@ -71,7 +71,7 @@ def open_context(
     )
     page = context.new_page()
     page.set_default_timeout(15000)
-    aside(page)  # указатель не должен начинать страницу над боковой панелью
+    start_aside(page)  # указатель не должен начинать страницу над боковой панелью
     return context, page
 
 

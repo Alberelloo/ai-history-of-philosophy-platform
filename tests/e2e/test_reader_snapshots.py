@@ -25,7 +25,7 @@ import httpx
 import pytest
 
 from ..assistant.browser import DONE, HOLD, AskStub, answer, cite, fragment, ndjson
-from ..helpers import aside
+from ..helpers import aside, start_aside
 from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 from .test_visual_design import reader_columns
@@ -107,7 +107,7 @@ def open_context(
     )
     page = context.new_page()
     page.set_default_timeout(15000)
-    aside(page)
+    start_aside(page)
     return context, page
 
 

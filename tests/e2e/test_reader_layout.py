@@ -18,7 +18,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from ..helpers import aside
+from ..helpers import aside, start_aside
 from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
@@ -86,7 +86,7 @@ def open_context(browser, *, width, pinned=False, motion="reduce", theme="light"
     )
     page = context.new_page()
     page.set_default_timeout(15000)
-    aside(page)
+    start_aside(page)
     return context, page
 
 
@@ -200,6 +200,13 @@ def library(page, site, ids):
 
 
 def graph(page, site, ids):
+    # Без достройки моделью: раскладке она не нужна, а на общем стенде сквозных тестов
+    # достройка сохранилась бы и изменила граф «Генезис: Кант» для test_site.py.
+    page.add_init_script(
+        f"{{ const s = JSON.parse(localStorage.getItem('{KEY}') || '{{}}');"
+        " s.settings = {...(s.settings || {}), generation: false};"
+        f" localStorage.setItem('{KEY}', JSON.stringify(s)); }}"
+    )
     page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
     page.wait_for_selector(".graph-page h1")
     page.wait_for_function("() => !document.querySelector('.graph-page .loading')")

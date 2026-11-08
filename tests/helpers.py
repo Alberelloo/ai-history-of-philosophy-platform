@@ -44,6 +44,18 @@ def aside(page) -> None:
     page.mouse.move(size["width"] - 5, size["height"] - 5)
 
 
+def start_aside(page) -> None:
+    """Новая страница: указатель в углу и до, и после первой загрузки документа.
+
+    Перемещение на пустой странице (about:blank) не переживает переход на сайт: документ
+    сайта открывается в новом процессе отрисовки, и Chromium под Linux сообщает ему указатель
+    в точке 0,0 (событие mouseover там), а это — значок боковой панели, и она раскрывается
+    поверх кнопок. Поэтому указатель уводится ещё раз, когда загрузится первый документ.
+    """
+    aside(page)
+    page.once("domcontentloaded", aside)
+
+
 def via_sidebar(page, name: str) -> None:
     """Переход по пункту боковой панели; указатель уходит, и панель сворачивается."""
     sidenav(page).get_by_role("link", name=name).first.click()
@@ -70,8 +82,8 @@ def reader_context(browser, *, accepted: bool = True, **options):
     options.setdefault("locale", "ru-RU")
     context = browser.new_context(**options)
     # Новая страница начинается с указателем в углу: иначе он достаётся от прошлой страницы
-    # (браузер помнит положение мыши) и раскрывает боковую панель поверх кнопок.
-    context.on("page", aside)
+    # (браузер помнит положение мыши) или стоит в 0,0 и раскрывает боковую панель поверх кнопок.
+    context.on("page", start_aside)
     if accepted:
         context.add_init_script(_ACCEPTED)
     return context
