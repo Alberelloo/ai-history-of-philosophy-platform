@@ -222,9 +222,10 @@ def test_sessions_always_visible_in_panel_and_collapse(page, site):
     assert "Вопрос о причинности" in rows.nth(1).inner_text()
     assert rows.nth(0).get_attribute("aria-current") == "true"
     # Сессии — над историей, под шапкой; история всё равно основная часть панели.
-    assert rect(box.locator(".assistant__sessions-box"))["bottom"] <= rect(
-        box.locator(".assistant__scroll")
-    )["top"] + 1
+    assert (
+        rect(box.locator(".assistant__sessions-box"))["bottom"]
+        <= rect(box.locator(".assistant__scroll"))["top"] + 1
+    )
     rows.nth(1).locator(".assistant__session-title").click()
     assert "Вопрос о причинности" in box.locator(".turns").inner_text()
     assert sessions.is_visible()
