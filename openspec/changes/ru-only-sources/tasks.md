@@ -1,6 +1,6 @@
 # Tasks
 
-Тесты помечаются `@pytest.mark.req("<возможность>", "<требование>")` (требования `regional-access` и изменённые требования). Возможность `regional-access` добавляется в `openspec/traceability.yaml` в задаче 8.5; до неё `scripts/check_traceability.py` её не проверяет. Группа 7 выполняется только если владелец подтвердит `external_processing: false` (открытый вопрос 1 в design.md).
+Тесты помечаются `@pytest.mark.req("<возможность>", "<требование>")` (требования `regional-access` и изменённые требования). Возможность `regional-access` добавляется в `openspec/traceability.yaml` в задаче 8.5; до неё `scripts/check_traceability.py` её не проверяет. Группа 7 обязательна: владелец решил, что `external_processing: false` (раздел «Решения владельца» в design.md). Открытых вопросов нет.
 
 ## 1. Регионы показа в учёте источников
 
@@ -11,15 +11,16 @@
 
 ## 2. Читатель и библиотека
 
-- [ ] 2.1 `Reader.region` и `Reader.ALL_REGIONS` в `src/philograph/library/reading.py`; правило видимости по регионам в `_visible_rows` одной проверкой; `Internal.published()` использует `ALL_REGIONS`. Тесты `tests/library/test_reading_chapters.py` (`source-library` / «Список источников», `regional-access` / «Библиотека скрывает закрытые источники целиком»): список, фильтры, языки, источник по умолчанию, запомненный источник, оглавление и глава для региона RU, другого региона и `None`.
-- [ ] 2.2 HTTP-слой библиотеки: `library/app.py` строит `Reader` из заголовка `X-Philograph-Region` (нет заголовка — регион `None`); `resolve_paragraph` отвечает `source_unavailable` без текста, названия и главы для региона. Тесты `chapter-reading` / «Устойчивость ссылок на абзацы» и `regional-access` / «Ссылка на абзац закрытого источника» (в том числе «читатель вернулся в РФ»).
+- [ ] 2.1 `Reader.region` и `Reader.ALL_REGIONS` в `src/philograph/library/reading.py`; правило открытости по регионам в `_visible_rows` одной проверкой; `Internal.published()` использует `ALL_REGIONS`; источник по умолчанию, текущий и запомненный берутся только из открытых. Тесты `tests/library/test_reading_chapters.py` (`regional-access` / «Библиотека закрывает текст ограниченных источников»): источник по умолчанию, запомненный источник, оглавление и глава для региона RU, другого региона и `None`.
+- [ ] 2.1а Список источников: закрытый для региона источник отдаётся строкой `{id, title, authors, restricted: true, regions}` без года, описания, лицензии; фильтры и поиск по названию действуют на неё; открыть её нельзя (`Reading.sources`, `library/app.py`). Тесты `source-library` / «Список источников» (сценарий «Источник закрыт для региона читателя») и `regional-access` / «Читатель вне РФ открывает библиотеку»; клиент `web/` показывает пометку «доступен в РФ» без перехода (тест `tests/web/test_library_reading.py`).
+- [ ] 2.2 HTTP-слой библиотеки: `library/app.py` строит `Reader` из заголовка `X-Philograph-Region` (нет заголовка — регион `None`); `resolve_paragraph` отвечает `source_unavailable` с причиной `region`, названием и авторами источника (как в списке), без текста, главы и раздела. Тесты `chapter-reading` / «Устойчивость ссылок на абзацы» и `regional-access` / «Ссылка на абзац закрытого источника» (в том числе «читатель вернулся в РФ»).
 - [ ] 2.3 Внутренний `GET /internal/access?region=XX` (идентификаторы закрытых для региона источников) и поля `regions`, `external_processing` в `version_paragraphs` (`library/app.py`, `Internal`). Тест `regional-access` / «Внутренние интерфейсы не фильтруют по региону»: версия закрытого источника отдаётся без региона, `published()` содержит его.
 
 ## 3. Шлюз
 
-- [ ] 3.1 `RegionResolver` (GeoIP из `PHILOGRAPH_GEOIP_DB`, запасной `PHILOGRAPH_REGION_FALLBACK`, недоступная база даёт `None` и событие-предупреждение) в новом `src/philograph/gateway/region.py`; зависимость для чтения `.mmdb` в `pyproject.toml`. Тесты в новом `tests/gateway/test_region.py` с подменой базы: «Читатель из РФ», «База GeoIP недоступна», «Локальный адрес в стенде разработки».
-- [ ] 3.2 В `gateway/app.py` `proxy` удаляет клиентский `X-Philograph-Region`, ставит определённый шлюзом (адрес берётся тем же `Limits.address`), добавляет `Vary: X-Philograph-Region` в ответы API; код страны попадает в события шлюза, адрес нет. Тесты `regional-access` / «Регион читателя определяет шлюз»: подделанный заголовок, недоверенный прокси, «Заголовок региона не пришёл» (проверка сервиса за шлюзом).
-- [ ] 3.3 Предупреждение оператору: доля запросов с неизвестным регионом в `ops/alerts.py` (метрика шлюза), правило в документации оповещений. Проверка: тест правила в `tests/ops/test_alerts.py`.
+- [ ] 3.1 `RegionSettings` и разбор заголовка страны (`PHILOGRAPH_REGION_HEADER`, доверие только при `PHILOGRAPH_TRUSTED_PROXY=1`, проверка значения «две латинские буквы», запасной `PHILOGRAPH_REGION_FALLBACK`) в новом `src/philograph/gateway/region.py`, чтение настроек рядом с `LimitSettings.from_env`. Новых зависимостей нет. Тесты в новом `tests/gateway/test_region.py`: «Читатель из РФ», «Запрос не от доверенного прокси», «Заголовка страны нет», «Локальный адрес в стенде разработки», значения `XX`/`T1`.
+- [ ] 3.2 В `gateway/app.py` `proxy` удаляет клиентские `X-Philograph-Region` и заголовок страны, ставит определённый шлюзом, добавляет `Cache-Control: private` и `Vary` на заголовок страны в ответы `/api/*`; страна не сохраняется и не попадает в журналы с привязкой к читателю. Тесты `regional-access` / «Регион читателя определяет шлюз»: подделанный заголовок, недоверенный прокси, «Регион не сохраняется», «Заголовок региона не пришёл» (проверка сервиса за шлюзом).
+- [ ] 3.3 Предупреждение оператору: доля запросов с неизвестным регионом как обезличенный счётчик шлюза (без страны и читателя) в `ops/alerts.py`, правило в документации оповещений. Проверка: тест правила в `tests/ops/test_alerts.py`.
 
 ## 4. Поиск и индексация
 
@@ -41,7 +42,7 @@
 - [ ] 6.3 `mentions.where_to_read` и `for_targets` скрывают закрытые источники (`knowledge/mentions.py`). Тест «Где читать».
 - [ ] 6.4 `assist._paragraphs/_facts` не отдаёт текст абзацев закрытых источников (`knowledge/assist.py`). Тест `tests/knowledge/test_service.py`: контекст ассистента для региона DE без абзаца закрытого источника.
 
-## 7. Внешняя обработка закрытых источников (если подтверждено владельцем)
+## 7. Внешняя обработка закрытых источников (обязательная, решение владельца)
 
 - [ ] 7.1 Индексатор сохраняет `external` в `docs`, поиск отдаёт его в результате (`search/indexing.py`, `searching.py`). Тест `regional-access` / «Внешняя обработка закрытых источников» / «Индексация».
 - [ ] 7.2 Ассистент не отправляет модели абзацы с `external = false` и показывает их ссылками с пометкой «найдено в источниках, не пересказывается» (`assistant/service.py`, поток событий NDJSON; клиент в `web/` показывает пометку). Тесты `tests/assistant/test_routing_grounding.py`: текст не уходит модели (фиктивная модель фиксирует `passages`), в потоке есть пометка со ссылкой.
@@ -55,10 +56,10 @@
 - [ ] 8.3 Сквозной тест: читатель с заголовком региона через шлюз получает библиотеку, главу и поиск из закрытого источника для `RU` и не получает для `DE` (`tests/e2e/` или API-тест на подставных сервисах `tests/gateway/`).
 - [ ] 8.4 Данные: `regions: [RU]` и `external_processing: false` (если задача 7 принята) у `public-domain-ru` в `sources/licenses.yaml` с обновлением комментария («метка» → «применяется сервисом»); `python -m philograph.library.catalog check` проходит; `sync` на стенде меняет учёт.
 - [ ] 8.5 Добавить `regional-access` в `enforce` файла `openspec/traceability.yaml`; `python scripts/check_traceability.py` зелёный.
-- [ ] 8.6 Документация: `docs/architecture/source-ingestion.md` (поле `regions`), `docs/operations/runbook.md` (файл GeoIP, обновление, настройки), `.env.example` (`PHILOGRAPH_GEOIP_DB`, `PHILOGRAPH_REGION_FALLBACK`), правка заголовка Caddy (удаление клиентского `X-Philograph-Region`) в `deploy/Caddyfile`.
+- [ ] 8.6 Развёртывание и документация: `docs/architecture/source-ingestion.md` (поле `regions`); `docs/operations/runbook.md` (требование «шлюз только через CDN», настройка CDN: передавать страну, не кэшировать `/api/*`, закрыть прямой доступ к серверу); `.env.example` (`PHILOGRAPH_REGION_HEADER`, `PHILOGRAPH_REGION_FALLBACK` только для стенда); `deploy/Caddyfile` (удаление клиентского `X-Philograph-Region` и заголовка страны, если запрос не от CDN); проверка конфигурации в `scripts/deploy.py` (`update` отказывает, если в `compose.prod.yaml` нет `PHILOGRAPH_TRUSTED_PROXY=1` или не задан `PHILOGRAPH_REGION_HEADER`) с тестом в `tests/platform/` или `tests/ops/` (`regional-access` / «Шлюз доступен только через CDN»).
 - [ ] 8.7 Финальная проверка: `ruff check .`, `ruff format --check .`, `pytest` с `PYTHONPATH=src`, `openspec validate ru-only-sources`; архивация изменения в том же PR (`openspec archive ru-only-sources --yes`).
 
 ## Workflow follow-up
 
-- Решения по открытым вопросам design.md до начала группы 3 (вопрос 5) и группы 7 (вопрос 1).
+- Открытых вопросов нет: решения владельца внесены в design.md (раздел «Решения владельца»).
 - Оценка объёма: группы 1-2 малые (около дня), 3-4 средние (по 1-2 дня), 5-6 средние (1-2 дня), 7 средняя и самая рискованная, 8 малая.
