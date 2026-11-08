@@ -157,12 +157,17 @@ function placement(
   const layout = document.querySelector(".reader")?.getAttribute("data-layout");
   const viewH = window.innerHeight;
   // Естественный размер окна — без ширины и высоты, заданных прошлым расчётом.
-  const saved = [el.style.maxHeight, el.style.width];
+  // Переход на время замера выключен: при «уменьшении движения» у всех элементов переход 1ms,
+  // и без этого offsetWidth отдавал бы прежнюю ширину, а окно уходило за правый край.
+  const saved = [el.style.maxHeight, el.style.width, el.style.transition];
+  el.style.transition = "none";
   el.style.maxHeight = "";
   el.style.width = "";
   let width = el.offsetWidth;
   const height = el.offsetHeight;
   [el.style.maxHeight, el.style.width] = saved;
+  void el.offsetWidth; // прежние размеры применены без перехода
+  el.style.transition = saved[2];
   if (layout === "K1") {
     let left = (chapter?.right ?? r.right) + MARGIN;
     const room = rightBoundary - MARGIN - left;
@@ -318,6 +323,9 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
     const chapter = anchor.closest(".chapter");
     const observer = typeof ResizeObserver !== "undefined" && chapter ? new ResizeObserver(bump) : null;
     if (observer && chapter) observer.observe(chapter);
+    // И само окно: первое наблюдение приходит после раскладки, поэтому окно «загружается» (S2)
+    // встаёт по окончательной ширине колонок и не выходит за правый край.
+    if (observer && box.current) observer.observe(box.current);
     // Прокрутка окно не закрывает; строка целиком ушла из видимой области — окно закрывается
     // без возврата фокуса.
     const onScroll = () => {

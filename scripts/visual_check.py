@@ -19,7 +19,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TESTS = ["tests/e2e/test_visual_design.py", "tests/web/test_design_system.py"]
+TESTS = [
+    "tests/e2e/test_visual_design.py",
+    "tests/e2e/test_reader_snapshots.py",
+    "tests/web/test_design_system.py",
+]
 
 
 def npm() -> list[str]:
