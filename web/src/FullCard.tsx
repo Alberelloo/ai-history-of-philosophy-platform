@@ -51,11 +51,27 @@ type Card = {
     chapter_id: string;
     chapter_title: string | null;
     count: number;
+    // N10: первый абзац главы с упоминанием; «Где читать» ведёт к нему, а не к началу главы.
+    first_paragraph_id?: string | null;
   }[];
   recipes: { code: string; title: string }[];
 };
 
 const API = "/api/knowledge/v1";
+
+// Переход по связи в полной карточке (4.6): событие ловит экран чтения и кладёт карточку
+// наверх стека панели, поэтому «Назад» подписан «Назад: <прежняя карточка>».
+export const OPEN_CARD_EVENT = "philograph:open-card";
+
+export function openCardInPanel(entityId: string, title: string): void {
+  window.dispatchEvent(new CustomEvent(OPEN_CARD_EVENT, { detail: { entityId, title } }));
+}
+
+// Адрес «Где читать»: к первому абзацу с упоминанием (N10), без него — к началу главы.
+export function whereToReadLink(w: { source_id: string; chapter_id: string; first_paragraph_id?: string | null }) {
+  const base = `/read/${w.source_id}/${w.chapter_id}`;
+  return w.first_paragraph_id ? `${base}#p-${w.first_paragraph_id}` : base;
+}
 
 function value(row: Row): string {
   if (row.label) return row.label;
@@ -89,11 +105,14 @@ function natureSummary(card: Card): { verified: number; sourced: number; generat
 
 export function FullCard({
   entityId,
+  title,
   onClose,
   onBack,
   backLabel,
 }: {
   entityId: string;
+  // Имя, известное до загрузки (из упоминания или строки карточки): голова панели при загрузке.
+  title?: string;
   onClose: () => void;
   onBack?: () => void;
   backLabel?: string;
@@ -101,6 +120,7 @@ export function FullCard({
   const t = useT();
   const [card, setCard] = useState<Card | null>(null);
   const [problem, setProblem] = useState<"not_found" | "failed" | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const [notInTextbook, setNotInTextbook] = useState(false);
   const scope = useScope();
   const textbook = storage.currentSource();
@@ -133,7 +153,7 @@ export function FullCard({
         if (!controller.signal.aborted) setProblem("failed");
       });
     return () => controller.abort();
-  }, [entityId, onlyTextbook, scope.generation, textbook]);
+  }, [entityId, onlyTextbook, scope.generation, textbook, attempt]);
 
   const family = familyOf(card?.type);
   const typeName = pick(t.family, card?.type);
@@ -162,7 +182,18 @@ export function FullCard({
           <Icon name="close" small />
         </button>
       </div>
-      <div className="pg-panel__body">
+      <div className="pg-panel__body" aria-busy={!card && !problem ? true : undefined}>
+        {!card && !problem && (
+          <div className="pg-entity-head card-panel__loading">
+            <span />
+            <div>
+              {title && <h3 className="pg-entity-head__name">{title}</h3>}
+              <p className="card-loading" role="status">
+                {t.card.loading}
+              </p>
+            </div>
+          </div>
+        )}
         {problem === "not_found" && (
           <div className="pg-notice pg-notice--danger" role="alert">
             <Icon name="warning" />
@@ -173,6 +204,10 @@ export function FullCard({
           <div className="pg-notice pg-notice--danger" role="alert">
             <Icon name="warning" />
             <div>{t.card.loadFailed}</div>
+            <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => setAttempt((n) => n + 1)}>
+              <Icon name="retry" small />
+              {t.card.retry}
+            </button>
           </div>
         )}
         {card && (
@@ -225,7 +260,10 @@ export function FullCard({
                           {relationTitle(t, row.type, Boolean(row.inverse), row.relation)}:{" "}
                         </span>
                         {row.entity_id ? (
-                          <button className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity">
+                          <button
+                            className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
+                            onClick={() => openCardInPanel(row.entity_id!, row.label ?? row.entity_id!)}
+                          >
                             {row.label}
                           </button>
                         ) : (
@@ -276,7 +314,8 @@ export function FullCard({
                     <li key={`${w.source_id}-${w.chapter_id}`}>
                       <button
                         className="pg-btn pg-btn--ghost pg-btn--sm card-where__chapter"
-                        onClick={() => navigate(`/read/${w.source_id}/${w.chapter_id}`)}
+                        data-paragraph={w.first_paragraph_id ?? undefined}
+                        onClick={() => navigate(whereToReadLink(w))}
                       >
                         {w.chapter_title ?? t.card.chapter}
                       </button>
