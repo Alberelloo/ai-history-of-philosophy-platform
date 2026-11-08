@@ -7840,3 +7840,2890 @@ entries:
     note: 'том собрания: состав тома не проверялся; в томах возможны примечания и предисловия редакторов
       1910-х гг. (также давно в общественном достоянии, редакторов не устанавливали)'
   publish: auto
+- id: nitsshe-chelovecheskoe-slishkom-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A7%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5,_%D1%81%D0%BB%D0%B8%D1%88%D0%BA%D0%BE%D0%BC_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_(%D0%9D%D0%B8%D1%86%D1%88%D0%B5)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:51:24+00:00'
+    adapter_version: 3
+    metadata:
+      title: Человеческое, слишком человеческое
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: null
+      translator:
+        name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      publisher: ru.wikisource.org
+    files:
+    - name: Человеческое, слишком человеческое (Ницше)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A7%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%2C_%D1%81%D0%BB%D0%B8%D1%88%D0%BA%D0%BE%D0%BC_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Человеческое, слишком человеческое
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: null
+      translator:
+        name: Семён Людвигович Франк
+        death_year: 1950
+        wikidata: null
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. С. Л. Франка, указан на странице); Ф. Ницше ум. 1900; С. Л. Франк ум.
+      1950; срок 70 лет истёк у обоих
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nitsshe-david-shtraus-ispovednik-pisatel-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B0%D0%B2%D0%B8%D0%B4_%D0%A8%D1%82%D1%80%D0%B0%D1%83%D1%81,_%D0%B8%D1%81%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA_%D0%B8_%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C_(%D0%9D%D0%B8%D1%86%D1%88%D0%B5)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:51:31+00:00'
+    adapter_version: 3
+    metadata:
+      title: Давид Штраус, исповедник и писатель
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      language: ru
+      year: null
+      translator:
+        name: Фридрих Ницше
+        death_year: 1900
+        wikidata: Q9358
+      publisher: ru.wikisource.org
+    files:
+    - name: Давид Штраус, исповедник и писатель (Ницше)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%B0%D0%B2%D0%B8%D0%B4_%D0%A8%D1%82%D1%80%D0%B0%D1%83%D1%81%2C_%D0%B8%D1%81%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA_%D0%B8_%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B5%D0%BB%D1%8C_%28%D0%9D%D0%B8%D1%86%D1%88%D0%B5%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Давид Штраус, исповедник и писатель (Несвоевременные размышления)
+      authors:
+      - name: Фридрих Ницше
+        death_year: 1900
+        wikidata: null
+      translator:
+        name: Григорий Алексеевич Рачинский
+        death_year: 1939
+        wikidata: null
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. Г. А. Рачинского, указан на странице); Ф. Ницше ум. 1900; Г. А. Рачинский
+      ум. 1939; срок 70 лет истёк у обоих
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: gosudar-makiavelli-kurochkin-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_(%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8;_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:51:42+00:00'
+    adapter_version: 3
+    metadata:
+      title: Государь (Макиавелли; Курочкин)
+      authors: []
+      language: ru
+      year: null
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Государь (Макиавелли; Курочкин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_%28%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8%3B_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    - name: Государь (Макиавелли; Курочкин)/1869 (ДО)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_%28%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8%3B_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD%29%2F1869_%28%D0%94%D0%9E%29
+      clean: wikisource
+      api: true
+    - name: Государь (Макиавелли; Курочкин)/1869 (ВТ)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_%28%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8%3B_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD%29%2F1869_%28%D0%92%D0%A2%29
+      clean: wikisource
+      api: true
+    - name: Государь (Макиавелли; Курочкин)/1869 (ВТ:Ё)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_%28%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8%3B_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD%29%2F1869_%28%D0%92%D0%A2%3A%D0%81%29
+      clean: wikisource
+      api: true
+    license_hint: PD-simple-translate
+  override:
+    metadata:
+      title: Государь
+      authors:
+      - name: Никколо Макиавелли
+        death_year: 1527
+        wikidata: null
+      translator:
+        name: Николай Степанович Курочкин
+        death_year: 1884
+        wikidata: null
+      year: 1869
+      language: ru
+    files:
+    - name: Государь (Макиавелли; Курочкин)/1869 (ВТ)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%8C_%28%D0%9C%D0%B0%D0%BA%D0%B8%D0%B0%D0%B2%D0%B5%D0%BB%D0%BB%D0%B8%3B_%D0%9A%D1%83%D1%80%D0%BE%D1%87%D0%BA%D0%B8%D0%BD%29%2F1869_%28%D0%92%D0%A2%29
+      clean: wikisource
+      api: true
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. Н. С. Курочкина, изд. 1869); Н. Макиавелли ум. 1527; Н. С. Курочкин
+      ум. 1884; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: страница-оглавление ведёт на три орфографических варианта одного издания 1869 г. (ДО, ВТ, ВТ:Ё);
+      в files оставлен только вариант ВТ (современная орфография); автор/переводчик/годы заданы вручную
+  publish: auto
+- id: geksli-evolyutsiya-etika-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%AD%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_(%D0%93%D0%B5%D0%BA%D1%81%D0%BB%D0%B8)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:51:54+00:00'
+    adapter_version: 3
+    metadata:
+      title: Эволюция и этика
+      authors:
+      - name: Томас Генри Гексли
+        death_year: 1895
+        wikidata: Q184366
+      language: ru
+      year: null
+      translator:
+        name: Томас Генри Гексли
+        death_year: 1895
+        wikidata: Q184366
+      publisher: ru.wikisource.org
+    files:
+    - name: Эволюция и этика (Гексли)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%93%D0%B5%D0%BA%D1%81%D0%BB%D0%B8%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Эволюция и этика
+      authors:
+      - name: Томас Генри Гексли
+        death_year: 1895
+        wikidata: null
+      translator:
+        name: Климент Аркадьевич Тимирязев
+        death_year: 1920
+        wikidata: null
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (речь 1893 г., пер. К. А. Тимирязева, «Русская мысль»); Т. Г. Гексли ум. 1895;
+      К. А. Тимирязев ум. 1920; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: год издания перевода (журнал «Русская мысль») не установлен; в оригинале речь произнесена 18
+      мая 1893 г.; переводчик К. А. Тимирязев указан на странице
+  publish: auto
+- id: shiller-pisma-ob-esteticheskom-vospitanii-cheloveka
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE%D0%B1_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%B2%D0%BE%D1%81%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%A8%D0%B8%D0%BB%D0%BB%D0%B5%D1%80)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:01+00:00'
+    adapter_version: 3
+    metadata:
+      title: Письма об эстетическом воспитании человека
+      authors:
+      - name: Фридрих Шиллер
+        death_year: 1805
+        wikidata: Q22670
+      language: ru
+      year: null
+      translator:
+        name: Фридрих Шиллер
+        death_year: 1805
+        wikidata: Q22670
+      publisher: ru.wikisource.org
+    files:
+    - name: Письма об эстетическом воспитании человека (Шиллер)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE%D0%B1_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%B2%D0%BE%D1%81%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_%28%D0%A8%D0%B8%D0%BB%D0%BB%D0%B5%D1%80%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Письма об эстетическом воспитании человека
+      authors:
+      - name: Фридрих Шиллер
+        death_year: 1805
+        wikidata: null
+      translator:
+        name: Эрнест Леопольдович Радлов
+        death_year: 1928
+        wikidata: null
+      year: 1902
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (Собрание сочинений Шиллера под ред. С. А. Венгерова, т. IV, 1902, пер. Э.
+      Л. Радлова); Ф. Шиллер ум. 1805; Э. Л. Радлов ум. 1928; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: на странице переводчик назван «Эрнест Львович Радлов» (ссылка на страницу автора); принят как
+      историк философии Э. Л. Радлов (1854–1928), переводчик Аристотеля — личность проверить
+  publish: auto
+- id: kerkegor-aforizmy-estetika-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%90%D1%84%D0%BE%D1%80%D0%B8%D0%B7%D0%BC%D1%8B_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D0%BA%D0%B0_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80;_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:08+00:00'
+    adapter_version: 3
+    metadata:
+      title: Афоризмы эстетика
+      authors:
+      - name: Сёрен Кьеркегор
+        death_year: 1855
+        wikidata: Q6512
+      language: ru
+      year: 1886
+      translator:
+        name: Пётр Готфридович Ганзен
+        death_year: 1930
+        wikidata: Q4133288
+      publisher: ru.wikisource.org
+    files:
+    - name: Афоризмы эстетика (Кьеркегор; Ганзен)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D1%84%D0%BE%D1%80%D0%B8%D0%B7%D0%BC%D1%8B_%D1%8D%D1%81%D1%82%D0%B5%D1%82%D0%B8%D0%BA%D0%B0_%28%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80%3B_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. П. Г. Ганзена, 1886); С. Кьеркегор ум. 1855; П. Г. Ганзен ум. 1930;
+      срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kerkegor-dnevnik-obolstitelya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%BD%D0%B5%D0%B2%D0%BD%D0%B8%D0%BA_%D0%BE%D0%B1%D0%BE%D0%BB%D1%8C%D1%81%D1%82%D0%B8%D1%82%D0%B5%D0%BB%D1%8F_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80;_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:16+00:00'
+    adapter_version: 3
+    metadata:
+      title: Дневник обольстителя
+      authors:
+      - name: Сёрен Кьеркегор
+        death_year: 1855
+        wikidata: Q6512
+      language: ru
+      year: 1885
+      translator:
+        name: Пётр Готфридович Ганзен
+        death_year: 1930
+        wikidata: Q4133288
+      publisher: ru.wikisource.org
+    files:
+    - name: Дневник обольстителя (Кьеркегор; Ганзен)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%BD%D0%B5%D0%B2%D0%BD%D0%B8%D0%BA_%D0%BE%D0%B1%D0%BE%D0%BB%D1%8C%D1%81%D1%82%D0%B8%D1%82%D0%B5%D0%BB%D1%8F_%28%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80%3B_%D0%93%D0%B0%D0%BD%D0%B7%D0%B5%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. П. Г. Ганзена, 1885); С. Кьеркегор ум. 1855; П. Г. Ганзен ум. 1930;
+      срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kerkegor-neschastneyshiy-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B5%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B5%D0%B9%D1%88%D0%B8%D0%B9_(%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:24+00:00'
+    adapter_version: 3
+    metadata:
+      title: Несчастнейший
+      authors:
+      - name: Сёрен Кьеркегор
+        death_year: 1855
+        wikidata: Q6512
+      language: ru
+      year: null
+      translator:
+        name: Балтрушайтис Юргис
+        death_year: 1944
+        wikidata: Q2378046
+      publisher: ru.wikisource.org
+    files:
+    - name: Несчастнейший (Кьеркегор)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B5%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B5%D0%B9%D1%88%D0%B8%D0%B9_%28%D0%9A%D1%8C%D0%B5%D1%80%D0%BA%D0%B5%D0%B3%D0%BE%D1%80%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      translator:
+        name: Юргис Казимирович Балтрушайтис
+        death_year: 1944
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. Ю. Балтрушайтиса); С. Кьеркегор ум. 1855; Ю. К. Балтрушайтис ум. 1944;
+      срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mill-svobode-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_(%D0%9C%D0%B8%D0%BB%D0%BB%D1%8C;_%D0%9D%D0%B5%D0%B2%D0%B5%D0%B4%D0%BE%D0%BC%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: О свободе
+      authors:
+      - name: Джон Стюарт Милль
+        death_year: 1873
+        wikidata: Q50020
+      language: ru
+      year: 1866
+      translator:
+        name: Александр Николаевич Неведомский
+        death_year: null
+        wikidata: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О свободе (Милль; Неведомский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_%28%D0%9C%D0%B8%D0%BB%D0%BB%D1%8C%3B_%D0%9D%D0%B5%D0%B2%D0%B5%D0%B4%D0%BE%D0%BC%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: PD-RusEmpire
+  override:
+    metadata:
+      title: О свободе
+      authors:
+      - name: Джон Стюарт Милль
+        death_year: 1873
+        wikidata: null
+      translator:
+        name: Александр Николаевич Неведомский
+        death_year: null
+        wikidata: null
+      year: 1866
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. А. Н. Неведомского, изд. 1866); Дж. С. Милль ум. 1873; год смерти переводчика
+      не установлен, но он был взрослым помещиком уже в 1862 г. (репрессирован по «Делу тверских мировых
+      посредников»), то есть родился не позднее 1840-х и умер задолго до 1955; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: год смерти переводчика не найден (нет в Wikidata); вывод о сроке сделан по возрасту в 1862 г.
+      — проверить вручную
+  publish: auto
+- id: rotterdamskiy-pokhvalnoe-slovo-gluposti-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D1%81%D0%BB%D0%BE%D0%B2%D0%BE_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_(%D0%AD%D1%80%D0%B0%D0%B7%D0%BC_%D0%A0%D0%BE%D1%82%D1%82%D0%B5%D1%80%D0%B4%D0%B0%D0%BC%D1%81%D0%BA%D0%B8%D0%B9;_%D0%93%D1%83%D0%B1%D0%B5%D1%80)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:43+00:00'
+    adapter_version: 3
+    metadata:
+      title: Похвальное слово глупости
+      authors:
+      - name: Эразм Роттердамский
+        death_year: 1536
+        wikidata: Q43499
+      language: ru
+      year: 1931
+      translator:
+        name: Губер, Пётр Константинович
+        death_year: 1941
+        wikidata: Q97182936
+      publisher: ru.wikisource.org
+    files:
+    - name: Похвальное слово глупости (Эразм Роттердамский; Губер)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D1%81%D0%BB%D0%BE%D0%B2%D0%BE_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_%28%D0%AD%D1%80%D0%B0%D0%B7%D0%BC_%D0%A0%D0%BE%D1%82%D1%82%D0%B5%D1%80%D0%B4%D0%B0%D0%BC%D1%81%D0%BA%D0%B8%D0%B9%3B_%D0%93%D1%83%D0%B1%D0%B5%D1%80%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Похвальное слово глупости
+      authors:
+      - name: Эразм Роттердамский
+        death_year: 1536
+        wikidata: null
+      translator:
+        name: Пётр Константинович Губер
+        death_year: 1941
+        wikidata: null
+      year: 1931
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. П. К. Губера, изд. 1931); Эразм ум. 1536; П. К. Губер ум. 1941; срок
+      70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'издание 1931 г. (советское, «Academia»): редакционные примечания и комментарии не проверялись,
+      возможны правообладатели (редакторы, комментаторы)'
+  publish: auto
+- id: lessing-laokoon-ili-granitsakh-zhivopisi-poezii
+  landing_url: https://ru.wikisource.org/wiki/%D0%9B%D0%B0%D0%BE%D0%BA%D0%BE%D0%BE%D0%BD,_%D0%B8%D0%BB%D0%B8_%D0%9E_%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0%D1%85_%D0%B6%D0%B8%D0%B2%D0%BE%D0%BF%D0%B8%D1%81%D0%B8_%D0%B8_%D0%BF%D0%BE%D1%8D%D0%B7%D0%B8%D0%B8_(%D0%9B%D0%B5%D1%81%D1%81%D0%B8%D0%BD%D0%B3;_%D0%AD%D0%B4%D0%B5%D0%BB%D1%8C%D1%81%D0%BE%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:52:51+00:00'
+    adapter_version: 3
+    metadata:
+      title: Лаокоон, или О границах живописи и поэзии
+      authors:
+      - name: Готхольд Эфраим Лессинг
+        death_year: 1781
+        wikidata: Q34628
+      language: ru
+      year: null
+      translator:
+        name: Евгений Николаевич Эдельсон
+        death_year: 1868
+        wikidata: Q19974589
+      publisher: ru.wikisource.org
+    files:
+    - name: Лаокоон, или О границах живописи и поэзии (Лессинг; Эдельсон)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9B%D0%B0%D0%BE%D0%BA%D0%BE%D0%BE%D0%BD%2C_%D0%B8%D0%BB%D0%B8_%D0%9E_%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0%D1%85_%D0%B6%D0%B8%D0%B2%D0%BE%D0%BF%D0%B8%D1%81%D0%B8_%D0%B8_%D0%BF%D0%BE%D1%8D%D0%B7%D0%B8%D0%B8_%28%D0%9B%D0%B5%D1%81%D1%81%D0%B8%D0%BD%D0%B3%3B_%D0%AD%D0%B4%D0%B5%D0%BB%D1%8C%D1%81%D0%BE%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Лаокоон, или О границах живописи и поэзии
+      authors:
+      - name: Готхольд Эфраим Лессинг
+        death_year: 1781
+        wikidata: null
+      translator:
+        name: Евгений Николаевич Эдельсон
+        death_year: 1868
+        wikidata: null
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. Е. Н. Эдельсона); Г. Э. Лессинг ум. 1781; Е. Н. Эдельсон ум. 1868; срок
+      70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: veyninger-pol-kharakter-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BB_%D0%B8_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80_(%D0%92%D0%B0%D0%B9%D0%BD%D0%B8%D0%BD%D0%B3%D0%B5%D1%80)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:53:01+00:00'
+    adapter_version: 3
+    metadata:
+      title: Пол и характер
+      authors:
+      - name: Отто Вейнингер
+        death_year: 1903
+        wikidata: Q78513
+      language: ru
+      year: 1908
+      translator:
+        name: Владимира Лихтенштадта
+        death_year: null
+        wikidata: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Пол и характер (Вайнингер)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB_%D0%B8_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80_%28%D0%92%D0%B0%D0%B9%D0%BD%D0%B8%D0%BD%D0%B3%D0%B5%D1%80%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Пол и характер
+      authors:
+      - name: Отто Вейнингер
+        death_year: 1903
+        wikidata: null
+      translator:
+        name: Владимир Осипович Лихтенштадт
+        death_year: 1919
+        wikidata: null
+      year: 1908
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. В. О. Лихтенштадта, изд. 1908); О. Вейнингер ум. 1903; В. О. Лихтенштадт
+      (Мазин) ум. 1919 по странице автора на ru.wikisource; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: epiktet-pravila-epikteta-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0_%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82%D0%B0_(%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:53:47+00:00'
+    adapter_version: 3
+    metadata:
+      title: Правила Эпиктета
+      authors:
+      - name: Эпиктет
+        death_year: 138
+        wikidata: Q183144
+      language: ru
+      year: 1901
+      translator:
+        name: Михаил Александрович Энгельгардт
+        death_year: 1915
+        wikidata: Q4531781
+      publisher: ru.wikisource.org
+    files:
+    - name: Правила Эпиктета (Эпиктет)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0_%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82%D0%B0_%28%D0%AD%D0%BF%D0%B8%D0%BA%D1%82%D0%B5%D1%82%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override:
+    metadata:
+      title: Правила Эпиктета
+      year: 1901
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: ru.wikisource (пер. М. А. Энгельгардта, 1901, дореформенная орфография); Эпиктет ум. ок.
+      138; М. А. Энгельгардт ум. 1915; срок 70 лет истёк
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chaadaev-apologiya-sumasshedshego-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%90%D0%BF%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D1%81%D1%83%D0%BC%D0%B0%D1%81%D1%88%D0%B5%D0%B4%D1%88%D0%B5%D0%B3%D0%BE_(%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:57:44+00:00'
+    adapter_version: 3
+    metadata:
+      title: Апология сумасшедшего
+      authors:
+      - name: Пётр Яковлевич Чаадаев
+        death_year: 1856
+        wikidata: Q471220
+      language: ru
+      year: 1837
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Апология сумасшедшего (Чаадаев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%90%D0%BF%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%D1%81%D1%83%D0%BC%D0%B0%D1%81%D1%88%D0%B5%D0%B4%D1%88%D0%B5%D0%B3%D0%BE_%28%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Яковлевич Чаадаев ум. 1856'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chaadaev-otryvki-raznye-mysli-1828-1850
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_%D0%B8_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D0%B5_%D0%BC%D1%8B%D1%81%D0%BB%D0%B8_(1828_-_1850_%D0%B5_%D0%B3%D0%BE%D0%B4%D1%8B)_(%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:57:52+00:00'
+    adapter_version: 3
+    metadata:
+      title: Отрывки и разные мысли (1828 - 1850 е годы)
+      authors:
+      - name: Пётр Яковлевич Чаадаев
+        death_year: 1856
+        wikidata: Q471220
+      language: ru
+      year: 1854
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Отрывки и разные мысли (1828 - 1850 е годы) (Чаадаев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_%D0%B8_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D0%B5_%D0%BC%D1%8B%D1%81%D0%BB%D0%B8_%281828_-_1850_%D0%B5_%D0%B3%D0%BE%D0%B4%D1%8B%29_%28%D0%A7%D0%B0%D0%B0%D0%B4%D0%B0%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Яковлевич Чаадаев ум. 1856'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kireevskiy-rech-shellinga-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B5%D1%87%D1%8C_%D0%A8%D0%B5%D0%BB%D0%BB%D0%B8%D0%BD%D0%B3%D0%B0_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:57:58+00:00'
+    adapter_version: 3
+    metadata:
+      title: Речь Шеллинга
+      authors:
+      - name: Иван Васильевич Киреевский
+        death_year: 1856
+        wikidata: Q981960
+      language: ru
+      year: 1835
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Речь Шеллинга (Киреевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B5%D1%87%D1%8C_%D0%A8%D0%B5%D0%BB%D0%BB%D0%B8%D0%BD%D0%B3%D0%B0_%28%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kireevskiy-otryvki-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:04+00:00'
+    adapter_version: 3
+    metadata:
+      title: Отрывки
+      authors:
+      - name: Иван Васильевич Киреевский
+        death_year: 1856
+        wikidata: Q981960
+      language: ru
+      year: 1845
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Отрывки (Киреевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D1%82%D1%80%D1%8B%D0%B2%D0%BA%D0%B8_%28%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: kireevskiy-otvet-s-khomyakovu-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%92_%D0%BE%D1%82%D0%B2%D0%B5%D1%82_%D0%90._%D0%A1._%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2%D1%83_(%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:09+00:00'
+    adapter_version: 3
+    metadata:
+      title: В ответ А. С. Хомякову
+      authors:
+      - name: Иван Васильевич Киреевский
+        death_year: 1856
+        wikidata: Q981960
+      language: ru
+      year: 1834
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: В ответ А. С. Хомякову (Киреевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92_%D0%BE%D1%82%D0%B2%D0%B5%D1%82_%D0%90._%D0%A1._%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2%D1%83_%28%D0%9A%D0%B8%D1%80%D0%B5%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Иван Васильевич Киреевский ум. 1856'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: khomyakov-neskolko-slov-filosoficheskom-pisme-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE_%D1%81%D0%BB%D0%BE%D0%B2_%D0%BE_%C2%AB%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BF%D0%B8%D1%81%D1%8C%D0%BC%D0%B5%C2%BB_(%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:16+00:00'
+    adapter_version: 3
+    metadata:
+      title: Несколько слов о "Философическом письме"
+      authors:
+      - name: Алексей Степанович Хомяков
+        death_year: 1860
+        wikidata: Q358497
+      language: ru
+      year: 1836
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Несколько слов о «Философическом письме» (Хомяков)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE_%D1%81%D0%BB%D0%BE%D0%B2_%D0%BE_%C2%AB%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BF%D0%B8%D1%81%D1%8C%D0%BC%D0%B5%C2%BB_%28%D0%A5%D0%BE%D0%BC%D1%8F%D0%BA%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Алексей Степанович Хомяков ум. 1860'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chernyshevskiy-esteticheskie-otnosheniya-iskusstva-k-deystvitelnosti
+  landing_url: https://ru.wikisource.org/wiki/%D0%AD%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BE%D1%82%D0%BD%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_%D0%BA_%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:22+00:00'
+    adapter_version: 3
+    metadata:
+      title: Эстетические отношения искусства к действительности
+      authors:
+      - name: Николай Гаврилович Чернышевский
+        death_year: 1889
+        wikidata: Q192331
+      language: ru
+      year: 1855
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Эстетические отношения искусства к действительности (Чернышевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D1%81%D1%82%D0%B5%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%BE%D1%82%D0%BD%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_%D0%BA_%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%28%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chernyshevskiy-kritika-filosofskikh-predubezhdeniy-protiv-obshchinnogo
+  landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D0%BF%D1%80%D0%B5%D0%B4%D1%83%D0%B1%D0%B5%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9_%D0%BF%D1%80%D0%BE%D1%82%D0%B8%D0%B2_%D0%BE%D0%B1%D1%89%D0%B8%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B2%D0%BB%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:28+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критика философских предубеждений против общинного владения
+      authors:
+      - name: Николай Гаврилович Чернышевский
+        death_year: 1889
+        wikidata: Q192331
+      language: ru
+      year: 1858
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Критика философских предубеждений против общинного владения (Чернышевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D0%BF%D1%80%D0%B5%D0%B4%D1%83%D0%B1%D0%B5%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9_%D0%BF%D1%80%D0%BE%D1%82%D0%B8%D0%B2_%D0%BE%D0%B1%D1%89%D0%B8%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B2%D0%BB%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_%28%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: chernyshevskiy-proiskhozhdenie-teorii-blagotvornosti-borby-za
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D1%80%D0%BE%D0%B8%D1%81%D1%85%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%B1%D0%BB%D0%B0%D0%B3%D0%BE%D1%82%D0%B2%D0%BE%D1%80%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D1%8B_%D0%B7%D0%B0_%D0%B6%D0%B8%D0%B7%D0%BD%D1%8C_(%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:35+00:00'
+    adapter_version: 3
+    metadata:
+      title: Происхождение теории благотворности борьбы за жизнь
+      authors:
+      - name: Николай Гаврилович Чернышевский
+        death_year: 1889
+        wikidata: Q192331
+      language: ru
+      year: 1888
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Происхождение теории благотворности борьбы за жизнь (Чернышевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D1%80%D0%BE%D0%B8%D1%81%D1%85%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%B1%D0%BB%D0%B0%D0%B3%D0%BE%D1%82%D0%B2%D0%BE%D1%80%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D1%8B_%D0%B7%D0%B0_%D0%B6%D0%B8%D0%B7%D0%BD%D1%8C_%28%D0%A7%D0%B5%D1%80%D0%BD%D1%8B%D1%88%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Гаврилович Чернышевский ум. 1889'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: pisarev-idealizm-platona-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B4%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0_(%D0%9F%D0%B8%D1%81%D0%B0%D1%80%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:41+00:00'
+    adapter_version: 3
+    metadata:
+      title: Идеализм Платона
+      authors:
+      - name: Дмитрий Иванович Писарев
+        death_year: 1868
+        wikidata: Q378753
+      language: ru
+      year: 1861
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Идеализм Платона (Писарев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%B4%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%9F%D0%BB%D0%B0%D1%82%D0%BE%D0%BD%D0%B0_%28%D0%9F%D0%B8%D1%81%D0%B0%D1%80%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Дмитрий Иванович Писарев ум. 1868'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mikhaylovskiy-borba-za-individualnost-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%91%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D0%B8%D0%BD%D0%B4%D0%B8%D0%B2%D0%B8%D0%B4%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C_(%D0%9C%D0%B8%D1%85%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:48+00:00'
+    adapter_version: 3
+    metadata:
+      title: Борьба за индивидуальность
+      authors:
+      - name: Николай Константинович Михайловский
+        death_year: 1904
+        wikidata: Q770682
+      language: ru
+      year: 1875
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Борьба за индивидуальность (Михайловский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%91%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D0%B8%D0%BD%D0%B4%D0%B8%D0%B2%D0%B8%D0%B4%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%28%D0%9C%D0%B8%D1%85%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Константинович Михайловский ум. 1904'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: sukhovokobylin-filosofiya-dukha-ili-sotsiologiya-uchenie
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B4%D1%83%D1%85%D0%B0_%D0%B8%D0%BB%D0%B8_%D1%81%D0%BE%D1%86%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_(%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%92%D1%81%D0%B5%D0%BC%D0%B8%D1%80%D0%B0)_(%D0%A1%D1%83%D1%85%D0%BE%D0%B2%D0%BE-%D0%9A%D0%BE%D0%B1%D1%8B%D0%BB%D0%B8%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:58:55+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия духа или социология (учение Всемира)
+      authors:
+      - name: Александр Васильевич Сухово-Кобылин
+        death_year: 1903
+        wikidata: Q2640236
+      language: ru
+      year: 1899
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия духа или социология (учение Всемира) (Сухово-Кобылин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B4%D1%83%D1%85%D0%B0_%D0%B8%D0%BB%D0%B8_%D1%81%D0%BE%D1%86%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F_%28%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%92%D1%81%D0%B5%D0%BC%D0%B8%D1%80%D0%B0%29_%28%D0%A1%D1%83%D1%85%D0%BE%D0%B2%D0%BE-%D0%9A%D0%BE%D0%B1%D1%8B%D0%BB%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Александр Васильевич Сухово-Кобылин ум. 1903'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: odoevskiy-russkie-nochi-ili-neobkhodimosti-novoy
+  landing_url: https://ru.wikisource.org/wiki/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B5_%D0%BD%D0%BE%D1%87%D0%B8,_%D0%B8%D0%BB%D0%B8_%D0%BE_%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B3%D0%BE_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_(%D0%9E%D0%B4%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:01+00:00'
+    adapter_version: 3
+    metadata:
+      title: Русские ночи, или о необходимости новой науки и нового искусства
+      authors:
+      - name: Владимир Фёдорович Одоевский
+        death_year: 1869
+        wikidata: Q468067
+      language: ru
+      year: 1835
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Русские ночи, или о необходимости новой науки и нового искусства (Одоевский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B5_%D0%BD%D0%BE%D1%87%D0%B8%2C_%D0%B8%D0%BB%D0%B8_%D0%BE_%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8_%D0%BD%D0%BE%D0%B2%D0%BE%D0%B3%D0%BE_%D0%B8%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B0_%28%D0%9E%D0%B4%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Фёдорович Одоевский ум. 1869'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-lyudvig-feyerbakh-istoricheskiy-etyud-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9B%D1%8E%D0%B4%D0%B2%D0%B8%D0%B3_%D0%A4%D0%B5%D0%B9%D0%B5%D1%80%D0%B1%D0%B0%D1%85._%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%8D%D1%82%D1%8E%D0%B4_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:08+00:00'
+    adapter_version: 3
+    metadata:
+      title: Людвиг Фейербах. Исторический этюд
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1868
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Людвиг Фейербах. Исторический этюд (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9B%D1%8E%D0%B4%D0%B2%D0%B8%D0%B3_%D0%A4%D0%B5%D0%B9%D0%B5%D1%80%D0%B1%D0%B0%D1%85._%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D1%8D%D1%82%D1%8E%D0%B4_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-sotsializm-borba-za-sushchestvovanie-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:14+00:00'
+    adapter_version: 3
+    metadata:
+      title: Социализм и борьба за существование
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1875
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Социализм и борьба за существование (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BE%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC_%D0%B8_%D0%B1%D0%BE%D1%80%D1%8C%D0%B1%D0%B0_%D0%B7%D0%B0_%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-kriticheskaya-istoriya-filosofii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:21+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критическая история философии
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1873
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Критическая история философии (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lavrov-postepennoe-razvitie-drevnikh-filosofskikh-ucheniy
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%81%D1%82%D0%B5%D0%BF%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5_%D0%B4%D1%80%D0%B5%D0%B2%D0%BD%D0%B8%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%D0%BC_%D1%8F%D0%B7%D1%8B%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D0%B2%D0%B5%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9_(%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:28+00:00'
+    adapter_version: 3
+    metadata:
+      title: Постепенное развитие древних философских учений в связи с развитием языческих верований
+      authors:
+      - name: Пётр Лаврович Лавров
+        death_year: 1900
+        wikidata: Q337628
+      language: ru
+      year: 1861
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Постепенное развитие древних философских учений в связи с развитием языческих верований (Лавров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D1%81%D1%82%D0%B5%D0%BF%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5_%D0%B4%D1%80%D0%B5%D0%B2%D0%BD%D0%B8%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B8%D1%85_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B9_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%D0%BC_%D1%8F%D0%B7%D1%8B%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85_%D0%B2%D0%B5%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9_%28%D0%9B%D0%B0%D0%B2%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Пётр Лаврович Лавров ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-pisma-filosofii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:34+00:00'
+    adapter_version: 3
+    metadata:
+      title: Письма о философии
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1896
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Письма о философии (Страхов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%B8%D1%81%D1%8C%D0%BC%D0%B0_%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-vremeni-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:40+00:00'
+    adapter_version: 3
+    metadata:
+      title: О времени
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О времени (Страхов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-znachenie-gegelevskoy-filosofii-nastoyashchee-vremya
+  landing_url: https://ru.wikisource.org/wiki/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B3%D0%B5%D0%B3%D0%B5%D0%BB%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%B2_%D0%BD%D0%B0%D1%81%D1%82%D0%BE%D1%8F%D1%89%D0%B5%D0%B5_%D0%B2%D1%80%D0%B5%D0%BC%D1%8F_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:47+00:00'
+    adapter_version: 3
+    metadata:
+      title: Значение гегелевской философии в настоящее время
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1860
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Значение гегелевской философии в настоящее время (Страхов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B3%D0%B5%D0%B3%D0%B5%D0%BB%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%B2_%D0%BD%D0%B0%D1%81%D1%82%D0%BE%D1%8F%D1%89%D0%B5%D0%B5_%D0%B2%D1%80%D0%B5%D0%BC%D1%8F_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-zadachakh-istorii-filosofii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T13:59:54+00:00'
+    adapter_version: 3
+    metadata:
+      title: О задачах истории философии
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1893
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О задачах истории философии (Страхов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-glavnaya-cherta-myshleniya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%87%D0%B5%D1%80%D1%82%D0%B0_%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:00:00+00:00'
+    adapter_version: 3
+    metadata:
+      title: Главная черта мышления
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1866
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Главная черта мышления (Страхов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%93%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%87%D0%B5%D1%80%D1%82%D0%B0_%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: strakhov-chistoempiricheskom-metode-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%87%D0%B8%D1%81%D1%82%D0%BE-%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B5_(%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:00:07+00:00'
+    adapter_version: 3
+    metadata:
+      title: О чисто-эмпирическом методе
+      authors:
+      - name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: Q2636293
+      language: ru
+      year: 1872
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О чисто-эмпирическом методе (Страхов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%87%D0%B8%D1%81%D1%82%D0%BE-%D1%8D%D0%BC%D0%BF%D0%B8%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC_%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B5_%28%D0%A1%D1%82%D1%80%D0%B0%D1%85%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Николаевич Страхов ум. 1896'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-istoricheskie-dela-filosofii-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%B4%D0%B5%D0%BB%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:13+00:00'
+    adapter_version: 3
+    metadata:
+      title: Исторические дела философии
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1881
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Исторические дела философии (Соловьёв)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5_%D0%B4%D0%B5%D0%BB%D0%B0_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D1%91%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-ponyatie-boge-zashchitu-filosofii-spinozy
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D0%B5_%D0%BE_%D0%91%D0%BE%D0%B3%D0%B5_(%D0%B2_%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D1%83_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B)_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:19+00:00'
+    adapter_version: 3
+    metadata:
+      title: Понятие о Боге (в защиту философии Спинозы)
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Понятие о Боге (в защиту философии Спинозы) (Соловьев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D0%B5_%D0%BE_%D0%91%D0%BE%D0%B3%D0%B5_%28%D0%B2_%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D1%83_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B%29_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-ideya-chelovechestva-u-avgusta-konta
+  landing_url: https://ru.wikisource.org/wiki/%D0%98%D0%B4%D0%B5%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0_%D1%83_%D0%90%D0%B2%D0%B3%D1%83%D1%81%D1%82%D0%B0_%D0%9A%D0%BE%D0%BD%D1%82%D0%B0_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Идея человечества у Августа Конта
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1898
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Идея человечества у Августа Конта (Соловьев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%98%D0%B4%D0%B5%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0_%D1%83_%D0%90%D0%B2%D0%B3%D1%83%D1%81%D1%82%D0%B0_%D0%9A%D0%BE%D0%BD%D1%82%D0%B0_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: solovev-na-puti-k-istinnoy-filosofii
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: На пути к истинной философии
+      authors:
+      - name: Владимир Сергеевич Соловьёв
+        death_year: 1900
+        wikidata: Q282280
+      language: ru
+      year: 1883
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: На пути к истинной философии (Соловьев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D0%BE%D0%B9_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Сергеевич Соловьёв ум. 1900'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mikhaylovich-nravstvennoe-uchenie-kanta-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_(%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:39+00:00'
+    adapter_version: 3
+    metadata:
+      title: Нравственное учение Канта
+      authors:
+      - name: Лопатин, Лев Михайлович
+        death_year: 1920
+        wikidata: Q4266616
+      language: ru
+      year: 1890
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Нравственное учение Канта (Лопатин)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%28%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: mikhaylovich-vera-znanie-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%92%D0%B5%D1%80%D0%B0_%D0%B8_%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD)/%D0%A0%D0%9C_1883_(%D0%94%D0%9E)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Вера и знание
+      authors:
+      - name: Лопатин, Лев Михайлович
+        death_year: 1920
+        wikidata: Q4266616
+      language: ru
+      year: 1883
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Вера и знание (Лопатин)/РМ 1883 (ДО)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92%D0%B5%D1%80%D0%B0_%D0%B8_%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5_%28%D0%9B%D0%BE%D0%BF%D0%B0%D1%82%D0%B8%D0%BD%29%2F%D0%A0%D0%9C_1883_%28%D0%94%D0%9E%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лопатин, Лев Михайлович ум. 1920'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: vvedenskiy-novoe-legkoe-dokazatelstvo-filosofskogo-krititsizma
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%BE%D0%B2%D0%BE%D0%B5_%D0%B8_%D0%BB%D0%B5%D0%B3%D0%BA%D0%BE%D0%B5_%D0%B4%D0%BE%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B0_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:00:52+00:00'
+    adapter_version: 3
+    metadata:
+      title: Новое и легкое доказательство философского критицизма
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: Q732458
+      language: ru
+      year: 1908
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Новое и легкое доказательство философского критицизма (Введенский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%BE%D0%B2%D0%BE%D0%B5_%D0%B8_%D0%BB%D0%B5%D0%B3%D0%BA%D0%BE%D0%B5_%D0%B4%D0%BE%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B0_%28%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: vvedenskiy-mistitsizme-krititsizme-teorii-poznaniya-s
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BC%D0%B8%D1%81%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B8_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D0%92._%D0%A1._%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%D0%B0_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:00:58+00:00'
+    adapter_version: 3
+    metadata:
+      title: О мистицизме и критицизме в теории познания В. С. Соловьева
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: Q732458
+      language: ru
+      year: 1900
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О мистицизме и критицизме в теории познания В. С. Соловьева (Введенский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%BC%D0%B8%D1%81%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B8_%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D0%92._%D0%A1._%D0%A1%D0%BE%D0%BB%D0%BE%D0%B2%D1%8C%D0%B5%D0%B2%D0%B0_%28%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: vvedenskiy-ob-ateizme-filosofii-spinozy-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E%D0%B1_%D0%B0%D1%82%D0%B5%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B_(%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:05+00:00'
+    adapter_version: 3
+    metadata:
+      title: Об атеизме в философии Спинозы
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: Q732458
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Об атеизме в философии Спинозы (Введенский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D0%B1_%D0%B0%D1%82%D0%B5%D0%B8%D0%B7%D0%BC%D0%B5_%D0%B2_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D1%8B_%28%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Александр Иванович Введенский ум. 1925'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: grot-znachenie-chuvstva-poznanii-deyatelnosti-cheloveka
+  landing_url: https://ru.wikisource.org/wiki/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D1%87%D1%83%D0%B2%D1%81%D1%82%D0%B2%D0%B0_%D0%B2_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B8_%D0%B8_%D0%B4%D0%B5%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_(%D0%93%D1%80%D0%BE%D1%82)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:01:11+00:00'
+    adapter_version: 3
+    metadata:
+      title: Значение чувства в познании и деятельности человека
+      authors:
+      - name: Николай Яковлевич Грот
+        death_year: 1899
+        wikidata: Q4150348
+      language: ru
+      year: 1889
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Значение чувства в познании и деятельности человека (Грот)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D1%87%D1%83%D0%B2%D1%81%D1%82%D0%B2%D0%B0_%D0%B2_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B8_%D0%B8_%D0%B4%D0%B5%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D0%BA%D0%B0_%28%D0%93%D1%80%D0%BE%D1%82%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: grot-dushe-svyazi-s-sovremennymi-ucheniyami
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B4%D1%83%D1%88%D0%B5_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%D0%BC%D0%B8_%D0%BE_%D1%81%D0%B8%D0%BB%D0%B5_(%D0%93%D1%80%D0%BE%D1%82)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:19+00:00'
+    adapter_version: 3
+    metadata:
+      title: О душе в связи с современными учениями о силе
+      authors:
+      - name: Николай Яковлевич Грот
+        death_year: 1899
+        wikidata: Q4150348
+      language: ru
+      year: 1886
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О душе в связи с современными учениями о силе (Грот)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B4%D1%83%D1%88%D0%B5_%D0%B2_%D1%81%D0%B2%D1%8F%D0%B7%D0%B8_%D1%81_%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8_%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%D0%BC%D0%B8_%D0%BE_%D1%81%D0%B8%D0%BB%D0%B5_%28%D0%93%D1%80%D0%BE%D1%82%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: grot-dzhordano-bruno-panteizm-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B6%D0%BE%D1%80%D0%B4%D0%B0%D0%BD%D0%BE_%D0%91%D1%80%D1%83%D0%BD%D0%BE_%D0%B8_%D0%BF%D0%B0%D0%BD%D1%82%D0%B5%D0%B8%D0%B7%D0%BC_(%D0%93%D1%80%D0%BE%D1%82)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Джордано Бруно и пантеизм
+      authors:
+      - name: Николай Яковлевич Грот
+        death_year: 1899
+        wikidata: Q4150348
+      language: ru
+      year: 1885
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Джордано Бруно и пантеизм (Грот)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%B6%D0%BE%D1%80%D0%B4%D0%B0%D0%BD%D0%BE_%D0%91%D1%80%D1%83%D0%BD%D0%BE_%D0%B8_%D0%BF%D0%B0%D0%BD%D1%82%D0%B5%D0%B8%D0%B7%D0%BC_%28%D0%93%D1%80%D0%BE%D1%82%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: grot-k-voprosu-ob-istinnykh-zadachakh
+  landing_url: https://ru.wikisource.org/wiki/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE%D0%B1_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_(%D0%93%D1%80%D0%BE%D1%82)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: К вопросу об истинных задачах философии
+      authors:
+      - name: Николай Яковлевич Грот
+        death_year: 1899
+        wikidata: Q4150348
+      language: ru
+      year: 1886
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: К вопросу об истинных задачах философии (Грот)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE%D0%B1_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B0%D1%85_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8_%28%D0%93%D1%80%D0%BE%D1%82%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Яковлевич Грот ум. 1899'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ern-kritika-kantovskogo-ponyatiya-istiny-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%BA%D0%B0%D0%BD%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D1%8F_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D1%8B_(%D0%AD%D1%80%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:01:39+00:00'
+    adapter_version: 3
+    metadata:
+      title: Критика кантовского понятия истины
+      authors:
+      - name: Владимир Францевич Эрн
+        death_year: 1917
+        wikidata: Q4532555
+      language: ru
+      year: 1912
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Критика кантовского понятия истины (Эрн)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0_%D0%BA%D0%B0%D0%BD%D1%82%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%B8%D1%8F_%D0%B8%D1%81%D1%82%D0%B8%D0%BD%D1%8B_%28%D0%AD%D1%80%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ern-sushchnost-nemetskogo-fenomenalizma-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A1%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%BE%D0%B3%D0%BE_%D1%84%D0%B5%D0%BD%D0%BE%D0%BC%D0%B5%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B0_(%D0%AD%D1%80%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Сущность немецкого феноменализма
+      authors:
+      - name: Владимир Францевич Эрн
+        death_year: 1917
+        wikidata: Q4532555
+      language: ru
+      year: 1915
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Сущность немецкого феноменализма (Эрн)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%BD%D0%B5%D0%BC%D0%B5%D1%86%D0%BA%D0%BE%D0%B3%D0%BE_%D1%84%D0%B5%D0%BD%D0%BE%D0%BC%D0%B5%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B0_%28%D0%AD%D1%80%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ern-na-puti-k-logizmu-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%BB%D0%BE%D0%B3%D0%B8%D0%B7%D0%BC%D1%83_(%D0%AD%D1%80%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:01:53+00:00'
+    adapter_version: 3
+    metadata:
+      title: На пути к логизму
+      authors:
+      - name: Владимир Францевич Эрн
+        death_year: 1917
+        wikidata: Q4532555
+      language: ru
+      year: 1911
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: На пути к логизму (Эрн)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B0_%D0%BF%D1%83%D1%82%D0%B8_%D0%BA_%D0%BB%D0%BE%D0%B3%D0%B8%D0%B7%D0%BC%D1%83_%28%D0%AD%D1%80%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ern-velikolepii-skeptitsizme-k-kharakteristike-adogmatizma
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%B2%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%BB%D0%B5%D0%BF%D0%B8%D0%B8_%D0%B8_%D1%81%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_(%D0%BA_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B5_%D0%B0%D0%B4%D0%BE%D0%B3%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%BC%D0%B0)_(%D0%AD%D1%80%D0%BD)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:00+00:00'
+    adapter_version: 3
+    metadata:
+      title: О великолепии и скептицизме (к характеристике адогматизма)
+      authors:
+      - name: Владимир Францевич Эрн
+        death_year: 1917
+        wikidata: Q4532555
+      language: ru
+      year: 1917
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О великолепии и скептицизме (к характеристике адогматизма) (Эрн)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%B2%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%BB%D0%B5%D0%BF%D0%B8%D0%B8_%D0%B8_%D1%81%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC%D0%B5_%28%D0%BA_%D1%85%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B5_%D0%B0%D0%B4%D0%BE%D0%B3%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%BC%D0%B0%29_%28%D0%AD%D1%80%D0%BD%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Владимир Францевич Эрн ум. 1917'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-metafizika-pola-lyubvi-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%B5%D1%82%D0%B0%D1%84%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%D0%BF%D0%BE%D0%BB%D0%B0_%D0%B8_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:07+00:00'
+    adapter_version: 3
+    metadata:
+      title: Метафизика пола и любви
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1907
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Метафизика пола и любви (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B5%D1%82%D0%B0%D1%84%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%D0%BF%D0%BE%D0%BB%D0%B0_%D0%B8_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: berdyaev-moe-filosofskoe-mirosozertsanie-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%BE%D0%B5_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:13+00:00'
+    adapter_version: 3
+    metadata:
+      title: Мое философское миросозерцание
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1937
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Мое философское миросозерцание (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%BE%D0%B5_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1948; срок 70 лет по ст. 1281 ГК РФ истёк с 1 января 2019; публикация эмигрантская,
+      посмертные редакторы не проверялись
+  publish: auto
+- id: berdyaev-knige-s-l-franka-nepostizhimoe
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BA%D0%BD%D0%B8%D0%B3%D0%B5_%D0%A1._%D0%9B._%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%D0%B0_%C2%AB%D0%9D%D0%B5%D0%BF%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5%C2%BB_(%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:20+00:00'
+    adapter_version: 3
+    metadata:
+      title: О книге С. Л. Франка "Непостижимое"
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: Q184656
+      language: ru
+      year: 1938
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О книге С. Л. Франка «Непостижимое» (Бердяев)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%BA%D0%BD%D0%B8%D0%B3%D0%B5_%D0%A1._%D0%9B._%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%D0%B0_%C2%AB%D0%9D%D0%B5%D0%BF%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5%C2%BB_%28%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Александрович Бердяев ум. 1948'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1948; срок 70 лет истёк; публикация эмигрантская 1938 г.
+  publish: auto
+- id: shestov-velikie-kanuny-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%B8%D0%B5_%D0%BA%D0%B0%D0%BD%D1%83%D0%BD%D1%8B_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: Великие кануны
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1909
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Великие кануны (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%B8%D0%B5_%D0%BA%D0%B0%D0%BD%D1%83%D0%BD%D1%8B_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-pokhvala-gluposti-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D0%B0_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: Похвала глупости
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1907
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Похвала глупости (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D1%85%D0%B2%D0%B0%D0%BB%D0%B0_%D0%B3%D0%BB%D1%83%D0%BF%D0%BE%D1%81%D1%82%D0%B8_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-filosofiya-teoriya-poznaniya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:02:40+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия и теория познания
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1909
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия и теория познания (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: shestov-nikolay-berdyaev-gnozis-ekzistentsialnaya-filosofiya
+  landing_url: https://ru.wikisource.org/wiki/%D0%9D%D0%B8%D0%BA%D0%BE%D0%BB%D0%B0%D0%B9_%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2._%D0%93%D0%BD%D0%BE%D0%B7%D0%B8%D1%81_%D0%B8_%D1%8D%D0%BA%D0%B7%D0%B8%D1%81%D1%82%D0%B5%D0%BD%D1%86%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_(%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Николай Бердяев. Гнозис и экзистенциальная философия
+      authors:
+      - name: Лев Исаакович Шестов
+        death_year: 1938
+        wikidata: Q314189
+      language: ru
+      year: 1938
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Николай Бердяев. Гнозис и экзистенциальная философия (Шестов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9D%D0%B8%D0%BA%D0%BE%D0%BB%D0%B0%D0%B9_%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2._%D0%93%D0%BD%D0%BE%D0%B7%D0%B8%D1%81_%D0%B8_%D1%8D%D0%BA%D0%B7%D0%B8%D1%81%D1%82%D0%B5%D0%BD%D1%86%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%28%D0%A8%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лев Исаакович Шестов ум. 1938'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-religiya-nauka-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_%D0%B8_%D0%BD%D0%B0%D1%83%D0%BA%D0%B0_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:53+00:00'
+    adapter_version: 3
+    metadata:
+      title: Религия и наука
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1950
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Религия и наука (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_%D0%B8_%D0%BD%D0%B0%D1%83%D0%BA%D0%B0_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1950; срок 70 лет истёк с 1 января 2021; если издание посмертное (1950+), проверить
+      редактора
+  publish: auto
+- id: lyudvigovich-filosofiya-religiya-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%80%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:02:59+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия и религия
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1923
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия и религия (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%B8_%D1%80%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: lyudvigovich-fridrikh-nitsshe-etika-lyubvi-k
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D1%80%D0%B8%D0%B4%D1%80%D0%B8%D1%85_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_%D0%BA_%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B5%D0%BC%D1%83_(%D0%A4%D1%80%D0%B0%D0%BD%D0%BA)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:06+00:00'
+    adapter_version: 3
+    metadata:
+      title: Фридрих Ницше и этика любви к дальнему
+      authors:
+      - name: Франк, Семён Людвигович
+        death_year: 1950
+        wikidata: Q981959
+      language: ru
+      year: 1902
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Фридрих Ницше и этика любви к дальнему (Франк)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D1%80%D0%B8%D0%B4%D1%80%D0%B8%D1%85_%D0%9D%D0%B8%D1%86%D1%88%D0%B5_%D0%B8_%D1%8D%D1%82%D0%B8%D0%BA%D0%B0_%D0%BB%D1%8E%D0%B1%D0%B2%D0%B8_%D0%BA_%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B5%D0%BC%D1%83_%28%D0%A4%D1%80%D0%B0%D0%BD%D0%BA%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Франк, Семён Людвигович ум. 1950'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-dekart-spinoza-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%94%D0%B5%D0%BA%D0%B0%D1%80%D1%82_%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D0%B0_(%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:12+00:00'
+    adapter_version: 3
+    metadata:
+      title: Декарт и Спиноза
+      authors:
+      - name: Трубецкой, Евгений Николаевич
+        death_year: 1920
+        wikidata: Q4464161
+      language: ru
+      year: 1898
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Декарт и Спиноза (Трубецкой)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%94%D0%B5%D0%BA%D0%B0%D1%80%D1%82_%D0%B8_%D0%A1%D0%BF%D0%B8%D0%BD%D0%BE%D0%B7%D0%B0_%28%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Трубецкой, Евгений Николаевич ум. 1920'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: nikolaevich-politicheskoe-mirosozertsanie-epokhi-vozrozhdeniya-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%D1%8D%D0%BF%D0%BE%D1%85%D0%B8_%D0%92%D0%BE%D0%B7%D1%80%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_(%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:19+00:00'
+    adapter_version: 3
+    metadata:
+      title: Политическое миросозерцание эпохи Возрождения
+      authors:
+      - name: Трубецкой, Евгений Николаевич
+        death_year: 1920
+        wikidata: Q4464161
+      language: ru
+      year: 1907
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Политическое миросозерцание эпохи Возрождения (Трубецкой)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9F%D0%BE%D0%BB%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%D0%BC%D0%B8%D1%80%D0%BE%D1%81%D0%BE%D0%B7%D0%B5%D1%80%D1%86%D0%B0%D0%BD%D0%B8%D0%B5_%D1%8D%D0%BF%D0%BE%D1%85%D0%B8_%D0%92%D0%BE%D0%B7%D1%80%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F_%28%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Трубецкой, Евгений Николаевич ум. 1920'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ivanovich-svobode-voli-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_%D0%B2%D0%BE%D0%BB%D0%B8_(%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:26+00:00'
+    adapter_version: 3
+    metadata:
+      title: О свободе воли
+      authors:
+      - name: Челпанов, Георгий Иванович
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О свободе воли (Челпанов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%B5_%D0%B2%D0%BE%D0%BB%D0%B8_%28%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ivanovich-k-voprosu-materializme-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE_%D0%BC%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B5_(%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:33+00:00'
+    adapter_version: 3
+    metadata:
+      title: К вопросу о материализме
+      authors:
+      - name: Челпанов, Георгий Иванович
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1897
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: К вопросу о материализме (Челпанов)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9A_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%83_%D0%BE_%D0%BC%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%BC%D0%B5_%28%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Челпанов, Георгий Иванович ум. 1936'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: viktorovich-chto-takoe-nauchnaya-filosofiya-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%A7%D1%82%D0%BE_%D1%82%D0%B0%D0%BA%D0%BE%D0%B5_%D0%BD%D0%B0%D1%83%D1%87%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%3F_(%D0%9B%D0%B5%D1%81%D0%B5%D0%B2%D0%B8%D1%87)/%D0%94%D0%9E
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:03:39+00:00'
+    adapter_version: 3
+    metadata:
+      title: Что такое научная философия?
+      authors:
+      - name: Лесевич, Владимир Викторович
+        death_year: 1905
+        wikidata: Q12117721
+      language: ru
+      year: 1888
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Что такое научная философия? (Лесевич)/ДО
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A7%D1%82%D0%BE_%D1%82%D0%B0%D0%BA%D0%BE%D0%B5_%D0%BD%D0%B0%D1%83%D1%87%D0%BD%D0%B0%D1%8F_%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%3F_%28%D0%9B%D0%B5%D1%81%D0%B5%D0%B2%D0%B8%D1%87%29%2F%D0%94%D0%9E
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Лесевич, Владимир Викторович ум. 1905'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: fedorov-filosofiya-obshchego-dela-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%BE%D0%B1%D1%89%D0%B5%D0%B3%D0%BE_%D0%B4%D0%B5%D0%BB%D0%B0_(%D0%A4%D0%B5%D0%B4%D0%BE%D1%80%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:46+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философия общего дела
+      authors:
+      - name: Николай Фёдорович Фёдоров
+        death_year: 1903
+        wikidata: Q463723
+      language: ru
+      year: 1913
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философия общего дела (Федоров)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F_%D0%BE%D0%B1%D1%89%D0%B5%D0%B3%D0%BE_%D0%B4%D0%B5%D0%BB%D0%B0_%28%D0%A4%D0%B5%D0%B4%D0%BE%D1%80%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Николай Фёдорович Фёдоров ум. 1903'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: издание 1906/1913 гг. подготовили В. А. Кожевников и Н. П. Петерсон (редакторы; даты смерти
+      не проверялись); состав страницы (весь ли том) не проверялся
+  publish: auto
+- id: anichkov-slovo-svoystvakh-poznaniya-chelovecheskogo-sredstvakh
+  landing_url: https://ru.wikisource.org/wiki/%D0%A1%D0%BB%D0%BE%D0%B2%D0%BE_%D0%BE_%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%D1%85_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B8_%D0%BE_%D1%81%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B2%D0%B0%D1%85,_%D0%BF%D1%80%D0%B5%D0%B4%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%8F%D1%8E%D1%89%D0%B8%D1%85_%D1%83%D0%BC_%D1%81%D0%BC%D0%B5%D1%80%D1%82%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%82_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B1%D0%BB%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9..._(%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:03:53+00:00'
+    adapter_version: 3
+    metadata:
+      title: Слово о свойствах познания человеческого и о средствах, предохраняющих ум смертного от разных
+        заблуждений…
+      authors:
+      - name: Дмитрий Сергеевич Аничков
+        death_year: 1788
+        wikidata: Q4066428
+      language: ru
+      year: 1770
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Слово о свойствах познания человеческого и о средствах, предохраняющих ум смертного от разных
+        заблуждений... (Аничков)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A1%D0%BB%D0%BE%D0%B2%D0%BE_%D0%BE_%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%D1%85_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F_%D1%87%D0%B5%D0%BB%D0%BE%D0%B2%D0%B5%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B8_%D0%BE_%D1%81%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B2%D0%B0%D1%85%2C_%D0%BF%D1%80%D0%B5%D0%B4%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%8F%D1%8E%D1%89%D0%B8%D1%85_%D1%83%D0%BC_%D1%81%D0%BC%D0%B5%D1%80%D1%82%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D1%82_%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85_%D0%B7%D0%B0%D0%B1%D0%BB%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9..._%28%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Дмитрий Сергеевич Аничков ум. 1788'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: anichkov-rassuzhdenie-iz-naturalnoy-bogoslovii-nachale
+  landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8%D0%B7_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9_%D0%B1%D0%BE%D0%B3%D0%BE%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B8_%D0%BE_%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B5_%D0%B8_%D0%BF%D1%80%D0%BE%D0%B8%D1%81%D1%88%D0%B5%D1%81%D1%82%D0%B2%D0%B8%D0%B8_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B1%D0%BE%D0%B3%D0%BE%D0%BF%D0%BE%D1%87%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F..._(%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:03:59+00:00'
+    adapter_version: 3
+    metadata:
+      title: Рассуждение из натуральной богословии о начале и происшествии натурального богопочитания…
+      authors:
+      - name: Дмитрий Сергеевич Аничков
+        death_year: 1788
+        wikidata: Q4066428
+      language: ru
+      year: 1769
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Рассуждение из натуральной богословии о начале и происшествии натурального богопочитания...
+        (Аничков)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8%D0%B7_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9_%D0%B1%D0%BE%D0%B3%D0%BE%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B8_%D0%BE_%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B5_%D0%B8_%D0%BF%D1%80%D0%BE%D0%B8%D1%81%D1%88%D0%B5%D1%81%D1%82%D0%B2%D0%B8%D0%B8_%D0%BD%D0%B0%D1%82%D1%83%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B1%D0%BE%D0%B3%D0%BE%D0%BF%D0%BE%D1%87%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F..._%28%D0%90%D0%BD%D0%B8%D1%87%D0%BA%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Дмитрий Сергеевич Аничков ум. 1788'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: ivanovich-opyt-nauki-izyashchnogo-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E%D0%BF%D1%8B%D1%82_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8%D0%B7%D1%8F%D1%89%D0%BD%D0%BE%D0%B3%D0%BE_(%D0%93%D0%B0%D0%BB%D0%B8%D1%87)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:06+00:00'
+    adapter_version: 3
+    metadata:
+      title: Опыт науки изящного
+      authors:
+      - name: Галич, Александр Иванович
+        death_year: 1848
+        wikidata: Q357009
+      language: ru
+      year: 1825
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Опыт науки изящного (Галич)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E%D0%BF%D1%8B%D1%82_%D0%BD%D0%B0%D1%83%D0%BA%D0%B8_%D0%B8%D0%B7%D1%8F%D1%89%D0%BD%D0%BE%D0%B3%D0%BE_%28%D0%93%D0%B0%D0%BB%D0%B8%D1%87%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Галич, Александр Иванович ум. 1848'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: osipovskiy-rassuzhdenie-dinamicheskoy-sisteme-kanta-ru
+  landing_url: https://ru.wikisource.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BE_%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9_%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_(%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:13+00:00'
+    adapter_version: 3
+    metadata:
+      title: Рассуждение о динамической системе Канта
+      authors:
+      - name: Тимофей Федорович Осиповский
+        death_year: 1831
+        wikidata: Q2564806
+      language: ru
+      year: 1813
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Рассуждение о динамической системе Канта (Осиповский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A0%D0%B0%D1%81%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BE_%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9_%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B5_%D0%9A%D0%B0%D0%BD%D1%82%D0%B0_%28%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Тимофей Федорович Осиповский ум. 1831'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: osipovskiy-prostranstve-vremeni-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9E_%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B5_%D0%B8_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_(%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:21+00:00'
+    adapter_version: 3
+    metadata:
+      title: О пространстве и времени
+      authors:
+      - name: Тимофей Федорович Осиповский
+        death_year: 1831
+        wikidata: Q2564806
+      language: ru
+      year: 1807
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: О пространстве и времени (Осиповский)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9E_%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B5_%D0%B8_%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8_%28%D0%9E%D1%81%D0%B8%D0%BF%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Тимофей Федорович Осиповский ум. 1831'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: null
+  publish: auto
+- id: plekhanov-materialismus-militans-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/Materialismus_militans_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:29+00:00'
+    adapter_version: 3
+    metadata:
+      title: Materialismus militans
+      authors:
+      - name: Георгий Валентинович Плеханов
+        death_year: 1918
+        wikidata: Q182905
+      language: ru
+      year: 1908
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Materialismus militans (Плеханов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/Materialismus_militans_%28%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1918; страница ru.wikisource может воспроизводить советское издание — редакционные
+      примечания не проверялись
+  publish: auto
+- id: plekhanov-filosofskaya-evolyutsiya-marksa-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B0%D1%8F_%D1%8D%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%9C%D0%B0%D1%80%D0%BA%D1%81%D0%B0_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:36+00:00'
+    adapter_version: 3
+    metadata:
+      title: Философская эволюция Маркса
+      authors:
+      - name: Георгий Валентинович Плеханов
+        death_year: 1918
+        wikidata: Q182905
+      language: ru
+      year: 1916
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Философская эволюция Маркса (Плеханов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D1%81%D0%BA%D0%B0%D1%8F_%D1%8D%D0%B2%D0%BE%D0%BB%D1%8E%D1%86%D0%B8%D1%8F_%D0%9C%D0%B0%D1%80%D0%BA%D1%81%D0%B0_%28%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1918; страница может воспроизводить советское издание — редакционные примечания не
+      проверялись
+  publish: auto
+- id: plekhanov-maks-shtirner-ru-wikisource
+  landing_url: https://ru.wikisource.org/wiki/%D0%9C%D0%B0%D0%BA%D1%81_%D0%A8%D1%82%D0%B8%D1%80%D0%BD%D0%B5%D1%80_(%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2)
+  adapter: wikisource
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:04:42+00:00'
+    adapter_version: 3
+    metadata:
+      title: Макс Штирнер
+      authors:
+      - name: Георгий Валентинович Плеханов
+        death_year: 1918
+        wikidata: Q182905
+      language: ru
+      year: 1906
+      translator: null
+      publisher: ru.wikisource.org
+    files:
+    - name: Макс Штирнер (Плеханов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%9C%D0%B0%D0%BA%D1%81_%D0%A8%D1%82%D0%B8%D1%80%D0%BD%D0%B5%D1%80_%28%D0%9F%D0%BB%D0%B5%D1%85%D0%B0%D0%BD%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    license_hint: null
+  override: {}
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'сайт: Wikisource; Георгий Валентинович Плеханов ум. 1918'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: автор ум. 1918; страница может воспроизводить советское издание — редакционные примечания не
+      проверялись
+  publish: auto
