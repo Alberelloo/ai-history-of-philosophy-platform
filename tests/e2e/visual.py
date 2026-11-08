@@ -409,7 +409,8 @@ def snap(page, name: str, *, mask: list | None = None, full_page: bool = False) 
         path=str(actual),
         animations="disabled",
         caret="hide",
-        mask=mask or [],
+        # Дата и время последнего обмена в строках сессий меняются от запуска к запуску.
+        mask=[*(mask or []), page.locator(".assistant__session-meta")],
         full_page=full_page,
     )
     expected = BASELINES / f"{name}.png"

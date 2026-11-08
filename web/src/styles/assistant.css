@@ -293,3 +293,8 @@
 .handoff-deleted {
   color: var(--ink-3);
 }
+
+/* ink-3 не читается на accent-soft активной строки (контраст ниже 4.5:1) — дата там ink-2. */
+.assistant__session.is-active .assistant__session-meta {
+  color: var(--ink-2);
+}
