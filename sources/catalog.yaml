@@ -12332,3 +12332,683 @@ entries:
     note: Ч. 4-6 из 6; ч. 1-3 не проверялись. Автор — духовное лицо, но труд — университетский учебник
       истории философии. OCR средний.
   publish: auto
+- id: lopatin-polozhitel-nyia-zadachi-filosofii-microform
+  landing_url: https://archive.org/details/polozhitelnyiaza00lopa
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:52:17+00:00'
+    adapter_version: 1
+    metadata:
+      title: Polozhitel'nyia zadachi filosofii. [microform]
+      authors:
+      - name: Lev Mikhailovich Lopatin
+        death_year: 1920
+        wikidata: null
+      language: ru
+      year: 1911
+      translator: null
+      publisher: 'Moskva : I.N. Kushnerev'
+    files:
+    - name: polozhitelnyiaza00lopa.pdf
+      url: https://archive.org/download/polozhitelnyiaza00lopa/polozhitelnyiaza00lopa.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Положительные задачи философии
+      authors:
+      - name: Лев Михайлович Лопатин
+        death_year: 1920
+        wikidata: null
+      year: 1911
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Л. М. Лопатин ум. 1920 (Wikidata Q4266616);
+      М., Кушнерев, 1911; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Скан Google/LoC (микрофильм), OCR удовлетворительный; какой части (1/2) соответствует экземпляр
+      — уточнить.
+  publish: auto
+- id: debolskii-vvedenie-uchenie-poznanii-archive
+  landing_url: https://archive.org/details/vvedenievuchenie00debo
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:52:24+00:00'
+    adapter_version: 1
+    metadata:
+      title: Vvedenie v uchenie o poznanii
+      authors:
+      - name: Nikolai Grigorevich, b. 1842. [from old catalog] Debolskii
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1870
+      translator: null
+      publisher: null
+    files:
+    - name: vvedenievuchenie00debo.pdf
+      url: https://archive.org/download/vvedenievuchenie00debo/vvedenievuchenie00debo.pdf
+    license_hint: The Library of Congress is unaware of any copyright restrictions for this item.
+  override:
+    metadata:
+      title: Введение в учение о познании
+      authors:
+      - name: Николай Григорьевич Дебольский
+        death_year: 1918
+        wikidata: null
+      year: 1870
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. Г. Дебольский ум. 1918 (Wikidata Q4156289); СПб., Неклюдов, 1870; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Метаданные archive.org романизированные; название и автор сверены по титульному листу OCR частично.
+  publish: auto
+- id: struve-lementarnai-logika-archive
+  landing_url: https://archive.org/details/lementarnaialogi00stru
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:52:31+00:00'
+    adapter_version: 1
+    metadata:
+      title: Ėlementarnai͡a logika
+      authors:
+      - name: Genrik Egorovich Struve
+        death_year: 1912
+        wikidata: null
+      language: ru
+      year: 1907
+      translator: null
+      publisher: 'S.-Peterburg : N.P. Karbasnikov'
+    files:
+    - name: lementarnaialogi00stru.pdf
+      url: https://archive.org/download/lementarnaialogi00stru/lementarnaialogi00stru.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Элементарная логика
+      authors:
+      - name: Генрих Егорович Струве
+        death_year: 1912
+        wikidata: null
+      year: 1907
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Г. Е. Струве ум. 1912 (Wikidata Q130387);
+      СПб., Карбасников, 1907 (13-е изд.); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Учебник для гимназий и духовных семинарий.
+  publish: auto
+- id: trubetsko-mirosozertsanie-vl-s-soloveva-archive
+  landing_url: https://archive.org/details/mirosozertsaniev00trub
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:52:49+00:00'
+    adapter_version: 1
+    metadata:
+      title: Mirosozertsanie Vl.S. Soloveva
+      authors:
+      - name: Evgeni Nikolaevich, kniaz Trubetsko
+        death_year: 1920
+        wikidata: null
+      language: ru
+      year: 1913
+      translator: null
+      publisher: '[Moskva] Izd. Avtora'
+    files:
+    - name: mirosozertsaniev00trub.epub
+      url: https://archive.org/download/mirosozertsaniev00trub/mirosozertsaniev00trub.epub
+    license_hint: null
+  override:
+    metadata:
+      title: Миросозерцание Вл. С. Соловьёва
+      authors:
+      - name: Евгений Николаевич Трубецкой
+        death_year: 1920
+        wikidata: null
+      year: 1913
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Е. Н. Трубецкой ум. 1920 (годы жизни 1863-1920
+      в метаданных archive.org; по памяти/архиву, сверить с Wikidata); М., изд. автора, 1913; срок 70
+      лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 1 (возможно, есть т. 2 отдельным item) — проверить.
+  publish: auto
+- id: g-vvedenie-filosofiyu-archive
+  landing_url: https://archive.org/details/b_20200329
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:53:00+00:00'
+    adapter_version: 1
+    metadata:
+      title: Введенiе въ философiю
+      authors:
+      - name: Челпанов Г.
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1916
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов. Введение в философию (b).epub
+      url: https://archive.org/download/b_20200329/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2.%20%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8E%20%28b%29.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Введение в философию
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1916
+      language: ru
+    files:
+    - name: Челпанов. Введение в философию (b)_djvu.txt
+      url: https://archive.org/download/b_20200329/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2.%20%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8E%20%28b%29_djvu.txt
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Г. И. Челпанов ум. 1936 (Wikidata Q1377656); М., 1916 (6-е изд.); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: EPUB 584 МБ превышает лимит 200 МБ — файл заменён на DjVu TXT через override.files. Есть и 7-е
+      изд. 1918 (item 20200329_20200329_1610, без текстового слоя).
+  publish: auto
+- id: g-mozg-dusha-archive
+  landing_url: https://archive.org/details/20200329_20200329_1635
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:53:11+00:00'
+    adapter_version: 1
+    metadata:
+      title: Мозгъ и душа
+      authors:
+      - name: Челпанов Г.
+        death_year: 1936
+        wikidata: Q1377656
+      language: ru
+      year: 1912
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов. Мозгъ и душа_text.pdf
+      url: https://archive.org/download/20200329_20200329_1635/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2.%20%D0%9C%D0%BE%D0%B7%D0%B3%D1%8A%20%D0%B8%20%D0%B4%D1%83%D1%88%D0%B0_text.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Мозг и душа
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1912
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Г. И. Челпанов ум. 1936 (Wikidata Q1377656); М., Кушнерев, 1912; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Критика материализма; есть и другой экземпляр 5988941-1912.
+  publish: auto
+- id: g-chelpanov-uchebnik-psikhologii-dlya-gimnaziy
+  landing_url: https://archive.org/details/915167-1910
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:53:19+00:00'
+    adapter_version: 1
+    metadata:
+      title: Челпанов Г.И. Учебник психологии (для гимназий и самообразования). 9-е изд. (1910)
+      authors:
+      - name: Челпанов Г.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1910
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов Г.И. Учебник психологии (для гимназий и самообразования). 9-е изд. (1910)_text.pdf
+      url: https://archive.org/download/915167-1910/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%93.%D0%98.%20%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D0%B8%D0%BA%20%D0%BF%D1%81%D0%B8%D1%85%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B8%20%28%D0%B4%D0%BB%D1%8F%20%D0%B3%D0%B8%D0%BC%D0%BD%D0%B0%D0%B7%D0%B8%D0%B9%20%D0%B8%20%D1%81%D0%B0%D0%BC%D0%BE%D0%BE%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%29.%209-%D0%B5%20%D0%B8%D0%B7%D0%B4.%20%281910%29_text.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Учебник психологии (для гимназий и самообразования), 9-е изд.
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1910
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
+      1910; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Только DjVu TXT.
+  publish: auto
+- id: g-chelpanov-psikhologiya-osnovnoy-kurs-chitannyy
+  landing_url: https://archive.org/details/1908963-1909
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:53:28+00:00'
+    adapter_version: 1
+    metadata:
+      title: Челпанов Г.И. Психология. Основной курс, читанный в 1908-9 г. (1909)
+      authors:
+      - name: Челпанов Г.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1909
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов Г.И. Психология. Основной курс, читанный в 1908-9 г. (1909).epub
+      url: https://archive.org/download/1908963-1909/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%93.%D0%98.%20%D0%9F%D1%81%D0%B8%D1%85%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F.%20%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D0%BE%D0%B9%20%D0%BA%D1%83%D1%80%D1%81%2C%20%D1%87%D0%B8%D1%82%D0%B0%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%201908-9%20%D0%B3.%20%281909%29.epub
+    license_hint: null
+  override:
+    metadata:
+      title: Психология. Основной курс, читанный в 1908-9 г.
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1909
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
+      1909 (литографированные лекции); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: OCR средний.
+  publish: auto
+- id: g-chelpanov-kurs-lektsiy-po-logike
+  landing_url: https://archive.org/details/17901416-1901
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:53:36+00:00'
+    adapter_version: 1
+    metadata:
+      title: Челпанов Г.И. Курс лекций по логике, читанных в 1900-1901 г. (1901)
+      authors:
+      - name: Челпанов Г.И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1901
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов Г.И. Курс лекций по логике, читанных в 1900-1901 г. (1901).pdf
+      url: https://archive.org/download/17901416-1901/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%93.%D0%98.%20%D0%9A%D1%83%D1%80%D1%81%20%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B9%20%D0%BF%D0%BE%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B5%2C%20%D1%87%D0%B8%D1%82%D0%B0%D0%BD%D0%BD%D1%8B%D1%85%20%D0%B2%201900-1901%20%D0%B3.%20%281901%29.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Курс лекций по логике, читанных в 1900-1901 г.
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1901
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
+      1901 (литографированные лекции); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: OCR местами плохой (схемы).
+  publish: auto
+- id: g-chelpanov-problema-vospriyatiya-prostranstva-chast
+  landing_url: https://archive.org/details/25123-1904641
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:53:46+00:00'
+    adapter_version: 1
+    metadata:
+      title: Челпанов Г.И. Проблема восприятия пространства. Часть 2 (1904)
+      authors:
+      - name: Челпанов Г.И
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1904
+      translator: null
+      publisher: null
+    files:
+    - name: Челпанов Г.И. Проблема восприятия пространства. Часть 2 (1904)_text.pdf
+      url: https://archive.org/download/25123-1904641/%D0%A7%D0%B5%D0%BB%D0%BF%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%93.%D0%98.%20%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D0%B0%20%D0%B2%D0%BE%D1%81%D0%BF%D1%80%D0%B8%D1%8F%D1%82%D0%B8%D1%8F%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%81%D1%82%D0%B2%D0%B0.%20%D0%A7%D0%B0%D1%81%D1%82%D1%8C%202%20%281904%29_text.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Проблема восприятия пространства. Ч. 2
+      authors:
+      - name: Георгий Иванович Челпанов
+        death_year: 1936
+        wikidata: null
+      year: 1904
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Г. И. Челпанов ум. 1936 (Wikidata Q1377656);
+      1904; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Ч. 2 («Теории»); ч. 1 не найдена.
+  publish: auto
+- id: khvostov-teoriya-istoricheskogo-protsessa-ocherki-po
+  landing_url: https://archive.org/details/teoriya_istoricheskogo_processa
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:53:56+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Теория исторического процесса : Очерки по философии и методологии истории : Курс лекций'
+      authors:
+      - name: Вениамин Михайлович Хвостов
+        death_year: 1920
+        wikidata: null
+      language: ru
+      year: 1914
+      translator: null
+      publisher: Москва Г.А. Леман и Б.Д. Плетнев
+    files:
+    - name: teoriya_istoricheskogo_processa.epub
+      url: https://archive.org/download/teoriya_istoricheskogo_processa/teoriya_istoricheskogo_processa.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: 'Теория исторического процесса: очерки по философии и методологии истории'
+      authors:
+      - name: Вениамин Михайлович Хвостов
+        death_year: 1920
+        wikidata: null
+      year: 1914
+      language: ru
+    files:
+    - name: teoriya_istoricheskogo_processa.pdf
+      url: https://archive.org/download/teoriya_istoricheskogo_processa/teoriya_istoricheskogo_processa.pdf
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      В. М. Хвостов ум. 1920 (Wikidata Q4496962); М., Леман и Плетнёв, 1914 (2-е изд.); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: EPUB 542 МБ превышает лимит; файл заменён на PDF (16 МБ) через override.files.
+  publish: auto
+- id: leontev-k-n-vizantizm-slavyanstvo-m
+  landing_url: https://archive.org/details/leontevknvizantizmislavjanstvom1823
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:54:06+00:00'
+    adapter_version: 1
+    metadata:
+      title: Леонтьев К. Н. Византизм и славянство. - М., 1876.
+      authors:
+      - name: Константин Николаевич Леонтьев
+        death_year: 1891
+        wikidata: Q542090
+      language: en
+      year: 1876
+      translator: null
+      publisher: null
+    files:
+    - name: leontevknvizantizmislavjanstvom1823.pdf
+      url: https://archive.org/download/leontevknvizantizmislavjanstvom1823/leontevknvizantizmislavjanstvom1823.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Византизм и славянство
+      authors:
+      - name: Константин Николаевич Леонтьев
+        death_year: 1891
+        wikidata: null
+      year: 1876
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; К. Н. Леонтьев ум. 1891 (Wikidata Q542090);
+      М., 1876; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Оттиск из «Чтений в Обществе любителей российской словесности»; OCR средний.
+  publish: auto
+- id: leontev-k-n-sobranie-sochineniy-m
+  landing_url: https://archive.org/details/leontevknsobraniesochinenijm191215
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:54:14+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Леонтьев К. Н. Собрание сочинений. - [М., 1912-1913]. Т. 5 : [Восток, Россия и славянство].
+        - [1912].'
+      authors: []
+      language: en
+      year: 1912
+      translator: null
+      publisher: null
+    files:
+    - name: leontevknsobraniesochinenijm191215.pdf
+      url: https://archive.org/download/leontevknsobraniesochinenijm191215/leontevknsobraniesochinenijm191215.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: 'Собрание сочинений. Т. 5: Восток, Россия и славянство'
+      authors:
+      - name: Константин Николаевич Леонтьев
+        death_year: 1891
+        wikidata: null
+      year: 1912
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; К. Н. Леонтьев ум. 1891 (Wikidata Q542090);
+      М., 1912; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Т. 5 из 9 (других томов не проверяли).
+  publish: auto
+- id: radishchev-polnoe-sobrani-e-sochineni-n
+  landing_url: https://archive.org/details/polnoesobranies01kallgoog
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:54:22+00:00'
+    adapter_version: 1
+    metadata:
+      title: Polnoe sobranīe sochinenīĭ A.N. Radishcheva
+      authors:
+      - name: Aleksandr Nikolaevich Radishchev
+        death_year: 1802
+        wikidata: null
+      language: ru
+      year: 1907
+      translator: null
+      publisher: 'Moskva : Izd. V.M. Sablina'
+    files:
+    - name: polnoesobranies01kallgoog_text.pdf
+      url: https://archive.org/download/polnoesobranies01kallgoog/polnoesobranies01kallgoog_text.pdf
+    license_hint: NOT_IN_COPYRIGHT
+  override:
+    metadata:
+      title: Полное собрание сочинений. Т. 1
+      authors:
+      - name: Александр Николаевич Радищев
+        death_year: 1802
+        wikidata: null
+      year: 1907
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. Н. Радищев ум. 1802; М., Саблин, 1907; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том определён по тексту OCR (т. 1 или 2 — уточнить); Google-скан, OCR средний.
+  publish: auto
+- id: radishchev-polnoe-sobrani-e-sochineni-n-2
+  landing_url: https://archive.org/details/polnoesobranies00kallgoog
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:54:29+00:00'
+    adapter_version: 1
+    metadata:
+      title: Polnoe sobranīe sochinenīĭ A.N. Radishcheva
+      authors:
+      - name: Aleksandr Nikolaevich Radishchev
+        death_year: 1802
+        wikidata: null
+      language: ru
+      year: 1907
+      translator: null
+      publisher: 'Moskva : Izd. V.M. Sablina'
+    files:
+    - name: polnoesobranies00kallgoog_text.pdf
+      url: https://archive.org/download/polnoesobranies00kallgoog/polnoesobranies00kallgoog_text.pdf
+    license_hint: NOT_IN_COPYRIGHT
+  override:
+    metadata:
+      title: Полное собрание сочинений. Т. 2
+      authors:
+      - name: Александр Николаевич Радищев
+        death_year: 1802
+        wikidata: null
+      year: 1907
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      А. Н. Радищев ум. 1802; М., Саблин, 1907; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том определён по тексту OCR (т. 1 или 2 — уточнить); содержит «О человеке, о его смертности
+      и бессмертии» (проверить).
+  publish: auto
+- id: kareev-istorikofilosofskie-sot-s-iologicheskie-ti
+  landing_url: https://archive.org/details/istorikofilosof00karegoog
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:54:36+00:00'
+    adapter_version: 1
+    metadata:
+      title: Istoriko-filosofskie i sot︠s︡iologicheskie ėti︠u︡dy
+      authors:
+      - name: N. I. Kareev
+        death_year: 1931
+        wikidata: null
+      language: ru
+      year: 1895
+      translator: null
+      publisher: 'S.-Peterburg : N. Karbasnikov'
+    files:
+    - name: istorikofilosof00karegoog.epub
+      url: https://archive.org/download/istorikofilosof00karegoog/istorikofilosof00karegoog.epub
+    license_hint: NOT_IN_COPYRIGHT
+  override:
+    metadata:
+      title: Историко-философские и социологические этюды
+      authors:
+      - name: Николай Иванович Кареев
+        death_year: 1931
+        wikidata: null
+      year: 1895
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Н. И. Кареев ум. 1931 (Wikidata Q7258532); СПб., Карбасников, 1895; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Google-скан, OCR средний.
+  publish: auto
