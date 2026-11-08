@@ -151,25 +151,44 @@ def close_assistant(page):
 
 # --- T45: размеры в rem без браузера ----------------------------------------------------
 
-# Свойства, которые по 9.7 остаются в px: толщины линий, радиусы, тени, подчёркивания, сдвиги.
+# Свойства, которые по 9.7 остаются в px: толщины линий, радиусы, тени, подчёркивания, сдвиги,
+# штриховка и линии фоном (background-image/-size), размытие подложки.
 PX_ALLOWED = re.compile(
-    r"^\s*(border[\w-]*|outline[\w-]*|[\w-]*radius|box-shadow|text-underline-offset|"
-    r"text-decoration-thickness|transform|clip-path)\s*:"
+    r"^(-webkit-)?(border[\w-]*|outline[\w-]*|[\w-]*radius|box-shadow|text-underline-offset|"
+    r"text-decoration-thickness|transform|clip-path|backdrop-filter|background-image|"
+    r"background-size)$"
 )
+STYLESHEETS = [STYLES, ROOT / "web" / "src" / "styles" / "components.css"]
+
+
+def px_offenders(css: str) -> list[str]:
+    """Объявления с размерами в px больше 1.5px: разбор по блокам и объявлениям ``prop: value``
+    (в одной строке может быть несколько объявлений); условия ``@media`` — вне блоков."""
+    text = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    offenders = []
+    for block in re.findall(r"\{([^{}]*)\}", text):
+        for declaration in block.split(";"):
+            prop, colon, value = declaration.partition(":")
+            if not colon or PX_ALLOWED.match(prop.strip()):
+                continue
+            sizes = re.findall(r"(?<![\w.-])-?(\d+(?:\.\d+)?)px\b", value)
+            if any(float(size) > 1.5 for size in sizes):
+                offenders.append(" ".join(declaration.split()))
+    return offenders
+
+
+def test_px_offenders_parses_declarations():
+    """Разбор по объявлениям: px после разрешённого свойства в той же строке находится."""
+    css = ".a { border: 1px solid; padding: 12px; } @media (min-width: 1921px) { .b { gap: 1px; } }"
+    assert px_offenders(css) == ["padding: 12px"]
 
 
 @req(VD, "Раскладка экрана чтения")
-def test_styles_sizes_in_rem():
-    """T45 (Р9): в styles.css размеры — в rem; px только у линий, радиусов, теней и 1px."""
-    text = re.sub(r"/\*.*?\*/", "", STYLES.read_text(encoding="utf-8"), flags=re.S)
-    offenders = []
-    for number, line in enumerate(text.splitlines(), 1):
-        if line.lstrip().startswith("@media") or PX_ALLOWED.match(line):
-            continue
-        for value in re.findall(r"(?<![\w.-])-?(\d+(?:\.\d+)?)px\b", line):
-            if float(value) > 1.5:
-                offenders.append(f"{number}: {line.strip()}")
-    assert not offenders, "размеры в px вместо rem:\n" + "\n".join(offenders)
+@pytest.mark.parametrize("sheet", STYLESHEETS, ids=lambda p: p.name)
+def test_styles_sizes_in_rem(sheet):
+    """T45 (Р9): размеры — в rem; px только у линий, радиусов, теней и 1px."""
+    offenders = px_offenders(sheet.read_text(encoding="utf-8"))
+    assert not offenders, f"размеры в px вместо rem ({sheet.name}):\n" + "\n".join(offenders)
 
 
 # --- T45: плавный масштаб во всём продукте ---------------------------------------------
@@ -261,6 +280,23 @@ def test_scale_across_product(browser, site, ids, screen):
             if screen == "chapter":
                 measure = chapter_measure(page)
                 assert 62 - 0.5 <= measure <= 68 + 0.5, (width, measure)
+            if screen == "graph":
+                # Рисунок растёт с корневым кеглем (узлы, ручки, подписи), viewBox прежний;
+                # шире холста он не становится (max-width: 100%).
+                ratio, canvas = page.evaluate(
+                    "() => { const s = document.querySelector('svg.graph');"
+                    " const c = document.querySelector('.graph-canvas');"
+                    " return [s.getBoundingClientRect().width / s.viewBox.baseVal.width,"
+                    " c.clientWidth / s.viewBox.baseVal.width]; }"
+                )
+                expected_ratio = min(root / 16, canvas)
+                assert abs(ratio - expected_ratio) <= 0.01, (width, ratio, expected_ratio)
+                if width == 2560:
+                    assert ratio > 1.1, (width, ratio)  # на 2560 граф крупнее, чем на 1920
+                label = page.locator(".graph-label").first.evaluate(
+                    "el => el.getBoundingClientRect().height"
+                )
+                assert label <= 13 * 1.6 * ratio, (width, label)  # кегль не умножен дважды
         finally:
             context.close()
 

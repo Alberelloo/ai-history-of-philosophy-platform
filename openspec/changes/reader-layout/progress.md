@@ -9,13 +9,13 @@
 | 1.1 Изменение OpenSpec | сделано | `openspec validate reader-layout` — valid |
 | 1.2 Документы дизайна | сделано | `docs/design/system/layout.md`, `components/SidePanel.md` |
 | 2.1 Токены и rem | сделано | `web/src/styles/tokens.css`, `tests/web/test_design_system.py` |
-| 2.2 Общие экраны на rem | сделано в `styles.css` | `test_styles_sizes_in_rem`, `test_scale_across_product[library/graph/settings/chapter]` (1280, 1920, 2560) |
+| 2.2 Общие экраны на rem | сделано (`styles.css`, `styles/components.css`, граф) | `test_styles_sizes_in_rem[styles.css/components.css]`, `test_scale_across_product[library/graph/settings/chapter]` (1280, 1920, 2560; у графа — масштаб `svg` от корневого кегля) |
 | 3.1–3.3 Каркас панели | сделано | `web/src/SidePanel.tsx`, `test_panel_strip_on_narrow_screen` |
 | 4.1–4.4 Раскладка K1–K4 | сделано | `web/src/layout.ts`, `test_layout_modes_and_text_measure`; 4.4 — `test_pinned_sidebar_folds_while_panel_open` (T5) |
 | 5.1 Место чтения | сделано в `hooks/useReadingAnchor.ts`, ждёт подключения | `test_reading_place_kept` (T4) |
 | 5.2 Колонки без анимации | сделано | `test_columns_do_not_animate` (T37) |
 | 6.1 Тесты | сделано | T1–T3 `tests/web/test_reader_layout.py`; T4, T5, T32, T37, T45 `tests/e2e/test_reader_layout.py` |
-| 6.2 Снимки S0/S5/полоска | не начато | эталоны пересоздаёт интегратор после слияния (правило 6); 2560 в `visual.WIDTHS` не добавлен — `visual.py` потокам закрыт |
+| 6.2 Снимки S0/S5/полоска | сценарии есть | `tests/e2e/test_reader_snapshots.py` (в `scripts/visual_check.py`); 2560 в `visual.WIDTHS`; эталонов `reader-*` нет — снимки в `tests/e2e/visual/results/`, эталоны и просмотр за интегратором |
 | 6.3 Итоговый прогон | сделано (см. ниже) | |
 
 ## Что сделано потоком C
@@ -60,11 +60,11 @@
 
 Без этих правок в ветке потока падают `test_reading_place_kept` (T4), `test_toc_layer_marks_section`, `test_toc_marks_section_on_scroll` (T32) и 4 теста поля сносок (`reader-notes`).
 
-## Нужно вне файлов потока C (Р9 не закрыт целиком)
+## Р9 закрыт (интеграция, 2026-11-09)
 
-- `web/src/styles/components.css` (общие компоненты `pg-*`: кнопки, поля, переключатели, чипы, статусы, портрет, галерея) — около 130 px-величин шрифтов, высот и отступов. На 2560 эти элементы не растут с корневым кеглем. По 9.7, п. 5 размеры задают `tokens.css` и `components.css`; владельца у файла в разделе 9 сводки нет — нужно решение интегратора (перевод тем же правилом: всё, кроме линий, радиусов и теней, в rem).
-- `web/src/GraphPage.tsx`: размеры узлов графа заданы числами в координатах SVG (`width={36}`, `rx={6}`), а холст — в px контейнера; узлы на 2560 не растут. Решение — масштаб `viewBox` от корневого кегля; файл не потока C.
-- `tests/e2e/visual.py`: ширина 2560 в `WIDTHS` и снимки 2560 по 14.3 — у интегратора.
+- `web/src/styles/components.css`: px → rem во всех объявлениях, кроме линий, радиусов, теней, подчёркиваний, `transform` (кроме сдвига ручки переключателя — он тоже в rem), `clip-path`, штриховки фоном и величин ≤ 1.5px; при 16px значения те же. Проверка `test_styles_sizes_in_rem` разбирает оба файла по объявлениям (раньше — по строкам, и px после разрешённого свойства в той же строке не находился).
+- `web/src/GraphPage.tsx`: размер `<svg>` на экране — `viewBox` × root/16 (`useRootScale`, пересчёт на `resize`), `viewBox` прежний: узлы, ручки и стрелки растут с кеглем. Кегль подписей — атрибут `fontSize` в единицах `viewBox` (13/11), в CSS остались семейство и насыщенность, иначе на 2560 кегль умножился бы дважды. `test_scale_across_product[graph]`: отношение ширины `svg` к `viewBox` = min(root/16, холст/viewBox), на 2560 > 1.1.
+- `scripts/visual_check.py --no-build` до и после правки: эталоны 1024–1920 совпадают, кроме `assistant-light-1280`, `assistant-dark-1280`, `assistant-dark-1024` — они разошлись (0,59–0,74%) из-за новой маски итога ответа (`.assistant__summary`) в `visual.snap`, а не из-за rem. Новые снимки без эталонов: `chapter-light-2560` и все `reader-*`.
 
 ## Известные проблемы
 

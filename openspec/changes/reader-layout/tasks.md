@@ -10,7 +10,7 @@
 ## 2. Токены и масштаб
 
 - [x] 2.1 Токены `measure-min`, `panel-strip`; размеры в `rem`; корневой кегль `clamp(100%, 53.1% + 0.39vw, 116%)`; `tokens.css` перегенерирован из `tokens.json` (`tests/web/test_design_system.py`)
-- [x] 2.2 Общие экраны (библиотека, граф, настройки, навигация, экран чтения) в `styles.css` — размеры в `rem` (74 строки px → rem, значения до 1920 те же); px только у линий, радиусов, теней и 1px (`test_styles_sizes_in_rem`, `test_scale_across_product` на 1280/1920/2560). Остаток вне файлов потока C — `styles/components.css` и узлы графа в `GraphPage.tsx` (см. `progress.md`)
+- [x] 2.2 Общие экраны (библиотека, граф, настройки, навигация, экран чтения) в `styles.css` — размеры в `rem` (74 строки px → rem, значения до 1920 те же); px только у линий, радиусов, теней и 1px (`test_styles_sizes_in_rem`, `test_scale_across_product` на 1280/1920/2560). Остаток закрыт: `styles/components.css` в `rem` тем же правилом (`test_styles_sizes_in_rem[components.css]`, разбор по объявлениям), граф на 2560 растёт с корневым кеглем — размер `<svg>` × root/16 при прежнем `viewBox`, кегль подписей в единицах `viewBox` (`test_scale_across_product[graph]`); эталоны 1024–1920 не сдвинулись (`scripts/visual_check.py --no-build`)
 
 ## 3. Каркас панели
 
@@ -33,5 +33,5 @@
 ## 6. Тесты и проверка
 
 - [x] 6.1 Тесты по требованиям дельт. T1, T2, T3 — `tests/web/test_reader_layout.py`; T4, T5, T32, T37, T45 — `tests/e2e/test_reader_layout.py` (поток C). T4 и T32 проходят только после подключения `useReadingAnchor`, `useTocLocation` и `Toc` из `ReaderToc.tsx` в `ReaderPage.tsx` (проверено локально с подключением: все зелёные). `check_traceability.py` — 322 из 322
-- [ ] 6.2 Снимки по 14.3 (S0, S5, полоска; имена `reader-<состояние>-<тема>-<язык>-<ширина>.png`): в `tests/e2e/visual/baselines/` лежат только старые эталоны (`chapter-*`, `card-*`, `assistant-*`); ширины 2560 в проверках нет; просмотр человеком не проведён
+- [ ] 6.2 Снимки по 14.3 (S0, S5, полоска; имена `reader-<состояние>-<тема>-<язык>-<ширина>.png`): сценарии есть в `tests/e2e/test_reader_snapshots.py` (S0/S5 на 1024–2560 в обеих темах и языках, закреплённая навигация, полоска), 2560 добавлена в `visual.WIDTHS`; эталоны и просмотр — за интегратором
 - [x] 6.3 Прогон при актуализации: `tsc --noEmit` без ошибок, `ruff check src tests scripts` и `ruff format --check` чистые, прослеживаемость 322/322; полный pytest и `vite build` в этой актуализации не запускались

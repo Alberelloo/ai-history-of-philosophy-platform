@@ -1473,15 +1473,19 @@ blockquote.block {
   stroke-width: 3;
 }
 
+/* Кегль подписей графа — атрибут fontSize в единицах viewBox (GraphPage.tsx): рисунок
+   масштабируется целиком от корневого кегля. */
 .graph-label {
   fill: var(--ink);
-  font: 500 0.8125rem var(--font-read);
+  font-family: var(--font-read);
+  font-weight: 500;
 }
 
 .graph-dates,
 .graph-legend {
   fill: var(--ink-3);
-  font: 500 0.6875rem var(--font-ui);
+  font-family: var(--font-ui);
+  font-weight: 500;
 }
 
 .graph-line.graph-stroke-verified {
