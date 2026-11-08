@@ -1781,18 +1781,307 @@ entries:
     license_hint: null
   override:
     metadata: {}
+    files:
+    - name: Физика (Аристотель; Карпов)
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 1/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_1%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 2/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_2%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 3/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_3%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 11
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_11
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 12
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_12
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 13
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_13
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 4/Глава 14
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_4%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_14
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 5/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_5%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 6/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_6%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 7/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_7%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 1
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_1
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 2
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_2
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 3
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_3
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 4
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_4
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 5
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_5
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 6
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_6
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 7
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_7
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 8
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_8
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 9
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_9
+      clean: wikisource
+      api: true
+    - name: Физика (Аристотель; Карпов)/Книга 8/Глава 10
+      url: https://ru.wikisource.org/api/rest_v1/page/html/%D0%A4%D0%B8%D0%B7%D0%B8%D0%BA%D0%B0_%28%D0%90%D1%80%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB%D1%8C%3B_%D0%9A%D0%B0%D1%80%D0%BF%D0%BE%D0%B2%29%2F%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0_8%2F%D0%93%D0%BB%D0%B0%D0%B2%D0%B0_10
+      clean: wikisource
+      api: true
   license:
     kind: public-domain
     basis: public_domain
     evidence: ru.wikisource (Физика, пер. В. П. Карпова, 1936); Аристотель ум. 322 до н. э.; переводчик
-      Владимир Порфирьевич Карпов ум. 1943 (Wikidata Q15720298), срок 70 лет истёк (2013)
+      Владимир Порфирьевич Карпов ум. 1943 (Wikidata Q15720298), срок 70 лет истёк (2013); издание 1936
+      г. (после 1930) — вид public-domain-ru
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: в оглавлении есть страница «Комментарии»; чьи они (переводчика В. П. Карпова
-      или советских редакторов 1936 г.) не установлено. Не одобрять, пока авторство комментариев не выяснено;
-      без неё текст можно оставить, если страницу «Комментарии» убрать из files.'
+    status: approved
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-08'
+    note: Комментарии (В. В. Шкода, 1999) исключены из files; перевод Карпова ум. 1943, изд. 1936; по
+      API ru.wikisource
   publish: auto
 - id: protagor-platon-karpov-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Протагор_(Платон;_Карпов)
@@ -3050,12 +3339,15 @@ entries:
     evidence: ru.wikisource (Апология Сократа, пер. М. С. Соловьёва, изд. 1903); Платон ум. 348 до н.
       э.; М. С. Соловьёв ум. 1903; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: на странице есть раздел «Примечания», набор указан по изданию «Мысль»,
-      1990 (Собр. соч. в 4 т.). Примечания и возможная правка текста могут принадлежать редакторам издания.
-      Есть перевод Карпова (дубль). Не одобрять без проверки.'
+    status: rejected
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Отклонено 2026-11-09: страница набрана по изданию «Мысль», 1990 (Собр. соч. в 4 т.); в тексте
+      издательские подзаголовки и подробные примечания (на основе примечаний А. А. Тахо-Годи к изданию
+      1968 г. — защищённая редакторская часть; в вики-тексте не менее 36 сносок <ref>), адаптер сноски
+      не вырезает. Перевод М. С. Соловьёва (ум. 1903) в каталоге уже есть в другом наборе — apologiya-sokrata-platon-karpov-ru-wikisource
+      (пер. Карпова, одобрена); потерь для библиотеки нет. Если понадобится перевод Соловьёва, брать чистый
+      текст изд. 1903 г. (Творения Платона) отдельной записью.'
   publish: auto
 - id: platon-kriton-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Критон_(Платон;_Соловьёв)
@@ -3092,11 +3384,15 @@ entries:
     evidence: ru.wikisource (Критон, пер. М. С. Соловьёва, изд. 1903); Платон ум. 348 до н. э.; М. С.
       Соловьёв ум. 1903; срок 70 лет истёк у обоих (по Wikidata)
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: страница ссылается на издание 1965 г. как источник набора, внизу сноски.
-      Возможна редакторская правка текста. Есть перевод Карпова (дубль). Не одобрять без проверки.'
+    status: rejected
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-09'
+    note: 'Отклонено 2026-11-09: набор по изданию «Избранные диалоги», М., 1965 (источник на странице);
+      в тексте сноски издателей (<ref>: «См.: Апология Сократа», примечание о корибантах и др.) — редакторские
+      примечания советского издания, защищённая часть; адаптер сноски не вырезает. Дубль: перевод Карпова
+      kriton-platon-karpov-ru-wikisource уже одобрен. Побитовое сравнение с изд. 1903 г. не проводилось
+      (достаточно наличия примечаний и дубля). Чистый текст Соловьёва 1903 г. можно добавить отдельной
+      записью.'
   publish: auto
 - id: platon-platonovy-razgovory-zakonakh-ru-wikisource
   landing_url: https://ru.wikisource.org/wiki/Платоновы_разговоры_о_законах_(Платон;_Оболенский)
@@ -8444,9 +8740,7 @@ entries:
     status: draft
     by: null
     at: null
-    note: 'Проверка 2026-11-09: страница — не издание 1931 г., а текст изд. ГИХЛ 1960 г.: «Редакция перевода
-      С. П. Маркиша», «Статья и комментарии Л. Е. Пинского». Редакция и комментарии 1960 г. защищены,
-      перевод П. К. Губера сам свободен. Не одобрять; искать издание 1931 г. (Academia) без комментариев.'
+    note: 'Проверка 2026-11-09: страница ru.wikisource — не издание 1931 г., а текст изд. ГИХЛ 1960 г. (источник набора az.lib.ru): «Редакция перевода С. П. Маркиша», «Статья и комментарии Л. Е. Пинского». Редакция и комментарии 1960 г. защищены, перевод П. К. Губера (ум. 1941) сам свободен. Поиск издания 1931 г. (Academia) без комментариев: на ru.wikisource другой страницы перевода Губера нет (поиск по названию, страница автора Губера); на archive.org (поиск по названию, автору, Губер, Academia 1931) найдены только другие переводы (Юрьев 1903, id erazmrotterdamskijpohvalaglupostijur89; П. Н. Ардашев 1910, id pohvalagluposti35; БВЛ т. 33, 1971 — защищено), издания 1931 г. нет; НЭБ/РГБ закрыты для программ. Не одобрять; оставить draft до появления чистого издания 1931 г. (можно рассмотреть перевод Ардашева 1910 отдельной записью после проверки его годов жизни).'
   publish: auto
 - id: lessing-laokoon-ili-granitsakh-zhivopisi-poezii
   landing_url: https://ru.wikisource.org/wiki/%D0%9B%D0%B0%D0%BE%D0%BA%D0%BE%D0%BE%D0%BD,_%D0%B8%D0%BB%D0%B8_%D0%9E_%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0%D1%85_%D0%B6%D0%B8%D0%B2%D0%BE%D0%BF%D0%B8%D1%81%D0%B8_%D0%B8_%D0%BF%D0%BE%D1%8D%D0%B7%D0%B8%D0%B8_(%D0%9B%D0%B5%D1%81%D1%81%D0%B8%D0%BD%D0%B3;_%D0%AD%D0%B4%D0%B5%D0%BB%D1%8C%D1%81%D0%BE%D0%BD)
@@ -13951,8 +14245,8 @@ entries:
       year: 1827
       language: ru
       translator:
-        name: В. Оболенский
-        death_year: null
+        name: Василий Иванович Оболенский
+        death_year: 1847
         wikidata: null
     files:
     - name: Платон. О законах_djvu.txt
@@ -13960,15 +14254,16 @@ entries:
   license:
     kind: public-domain
     basis: public_domain
-    evidence: 'Платон ум. 347 до н. э.; перевод В. Оболенского (М., Типография С. Селивановского, 1827),
-      годы жизни переводчика не найдены: издание вышло в 1827, поэтому он не мог умереть позже ~1930 (вывод
-      по возрасту, не по источнику); срок 70 лет истёк. Отметка Public Domain Mark не считается доказательством.'
+    evidence: 'Платон ум. 347 до н. э.; перевод «В. Оболенскаго» (М., Типография С. Селивановского, 1827)
+      — Василий Иванович Оболенский (1790–1847), адъюнкт Московского университета; тождество и годы жизни:
+      РБС (ru.wikisource, РБС/ВТ/Оболенский, Василий Иванович (филолог)) — «Платоновы разговоры о законах»,
+      М. 1827; страница издания на ru.wikisource (переводчик В. И. Оболенский); срок 70 лет истёк (1847
+      + 70). Отметка Public Domain Mark не считается доказательством.'
   review:
-    status: draft
-    by: null
-    at: null
-    note: 'Проверка 2026-11-09: «В. Оболенский» вероятно В. И. Оболенский (1790–1847, филолог МГУ), но
-      титул djvu не читается, годы жизни только из ru.wikipedia. Нужна проверка по ЭСБЕ/РБС или титулу.'
+    status: approved
+    by: проверено по поручению владельца, 2026-11-09
+    at: '2026-11-08'
+    note: Переводчик Василий Иванович Оболенский (1790-1847) по РБС и ru.wikisource; срок 70 лет истёк
   publish: auto
 - id: zakony-myshleniya-formy-poznaniya-archive
   landing_url: https://archive.org/details/lapshin_thinking
