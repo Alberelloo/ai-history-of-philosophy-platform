@@ -303,3 +303,40 @@ def test_answers_without_ontology_when_knowledge_down(ob, events):
     assert items[-1]["type"] == "done"
     assert events.one("assistant.ontology.skipped")["reason"] == "knowledge_unavailable"
     assert not events.of("assistant.ontology.used")
+
+
+def _kant_statement_answer(ob):
+    answer_with(
+        ob, lambda prompt: f"Кант испытал влияние Юма [{ob.number('Кант — испытал влияние — Юм')}]. "
+    )
+    items = ob.bot.ask(question="как Кант связан с Юмом и Аристотелем?")
+    return next(c for f in fragments(items) for c in f["citations"] if c["kind"] == "statement")
+
+
+@req("answer-grounding", "Ссылки на абзацы")
+def test_statement_citation_carries_entity_id(ob):
+    """N5: entity_id утверждения доходит до ссылки — по нему клиент откроет карточку (5.4)."""
+    knowledge = ob.bot.assistant.ontology.knowledge
+    original = knowledge.context
+
+    def with_subject(**body):
+        data = original(**body)
+        for s in data["statements"]:
+            s.setdefault("entity_id", ob.ids["kant"])
+        return data
+
+    knowledge.context = with_subject
+    citation = _kant_statement_answer(ob)
+    assert citation["statement_id"] == ob.ids["kant_hume"]
+    assert citation["entity_id"] == ob.ids["kant"]
+
+
+@pytest.mark.xfail(
+    reason="N5: сервис знаний (knowledge/assist.py, describe) не отдаёт entity_id утверждения; "
+    "правка у потока B",
+    strict=False,
+)
+@req("answer-grounding", "Ссылки на абзацы")
+def test_knowledge_service_sends_statement_entity_id(ob):
+    """N5 по настоящему сервису знаний: у ссылки на утверждение — сущность-подлежащее."""
+    assert _kant_statement_answer(ob)["entity_id"] == ob.ids["kant"]

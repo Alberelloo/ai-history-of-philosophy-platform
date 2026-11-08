@@ -6,7 +6,7 @@ import os
 
 from philograph import __version__
 from philograph.assistant.app import build_app
-from philograph.assistant.clients import LlmHttp, SearchHttp
+from philograph.assistant.clients import LibraryHttp, LlmHttp, SearchHttp
 from philograph.assistant.ontology import KnowledgeHttp, Ontology, OntologySteps
 from philograph.assistant.service import Assistant
 from philograph.platform import events
@@ -30,5 +30,11 @@ if os.environ.get("PHILOGRAPH_SEARCH_URL"):
         SearchHttp(ServiceClient("search", os.environ["PHILOGRAPH_SEARCH_URL"], timeout=10)),
         LlmHttp(ServiceClient("llm", os.environ["PHILOGRAPH_LLM_URL"], timeout=60)),
         ontology=_ontology,
+        # Названия глав в ссылках (N4) — если задан адрес библиотеки.
+        library=LibraryHttp(
+            ServiceClient("library", os.environ["PHILOGRAPH_LIBRARY_URL"] + "/api", timeout=3)
+        )
+        if os.environ.get("PHILOGRAPH_LIBRARY_URL")
+        else None,
     )
     app = build_app(_assistant, Health("assistant", __version__))
