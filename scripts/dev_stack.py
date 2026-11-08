@@ -4,6 +4,11 @@
 исполнитель очереди и шлюз, который отдаёт клиент. База — файловая SQLite, Qdrant — внутри
 процесса поиска, модели — демо (``config/llm.demo.yaml``). Журналы сервисов — строки JSON в
 ``<каталог>/logs/<сервис>.log``. Перед запуском соберите клиент: ``cd web && npm run build``.
+
+Демо-источники (``demo/``) по умолчанию не загружаются: библиотека пустая, настоящие источники
+добавляются из каталога (``python -m philograph.library.catalog sync``). Ключ ``--demo`` включает
+демо-учебник и демо-первоисточник для ручной проверки; сквозные тесты зовут ``start`` с
+``demo=True``.
 """
 
 from __future__ import annotations
@@ -72,7 +77,8 @@ def _wait(url: str, seconds: float = 60) -> None:
     raise RuntimeError(f"не поднялся: {url}")
 
 
-def start(data: Path, port: int | None = None) -> Stack:
+def start(data: Path, port: int | None = None, *, demo: bool = True) -> Stack:
+    """``demo=True`` загружает демо-источники из ``demo/`` (для тестов), иначе библиотека пуста."""
     data.mkdir(parents=True, exist_ok=True)
     (data / "logs").mkdir(exist_ok=True)
     ports = {name: free_port() for name in ("llm", "library", "search", "assistant", "knowledge")}
@@ -131,15 +137,16 @@ def start(data: Path, port: int | None = None) -> Stack:
         )
     for name in ("llm", "library"):
         _wait(f"http://127.0.0.1:{ports[name]}/health/ready")
-    with open(data / "logs" / "seed.log", "w", encoding="utf-8") as seed_log:
-        subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / "seed_demo.py")],
-            cwd=ROOT,
-            env=env,
-            check=True,
-            stdout=seed_log,
-            stderr=subprocess.STDOUT,
-        )
+    if demo:
+        with open(data / "logs" / "seed.log", "w", encoding="utf-8") as seed_log:
+            subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "seed_demo.py")],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                stdout=seed_log,
+                stderr=subprocess.STDOUT,
+            )
     for name in ("search", "assistant", "gateway", "knowledge"):
         run(
             name,
@@ -157,6 +164,8 @@ def start(data: Path, port: int | None = None) -> Stack:
     run("worker", [sys.executable, "-m", "philograph.worker"])
     for name in ("search", "assistant", "gateway", "knowledge"):
         _wait(f"http://127.0.0.1:{ports[name]}/health/ready")
+    if not demo:
+        return stack  # индексировать нечего: библиотека пустая
     # Индексацию делает сервис поиска из очереди: ждём, пока поиск начнёт находить.
     deadline = time.time() + 60
     while time.time() < deadline:
@@ -170,12 +179,21 @@ def start(data: Path, port: int | None = None) -> Stack:
     raise RuntimeError("индексация не завершилась")
 
 
-def main() -> None:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, default=ROOT / ".stack")
     parser.add_argument("--port", type=int, default=8080)
-    args = parser.parse_args()
-    stack = start(args.data, args.port)
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="загрузить демо-учебник и демо-первоисточник (по умолчанию библиотека пустая)",
+    )
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    stack = start(args.data, args.port, demo=args.demo)
     print(f"PhiloGraph: {stack.url}  (журналы: {args.data / 'logs'}; остановка — Ctrl+C)")
     try:
         while all(p.poll() is None for p in stack.processes.values()):
