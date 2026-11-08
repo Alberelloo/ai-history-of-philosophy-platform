@@ -11702,3 +11702,633 @@ entries:
     at: null
     note: null
   publish: auto
+- id: kritika-chistago-razuma-archive
+  landing_url: https://archive.org/details/20200404_20200404_1407
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:39:36+00:00'
+    adapter_version: 1
+    metadata:
+      title: Критика чистаго разума
+      authors:
+      - name: Кант И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1867
+      translator: null
+      publisher: null
+    files:
+    - name: Кант. Критика чистого разума.epub
+      url: https://archive.org/download/20200404_20200404_1407/%D0%9A%D0%B0%D0%BD%D1%82.%20%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0%20%D1%87%D0%B8%D1%81%D1%82%D0%BE%D0%B3%D0%BE%20%D1%80%D0%B0%D0%B7%D1%83%D0%BC%D0%B0.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Критика чистого разума
+      authors:
+      - name: Иммануил Кант
+        death_year: 1804
+        wikidata: null
+      year: 1867
+      language: ru
+      translator:
+        name: Михаил Иванович Владиславлев
+        death_year: 1890
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      И. Кант ум. 1804; перевод М. И. Владиславлева (СПб., Тиблен, 1867), Владиславлев ум. 1890 (Wikidata
+      Q4113335); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Первый русский перевод КЧР. Размер EPUB/PDF большой (PDF 130 МБ, EPUB 43 МБ). OCR дореформенной
+      орфографии (ѣ, і), удовлетворительный.
+  publish: auto
+- id: kritika-sposobnosti-suzhdeniya-archive
+  landing_url: https://archive.org/details/20200404_20200404_1235
+  adapter: archive_org
+  kind: primary
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:39:44+00:00'
+    adapter_version: 1
+    metadata:
+      title: Критика способности сужденiя
+      authors:
+      - name: Кант И.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1898
+      translator: null
+      publisher: null
+    files:
+    - name: Кант. Критика способности суждения.epub
+      url: https://archive.org/download/20200404_20200404_1235/%D0%9A%D0%B0%D0%BD%D1%82.%20%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D0%BA%D0%B0%20%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20%D1%81%D1%83%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Критика способности суждения
+      authors:
+      - name: Иммануил Кант
+        death_year: 1804
+        wikidata: null
+      year: 1898
+      language: ru
+      translator:
+        name: Николай Матвеевич Соколов
+        death_year: 1908
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      И. Кант ум. 1804; перевод Н. М. Соколова (СПб., М. В. Попов, 1898), ум. 1908 (Wikidata Q4427221,
+      тождество с переводчиком Канта по имени); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Проверить тождество переводчика Н. М. Соколова (1860-1908) с поэтом-публицистом из Wikidata.
+  publish: auto
+- id: k-istoriya-novoy-filosofii-t-1
+  landing_url: https://archive.org/details/1_20200408_202004
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:39:53+00:00'
+    adapter_version: 1
+    metadata:
+      title: Исторiя новой философiи. Т.1
+      authors:
+      - name: Фишер К.
+        death_year: 1907
+        wikidata: Q61255
+      language: ru
+      year: 1862
+      translator: null
+      publisher: null
+    files:
+    - name: Фишер К. История новой философии. Т.1.epub
+      url: https://archive.org/download/1_20200408_202004/%D0%A4%D0%B8%D1%88%D0%B5%D1%80%20%D0%9A.%20%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8.%20%D0%A2.1.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: История новой философии. Т. 1. Классический век догматической философии
+      authors:
+      - name: Куно Фишер
+        death_year: 1907
+        wikidata: null
+      year: 1862
+      language: ru
+      translator:
+        name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1862), Страхов ум. 1896 (Wikidata Q2636293);
+      срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том 1 из 4; тома 2-4 отдельными записями.
+  publish: auto
+- id: k-istoriya-novoy-filosofii-t-2
+  landing_url: https://archive.org/details/2_20200408_20200408
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:01+00:00'
+    adapter_version: 1
+    metadata:
+      title: Исторiя новой философiи. Т.2
+      authors:
+      - name: Фишер К.
+        death_year: 1907
+        wikidata: Q61255
+      language: ru
+      year: 1863
+      translator: null
+      publisher: null
+    files:
+    - name: Фишер К. История новой философии. Т.2.pdf
+      url: https://archive.org/download/2_20200408_20200408/%D0%A4%D0%B8%D1%88%D0%B5%D1%80%20%D0%9A.%20%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8.%20%D0%A2.2.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: 'История новой философии. Т. 2. Век немецкого просвещения: переход от догматической философии
+        к критической'
+      authors:
+      - name: Куно Фишер
+        death_year: 1907
+        wikidata: null
+      year: 1863
+      language: ru
+      translator:
+        name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1863), Страхов ум. 1896; срок 70 лет
+      истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том 2 из 4.
+  publish: auto
+- id: k-istoriya-novoy-filosofii-t-3
+  landing_url: https://archive.org/details/3_20200408_20200408
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:09+00:00'
+    adapter_version: 1
+    metadata:
+      title: Исторiя новой философiи. Т.3
+      authors:
+      - name: Фишер К.
+        death_year: 1907
+        wikidata: Q61255
+      language: ru
+      year: 1864
+      translator: null
+      publisher: null
+    files:
+    - name: Фишер К. История новой философии. Т.3.pdf
+      url: https://archive.org/download/3_20200408_20200408/%D0%A4%D0%B8%D1%88%D0%B5%D1%80%20%D0%9A.%20%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8.%20%D0%A2.3.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: История новой философии. Т. 3. Происхождение и обоснование критической философии. Критика
+        чистого разума
+      authors:
+      - name: Куно Фишер
+        death_year: 1907
+        wikidata: null
+      year: 1864
+      language: ru
+      translator:
+        name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1864), Страхов ум. 1896; срок 70 лет
+      истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том 3 из 4.
+  publish: auto
+- id: k-istoriya-novoy-filosofii-t-4
+  landing_url: https://archive.org/details/4_20200408
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:17+00:00'
+    adapter_version: 1
+    metadata:
+      title: Исторiя новой философiи. Т.4
+      authors:
+      - name: Фишер К.
+        death_year: 1907
+        wikidata: Q61255
+      language: ru
+      year: 1865
+      translator: null
+      publisher: null
+    files:
+    - name: Фишер К. История новой философии. Т.4.pdf
+      url: https://archive.org/download/4_20200408/%D0%A4%D0%B8%D1%88%D0%B5%D1%80%20%D0%9A.%20%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8.%20%D0%A2.4.pdf
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: История новой философии. Т. 4. Учение критической философии. Система чистого разума
+      authors:
+      - name: Куно Фишер
+        death_year: 1907
+        wikidata: null
+      year: 1865
+      language: ru
+      translator:
+        name: Николай Николаевич Страхов
+        death_year: 1896
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      Куно Фишер ум. 1907; перевод Н. Н. Страхова (СПб., Тиблен, 1865), Страхов ум. 1896; срок 70 лет
+      истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Том 4 из 4.
+  publish: auto
+- id: deduktivnaya-induktivnaya-logika-archive
+  landing_url: https://archive.org/details/20200203_20200203_1026
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:40:24+00:00'
+    adapter_version: 1
+    metadata:
+      title: Дедуктивная и индуктивная логика
+      authors:
+      - name: Минто В.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1896
+      translator: null
+      publisher: null
+    files:
+    - name: Минто. Дедуктивная и индуктивная логика.epub
+      url: https://archive.org/download/20200203_20200203_1026/%D0%9C%D0%B8%D0%BD%D1%82%D0%BE.%20%D0%94%D0%B5%D0%B4%D1%83%D0%BA%D1%82%D0%B8%D0%B2%D0%BD%D0%B0%D1%8F%20%D0%B8%20%D0%B8%D0%BD%D0%B4%D1%83%D0%BA%D1%82%D0%B8%D0%B2%D0%BD%D0%B0%D1%8F%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0.epub
+    license_hint: http://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Дедуктивная и индуктивная логика
+      authors:
+      - name: Уильям Минто
+        death_year: 1893
+        wikidata: null
+      year: 1896
+      language: ru
+      translator:
+        name: Сергей Андреевич Котляревский
+        death_year: 1939
+        wikidata: null
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      У. Минто (William Minto) ум. 1893; перевод С. А. Котляревского под ред. Л. Н. Ивановского (М., Сытин,
+      1896, 2-е изд.), Котляревский ум. 1939 (Wikidata Q4236122, тождество по имени); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Тот же текст — второй экземпляр b_minto_induction (не добавлялся). Проверить тождество переводчика.
+  publish: auto
+- id: berdyaev-n-filosofiya-svobody-1911-archive
+  landing_url: https://archive.org/details/1911-2523026-0120
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:32+00:00'
+    adapter_version: 1
+    metadata:
+      title: Бердяев Н. Философия свободы (1911)
+      authors: []
+      language: ru
+      year: 1911
+      translator: null
+      publisher: null
+    files:
+    - name: Бердяев Н. Философия свободы (1911).pdf
+      url: https://archive.org/download/1911-2523026-0120/%D0%91%D0%B5%D1%80%D0%B4%D1%8F%D0%B5%D0%B2%20%D0%9D.%20%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%20%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D1%8B%20%281911%29.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Философия свободы
+      authors:
+      - name: Николай Александрович Бердяев
+        death_year: 1948
+        wikidata: null
+      year: 1911
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Н. А. Бердяев ум. 1948; изд. М., 1911; срок
+      70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Ранее падение адаптера (нет лицензии в метаданных) — исправлено. Метаданные archive.org без
+      автора и издателя.
+  publish: auto
+- id: trubetskoy-e-filosofiya-nitsshe-kriticheskiy-ocherk
+  landing_url: https://archive.org/details/1904-523478-20260120
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:38+00:00'
+    adapter_version: 1
+    metadata:
+      title: Трубецкой Е. Философия Ницше. Критический очерк (1904)
+      authors: []
+      language: ru
+      year: 1904
+      translator: null
+      publisher: null
+    files:
+    - name: Трубецкой Е. Философия Ницше. Критический очерк (1904)_text.pdf
+      url: https://archive.org/download/1904-523478-20260120/%D0%A2%D1%80%D1%83%D0%B1%D0%B5%D1%86%D0%BA%D0%BE%D0%B9%20%D0%95.%20%D0%A4%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D1%8F%20%D0%9D%D0%B8%D1%86%D1%88%D0%B5.%20%D0%9A%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D0%BE%D1%87%D0%B5%D1%80%D0%BA%20%281904%29_text.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Философия Ницше. Критический очерк
+      authors:
+      - name: Евгений Николаевич Трубецкой
+        death_year: 1920
+        wikidata: null
+      year: 1904
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; Е. Н. Трубецкой ум. 1920 (по памяти, Wikidata
+      по имени не найден — сверить); изд. М., 1904; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Год смерти автора указан по памяти — сверить с Wikidata/ru.wikipedia.
+  publish: auto
+- id: aleksandrovich-religioznyy-smysl-filosofii-tri-rechi
+  landing_url: https://archive.org/details/1914-1923-1924
+  adapter: archive_org
+  kind: primary
+  section: null
+  harvested:
+    at: '2026-11-08T14:40:46+00:00'
+    adapter_version: 1
+    metadata:
+      title: 'Религиозный смысл философии: Три речи. 1914-1923 (1924)'
+      authors:
+      - name: Ильин Иван Александрович
+        death_year: null
+        wikidata: null
+      - name: 'Издатель: Ymca-Press'
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1924
+      translator: null
+      publisher: null
+    files:
+    - name: Ильин И.А. - Религиозный смысл философии Три речи. 1914-1923 ,  1924.pdf
+      url: https://archive.org/download/1914-1923-1924/%D0%98%D0%BB%D1%8C%D0%B8%D0%BD%20%D0%98.%D0%90.%20-%20%D0%A0%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D0%BE%D0%B7%D0%BD%D1%8B%D0%B9%20%D1%81%D0%BC%D1%8B%D1%81%D0%BB%20%D1%84%D0%B8%D0%BB%D0%BE%D1%81%D0%BE%D1%84%D0%B8%D0%B8%20%D0%A2%D1%80%D0%B8%20%D1%80%D0%B5%D1%87%D0%B8.%201914-1923%20%2C%20%201924.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: 'Религиозный смысл философии: три речи (1914-1923)'
+      authors:
+      - name: Иван Александрович Ильин
+        death_year: 1954
+        wikidata: null
+      year: 1924
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; И. А. Ильин ум. 21.12.1954 (Wikidata Q1282198);
+      срок 70 лет по ст. 1281 ГК РФ истёк 31.12.2024; изд. Париж, YMCA-Press'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: 'Граничный случай: автор умер в 1954, срок истёк только в 2025. Нужна ручная проверка. Ранее
+      падение адаптера — исправлено.'
+  publish: auto
+- id: m-elementy-logiki-archive
+  landing_url: https://archive.org/details/troitskij_logic
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:40:57+00:00'
+    adapter_version: 1
+    metadata:
+      title: Элементы логики
+      authors:
+      - name: Троицкий М.
+        death_year: null
+        wikidata: null
+      language: ru
+      year: 1887
+      translator: null
+      publisher: null
+    files:
+    - name: Троицкий. Элементы логики.epub
+      url: https://archive.org/download/troitskij_logic/%D0%A2%D1%80%D0%BE%D0%B8%D1%86%D0%BA%D0%B8%D0%B9.%20%D0%AD%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D1%8B%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D0%B8.epub
+    license_hint: https://creativecommons.org/publicdomain/mark/1.0/
+  override:
+    metadata:
+      title: Элементы логики
+      authors:
+      - name: Матвей Михайлович Троицкий
+        death_year: 1899
+        wikidata: null
+      year: 1887
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: загрузчик отметил Public Domain Mark 1.0 (отметка загрузчика, не доказательство);
+      М. М. Троицкий ум. 1899 (Wikidata Q4463478); изд. М., 1887; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Проверить тождество автора «М. Троицкий» с М. М. Троицким (1835-1899); EPUB 252 КБ, OCR дореформенный,
+      с ошибками.
+  publish: auto
+- id: ivanovich-lektsii-po-istorii-novoy-filosofii
+  landing_url: https://archive.org/details/lektsiipoistoriinovojfilosofiich2fil12
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:41:09+00:00'
+    adapter_version: 1
+    metadata:
+      title: Лекции по истории новой философии,. Ч. 2. Философия Канта
+      authors:
+      - name: Введенский Александр Иванович
+        death_year: 1941
+        wikidata: Q1935543
+      language: en
+      year: 1896
+      translator: null
+      publisher: null
+    files:
+    - name: lektsiipoistoriinovojfilosofiich2fil12.pdf
+      url: https://archive.org/download/lektsiipoistoriinovojfilosofiich2fil12/lektsiipoistoriinovojfilosofiich2fil12.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Лекции по истории новой философии. Ч. 2. Философия Канта
+      authors:
+      - name: Александр Иванович Введенский
+        death_year: 1925
+        wikidata: null
+      year: 1896
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; А. И. Введенский ум. 1925 (Wikidata Q732458);
+      СПб., 1896 (лекции на Высших женских курсах); срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Литографированное издание лекций; в ПБ.
+  publish: auto
+- id: markovich-rukovodstvo-k-logike-sostavlennoe-ordinarnym
+  landing_url: https://archive.org/details/rukovodstvoklogikesostavlennoeordinarny92
+  adapter: archive_org
+  kind: textbook
+  section: epistemology
+  harvested:
+    at: '2026-11-08T14:41:18+00:00'
+    adapter_version: 1
+    metadata:
+      title: Руководство к логике, составленное ординарным проф. Универ. св. Владимира Орестом Новицким
+      authors:
+      - name: Новицкий Орест Маркович
+        death_year: null
+        wikidata: null
+      - name: Фишер Фрид.
+        death_year: null
+        wikidata: null
+      language: en
+      year: 1841
+      translator: null
+      publisher: null
+    files:
+    - name: rukovodstvoklogikesostavlennoeordinarny92.pdf
+      url: https://archive.org/download/rukovodstvoklogikesostavlennoeordinarny92/rukovodstvoklogikesostavlennoeordinarny92.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: Руководство к логике
+      authors:
+      - name: Орест Маркович Новицкий
+        death_year: 1884
+        wikidata: null
+      year: 1841
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; О. М. Новицкий ум. 1884 (Wikidata Q16681249);
+      Киев, 1841; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Скан Google/ПБ, OCR с ошибками (ѣ→ф).
+  publish: auto
+- id: gavriil-voskresenskiy-n-istoriya-filosofii-ch
+  landing_url: https://archive.org/details/gavriilvoskresenskijvnistorijafilos49
+  adapter: archive_org
+  kind: textbook
+  section: null
+  harvested:
+    at: '2026-11-08T14:41:29+00:00'
+    adapter_version: 1
+    metadata:
+      title: Гавриил (Воскресенский В. Н.). История философии. Ч. 4-6. - Казань, 1839.
+      authors:
+      - name: Гавриил
+        death_year: 1868
+        wikidata: null
+      language: en
+      year: 1839
+      translator: null
+      publisher: null
+    files:
+    - name: gavriilvoskresenskijvnistorijafilos49.pdf
+      url: https://archive.org/download/gavriilvoskresenskijvnistorijafilos49/gavriilvoskresenskijvnistorijafilos49.pdf
+    license_hint: null
+  override:
+    metadata:
+      title: История философии. Ч. 4-6
+      authors:
+      - name: Гавриил (Василий Николаевич Воскресенский)
+        death_year: 1868
+        wikidata: null
+      year: 1839
+      language: ru
+  license:
+    kind: public-domain
+    basis: public_domain
+    evidence: 'archive.org: лицензия в метаданных не указана; архим. Гавриил (Воскресенский) ум. 1868;
+      Казань, 1839-1840; срок 70 лет истёк'
+  review:
+    status: draft
+    by: null
+    at: null
+    note: Ч. 4-6 из 6; ч. 1-3 не проверялись. Автор — духовное лицо, но труд — университетский учебник
+      истории философии. OCR средний.
+  publish: auto
