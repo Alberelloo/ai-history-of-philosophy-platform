@@ -72,7 +72,8 @@ export type Turn = {
   chapterTitle?: string;
   handoff?: Handoff;
   handoffId?: string;
-  from?: { sourceId: string; chapterId?: string };
+  // Откуда перенесён вопрос (5.10): книга и глава; название главы — для подписи у обмена.
+  from?: { sourceId: string; chapterId?: string; chapterTitle?: string };
   stats?: TurnStats;
 };
 export type Session = {

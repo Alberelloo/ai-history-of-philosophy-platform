@@ -1,7 +1,7 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { AssistantPanel } from "./AssistantPanel";
 import { AssistantPage } from "./AssistantPage";
-import { FullCard } from "./FullCard";
+import { FullCard, OPEN_CARD_EVENT } from "./FullCard";
 import { GraphPage } from "./GraphPage";
 import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
@@ -66,6 +66,21 @@ export type PanelState = {
   chapterTitle?: string;
 };
 
+// Положить элемент наверх стека панели (4.6): повторное открытие того же — не растит; глубина ≤ 20.
+function samePanelItem(a: PanelItem | undefined, b: PanelItem): boolean {
+  if (!a) return false;
+  if (a.kind === "assistant") return b.kind === "assistant";
+  return b.kind === "card" && a.entityId === b.entityId;
+}
+
+export function pushPanelItem(stack: PanelItem[] | undefined, item: PanelItem): PanelItem[] {
+  const items = stack ? [...stack] : [];
+  const top = items[items.length - 1];
+  if (samePanelItem(top, item)) items[items.length - 1] = item;
+  else items.push(item);
+  return items.slice(-20);
+}
+
 export function App() {
   const t = useT();
   useDocumentAppearance();
@@ -74,6 +89,23 @@ export function App() {
   const [path, search = ""] = beforeHash.split("?");
   const parts = path.split("/").filter(Boolean);
   const [panel, setPanel] = useState<PanelState | null>(null);
+  // Карточка по ссылке из полной карточки (связь) или из ответа ассистента (утверждение, 5.4)
+  // ложится наверх стека правой панели. На странице «Ассистент» панели может не быть —
+  // тогда она открывается с одной карточкой.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const detail = (e as CustomEvent<{ entityId: string; title: string }>).detail;
+      if (!detail) return;
+      const card: PanelItem = { kind: "card", entityId: detail.entityId, title: detail.title };
+      setPanel((p) =>
+        p
+          ? { ...p, stack: pushPanelItem(p.stack, card), stripExpanded: true }
+          : { stack: [card], sourceId: "", selection: null, selectionParagraphs: [], stripExpanded: true },
+      );
+    };
+    window.addEventListener(OPEN_CARD_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CARD_EVENT, onOpen);
+  }, []);
   return (
     <>
       <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} panelOpen={panel !== null} />

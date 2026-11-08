@@ -939,9 +939,29 @@ blockquote.block {
   transition: opacity var(--dur-quick) var(--ease-out);
 }
 
+/* «Спросить об абзаце» (5.1) — под «Скопировать ссылку», в том же левом промежутке. У абзаца
+   в одну строку кнопка выходит ниже него, на уровень «Скопировать ссылку» следующего абзаца:
+   поэтому она поверх (z-index) и, пока не видна, не ловит указатель. */
+.ask-paragraph {
+  position: absolute;
+  z-index: 1;
+  top: calc(0.125rem + var(--control-sm) + var(--space-1));
+  left: calc(var(--control-sm) * -1 - var(--space-2));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-quick) var(--ease-out);
+}
+
 .block:hover .copy-link,
-.copy-link:focus-visible {
+.copy-link:focus-visible,
+.block:hover .ask-paragraph,
+.ask-paragraph:focus-visible {
   opacity: 1;
+}
+
+.block:hover .ask-paragraph,
+.ask-paragraph:focus-visible {
+  pointer-events: auto;
 }
 
 .note {

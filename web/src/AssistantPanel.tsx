@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { SourceItem } from "./api";
 import { navigate } from "./App";
+import { openCardInPanel } from "./FullCard";
 import { QUESTION_SELECTOR } from "./hooks/useAssistantShortcut";
 import { pick, recipeTitle, useLang, useT, type Catalog } from "./i18n";
 import { ru } from "./i18n/ru";
@@ -125,6 +126,20 @@ export function sessionTitle(session: Session, fallback: string): string {
 }
 
 // Подпись каталога с вставленным названием книги: название — контент со своим языком.
+// Подпись с названием книги и главы: оба названия — текст источника на его языке.
+function withTitles(format: (book: string, chapter: string) => string, source: SourceItem | undefined, chapter: string) {
+  const [before, middle = "", after = ""] = format("\u0001", "\u0002").split(/[\u0001\u0002]/);
+  return (
+    <>
+      {before}
+      <span lang={source?.language}>{source?.title ?? ""}</span>
+      {middle}
+      <span lang={source?.language}>{chapter}</span>
+      {after}
+    </>
+  );
+}
+
 function withTitle(format: (title: string) => string, source: SourceItem | undefined, fallback: string) {
   const [before, after = ""] = format("\u0001").split("\u0001");
   return (
@@ -203,7 +218,7 @@ type Ask = {
   settings: AskSettings;
   handoff?: { declined: boolean; reason: string };
   handoffId?: string;
-  from?: { sourceId: string; chapterId?: string };
+  from?: { sourceId: string; chapterId?: string; chapterTitle?: string };
   chapter?: { id: string; title?: string };
 };
 
@@ -671,7 +686,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     send(
       pending.question,
       pending.selection ? { text: pending.selection, paragraphs: pending.selectionParagraphs } : null,
-      { handoffId: pending.id, sourceId: pending.from, from: { sourceId: pending.from, chapterId: pending.chapter?.id } },
+      { handoffId: pending.id, sourceId: pending.from, from: { sourceId: pending.from, chapterId: pending.chapter?.id, chapterTitle: pending.chapter?.title || undefined } },
     );
     // У обмена книги отметка «отправлено»: по ней панель книги отличает удалённый ответ.
     storage.updateDialogs(pending.from, (set) => ({
@@ -933,7 +948,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                               navigate(`/read/${turn.from!.sourceId}${turn.from!.chapterId ? `/${turn.from!.chapterId}` : ""}`);
                             }}
                           >
-                            {withTitle(t.assistantPage.fromBook, sources[turn.from.sourceId], "")}
+                            {turn.from.chapterTitle
+                              ? withTitles(t.assistantPage.fromBookChapter, sources[turn.from.sourceId], turn.from.chapterTitle)
+                              : withTitle(t.assistantPage.fromBook, sources[turn.from.sourceId], "")}
                           </a>
                         </p>
                       )}
@@ -976,6 +993,18 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                                   >
                                     {k + 1}
                                   </a>
+                                ) : c.entity_id ? (
+                                  // Утверждение со ссылкой на сущность (5.4): карточка ложится на стек
+                                  // правой панели, «Назад к ассистенту» возвращает к ответу.
+                                  <button
+                                    key={`${c.statement_id ?? c.title}-${k}`}
+                                    type="button"
+                                    className="citation pg-cite pg-cite--statement"
+                                    title={c.title}
+                                    onClick={() => openCardInPanel(c.entity_id!, statementName(c.title))}
+                                  >
+                                    {k + 1}
+                                  </button>
                                 ) : (
                                   <span key={`${c.statement_id ?? c.title}-${k}`} className="citation pg-cite pg-cite--statement" title={c.title}>
                                     {k + 1}
@@ -1226,6 +1255,11 @@ function retryable(turn: Turn): boolean {
 }
 
 // Подсказка ссылки (5.4): книга, глава и начало абзаца; без них — заголовок раздела.
+// Имя сущности для шапки карточки: часть подписи утверждения до « — ».
+function statementName(title: string): string {
+  return title.split(" — ")[0].trim() || title;
+}
+
 function citationTitle(t: Catalog, c: Citation): string {
   const head = [c.source_title, c.chapter_title].filter(Boolean).join(", ");
   const start = c.paragraph_start ? `${c.paragraph_start}${c.paragraph_start.length >= 120 ? "…" : ""}` : "";

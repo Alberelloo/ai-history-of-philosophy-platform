@@ -758,3 +758,57 @@ def test_t17_alt_q_with_and_without_selection(wide, site):
     page.keyboard.press("Alt+KeyQ")
     panel(page).wait_for()
     assert panel(page).locator(".assistant__form .selection-context").count() == 0
+
+
+# --- ссылка на утверждение (5.4) ------------------------------------------------------
+
+
+def statement(sid: str, chapter: str, entity: str | None, title: str) -> dict:
+    return {
+        **cite(sid, chapter, None, title=title),
+        "kind": "statement",
+        "statement_id": f"st-{title}",
+        "entity_id": entity,
+    }
+
+
+@req(AG, "Ссылки на абзацы")
+def test_statement_citation_opens_card_in_panel(wide, site):
+    """Ссылка на утверждение с entity_id — кнопка: карточка ложится на стек панели, «Назад к
+    ассистенту» возвращает к ответу; без entity_id — прежняя метка, не кнопка. На странице
+    «Ассистент» карточка открывается в правой панели."""
+    from .test_reader_cards import CARDS, HUME
+
+    page = wide
+    (ch1, _), *_ = chapters(site)
+    sid = site.ids["textbook"]
+    page.route("**/api/knowledge/v1/entities/*/card*", lambda r: r.fulfill(json=CARDS[HUME]))
+    linked = statement(sid, ch1, HUME, "Юм — повлиял на — Кант")
+    plain = statement(sid, ch1, None, "Без сущности")
+    stub = AskStub(page).reply(answer(fragment("Юм повлиял на Канта.", linked, plain)))
+    open_book(page, site)
+    open_assistant(page)
+    ask(panel(page), "Кто повлиял на Канта?")
+    box = panel(page)
+    box.locator(".copy-answer").wait_for()
+    cites = box.locator(".pg-cite--statement")
+    assert cites.count() == 2
+    assert cites.nth(0).evaluate("e => e.tagName") == "BUTTON"
+    assert cites.nth(1).evaluate("e => e.tagName") == "SPAN"
+    cites.nth(0).click()
+    card = page.get_by_role("complementary", name="Карточка")
+    card.get_by_text("Шотландский философ.").wait_for()
+    back = card.get_by_role("button", name="Назад к ассистенту")
+    back.click()
+    panel(page).locator(".copy-answer").wait_for()
+    assert "Юм повлиял на Канта." in panel(page).locator(".turns").inner_text()
+    # Страница «Ассистент»: панели нет — она открывается с карточкой.
+    stub.reply(answer(fragment("Юм повлиял на Канта.", linked)))
+    page.goto(f"{site.url}/assistant")
+    area = page.locator(".assistant-page")
+    ask(area, "Кто повлиял на Канта?")
+    area.locator(".copy-answer").wait_for()
+    area.locator(".pg-cite--statement").first.click()
+    page.get_by_role("complementary", name="Карточка").get_by_text(
+        "Шотландский философ."
+    ).wait_for()

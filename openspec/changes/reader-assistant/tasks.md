@@ -27,8 +27,9 @@
 - [x] 4.2 Поток со стадиями и временем (5.3) (`test_answer_stages_visible`)
 - [x] 4.3 «Остановить» только в потоке; «Повторить»; тайм-аут 45 с (`AssistantPanel.tsx:47`; `test_stream_and_stop`, `test_error_mid_answer_keeps_marks`)
 - [x] 4.4 Ссылки, пометки, строка «только по источникам», S12 с «Показать уведомление» (`AssistantPanel.tsx:453, 490`; `test_question_waits_for_notice`)
+- [x] 4.7 Ссылка на утверждение с `entity_id` (5.4, N5) — кнопка: карточка ложится на стек правой панели, «Назад к ассистенту» возвращает; без `entity_id` — прежняя метка; на странице «Ассистент» панель открывается с карточкой. Слушатель `OPEN_CARD_EVENT` и `pushPanelItem` перенесены из `ReaderPage.tsx` в `App.tsx` (`test_statement_citation_opens_card_in_panel`)
 - [x] 4.5 Метка главы у обмена: `Turn.chapterId`/`chapterTitle` (глава по адресу, название — из панели или заголовка главы); у вопроса из другой главы подпись «Глава „…“» (`.assistant__chapter-label`)
-- [x] 4.6 Alt+Q: хук `web/src/hooks/useAssistantShortcut.ts` (подключение в `ReaderPage` — интегратор, строка в `progress.md`). «Спросить об абзаце» — кнопка в разметке абзаца `ReaderPage` (поток B), не сделана
+- [x] 4.6 Alt+Q: хук `web/src/hooks/useAssistantShortcut.ts` (подключение в `ReaderPage` — интегратор, строка в `progress.md`). «Спросить об абзаце» — кнопка `.ask-paragraph` под «Скопировать ссылку» у абзацев и цитат (у плашек нет): фрагмент — текст абзаца и один id (`test_ask_about_paragraph_button`). Тройной щелчок по абзацу — фрагмент одного абзаца, без соседнего (`test_triple_click_selects_one_paragraph`; в список абзацев выделения входят только абзацы с непустым выделенным текстом)
 - [x] 4.7 Р13: ссылка на абзац другой книги — переход с `pushState` и `assistantFrom` в состоянии истории; панель показывает диалог новой книги и `Notice` «Вы пришли из диалога по книге „…“» с «Вернуться» (`history.back()`); у прежней записи — опорный абзац, «Назад» возвращает на место ±4px (`test_t39_link_to_other_book_switches_dialog_and_back`)
 
 ## 4a. Найдено при работе потока A

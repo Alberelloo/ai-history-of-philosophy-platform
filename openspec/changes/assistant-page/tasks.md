@@ -18,6 +18,7 @@
 - [x] 3.1 Блок S7a в `AssistantPanel.tsx` (`test_handoff_block_and_transfer_link`: текст, ссылка с `/assistant?q=`, «Продолжить в рамках этого источника»)
 - [x] 3.2 Поручение перехода в памяти вкладки, отправка один раз, `handoffId` (`AssistantPanel.tsx:218, 341`); двойной щелчок, «Назад», Ctrl+щелчок и перезагрузка (T41, T42) отдельным тестом не проверены
 - [x] 3.3 i18n: `assistant.handoff.*`
+- [x] 3.4 Подпись перенесённого вопроса «Из книги «…», глава «…»» (`assistantPage.fromBookChapter`, EN “From the book “…”, chapter “…””): название главы хранится в `Turn.from.chapterTitle`; без него — прежнее «Из книги «…»» (`test_transfer_shows_book_and_chapter`)
 
 ## 4. Тесты
 

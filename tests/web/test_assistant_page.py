@@ -353,3 +353,23 @@ def test_t36_assistant_page_and_boundary_in_english(browser, site):
     assert page.locator(".assistant-page").evaluate(CYRILLIC) == []
     assert len(stub.requests) == 2
     context.close()
+
+
+@req(AD, "Переход с вопросом из панели")
+def test_transfer_shows_book_and_chapter(wide, site):
+    """У перенесённого вопроса подпись «Из книги «…», глава «…»» — ссылка на главу."""
+    page = wide
+    (ch, _), *_ = chapters(site)
+    sid = site.ids["textbook"]
+    AskStub(page).reply(BROADER, answer(fragment("Ответ по всей библиотеке.", grounded=False)))
+    open_book(page, site, chapter=ch)
+    open_assistant(page)
+    ask(panel(page), QUESTION)
+    handoff_block(page).get_by_role("link", name=re.compile("^Перейти")).click()
+    page.locator(".assistant-page .copy-answer").wait_for()
+    label = page.locator(".handoff-from a")
+    assert label.inner_text() == "Из книги «История теории познания», глава «Глава 1. Опыт»"
+    assert label.get_attribute("href") == f"/read/{sid}/{ch}"
+    assert stored(page)["libraryDialogs"]["sessions"][0]["messages"][0]["from"]["chapterTitle"] == (
+        "Глава 1. Опыт"
+    )

@@ -1,8 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type MouseEvent as ReactMouseEvent, type ReactNode, type SetStateAction } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
-import { navigate, type PanelItem, type PanelState } from "./App";
+import { navigate, pushPanelItem, type PanelState } from "./App";
 import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
-import { OPEN_CARD_EVENT } from "./FullCard";
 import { FootnoteRef } from "./Footnote";
 import { fieldItems, MarginCol } from "./Footnote";
 import { useAssistantShortcut } from "./hooks/useAssistantShortcut";
@@ -111,21 +110,6 @@ type Relocated = { chapterId: string; reason: "saved" | "link" };
 
 // Предел длины выделенного фрагмента (assistant-dialog «Ограничение длины»).
 const MAX_SELECTION = 4000;
-
-// Положить элемент наверх стека панели (4.6): повторное открытие того же — не растит; глубина ≤ 20.
-function samePanelItem(a: PanelItem | undefined, b: PanelItem): boolean {
-  if (!a) return false;
-  if (a.kind === "assistant") return b.kind === "assistant";
-  return b.kind === "card" && a.entityId === b.entityId;
-}
-
-function pushPanelItem(stack: PanelItem[] | undefined, item: PanelItem): PanelItem[] {
-  const items = stack ? [...stack] : [];
-  const top = items[items.length - 1];
-  if (samePanelItem(top, item)) items[items.length - 1] = item;
-  else items.push(item);
-  return items.slice(-20);
-}
 
 // Ближайшее место вместо пропавшей главы: глава сохранённого абзаца, иначе первая глава.
 async function nearestPlace(
@@ -303,23 +287,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
       el.removeAttribute("aria-controls");
     };
   }, [card]);
-  // Переход по связи в полной карточке (FullCard): карточка ложится наверх стека панели.
-  useEffect(() => {
-    const onOpen = (e: Event) => {
-      const detail = (e as CustomEvent<{ entityId: string; title: string }>).detail;
-      if (!detail) return;
-      setPanel((p) =>
-        p
-          ? {
-              ...p,
-              stack: pushPanelItem(p.stack, { kind: "card", entityId: detail.entityId, title: detail.title }),
-            }
-          : p,
-      );
-    };
-    window.addEventListener(OPEN_CARD_EVENT, onOpen);
-    return () => window.removeEventListener(OPEN_CARD_EVENT, onOpen);
-  }, [setPanel]);
+  // Карточка по ссылке из полной карточки или из ответа ассистента — слушатель в App.tsx.
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
@@ -374,8 +342,15 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
         }
         const ids = new Set<string>();
         const range = sel.getRangeAt(0);
+        // Абзац входит во фрагмент, только если выделен непустой текст из него: тройной щелчок
+        // заканчивает выделение в начале следующего абзаца, и тот не должен попадать в список.
         article.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
-          if (range.intersectsNode(el)) ids.add(el.dataset.paragraph!);
+          if (!range.intersectsNode(el)) return;
+          const part = document.createRange();
+          part.selectNodeContents(el);
+          if (range.compareBoundaryPoints(Range.START_TO_START, part) > 0) part.setStart(range.startContainer, range.startOffset);
+          if (range.compareBoundaryPoints(Range.END_TO_END, part) < 0) part.setEnd(range.endContainer, range.endOffset);
+          if (part.toString().trim()) ids.add(el.dataset.paragraph!);
         });
         const rect = range.getBoundingClientRect();
         setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
@@ -732,6 +707,16 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
                 onClick={() => copyLink(block.id, () => setCopied(block.id))}
               >
                 <Icon name={copied === block.id ? "check" : "link"} small />
+              </button>
+              {/* Вопрос об абзаце целиком (5.1): фрагмент — текст абзаца, без выделения мышью. */}
+              <button
+                type="button"
+                className="ask-paragraph pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+                aria-label={t.reader.askParagraph}
+                title={t.reader.askParagraph}
+                onClick={() => openAssistant({ text: block.text, paragraphs: [block.id] })}
+              >
+                <Icon name="chat" small />
               </button>
             </Tag>
           );

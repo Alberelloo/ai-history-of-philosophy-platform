@@ -292,3 +292,81 @@ def test_handoff_block_and_transfer_link(page, server, bot):
     # Кнопка «Продолжить в рамках этого источника» отправляет новый обмен с handoff_declined.
     panel.locator(".handoff-block button", has_text="Продолжить").click()
     panel.locator(".handoff-block").wait_for(state="detached")
+
+
+# --- «Спросить об абзаце» и тройной щелчок (5.1, 7) -------------------------------------
+
+
+@req(AD, "Вопрос о выделенном фрагменте")
+def test_ask_about_paragraph_button(page, site):
+    """Кнопка «Спросить об абзаце» под «Скопировать ссылку»: фрагмент — текст абзаца, один id;
+    у плашки неразобранной части кнопки нет."""
+    from ..assistant.browser import AskStub, answer, ask, fragment, panel
+    from .test_assistant_dialogs import chapters
+
+    (chapter_id, paras), *_ = chapters(site)
+    source = site.ids["textbook"]
+    real = page.request.get(f"{site.url}/api/v1/sources/{source}/chapters/{chapter_id}").json()
+    real["blocks"].insert(
+        0,
+        {
+            "type": "block",
+            "id": "p-plate",
+            "kind": "unrendered",
+            "text": "",
+            "lang": "ru",
+            "pages": [],
+            "notes": [],
+            "detail": None,
+            "detail_code": "missing",
+            "page": None,
+        },
+    )
+    page.route(f"**/sources/{source}/chapters/{chapter_id}", lambda r: r.fulfill(json=real))
+    page.set_viewport_size({"width": 1440, "height": 900})
+    stub = AskStub(page).reply(answer(fragment("Ответ об абзаце.", grounded=False)))
+    page.goto(f"{site.url}/read/{source}/{chapter_id}")
+    target, text = paras[2]
+    block = page.locator(f"#p-{target}")
+    block.wait_for()
+    assert page.locator("figure.unrendered .ask-paragraph").count() == 0
+    block.hover()
+    button = block.get_by_role("button", name="Спросить об абзаце")
+    assert button.is_visible()
+    # Под «Скопировать ссылку», в левом промежутке, не поверх текста.
+    copy = block.locator(".copy-link").bounding_box()
+    own = button.bounding_box()
+    para = block.evaluate("e => e.getBoundingClientRect().left")
+    assert own["y"] >= copy["y"] + copy["height"] and own["x"] + own["width"] <= para
+    button.click()
+    box = panel(page)
+    quote = box.locator(".assistant__form .selection-context")
+    quote.wait_for()
+    assert quote.inner_text().strip() == text.strip()
+    ask(box, "О чём этот абзац?")
+    box.locator(".copy-answer").wait_for()
+    assert stub.requests[0]["selection_paragraphs"] == [target]
+    assert stub.requests[0]["selection"].strip() == text.strip()
+
+
+@req(AD, "Панель действий над выделением")
+def test_triple_click_selects_one_paragraph(page, site):
+    """Тройной щелчок по абзацу → «Спросить ассистента» → фрагмент одного абзаца, без соседнего."""
+    from ..assistant.browser import AskStub, answer, ask, fragment, panel
+    from .test_assistant_dialogs import chapters, open_book
+
+    (_, paras), *_ = chapters(site)
+    page.set_viewport_size({"width": 1440, "height": 900})
+    stub = AskStub(page).reply(answer(fragment("Ответ.", grounded=False)))
+    open_book(page, site)
+    target, text = paras[3]
+    page.locator(f"#p-{target}").click(click_count=3)
+    toolbar = page.get_by_role("toolbar")
+    toolbar.get_by_role("button", name="Спросить ассистента").click()
+    box = panel(page)
+    box.locator(".assistant__form .selection-context").wait_for()
+    ask(box, "Поясните")
+    box.locator(".copy-answer").wait_for()
+    request = stub.requests[0]
+    assert request["selection_paragraphs"] == [target], request["selection_paragraphs"]
+    assert text.strip() in request["selection"]

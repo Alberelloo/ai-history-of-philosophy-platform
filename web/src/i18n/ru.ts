@@ -145,6 +145,7 @@ export const ru = {
     asked: "Этот вопрос уже задан — ответ выше.",
     showAnswer: "Показать ответ",
     fromBook: (book: string) => `Из книги «${book}»`,
+    fromBookChapter: (book: string, chapter: string) => `Из книги «${book}», глава «${chapter}»`,
   },
   family: {
     person: "Персона",
@@ -209,6 +210,7 @@ export const ru = {
     selectionActions: "Действия с выделенным",
     selectionTooLong: (max: number) => `Фрагмент длиннее ${max.toLocaleString("ru-RU")} знаков. Выделите меньше.`,
     copyLink: "Скопировать ссылку на абзац",
+    askParagraph: "Спросить об абзаце",
     copied: "Скопировано",
     page: (label: string) => `с. ${label}`,
     unrendered: "Не передано в тексте",

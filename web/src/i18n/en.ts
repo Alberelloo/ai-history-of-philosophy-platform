@@ -133,6 +133,7 @@ export const en: Catalog = {
     asked: "This question has already been asked — see the answer above.",
     showAnswer: "Show the answer",
     fromBook: (book: string) => `From the book “${book}”`,
+    fromBookChapter: (book: string, chapter: string) => `From the book “${book}”, chapter “${chapter}”`,
   },
   family: {
     person: "Person",
@@ -197,6 +198,7 @@ export const en: Catalog = {
     selectionActions: "Selection actions",
     selectionTooLong: (max: number) => `The passage is longer than ${max.toLocaleString("en-US")} characters. Select less.`,
     copyLink: "Copy link to paragraph",
+    askParagraph: "Ask about this paragraph",
     copied: "Copied",
     page: (label: string) => `p. ${label}`,
     unrendered: "Not rendered as text",
