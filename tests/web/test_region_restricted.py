@@ -45,6 +45,8 @@ def test_restricted_source_row(page, limited):
     site, source_id = limited
     assert site.registry.regions(source_id) == frozenset({"RU"})
     page.goto(f"{site.url}/")
+    # Список грузится запросом к библиотеке: ждём отрисовку строки, а не считаем сразу.
+    page.wait_for_selector("li.source--restricted")
 
     row = page.locator("li.source--restricted", has_text="Русский учебник")
     assert row.count() == 1

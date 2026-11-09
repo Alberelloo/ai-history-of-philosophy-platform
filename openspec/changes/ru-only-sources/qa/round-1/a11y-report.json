@@ -1,0 +1,15 @@
+{
+ "badgeText": "Доступен в РФ",
+ "badgeColor": "rgb(72, 80, 93)",
+ "badgeBackground": "rgb(232, 234, 228)",
+ "contrast": 6.71061702724947,
+ "fontSize": "12px",
+ "fontWeight": "500",
+ "rowWidth": 368,
+ "openRowWidth": 368,
+ "sameWidth": true,
+ "focusable": [],
+ "horizontalOverflow": false,
+ "scrollWidth": 1440,
+ "clientWidth": 1440
+}
