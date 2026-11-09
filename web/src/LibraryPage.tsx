@@ -106,58 +106,78 @@ export function LibraryPage() {
       )}
 
       <ul className="sources">
-        {data?.sources.map((s) => (
-          <li key={s.id} className={s.id === current ? "source current" : "source"}>
-            <div className="source-main">
-              <div className="source-head">
-                <h2>{s.title}</h2>
-                <div className="source-badges">
-                  {s.id === current && <span className="badge badge--accent">{t.library.current}</span>}
-                  {s.id === data.default_source_id && <span className="badge">{t.library.byDefault}</span>}
-                </div>
-              </div>
-              <dl>
-                <dt>{t.library.author}</dt>
-                <dd>{s.authors.length ? s.authors.join(", ") : notSet}</dd>
-                <dt>{t.library.year}</dt>
-                <dd className="num">{s.year ?? notSet}</dd>
-                <dt>{t.library.language}</dt>
-                <dd>{s.language ? languageName(s.language) : notSet}</dd>
-                <dt>{t.library.kind}</dt>
-                <dd>{pick(t.library.kinds, s.kind) ?? notSet}</dd>
-                <dt>{t.library.license}</dt>
-                <dd>
-                  <button
-                    className="pg-btn pg-btn--ghost pg-btn--sm license-toggle"
-                    aria-expanded={openLicense === s.id}
-                    onClick={() => setOpenLicense(openLicense === s.id ? null : s.id)}
-                  >
-                    {s.license.title ?? notSet}
-                    <Icon name="chevronDown" small className="license-toggle__chevron" />
-                  </button>
-                  {openLicense === s.id && (
-                    <span className="license-details" role="note">
-                      {s.license.title ?? notSet}
-                      {s.license.url && (
-                        <>
-                          {" — "}
-                          <a href={s.license.url} target="_blank" rel="noreferrer">
-                            {t.library.licenseText}
-                          </a>
-                        </>
-                      )}
+        {data?.sources.map((s) =>
+          "restricted" in s ? (
+            // Источник закрыт для региона читателя: название, авторы и пометка, без открытия.
+            <li key={s.id} className="source source--restricted">
+              <div className="source-main">
+                <div className="source-head">
+                  <h2>{s.title}</h2>
+                  <div className="source-badges">
+                    <span className="badge" title={t.library.restrictedHint}>
+                      {t.library.restricted}
                     </span>
-                  )}
-                </dd>
-              </dl>
-            </div>
-            <div className="source-actions">
-              <button className="pg-btn pg-btn--secondary" onClick={() => choose(s.id)}>
-                {t.library.read}
-              </button>
-            </div>
-          </li>
-        ))}
+                  </div>
+                </div>
+                <dl>
+                  <dt>{t.library.author}</dt>
+                  <dd>{s.authors.length ? s.authors.join(", ") : notSet}</dd>
+                </dl>
+              </div>
+            </li>
+          ) : (
+            <li key={s.id} className={s.id === current ? "source current" : "source"}>
+              <div className="source-main">
+                <div className="source-head">
+                  <h2>{s.title}</h2>
+                  <div className="source-badges">
+                    {s.id === current && <span className="badge badge--accent">{t.library.current}</span>}
+                    {s.id === data.default_source_id && <span className="badge">{t.library.byDefault}</span>}
+                  </div>
+                </div>
+                <dl>
+                  <dt>{t.library.author}</dt>
+                  <dd>{s.authors.length ? s.authors.join(", ") : notSet}</dd>
+                  <dt>{t.library.year}</dt>
+                  <dd className="num">{s.year ?? notSet}</dd>
+                  <dt>{t.library.language}</dt>
+                  <dd>{s.language ? languageName(s.language) : notSet}</dd>
+                  <dt>{t.library.kind}</dt>
+                  <dd>{pick(t.library.kinds, s.kind) ?? notSet}</dd>
+                  <dt>{t.library.license}</dt>
+                  <dd>
+                    <button
+                      className="pg-btn pg-btn--ghost pg-btn--sm license-toggle"
+                      aria-expanded={openLicense === s.id}
+                      onClick={() => setOpenLicense(openLicense === s.id ? null : s.id)}
+                    >
+                      {s.license.title ?? notSet}
+                      <Icon name="chevronDown" small className="license-toggle__chevron" />
+                    </button>
+                    {openLicense === s.id && (
+                      <span className="license-details" role="note">
+                        {s.license.title ?? notSet}
+                        {s.license.url && (
+                          <>
+                            {" — "}
+                            <a href={s.license.url} target="_blank" rel="noreferrer">
+                              {t.library.licenseText}
+                            </a>
+                          </>
+                        )}
+                      </span>
+                    )}
+                  </dd>
+                </dl>
+              </div>
+              <div className="source-actions">
+                <button className="pg-btn pg-btn--secondary" onClick={() => choose(s.id)}>
+                  {t.library.read}
+                </button>
+              </div>
+            </li>
+          ),
+        )}
       </ul>
     </main>
   );

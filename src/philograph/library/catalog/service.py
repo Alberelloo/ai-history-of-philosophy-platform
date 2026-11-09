@@ -19,7 +19,7 @@ from philograph.library.catalog import model
 from philograph.library.catalog.adapters import Wikidata, adapter_for, slugify, suggest_license
 from philograph.library.catalog.fetcher import Fetcher, FetchError, now_iso
 from philograph.library.processing import Pipeline, ProcessingBusy, StepFailed
-from philograph.library.registry import OPTIONAL, Registry, RegistryError
+from philograph.library.registry import OPTIONAL, Registry, RegistryError, normalize_regions
 from philograph.platform import events
 from philograph.platform.clock import Clock, SystemClock
 
@@ -122,13 +122,15 @@ class CatalogService:
     def ensure_license_kinds(self) -> None:
         for kind in self.catalog.licenses():
             current = self.registry.license_kind(kind["code"])
+            regions = normalize_regions(kind.get("regions"))
             if (
                 current is None
                 or current["permissions"] != kind["permissions"]
                 or current["title"] != kind["title"]
+                or list(current["regions"] or []) != (regions or [])
             ):
                 self.registry.add_license_kind(
-                    kind["code"], kind["title"], kind.get("url"), kind["permissions"]
+                    kind["code"], kind["title"], kind.get("url"), kind["permissions"], regions
                 )
 
     # --- добавление и сбор метаданных -------------------------------------------------

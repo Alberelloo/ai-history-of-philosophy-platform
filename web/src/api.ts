@@ -10,8 +10,17 @@ export type SourceItem = {
   license: { title: string | null; url: string | null };
 };
 
+// Источник, закрытый для региона читателя: название, авторы и пометка, без года и лицензии.
+export type RestrictedSourceItem = {
+  id: string;
+  title: string;
+  authors: string[];
+  restricted: true;
+  regions: string[];
+};
+
 export type SourceList = {
-  sources: SourceItem[];
+  sources: (SourceItem | RestrictedSourceItem)[];
   languages: string[];
   default_source_id: string | null;
 };
@@ -57,7 +66,11 @@ export type Chapter = {
 export type Resolved =
   | { status: "found"; source_id: string; chapter_id: string; paragraph_id: string }
   | { status: "removed"; source_id: string; chapter_id: string | null }
-  | { status: "source_unavailable" }
+  | {
+      status: "source_unavailable";
+      reason?: "region";
+      source?: { id: string; title: string; authors: string[] };
+    }
   | { status: "unknown" };
 
 export class ApiError extends Error {

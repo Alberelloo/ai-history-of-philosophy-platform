@@ -5,14 +5,31 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, FastAPI, Query
+from fastapi import APIRouter, FastAPI, Query, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from philograph import __version__
-from philograph.library.reading import ChapterNotFound, Internal, NotVisible, Reading
+from philograph.library.reading import (
+    ANONYMOUS,
+    ChapterNotFound,
+    Internal,
+    NotVisible,
+    Reader,
+    Reading,
+    parse_region,
+)
 from philograph.platform.health import Health
 from philograph.platform.web import UserFacingError, create_app
+
+# Заголовок ставит шлюз: клиентский регион отбрасывается и подделываться не может.
+REGION_HEADER = "X-Philograph-Region"
+
+
+def _reader(request: Request) -> Reader:
+    """Читатель запроса: регион из заголовка шлюза; нет заголовка — регион неизвестен."""
+    region = parse_region(request.headers.get(REGION_HEADER))
+    return Reader(region=region) if region else ANONYMOUS
 
 
 def build_app(
@@ -31,27 +48,32 @@ def build_app(
 
     @router.get("/sources")
     def sources(
-        kind: list[str] = Query(default=[]), lang: list[str] = Query(default=[]), q: str = ""
+        request: Request,
+        kind: list[str] = Query(default=[]),
+        lang: list[str] = Query(default=[]),
+        q: str = "",
     ) -> dict[str, Any]:
-        return reading.sources(kinds=kind or None, languages=lang or None, query=q)
+        return reading.sources(
+            _reader(request), kinds=kind or None, languages=lang or None, query=q
+        )
 
     @router.get("/current")
-    def current(remembered: str | None = None) -> dict[str, Any]:
-        return reading.resolve_current(remembered)
+    def current(request: Request, remembered: str | None = None) -> dict[str, Any]:
+        return reading.resolve_current(remembered, _reader(request))
 
     @router.get("/sources/{source_id}/toc")
-    def toc(source_id: str) -> list[dict[str, Any]]:
+    def toc(source_id: str, request: Request) -> list[dict[str, Any]]:
         try:
-            return reading.toc(source_id)
+            return reading.toc(source_id, _reader(request))
         except NotVisible as exc:
             raise UserFacingError(
                 "Источник недоступен", status=404, kind="source_unavailable"
             ) from exc
 
     @router.get("/sources/{source_id}/chapters/{chapter_id}")
-    def chapter(source_id: str, chapter_id: str) -> dict[str, Any]:
+    def chapter(source_id: str, chapter_id: str, request: Request) -> dict[str, Any]:
         try:
-            return reading.chapter(source_id, chapter_id)
+            return reading.chapter(source_id, chapter_id, _reader(request))
         except NotVisible as exc:
             raise UserFacingError(
                 "Источник недоступен", status=404, kind="source_unavailable"
@@ -66,8 +88,8 @@ def build_app(
             ) from exc
 
     @router.get("/paragraphs/{paragraph_id}")
-    def paragraph(paragraph_id: str) -> dict[str, Any]:
-        return reading.resolve_paragraph(paragraph_id)
+    def paragraph(paragraph_id: str, request: Request) -> dict[str, Any]:
+        return reading.resolve_paragraph(paragraph_id, _reader(request))
 
     internal = Internal(reading.registry, reading)
 
@@ -85,6 +107,10 @@ def build_app(
     @router.get("/internal/published")
     def published() -> list[dict[str, str]]:
         return internal.published()
+
+    @router.get("/internal/access")
+    def access(region: str | None = None) -> dict[str, Any]:
+        return internal.access(region)
 
     app.include_router(router, prefix="/api")
     for path, sub in (mounts or {}).items():

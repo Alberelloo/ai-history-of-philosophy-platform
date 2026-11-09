@@ -189,6 +189,8 @@ export const en: Catalog = {
     notSet: "not set",
     licenseText: "license text",
     read: "Read",
+    restricted: "Available in Russia only",
+    restrictedHint: "This source is open to readers in Russia only.",
   },
   reader: {
     toc: "Contents",
@@ -222,6 +224,7 @@ export const en: Catalog = {
     removed: "Paragraph not found: the new version of the source no longer has it.",
     notFound: "Paragraph not found.",
     openChapter: "Open the chapter where it was",
+    regionOnly: "This source is available in Russia only.",
   },
   errors: {
     generic: "Something went wrong. Reload the page and try again.",
