@@ -1,0 +1,5 @@
+﻿Проверка harness раунда 1 как он закоммичен (HEAD):
+файл: C:\Users\Ivano\Desktop\ai-philosophy-platform\ai-history-of-philosophy-platform\openspec\changes\ru-only-sources\qa\round-1\harness\browser_checks.py
+ROOT  = C:\Users\Ivano\Desktop\ai-philosophy-platform\ai-history-of-philosophy-platform\openspec\changes\ru-only-sources\qa
+DIST  = C:\Users\Ivano\Desktop\ai-philosophy-platform\ai-history-of-philosophy-platform\openspec\changes\ru-only-sources\qa\web\dist | существует: False
+SHOTS = C:\Users\Ivano\Desktop\ai-philosophy-platform\ai-history-of-philosophy-platform\openspec\changes\ru-only-sources\qa\openspec\changes\ru-only-sources\qa\screenshots\round-1 | существует: False

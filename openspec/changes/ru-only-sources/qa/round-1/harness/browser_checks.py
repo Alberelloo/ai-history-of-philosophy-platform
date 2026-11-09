@@ -30,7 +30,15 @@ from philograph.platform.db import make_engine
 from philograph.platform.files import FileStore
 from tests.web.conftest import PRIMARY, REFERENCE, TEXTBOOK
 
-ROOT = Path(__file__).resolve().parents[2]
+def _repo_root(start: Path) -> Path:
+    """Корень репозитория: вверх до каталога с pyproject.toml."""
+    for candidate in [start, *start.parents]:
+        if (candidate / "pyproject.toml").exists():
+            return candidate
+    raise RuntimeError("не найден корень репозитория (pyproject.toml)")
+
+
+ROOT = _repo_root(Path(__file__).resolve().parent)
 DIST = ROOT / "web" / "dist"
 QA = ROOT / "openspec" / "changes" / "ru-only-sources" / "qa"
 SHOTS = QA / "screenshots" / "round-1"

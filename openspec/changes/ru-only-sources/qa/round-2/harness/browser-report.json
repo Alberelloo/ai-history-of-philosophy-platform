@@ -1,0 +1,201 @@
+{
+ "url": "http://127.0.0.1:56551",
+ "ids": {
+  "textbook": "s_f2188c693fc6",
+  "primary": "s_2162d2e990a7",
+  "reference": "s_b4413cd03d4b",
+  "limited": "s_85e2a3f81e56"
+ },
+ "version_id": "v_ff8f2374a283",
+ "checks": [
+  {
+   "case": "TC-17",
+   "step": "строка закрытого источника в списке",
+   "ok": true,
+   "expected": "одна строка li.source--restricted; в /api/v1/sources строка с restricted:true",
+   "actual": "строк в DOM: 1; строка в API: [{'id': 's_85e2a3f81e56', 'title': 'Русский учебник', 'authors': ['П. Д. Юркевич'], 'restricted': True, 'regions': ['RU']}]",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-17-1-library-list.png"
+   ]
+  },
+  {
+   "case": "TC-17",
+   "step": "пометка, авторы, без года и лицензии",
+   "ok": true,
+   "expected": "пометка «Доступен в РФ», автор в dd, нет dt «Год» и «Лицензия»",
+   "actual": "текст строки: 'Русский учебник\\nДоступен в РФ\\nАвтор\\nП. Д. Юркевич'; бейдж: ['Доступен в РФ']; dd: ['П. Д. Юркевич']",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-17-2-restricted-row-fields.png"
+   ]
+  },
+  {
+   "case": "TC-17",
+   "step": "нет кнопки «Читать» и переходов",
+   "ok": true,
+   "expected": "в строке закрытого источника нет кнопок и ссылок",
+   "actual": "button/a в строке: 0",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-17-3-no-read-button.png"
+   ]
+  },
+  {
+   "case": "EC-14",
+   "step": "пометка доступна, фокус в строку не уходит",
+   "ok": true,
+   "expected": "у пометки есть title (описание для чтения с экрана)",
+   "actual": "title='Источник открыт только читателям из России.'",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/EC-14-restricted-badge-title.png"
+   ]
+  },
+  {
+   "case": "EC-14",
+   "step": "Tab не попадает в строку закрытого источника, «Читать» достижима",
+   "ok": true,
+   "expected": "ни один Tab не ставит фокус в закрытую строку; кнопки «Читать» достижимы",
+   "actual": "последовательность фокуса: ['A:Библиотека', 'A:Открытые книги', 'A:Ассистент', 'A:Граф\\nскоро', 'A:Справочник\\nскоро', 'A:Эпохи и контекст\\nскоро', 'A:Сравнение трактовок\\nскоро', 'A:Маршрут изучения\\nскоро', 'A:Мои материалы\\nскоро', 'A:Подборки\\nскоро', 'A:Настройки', 'BUTTON:RU\\nРусский']…; всего 44",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/EC-14-tab-order.png"
+   ]
+  },
+  {
+   "case": "UC-1",
+   "step": "по строке нельзя открыть источник",
+   "ok": true,
+   "expected": "адрес не меняется после клика по строке закрытого источника",
+   "actual": "до: http://127.0.0.1:56551/; после: http://127.0.0.1:56551/",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-1-click-restricted-stays.png"
+   ]
+  },
+  {
+   "case": "UC-1",
+   "step": "открытые источники по-прежнему открываются",
+   "ok": true,
+   "expected": "три кнопки «Читать» у трёх открытых источников",
+   "actual": "кнопок «Читать»: 3",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-1-open-sources.png"
+   ]
+  },
+  {
+   "case": "UC-3",
+   "step": "запрос без заголовка региона",
+   "ok": true,
+   "expected": "регион неизвестен: ограниченный закрыт, по умолчанию — открытый учебник",
+   "actual": "status=200, default=s_f2188c693fc6, ограниченный=True",
+   "evidence": []
+  },
+  {
+   "case": "UC-2",
+   "step": "открытый учебник читается",
+   "ok": true,
+   "expected": "глава открытого учебника показывает текст",
+   "actual": "адрес: http://127.0.0.1:56551/read/s_f2188c693fc6/sec_497dc0cebb2b; первые строки: 'Ассистент\\n\\nОглавление\\n\\nГлава 1. Опыт\\nГлава 2. Рассудок\\nСхематизм\\nГлава 3. Разум\\nГлава 1. Опыт\\n\\nВсякое знание начинается '",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-2-open-source-readable.png"
+   ]
+  },
+  {
+   "case": "TC-12",
+   "step": "прямой адрес главы закрытого источника",
+   "ok": true,
+   "expected": "«Источник недоступен», текст главы не показан",
+   "actual": "сообщение: 'Источник недоступен.\\nПерейти в библиотеку'; ответы: [{'url': 'http://127.0.0.1:56551/api/v1/sources/s_85e2a3f81e56/chapters/sec_43e1da8d0a7d', 'status': 404, 'json': {'error': 'Источник недоступен', 'kind': 'source_unavailable', 'request_id': '4d666333f0b94c0c93dfac8bab288f46'}}]",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-12-chapter-unavailable.png"
+   ]
+  },
+  {
+   "case": "TC-12",
+   "step": "HTTP-ответ на главу — 404 source_unavailable",
+   "ok": true,
+   "expected": "404, kind=source_unavailable",
+   "actual": "ответы: [{'url': 'http://127.0.0.1:56551/api/v1/sources/s_85e2a3f81e56/chapters/sec_43e1da8d0a7d', 'status': 404, 'json': {'error': 'Источник недоступен', 'kind': 'source_unavailable', 'request_id': '4d666333f0b94c0c93dfac8bab288f46'}}]",
+   "evidence": []
+  },
+  {
+   "case": "UC-4",
+   "step": "ссылка на абзац: причина «регион»",
+   "ok": true,
+   "expected": "«Источник доступен только в России.», текст абзаца не раскрыт",
+   "actual": "сообщение: 'Источник доступен только в России.\\nПерейти в библиотеку'; текст страницы: 'Источник доступен только в России.\\nПерейти в библиотеку'",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-4-paragraph-region.png"
+   ]
+  },
+  {
+   "case": "UC-4",
+   "step": "ответ API: source_unavailable + reason region + название/авторы",
+   "ok": true,
+   "expected": "status=source_unavailable, reason=region, название и авторы, без text/chapter_id/section_id",
+   "actual": "ответ: {'status': 'source_unavailable', 'reason': 'region', 'source': {'id': 's_85e2a3f81e56', 'title': 'Русский учебник', 'authors': ['П. Д. Юркевич']}}",
+   "evidence": []
+  },
+  {
+   "case": "UC-5",
+   "step": "уведомление previous_unavailable и переход к учебнику по умолчанию",
+   "ok": true,
+   "expected": "пометка «Прежний источник недоступен…», адрес — учебник по умолчанию",
+   "actual": "адрес: http://127.0.0.1:56551/read/s_f2188c693fc6/sec_497dc0cebb2b; ответ /current: {'url': 'http://127.0.0.1:56551/api/v1/current?remembered=s_85e2a3f81e56', 'status': 200, 'json': {'source_id': 's_f2188c693fc6', 'notice': 'previous_unavailable'}}",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-5-remembered-closed.png"
+   ]
+  },
+  {
+   "case": "TC-8",
+   "step": "поиск по названию действует на закрытую строку",
+   "ok": true,
+   "expected": "по запросу «Юркевич» остаётся одна строка — закрытый источник",
+   "actual": "строк всего: 1",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-8-search-restricted.png"
+   ]
+  },
+  {
+   "case": "EC-13",
+   "step": "пометка локализуется, данные источника — нет",
+   "ok": true,
+   "expected": "пометка на языке интерфейса, название источника не переводится",
+   "actual": "бейдж: 'Available in Russia only'; название: 'Русский учебник'",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/EC-13-restricted-en.png"
+   ]
+  }
+ ],
+ "failed": [],
+ "console": [
+  {
+   "type": "http",
+   "text": "404 http://127.0.0.1:56551/api/knowledge/v1/mentions?targets=p_06699e89ad54,p_95ca9b6e0642,p_c625581f5c19,p_310a0c03d4a4,p_569d082d0d98,p_ece2dcbb1a70,p_c69299be43b3,p_03413d6ac255,p_36b891ae62d4,p_65e0b2048398,p_e6054b1b5e4d,p_78ef37e5b11c,p_7942aa06f95f,p_90721484f271,p_7d720f57afcc,p_6638cbac4aff,p_d3e82a8c6c9e,p_6d6e619a7b27,p_13a4a42b7442,p_aac442bc180f,p_36146a97ac49,p_865e646af5dd,p_f90de043e629,p_4777626d7790,p_aa73748c9915,p_77de61b4d951,p_0a61f611f4d8,p_19e4031d7d64,p_fb89b4506b7e,p_114e150f10ff,p_355d24a69305,p_f48ab6442f7f,p_93717b1fd07d,p_9e88a59d112b,p_1746058457db,p_7d3bb3a4abd2,p_7c08311459cb,p_1ec40c8d5bb3,p_a61040e8b82e,p_bc3aab3bdfa8,p_3d162d25e40a,p_7acd0b1d3b5b"
+  },
+  {
+   "type": "error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "type": "http",
+   "text": "404 http://127.0.0.1:56551/api/v1/sources/s_85e2a3f81e56/toc"
+  },
+  {
+   "type": "error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "type": "http",
+   "text": "404 http://127.0.0.1:56551/api/v1/sources/s_85e2a3f81e56/chapters/sec_43e1da8d0a7d"
+  },
+  {
+   "type": "error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "type": "http",
+   "text": "404 http://127.0.0.1:56551/api/knowledge/v1/mentions?targets=p_06699e89ad54,p_95ca9b6e0642,p_c625581f5c19,p_310a0c03d4a4,p_569d082d0d98,p_ece2dcbb1a70,p_c69299be43b3,p_03413d6ac255,p_36b891ae62d4,p_65e0b2048398,p_e6054b1b5e4d,p_78ef37e5b11c,p_7942aa06f95f,p_90721484f271,p_7d720f57afcc,p_6638cbac4aff,p_d3e82a8c6c9e,p_6d6e619a7b27,p_13a4a42b7442,p_aac442bc180f,p_36146a97ac49,p_865e646af5dd,p_f90de043e629,p_4777626d7790,p_aa73748c9915,p_77de61b4d951,p_0a61f611f4d8,p_19e4031d7d64,p_fb89b4506b7e,p_114e150f10ff,p_355d24a69305,p_f48ab6442f7f,p_93717b1fd07d,p_9e88a59d112b,p_1746058457db,p_7d3bb3a4abd2,p_7c08311459cb,p_1ec40c8d5bb3,p_a61040e8b82e,p_bc3aab3bdfa8,p_3d162d25e40a,p_7acd0b1d3b5b"
+  },
+  {
+   "type": "error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  }
+ ]
+}
