@@ -113,6 +113,9 @@ events.define(
     required=("type", "fragments"),
 )
 events.define("assistant.stopped", "info", "Читатель остановил ответ", required=("fragments",))
+events.define(
+    "assistant.handoff", "info", "Граница книги: вопрос шире источника", required=("reason",)
+)
 
 STATUS_TITLES = {"verified": "проверено", "sourced": "по источникам", "generated": "сгенерировано"}
 
@@ -128,6 +131,9 @@ class AskRequest:
     sources_only: bool = False
     generation: bool = True  # генерация без опоры на источники (по умолчанию включена)
     scope: str = "all"  # переключатель источников: all | current
+    context: str = "library"  # N12: "book" | "library" (по умолчанию library — старые клиенты)
+    handoff_declined: bool = False  # читатель выбрал «Продолжить в рамках этого источника»
+    handoff_reason: str | None = None  # broader | outside_book — для журнала
 
 
 @dataclass
@@ -179,9 +185,12 @@ class Assistant:
         settings: AssistantSettings | None = None,
         clock: Clock | None = None,
         ontology: Ontology | None = None,
+        library=None,
     ) -> None:
         self.search = search
         self.llm = llm
+        # Библиотека — для названий глав в ссылках (N4); без неё название главы не приходит.
+        self.library = library
         self.settings = settings or AssistantSettings()
         self.clock = clock or SystemClock()
         self.ontology = ontology
@@ -224,6 +233,15 @@ class Assistant:
             duration_ms=duration,
         )
         return kind, names
+
+    def _chapter_title(self, result: dict[str, Any]) -> str | None:
+        """Название главы абзаца для подсказки ссылки (N4): от поиска, иначе из оглавления."""
+        if result.get("chapter_title"):
+            return result["chapter_title"]
+        chapter = result.get("chapter_id")
+        if not chapter or self.library is None:
+            return None
+        return self.library.chapter_titles(result["source_id"]).get(chapter) or None
 
     def _history_summary(self, request: AskRequest) -> str:
         earlier = (
@@ -344,6 +362,20 @@ class Assistant:
         except LlmUnavailable:
             yield from self._unavailable("budget_exhausted")
             return
+        # N12: вопрос шире книги — граница без составления ответа (5.10).
+        if request.context == "book" and kind == "other_authors" and not request.handoff_declined:
+            events.emit("assistant.handoff", reason="broader")
+            yield {"type": "handoff", "reason": "broader"}
+            yield {
+                "type": "done",
+                "kind": kind,
+                "stats": {"fragments": 0, "grounded": 0, "ungrounded": 0, "hidden": 0},
+                "passages": 0,
+                "llm_calls": 0,
+                "total_ms": round((time.perf_counter() - started) * 1000, 2),
+                "answer_language": answer_language(request.question),
+            }
+            return
         calls = 1
         if CHAINS[kind].get("refuse"):
             events.emit("assistant.refused", reason="off_topic")
@@ -354,6 +386,7 @@ class Assistant:
             }
             return
         ctx = self._ontology(kind, request, names)
+        yield {"type": "stage", "name": "searching"}
         try:
             results = self._gather(kind, request, names, ctx)
         except ServiceUnavailable:
@@ -381,6 +414,9 @@ class Assistant:
                 r.get("section_title") or "",
                 r["text"],
                 quoting=r.get("quoting", True),
+                source_title=r.get("source_title"),
+                chapter_title=self._chapter_title(r),
+                paragraph_start=r["text"][:120],
             )
             for i, r in enumerate(results)
         }
@@ -397,6 +433,7 @@ class Assistant:
                 kind="statement",
                 statement_id=s["id"],
                 grounds=s["status"] in ("verified", "sourced"),
+                entity_id=s.get("entity_id"),
             )
         paragraphs = [p for p in passages.values() if p.kind == "paragraph"]
         if kind == "other_authors":
@@ -437,9 +474,10 @@ class Assistant:
         first_ms = -1.0
         calls += 1
         assert calls <= self.settings.max_llm_calls
+        cited_book = False  # N12: хоть один фрагмент опёрся на абзац книги панели
 
         def emit_fragments(fragments) -> Iterator[dict[str, Any]]:
-            nonlocal first_ms
+            nonlocal first_ms, cited_book
             for fragment in fragments:
                 stats["removed_citations"] += fragment.removed_citations
                 stats["removed_quotes"] += fragment.removed_quotes
@@ -455,11 +493,16 @@ class Assistant:
                     continue
                 stats["fragments"] += 1
                 stats["grounded" if fragment.grounded else "ungrounded"] += 1
+                if request.source_id and any(
+                    p.source_id == request.source_id for p in fragment.citations
+                ):
+                    cited_book = True
                 if first_ms < 0:
                     first_ms = round((time.perf_counter() - started) * 1000, 2)
                     metrics.observe("assistant.first_fragment_ms", first_ms)
                 yield {"type": "fragment", **fragment.to_json()}
 
+        yield {"type": "stage", "name": "composing", "found": len(passages)}
         try:
             try:
                 for item in self.llm.stream("main", CHAINS[kind]["template"], data, "answer"):
@@ -490,10 +533,24 @@ class Assistant:
             yield {
                 "type": "no_answer",
                 "message": "В источниках ответа не нашлось.",
-                "suggestions": [p.title for p in passages.values()][:3],
+                "suggestions": [
+                    {"paragraph_id": p.paragraph_id, "title": p.title}
+                    for p in passages.values()
+                    if p.kind == "paragraph"
+                ][:3],
             }
         if ctx is not None and ctx.graph and stats["fragments"]:
             yield {"type": "suggestion", "kind": "graph", **ctx.graph}
+        # N12: ответ составлен, но ни один фрагмент не опёрся на абзацы книги (5.10).
+        if (
+            request.context == "book"
+            and request.source_id
+            and stats["fragments"] > 0
+            and not cited_book
+            and not request.handoff_declined
+        ):
+            events.emit("assistant.handoff", reason="outside_book")
+            yield {"type": "handoff", "reason": "outside_book"}
         total = round((time.perf_counter() - started) * 1000, 2)
         events.emit(
             "assistant.answer.completed",
@@ -512,6 +569,7 @@ class Assistant:
             "llm_calls": calls,
             "first_fragment_ms": first_ms,
             "total_ms": total,
+            "answer_language": answer_language(request.question),
         }
 
     @staticmethod

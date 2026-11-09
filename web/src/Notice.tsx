@@ -21,13 +21,18 @@ export function requestNotice(): void {
 
 export function NoticeText() {
   const t = useT();
+  // Пример пометки не рвётся между строками, и точка после него не уходит на следующую строку.
+  const punct = /^[.,;:!?…]*/.exec(t.notice.markedAfter)?.[0] ?? "";
   return (
     <div className="notice-text">
       <p>{t.notice.about}</p>
       <p>
         {t.notice.markedBefore}{" "}
-        <Generated className="card-description ungrounded notice-example">{t.notice.example}</Generated>
-        {t.notice.markedAfter}
+        <span className="pg-nowrap notice-example-wrap">
+          <Generated className="card-description ungrounded notice-example">{t.notice.example}</Generated>
+          {punct}
+        </span>
+        {t.notice.markedAfter.slice(punct.length)}
       </p>
       <p>{t.notice.generationOn}</p>
       <p>{t.notice.provider}</p>

@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { AssistantPanel, useAnsweringStage } from "./AssistantPanel";
+import { AssistantPage } from "./AssistantPage";
+import { FullCard, OPEN_CARD_EVENT } from "./FullCard";
 import { GraphPage } from "./GraphPage";
 import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
@@ -8,6 +11,7 @@ import { ReaderPage } from "./ReaderPage";
 import { ReviewPage } from "./ReviewPage";
 import { SettingsPage } from "./SettingsPage";
 import { Sidebar } from "./Sidebar";
+import { SidePanel } from "./SidePanel";
 import { SoonPage } from "./SoonPage";
 import { storage } from "./storage";
 import { useDocumentAppearance } from "./theme";
@@ -19,8 +23,8 @@ import { Icon } from "./ui";
 //         /graph/:entity?recipe=… — граф по запросу
 //         /settings[#раздел]  — настройки читателя
 //         /soon/:раздел       — раздел в разработке
-export function navigate(path: string): void {
-  window.history.pushState(null, "", path);
+export function navigate(path: string, state?: unknown): void {
+  window.history.pushState(state ?? null, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
@@ -44,8 +48,37 @@ function activeItem(parts: string[]): string {
   if (parts.length === 0) return "library";
   if (parts[0] === "read" || parts[0] === "p") return "reading";
   if (parts[0] === "soon") return parts[1] ?? "other";
+  if (parts[0] === "assistant") return "assistant";
   if (parts[0] === "settings" || parts[0] === "graph") return parts[0];
   return "other";
+}
+
+// Состояние правой панели живёт выше ReaderPage, чтобы переживать переходы между главами и
+// книгами. Стек «Назад» (4.6): элементы «ассистент» и «карточка X», верхний — текущий.
+export type PanelItem = { kind: "assistant" } | { kind: "card"; entityId: string; title: string };
+export type PanelState = {
+  stack: PanelItem[];
+  sourceId: string;
+  selection: string | null;
+  selectionParagraphs: string[];
+  stripExpanded: boolean;
+  chapterId?: string;
+  chapterTitle?: string;
+};
+
+// Положить элемент наверх стека панели (4.6): повторное открытие того же — не растит; глубина ≤ 20.
+function samePanelItem(a: PanelItem | undefined, b: PanelItem): boolean {
+  if (!a) return false;
+  if (a.kind === "assistant") return b.kind === "assistant";
+  return b.kind === "card" && a.entityId === b.entityId;
+}
+
+export function pushPanelItem(stack: PanelItem[] | undefined, item: PanelItem): PanelItem[] {
+  const items = stack ? [...stack] : [];
+  const top = items[items.length - 1];
+  if (samePanelItem(top, item)) items[items.length - 1] = item;
+  else items.push(item);
+  return items.slice(-20);
 }
 
 export function App() {
@@ -55,9 +88,29 @@ export function App() {
   const [beforeHash, hash = ""] = location.split("#");
   const [path, search = ""] = beforeHash.split("?");
   const parts = path.split("/").filter(Boolean);
+  const [panel, setPanel] = useState<PanelState | null>(null);
+  // Идёт ли ответ в книге панели: точка стадии в свёрнутой полоске (2.3).
+  const answering = useAnsweringStage(panel?.sourceId || null);
+  // Карточка по ссылке из полной карточки (связь) или из ответа ассистента (утверждение, 5.4)
+  // ложится наверх стека правой панели. На странице «Ассистент» панели может не быть —
+  // тогда она открывается с одной карточкой.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const detail = (e as CustomEvent<{ entityId: string; title: string }>).detail;
+      if (!detail) return;
+      const card: PanelItem = { kind: "card", entityId: detail.entityId, title: detail.title };
+      setPanel((p) =>
+        p
+          ? { ...p, stack: pushPanelItem(p.stack, card), stripExpanded: true }
+          : { stack: [card], sourceId: "", selection: null, selectionParagraphs: [], stripExpanded: true },
+      );
+    };
+    window.addEventListener(OPEN_CARD_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CARD_EVENT, onOpen);
+  }, []);
   return (
     <>
-      <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} />
+      <Sidebar active={activeItem(parts)} sourceId={parts[0] === "read" ? parts[1] : undefined} panelOpen={panel !== null} />
       {/* Область содержимого: сюда переходит фокус, когда Esc сворачивает боковую панель. */}
       <div id="content" className="app-content" tabIndex={-1}>
         {!storage.persistent() && (
@@ -67,22 +120,86 @@ export function App() {
           </div>
         )}
         <FirstRunNotice />
-        <Page parts={parts} search={search} hash={hash} />
+        <Page parts={parts} search={search} hash={hash} panel={panel} setPanel={setPanel} />
       </div>
+      {panel && (
+        <SidePanel
+          expanded={panel.stripExpanded}
+          onExpand={(stripExpanded) => setPanel({ ...panel, stripExpanded })}
+          ariaLabel={panel.stack[panel.stack.length - 1].kind === "assistant" ? t.assistant.label : t.card.label}
+          kind={panel.stack[panel.stack.length - 1].kind}
+          answering={answering ? t.assistant.stage[answering] : null}
+        >
+          {(() => {
+            const top = panel.stack[panel.stack.length - 1];
+            const below = panel.stack[panel.stack.length - 2];
+            const back = below
+              ? {
+                  onClick: () => setPanel({ ...panel, stack: panel.stack.slice(0, -1) }),
+                  label: below.kind === "card" ? t.panel.backToCard(below.title) : t.panel.backToAssistant,
+                }
+              : undefined;
+            if (top.kind === "assistant") {
+              return (
+                <AssistantPanel
+                  sourceId={panel.sourceId}
+                  selection={panel.selection}
+                  selectionParagraphs={panel.selectionParagraphs}
+                  onClose={() => setPanel(null)}
+                  onBack={back?.onClick}
+                  backLabel={back?.label}
+                  chapterId={panel.chapterId}
+                  chapterTitle={panel.chapterTitle}
+                />
+              );
+            }
+            return (
+              <FullCard
+                entityId={top.entityId}
+                onClose={() => setPanel(null)}
+                onBack={back?.onClick}
+                backLabel={back?.label}
+              />
+            );
+          })()}
+        </SidePanel>
+      )}
     </>
   );
 }
 
-function Page({ parts, search, hash }: { parts: string[]; search: string; hash: string }) {
+function Page({
+  parts,
+  search,
+  hash,
+  panel,
+  setPanel,
+}: {
+  parts: string[];
+  search: string;
+  hash: string;
+  panel: PanelState | null;
+  setPanel: Dispatch<SetStateAction<PanelState | null>>;
+}) {
   if (parts[0] === "p" && parts[1]) return <ParagraphLink paragraphId={parts[1]} />;
   if (parts[0] === "internal" && parts[1] === "review") return <ReviewPage />;
   if (parts[0] === "settings") return <SettingsPage hash={hash} />;
-  if (parts[0] === "soon" && parts[1]) return <SoonPage key={parts[1]} code={parts[1]} />;
+  if (parts[0] === "soon" && parts[1]) {
+    if (parts[1] === "assistant") {
+      // Старая закладка на заглушку раздела «Ассистент» (5.10): замена без записи в историю.
+      window.history.replaceState(null, "", "/assistant");
+      return <AssistantPage />;
+    }
+    return <SoonPage key={parts[1]} code={parts[1]} />;
+  }
+  if (parts[0] === "assistant") return <AssistantPage search={search} />;
   if (parts[0] === "graph" && parts[1]) {
     return <GraphPage key={parts[1]} entityId={parts[1]} query={new URLSearchParams(search)} />;
   }
   if (parts[0] === "read") {
-    return <ReaderPage sourceId={parts[1]} chapterId={parts[2]} anchor={hash} />;
+    return (
+      <ReaderPage sourceId={parts[1]} chapterId={parts[2]} anchor={hash} panel={panel} setPanel={setPanel} />
+    );
   }
   return <LibraryPage />;
 }

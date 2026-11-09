@@ -262,6 +262,8 @@ class Reading:
                         "pages": [[m.offset, m.label] for m in block.pages if m.label is not None],
                         "notes": [[r.offset, r.footnote_id] for r in block.notes],
                         "detail": block.detail,
+                        "detail_code": block.detail_code,
+                        "page": block.page,
                     }
                 )
             for note in section.footnotes:

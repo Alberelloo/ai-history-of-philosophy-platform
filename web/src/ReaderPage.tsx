@@ -1,26 +1,116 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type MouseEvent as ReactMouseEvent, type ReactNode, type SetStateAction } from "react";
 import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
-import { navigate } from "./App";
-import { AssistantPanel } from "./AssistantPanel";
-import { CardPopup } from "./CardPopup";
+import { navigate, pushPanelItem, type PanelState } from "./App";
+import { useFragmentParagraphs } from "./AssistantPanel";
+import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
+import { fieldItems, MarginCol } from "./Footnote";
+import { useAssistantShortcut } from "./hooks/useAssistantShortcut";
+import { useReadingAnchor } from "./hooks/useReadingAnchor";
+import { useTocLocation } from "./hooks/useTocLocation";
+import { Toc } from "./ReaderToc";
 import { errorText, useT, type Catalog } from "./i18n";
-import { storage } from "./storage";
-import { Icon } from "./ui";
+import { computeLayout, type Layout } from "./layout";
+import { storage, useStored } from "./storage";
+import { familyOf, Icon } from "./ui";
 
-type Props = { sourceId?: string; chapterId?: string; anchor: string };
+type Props = {
+  sourceId?: string;
+  chapterId?: string;
+  anchor: string;
+  panel: PanelState | null;
+  setPanel: Dispatch<SetStateAction<PanelState | null>>;
+};
+
+// Ширина окна: раскладка K1–K4 пересчитывается при её изменении.
+function useWindowWidth(): number {
+  const [width, setWidth] = useState(() => window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
+
+// Раскладка по свободной ширине (2.2). Корневой кегль и ширина 1ch измеряются: на окнах шире
+// 1920px кегль растёт (9.7), и все величины в rem/ch масштабируются.
+function useReaderLayout(panelOpen: boolean): Layout {
+  const width = useWindowWidth();
+  const pinned = useStored((s) => s.sidebarPinned);
+  const [metrics, setMetrics] = useState({ root: 16, ch: 11 });
+  useEffect(() => {
+    const measure = () => {
+      const root = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const probe = document.createElement("span");
+      probe.style.cssText = "position:absolute;visibility:hidden;width:1ch;font:var(--type-read-body);";
+      document.body.appendChild(probe);
+      const ch = probe.getBoundingClientRect().width || 11;
+      probe.remove();
+      setMetrics({ root, ch });
+    };
+    measure();
+    // До загрузки Literata ширина 1ch берётся из запасного шрифта и отличается: после
+    // загрузки шрифта раскладка пересчитывается (document.fonts.ready).
+    document.fonts?.ready.then(measure).catch(() => {});
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  return computeLayout({ root: metrics.root, ch: metrics.ch, width, pinned, panelOpen });
+}
 
 function replace(path: string) {
   window.history.replaceState(null, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-type Mention = { target_id: string; entity_id: string; start: number; end: number };
-type OpenMention = (entityId: string, x: number, y: number) => void;
+type Mention = {
+  target_id: string;
+  entity_id: string;
+  entity_type?: string;
+  start: number;
+  end: number;
+};
+// Открыть окно карточки у упоминания: анкор — сам элемент упоминания (положение считает окно),
+// ``line`` — строка упоминания, по которой щёлкнули, ``keyboard`` — открыто Enter/Space.
+type OpenMention = (
+  entityId: string,
+  entityType: string | undefined,
+  anchor: HTMLElement,
+  opts: { line: number; keyboard: boolean },
+) => void;
+type OpenCard = { id: string; anchor: HTMLElement; line: number; keyboard: boolean; name: string };
+
+// Сервер знаний принимает до 500 абзацев за запрос (`targets[:500]`); главу длиннее
+// запрашиваем частями параллельно (N11, раздел 13 дока).
+const MENTIONS_CHUNK = 500;
+
+// Щелчок, а не протяжка выделения: указатель сдвинулся меньше чем на 4px и выделение пусто (4.2).
+let pointerDownAt: { x: number; y: number } | null = null;
+function isClick(e: ReactMouseEvent): boolean {
+  const start = pointerDownAt;
+  pointerDownAt = null;
+  if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) >= 4) return false;
+  const sel = window.getSelection();
+  return !sel || sel.isCollapsed || sel.toString().trim() === "";
+}
+
+// Строка упоминания, по которой щёлкнули: прямоугольник из getClientRects() под указателем.
+function clickedLine(el: HTMLElement, e: ReactMouseEvent): number {
+  const rects = Array.from(el.getClientRects());
+  const i = rects.findIndex(
+    (r) =>
+      e.clientX >= r.left - 1 && e.clientX <= r.right + 1 && e.clientY >= r.top - 1 && e.clientY <= r.bottom + 1,
+  );
+  return i < 0 ? 0 : i;
+}
 // Что показать вместо главы: код ошибки сервера (переводится) и запасной текст.
 type Problem = { kind: string; text?: string };
 // Читатель пришёл в главу, которой больше нет, и открыто ближайшее место: куда и почему.
 type Relocated = { chapterId: string; reason: "saved" | "link" };
+
+// Предел длины выделенного фрагмента (assistant-dialog «Ограничение длины»).
+const MAX_SELECTION = 4000;
 
 // Ближайшее место вместо пропавшей главы: глава сохранённого абзаца, иначе первая глава.
 async function nearestPlace(
@@ -72,15 +162,33 @@ function renderText(
     const mention = mentions.find((m) => m.start <= a && b <= m.end);
     parts.push(
       mention ? (
-        <button
+        <span
           key={`m${a}`}
-          type="button"
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
           className="mention pg-mention"
           data-entity={mention.entity_id}
-          onClick={(e) => open(mention.entity_id, e.pageX, e.pageY + 12)}
+          data-family={familyOf(mention.entity_type)}
+          onPointerDown={(e) => {
+            pointerDownAt = { x: e.clientX, y: e.clientY };
+          }}
+          onClick={(e) => {
+            if (!isClick(e)) return;
+            open(mention.entity_id, mention.entity_type, e.currentTarget, {
+              line: clickedLine(e.currentTarget, e),
+              keyboard: false,
+            });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open(mention.entity_id, mention.entity_type, e.currentTarget, { line: 0, keyboard: true });
+            }
+          }}
         >
           {piece}
-        </button>
+        </span>
       ) : (
         piece
       ),
@@ -89,60 +197,67 @@ function renderText(
   return parts;
 }
 
-function blockPoints(block: Extract<ChapterBlock, { type: "block" }>, chapter: Chapter, t: Catalog) {
+function blockPoints(
+  block: Extract<ChapterBlock, { type: "block" }>,
+  chapter: Chapter,
+  t: Catalog,
+  field: boolean,
+  noteActive: string | null,
+  setNoteActive: (id: string | null) => void,
+) {
+  const pageAnchor = (at: number) => `${block.id}-${at}`;
   return [
     ...block.pages.map(([at, label]) => ({
       at,
       skip: 0,
-      node: (key: string) => (
-        <span key={key} className="page-mark" data-page={label}>
-          {t.reader.page(label)}
-        </span>
-      ),
+      node: (key: string) =>
+        field ? (
+          // В K1 номер страницы на поле: в тексте — невидимая метка, к которой он привязывается.
+          <span key={key} className="page-anchor" data-page-anchor={pageAnchor(at)} aria-hidden="true" />
+        ) : (
+          <span key={key} className="page-mark" data-page={label} data-nontext>
+            {t.reader.page(label)}
+          </span>
+        ),
     })),
     ...block.notes.flatMap(([at, id]) => {
       const note = chapter.footnotes[id];
       if (!note) return [];
       const skip = block.text.startsWith(note.marker, at) ? note.marker.length : 0;
-      return [{ at, skip, node: (key: string) => <FootnoteRef key={key} note={note} /> }];
+      return [
+        {
+          at,
+          skip,
+          node: (key: string) => (
+            <FootnoteRef
+              key={key}
+              note={note}
+              noteId={id}
+              field={field}
+              active={noteActive === id}
+              onActive={setNoteActive}
+            />
+          ),
+        },
+      ];
     }),
   ];
 }
 
+function unrenderedDetail(t: Catalog, block: Extract<ChapterBlock, { type: "block" }>): string | null {
+  if (block.detail_code === "blank_page") return t.unrendered.blank_page(block.page ?? "");
+  if (block.detail_code === "missing") return t.unrendered.missing;
+  return block.detail;
+}
+
+// Поле сносок (K1): элементы встают верхом на уровне своих строк; при наезде сдвигаются вниз
+// каскадом до промежутка 12px. Положения считаются одним проходом после отрисовки.
 function copyLink(paragraphId: string, onDone: () => void) {
   const url = `${window.location.origin}/p/${paragraphId}`;
   navigator.clipboard?.writeText(url).then(onDone, onDone);
 }
 
-function Toc({ items, sourceId, current }: { items: TocItem[]; sourceId: string; current: string }) {
-  return (
-    <ul>
-      {items.map((item) => {
-        const isChapter = item.chapter_id === item.id;
-        const target = isChapter
-          ? `/read/${sourceId}/${item.id}`
-          : `/read/${sourceId}/${item.chapter_id}#s-${item.id}`;
-        return (
-          <li key={item.id}>
-            <a
-              href={target}
-              aria-current={item.id === current ? "true" : undefined}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(target);
-              }}
-            >
-              {item.title}
-            </a>
-            {item.children.length > 0 && <Toc items={item.children} sourceId={sourceId} current={current} />}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
+export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Props) {
   const t = useT();
   const [toc, setToc] = useState<TocItem[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -150,44 +265,122 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   const [previousUnavailable, setPreviousUnavailable] = useState(false);
   const [relocated, setRelocated] = useState<Relocated | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [selection, setSelection] = useState<{ text: string; paragraphs: string[]; top: number } | null>(
     null,
   );
-  const [asked, setAsked] = useState<{ text: string; paragraphs: string[] } | null>(null);
   const [mentions, setMentions] = useState<Record<string, Mention[]>>({});
-  const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
-  const openCard: OpenMention = (id, x, y) => setCard({ id, x, y });
+  const [card, setCard] = useState<OpenCard | null>(null);
+  // Повторный щелчок по тому же упоминанию закрывает окно (4.2).
+  const openCard: OpenMention = (id, _type, anchorEl, opts) =>
+    setCard((c) =>
+      c && c.anchor === anchorEl && !opts.keyboard
+        ? null
+        : { id, anchor: anchorEl, name: anchorEl.textContent ?? "", ...opts },
+    );
+  // Упоминание открытого окна: aria-expanded и aria-controls (10.2).
+  useEffect(() => {
+    if (!card) return;
+    const el = card.anchor;
+    el.setAttribute("aria-expanded", "true");
+    el.setAttribute("aria-controls", CARD_POPUP_ID);
+    return () => {
+      el.setAttribute("aria-expanded", "false");
+      el.removeAttribute("aria-controls");
+    };
+  }, [card]);
+  // Карточка по ссылке из полной карточки или из ответа ассистента — слушатель в App.tsx.
   const textRef = useRef<HTMLElement>(null);
   const anchorRef = useRef(anchor);
   anchorRef.current = anchor;
+  const [tocOpen, setTocOpen] = useState(false);
+  const layout = useReaderLayout(panel !== null);
+  const mentionsView = useStored((s) => s.mentions);
+  const [noteActive, setNoteActive] = useState<string | null>(null);
+  // Абзацы фрагмента, ждущего отправки в панели (S6): отметка на левом поле, пока панель открыта.
+  const fragmentMarks = useFragmentParagraphs(panel ? sourceId ?? undefined : undefined);
 
-  // Выделение в тексте главы: кнопка «спросить ассистента» рядом с выделением.
+  // Открыть ассистента в правой панели; фрагмент — если вопрос задан по выделению.
+  const openAssistant = (sel?: { text: string; paragraphs: string[] } | null) => {
+    // Фрагмент ушёл в панель (S6): выделение в тексте снимается, абзацы фрагмента получают
+    // отметку на левом поле (``is-fragment``), пока вопрос не отправлен.
+    if (sel) window.getSelection()?.removeAllRanges();
+    setPanel((p) => ({
+      stack: pushPanelItem(p?.stack, { kind: "assistant" }),
+      sourceId: sourceId ?? p?.sourceId ?? "",
+      selection: sel?.text ?? null,
+      selectionParagraphs: sel?.paragraphs ?? [],
+      stripExpanded: true,
+      chapterId: chapter?.chapter_id ?? p?.chapterId,
+      chapterTitle: chapter?.title ?? p?.chapterTitle,
+    }));
+  };
+  useAssistantShortcut(textRef, openAssistant);
+  // Возврат к тексту на узком окне сворачивает развёрнутую полоску (2.3).
+  const collapsePanel = () => {
+    if (panel) setPanel({ ...panel, stripExpanded: false });
+  };
+  // Панель остаётся открытой при переходе в другую главу/книгу: диалог следует за книгой.
   useEffect(() => {
+    const top = panel?.stack[panel.stack.length - 1];
+    if (panel && top?.kind === "assistant" && sourceId && panel.sourceId !== sourceId) {
+      setPanel({ ...panel, sourceId, chapterId: chapter?.chapter_id, chapterTitle: chapter?.title });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceId]);
+
+  // Выделение в тексте главы: панель действий над выделением через 120 мс (раздел 7).
+  useEffect(() => {
+    let pending = 0;
     const onUp = () => {
-      const sel = window.getSelection();
-      const text = sel?.toString().trim() ?? "";
-      if (!sel || !text || !textRef.current?.contains(sel.anchorNode)) {
-        setSelection(null);
-        return;
-      }
-      const ids = new Set<string>();
-      const range = sel.getRangeAt(0);
-      textRef.current.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
-        if (range.intersectsNode(el)) ids.add(el.dataset.paragraph!);
-      });
-      const rect = range.getBoundingClientRect();
-      setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
+      window.clearTimeout(pending);
+      pending = window.setTimeout(() => {
+        const sel = window.getSelection();
+        const text = sel?.toString().trim() ?? "";
+        const article = textRef.current;
+        if (
+          !sel ||
+          !text ||
+          !article ||
+          !article.contains(sel.anchorNode) ||
+          !article.contains(sel.focusNode)
+        ) {
+          setSelection(null);
+          return;
+        }
+        const ids = new Set<string>();
+        const range = sel.getRangeAt(0);
+        // Абзац входит во фрагмент, только если выделен непустой текст из него: тройной щелчок
+        // заканчивает выделение в начале следующего абзаца, и тот не должен попадать в список.
+        article.querySelectorAll<HTMLElement>("[data-paragraph]").forEach((el) => {
+          if (!range.intersectsNode(el)) return;
+          const part = document.createRange();
+          part.selectNodeContents(el);
+          if (range.compareBoundaryPoints(Range.START_TO_START, part) > 0) part.setStart(range.startContainer, range.startOffset);
+          if (range.compareBoundaryPoints(Range.END_TO_END, part) < 0) part.setEnd(range.endContainer, range.endOffset);
+          if (part.toString().trim()) ids.add(el.dataset.paragraph!);
+        });
+        const rect = range.getBoundingClientRect();
+        setSelection({ text, paragraphs: [...ids], top: rect.bottom + window.scrollY });
+      }, 120);
     };
     document.addEventListener("mouseup", onUp);
-    return () => document.removeEventListener("mouseup", onUp);
+    document.addEventListener("keyup", onUp);
+    return () => {
+      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener("keyup", onUp);
+      window.clearTimeout(pending);
+    };
   }, []);
 
   // Какой источник открыть, если он не указан: запомненный или учебник по умолчанию.
   useEffect(() => {
     if (sourceId) return;
+    // Ответ пришёл, когда читатель уже ушёл с экрана чтения (например, закрыл книгу): адрес
+    // не трогаем и книгу снова не открываем.
+    let cancelled = false;
     const remembered = storage.currentSource();
     api.current(remembered).then((result) => {
+      if (cancelled) return;
       if (result.notice === "previous_unavailable") setPreviousUnavailable(true);
       if (!result.source_id) {
         setProblem({ kind: "no_default" });
@@ -196,16 +389,21 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
       storage.setCurrentSource(result.source_id);
       replace(`/read/${result.source_id}`);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [sourceId]);
 
   // Глава не указана: место, где читатель остановился, иначе первая глава.
   useEffect(() => {
     if (!sourceId) return;
+    let cancelled = false;
     storage.setCurrentSource(sourceId);
     setProblem(null);
     api
       .toc(sourceId)
       .then((items) => {
+        if (cancelled) return;
         setToc(items);
         if (chapterId) return;
         const saved = storage.position(sourceId);
@@ -213,7 +411,12 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
         if (saved) replace(`/read/${sourceId}/${saved.chapterId}${saved.paragraphId ? `#p-${saved.paragraphId}` : ""}`);
         else if (first) replace(`/read/${sourceId}/${first}`);
       })
-      .catch((e: ApiError) => setProblem({ kind: e.kind, text: e.message }));
+      .catch((e: ApiError) => {
+        if (!cancelled) setProblem({ kind: e.kind, text: e.message });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [sourceId, chapterId]);
 
   // Глава по адресу. Раздел внутри главы — его глава с прокруткой к разделу. Главы больше нет
@@ -256,19 +459,32 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
     };
   }, [sourceId, chapterId]);
 
-  // Упоминания сущностей главы. Без онтологии глава показывается без них.
+  // Упоминания сущностей главы. Без онтологии глава показывается без них. Абзацев больше 500 —
+  // запросы частями по 500 параллельно (N11); часть, на которую сервер не ответил, остаётся без
+  // упоминаний. Ответ для прежней главы отбрасывается.
   useEffect(() => {
     setMentions({});
+    setCard(null);
     if (!chapter) return;
-    const targets = chapter.blocks.map((b) => (b.type === "block" ? b.id : b.section_id));
-    fetch(`/api/knowledge/v1/mentions?targets=${targets.join(",")}`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((items: Mention[]) => {
-        const map: Record<string, Mention[]> = {};
-        items.forEach((m) => (map[m.target_id] ??= []).push(m));
-        setMentions(map);
-      })
-      .catch(() => setMentions({}));
+    const controller = new AbortController();
+    const targets = [...new Set(chapter.blocks.map((b) => (b.type === "block" ? b.id : b.section_id)))];
+    const chunks: string[][] = [];
+    for (let i = 0; i < targets.length; i += MENTIONS_CHUNK) chunks.push(targets.slice(i, i + MENTIONS_CHUNK));
+    Promise.all(
+      chunks.map((part) =>
+        fetch(`/api/knowledge/v1/mentions?targets=${part.map(encodeURIComponent).join(",")}`, {
+          signal: controller.signal,
+        })
+          .then((r) => (r.ok ? (r.json() as Promise<Mention[]>) : []))
+          .catch(() => [] as Mention[]),
+      ),
+    ).then((parts) => {
+      if (controller.signal.aborted) return;
+      const map: Record<string, Mention[]> = {};
+      parts.flat().forEach((m) => (map[m.target_id] ??= []).push(m));
+      setMentions(map);
+    });
+    return () => controller.abort();
   }, [chapter]);
 
   // Прокрутка к абзацу или разделу из адреса, подсветка абзаца.
@@ -283,6 +499,9 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
       window.scrollTo(0, 0);
     }
   }, [chapter, anchor]);
+
+  useReadingAnchor(textRef, chapter ? `${layout.mode}:${Math.round(layout.text)}:${layout.navWidth}` : null);
+  const tocSection = useTocLocation(textRef, chapter?.chapter_id ?? null, anchor);
 
   // Запоминание места: первый видимый абзац главы.
   useEffect(() => {
@@ -326,47 +545,115 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
   if (!sourceId || !chapter) return <main className="page loading">{t.app.loading}</main>;
 
   const go = (id: string) => navigate(`/read/${sourceId}/${id}`);
+  const readerStyle = {
+    ["--rl-pad-left" as string]: `${layout.offsetLeft}px`,
+    ["--rl-pad-right" as string]: `${layout.offsetRight}px`,
+  };
+  const tocNav = (
+    <nav className="toc" aria-label={t.reader.toc} style={{ width: layout.toc, flexBasis: layout.toc }}>
+      <button className="pg-btn pg-btn--secondary toc__assistant" onClick={() => openAssistant(null)}>
+        <Icon name="chat" />
+        {t.reader.assistant}
+      </button>
+      <p className="toc__title">{t.reader.toc}</p>
+      <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} section={tocSection} />
+    </nav>
+  );
+  const rail = (
+    <div className="rail">
+      <button
+        type="button"
+        className="pg-btn pg-btn--ghost pg-btn--icon"
+        aria-expanded={tocOpen}
+        aria-controls="reader-toc-layer"
+        aria-label={t.reader.toc}
+        title={t.reader.toc}
+        onClick={() => setTocOpen((v) => !v)}
+      >
+        <Icon name="index" />
+      </button>
+      <button
+        type="button"
+        className="pg-btn pg-btn--ghost pg-btn--icon"
+        aria-label={t.reader.assistant}
+        title={t.reader.assistant}
+        onClick={() => openAssistant(null)}
+      >
+        <Icon name="chat" />
+      </button>
+    </div>
+  );
   return (
-    <div className="reader">
-      <nav className="toc" aria-label={t.reader.toc}>
-        <button
-          className="pg-btn pg-btn--secondary toc__assistant"
-          onClick={() => {
-            setAsked(null);
-            setAssistantOpen(true);
-          }}
-        >
-          <Icon name="chat" />
-          {t.reader.assistant}
-        </button>
-        <p className="toc__title">{t.reader.toc}</p>
-        <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} />
-      </nav>
+    <div className="reader" data-layout={layout.mode} style={readerStyle}>
+      {(layout.mode === "K1" || layout.mode === "K2") && tocNav}
+      {layout.mode === "K3" && rail}
       {selection && (
-        <button
-          className="ask-selection pg-btn pg-btn--primary pg-btn--sm"
+        <div
+          className="selection-toolbar pg-popover"
+          role="toolbar"
+          aria-label={t.reader.selectionActions}
           style={{ top: selection.top + 8 }}
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            setAsked({ text: selection.text, paragraphs: selection.paragraphs });
-            setAssistantOpen(true);
-            setSelection(null);
-          }}
         >
-          <Icon name="chat" small />
-          {t.reader.askSelection}
-        </button>
+          <button
+            className="pg-btn pg-btn--primary pg-btn--sm"
+            aria-disabled={selection.text.length > MAX_SELECTION || undefined}
+            title={selection.text.length > MAX_SELECTION ? t.reader.selectionTooLong(MAX_SELECTION) : t.reader.assistantHint}
+            onClick={() => {
+              if (selection.text.length <= MAX_SELECTION) {
+                openAssistant(selection);
+                setSelection(null);
+              }
+            }}
+          >
+            <Icon name="chat" small />
+            {t.reader.askSelection}
+          </button>
+          <button
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.reader.copyLink}
+            title={t.reader.copyLink}
+            onClick={() => {
+              const id = selection.paragraphs[0];
+              if (id) copyLink(id, () => setCopied(id));
+            }}
+          >
+            <Icon name="link" small />
+          </button>
+        </div>
       )}
-      {card && <CardPopup entityId={card.id} x={card.x} y={card.y} onClose={() => setCard(null)} />}
-      {assistantOpen && (
-        <AssistantPanel
-          sourceId={sourceId}
-          selection={asked?.text ?? null}
-          selectionParagraphs={asked?.paragraphs ?? []}
-          onClose={() => setAssistantOpen(false)}
+      {card && (
+        <CardPopup
+          entityId={card.id}
+          anchor={card.anchor}
+          line={card.line}
+          name={card.name}
+          keyboard={card.keyboard}
+          onClose={(opts) => {
+            const el = card.anchor;
+            setCard(null);
+            if (opts?.restoreFocus && el.isConnected) el.focus({ preventScroll: true });
+          }}
+          onOpenFull={(id, title) => {
+            setCard(null);
+            setPanel((p) => ({
+              stack: pushPanelItem(p?.stack, { kind: "card", entityId: id, title }),
+              sourceId: sourceId ?? p?.sourceId ?? "",
+              selection: p?.selection ?? null,
+              selectionParagraphs: p?.selectionParagraphs ?? [],
+              stripExpanded: true,
+            }));
+          }}
         />
       )}
-      <article className="chapter pg-reading" ref={textRef}>
+      <article
+        className="chapter pg-reading"
+        ref={textRef}
+        data-mentions={mentionsView === "hover" ? "quiet" : undefined}
+        onMouseDown={collapsePanel}
+        onFocusCapture={collapsePanel}
+        style={{ width: layout.text, flexBasis: layout.text }}
+      >
         {relocated && relocated.chapterId === chapter.chapter_id && (
           <div className="pg-notice notice relocated" role="status">
             <Icon name="info" />
@@ -378,6 +665,12 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
             <Icon name="info" />
             <div>{t.reader.previousUnavailable}</div>
           </div>
+        )}
+        {layout.mode === "K4" && (
+          <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm toc-open" onClick={() => setTocOpen(true)}>
+            <Icon name="index" small />
+            {t.reader.toc}
+          </button>
         )}
         <h1>{chapter.title}</h1>
         {chapter.blocks.map((block) => {
@@ -391,11 +684,13 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           }
           if (block.kind === "unrendered") {
             return (
-              <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered">
+              <figure key={block.id} id={`p-${block.id}`} data-paragraph={block.id} className="unrendered" data-nontext>
                 <Icon name="info" className="unrendered__icon" />
                 <div className="unrendered__body">
                   <span className="unrendered__label">{t.reader.unrendered}</span>
-                  {block.detail && <span className="unrendered__detail">{block.detail}</span>}
+                  {unrenderedDetail(t, block) && (
+                    <span className="unrendered__detail">{unrenderedDetail(t, block)}</span>
+                  )}
                   {block.text && <figcaption>{block.text}</figcaption>}
                 </div>
               </figure>
@@ -408,9 +703,9 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
               id={`p-${block.id}`}
               data-paragraph={block.id}
               lang={block.lang}
-              className={`block ${block.kind}`}
+              className={fragmentMarks.includes(block.id) ? `block ${block.kind} is-fragment` : `block ${block.kind}`}
             >
-              {renderText(block.text, blockPoints(block, chapter, t), mentions[block.id] ?? [], openCard)}
+              {renderText(block.text, blockPoints(block, chapter, t, layout.mode === "K1", noteActive, setNoteActive), mentions[block.id] ?? [], openCard)}
               <button
                 type="button"
                 className="copy-link pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
@@ -419,6 +714,16 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
                 onClick={() => copyLink(block.id, () => setCopied(block.id))}
               >
                 <Icon name={copied === block.id ? "check" : "link"} small />
+              </button>
+              {/* Вопрос об абзаце целиком (5.1): фрагмент — текст абзаца, без выделения мышью. */}
+              <button
+                type="button"
+                className="ask-paragraph pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+                aria-label={t.reader.askParagraph}
+                title={t.reader.askParagraph}
+                onClick={() => openAssistant({ text: block.text, paragraphs: [block.id] })}
+              >
+                <Icon name="chat" small />
               </button>
             </Tag>
           );
@@ -448,6 +753,18 @@ export function ReaderPage({ sourceId, chapterId, anchor }: Props) {
           )}
         </nav>
       </article>
+      {layout.mode === "K1" && <MarginCol items={fieldItems(chapter)} noteActive={noteActive} onActive={setNoteActive} />}
+      {tocOpen && (
+        <div
+          id="reader-toc-layer"
+          className="toc-layer pg-popover"
+          role="dialog"
+          aria-modal="false"
+          aria-label={t.reader.toc}
+        >
+          <Toc items={toc} sourceId={sourceId} current={chapter.chapter_id} section={tocSection} onNavigate={() => setTocOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

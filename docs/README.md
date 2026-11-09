@@ -12,3 +12,4 @@
 | [operations/runbook.md](operations/runbook.md) | Эксплуатация сервера: запуск, обновление и откат, копии и восстановление, оповещения, лимиты |
 | [process/git-workflow.md](process/git-workflow.md) | Ветки, PR, CI и автослияние |
 | [process/openspec-workflow.md](process/openspec-workflow.md) | Работа по OpenSpec: структура `openspec/`, цикл изменения, формат спецификации |
+| [process/reader-handoff.md](process/reader-handoff.md) | Экран чтения: состояние этапов 1–6, нужное от сервера, тесты T1–T48, запуск, процесс и порядок продолжения |

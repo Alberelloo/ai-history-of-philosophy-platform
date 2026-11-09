@@ -12,7 +12,7 @@
         var state = {};
         try {
           var ls = window.localStorage;
-          state = JSON.parse(ls.getItem("philograph:v3") || ls.getItem("philograph:v2") || "{}") || {};
+          state = JSON.parse(ls.getItem("philograph:v4") || ls.getItem("philograph:v3") || ls.getItem("philograph:v2") || "{}") || {};
         } catch (e) {
           state = {};
         }

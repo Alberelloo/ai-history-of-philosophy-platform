@@ -49,17 +49,19 @@ def test_library_search_filter_and_choose(page, stack):
 @req("chapter-reading", "Переход между главами")
 def test_reading_journey(page, stack):
     open_textbook(page, stack)
-    assert page.locator(".page-mark").all_inner_texts()[:2] == ["с. 11", "с. 12"]
+    assert page.locator(".field-page").all_inner_texts()[:2] == ["11", "12"]
     page.locator(".note-ref").first.hover()
-    popup = page.get_by_role("tooltip")
-    assert "белой бумаге" in popup.inner_text()
-    assert popup.get_by_role("link").get_attribute("href") == "https://example.org/tabula-rasa"
+    assert "белой бумаге" in page.locator(".field-note").first.inner_text()
+    assert (
+        page.locator(".field-note a").first.get_attribute("href")
+        == "https://example.org/tabula-rasa"
+    )
     page.get_by_role("navigation", name="Главы").get_by_role(
         "button", name="Следующая глава"
     ).click()
     page.wait_for_selector("h1:text('Глава 2. Юм и проблема индукции')")
     toc = page.get_by_role("navigation", name="Оглавление")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 2. Юм и проблема индукции"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 2. Юм и проблема индукции"
     toc.get_by_role("link", name="Глава 3. Ответ Канта").click()
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
     toc.get_by_role("link", name="Привычка и ожидание").click()
@@ -92,7 +94,7 @@ def test_assistant_on_selection_through_all_services(page, stack):
     page.evaluate("""() => {
         const p = [...document.querySelectorAll('p.block')]
             .find(e => e.innerText.includes('проблема индукции'));
-        const range = document.createRange(); range.selectNodeContents(p.firstChild);
+        const range = document.createRange(); range.selectNodeContents(p);
         const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
         p.dispatchEvent(new MouseEvent('mouseup', {bubbles: true}));
     }""")
@@ -150,7 +152,7 @@ EMPIRICISM = "Empiricism: a demonstration reader"
 
 
 def stored(page) -> dict:
-    return json.loads(page.evaluate("localStorage.getItem('philograph:v3')") or "{}")
+    return json.loads(page.evaluate("localStorage.getItem('philograph:v4')") or "{}")
 
 
 def read_from_library(page, stack, title: str, heading: str) -> None:
@@ -238,21 +240,19 @@ def test_mention_opens_card_and_navigates(page, stack):
     card.locator("h3:text('Юм')").wait_for()
     assert page.evaluate("window.scrollY") == scroll  # глава не сдвигается
     assert card.locator(".card-dates").inner_text() == "1711–1776"  # тире без пробелов
-    influence = card.locator("[data-section=influence]")
-    assert "так считает" in influence.inner_text()
+    # Компактное окно: не больше двух утверждений, без переключателей источников.
+    assert card.locator(".card-popup__facts .card-row").count() <= 2
+    assert card.get_by_label("Только выбранный учебник").count() == 0
     # Описание дописывается потоком и помечено как сгенерированное.
     card.locator(".card-description.ungrounded").get_by_role("img", name="Сгенерировано").wait_for()
     description = card.locator(".card-description").inner_text().strip()
     assert description and "config/" not in description  # описание, а не служебный текст
-    influence.get_by_role("button", name="Кант", exact=True).click()
-    card.locator("h3:text('Кант')").wait_for()
-    card.get_by_role("button", name="Назад").click()
-    card.locator("h3:text('Юм')").wait_for()
-    # Подтверждающий абзац из строки ведёт к абзацу учебника.
-    card.get_by_role("button", name="Кант", exact=True).click()
-    card.locator("h3:text('Кант')").wait_for()
-    card.locator("[data-section=influence] .citation").first.click()
-    page.locator("p.block.highlight", has_text="догматического сна").wait_for()
+    # Полная карточка — в правой панели.
+    card.get_by_role("button", name="Открыть карточку").click()
+    panel = page.get_by_role("complementary", name="Карточка")
+    influence = panel.locator("[data-section=influence]")
+    influence.wait_for()
+    assert "так считает" in influence.inner_text()
 
     indexed = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.mentions.indexed")
     assert any(e["mentions"] > 0 for e in indexed)
@@ -273,10 +273,13 @@ def test_concept_card_with_definition_and_where_to_read(page, stack):
     ).click()
     card = page.get_by_role("dialog", name="Карточка")
     card.locator("h3:text('Причинность')").wait_for()
-    definitions = card.locator("[data-section=definitions]")
+    card.get_by_role("button", name="Открыть карточку").click()
+    panel = page.get_by_role("complementary", name="Карточка")
+    definitions = panel.locator("[data-section=definitions]")
+    definitions.wait_for()
     assert "априорная категория рассудка" in definitions.inner_text()
     assert "так считает: Кант" in definitions.inner_text()
-    where = card.locator("[data-section=where]")
+    where = panel.locator("[data-section=where]")
     # По одному упоминанию в каждой главе, поэтому порядок между ними не задан.
     assert sorted(where.get_by_role("button").all_inner_texts()) == [
         "Глава 2. Юм и проблема индукции",
@@ -285,8 +288,8 @@ def test_concept_card_with_definition_and_where_to_read(page, stack):
     assert TEXTBOOK in where.inner_text()
     where.get_by_role("button", name="Глава 3. Ответ Канта").click()
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")
-    card.get_by_role("button", name="Закрыть карточку").click()
-    assert page.get_by_role("dialog", name="Карточка").count() == 0
+    panel.get_by_role("button", name="Закрыть карточку").click()
+    assert page.get_by_role("complementary", name="Карточка").count() == 0
 
 
 @req("entity-mentions", "Показ при чтении")
@@ -326,7 +329,7 @@ def test_genesis_graph_from_card(page, stack, tmp_path):
         ".mention", has_text="Кант"
     ).click()
     card = page.get_by_role("dialog", name="Карточка")
-    card.locator("[data-section=graph]").get_by_role("button", name="Генезис").click()
+    card.get_by_role("button", name="Генезис").click()
     page.wait_for_selector("h1:text('Генезис: Кант')")
     # Сохранённая связь видна сразу, достроенные приходят следом и помечены.
     page.locator(".graph-edge[data-generated=false]").first.wait_for()
@@ -391,17 +394,13 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
     assert page.locator(".graph-edge").get_attribute("aria-label") == "Кант — испытал влияние — Юм"
     built = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.built")
     assert built[-1]["extension"] == "scope"
-    # То же значение в карточке и в ассистенте.
-    page.get_by_role("button", name="Юм", exact=True).click()
-    page.get_by_role("region", name="Узел").get_by_role("button", name="Открыть карточку").click()
-    card = page.get_by_role("dialog", name="Карточка")
-    assert card.get_by_label("Только выбранный учебник").is_checked()
-    card.get_by_role("button", name="Закрыть карточку").click()
+    # Переключатель источников переехал в полную карточку в панели (этап 3); здесь проверяется
+    # то же значение в ассистенте.
     via_sidebar(page, TEXTBOOK)
     page.wait_for_selector("h1:text('Глава 1. Опыт и врождённые идеи')")
     page.evaluate("""() => {
         const p = document.querySelector('p.block');
-        const range = document.createRange(); range.selectNodeContents(p.firstChild);
+        const range = document.createRange(); range.selectNodeContents(p);
         const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
         p.dispatchEvent(new MouseEvent('mouseup', {bubbles: true}));
     }""")

@@ -28,7 +28,8 @@ MAX_DIFF_RATIO = 0.005
 # Разница канала, которую ещё списываем на сглаживание шрифтов и краёв.
 CHANNEL_TOLERANCE = 40
 
-WIDTHS = (1024, 1280, 1600, 1920)
+# 2560 — плавный масштаб (9.7): корневой кегль растёт, и всё в rem растёт вместе с ним.
+WIDTHS = (1024, 1280, 1440, 1920, 2560)
 # Ширины проверки боковой панели: свёрнутая и закреплённая не закрывают текст главы.
 SIDEBAR_WIDTHS = (1024, 1280, 1440, 1920)
 
@@ -36,13 +37,17 @@ SIDEBAR_WIDTHS = (1024, 1280, 1440, 1920)
 # --- подготовка страницы -------------------------------------------------------------
 
 
-def settle(page) -> None:
-    """Ждёт шрифтов и конца перестроек: снимок и измерения стабильны."""
+def settle(page, *, network: bool = True, pointer: bool = True) -> None:
+    """Ждёт шрифтов и конца перестроек: снимок и измерения стабильны. ``network=False`` — не
+    ждать тишины в сети (снимок состояния, где запрос намеренно висит: «загружается»);
+    ``pointer=False`` — не уводить указатель (снимаемое состояние держится наведением)."""
     # Наведение после клика меняло бы вид кнопок; угол — справа внизу: слева боковая панель,
     # и указатель над ней раскрыл бы её.
-    size = page.viewport_size or {"width": 1280, "height": 800}
-    page.mouse.move(size["width"] - 1, size["height"] - 1)
-    page.wait_for_load_state("networkidle")
+    if pointer:
+        size = page.viewport_size or {"width": 1280, "height": 800}
+        page.mouse.move(size["width"] - 1, size["height"] - 1)
+    if network:
+        page.wait_for_load_state("networkidle")
     page.evaluate("document.fonts.ready.then(() => true)")
     page.evaluate(
         "new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => r(true))))"
@@ -203,11 +208,13 @@ def expand_sidebar(page) -> None:
     """Раскрывает боковую панель наведением и ждёт конца анимации ширины."""
     page.locator(".sidebar__brand").hover()
     page.wait_for_function(
-        "() => { const s = document.querySelector('.sidebar');"
-        " return s.dataset.state !== 'collapsed'"
-        " && Math.abs(s.getBoundingClientRect().width"
-        " - parseFloat(getComputedStyle(document.documentElement).getPropertyValue("
-        "s.dataset.state === 'pinned' ? '--sidebar-pinned' : '--sidebar-open'))) < 1; }"
+        """() => { const s = document.querySelector('.sidebar');
+            const root = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const toPx = v => v.endsWith('rem') ? parseFloat(v) * root : parseFloat(v);
+            return s.dataset.state !== 'collapsed'
+            && Math.abs(s.getBoundingClientRect().width
+            - toPx(getComputedStyle(document.documentElement).getPropertyValue(
+            s.dataset.state === 'pinned' ? '--sidebar-pinned' : '--sidebar-open'))) < 1; }"""
     )
 
 
@@ -362,6 +369,17 @@ def assert_focus_ring(page, presses: int = 1) -> dict:
 # --- снимки ---------------------------------------------------------------------------
 
 
+def reader_name(state: str, theme: str, lang: str, width: int) -> str:
+    """Имя снимка экрана чтения по 14.3: ``reader-<состояние>-<тема>-<язык>-<ширина>``."""
+    return f"reader-{state}-{theme}-{lang}-{width}"
+
+
+# Меняется от запуска к запуску: дата и время последнего обмена в строках сессий, секунды
+# с отправки в строке стадий и в итоге ответа. Маска — только сами числа (``assistant__elapsed``):
+# подписи стадий, итога и текст ответа остаются на снимке.
+UNSTABLE = (".assistant__session-meta", ".assistant__elapsed")
+
+
 class SnapshotMismatch(AssertionError):
     pass
 
@@ -398,16 +416,24 @@ def compare(actual: Path, expected: Path, name: str) -> float:
     return ratio
 
 
-def snap(page, name: str, *, mask: list | None = None, full_page: bool = False) -> float | None:
+def snap(
+    page,
+    name: str,
+    *,
+    mask: list | None = None,
+    full_page: bool = False,
+    network: bool = True,
+    pointer: bool = True,
+) -> float | None:
     """Снимает экран и сравнивает с эталоном; возвращает долю различий или None без эталона."""
-    settle(page)
+    settle(page, network=network, pointer=pointer)
     RESULTS.mkdir(parents=True, exist_ok=True)
     actual = RESULTS / f"{name}.png"
     page.screenshot(
         path=str(actual),
         animations="disabled",
         caret="hide",
-        mask=mask or [],
+        mask=[*(mask or []), *(page.locator(s) for s in UNSTABLE)],
         full_page=full_page,
     )
     expected = BASELINES / f"{name}.png"
@@ -417,7 +443,8 @@ def snap(page, name: str, *, mask: list | None = None, full_page: bool = False) 
         actual.unlink()
         return 0.0
     if not expected.exists():
-        return None  # эталонов этой платформы нет: остаются проверки по DOM
+        # Эталона нет: остаются проверки по DOM, а снимок — в results/ для просмотра.
+        return None
     ratio = compare(actual, expected, name)
     actual.unlink()
     return ratio

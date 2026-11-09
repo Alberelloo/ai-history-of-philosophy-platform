@@ -10,6 +10,9 @@ import "@fontsource-variable/literata/opsz-italic.css";
 import "./styles/tokens.css";
 import "./styles/components.css";
 import "./styles.css";
+import "./styles/notes.css";
+import "./styles/assistant.css";
+import "./styles/card.css";
 import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(

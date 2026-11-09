@@ -139,6 +139,8 @@ blocks = Table(
     Column("pages", JSON, nullable=False),
     Column("notes", JSON, nullable=False),
     Column("detail", Text),
+    Column("detail_code", String(20)),
+    Column("page", String(20)),
     schema=SCHEMA,
 )
 
@@ -276,3 +278,14 @@ migrations.add(2, "учебник по умолчанию")(migrations.create_ta
 migrations.add(3, "каталог источников и состояние загрузки")(
     migrations.create_tables("catalog_links", "fetch_state")
 )
+
+
+@migrations.add(4, "код и страница неразобранной части")
+def _add_unrendered_codes(conn) -> None:
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("blocks", schema=SCHEMA)}
+    if "detail_code" not in columns:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.blocks ADD COLUMN detail_code VARCHAR(20)"))
+    if "page" not in columns:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.blocks ADD COLUMN page VARCHAR(20)"))

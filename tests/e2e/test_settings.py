@@ -14,8 +14,9 @@ req = pytest.mark.req
 FR = "first-run-notice"
 RS = "reader-settings"
 pytestmark = pytest.mark.e2e
-KEY = "philograph:v3"
+KEY = "philograph:v4"
 V2 = "philograph:v2"
+V3 = "philograph:v3"
 NOTICE = "О пометках и обработке вопросов"
 
 
@@ -204,7 +205,7 @@ def test_format_2_migrated_to_open_books(browser, stack):
     page.goto(stack.url + "/read")
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")  # место чтения перенесено
     data = stored(page)
-    assert data["version"] == 3 and data["theme"] == "dark"
+    assert data["version"] == 4 and data["theme"] == "dark"
     assert data["settings"]["generation"] is False
     assert [o["id"] for o in data["openSources"]] == [source] and data["currentSource"] == source
     assert data["sidebarPinned"] is False
@@ -232,11 +233,11 @@ def test_old_format_migrated(browser, stack):
     page.goto(stack.url + "/read")
     page.wait_for_selector("h1:text('Глава 3. Ответ Канта')")  # место чтения перенесено
     data = stored(page)
-    assert data["version"] == 3 and data["settings"]["generation"] is False
+    assert data["version"] == 4 and data["settings"]["generation"] is False
     assert page.evaluate("localStorage.getItem('philograph:v1')") is None
-    page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
-    page.get_by_role("button", name="Ассистент", exact=True).click()
-    assert "старый вопрос" in page.get_by_role("complementary", name="Ассистент").inner_text()
+    # Старый диалог перенесён в диалоги раздела «Ассистент» (страница — этап 6).
+    lib = data["libraryDialogs"]["sessions"]
+    assert any(m["question"] == "старый вопрос" for s in lib for m in s["messages"])
     context.close()
 
 
@@ -250,7 +251,7 @@ def test_corrupted_storage_resets(browser, stack):
     page.get_by_role("region", name=NOTICE).get_by_role("button", name="Понятно").click()
     page.goto(stack.url + "/settings")
     assert page.get_by_label("Генерация без опоры на источники").is_checked()
-    assert stored(page)["version"] == 3
+    assert stored(page)["version"] == 4
     context.close()
 
 
@@ -306,18 +307,31 @@ def test_old_dialogs_dropped_over_limit(browser, stack):
         },
         ensure_ascii=False,
     )
-    seed_once(context, f"localStorage.setItem('{KEY}', {json.dumps(big)});")
+    seed_once(context, f"localStorage.setItem('{V3}', {json.dumps(big)});")
     page = context.new_page()
     panel = open_assistant(page, stack)
     panel.get_by_label("Вопрос ассистенту").fill("новый вопрос")
     panel.get_by_role("button", name="Спросить").click()
     panel.locator(".fragment").first.wait_for()
     page.wait_for_function(
-        f"JSON.parse(localStorage.getItem('{KEY}')).dialogs.flat()"
-        ".some(t => t.question === 'новый вопрос')"
+        "() => { const s = JSON.parse(localStorage.getItem('philograph:v4') || 'null');"
+        " return s && s.dialogs && Object.values(s.dialogs)"
+        ".some(ds => ds.sessions.some(s => s.messages.some(t => t.question === 'новый вопрос'))); }"
     )
-    dialogs = stored(page)["dialogs"]
-    assert len(json.dumps(dialogs, ensure_ascii=False)) <= 200_000
-    questions = [t["question"][:8] for d in dialogs for t in d]
-    assert "диалог 0" not in questions and questions[-1] == "новый во"
+    state = stored(page)
+    encoded = json.dumps(
+        {"dialogs": state["dialogs"], "libraryDialogs": state["libraryDialogs"]}, ensure_ascii=False
+    )
+    assert len(encoded) <= 200_000
+    # Старейшие диалоги библиотеки вытеснены, новый вопрос сохранён.
+    questions = [
+        m["question"] for s in state["libraryDialogs"]["sessions"] for m in s["messages"]
+    ] + [
+        m["question"]
+        for ds in state["dialogs"].values()
+        for s in ds["sessions"]
+        for m in s["messages"]
+    ]
+    assert not any(q.startswith("диалог 0") for q in questions)
+    assert any(q.startswith("новый вопрос") for q in questions)
     context.close()

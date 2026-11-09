@@ -89,6 +89,17 @@ def test_ask_about_selection(page, server, events):
     assert searched["scope"] == "current"
 
 
+@req(AD, "Панель действий над выделением")
+def test_selection_toolbar(page, server):
+    url, bot = server
+    open_reader(page, url, bot)
+    select_text(page, "привычка ума")
+    toolbar = page.get_by_role("toolbar", name="Действия с выделенным")
+    toolbar.wait_for()
+    assert toolbar.get_by_role("button", name="Спросить ассистента").is_visible()
+    assert toolbar.get_by_role("button", name="Скопировать ссылку на абзац").is_visible()
+
+
 @req(AD, "Ограничение длины")
 def test_length_limit(bot, events):
     items = bot.ask(question="что это?", selection="а" * 5000)
@@ -165,7 +176,7 @@ def test_dialog_memory(page, server, bot, events):
     page.reload()
     page.get_by_role("button", name="Ассистент").click()
     assert panel.locator(".turn").count() == 2  # диалог в браузере
-    panel.get_by_role("button", name="Новый диалог").click()
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
     assert panel.locator(".turn").count() == 0
     long_history = [{"question": f"вопрос {i}", "answer": "ответ"} for i in range(6)]
     bot.ask(question="и ещё?", history=long_history)
@@ -213,3 +224,149 @@ def test_error_mid_answer_keeps_marks(page, server):
     assert panel.locator(".fragment").count() == 2
     assert panel.locator(".fragment.ungrounded").count() == 1  # пометка не потерялась
     assert "оборвался" in panel.locator(".assistant-notice").inner_text()
+
+
+@req(AD, "Память диалога")
+def test_sessions_are_separate(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.answers.append(["Юм считал причинность привычкой [1]. "])
+    panel.get_by_label("Вопрос ассистенту").fill("что Юм думал о причинности?")
+    panel.get_by_role("button", name="Спросить").click()
+    panel.locator(".turn").first.locator(".fragment").wait_for()
+    # «+» — вторая сессия, пустая; «+» при пустой активной не плодит третью.
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
+    assert panel.locator(".turn").count() == 0
+    panel.get_by_role("button", name="Новая сессия", exact=True).click()
+    # Список сессий всегда на виду: две строки.
+    assert panel.locator(".assistant__sessions .assistant__session").count() == 2
+    # Возврат к первой сессии по списку (сначала новые, 5.8): там только первый вопрос.
+    panel.locator(".assistant__session-title", has_text="причинности").click()
+    assert panel.locator(".turn").count() == 1
+    assert "причинности" in panel.locator(".turn").first.inner_text()
+
+
+@req(AD, "Ход ответа")
+def test_answer_stages_visible(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.answers.append(["Юм пишет о привычке [1]. ", 1.0, "Кант ответил [1]. "])
+    panel.get_by_label("Вопрос ассистенту").fill("что пишет Юм?")
+    panel.get_by_role("button", name="Спросить").click()
+    # Стадия видна во время потока; номер «N из 4», без процента и счётчика слов.
+    panel.locator(".assistant__stage").first.wait_for()
+    stage_text = panel.locator(".assistant__stage").first.inner_text()
+    assert "из 4" in stage_text
+    assert "%" not in stage_text and "слов" not in stage_text
+    panel.locator(".fragment").first.wait_for()
+
+
+@req(AD, "Раздел «Ассистент»")
+def test_assistant_page_and_stub(page, server):
+    url, _ = server
+    page.goto(f"{url}/assistant")
+    page.wait_for_selector(".assistant-page")
+    assert "по всей библиотеке" in page.locator(".assistant-page__subtitle").inner_text()
+    # Старая закладка /soon/assistant заменяется на /assistant.
+    page.goto(f"{url}/soon/assistant")
+    page.wait_for_url("**/assistant")
+
+
+@req(AD, "Переход с вопросом из панели")
+def test_handoff_block_and_transfer_link(page, server, bot):
+    url, _ = server
+    open_reader(page, url, bot)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    bot.model.routes.append({"type": "other_authors", "confidence": 0.9, "names": []})
+    panel.get_by_label("Вопрос ассистенту").fill("а что думали другие авторы?")
+    panel.get_by_role("button", name="Спросить").click()
+    panel.locator(".handoff-block").wait_for()
+    assert "выходит за границы" in panel.locator(".handoff-block").inner_text()
+    link = panel.locator(".handoff-block a")
+    assert "/assistant?q=" in (link.get_attribute("href") or "")
+    # Кнопка «Продолжить в рамках этого источника» отправляет новый обмен с handoff_declined.
+    panel.locator(".handoff-block button", has_text="Продолжить").click()
+    panel.locator(".handoff-block").wait_for(state="detached")
+
+
+# --- «Спросить об абзаце» и тройной щелчок (5.1, 7) -------------------------------------
+
+
+@req(AD, "Вопрос о выделенном фрагменте")
+def test_ask_about_paragraph_button(page, site):
+    """Кнопка «Спросить об абзаце» под «Скопировать ссылку»: фрагмент — текст абзаца, один id;
+    у плашки неразобранной части кнопки нет."""
+    from ..assistant.browser import AskStub, answer, ask, fragment, panel
+    from .test_assistant_dialogs import chapters
+
+    (chapter_id, paras), *_ = chapters(site)
+    source = site.ids["textbook"]
+    real = page.request.get(f"{site.url}/api/v1/sources/{source}/chapters/{chapter_id}").json()
+    real["blocks"].insert(
+        0,
+        {
+            "type": "block",
+            "id": "p-plate",
+            "kind": "unrendered",
+            "text": "",
+            "lang": "ru",
+            "pages": [],
+            "notes": [],
+            "detail": None,
+            "detail_code": "missing",
+            "page": None,
+        },
+    )
+    page.route(f"**/sources/{source}/chapters/{chapter_id}", lambda r: r.fulfill(json=real))
+    page.set_viewport_size({"width": 1440, "height": 900})
+    stub = AskStub(page).reply(answer(fragment("Ответ об абзаце.", grounded=False)))
+    page.goto(f"{site.url}/read/{source}/{chapter_id}")
+    target, text = paras[2]
+    block = page.locator(f"#p-{target}")
+    block.wait_for()
+    assert page.locator("figure.unrendered .ask-paragraph").count() == 0
+    block.hover()
+    button = block.get_by_role("button", name="Спросить об абзаце")
+    assert button.is_visible()
+    # Под «Скопировать ссылку», в левом промежутке, не поверх текста.
+    copy = block.locator(".copy-link").bounding_box()
+    own = button.bounding_box()
+    para = block.evaluate("e => e.getBoundingClientRect().left")
+    assert own["y"] >= copy["y"] + copy["height"] and own["x"] + own["width"] <= para
+    button.click()
+    box = panel(page)
+    quote = box.locator(".assistant__form .selection-context")
+    quote.wait_for()
+    assert quote.inner_text().strip() == text.strip()
+    ask(box, "О чём этот абзац?")
+    box.locator(".copy-answer").wait_for()
+    assert stub.requests[0]["selection_paragraphs"] == [target]
+    assert stub.requests[0]["selection"].strip() == text.strip()
+
+
+@req(AD, "Панель действий над выделением")
+def test_triple_click_selects_one_paragraph(page, site):
+    """Тройной щелчок по абзацу → «Спросить ассистента» → фрагмент одного абзаца, без соседнего."""
+    from ..assistant.browser import AskStub, answer, ask, fragment, panel
+    from .test_assistant_dialogs import chapters, open_book
+
+    (_, paras), *_ = chapters(site)
+    page.set_viewport_size({"width": 1440, "height": 900})
+    stub = AskStub(page).reply(answer(fragment("Ответ.", grounded=False)))
+    open_book(page, site)
+    target, text = paras[3]
+    page.locator(f"#p-{target}").click(click_count=3)
+    toolbar = page.get_by_role("toolbar")
+    toolbar.get_by_role("button", name="Спросить ассистента").click()
+    box = panel(page)
+    box.locator(".assistant__form .selection-context").wait_for()
+    ask(box, "Поясните")
+    box.locator(".copy-answer").wait_for()
+    request = stub.requests[0]
+    assert request["selection_paragraphs"] == [target], request["selection_paragraphs"]
+    assert text.strip() in request["selection"]

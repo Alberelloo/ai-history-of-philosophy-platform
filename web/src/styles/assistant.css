@@ -1,0 +1,300 @@
+/* Панель ассистента и раздел «Ассистент» (reader-panels.md, 5.3–5.10): дополнения этапов 4 и 6.
+   Существующие правила панели — в styles.css; здесь только новые элементы. */
+
+/* ---------- Раскладка диалога (решение владельца 2026-11-08) ----------
+   Сессии всегда на виду; область сообщений прокручивается сама и никогда не уходит под поле
+   вопроса: поле — в потоке flex-колонки, а не sticky/fixed поверх истории. */
+.assistant__layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.assistant__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.assistant__top {
+  display: grid;
+  flex: none;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5) var(--space-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.assistant__top:empty {
+  display: none;
+}
+
+.assistant__top > p {
+  margin: 0;
+}
+
+.assistant__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4) var(--space-5);
+}
+
+.assistant__thread {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+}
+
+/* Поле вопроса прижато к низу области; уведомления «над полем» — тоже вне прокрутки. */
+.assistant__dock {
+  display: grid;
+  flex: none;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+/* Многострочное поле растёт до шести строк и не съедает историю. */
+.assistant__form textarea.pg-input {
+  min-height: 4.5rem;
+  max-height: 10rem;
+}
+
+/* Блок сессий: заголовок с «+» и список. */
+.assistant__sessions-box {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.assistant__sessions-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.assistant__sessions-heading {
+  flex: 1;
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-ui-label);
+}
+
+.assistant__sessions-toggle {
+  flex: none;
+  gap: var(--space-1);
+}
+
+.assistant__sessions-chevron {
+  transform: rotate(-90deg);
+  transition: transform var(--dur-quick) var(--ease-out);
+}
+
+.assistant__sessions-toggle[aria-expanded="true"] .assistant__sessions-chevron {
+  transform: none;
+}
+
+.assistant__sessions-count {
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+}
+
+/* Свёрнутый список: строка активной сессии — название и дата. */
+.assistant__sessions-current {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--ink);
+  font: var(--type-ui-body-sm);
+}
+
+.assistant__sessions-current .assistant__session-name {
+  min-width: 0;
+}
+
+.assistant__new {
+  flex: none;
+  margin-left: auto;
+}
+
+/* В панели книги: компактный список под шапкой, до четырёх строк, дальше прокрутка. */
+.assistant__layout[data-mode="book"] .assistant__sessions-box {
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.assistant__layout[data-mode="book"] .assistant__sessions {
+  max-height: clamp(7.5rem, 22vh, 11rem);
+  overflow-y: auto;
+}
+
+/* Страница «Ассистент»: колонка сессий слева, диалог справа на всю оставшуюся ширину. */
+.assistant-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  padding: var(--space-6) clamp(var(--space-4), 2vw, var(--space-8)) 0;
+}
+
+.assistant-page__head {
+  display: grid;
+  flex: none;
+  gap: var(--space-1);
+  padding-bottom: var(--space-4);
+}
+
+.assistant-page__head .pg-display {
+  margin: 0;
+}
+
+.assistant__layout[data-mode="library"] {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: clamp(14rem, 18vw, 20rem) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  border-top: 1px solid var(--line);
+}
+
+.assistant__layout[data-mode="library"] .assistant__sessions-box {
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3) var(--space-4) 0;
+  border-right: 1px solid var(--line);
+}
+
+.assistant__layout[data-mode="library"] .assistant__sessions {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Строка ответа ограничена для чтения (68rem — около 120 знаков интерфейсного шрифта), но поля по
+   бокам невелики: колонка растёт с окном (rem растёт с корневым кеглем, Р9) и центрируется в
+   области; полоса прокрутки — у правого края области. */
+.assistant__layout[data-mode="library"] :is(.assistant__top, .assistant__thread, .assistant__dock > *) {
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+}
+
+.assistant__layout[data-mode="library"] .assistant__top {
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  border-bottom: 0;
+}
+
+.assistant__layout[data-mode="library"] .assistant__scroll {
+  padding: var(--space-4) var(--space-6);
+}
+
+.assistant__layout[data-mode="library"] .assistant__dock {
+  padding: var(--space-3) var(--space-6) var(--space-5);
+  background: var(--paper);
+}
+
+/* Строка списка сессий: название и под ним дата последнего обмена или «Ответ идёт». */
+.assistant__session-title {
+  display: grid;
+  gap: 0;
+  height: auto;
+  min-height: var(--control-sm);
+  padding-block: var(--space-1);
+  white-space: normal;
+}
+
+.assistant__session-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant__session-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+.assistant__session-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.assistant__session-confirm-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.assistant__danger {
+  color: var(--danger);
+}
+
+/* Подпись главы у вопроса из другой главы (5.8). */
+.assistant__chapter-label {
+  margin: 0;
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+/* Итог хода ответа одной строкой (5.3). */
+.assistant__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+.assistant__summary.is-broken .pg-icon,
+.assistant__summary.is-broken svg {
+  color: var(--danger);
+}
+
+/* «Вы пришли из диалога по книге …» над историей (Р13). */
+.assistant__came-from {
+  align-items: center;
+}
+
+.assistant__came-from .pg-btn {
+  margin-left: auto;
+}
+
+/* «Близкое в библиотеке» при no_answer (5.6). */
+.assistant__suggestions p {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+}
+
+.assistant__suggestions ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font: var(--type-ui-body-sm);
+}
+
+.handoff-deleted {
+  color: var(--ink-3);
+}
+
+/* ink-3 не читается на accent-soft активной строки (контраст ниже 4.5:1) — дата там ink-2. */
+.assistant__session.is-active .assistant__session-meta {
+  color: var(--ink-2);
+}

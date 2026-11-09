@@ -40,6 +40,12 @@ class DuplicateEntity(Exception):
         self.existing = existing
 
 
+class EntityNotFound(Exception):
+    def __init__(self, entity_id: str) -> None:
+        super().__init__(f"сущность {entity_id} не найдена")
+        self.entity_id = entity_id
+
+
 def normalize(name: str) -> str:
     name = name.lower().replace("ё", "е")
     name = re.sub(r"[^\w\s]", " ", name)
@@ -115,8 +121,10 @@ class Entities:
             row = (
                 conn.execute(select(t.entities).where(t.entities.c.id == entity_id))
                 .mappings()
-                .one()
+                .one_or_none()
             )
+            if row is None:
+                raise EntityNotFound(entity_id)
             names_rows = (
                 conn.execute(select(t.names).where(t.names.c.entity_id == entity_id))
                 .mappings()
@@ -137,6 +145,24 @@ class Entities:
             if n["kind"] == "primary" and n["lang"] == lang:
                 return n["text"]
         return names[0]["text"] if names else entity_id
+
+    def types(self, entity_ids: list[str]) -> dict[str, str]:
+        """Типы сущностей по идентификаторам (после перенаправлений слитых дублей)."""
+        resolved = {eid: self.resolve(eid) for eid in dict.fromkeys(entity_ids)}
+        if not resolved:
+            return {}
+        with self.engine.begin() as conn:
+            rows = (
+                conn.execute(
+                    select(t.entities.c.id, t.entities.c.type).where(
+                        t.entities.c.id.in_(list(resolved.values()))
+                    )
+                )
+                .mappings()
+                .all()
+            )
+        by_id = {r["id"]: r["type"] for r in rows}
+        return {eid: by_id[rid] for eid, rid in resolved.items() if rid in by_id}
 
     def set_primary(self, entity_id: str, key: str, value: Any) -> None:
         entity = self.get(entity_id)

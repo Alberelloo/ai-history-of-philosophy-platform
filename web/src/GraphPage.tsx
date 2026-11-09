@@ -104,6 +104,24 @@ function standalone(svg: SVGSVGElement): string {
   return new XMLSerializer().serializeToString(copy);
 }
 
+// Корневой кегль (9.7): на окнах шире 1920px он растёт, и рисунок графа растёт вместе с ним —
+// размер <svg> на экране умножается на root/16, а viewBox (координаты узлов) прежний.
+function useRootScale(): number {
+  const read = () => (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
+  const [scale, setScale] = useState(read);
+  useEffect(() => {
+    const update = () => setScale(read());
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return scale;
+}
+
+// Кегль подписей — в единицах viewBox (при 16px они равны px): масштаб всего рисунка уже
+// учитывает корневой кегль, и кегль в rem умножился бы на него второй раз.
+const LABEL_SIZE = 13;
+const SMALL_SIZE = 11;
+
 const STROKE_CLASS: Record<string, string> = {
   verified: "graph-stroke-verified",
   sourced: "graph-stroke-sourced",
@@ -122,6 +140,7 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
   const [card, setCard] = useState<{ id: string; x: number; y: number } | null>(null);
   const [notInTextbook, setNotInTextbook] = useState(false);
   const svg = useRef<SVGSVGElement>(null);
+  const scale = useRootScale();
   const onlyTextbook = scope.onlyTextbook && Boolean(textbook);
 
   async function load(start: string, startDepth: number | null, merge: boolean) {
@@ -369,8 +388,8 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
               ref={svg}
               xmlns="http://www.w3.org/2000/svg"
               className="graph"
-              width={width}
-              height={height + 30}
+              width={width * scale}
+              height={(height + 30) * scale}
               viewBox={`0 0 ${width} ${height + 30}`}
               role="img"
               aria-label={t.graph.image}
@@ -410,11 +429,11 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
                     onKeyDown={(k) => k.key === "Enter" && setSelected({ node: n.id })}
                   >
                     <Shape node={n} x={p.x} y={p.y} />
-                    <text className="graph-label" x={p.x} y={p.y + 40} textAnchor="middle">
+                    <text className="graph-label" x={p.x} y={p.y + 40} fontSize={LABEL_SIZE} textAnchor="middle">
                       {n.label}
                     </text>
                     {n.dates && (
-                      <text className="graph-dates" x={p.x} y={p.y + 55} textAnchor="middle">
+                      <text className="graph-dates" x={p.x} y={p.y + 55} fontSize={SMALL_SIZE} textAnchor="middle">
                         {n.dates}
                       </text>
                     )}
@@ -436,13 +455,13 @@ export function GraphPage({ entityId, query }: { entityId: string; query: URLSea
                   onKeyDown={(k) => k.key === "Enter" && setSelected({ edge: e.id })}
                 >
                   <circle className="graph-handle" cx={mid.x} cy={mid.y} r={9} />
-                  <text className="graph-handle__mark" x={mid.x} y={mid.y + 4} fontSize="11" textAnchor="middle">
+                  <text className="graph-handle__mark" x={mid.x} y={mid.y + 4} fontSize={SMALL_SIZE} textAnchor="middle">
                     {e.generated ? "◇" : "•"}
                     <title>{e.generated ? t.graph.generatedEdge(name) : name}</title>
                   </text>
                 </g>
               ))}
-              <text className="graph-legend" x={12} y={height + 18}>
+              <text className="graph-legend" x={12} y={height + 18} fontSize={SMALL_SIZE}>
                 ◇ {t.graph.legend}
               </text>
             </svg>

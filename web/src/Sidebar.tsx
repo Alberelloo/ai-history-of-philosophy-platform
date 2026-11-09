@@ -70,7 +70,7 @@ function Item({ href, icon, label, current, soon, title, count }: ItemProps) {
   );
 }
 
-export function Sidebar({ active, sourceId }: { active: string; sourceId?: string }) {
+export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourceId?: string; panelOpen: boolean }) {
   const t = useT();
   const lang = useLang();
   const theme = useTheme();
@@ -78,7 +78,11 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
   const open = useStored((s) => s.openSources);
   const current = useStored((s) => s.currentSource);
   const wide = useMedia(PIN_MEDIA);
-  const pinned = pinnedChoice && wide;
+  // Временное сворачивание (2.2): закреплённая навигация + открытая панель не помещаются на
+  // ширине 1280–1471px — навигация сворачивается до 56px, пока панель открыта; выбор сохраняется.
+  const roomy = useMedia("(min-width: 1472px)");
+  const blocked = wide && panelOpen && !roomy;
+  const pinned = pinnedChoice && wide && !blocked;
   const [hover, setHover] = useState(false);
   const [focused, setFocused] = useState(false);
   // Esc свернул панель: она не раскроется снова, пока указатель или фокус не уйдут и не вернутся.
@@ -90,12 +94,12 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
   const info = useSources(open.map((o) => o.id));
   const books = open.filter((o) => info[o.id]);
 
-  // Отступ содержимого — по выбору читателя; ширина окна решает в CSS (index.html ставит его
-  // до первой отрисовки).
+  // Отступ содержимого — по фактическому состоянию панели (с учётом временного сворачивания):
+  // при временном сворачивании содержимое сдвигается только на 56px, как у свёрнутой панели.
   useEffect(() => {
-    if (pinnedChoice) document.documentElement.dataset.sidebar = "pinned";
+    if (pinned) document.documentElement.dataset.sidebar = "pinned";
     else delete document.documentElement.dataset.sidebar;
-  }, [pinnedChoice]);
+  }, [pinned]);
 
   // Раскрывает только фокус с клавиатуры: после щелчка мышью фокус остаётся на пункте, и панель
   // не должна висеть поверх текста, когда указатель ушёл.
@@ -115,15 +119,24 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
   };
   const close = (id: string) => {
     storage.closeSource(id);
+    // Закрыта книга, которую сейчас читают: к следующей открытой, а если она была последней —
+    // в библиотеку (адрес заменяется, чтобы «Назад» не открыл закрытую книгу снова).
     if (active === "reading" && sourceId === id) {
       const next = storage.currentSource();
-      navigate(next ? `/read/${next}` : "/");
+      if (next) navigate(`/read/${next}`);
+      else {
+        window.history.replaceState(null, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
     }
   };
   const nextTheme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
   const themeName = (value: Theme) => t.theme[value];
   const otherLang: Lang = lang === "ru" ? "en" : "ru";
-  const continueHref = current ? `/read/${current}` : "/read";
+  // Ни одной открытой книги: заголовок ведёт в библиотеку. Ссылка на «/read» открыла бы учебник
+  // по умолчанию, и закрытая последней книга тут же вернулась бы в список.
+  const lastOpen = current && open.some((o) => o.id === current) ? current : open[0]?.id;
+  const continueHref = lastOpen ? `/read/${lastOpen}` : "/";
 
   return (
     <div
@@ -157,7 +170,7 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
             icon="books"
             label={t.sidebar.openBooks}
             count={books.length}
-            title={books.length ? t.sidebar.openBooksCount(books.length) : undefined}
+            title={books.length ? t.sidebar.openBooksCount(books.length) : t.sidebar.noOpenBooks}
             current={active === "reading" && !books.some((b) => b.id === sourceId)}
           />
           <ul className="sidebar__books" aria-label={t.sidebar.openBooks}>
@@ -203,14 +216,15 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
               </p>
               {SOON.filter((s) => s.group === group).map((s) => {
                 const text = t.soon.sections[s.code];
+                const isAssistant = s.code === "assistant";
                 return (
                   <Item
                     key={s.code}
-                    href={`/soon/${s.code}`}
+                    href={isAssistant ? "/assistant" : `/soon/${s.code}`}
                     icon={s.icon}
                     label={text.title}
-                    soon
-                    title={text.hint}
+                    soon={!isAssistant}
+                    title={isAssistant ? undefined : text.hint}
                     current={active === s.code}
                   />
                 );
@@ -254,9 +268,13 @@ export function Sidebar({ active, sourceId }: { active: string; sourceId?: strin
             type="button"
             className="pg-btn pg-btn--ghost sidebar__item sidebar__pin"
             aria-pressed={pinnedChoice}
+            aria-disabled={blocked || undefined}
             disabled={!wide}
-            title={wide ? undefined : t.sidebar.pinNarrow}
-            onClick={() => storage.setSidebarPinned(!pinnedChoice)}
+            title={blocked ? t.reader.pinBlocked : wide ? undefined : t.sidebar.pinNarrow}
+            onClick={() => {
+              if (blocked) return;
+              storage.setSidebarPinned(!pinnedChoice);
+            }}
           >
             <span className="sidebar__icon">
               <Icon name="pin" />

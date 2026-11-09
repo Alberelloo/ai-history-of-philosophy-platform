@@ -362,6 +362,174 @@ export function Portrait({ name, size = 56 }: { name: string; size?: number }) {
   );
 }
 
+export type PortraitItem = {
+  url: string;
+  width: number;
+  height: number;
+  author?: string;
+  year?: string;
+  license?: string;
+  source_url?: string;
+};
+
+// Галерея портретов персоны (docs/design/features/reader-panels.md, 4.5): до 7 изображений,
+// одно главное, счётчик, точки, листание кнопками, точками и стрелками. Без изображений —
+// монограмма и «Изображений нет».
+export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]; name: string }) {
+  const t = useT();
+  const [index, setIndex] = useState(0);
+  const shown = portraits.slice(0, 7);
+  if (shown.length === 0) {
+    return (
+      <div className="pg-portrait-gallery pg-portrait-gallery--empty">
+        <Portrait name={name} />
+        <p className="pg-portrait-gallery__empty">{t.card.noImages}</p>
+      </div>
+    );
+  }
+  const current = shown[Math.min(index, shown.length - 1)];
+  const move = (delta: number) => setIndex((i) => (i + delta + shown.length) % shown.length);
+  return (
+    <div
+      className="pg-portrait-gallery"
+      role="region"
+      aria-roledescription="галерея"
+      aria-label={t.card.gallery(name)}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") move(-1);
+        if (e.key === "ArrowRight") move(1);
+      }}
+    >
+      <img
+        className="pg-portrait-gallery__image"
+        src={current.url}
+        width={current.width}
+        height={current.height}
+        alt={name}
+        aria-label={shown.length > 1 ? t.card.slide(index + 1, shown.length) : undefined}
+        loading="lazy"
+        decoding="async"
+      />
+      {(current.author || current.year) && (
+        <p className="pg-portrait-gallery__credit">
+          {[current.author, current.year].filter(Boolean).join(", ")}
+        </p>
+      )}
+      {shown.length > 1 && (
+        <div className="pg-portrait-gallery__nav">
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.card.previousPortrait}
+            onClick={() => move(-1)}
+          >
+            <Icon name="arrowLeft" small />
+          </button>
+          <span className="pg-portrait-gallery__count num">{t.card.slide(index + 1, shown.length)}</span>
+          <button
+            type="button"
+            className="pg-btn pg-btn--ghost pg-btn--icon pg-btn--sm"
+            aria-label={t.card.nextPortrait}
+            onClick={() => move(1)}
+          >
+            <Icon name="arrowRight" small />
+          </button>
+        </div>
+      )}
+      {shown.length > 1 && (
+        <div className="pg-portrait-gallery__dots" role="group" aria-label={t.card.gallery(name)}>
+          {shown.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === index ? "pg-portrait-gallery__dot is-active" : "pg-portrait-gallery__dot"}
+              aria-label={t.card.slide(i + 1, shown.length)}
+              aria-current={i === index ? "true" : undefined}
+              onClick={() => setIndex(i)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Даты сущности: исходная запись и границы в астрономических годах (0 = 1 до н. э.).
+export type LifeDates = {
+  original: string;
+  earliest_start?: number;
+  latest_start?: number;
+  earliest_end?: number;
+  latest_end?: number;
+  precision?: string;
+};
+
+const ROMAN: [number, string][] = [
+  [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+  [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+];
+
+function roman(n: number): string {
+  let out = "";
+  for (const [value, sign] of ROMAN) {
+    while (n >= value) {
+      out += sign;
+      n -= value;
+    }
+  }
+  return out;
+}
+
+// Век по границе шкалы: отрезок [from, from + 100) астрономических лет. 1701–1800 — XVIII,
+// −499…−400 (500–401 до н. э.) — V до н. э.
+function centuryLabel(from: number, bce: string): string {
+  const year = from + 1; // первый год отрезка
+  return year > 0 ? roman(Math.ceil(year / 100)) : `${roman(Math.ceil((1 - year) / 100))} ${bce}`;
+}
+
+// Линия жизни персоны (4.5, Lifeline.md): шкала веков с делениями и римскими номерами, полоса
+// жизни цвета семьи, годы одной подписью над началом полосы. Годы уже есть в голове карточки,
+// поэтому для читалок шкала скрыта. Без границ лет шкалу не из чего построить — её нет.
+export function Lifeline({ dates }: { dates: LifeDates }) {
+  const t = useT();
+  const start = dates.earliest_start;
+  const end = dates.latest_end ?? dates.earliest_end;
+  if (start === undefined || end === undefined || end < start) return null;
+  const from = Math.floor((start - 1) / 100) * 100;
+  const to = Math.max(Math.ceil(end / 100) * 100, from + 100);
+  const span = to - from;
+  const at = (year: number) => ((year - from) / span) * 100;
+  const bounds: number[] = [];
+  for (let y = from; y <= to; y += 100) bounds.push(y);
+  const lifeLeft = at(start);
+  const lifeWidth = Math.max(at(end) - lifeLeft, 1);
+  const fuzzy = dates.precision !== undefined && dates.precision !== "year";
+  return (
+    <div className="pg-lifeline" aria-hidden="true">
+      <span className="pg-lifeline__rule" />
+      {bounds.map((y) => (
+        <span key={y} className="pg-lifeline__tick" style={{ left: `${at(y)}%` }} />
+      ))}
+      {bounds.slice(0, -1).map((y) => (
+        <span key={`c${y}`} className="pg-lifeline__century" style={{ left: `${at(y + 50)}%` }}>
+          {centuryLabel(y, t.card.bce)}
+        </span>
+      ))}
+      <span
+        className={fuzzy ? "pg-lifeline__life pg-lifeline__life--fuzzy" : "pg-lifeline__life"}
+        style={{ left: `${lifeLeft}%`, width: `${lifeWidth}%` }}
+      />
+      <span
+        className={lifeLeft > 60 ? "pg-lifeline__year pg-lifeline__year--end" : "pg-lifeline__year"}
+        style={{ left: `${lifeLeft > 60 ? lifeLeft + lifeWidth : lifeLeft}%` }}
+      >
+        {dates.original}
+      </span>
+    </div>
+  );
+}
+
 export type FilterItem = { value: string; label: string };
 
 // Выпадающий фильтр с флажками (docs/design/system/components/FilterMenu.md): кнопка с числом

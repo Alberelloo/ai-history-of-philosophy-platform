@@ -540,6 +540,8 @@ class Registry:
                             pages=[[m.offset, m.label] for m in block.pages],
                             notes=[[r.offset, r.footnote_id] for r in block.notes],
                             detail=block.detail,
+                            detail_code=block.detail_code,
+                            page=block.page,
                         )
                     )
                 for i, note in enumerate(section.footnotes):
@@ -612,6 +614,8 @@ class Registry:
                     pages=[PageMark(o, label) for o, label in row["pages"]],
                     notes=[NoteRef(o, f) for o, f in row["notes"]],
                     detail=row["detail"],
+                    detail_code=row["detail_code"],
+                    page=row["page"],
                 )
             )
         for row in notes:

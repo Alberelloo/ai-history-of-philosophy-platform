@@ -15,14 +15,14 @@ import re
 import httpx
 import pytest
 
-from ..helpers import aside
+from ..helpers import aside, start_aside
 from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
 req = pytest.mark.req
 VD = "visual-design"
 pytestmark = pytest.mark.e2e
-KEY = "philograph:v3"
+KEY = "philograph:v4"
 TEXTBOOK = "Теория познания: демонстрационный учебник"
 LIGHT_PAPER, DARK_PAPER = "#eff1ec", "#13171e"
 
@@ -71,8 +71,34 @@ def open_context(
     )
     page = context.new_page()
     page.set_default_timeout(15000)
-    aside(page)  # указатель не должен начинать страницу над боковой панелью
+    start_aside(page)  # указатель не должен начинать страницу над боковой панелью
     return context, page
+
+
+def reader_columns(page) -> list[str]:
+    """Колонки экрана чтения, которые сейчас на экране (по выбранной раскладке K1–K4)."""
+    mode = page.locator(".reader").get_attribute("data-layout")
+    columns = [".sidebar", ".chapter"]
+    if mode in ("K1", "K2"):
+        columns.append(".toc")
+    elif mode == "K3":
+        columns.append(".rail")
+    if mode == "K1":
+        columns.append(".margin-col")
+    return columns
+
+
+def chapter_measure(page) -> float:
+    """Ширина колонки текста в ch шрифта чтения."""
+    return page.evaluate(
+        "() => { const c = document.querySelector('.chapter');"
+        " const el = document.createElement('span');"
+        " el.style.cssText = 'position:absolute;visibility:hidden;width:1ch;"
+        "font:var(--type-read-body)';"
+        " document.body.appendChild(el);"
+        " const ch = el.getBoundingClientRect().width; el.remove();"
+        " return c.getBoundingClientRect().width / ch; }"
+    )
 
 
 # --- экраны ---------------------------------------------------------------------------
@@ -188,14 +214,10 @@ def test_layout_at_supported_widths(browser, site, ids, width):
         chapter(page, site, ids)
         visual.settle(page)
         visual.assert_no_horizontal_scroll(page)
-        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+        visual.assert_no_overlap(page, reader_columns(page))
         visual.assert_no_clipped_text(page)
-        measure = page.evaluate(
-            "() => { const c = document.querySelector('.chapter');"
-            " const ch = parseFloat(getComputedStyle(c).fontSize) * 0.5;"
-            " return c.getBoundingClientRect().width / ch; }"
-        )
-        assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f}"
+        measure = chapter_measure(page)
+        assert measure >= 62, f"колонка текста уже 62ch: {measure:.0f}"
         if width != 1280:
             snaps(page, f"chapter-light-{width}")
         library(page, site, ids)
@@ -351,17 +373,29 @@ def test_english_card_and_graph(browser, site, ids):
         card.locator("h3:text('Юм')").wait_for()
         card.locator(".card-recipe").first.wait_for()
         labels = [
-            *card.locator(".card-section h4").all_inner_texts(),
             *card.locator(".card-row__relation").all_inner_texts(),
             *card.locator(".card-recipe").all_inner_texts(),
         ]
         assert labels and not [text for text in labels if cyrillic.search(text)], labels
-        assert "common opinion" in card.locator(".card-section").first.inner_text()
+        # Рецепт графа — из компактного окна у упоминания.
         card.locator(".card-recipe", has_text="Genesis").click()
         page.wait_for_selector("h1:text('Genesis: Юм')")
         page.locator(".graph-edge").first.wait_for()
         options = page.locator("#graph-recipe option").all_inner_texts()
         assert options and not [text for text in options if cyrillic.search(text)], options
+        # Полная карточка в панели: разделы на английском.
+        page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
+        page.locator("p.block", has_text="догматического сна").locator(
+            ".mention", has_text="Юм"
+        ).click()
+        page.get_by_role("dialog", name="Card").get_by_role("button", name="Open card").click()
+        panel = page.get_by_role("complementary", name="Card")
+        panel.locator(".card-section h4").first.wait_for()
+        section_labels = panel.locator(".card-section h4").all_inner_texts()
+        assert section_labels and not [text for text in section_labels if cyrillic.search(text)], (
+            section_labels
+        )
+        assert "common opinion" in panel.locator(".card-section").first.inner_text()
         page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
         page.get_by_role("button", name="Кант — influenced by — Юм").click()
         details = page.get_by_role("region", name="Link")
@@ -483,7 +517,7 @@ def test_sidebar_pin_persists_and_shifts_content(browser, site, ids):
         page.wait_for_function(
             "() => document.querySelector('.reader').getBoundingClientRect().left >= 280"
         )
-        visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+        visual.assert_no_overlap(page, reader_columns(page))
         page.reload()
         page.wait_for_selector(".chapter p")
         assert visual.sidebar_state(page) == "pinned"
@@ -512,15 +546,11 @@ def test_sidebar_never_covers_chapter(browser, site, ids, width):
             visual.settle(page)
             state = visual.sidebar_state(page)
             assert state == ("pinned" if pinned and width >= 1280 else "collapsed"), state
-            visual.assert_no_overlap(page, [".sidebar", ".toc", ".chapter"])
+            visual.assert_no_overlap(page, reader_columns(page))
             visual.assert_no_horizontal_scroll(page)
             visual.assert_no_clipped_text(page)
-            measure = page.evaluate(
-                "() => { const c = document.querySelector('.chapter');"
-                " const ch = parseFloat(getComputedStyle(c).fontSize) * 0.5;"
-                " return c.getBoundingClientRect().width / ch; }"
-            )
-            assert measure >= 60, f"колонка текста уже 60 знаков: {measure:.0f} ({state})"
+            measure = chapter_measure(page)
+            assert measure >= 62, f"колонка текста уже 62ch: {measure:.0f} ({state})"
         finally:
             context.close()
 
@@ -552,8 +582,9 @@ def test_future_sections_marked_and_described(browser, site, ids):
         library(page, site, ids)
         visual.expand_sidebar(page)
         nav = page.get_by_role("navigation", name="Разделы")
+        # Раздел «Ассистент» реализован (этап 6): без метки «скоро».
+        assert "скоро" not in nav.get_by_role("link", name="Ассистент").inner_text()
         future = [
-            "Ассистент",
             "Граф",
             "Справочник",
             "Эпохи и контекст",
@@ -583,8 +614,10 @@ def test_future_sections_marked_and_described(browser, site, ids):
         text = main.inner_text()
         assert "Позже" in text and "Сценарий У1" in text and "сопоставление трактовок" in text
         assert main.locator(".source, .graph-edge, .card-row").count() == 0  # без данных
+        # Заглушка «Ассистент» снята (этап 6): адрес заменяется на /assistant.
         page.goto(site.url + "/soon/assistant")
-        assert "В разработке" in page.get_by_role("main").inner_text()
+        page.wait_for_url("**/assistant")
+        assert "В разработке" not in page.get_by_role("main").inner_text()
         # Граф: поиск сущности ведёт на её граф.
         page.goto(site.url + "/soon/graph")
         page.get_by_label("Найти сущность").fill("Кант")

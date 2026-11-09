@@ -31,6 +31,9 @@ class AskBody(BaseModel):
     sources_only: bool = False
     generation: bool = True
     scope: str = Field(default="all", pattern="^(all|current)$")
+    context: str = Field(default="library", pattern="^(book|library)$")
+    handoff_declined: bool = False
+    handoff_reason: str | None = None
 
 
 def build_app(assistant: Assistant, health: Health | None = None) -> FastAPI:
@@ -57,6 +60,9 @@ def build_app(assistant: Assistant, health: Health | None = None) -> FastAPI:
                 sources_only=body.sources_only,
                 generation=body.generation,
                 scope=body.scope,
+                context=body.context,
+                handoff_declined=body.handoff_declined,
+                handoff_reason=body.handoff_reason,
             )
         )
 

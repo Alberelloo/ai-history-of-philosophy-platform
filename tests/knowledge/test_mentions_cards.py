@@ -228,6 +228,8 @@ def test_mentions_endpoint_and_degradation(mx):
     p = mx.paragraph("Согласно Канту")
     response = client.get("/v1/mentions", params={"targets": p.id})
     assert response.status_code == 200 and response.json()
+    kant = next(m for m in response.json() if m["entity_id"] == mx.ids["kant"])
+    assert kant["entity_type"] == "person"  # N1: клиент красит подчёркивание цветом семьи
     # Без сервиса знаний клиент получает ошибку соединения и показывает главу без выделений:
     # это проверяет сквозной тест; здесь — что неизвестные абзацы дают пустой список.
     assert client.get("/v1/mentions", params={"targets": "nope"}).json() == []
@@ -243,6 +245,67 @@ def test_where_to_read(mx):
     assert [w["count"] for w in where] == [2, 1]  # самые насыщенные главы первыми
     client = TestClient(build_app(mx.onto.statements, mentions=mx.mentions))
     assert client.get(f"/v1/entities/{mx.ids['kant']}/where").json() == where
+
+
+@req(EM, "Где читать")
+def test_where_to_read_first_paragraph(mx):
+    """N10: «Где читать» ведёт к первому абзацу главы с упоминанием, а не к началу главы."""
+    mx.publish()
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    first = mx.paragraph("Согласно Канту")
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == first.id
+    # В главе 3 Кант только в заголовке: абзаца нет, клиент ведёт к началу главы.
+    assert where["Глава 3. Кант о Юме"]["first_paragraph_id"] is None
+    # Пересчёт изменённого абзаца ниже по тексту порядок не ломает.
+    mx.lib.files["book.txt"] = TEXT.replace(
+        "Трансцендентального идеализма придерживался Кант.",
+        "Трансцендентального идеализма придерживался именно Кант.",
+    ).encode()
+    mx.publish()
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == mx.paragraph("Согласно Канту").id
+    # Карточка отдаёт то же поле.
+    card = mx.cards.card(mx.ids["kant"], generation=False)
+    assert {w["first_paragraph_id"] for w in card["where_to_read"]} == {
+        mx.paragraph("Согласно Канту").id,
+        None,
+    }
+
+
+@req(EM, "Где читать")
+def test_where_to_read_without_position(mx):
+    """Строки до миграции 6 без ``position``: первым считается вставленный раньше."""
+    from sqlalchemy import update
+
+    from philograph.knowledge import schema as ks
+
+    mx.publish()
+    with mx.onto.statements.engine.begin() as conn:
+        conn.execute(update(ks.mentions).values(position=None))
+    where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
+    assert where["Глава 1. Новое время"]["first_paragraph_id"] == mx.paragraph("Согласно Канту").id
+
+
+@req(EM, "Где читать")
+def test_migration_6_adds_mention_position(tmp_path):
+    """Миграция 6 добавляет ``position`` в таблицу упоминаний прежнего вида и повторно безвредна."""
+    from sqlalchemy import inspect, text
+
+    from philograph.knowledge import schema as ks
+    from philograph.platform.db import make_engine
+
+    engine = make_engine(f"sqlite:///{(tmp_path / 'k.db').as_posix()}", [ks.SCHEMA])
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                f"CREATE TABLE {ks.SCHEMA}.mentions (id INTEGER PRIMARY KEY, target_id VARCHAR(40))"
+            )
+        )
+        ks._mention_position(conn)
+        ks._mention_position(conn)
+        columns = {c["name"] for c in inspect(conn).get_columns("mentions", schema=ks.SCHEMA)}
+    assert "position" in columns
+    assert ks.migrations.latest() == 6
 
 
 @req(EM, "Метрики упоминаний")
@@ -267,6 +330,22 @@ def test_card_navigation_links(mx):
     card = mx.cards.card(mx.ids["hume"])
     row = next(r for s in card["sections"] for r in s["rows"] if r["entity_id"] == mx.ids["kant"])
     assert row["label"] == "Кант" and row["relation"] == "подвергся критике"
+
+
+@req(EC, "Карточка рядом с текстом")
+def test_card_not_found_returns_404(mx):
+    client = TestClient(build_app(mx.onto.statements, cards=mx.cards, mentions=mx.mentions))
+    response = client.get("/v1/entities/nonexistent/card")
+    assert response.status_code == 404
+    assert response.json()["kind"] == "entity_not_found"
+
+
+@req(EC, "Портреты в карточке")
+def test_card_has_portraits_field(mx):
+    mx.publish()
+    card = mx.cards.card(mx.ids["kant"])
+    # N3 отложен: поле есть и пустое, клиент показывает монограмму и «Изображений нет».
+    assert card["portraits"] == []
 
 
 @req(EC, "Разделы карточки по типу")

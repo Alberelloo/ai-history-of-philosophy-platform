@@ -35,6 +35,8 @@ export type ChapterBlock =
       pages: [number, string][];
       notes: [number, string][];
       detail: string | null;
+      detail_code: string | null;
+      page: string | null;
     };
 
 export type Footnote = { marker: string; text: string; linked: boolean };

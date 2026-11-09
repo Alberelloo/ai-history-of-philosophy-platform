@@ -34,6 +34,10 @@ class Passage:
     kind: str = "paragraph"  # paragraph | statement
     statement_id: str | None = None
     grounds: bool = True  # служит ли опорой: у сгенерированного утверждения — нет
+    source_title: str | None = None
+    chapter_title: str | None = None
+    paragraph_start: str | None = None
+    entity_id: str | None = None
 
 
 @dataclass
@@ -57,9 +61,13 @@ class Fragment:
                     "kind": p.kind,
                     "paragraph_id": p.paragraph_id or None,
                     "statement_id": p.statement_id,
+                    "entity_id": p.entity_id,
                     "source_id": p.source_id,
                     "chapter_id": p.chapter_id,
                     "title": p.title,
+                    "source_title": p.source_title,
+                    "chapter_title": p.chapter_title,
+                    "paragraph_start": p.paragraph_start,
                 }
                 for p in self.citations
             ],

@@ -97,6 +97,8 @@ class Block:
     pages: list[PageMark] = field(default_factory=list)
     notes: list[NoteRef] = field(default_factory=list)
     detail: str | None = None  # у непереданного элемента: вид и подпись
+    detail_code: str | None = None  # код пояснения (blank_page/missing/figure/table)
+    page: str | None = None  # номер страницы, если есть
 
 
 @dataclass

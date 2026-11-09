@@ -302,10 +302,10 @@ def open_textbook(page, site, suffix=""):
 def test_toc_navigation_and_current_mark(page, site):
     open_textbook(page, site)
     toc = page.get_by_role("navigation", name="Оглавление")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 1. Опыт"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 1. Опыт"
     toc.get_by_role("link", name="Глава 3. Разум").click()
     page.wait_for_selector("h1:text('Глава 3. Разум')")
-    assert toc.locator("[aria-current=true]").inner_text() == "Глава 3. Разум"
+    assert toc.locator("[aria-current=page]").inner_text() == "Глава 3. Разум"
     toc.get_by_role("link", name="Схематизм").click()
     page.wait_for_selector("h1:text('Глава 2. Рассудок')")
     heading = page.locator("h2", has_text="Схематизм")
@@ -347,7 +347,7 @@ def test_reading_position_per_source(browser, site):
     page.mouse.wheel(0, 1)
     page.wait_for_timeout(400)
     saved = page.evaluate(
-        f"JSON.parse(localStorage['philograph:v3']).positions['{site.ids['textbook']}']"
+        f"JSON.parse(localStorage['philograph:v4']).positions['{site.ids['textbook']}']"
     )
     page.goto(f"{site.url}/read/{site.ids['primary']}")
     page.wait_for_selector(".chapter p")
@@ -382,7 +382,7 @@ def test_paragraph_link_opens_and_highlights(page, site, events):
     page.wait_for_selector(f"#p-{primary_pid}")
     assert site.ids["primary"] in page.url
     assert (
-        page.evaluate("JSON.parse(localStorage['philograph:v3']).currentSource")
+        page.evaluate("JSON.parse(localStorage['philograph:v4']).currentSource")
         == (site.ids["primary"])
     )
 
@@ -443,7 +443,7 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     before = page.evaluate("window.scrollY")
     ref = page.locator(".note-ref").first
     ref.hover()
-    popup = page.get_by_role("tooltip")
+    popup = page.locator(".note-popup")
     assert "Критика чистого разума" in popup.inner_text()
     assert page.evaluate("window.scrollY") == before
     popup.hover()
@@ -452,6 +452,6 @@ def test_footnote_popup_hover_keyboard_and_links(page, site):
     assert popup.get_by_role("link").get_attribute("href") == "https://example.org/kant"
     aside(page)  # не 5,5: указатель в левом верхнем углу раскрыл бы боковую панель
     page.wait_for_timeout(400)
-    assert page.get_by_role("tooltip").count() == 0
+    assert page.locator(".note-popup").count() == 0
     ref.focus()
-    assert "Критика чистого разума" in page.get_by_role("tooltip").inner_text()
+    assert "Критика чистого разума" in page.locator(".note-popup").inner_text()
