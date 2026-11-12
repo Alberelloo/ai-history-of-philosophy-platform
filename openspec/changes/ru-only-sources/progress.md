@@ -1,10 +1,11 @@
 # Журнал: ru-only-sources
 
 - Кто ведёт: ведущий инженер (роль: разработчик), сессия DSH.
-- Ветка: `claude/ru-only-sources` (от `main` 3cc63b4).
-- Статус: **группы 1–2 сделаны** (учёт регионов, миграция, каталог, событие, библиотека, HTTP-слой,
-  служебные интерфейсы, клиентская строка списка). Группы 3–8 не начаты.
-- Кейсы: `qa/cases.md` (UC-1…UC-8, TC-1…TC-17, EC-1…EC-15).
+- Ветка: `claude/ru-only-sources` (от `main` 3cc63b4); черновой PR #39.
+- Статус: **группы 1–3 сделаны** (учёт регионов, миграция, каталог, событие, библиотека,
+  HTTP-слой, служебные интерфейсы, клиентская строка списка, шлюз: регион читателя, заголовки,
+  счётчик неизвестных). Группы 4–8 не начаты.
+- Кейсы: `qa/cases.md` (UC-1…UC-13, TC-1…TC-27, EC-1…EC-25).
 
 ## Что сделано (2026-11-10)
 
@@ -37,6 +38,37 @@
 - `scripts/check_traceability.py`: 322 из 322.
 - `python -m philograph.library.catalog validate`: 0 ошибок, 6 предупреждений о дублях названий.
 - `openspec validate ru-only-sources`: valid (3 предупреждения о длинных требованиях).
+
+## Что сделано (2026-11-12): группа 3 — шлюз
+
+- Кейсы группы 3 дописаны до кода: `qa/cases.md` — R10–R13, UC-9…UC-13, TC-18…TC-27,
+  EC-16…EC-25; R13 (проверка конфигурации развёртывания) отнесена к задаче 8.6.
+- `src/philograph/gateway/region.py`: `RegionSettings.from_env` (`PHILOGRAPH_REGION_HEADER`,
+  `PHILOGRAPH_TRUSTED_PROXY`, `PHILOGRAPH_REGION_FALLBACK`), `normalize_region` (две латинские
+  буквы, верхний регистр, служебные `XX`/`T1` — неизвестный регион, неверный запасной регион
+  игнорируется), `RegionResolver.region/dropped_headers/vary`.
+- `src/philograph/gateway/app.py`: `build_app(..., regions=...)`; прокси удаляет клиентский
+  `X-Philograph-Region` и заголовок страны, ставит свой `X-Philograph-Region`, считает
+  `gateway.region` (`known`/`unknown` — без стран и посетителей), ответы `/api/*` получают
+  `Cache-Control: private` и `Vary` на заголовок страны (прежние значения `Vary` сохраняются).
+- `src/philograph/ops/alerts.py`: `UnknownRegionRule` над счётчиками шлюза, пороги
+  `unknown_region_ratio` (0.10) и `unknown_region_min_requests` (100), правило `region`
+  в `standard_rules`; общий сборщик метрик шлюза для правил ошибок и региона.
+- `docs/operations/runbook.md`: строка правила «Регион читателя», пояснение про
+  `PHILOGRAPH_REGION_HEADER`, доверенный прокси, счётчик и запасной регион.
+- Закрыт finding F-2 раунда 1 («шлюз не отбрасывает клиентский `X-Philograph-Region`») — это
+  была задача 3.2.
+- Тесты: `tests/gateway/test_region.py` (9), `tests/gateway/test_region_proxy.py` (8),
+  `tests/ops/test_alerts.py::test_unknown_region_rule` (1); в `test_rules_from_settings`
+  ожидаемый набор правил дополнен `region`.
+
+## Прогоны (2026-11-12)
+
+- `pytest -q -m "not e2e"`: 367 passed, 115 skipped (Chromium без `TMP` в репозитории);
+- `pytest -q tests/web` с `TMP`/`TEMP` = `<repo>/.tmp`: 127 passed;
+- `pytest -q tests/gateway tests/ops`: 38 passed;
+- `ruff check`, `ruff format --check`: чисто; `lint-imports`: 3 контракта; traceability 322/322;
+  `openspec validate ru-only-sources`: valid (3 предупреждения о длине требований).
 
 ## Раунд dev_cycle 1 (2026-11-10)
 
@@ -72,14 +104,17 @@
 
 ## Следующий шаг
 
-- Группа 3 (шлюз): `gateway/region.py`, настройки, удаление клиентских заголовков, `Vary`,
-  предупреждение о доле неизвестных регионов.
-- Затем группы 4 (поиск), 5–6 (ассистент, знания), 7 (внешняя обработка), 8 (данные `licenses.yaml`
-  — задача 8.4, `traceability.yaml` — 8.5, документация и архив — 8.6–8.7).
-- Раунд `dev_cycle` по группам 1–2 — тестировщик и судья.
+- Группа 4 (поиск): миграция 4 (`docs.regions`, `docs.external`), регион в запросе и фильтре,
+  обработчик `source.access_changed`, шаг сверки.
+- Затем 8.2 (запасной регион в стенде) и 8.4 (данные `licenses.yaml`), группы 6 и 5 параллельно,
+  группа 7 (внешняя обработка), 8.1/8.3/8.5/8.6.
+- Раунд `dev_cycle` по группам 1–3 — тестировщик и судья.
 
 ## Проблемы и замечания
 
+- Environment: браузерные тесты (`tests/web`) и Playwright проходят только если `TMP`/`TEMP`
+  указывают внутрь репозитория — иначе Chromium падает с `EPERM mkdtemp`; при работе в песочнице
+  DSH тесты без этого падают полностью (`PermissionError` на временных каталогах).
 - В `tasks.md` задача 1.1 называет миграцию 4, фактически применена 5 (4 занята). Число в задаче
   исправлять не стал: история изменений важнее, отметка стоит.
 - Старое замечание `progress.md` о расхождении кода и спецификации (ассистент и разбор упоминаний

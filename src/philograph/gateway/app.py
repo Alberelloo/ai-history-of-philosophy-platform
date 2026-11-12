@@ -3,7 +3,8 @@
 Отдаёт веб-клиент, проксирует ``/api/assistant/*`` в ассистента, ``/api/*`` — в библиотеку.
 Ответы идут потоком, без буферизации: первое слово ассистента не ждёт конца ответа.
 Внутренние интерфейсы сервисов (``/api/v1/internal/*``) снаружи недоступны. Здесь же лимиты
-запросов и защита бюджета (``gateway.limits``), а когда появятся — аккаунты.
+запросов и защита бюджета (``gateway.limits``), регион читателя (``gateway.region``), а когда
+появятся — аккаунты.
 """
 
 from __future__ import annotations
@@ -22,8 +23,10 @@ from starlette.background import BackgroundTask
 
 from philograph import __version__
 from philograph.gateway.limits import PAGE_COOKIE, Limits, LimitSettings, paid_operation
+from philograph.gateway.region import REGION_HEADER, RegionResolver, RegionSettings
 from philograph.platform import context, events
 from philograph.platform.health import Health
+from philograph.platform.metrics import metrics
 from philograph.platform.web import create_app
 
 events.define(
@@ -54,13 +57,26 @@ def _ndjson(*items: dict) -> StreamingResponse:
     return StreamingResponse(lines(), media_type="application/x-ndjson")
 
 
+def _add_vary(headers: dict[str, str], name: str) -> None:
+    """Добавить заголовок запроса в ``Vary``, не потеряв прежние значения сервиса."""
+    key = next((k for k in headers if k.lower() == "vary"), None)
+    existing = [v.strip() for v in headers.get(key, "").split(",") if v.strip()] if key else []
+    if name.lower() not in {v.lower() for v in existing}:
+        existing.append(name)
+    if key is not None:
+        headers.pop(key)
+    headers["Vary"] = ", ".join(existing)
+
+
 def build_app(
     upstreams: dict[str, str],
     web_root: Path | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
     limits: Limits | None = None,
+    regions: RegionResolver | None = None,
 ) -> FastAPI:
-    """``upstreams``: ``{"library": url, "assistant": url}``; ``limits`` — защита бюджета."""
+    """``upstreams``: ``{"library": url, "assistant": url}``; ``limits`` — защита бюджета;
+    ``regions`` — определение региона читателя (без него регион всегда неизвестен)."""
     health = Health("gateway", __version__)
     app = create_app("gateway", __version__, health)
     client = httpx.AsyncClient(timeout=httpx.Timeout(10.0, read=120.0), transport=transport)
@@ -158,7 +174,18 @@ def build_app(
         body = await guard(request, await request.body())
         if isinstance(body, Response):
             return body
-        headers = {k: v for k, v in request.headers.items() if k.lower() not in HOP_HEADERS}
+        # Регион читателя: страна от CDN, иначе запасной. В счётчике только «известен /
+        # неизвестен» — страны и посетителя в метриках нет (design.md, п. 1).
+        region = regions.region(request.headers) if regions is not None else None
+        metrics.inc("gateway.region", kind="known" if region else "unknown")
+        dropped = regions.dropped_headers() if regions is not None else {REGION_HEADER.lower()}
+        headers = {
+            k: v
+            for k, v in request.headers.items()
+            if k.lower() not in HOP_HEADERS and k.lower() not in dropped
+        }
+        if region is not None:
+            headers[REGION_HEADER] = region
         # Сервисам — адрес посетителя, а не обратного прокси перед шлюзом.
         headers["X-Forwarded-For"] = (
             who(request)[0]
@@ -181,6 +208,11 @@ def build_app(
                 status_code=503,
             )
         out_headers = {k: v for k, v in response.headers.items() if k.lower() not in HOP_HEADERS}
+        # Ответ API зависит от региона читателя: CDN не должен кэшировать его между странами.
+        out_headers["Cache-Control"] = "private"
+        vary = regions.vary() if regions is not None else None
+        if vary:
+            _add_vary(out_headers, vary)
         return StreamingResponse(
             response.aiter_raw(),
             status_code=response.status_code,
@@ -242,4 +274,5 @@ if os.environ.get("PHILOGRAPH_LIBRARY_URL") and os.environ.get("PHILOGRAPH_ASSIS
         LimitSettings.from_env(dict(os.environ)),
         os.environ.get("PHILOGRAPH_VISITOR_SECRET", "dev-secret"),
     )
-    app = build_app(_upstreams, Path(_root) if _root else None, limits=_limits)
+    _regions = RegionResolver(RegionSettings.from_env(dict(os.environ)))
+    app = build_app(_upstreams, Path(_root) if _root else None, limits=_limits, regions=_regions)

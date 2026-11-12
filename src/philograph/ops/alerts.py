@@ -51,6 +51,8 @@ class AlertSettings:
     budget_ratio: float = 0.8
     queue_age_minutes: float = 30.0
     backup_age_hours: float = 26.0
+    unknown_region_ratio: float = 0.10  # доля запросов шлюза без определённой страны
+    unknown_region_min_requests: int = 100  # меньше запросов за интервал — доля не считается
 
     @classmethod
     def from_env(cls, env: dict[str, str]) -> AlertSettings:
@@ -236,6 +238,42 @@ class ErrorRateRule:
         )
 
 
+class UnknownRegionRule:
+    """Доля запросов шлюза без определённой страны (счётчик ``gateway.region``).
+
+    Страны и посетителя в счётчике нет — только «известен / неизвестен». Высокая доля
+    неизвестных означает, что CDN не присылает страну или шлюз смотрит не туда: тогда
+    ограниченные источники закрыты всем читателям, и это надо заметить до жалоб.
+    """
+
+    def __init__(self, metrics: Callable[[], dict], settings: AlertSettings) -> None:
+        self.metrics, self.settings = metrics, settings
+        self.previous: dict[str, float] | None = None
+
+    def __call__(self) -> Check:
+        current: dict[str, float] = {}
+        for c in self.metrics().get("counters", []):
+            if c["name"] == "gateway.region":
+                key = c["labels"].get("kind", "?")
+                current[key] = current.get(key, 0) + c["value"]
+        previous, self.previous = self.previous, current
+        if previous is None:
+            return Check(False, "первое измерение")
+        delta = {k: v - previous.get(k, 0) for k, v in current.items()}
+        if any(v < 0 for v in delta.values()):  # шлюз перезапускался — счётчики обнулились
+            return Check(False, "счётчики сброшены")
+        total = sum(delta.values())
+        if total < self.settings.unknown_region_min_requests:
+            return Check(False, f"мало запросов: {int(total)}")
+        unknown = delta.get("unknown", 0.0)
+        rate = unknown / total if total else 0.0
+        return Check(
+            rate > self.settings.unknown_region_ratio,
+            f"регион не определён у {rate:.1%} из {int(total)} запросов",
+            {"rate": round(rate, 4), "requests": int(total), "unknown": int(unknown)},
+        )
+
+
 class BudgetRule:
     def __init__(self, budgets: Callable[[], list[dict]], settings: AlertSettings) -> None:
         self.budgets, self.settings = budgets, settings
@@ -344,15 +382,17 @@ def standard_rules(
             )
     if env.get("PHILOGRAPH_GATEWAY_URL"):
         gateway = env["PHILOGRAPH_GATEWAY_URL"]
+
+        def gateway_metrics() -> dict:
+            return client.get(
+                f"{gateway}/internal/metrics", headers={"X-Internal-Token": token}
+            ).json()
+
         rules["errors:gateway"] = (
             "Ошибки на сайте",
-            ErrorRateRule(
-                lambda: client.get(
-                    f"{gateway}/internal/metrics", headers={"X-Internal-Token": token}
-                ).json(),
-                settings,
-            ),
+            ErrorRateRule(gateway_metrics, settings),
         )
+        rules["region"] = ("Регион читателя", UnknownRegionRule(gateway_metrics, settings))
     if env.get("PHILOGRAPH_LLM_URL"):
         llm = env["PHILOGRAPH_LLM_URL"]
         rules["budget"] = (

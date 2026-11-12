@@ -18,6 +18,7 @@ from philograph.ops.alerts import (
     QueueRule,
     ReadinessRule,
     TelegramChannel,
+    UnknownRegionRule,
     WebhookChannel,
     standard_rules,
 )
@@ -93,10 +94,47 @@ def test_rules_from_settings(ops_engine, clock):
         "ready:gateway",
         "ready:llm",
         "errors:gateway",
+        "region",
         "budget",
         "queue",
         "backup",
     }
+
+
+@req(OA, "Без персональных данных")
+def test_unknown_region_rule():
+    """Доля запросов шлюза без определённой страны: порог, минимум запросов, без стран."""
+
+    snapshots = iter(
+        [
+            {
+                "counters": [
+                    {"name": "gateway.region", "labels": {"kind": "known"}, "value": 60},
+                    {"name": "gateway.region", "labels": {"kind": "unknown"}, "value": 0},
+                ]
+            },
+            {
+                "counters": [
+                    {"name": "gateway.region", "labels": {"kind": "known"}, "value": 66},
+                    {"name": "gateway.region", "labels": {"kind": "unknown"}, "value": 4},
+                ]
+            },
+            {
+                "counters": [
+                    {"name": "gateway.region", "labels": {"kind": "known"}, "value": 67},
+                    {"name": "gateway.region", "labels": {"kind": "unknown"}, "value": 5},
+                ]
+            },
+        ]
+    )
+    settings = AlertSettings(unknown_region_ratio=0.1, unknown_region_min_requests=10)
+    rule = UnknownRegionRule(lambda: next(snapshots), settings)
+    assert not rule().firing  # первое измерение — точка отсчёта
+    check = rule()
+    assert check.firing and check.summary == "регион не определён у 40.0% из 10 запросов"
+    assert "CF-" not in check.summary and "country" not in check.details
+    # Мало запросов в окне — доля не считается, шума нет.
+    assert rule().summary == "мало запросов: 2"
 
 
 @req(OA, "Канал оповещений")
