@@ -1,0 +1,30 @@
+# Демо-стенд и сквозные тесты без ключей провайдеров: модели отвечают постоянным текстом.
+# Маршрутизатор всегда относит вопрос к «базе знаний», ответ ссылается на первый найденный абзац.
+providers:
+  demo-router:
+    kind: fake
+    fake_reply: '{"type": "knowledge", "confidence": 0.9, "names": []}'
+  demo-answer:
+    kind: fake
+    fake_reply: "Это демонстрационный ответ: он опирается на первый найденный абзац [99]. Настоящая модель подключается в config/llm.yaml."
+    # Достройка графа: две допустимые связи и одна с типом вне рецепта (будет отброшена).
+    fake_replies:
+      # Описание карточки похоже на настоящее: служебный текст заглушки читателю не показывается.
+      card.description: "Философ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное."
+      graph.extend: '{"statements": [{"subject": "Кант", "relation": "develops", "object": "Лейбниц"}, {"subject": "Юм", "relation": "influenced_by", "object": "Локк"}, {"subject": "Кант", "relation": "lived_in", "object": "Юм"}]}'
+  demo-embeddings:
+    kind: fake
+
+roles:
+  fast: {provider: demo-router, model: demo-flash, max_output_tokens: 200}
+  main: {provider: demo-answer, model: demo-flash, max_output_tokens: 800}
+  strong: {provider: demo-answer, model: demo-flash, max_output_tokens: 800}
+  embeddings: {provider: demo-embeddings, model: demo-embeddings}
+
+prices:
+  demo-flash: {input_cache_miss: 0.0, input_cache_hit: 0.0, output: 0.0}
+  demo-embeddings: {input_cache_miss: 0.0, input_cache_hit: 0.0}
+
+budgets:
+  site: {daily_limit_usd: 1.7}
+  filling: {}
