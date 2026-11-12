@@ -70,6 +70,27 @@
 - `ruff check`, `ruff format --check`: чисто; `lint-imports`: 3 контракта; traceability 322/322;
   `openspec validate ru-only-sources`: valid (3 предупреждения о длине требований).
 
+## Раунд dev_cycle 3 (2026-11-12)
+
+- Вердикт: **`fix`**. Тестировщик: 385 passed в общем прогоне (115 skipped — Chromium без `TMP`
+  в репозитории), 27 passed по `tests/gateway` и `tests/ops`, 25 passed клиентских с `TEMP`
+  в репозитории; независимый стенд из четырёх шлюзов (доверенный прокси, недоверенный,
+  запасной регион, без настроек) — 32 шага, 2 нарушения. Артефакты: `qa/round-3/`,
+  `qa/screenshots/round-3/` (24 PNG).
+- Кейсы TC-18…TC-24, TC-26, TC-27, EC-16…EC-20, EC-22…EC-25 — пройдены.
+- F-4 (`product-bug`, major): TC-25 и EC-21 — шлюз дописывал второй `Cache-Control` вместо
+  замены: httpx отдаёт имя в нижнем регистре (`cache-control`), код присваивал `Cache-Control`,
+  и клиент получал «public, max-age=300» от сервиса вместе с «private» шлюза. **Исправлено**:
+  прежние значения снимаются без учёта регистра (как в `_add_vary`); тест
+  `test_api_response_is_private_and_varies` усилен — поддельный сервис отдаёт свой
+  `Cache-Control: public, max-age=300`, проверяется ровно одно значение через
+  `get_list("cache-control") == ["private"]`. Живая проверка harness
+  `qa/round-3/harness/headers_evidence.py`: один `Cache-Control: private`,
+  `Vary: Accept-Encoding, CF-IPCountry`.
+- Не проверено: настоящий CDN и проверка конфигурации развёртывания (R13, задача 8.6); штатный
+  `scripts/dev_stack.py` без `PHILOGRAPH_REGION_FALLBACK` (задача 8.2) — на нём регион неизвестен
+  по замыслу; группы 4–8 не проверялись, задач нет.
+
 ## Раунд dev_cycle 1 (2026-11-10)
 
 - Вердикт: `fix`. Тестировщик: все UC-1…UC-8, TC-1…TC-17, EC-1…EC-15 прошли по поведению;

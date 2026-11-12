@@ -1,0 +1,484 @@
+{
+  "gateways": {
+    "trusted": "http://127.0.0.1:62635",
+    "untrusted": "http://127.0.0.1:62636",
+    "fallback": "http://127.0.0.1:62637",
+    "untrusted_fallback": "http://127.0.0.1:62638",
+    "bare": "http://127.0.0.1:62639",
+    "fake": "http://127.0.0.1:63868"
+  },
+  "steps": [
+    {
+      "case": "TC-18",
+      "step": "1",
+      "title": "доверенный прокси, заголовок страны RU",
+      "ok": true,
+      "expected": "сервис получает X-Philograph-Region: RU",
+      "actual": {
+        "status": 200,
+        "region_seen": "RU"
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-19",
+      "step": "1",
+      "title": "клиент прислал X-Philograph-Region: RU, CDN сообщает DE",
+      "ok": true,
+      "expected": "сервис получает DE; клиентского заголовка в запросе нет",
+      "actual": {
+        "region_seen": "DE",
+        "cf_sent": false
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-20",
+      "step": "1",
+      "title": "клиентский X-Philograph-Region без страны от CDN",
+      "ok": true,
+      "expected": "сервис получает запрос без заголовка региона",
+      "actual": {
+        "region_seen": null
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-21",
+      "step": "1",
+      "title": "PHILOGRAPH_TRUSTED_PROXY выключен, есть страна RU",
+      "ok": true,
+      "expected": "сервис без заголовка региона; клиентский и внешний заголовки удалены",
+      "actual": {
+        "region_seen": null,
+        "cf_sent": false
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-18",
+      "step": "3",
+      "title": "регион передаётся в ассистента",
+      "ok": true,
+      "expected": "сервис ассистента получает X-Philograph-Region: RU",
+      "actual": {
+        "region_seen": "RU"
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-18",
+      "step": "4",
+      "title": "регион передаётся в знания (если адрес подключён)",
+      "ok": true,
+      "expected": "200 при подключённых знаниях, иначе 404 — в этом стенде знания не подключены",
+      "actual": {
+        "status": 404
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-22",
+      "step": "1",
+      "title": "PHILOGRAPH_REGION_FALLBACK=RU, заголовка страны нет",
+      "ok": true,
+      "expected": "сервис получает RU",
+      "actual": {
+        "region_seen": "RU"
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-22",
+      "step": "2",
+      "title": "запасной регион не перебивает страну от CDN",
+      "ok": true,
+      "expected": "страна от CDN важнее запасного региона",
+      "actual": {
+        "region_seen": "DE"
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-19",
+      "step": "1",
+      "title": "недоверенный прокси при заданном запасном регионе",
+      "ok": true,
+      "expected": "страна игнорируется, подставляется запасной RU",
+      "actual": {
+        "region_seen": "RU"
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-16",
+      "step": "1",
+      "title": "PHILOGRAPH_REGION_HEADER не задан, клиент прислал страну",
+      "ok": true,
+      "expected": "регион неизвестен: заголовка региона сервису нет",
+      "actual": {
+        "region_seen": null,
+        "cf_sent": true
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-18",
+      "step": "1",
+      "title": "не-ASCII, пробелы и пустое значение в разборе региона",
+      "ok": true,
+      "expected": "РФ и пробелы — неизвестный регион; ' ru ' приводится к RU",
+      "actual": {
+        "РФ": null,
+        "  ": null,
+        " ru ": "RU",
+        "None": null
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-23",
+      "step": "1",
+      "title": "служебные коды и не-двухбуквенные значения",
+      "ok": true,
+      "expected": "для всех значений регион неизвестен",
+      "actual": {
+        "XX": null,
+        "T1": null,
+        "RUS": null,
+        "RU1": null,
+        "R": null,
+        "1R": null,
+        "<нет заголовка>": null,
+        "fallback=XX": null
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-24",
+      "step": "1",
+      "title": "неверный запасной регион XX",
+      "ok": true,
+      "expected": "значение считается пустым, регион неизвестен",
+      "actual": {
+        "XX": null,
+        "T1": null,
+        "RUS": null,
+        "RU1": null,
+        "R": null,
+        "1R": null,
+        "<нет заголовка>": null,
+        "fallback=XX": null
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-24",
+      "step": "1",
+      "title": "значение страны в нижнем регистре",
+      "ok": true,
+      "expected": "сервис получает RU (и DE для 'De')",
+      "actual": {
+        "ru": "RU",
+        "De": "DE"
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-25",
+      "step": "1",
+      "title": "ответ /api/v1/sources через шлюз",
+      "ok": false,
+      "expected": "Cache-Control: private; Vary содержит имя заголовка страны (и прежнее значение сервиса)",
+      "actual": {
+        "cache_control": "public, max-age=300, private",
+        "vary": "Accept-Encoding, CF-IPCountry",
+        "country_forwarded": false
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-21",
+      "step": "1",
+      "title": "страница (не /api/*) через шлюз",
+      "ok": true,
+      "expected": "статика и страницы не помечены Cache-Control: private",
+      "actual": {
+        "status": 200,
+        "cache_control": null
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-26",
+      "step": "1",
+      "title": "два запроса: с регионом и без",
+      "ok": true,
+      "expected": "gateway.region считает known/unknown",
+      "actual": {
+        "before": {
+          "known": 6.0,
+          "unknown": 8.0
+        },
+        "after": {
+          "known": 7.0,
+          "unknown": 9.0
+        }
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-27",
+      "step": "1",
+      "title": "правило «Регион читателя» над живым счётчиком шлюза",
+      "ok": true,
+      "expected": "при 9 неизвестных из 10 правило срабатывает; при минимуме 100 запросов — нет; стран в сообщении нет",
+      "actual": {
+        "baseline": "первое измерение",
+        "warning": {
+          "firing": true,
+          "summary": "регион не определён у 90.0% из 10 запросов",
+          "details": {
+            "rate": 0.9,
+            "requests": 10,
+            "unknown": 9
+          }
+        },
+        "default_min_100": {
+          "firing": false,
+          "summary": "мало запросов: 10"
+        },
+        "country_in_message": false
+      },
+      "evidence": []
+    },
+    {
+      "case": "EC-22",
+      "step": "1",
+      "title": "журнал шлюза после запросов с RU",
+      "ok": true,
+      "expected": "кода страны в событиях нет",
+      "actual": {
+        "lines_with_country": [],
+        "lines": 46
+      },
+      "evidence": []
+    },
+    {
+      "case": "TC-18",
+      "step": "2",
+      "title": "браузер: страна RU от доверенного CDN",
+      "ok": true,
+      "expected": "регион в сервисе: RU",
+      "actual": {
+        "status": 200,
+        "region_seen": "RU",
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-18-2-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-18-2-summary.png"
+      ]
+    },
+    {
+      "case": "TC-19",
+      "step": "2",
+      "title": "браузер: клиент подделал регион, CDN сообщает DE",
+      "ok": true,
+      "expected": "регион в сервисе: DE",
+      "actual": {
+        "status": 200,
+        "region_seen": "DE",
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-19-2-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-19-2-summary.png"
+      ]
+    },
+    {
+      "case": "TC-20",
+      "step": "2",
+      "title": "браузер: только клиентский регион",
+      "ok": true,
+      "expected": "регион в сервисе: None",
+      "actual": {
+        "status": 200,
+        "region_seen": null,
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-20-2-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-20-2-summary.png"
+      ]
+    },
+    {
+      "case": "TC-21",
+      "step": "2",
+      "title": "браузер: прокси не доверенный",
+      "ok": true,
+      "expected": "регион в сервисе: None",
+      "actual": {
+        "status": 200,
+        "region_seen": null,
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-21-2-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-21-2-summary.png"
+      ]
+    },
+    {
+      "case": "TC-22",
+      "step": "3",
+      "title": "браузер: запасной регион стенда",
+      "ok": true,
+      "expected": "регион в сервисе: RU",
+      "actual": {
+        "status": 200,
+        "region_seen": "RU",
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-22-3-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-22-3-summary.png"
+      ]
+    },
+    {
+      "case": "EC-16",
+      "step": "2",
+      "title": "браузер: имя заголовка страны не задано",
+      "ok": true,
+      "expected": "регион в сервисе: None",
+      "actual": {
+        "status": 200,
+        "region_seen": null,
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/EC-16-2-response.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/EC-16-2-summary.png"
+      ]
+    },
+    {
+      "case": "TC-23",
+      "step": "2",
+      "title": "браузер: XX/T1/RUS/РФ/RU1/R",
+      "ok": true,
+      "expected": "во всех случаях регион неизвестен",
+      "actual": [
+        "CF-IPCountry = 'XX'  ->  регион в сервисе: None",
+        "CF-IPCountry = 'T1'  ->  регион в сервисе: None",
+        "CF-IPCountry = 'RUS'  ->  регион в сервисе: None",
+        "CF-IPCountry = 'RU1'  ->  регион в сервисе: None",
+        "CF-IPCountry = 'R'  ->  регион в сервисе: None"
+      ],
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-23-2-browser-matrix.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-23-3-browser-matrix-summary.png"
+      ]
+    },
+    {
+      "case": "TC-24",
+      "step": "2",
+      "title": "браузер: 'ru' в нижнем регистре",
+      "ok": true,
+      "expected": "RU",
+      "actual": {
+        "region_seen": "RU"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-24-2-browser-lowercase.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-24-3-browser-lowercase-summary.png"
+      ]
+    },
+    {
+      "case": "TC-25",
+      "step": "2",
+      "title": "браузер: Cache-Control и Vary",
+      "ok": false,
+      "expected": "Cache-Control: private, Vary с именем заголовка страны",
+      "actual": {
+        "cache_control": "public, max-age=300\nprivate",
+        "vary": "Accept-Encoding, CF-IPCountry"
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-25-2-browser-api.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-25-3-browser-api-headers.png"
+      ]
+    },
+    {
+      "case": "EC-21",
+      "step": "2",
+      "title": "браузер: страница продукта не помечена private",
+      "ok": true,
+      "expected": "страница без Cache-Control: private",
+      "actual": {
+        "cache_control": null
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/EC-21-2-browser-page.png",
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/EC-21-3-browser-page-headers.png"
+      ]
+    },
+    {
+      "case": "TC-26",
+      "step": "2",
+      "title": "браузер: дамп метрик шлюза",
+      "ok": true,
+      "expected": "только known/unknown, без стран",
+      "actual": {
+        "status": 200,
+        "region_rows": 2,
+        "no_country": true
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-26-3-browser-metrics-summary.png"
+      ]
+    },
+    {
+      "case": "TC-26",
+      "step": "3",
+      "title": "метрики без служебного токена закрыты",
+      "ok": true,
+      "expected": "404",
+      "actual": {
+        "status": 404
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-26-4-browser-metrics-no-token.png"
+      ]
+    },
+    {
+      "case": "TC-27",
+      "step": "2",
+      "title": "правило на подставных счётчиках: порог, минимум, приватность",
+      "ok": true,
+      "expected": "срабатывает при превышении порога; при малом числе запросов — нет; без стран",
+      "actual": {
+        "fired": {
+          "firing": true,
+          "summary": "регион не определён у 90.0% из 10 запросов",
+          "details": {
+            "rate": 0.9,
+            "requests": 10,
+            "unknown": 9
+          }
+        },
+        "few": {
+          "firing": false,
+          "summary": "мало запросов: 1"
+        }
+      },
+      "evidence": [
+        "openspec/changes/ru-only-sources/qa/screenshots/round-3/TC-27-1-rule-summary.png"
+      ]
+    }
+  ]
+}

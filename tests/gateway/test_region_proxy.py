@@ -7,6 +7,7 @@ import json
 import httpx
 import pytest
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
 from philograph.gateway.app import build_app
@@ -18,7 +19,11 @@ RA = "regional-access"
 
 
 class Services:
-    """Библиотека за шлюзом: запоминает заголовки, с которыми к ней пришли."""
+    """Библиотека за шлюзом: запоминает заголовки, с которыми к ней пришли.
+
+    Отвечает со своим ``Cache-Control``: настоящая библиотека кэширует список, и шлюз обязан
+    заменить это значение, а не дописать второе.
+    """
 
     def __init__(self) -> None:
         self.seen: list[dict[str, str]] = []
@@ -27,7 +32,7 @@ class Services:
         @app.get("/library/api/v1/sources")
         def sources(request: Request):
             self.seen.append({k.lower(): v for k, v in request.headers.items()})
-            return {"items": []}
+            return JSONResponse({"items": []}, headers={"Cache-Control": "public, max-age=300"})
 
         self.app = app
 
@@ -96,10 +101,14 @@ def test_fallback_region_for_local_stand():
 
 @req(RA, "Регион читателя определяет шлюз")
 def test_api_response_is_private_and_varies():
-    """Ответ API зависит от страны: Cache-Control: private и Vary на заголовок страны."""
+    """Ответ API зависит от страны: Cache-Control: private и Vary на заголовок страны.
+
+    Сервис отдаёт свой ``public, max-age=300``: шлюз обязан его заменить, а не дописать второй
+    заголовок — иначе CDN кэширует ответ между странами.
+    """
     client, _ = gateway(RegionSettings(header="CF-IPCountry", trusted_proxy=True))
     response = client.get("/api/v1/sources", headers={"CF-IPCountry": "RU"})
-    assert response.headers["cache-control"] == "private"
+    assert response.headers.get_list("cache-control") == ["private"]
     assert "cf-ipcountry" in response.headers["vary"].lower()
 
 
