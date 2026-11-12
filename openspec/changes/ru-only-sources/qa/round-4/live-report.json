@@ -1,0 +1,300 @@
+{
+  "stack": {
+    "url": "http://127.0.0.1:63727",
+    "ports": {
+      "llm": 63722,
+      "library": 63723,
+      "search": 63724,
+      "assistant": 63725,
+      "knowledge": 63726,
+      "gateway": 63727
+    },
+    "sources": {
+      "open": "s_4aaa048bc411",
+      "restricted": "s_fd2030ac9be8"
+    },
+    "logs": "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+  },
+  "checks": [
+    {
+      "id": "TC-33",
+      "ok": true,
+      "expected": "на базе версии 3 миграция 4 добавляет regions/external; старые строки — '*' и TRUE",
+      "actual": "{\"applied_before\": [1, 2, 3], \"applied_by_start\": [4], \"columns\": [\"active\", \"chapter_id\", \"embedded\", \"external\", \"lang\", \"length\", \"ord\", \"paragraph_id\", \"quoting\", \"regions\", \"scope\", \"section_id\", \"section_title\", \"source_id\", \"source_title\", \"text\", \"text_hash\", \"version_id\"], \"old_row\": {\"regions\": \"*\", \"external\": true}, \"schema_version\": 4}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json"
+      ]
+    },
+    {
+      "id": "TC-28/RU",
+      "ok": true,
+      "expected": "поиск с регионом RU возвращает абзацы источника [RU]",
+      "actual": "{\"sources\": [\"s_fd2030ac9be8\", \"s_fd2030ac9be8\", \"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_5f40e2d223f2\"], \"semantic_used\": true}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-28/DE",
+      "ok": true,
+      "expected": "поиск с регионом DE не возвращает абзацы источника [RU], открытые — возвращает",
+      "actual": "{\"sources\": [\"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_5f40e2d223f2\", \"s_98814cf37330\", \"s_5f40e2d223f2\"], \"semantic_used\": true, \"found_by\": [\"lexical\", \"semantic\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-28/none",
+      "ok": true,
+      "expected": "поиск без региона не возвращает абзацы источника [RU]",
+      "actual": "{\"sources\": [\"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_5f40e2d223f2\", \"s_98814cf37330\", \"s_5f40e2d223f2\"], \"semantic_used\": true}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-29",
+      "ok": true,
+      "expected": "поиск из DE с limit=3 отдаёт ровно 3 результата, все — открытые источники",
+      "actual": "{\"count\": 3, \"sources\": [\"s_4aaa048bc411\", \"s_4aaa048bc411\", \"s_4aaa048bc411\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-30",
+      "ok": true,
+      "expected": "абзац по уникальному слову [RU]-источника: для DE и без региона нет, для RU найден",
+      "actual": "{\"DE\": [\"s_5f40e2d223f2\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_4aaa048bc411\", \"s_5f40e2d223f2\", \"s_5f40e2d223f2\", \"s_98814cf37330\"], \"none\": [\"s_5f40e2d223f2\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_4aaa048bc411\", \"s_5f40e2d223f2\", \"s_5f40e2d223f2\", \"s_98814cf37330\"], \"RU\": [\"s_fd2030ac9be8\", \"s_5f40e2d223f2\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_fd2030ac9be8\", \"s_fd2030ac9be8\", \"s_4aaa048bc411\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "UC-19/gateway",
+      "ok": true,
+      "expected": "через шлюз источник [RU] открыт (нет restricted, есть год/лицензия)",
+      "actual": "{\"row\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"], \"year\": 2026, \"language\": \"ru\", \"kind\": \"textbook\", \"license\": {\"title\": \"Только РФ\", \"url\": null}, \"translator\": null, \"edition\": null}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "UC-10/gateway",
+      "ok": true,
+      "expected": "клиентские заголовки не подменяют регион: источник открыт по запасному RU",
+      "actual": "{\"row\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"], \"year\": 2026, \"language\": \"ru\", \"kind\": \"textbook\", \"license\": {\"title\": \"Только РФ\", \"url\": null}, \"translator\": null, \"edition\": null}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-25",
+      "ok": true,
+      "expected": "ответ API через шлюз помечен одним Cache-Control: private",
+      "actual": "{\"cache_control\": [\"private\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "UC-3/direct",
+      "ok": true,
+      "expected": "напрямую в библиотеке без заголовка региона источник [RU] закрыт",
+      "actual": "{\"row\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"], \"restricted\": true, \"regions\": [\"RU\"]}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-9",
+      "ok": true,
+      "expected": "прямой запрос с X-Philograph-Region: RU открывает источник",
+      "actual": "{\"row\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"], \"year\": 2026, \"language\": \"ru\", \"kind\": \"textbook\", \"license\": {\"title\": \"Только РФ\", \"url\": null}, \"translator\": null, \"edition\": null}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-14",
+      "ok": true,
+      "expected": "GET /internal/published содержит ограниченный источник",
+      "actual": "{\"sources\": [\"s_4aaa048bc411\", \"s_fd2030ac9be8\", \"s_98814cf37330\", \"s_5f40e2d223f2\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-15",
+      "ok": true,
+      "expected": "GET /internal/access: для DE закрытый идентификатор есть, для RU — нет",
+      "actual": "{\"DE\": {\"region\": \"DE\", \"closed\": [\"s_fd2030ac9be8\"]}, \"RU\": {\"region\": \"RU\", \"closed\": []}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-16",
+      "ok": true,
+      "expected": "внутренний ответ версии несёт regions, permissions, external_processing",
+      "actual": "{\"fields\": [\"chapters\", \"external_processing\", \"footnotes\", \"headings\", \"paragraphs\", \"permissions\", \"published\", \"regions\", \"scope\", \"source_id\", \"source_title\", \"version_id\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-12",
+      "ok": true,
+      "expected": "GET /paragraphs/{id} из DE: source_unavailable с причиной region, без текста",
+      "actual": "{\"DE\": {\"status\": \"source_unavailable\", \"reason\": \"region\", \"source\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"]}}, \"RU_status\": \"found\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-38",
+      "ok": true,
+      "expected": "change_license у вида [RU] без сужения источника: в событии regions == ['RU']",
+      "actual": "{\"kind\": \"source.access_changed\", \"regions\": [\"RU\"], \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-31",
+      "ok": true,
+      "expected": "событие source.access_changed меняет видимость для DE без вызовов эмбеддера",
+      "actual": "{\"hidden_before\": true, \"visible_for_DE\": true, \"embedding_calls_before\": 4, \"embedding_calls_after\": 4}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs\\llm.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json"
+      ]
+    },
+    {
+      "id": "TC-34/live",
+      "ok": true,
+      "expected": "снятие ограничения записывает в индекс регионы '*'",
+      "actual": "{\"regions\": [\"*\"], \"active\": [true, true, true]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-36",
+      "ok": true,
+      "expected": "повторное событие — дубликат: работа не повторяется, эмбеддер не вызывается, видимость для DE прежняя",
+      "actual": "{\"duplicate_logged\": true, \"hidden_for_DE\": true, \"embedding_calls\": 4}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs\\search.log"
+      ]
+    },
+    {
+      "id": "TC-37",
+      "ok": true,
+      "expected": "regions: [] закрывает источник всем: ни RU, ни DE, ни без региона; в индексе ','",
+      "actual": "{\"closed_all\": true, \"state\": {\"regions\": [\",\"], \"active\": [true, true, true]}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs\\search.log"
+      ]
+    },
+    {
+      "id": "TC-32",
+      "ok": true,
+      "expected": "сверка чинит регионы (',RU,'), не гасит закрытый источник, повтор без изменений",
+      "actual": "{\"first\": {\"missing\": 0, \"extra\": 0}, \"second\": {\"missing\": 0, \"extra\": 0}, \"state\": {\"regions\": [\",RU,\"], \"active\": [true, true, true]}, \"DE\": [\"s_5f40e2d223f2\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_4aaa048bc411\", \"s_5f40e2d223f2\", \"s_5f40e2d223f2\", \"s_98814cf37330\"], \"RU\": [\"s_fd2030ac9be8\", \"s_5f40e2d223f2\", \"s_4aaa048bc411\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_98814cf37330\", \"s_fd2030ac9be8\", \"s_fd2030ac9be8\", \"s_4aaa048bc411\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs\\search.log"
+      ]
+    },
+    {
+      "id": "EC-31",
+      "ok": true,
+      "expected": "повторная сверка без расхождений: {missing: 0, extra: 0}",
+      "actual": "{\"missing\": 0, \"extra\": 0}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-35",
+      "ok": true,
+      "expected": "провайдер эмбеддингов недоступен: ответ только по словам, ограниченный источник по-прежнему виден только RU",
+      "actual": "{\"semantic_used_DE\": false, \"DE\": [], \"none\": [], \"RU\": [\"s_fd2030ac9be8\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\harness\\stand\\logs\\search.log"
+      ]
+    },
+    {
+      "id": "EC-19/alt-gateway",
+      "ok": true,
+      "expected": "заголовок страны от клиента при недоверенном прокси игнорируется: работает запасной RU, источник открыт",
+      "actual": "{\"ready\": true, \"row\": {\"id\": \"s_fd2030ac9be8\", \"title\": \"Ограниченный учебник [RU]\", \"authors\": [\"QA тестировщик\"], \"year\": 2026, \"language\": \"ru\", \"kind\": \"textbook\", \"license\": {\"title\": \"Только РФ\", \"url\": null}, \"translator\": null, \"edition\": null}, \"port\": 51292}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-4\\gateway-alt.log"
+      ]
+    },
+    {
+      "id": "UC-19",
+      "ok": true,
+      "expected": "через шлюз с запасным регионом RU ограниченный источник открыт (без пометки «доступен в РФ», есть кнопка «Читать»)",
+      "actual": "{\"restricted_rows\": 0, \"rows\": [\"Empiricism: a demonstration reader\\nАвтор\\nPhiloGraph project\\nГод\\n2026\\nЯзык\\nанглийский\\nВид\\nПервоисточник\\nЛицензия\\nCC BY 4.0\\nЧитать\", \"Ограниченный учебник [RU]\\nАвтор\\nQA тестировщик\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nТолько РФ\\nЧитать\", \"Открытый сборник о разуме\\nАвтор\\nQA тестировщик\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nОткрытая демонстрация\\nЧитать\", \"Теория познания: демонстрационный учебник\\nПо умолчанию\\nАвтор\\nПроект PhiloGraph\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nCC BY 4.0\\nЧитать\"], \"url\": \"http://127.0.0.1:63727\", \"console_errors\": [], \"failed_requests\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-4\\UC-19-1-library-fallback-ru.png"
+      ]
+    },
+    {
+      "id": "UC-2",
+      "ok": true,
+      "expected": "источник [RU] на стенде с запасным регионом RU читается: абзац с маркером виден",
+      "actual": "{\"read_buttons\": 1, \"marker_visible\": true}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-4\\UC-19-3-restricted-source-readable.png"
+      ]
+    },
+    {
+      "id": "UC-10",
+      "ok": true,
+      "expected": "клиентские заголовки X-Philograph-Region: DE и CF-IPCountry: DE не меняют регион: источник по-прежнему открыт по запасному RU",
+      "actual": "{\"restricted_rows\": 0, \"rows\": [\"Empiricism: a demonstration reader\\nАвтор\\nPhiloGraph project\\nГод\\n2026\\nЯзык\\nанглийский\\nВид\\nПервоисточник\\nЛицензия\\nCC BY 4.0\\nЧитать\", \"Ограниченный учебник [RU]\\nАвтор\\nQA тестировщик\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nТолько РФ\\nЧитать\", \"Открытый сборник о разуме\\nАвтор\\nQA тестировщик\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nОткрытая демонстрация\\nЧитать\", \"Теория познания: демонстрационный учебник\\nПо умолчанию\\nАвтор\\nПроект PhiloGraph\\nГод\\n2026\\nЯзык\\nрусский\\nВид\\nУчебник\\nЛицензия\\nCC BY 4.0\\nЧитать\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-4\\UC-19-2-client-header-ignored.png"
+      ]
+    },
+    {
+      "id": "UC-3",
+      "ok": true,
+      "expected": "напрямую в библиотеке без шлюза регион неизвестен: источник показан строкой «Доступен в РФ»",
+      "actual": "{\"restricted_rows\": 1, \"badges\": 1, \"url\": \"http://127.0.0.1:63723\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-4\\UC-19-4-library-direct-unknown-region.png"
+      ]
+    },
+    {
+      "id": "EC-console",
+      "ok": true,
+      "expected": "в браузере нет ошибок консоли и сетевых сбоев",
+      "actual": "{\"console_errors\": [], \"failed_requests\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-4\\UC-19-1-library-fallback-ru.png"
+      ]
+    }
+  ],
+  "failures": 0
+}
