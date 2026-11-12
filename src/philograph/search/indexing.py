@@ -74,6 +74,34 @@ def text_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def regions_column(regions: list[str] | tuple[str, ...] | frozenset[str] | None) -> str:
+    """Регионы показа в формате столбца ``docs.regions``.
+
+    ``*`` — везде; ``,RU,BY,`` — перечень (подстрока ``LIKE '%,RU,%'`` безопасна, коды —
+    двухбуквенные латинские); ``','`` — пустое пересечение («нигде»): не совпадает ни с
+    ``regions = '*'``, ни с ``LIKE '%,RU,%'``.
+    """
+    if regions is None:
+        return "*"
+    codes = sorted(regions)
+    if not codes:
+        return ","
+    return "," + ",".join(codes) + ","
+
+
+def regions_payload(
+    regions: list[str] | tuple[str, ...] | frozenset[str] | None,
+) -> list[str]:
+    """Регионы показа для полезной нагрузки Qdrant: ``["*"]`` — везде, иначе список кодов.
+
+    Пустое пересечение — пустой список: ``MatchAny`` по такому полю не совпадёт ни с одним
+    регионом, источник закрыт для всех.
+    """
+    if regions is None:
+        return ["*"]
+    return sorted(regions)
+
+
 def chunks(text: str, size: int, overlap: int) -> list[str]:
     """Перекрывающиеся фрагменты длинного абзаца; результат поиска всё равно — абзац."""
     if len(text) <= size:
@@ -152,6 +180,9 @@ class Indexer:
             self._set_source_active(source_id, False)
         elif kind == "source.deleted":
             counts["removed"] = self._drop_source(source_id)
+        elif kind == "source.access_changed":
+            # Регионы показа сменились без повторной публикации: эмбеддинги не пересчитываются.
+            self._set_source_regions(source_id, payload)
         with self.engine.begin() as conn:
             conn.execute(t.processed.insert().values(event_id=event_id))
         events.emit(
@@ -199,6 +230,8 @@ class Indexer:
                             section_title=p["section_title"],
                             source_title=data.get("source_title"),
                             quoting=bool(data["permissions"].get("quoting", True)),
+                            regions=regions_column(data.get("regions")),
+                            external=bool(data.get("external_processing", True)),
                         )
                     )
             if external and (old is None or old.text_hash != digest or not old.embedded):
@@ -237,6 +270,8 @@ class Indexer:
                     embedded=False,
                     active=True,
                     quoting=bool(data["permissions"].get("quoting", True)),
+                    regions=regions_column(data.get("regions")),
+                    external=bool(data.get("external_processing", True)),
                 )
             )
             if counted:
@@ -325,6 +360,7 @@ class Indexer:
             "scope": data["scope"],
             "active": True,
             "text_hash": item["hash"],
+            "regions": regions_payload(data.get("regions")),
         }
 
     def _copy_vectors(self, item: dict[str, Any], data: dict[str, Any], collection: str) -> bool:
@@ -371,6 +407,23 @@ class Indexer:
             )
         self.vectors.set_active(self.active_collection, ids, active)
 
+    def _set_source_regions(self, source_id: str, payload: dict[str, Any]) -> None:
+        """Обновляет регионы показа источника в таблице и в полезной нагрузке Qdrant.
+
+        Эмбеддинги не пересчитываются: текст абзацев не менялся, меняется только фильтр.
+        """
+        regions = payload.get("regions")
+        with self.engine.begin() as conn:
+            ids = list(
+                conn.scalars(select(t.docs.c.paragraph_id).where(t.docs.c.source_id == source_id))
+            )
+            conn.execute(
+                update(t.docs)
+                .where(t.docs.c.source_id == source_id)
+                .values(regions=regions_column(regions))
+            )
+        self.vectors.set_regions(self.active_collection, ids, regions_payload(regions))
+
     def _drop_source(self, source_id: str) -> int:
         with self.engine.begin() as conn:
             ids = list(
@@ -382,7 +435,12 @@ class Indexer:
     # --- сверка, оценка, смена модели ---
 
     def reconcile(self) -> dict[str, int]:
-        """Догоняет библиотеку, если событие потерялось: недостающее индексирует, лишнее гасит."""
+        """Догоняет библиотеку, если событие потерялось: недостающее индексирует, лишнее гасит.
+
+        Закрытые по региону источники «лишними» не считаются: ``published()`` отдаёт их без
+        фильтра региона. Отдельный шаг сверяет регионы индекса с библиотекой и чинит расхождение
+        (например, после миграции, задавшей значения по умолчанию).
+        """
         published = self.library.published()
         with self.engine.begin() as conn:
             rows = conn.execute(
@@ -398,6 +456,18 @@ class Indexer:
         extra = sorted({r.source_id for r in rows if r.active and r.source_id not in live})
         for source_id in extra:
             self._set_source_active(source_id, False)
+        # Сверка регионов: источники, которые уже проиндексированы, сравниваются с библиотекой.
+        for item in published:
+            if (item["source_id"], item["version_id"]) not in indexed_versions:
+                continue  # только что проиндексирован: регионы уже актуальные
+            data = self.library.version_paragraphs(item["version_id"])
+            want = regions_column(data.get("regions"))
+            with self.engine.begin() as conn:
+                stored = conn.scalar(
+                    select(t.docs.c.regions).where(t.docs.c.source_id == item["source_id"]).limit(1)
+                )
+            if stored is not None and stored != want:
+                self._set_source_regions(item["source_id"], data)
         events.emit("search.index.reconciled", missing=len(missing), extra=len(extra))
         return {"missing": len(missing), "extra": len(extra)}
 

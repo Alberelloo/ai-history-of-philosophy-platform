@@ -66,6 +66,13 @@ class VectorStore:
                 collection, payload={"active": active}, points=self._match(paragraph_ids)
             )
 
+    def set_regions(self, collection: str, paragraph_ids: list[str], regions: list[str]) -> None:
+        """Обновляет регионы показа у точек абзацев; эмбеддинги не пересчитываются."""
+        if paragraph_ids and self.exists(collection):
+            self.client.set_payload(
+                collection, payload={"regions": regions}, points=self._match(paragraph_ids)
+            )
+
     def delete(self, collection: str, paragraph_ids: list[str]) -> None:
         if paragraph_ids and self.exists(collection):
             self.client.delete(
@@ -83,10 +90,15 @@ class VectorStore:
         scopes: list[str],
         limit: int,
         exclude_sources: list[str] | None = None,
+        region: str | None = None,
     ) -> list[Hit]:
         must = [
             qm.FieldCondition(key="active", match=qm.MatchValue(value=True)),
             qm.FieldCondition(key="scope", match=qm.MatchAny(any=scopes)),
+            # Регион читателя; без региона — только источники без ограничения ("*").
+            qm.FieldCondition(
+                key="regions", match=qm.MatchAny(any=[region, "*"] if region else ["*"])
+            ),
         ]
         if sources:
             must.append(qm.FieldCondition(key="source_id", match=qm.MatchAny(any=sources)))

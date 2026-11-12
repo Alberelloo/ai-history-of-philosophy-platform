@@ -14,7 +14,7 @@ from philograph.platform.web import create_app
 from philograph.search.indexing import Indexer
 from philograph.search.searching import Query, Searcher
 
-EVENTS = ("source.published", "source.unpublished", "source.deleted")
+EVENTS = ("source.published", "source.unpublished", "source.deleted", "source.access_changed")
 
 
 class SearchBody(BaseModel):
@@ -28,6 +28,7 @@ class SearchBody(BaseModel):
     neighbors: int = Field(default=0, ge=0, le=3)
     per_chapter: int = Field(default=3, ge=1, le=20)
     limit: int = Field(default=10, ge=1, le=50)
+    region: str | None = None  # регион читателя; нет значения — неизвестный регион
 
 
 def build_app(searcher: Searcher, indexer: Indexer, health: Health | None = None) -> FastAPI:

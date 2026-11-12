@@ -84,6 +84,8 @@ def stack(tmp_path_factory):
     import dev_stack
 
     os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
+    # Стенд поднимается с локального адреса без CDN: регион неизвестен, подставляем РФ.
+    os.environ.setdefault("PHILOGRAPH_REGION_FALLBACK", "RU")
     running = dev_stack.start(tmp_path_factory.mktemp("stack"))
     yield running
     running.stop()

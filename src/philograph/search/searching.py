@@ -8,7 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlalchemy import Engine, and_, func, select
+from sqlalchemy import Engine, and_, func, or_, select
 
 from philograph.platform import events
 from philograph.search import schema as t
@@ -70,6 +70,7 @@ class Query:
     per_chapter: int = 3
     limit: int = 10
     scopes: list[str] = field(default_factory=lambda: ["public"])
+    region: str | None = None  # регион читателя; нет значения — неизвестный регион
 
 
 class Searcher:
@@ -89,6 +90,10 @@ class Searcher:
 
     def _filters(self, q: Query):
         conds = [t.docs.c.active, t.docs.c.scope.in_(q.scopes)]
+        if q.region:
+            conds.append(or_(t.docs.c.regions == "*", t.docs.c.regions.like(f"%,{q.region},%")))
+        else:  # неизвестный регион: открыты только источники без ограничения
+            conds.append(t.docs.c.regions == "*")
         if q.sources:
             conds.append(t.docs.c.source_id.in_(q.sources))
         if q.languages:
@@ -150,6 +155,7 @@ class Searcher:
                 exclude=q.exclude,
                 exclude_sources=q.exclude_sources,
                 scopes=q.scopes,
+                region=q.region,
                 limit=self.settings.candidates,
             )
             semantic = {

@@ -148,6 +148,22 @@ def test_change_license_emits_access_changed(lib, events):
     assert lib.registry.regions(source_id) == frozenset({"RU"})
 
 
+@req(RA, "Смена регионов у опубликованного источника")
+def test_access_changed_carries_effective_regions(lib, events):
+    """Событие уносит действующие регионы, а не сужение: вид ограничен РФ, сужения нет."""
+    add_ru_kind(lib)  # вид: regions ["RU"]
+    source_id = lib.register(license=ru_license())  # источник без собственного сужения
+    lib.publish_new(source_id)
+    events.clear()
+
+    lib.registry.change_license("operator", source_id, ru_license())
+    payload = lib.registry.outbox_pending()[-1]["payload"]
+    # `null` здесь означал бы «везде» и открыл бы текст всем регионам до следующей сверки.
+    assert payload["regions"] == ["RU"]
+    assert payload["permissions"]["display"] is True
+    assert lib.registry.regions(source_id) == frozenset({"RU"})
+
+
 @req(RA, "Библиотека закрывает текст ограниченных источников")
 def test_list_marks_restricted_rows(lib, events):
     add_ru_kind(lib)

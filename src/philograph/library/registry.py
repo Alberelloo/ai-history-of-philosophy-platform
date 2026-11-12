@@ -513,11 +513,12 @@ class Registry:
         blocked = self._validate_license(lic, source.translator)
         regions = normalize_regions(lic.regions)
         kind = self.license_kind(lic.kind) or {"permissions": {}}
+        # В событие — действующие регионы (пересечение с видом), а не сужение источника:
+        # индексы обновляют видимость по ним, и `null` вместо `["RU"]` открыл бы источник всем.
+        effective = effective_regions(kind.get("regions"), regions)
         access = {
-            "regions": regions,
-            "permissions": effective_permissions(
-                kind["permissions"], lic.narrowed, effective_regions(kind.get("regions"), regions)
-            ),
+            "regions": sorted(effective) if effective is not None else None,
+            "permissions": effective_permissions(kind["permissions"], lic.narrowed, effective),
         }
         with self.engine.begin() as conn:
             conn.execute(

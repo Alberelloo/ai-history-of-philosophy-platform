@@ -1,4 +1,4 @@
-﻿# Tasks
+# Tasks
 
 Тесты помечаются `@pytest.mark.req("<возможность>", "<требование>")` (требования `regional-access` и изменённые требования). Возможность `regional-access` добавляется в `openspec/traceability.yaml` в задаче 8.5; до неё `scripts/check_traceability.py` её не проверяет. Группа 7 обязательна: владелец решил, что `external_processing: false` (раздел «Решения владельца» в design.md). Открытых вопросов нет.
 
@@ -24,10 +24,10 @@
 
 ## 4. Поиск и индексация
 
-- [ ] 4.1 Миграция поиска 4: `docs.regions TEXT NOT NULL DEFAULT '*'`, `docs.external BOOLEAN NOT NULL DEFAULT TRUE` в `src/philograph/search/schema.py`; запись в `Indexer.index_version/_write_doc` из `version_paragraphs`. Тест `tests/search/` (миграция на старой базе, значения по умолчанию).
-- [ ] 4.2 `Query.region` и `SearchBody.region` (нет значения — неизвестный регион); фильтр в `Searcher._filters` и `lexical`; полезная нагрузка `regions` и фильтр `MatchAny([region, "*"])` в `search/vectors.py`. Тесты `paragraph-search` / «Видимость и публикация», `regional-access` / «Поиск учитывает регион запроса»: RU, DE, без региона, лимит результатов заполняется открытыми.
-- [ ] 4.3 Обработчик `source.access_changed` в `search/app.py` (`EVENTS`) и `Indexer.handle`: `UPDATE docs`, `VectorStore.set_regions` без вызова провайдера эмбеддингов. Тест: смена регионов меняет выдачу без вызова эмбеддера (счётчик вызовов фиктивного провайдера).
-- [ ] 4.4 Шаг сверки регионов в `Indexer.reconcile` (расхождение с библиотекой чинится) и проверка, что закрытые источники не гасятся как лишние. Тест `regional-access` / «Внутренние интерфейсы не фильтруют по региону» / «Сверка индексов».
+- [x] 4.1 Миграция поиска 4: `docs.regions TEXT NOT NULL DEFAULT '*'`, `docs.external BOOLEAN NOT NULL DEFAULT TRUE` в `src/philograph/search/schema.py`; запись в `Indexer.index_version/_write_doc` из `version_paragraphs`. Тест `tests/search/` (миграция на старой базе, значения по умолчанию).
+- [x] 4.2 `Query.region` и `SearchBody.region` (нет значения — неизвестный регион); фильтр в `Searcher._filters` и `lexical`; полезная нагрузка `regions` и фильтр `MatchAny([region, "*"])` в `search/vectors.py`. Тесты `paragraph-search` / «Видимость и публикация», `regional-access` / «Поиск учитывает регион запроса»: RU, DE, без региона, лимит результатов заполняется открытыми.
+- [x] 4.3 Обработчик `source.access_changed` в `search/app.py` (`EVENTS`) и `Indexer.handle`: `UPDATE docs`, `VectorStore.set_regions` без вызова провайдера эмбеддингов. Тест: смена регионов меняет выдачу без вызова эмбеддера (счётчик вызовов фиктивного провайдера).
+- [x] 4.4 Шаг сверки регионов в `Indexer.reconcile` (расхождение с библиотекой чинится) и проверка, что закрытые источники не гасятся как лишние. Тест `regional-access` / «Внутренние интерфейсы не фильтруют по региону» / «Сверка индексов».
 
 ## 5. Ассистент
 
@@ -52,7 +52,7 @@
 ## 8. Оценка, стенд, данные, документация
 
 - [ ] 8.1 `evaluation/components.py` и наборы оценки: поле `region`, запросы идут с регионом; тесты `regional-access` / «Оценка и служебные запросы задают регион явно» в `tests/evaluation/test_evaluation.py`.
-- [ ] 8.2 Стенд разработки: `PHILOGRAPH_REGION_FALLBACK=RU` в `scripts/dev_stack.py` и в окружении `tests/e2e/conftest.py`. Проверка: сквозные тесты зелёные.
+- [x] 8.2 Стенд разработки: `PHILOGRAPH_REGION_FALLBACK=RU` в `scripts/dev_stack.py` и в окружении `tests/e2e/conftest.py`. Проверка: сквозные тесты зелёные.
 - [ ] 8.3 Сквозной тест: читатель с заголовком региона через шлюз получает библиотеку, главу и поиск из закрытого источника для `RU` и не получает для `DE` (`tests/e2e/` или API-тест на подставных сервисах `tests/gateway/`).
 - [ ] 8.4 Данные: `regions: [RU]` и `external_processing: false` (если задача 7 принята) у `public-domain-ru` в `sources/licenses.yaml` с обновлением комментария («метка» → «применяется сервисом»); `python -m philograph.library.catalog check` проходит; `sync` на стенде меняет учёт.
 - [ ] 8.5 Добавить `regional-access` в `enforce` файла `openspec/traceability.yaml`; `python scripts/check_traceability.py` зелёный.
