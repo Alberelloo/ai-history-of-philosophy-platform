@@ -41,6 +41,7 @@ class Components:
     mentions: Mentions
     graphs: Graphs
     assistant: AssistantKnowledge
+    library: ServiceClient
 
 
 def components(env: dict[str, str]) -> Components:
@@ -88,7 +89,9 @@ def components(env: dict[str, str]) -> Components:
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
-    return Components(statements, health, queue, review, auth, cards, mentions, graphs, assistant)
+    return Components(
+        statements, health, queue, review, auth, cards, mentions, graphs, assistant, library
+    )
 
 
 if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
@@ -107,4 +110,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         mentions=_c.mentions,
         graphs=_c.graphs,
         assistant=_c.assistant,
+        library=_c.library,
     )

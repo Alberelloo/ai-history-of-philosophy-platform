@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
+from philograph.knowledge.assist import STEPS, AssistantKnowledge
+from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.statements import Attribution, Evidence, Provenance
 from philograph.library.app import build_app as library_app
 from philograph.library.reading import Reading
@@ -66,3 +69,41 @@ def test_http_interface(onto):
     assert [n["id"] for n in graph["nodes"]] == [hume, kant]
     wrong = client.get("/v1/graph", params={"recipe": "answers", "start": kant})
     assert wrong.status_code == 400 and wrong.json()["kind"] == "recipe_not_applicable"
+
+
+@req("regional-access", "Онтология не раскрывает текст закрытых источников")
+def test_assistant_context_without_closed_source_paragraph(onto):
+    """6.4: контекст ассистента не несёт текст абзацев закрытых для региона источников."""
+
+    def unused(request: httpx.Request) -> httpx.Response:
+        raise AssertionError("библиотека в этом тесте не вызывается")
+
+    library = ServiceClient("library", "http://library", transport=httpx.MockTransport(unused))
+    kant, hume = onto.person("Кант", "1724", "1804"), onto.person("Юм", "1711", "1776")
+    onto.statements.add(
+        kant,
+        "influenced_by",
+        obj=hume,
+        attributions=[Attribution("source", "s_closed")],
+        evidence=[Evidence("p1", "Юм пробудил его от догматического сна", source_id="s_closed")],
+    )
+    onto.statements.add(
+        kant,
+        "influenced_by",
+        obj=hume,
+        attributions=[Attribution("source", "s_open")],
+        evidence=[Evidence("p2", "Кант испытал влияние Юма", source_id="s_open")],
+    )
+    assistant = AssistantKnowledge(onto.statements, Mentions(onto.statements, library))
+    context = assistant.context(
+        text="Кант",
+        names=[],
+        paragraphs=[],
+        steps=list(STEPS),
+        recipe="genesis",
+        closed={"s_closed"},
+    )
+    assert {p["paragraph_id"] for p in context["paragraphs"]} == {"p2"}
+    for statement in context["statements"]:
+        assert "s_closed" not in statement["sources"]
+        assert all(e["source_id"] != "s_closed" for e in statement["evidence"])

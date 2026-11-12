@@ -66,11 +66,14 @@ def parse_region(value: str | None) -> str | None:
     """Код региона из заголовка: две латинские буквы в верхнем регистре.
 
     Всё прочее (пусто, ``XX``, ``T1``, кириллица) — неизвестный регион: источники с
-    ограничением регионов такому читателю закрыты.
+    ограничением регионов такому читателю закрыты. ``XX`` — служебное «страна не определена»
+    у CDN, поэтому он не считается кодом страны.
     """
     if not value:
         return None
     code = value.strip().upper()
+    if code in {"XX", "T1"}:
+        return None
     if len(code) == 2 and code.isascii() and code.isalpha():
         return code
     return None

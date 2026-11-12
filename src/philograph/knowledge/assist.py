@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from philograph.knowledge.graph import attribution_label
+from philograph.knowledge.graph import attribution_label, hidden_by_region
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.statements import STRENGTH, Statements
@@ -55,7 +55,13 @@ class AssistantKnowledge:
 
     # --- сущности вопроса ---
 
-    def resolve(self, text: str, names: list[str], paragraphs: list[str]) -> list[dict[str, Any]]:
+    def resolve(
+        self,
+        text: str,
+        names: list[str],
+        paragraphs: list[str],
+        closed: frozenset[str] = frozenset(),
+    ) -> list[dict[str, Any]]:
         chapter = self.mentions.chapter_entities(paragraphs) if paragraphs else set()
         weights: dict[str, float] = {}
         how: dict[str, str] = {}
@@ -65,7 +71,7 @@ class AssistantKnowledge:
             if weight > weights.get(entity_id, 0):
                 weights[entity_id], how[entity_id] = weight, way
 
-        for m in self.mentions.for_targets(paragraphs) if paragraphs else []:
+        for m in self.mentions.for_targets(paragraphs, closed) if paragraphs else []:
             add(m["entity_id"], 1.0, "selection")
         for source, way in [(text, "question"), *[(n, "router") for n in names]]:
             for m in self.mentions.find_in_text(source, chapter):
@@ -86,7 +92,7 @@ class AssistantKnowledge:
 
     # --- вид утверждения для модели ---
 
-    def describe(self, s: dict[str, Any]) -> dict[str, Any]:
+    def describe(self, s: dict[str, Any], closed: frozenset[str] = frozenset()) -> dict[str, Any]:
         spec = self.registry.relation(s["type"])
         value = s.get("value")
         if s["object"]:
@@ -95,9 +101,15 @@ class AssistantKnowledge:
             other = str(value.get("original", value))
         else:
             other = str(value)
-        visible = [a for a in s["attributions"] if not a["hidden"]]
+        visible = [
+            a for a in s["attributions"] if not a["hidden"] and not hidden_by_region(a, closed)
+        ]
         sources = [a["who"] for a in visible if a["who_kind"] == "source" and a["who"]]
-        sources += [e["source_id"] for e in s["evidence"] if e["source_id"] and not e["lost"]]
+        sources += [
+            e["source_id"]
+            for e in s["evidence"]
+            if e["source_id"] and not e["lost"] and e["source_id"] not in closed
+        ]
         return {
             "id": s["id"],
             "entity_id": s["subject"],
@@ -111,7 +123,7 @@ class AssistantKnowledge:
             "evidence": [
                 {"paragraph_id": e["paragraph_id"], "source_id": e["source_id"]}
                 for e in s["evidence"]
-                if not e["lost"]
+                if not e["lost"] and e["source_id"] not in closed
             ],
             "year": self._year(s),
         }
@@ -135,8 +147,9 @@ class AssistantKnowledge:
         steps: list[str],
         recipe: str | None = None,
         textbook: str | None = None,
+        closed: frozenset[str] = frozenset(),
     ) -> dict[str, Any]:
-        found = self.resolve(text, names, paragraphs)
+        found = self.resolve(text, names, paragraphs, closed)
         top = [e for e in found if e["weight"] >= 1.0][: self.max_entities] or found[
             : self.max_entities
         ]
@@ -155,10 +168,10 @@ class AssistantKnowledge:
         if "priority" in steps and found:
             result["priority"] = self.mentions.paragraphs_of([e["id"] for e in found])
         if "recipes" in steps and recipe and top:
-            line, graph = self._line(top, recipe, textbook)
+            line, graph = self._line(top, recipe, textbook, closed)
             result["statements"] += line
             result["graph"] = graph
-            result["paragraphs"] = self._paragraphs(line)
+            result["paragraphs"] = self._paragraphs(line, closed)
         if "context" in steps:
             seen = {s["id"] for s in result["statements"]}
             about = []
@@ -168,7 +181,7 @@ class AssistantKnowledge:
                         seen.add(s["id"])
                         about.append(s)
             about.sort(key=lambda s: -STRENGTH[s["status"]])
-            result["statements"] += [self.describe(s) for s in about[: self.max_statements]]
+            result["statements"] += [self.describe(s, closed) for s in about[: self.max_statements]]
         if "verification" in steps:
             ends = set(ids)
             for s in result["statements"]:
@@ -199,7 +212,11 @@ class AssistantKnowledge:
         return list(dict.fromkeys(terms))[: self.max_terms]
 
     def _line(
-        self, top: list[dict[str, Any]], recipe: str, textbook: str | None
+        self,
+        top: list[dict[str, Any]],
+        recipe: str,
+        textbook: str | None,
+        closed: frozenset[str],
     ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
         """Линия по рецепту от главной сущности вопроса, по времени."""
         for entity in top:
@@ -211,7 +228,7 @@ class AssistantKnowledge:
                     found = self.statements.traverse(code, [entity["id"]], attributed_to=textbook)
                 except RegistryError:
                     continue
-                line = [self.describe(s) for s in found["edges"] if not s.get("derived")]
+                line = [self.describe(s, closed) for s in found["edges"] if not s.get("derived")]
                 line.sort(key=lambda s: s["year"] if s["year"] is not None else float("inf"))
                 graph = {
                     "entity_id": entity["id"],
@@ -222,12 +239,16 @@ class AssistantKnowledge:
                 return line[: self.max_statements], graph
         return [], None
 
-    def _paragraphs(self, line: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Подтверждающие абзацы линии — модель получает их текст рядом с утверждениями."""
+    def _paragraphs(
+        self, line: list[dict[str, Any]], closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
+        """Подтверждающие абзацы линии — модель получает их текст рядом с утверждениями.
+
+        Абзацы источников, закрытых для региона читателя, модели не передаются."""
         result, seen = [], set()
         for s in line:
             for e in s["evidence"]:
-                if e["paragraph_id"] in seen:
+                if e["paragraph_id"] in seen or e["source_id"] in closed:
                     continue
                 text = self.statements.paragraph_text(e["paragraph_id"])
                 if text:

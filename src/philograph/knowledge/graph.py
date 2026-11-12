@@ -78,6 +78,11 @@ def attribution_label(statements: Statements, a: dict[str, Any]) -> str:
     return a["who"] or "?"
 
 
+def hidden_by_region(a: dict[str, Any], closed: frozenset[str]) -> bool:
+    """Атрибуция источника, закрытого для региона читателя: её скрывают."""
+    return a["who_kind"] == "source" and a["who"] in closed
+
+
 def recipes_for(registry: OntologyRegistry, entity_type: str) -> list[dict[str, Any]]:
     """Рецепты, которые подходят типу сущности; «путь» требует двух концов и здесь не нужен."""
     return [
@@ -131,9 +136,13 @@ class Graphs:
             "dates": dates["original"] if dates else None,
         }
 
-    def _edge(self, s: dict[str, Any], textbook: str | None) -> dict[str, Any]:
+    def _edge(
+        self, s: dict[str, Any], textbook: str | None, closed: frozenset[str] = frozenset()
+    ) -> dict[str, Any]:
         spec = self.registry.relation(s["type"])
-        visible = [a for a in s["attributions"] if not a["hidden"]]
+        visible = [
+            a for a in s["attributions"] if not a["hidden"] and not hidden_by_region(a, closed)
+        ]
         return {
             "id": s["id"],
             "subject": s["subject"],
@@ -162,7 +171,7 @@ class Graphs:
                     "link": f"/p/{e['paragraph_id']}",
                 }
                 for e in s["evidence"]
-                if not e["lost"]
+                if not e["lost"] and e["source_id"] not in closed
             ],
             "in_textbook": self.statements._attributed(s, textbook) if textbook else None,
         }
@@ -179,6 +188,7 @@ class Graphs:
         only_textbook: bool = False,
         generation: bool = True,
         visitor_limited: bool = False,
+        closed: frozenset[str] = frozenset(),
     ) -> Iterator[dict[str, Any]]:
         """Поток событий графа: сначала сохранённое, затем достроенное моделью.
 
@@ -195,7 +205,7 @@ class Graphs:
             attributed_to=attributed_to,
         )
         nodes = {n["id"]: self._node(n["id"], n["depth"]) for n in found["nodes"]}
-        edges = [self._edge(s, textbook) for s in found["edges"]]
+        edges = [self._edge(s, textbook, closed) for s in found["edges"]]
         extension = self._extension(
             entity_id, recipe, len(edges), attributed_to, generation and not visitor_limited
         )

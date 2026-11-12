@@ -313,13 +313,16 @@ class Mentions:
 
     # --- чтение ---
 
-    def for_targets(self, target_ids: list[str]) -> list[dict[str, Any]]:
+    def for_targets(
+        self, target_ids: list[str], closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
         with self.engine.begin() as conn:
             rows = (
                 conn.execute(select(t.mentions).where(t.mentions.c.target_id.in_(target_ids)))
                 .mappings()
                 .all()
             )
+        rows = [r for r in rows if r["source_id"] not in closed]
         types = self.entities.types([r["entity_id"] for r in rows])
         return [
             {
@@ -333,11 +336,14 @@ class Mentions:
             for r in rows
         ]
 
-    def where_to_read(self, entity_id: str) -> list[dict[str, Any]]:
+    def where_to_read(
+        self, entity_id: str, closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
         """Главы, где упомянута сущность, с первым абзацем упоминания (N10): «Где читать» ведёт
         к нему, а не к началу главы. Порядок абзацев — ``position`` (строки до миграции 6 без
         него идут после, в порядке вставки); упоминание только в заголовке или сноске абзаца
-        не даёт, тогда ``first_paragraph_id`` пуст."""
+        не даёт, тогда ``first_paragraph_id`` пуст. Источники, закрытые для региона читателя,
+        в списке не показываются."""
         entity_id = self.entities.resolve(entity_id)
         with self.engine.begin() as conn:
             rows = (
@@ -349,6 +355,7 @@ class Mentions:
                 .mappings()
                 .all()
             )
+        rows = [r for r in rows if r["source_id"] not in closed]
         grouped: dict[tuple, list[str]] = defaultdict(list)
         titles: dict[tuple, tuple] = {}
         first: dict[tuple, tuple[tuple[int, int], str]] = {}

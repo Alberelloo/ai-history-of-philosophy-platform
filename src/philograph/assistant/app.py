@@ -16,6 +16,25 @@ from philograph.platform.health import Health
 from philograph.platform.privacy import visitor_hash
 from philograph.platform.web import create_app
 
+# Заголовок ставит шлюз: клиентский регион отбрасывается и подделываться не может.
+REGION_HEADER = "X-Philograph-Region"
+
+
+def parse_region(value: str | None) -> str | None:
+    """Код региона из заголовка шлюза: две латинские буквы в верхнем регистре.
+
+    Всё прочее (пусто, ``XX``, ``T1``, кириллица) — неизвестный регион: источники с
+    ограничением регионов такому читателю закрыты.
+    """
+    if not value:
+        return None
+    code = value.strip().upper()
+    if code in {"XX", "T1"}:  # служебные значения CDN: страна не определена
+        return None
+    if len(code) == 2 and code.isascii() and code.isalpha():
+        return code
+    return None
+
 
 class Turn(BaseModel):
     question: str
@@ -63,6 +82,7 @@ def build_app(assistant: Assistant, health: Health | None = None) -> FastAPI:
                 context=body.context,
                 handoff_declined=body.handoff_declined,
                 handoff_reason=body.handoff_reason,
+                region=parse_region(request.headers.get(REGION_HEADER)),
             )
         )
 

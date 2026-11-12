@@ -13,7 +13,7 @@ from philograph import __version__
 from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import EntityNotFound
-from philograph.knowledge.graph import Graphs, RecipeNotApplicable, ndjson
+from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
@@ -26,12 +26,25 @@ from philograph.operator.access import (
     Session,
     require,
 )
-from philograph.platform.client import ServiceClient
+from philograph.platform.client import ServiceClient, ServiceUnavailable
 from philograph.platform.health import Health
 from philograph.platform.queue import Job, Queue
 from philograph.platform.web import UserFacingError, create_app
 
 EVENTS = ("source.published", "source.unpublished", "source.deleted")
+REGION_HEADER = "X-Philograph-Region"
+
+
+def closed_sources(client: ServiceClient, region: str | None) -> frozenset[str]:
+    """Идентификаторы источников, закрытых для региона, из ``GET /internal/access``.
+
+    Регион приходит заголовком ``X-Philograph-Region`` от шлюза или в теле запроса ассистента.
+    Библиотека сама нормализует значение; без региона она считает его неизвестным и закрывает
+    все ограниченные источники. Недоступная библиотека поднимает ``ServiceUnavailable``.
+    """
+    params = {"region": region} if region else None
+    response = client.get("internal/access", params=params)
+    return frozenset(response.json().get("closed", []))
 
 
 def library_paragraphs(client: ServiceClient):
@@ -42,6 +55,24 @@ def library_paragraphs(client: ServiceClient):
         return response.json()["text"] if response.status_code == 200 else None
 
     return text
+
+
+def without_closed(statement: dict[str, Any], closed: frozenset[str]) -> dict[str, Any]:
+    """Утверждение без подтверждений и атрибуций закрытых источников.
+
+    Сырые маршруты (``/entities/{id}/statements`` и ``/graph``) отдают утверждения как есть;
+    через шлюз они доступны читателю, поэтому цитаты, ссылки на абзацы и атрибуция источников
+    закрытых для региона источников снимаются так же, как в карточке и графе.
+    """
+    if not closed:
+        return statement
+    return {
+        **statement,
+        "evidence": [e for e in statement.get("evidence", []) if e.get("source_id") not in closed],
+        "attributions": [
+            a for a in statement.get("attributions", []) if not hidden_by_region(a, closed)
+        ],
+    }
 
 
 class Login(BaseModel):
@@ -70,6 +101,7 @@ class AssistantContextRequest(BaseModel):
     steps: list[str] = list(STEPS)
     recipe: str | None = None
     textbook: str | None = None  # режим «только выбранный учебник»
+    region: str | None = None  # регион читателя от ассистента (вызов сервис-сервис)
 
 
 class SampleRequest(BaseModel):
@@ -88,10 +120,27 @@ def build_app(
     mentions: Mentions | None = None,
     graphs: Graphs | None = None,
     assistant: AssistantKnowledge | None = None,
+    library: ServiceClient | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
     entities = statements.entities
+
+    def _closed_for(region: str | None) -> frozenset[str]:
+        """Множество закрытых источников для запроса; без библиотеки фильтр выключен."""
+        if library is None:
+            return frozenset()
+        try:
+            return closed_sources(library, region)
+        except ServiceUnavailable as exc:
+            raise UserFacingError(
+                "Сервис знаний временно недоступен",
+                status=503,
+                kind="knowledge_unavailable",
+            ) from exc
+
+    def region_closed(request: Request) -> frozenset[str]:
+        return _closed_for(request.headers.get(REGION_HEADER))
 
     @router.get("/entities")
     def find(name: str) -> list[dict[str, Any]]:
@@ -103,9 +152,13 @@ def build_app(
 
     @router.get("/entities/{entity_id}/statements")
     def about(
-        entity_id: str, family: list[str] = Query(default=[]), attributed_to: str | None = None
+        entity_id: str,
+        family: list[str] = Query(default=[]),
+        attributed_to: str | None = None,
+        closed: frozenset[str] = Depends(region_closed),
     ) -> list[dict[str, Any]]:
-        return statements.about(entity_id, families=family or None, attributed_to=attributed_to)
+        rows = statements.about(entity_id, families=family or None, attributed_to=attributed_to)
+        return [without_closed(row, closed) for row in rows]
 
     @router.get("/graph")
     def graph(
@@ -113,11 +166,16 @@ def build_app(
         start: list[str] = Query(),
         depth: int | None = None,
         attributed_to: str | None = None,
+        closed: frozenset[str] = Depends(region_closed),
     ) -> dict[str, Any]:
         try:
-            return statements.traverse(recipe, start, depth=depth, attributed_to=attributed_to)
+            result = statements.traverse(recipe, start, depth=depth, attributed_to=attributed_to)
         except RegistryError as exc:
             raise UserFacingError(str(exc), status=400, kind="recipe_not_applicable") from exc
+        return {
+            **result,
+            "edges": [without_closed(edge, closed) for edge in result["edges"]],
+        }
 
     if assistant is not None:
 
@@ -131,6 +189,7 @@ def build_app(
                 steps=[s for s in body.steps if s in STEPS],
                 recipe=body.recipe,
                 textbook=body.textbook,
+                closed=_closed_for(body.region),
             )
 
     if graphs is not None:
@@ -140,7 +199,9 @@ def build_app(
             return graphs.recipes_for(entity_id)
 
         @router.post("/graph/build")
-        def build(body: GraphRequest) -> StreamingResponse:
+        def build(
+            body: GraphRequest, closed: frozenset[str] = Depends(region_closed)
+        ) -> StreamingResponse:
             """Поток графа: сохранённое сразу, достроенное моделью — по мере появления."""
             try:
                 graphs.check_recipe(body.entity_id, body.recipe)
@@ -161,19 +222,24 @@ def build_app(
                 only_textbook=body.only_textbook,
                 generation=body.generation,
                 visitor_limited=body.visitor_limited,
+                closed=closed,
             )
             return StreamingResponse(ndjson(items), media_type="application/x-ndjson")
 
     if mentions is not None:
 
         @router.get("/mentions")
-        def mentions_of(targets: str) -> list[dict[str, Any]]:
+        def mentions_of(
+            targets: str, closed: frozenset[str] = Depends(region_closed)
+        ) -> list[dict[str, Any]]:
             """Упоминания для абзацев главы; без онтологии клиент показывает текст без них."""
-            return mentions.for_targets([x for x in targets.split(",") if x][:500])
+            return mentions.for_targets([x for x in targets.split(",") if x][:500], closed)
 
         @router.get("/entities/{entity_id}/where")
-        def where(entity_id: str) -> list[dict[str, Any]]:
-            return mentions.where_to_read(entity_id)
+        def where(
+            entity_id: str, closed: frozenset[str] = Depends(region_closed)
+        ) -> list[dict[str, Any]]:
+            return mentions.where_to_read(entity_id, closed)
 
     if cards is not None:
 
@@ -183,10 +249,15 @@ def build_app(
             attributed_to: str | None = None,
             generation: bool = True,
             textbook: str | None = None,
+            closed: frozenset[str] = Depends(region_closed),
         ) -> dict[str, Any]:
             try:
                 return cards.card(
-                    entity_id, attributed_to=attributed_to, generation=generation, textbook=textbook
+                    entity_id,
+                    attributed_to=attributed_to,
+                    generation=generation,
+                    textbook=textbook,
+                    closed=closed,
                 )
             except EntityNotFound as exc:
                 raise UserFacingError(

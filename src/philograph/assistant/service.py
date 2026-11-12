@@ -134,6 +134,7 @@ class AskRequest:
     context: str = "library"  # N12: "book" | "library" (по умолчанию library — старые клиенты)
     handoff_declined: bool = False  # читатель выбрал «Продолжить в рамках этого источника»
     handoff_reason: str | None = None  # broader | outside_book — для журнала
+    region: str | None = None  # регион читателя; нет значения — неизвестный регион
 
 
 @dataclass
@@ -277,6 +278,7 @@ class Assistant:
             query: dict[str, Any] = {
                 "query": query_text[:2000],
                 "limit": step["limit"],
+                "region": request.region,
                 "neighbors": step.get("neighbors", 0),
                 "per_chapter": step.get("per_chapter", 3),
                 "extra_terms": list(step.get("extra_terms", []))
@@ -321,6 +323,7 @@ class Assistant:
             paragraphs=list(request.selection_paragraphs),
             recipe=CHAINS[kind].get("recipe"),
             textbook=request.source_id if request.scope == "current" else None,
+            region=request.region,
         )
 
     # --- ответ ---

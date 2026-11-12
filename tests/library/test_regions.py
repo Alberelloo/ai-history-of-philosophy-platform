@@ -272,5 +272,5 @@ def test_paragraph_link_from_other_region(lib):
 def test_region_header_is_two_latin_letters():
     assert parse_region("ru") == "RU"
     assert parse_region(" DE ") == "DE"
-    for bad in (None, "", "XX1", "РФ", "T1", "R"):
+    for bad in (None, "", "XX1", "РФ", "T1", "R", "XX", "xx"):
         assert parse_region(bad) is None

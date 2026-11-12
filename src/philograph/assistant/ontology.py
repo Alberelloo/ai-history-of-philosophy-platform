@@ -114,6 +114,7 @@ class Ontology:
         paragraphs: list[str],
         recipe: str | None,
         textbook: str | None,
+        region: str | None = None,
     ) -> OntologyContext | None:
         if not self.steps.enabled:
             events.emit("assistant.ontology.skipped", reason="steps_off")
@@ -126,6 +127,7 @@ class Ontology:
                 steps=sorted(self.steps.enabled),
                 recipe=recipe if "recipes" in self.steps else None,
                 textbook=textbook,
+                region=region,
             )
         except ServiceUnavailable as exc:
             events.emit(
