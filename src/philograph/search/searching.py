@@ -215,6 +215,7 @@ class Searcher:
                     "text": doc.text,
                     "lang": doc.lang,
                     "quoting": doc.quoting,
+                    "external": doc.external,
                     "score": round(fused[pid], 6),
                     "found_by": sorted(found_by[pid]),
                     "neighbors": self._neighbors(doc, q.neighbors),

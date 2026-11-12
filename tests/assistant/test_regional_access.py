@@ -20,6 +20,7 @@ RA = "regional-access"
 AG = "answer-grounding"
 
 RESTRICTED_TEXT = "Глава 1\n\nРассудок есть способность правил, разум — способность принципов.\n"
+NO_EXTERNAL_TEXT = "Глава 1\n\nРассудок даёт правила, а разум — принципы познания.\n"
 OPEN_PERMISSIONS = {"display": True, "external_processing": True, "quoting": True}
 
 
@@ -72,6 +73,32 @@ def add_restricted(bot) -> str:
     )
     rig.files["restricted.txt"] = RESTRICTED_TEXT.encode()
     rig.ids["restricted"] = source_id
+    return source_id
+
+
+def add_no_external(bot) -> str:
+    """Регистрирует источник только для РФ без внешней обработки, возвращает идентификатор."""
+    rig = bot.rig
+    rig.registry.add_license_kind(
+        "ru-no-external",
+        "Только РФ без внешней обработки",
+        None,
+        {"display": True, "external_processing": False, "quoting": True},
+        regions=["RU"],
+    )
+    lic = License("ru-no-external", "public_domain", author_death_years=[1900])
+    source_id = rig.registry.register(
+        "operator",
+        title="Без внешней обработки",
+        authors=["Н"],
+        language="ru",
+        kind="textbook",
+        license=lic,
+        scope="public",
+        files=[{"name": "n", "path": "noexternal.txt"}],
+    )
+    rig.files["noexternal.txt"] = NO_EXTERNAL_TEXT.encode()
+    rig.ids["no_external"] = source_id
     return source_id
 
 
@@ -188,6 +215,60 @@ def test_current_source_in_closed_region_behaves_as_absent(bot):
     assert "Рассудок есть способность правил" not in prompt(bot)
     assert restricted not in cited_sources(items)
     assert any(i.get("kind") == "no_library_support" for i in items)
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_non_external_paragraphs_not_sent_to_model(bot):
+    """7.2: абзацы без ``external_processing`` не уходят модели, в потоке есть пометка со ссылкой.
+
+    Читатель из РФ видит источник по региону, но текст не передаётся модели: фиктивная модель
+    фиксирует в ``passages`` только пересказываемые абзацы, а найденное показано ссылкой."""
+    source = add_no_external(bot)
+    bot.rig.publish("no_external")
+    bot.model.routes.append({"type": "knowledge", "confidence": 0.9, "names": []})
+    bot.model.answers.append(["Ответ без опоры на закрытый абзац. "])
+    items = ask_region(bot, "RU", question="рассудок и разум")
+
+    passages = block(prompt(bot), "passages")
+    assert "Рассудок даёт правила" not in passages  # текста источника без внешней обработки нет
+    assert "категория рассудка" in passages  # открытые абзацы пересказываются, как раньше
+
+    notice = next(i for i in items if i["type"] == "notice" and i["kind"] == "found_not_retold")
+    assert notice["message"] == "Найдено в источниках, не пересказывается."
+    assert [s["paragraph_id"] for s in notice["suggestions"]] == [
+        bot.rig.paragraph("no_external", "Рассудок даёт правила")
+    ]
+    assert source not in cited_sources(items)
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_only_hidden_results_marked_as_unsupported(bot):
+    """Найдены только непересказываемые абзацы: контекст модели пуст, ответ честно помечен
+    «без опоры на библиотеку», а найденное показано ссылками."""
+    source = add_no_external(bot)
+    bot.rig.publish("no_external")
+    paragraph = bot.rig.paragraph("no_external", "Рассудок даёт правила")
+    hidden = {
+        "paragraph_id": paragraph,
+        "source_id": source,
+        "source_title": "Без внешней обработки",
+        "text": "Рассудок даёт правила, а разум — принципы познания.",
+        "external": False,
+    }
+
+    class HiddenOnly:
+        def search(self, **query):
+            return {"results": [hidden], "semantic_used": False}
+
+    bot.assistant.search = HiddenOnly()
+    bot.model.routes.append({"type": "knowledge", "confidence": 0.9, "names": []})
+    bot.model.answers.append(["Ответ [1]. "])
+    items = ask_region(bot, "RU", question="рассудок и разум")
+
+    assert "Рассудок даёт правила" not in prompt(bot)  # модели нечего пересказывать
+    kinds = [i["kind"] for i in items if i["type"] == "notice"]
+    assert kinds == ["found_not_retold", "no_library_support"]
+    assert cited_sources(items) == set()
 
 
 @req(AG, "Проверка ссылок кодом")

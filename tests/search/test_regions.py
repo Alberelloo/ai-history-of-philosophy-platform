@@ -43,6 +43,34 @@ def found_sources(result):
     return {r["source_id"] for r in result["results"]}
 
 
+NO_EXTERNAL_TEXT = "Глава 1\n\nРассудок даёт правила, а разум — принципы познания.\n"
+
+
+def add_no_external(rig) -> str:
+    """Регистрирует и публикует источник только для РФ без внешней обработки."""
+    rig.registry.add_license_kind(
+        "ru-no-external",
+        "Только РФ без внешней обработки",
+        None,
+        {"display": True, "external_processing": False, "quoting": True},
+        regions=["RU"],
+    )
+    lic = License("ru-no-external", "public_domain", author_death_years=[1900])
+    source_id = rig.registry.register(
+        "operator",
+        title="Без внешней обработки",
+        authors=["Н"],
+        language="ru",
+        kind="textbook",
+        license=lic,
+        scope="public",
+        files=[{"name": "n", "path": "noexternal.txt"}],
+    )
+    rig.files["noexternal.txt"] = NO_EXTERNAL_TEXT.encode()
+    rig.ids["no_external"] = source_id
+    return source_id
+
+
 def test_regions_column_format():
     """Формат хранения регионов: ``*`` — везде, ``,RU,BY,`` — перечень, ``','`` — нигде."""
     assert regions_column(None) == "*"
@@ -197,6 +225,30 @@ def test_access_changed_empty_regions_closes(rig):
     )
     for region in (None, "RU", "DE"):
         assert restricted not in found_sources(rig.search("рассудок и разум", region=region))
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_indexing_source_without_external_processing(rig, events):
+    """7.1: абзацы без ``external_processing`` есть в полнотекстовом индексе и отсутствуют в
+    смысловом; провайдер эмбеддингов не вызывается; поиск отдаёт ``external`` в результате."""
+    source = add_no_external(rig)
+    rig.publish("ru")
+    calls = len(rig.provider.calls)
+    rig.publish("no_external")
+    assert len(rig.provider.calls) == calls  # эмбеддинги не считались
+
+    with rig.indexer.engine.begin() as conn:
+        rows = conn.execute(select(s.docs).where(s.docs.c.source_id == source)).all()
+    assert rows  # полнотекстовый индекс есть
+    assert all(bool(r.external) is False for r in rows)
+    assert all(bool(r.embedded) is False for r in rows)  # смыслового индекса нет
+
+    # Поиск из РФ находит абзац по словам и сообщает, что внешняя обработка запрещена.
+    ru = rig.search("рассудок и разум", region="RU")
+    assert source in found_sources(ru)
+    assert all(r["external"] is False for r in ru["results"] if r["source_id"] == source)
+    # Вне РФ источник закрыт по региону, как и прежде.
+    assert source not in found_sources(rig.search("рассудок и разум", region="DE"))
 
 
 @req(RA, "Внутренние интерфейсы не фильтруют по региону")

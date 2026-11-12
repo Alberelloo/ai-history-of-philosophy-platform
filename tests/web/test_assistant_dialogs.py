@@ -33,6 +33,7 @@ req = pytest.mark.req
 AD = "assistant-dialog"
 AG = "answer-grounding"
 RS = "reader-settings"
+RA = "regional-access"
 UNGROUNDED = "[без опоры на источники]"
 
 
@@ -137,6 +138,36 @@ def test_t22_notice_without_library_support(wide, site):
     # Предупреждение — над ответом.
     assert notice.bounding_box()["y"] < box.locator(".turn .answer").bounding_box()["y"]
     assert box.locator(".fragment.ungrounded").count() == 1
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_t22b_notice_not_retold_with_links(wide, site):
+    """Абзацы без внешней обработки: пометка «найдено, не пересказывается» и ссылки на них."""
+    page = wide
+    (ch1, paras), *_ = chapters(site)
+    sid = site.ids["textbook"]
+    target = paras[0][0]
+    AskStub(page).reply(
+        answer(
+            {
+                "type": "notice",
+                "kind": "found_not_retold",
+                "message": "Найдено в источниках, не пересказывается.",
+                "suggestions": [{"paragraph_id": target, "title": "Глава 1. Опыт"}],
+            },
+            fragment("Ответ без пересказа.", grounded=False),
+        )
+    )
+    open_book(page, site)
+    open_assistant(page)
+    ask(panel(page), "Что пишет Кант?")
+    box = panel(page)
+    box.locator(".copy-answer").wait_for()
+    assert "Найдено в источниках, не пересказывается." in box.locator(".turn").inner_text()
+    link = box.locator(".assistant__suggestions").get_by_role("link", name="Глава 1. Опыт")
+    link.wait_for()
+    link.click()
+    page.wait_for_url(re.compile(rf"/read/{sid}/{ch1}#p-{target}$"))
 
 
 def seed_settings(page, site, **settings) -> None:

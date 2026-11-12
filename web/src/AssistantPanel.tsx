@@ -66,6 +66,7 @@ const SERVER_CODES = [
   "search_unavailable",
   "no_answer",
   "no_library_support",
+  "found_not_retold",
   "budget_exhausted",
   "llm_unavailable",
 ] as const;
@@ -1167,9 +1168,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                           </button>
                         )}
                       </div>
-                      {turn.message?.code === "no_answer" && turn.message.suggestions && turn.message.suggestions.length > 0 && (
+                      {turn.message?.suggestions && turn.message.suggestions.length > 0 && (turn.message.code === "no_answer" || turn.message.code === "found_not_retold") && (
                         <div className="assistant__suggestions">
-                          <p>{t.assistant.nearby}</p>
+                          {turn.message.code === "no_answer" && <p>{t.assistant.nearby}</p>}
                           <ul>
                             {turn.message.suggestions.map((s, i) => (
                               <li key={i}>
