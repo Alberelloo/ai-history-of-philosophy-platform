@@ -19,6 +19,7 @@ from pathlib import Path
 
 import httpx
 import pytest
+import yaml
 from fastapi.testclient import TestClient
 
 from philograph.ops import migrate
@@ -173,6 +174,19 @@ def stack_compose() -> list[str] | None:
     files = os.environ.get("PHILOGRAPH_DEPLOY_COMPOSE")
     docker = shutil.which("docker") or (str(DOCKER_WINDOWS) if DOCKER_WINDOWS.exists() else None)
     return [docker, "compose", *files.split()] if files and docker else None
+
+
+@req(DP, "Автоматический перезапуск")
+def test_knowledge_service_has_files_root():
+    """Сервис знаний раздаёт портреты из общего FileStore: ему нужен PHILOGRAPH_FILES_ROOT.
+
+    Регресс к портретам (entity-portraits): без этой переменной knowledge падает на старте
+    с ``KeyError: PHILOGRAPH_FILES_ROOT``, и docker compose ``up --wait`` не становится готовым.
+    """
+    config = yaml.safe_load((ROOT / "compose.yaml").read_text(encoding="utf-8"))
+    knowledge = config["services"]["knowledge"]
+    assert knowledge["environment"]["PHILOGRAPH_FILES_ROOT"] == "/data/files"
+    assert knowledge["volumes"] == ["library-files:/data/files"]
 
 
 @req(DP, "Автоматический перезапуск")

@@ -101,6 +101,10 @@ services:
       PHILOGRAPH_DATABASE_URL: postgresql+psycopg://philograph:${POSTGRES_PASSWORD}@postgres/philograph
       PHILOGRAPH_LIBRARY_URL: http://library:8001
       PHILOGRAPH_LLM_URL: http://llm:8000
+      # Портреты персон лежат в общем FileStore вместе с файлами источников.
+      PHILOGRAPH_FILES_ROOT: /data/files
+    volumes:
+      - library-files:/data/files
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8004/health/ready').status == 200 else 1)"]
       interval: 10s
