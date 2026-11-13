@@ -8,6 +8,8 @@ services:
     ports: ["80:80", "443:443"]
     environment:
       PHILOGRAPH_DOMAIN: ${PHILOGRAPH_DOMAIN:?задайте PHILOGRAPH_DOMAIN в .env}
+      PHILOGRAPH_REGION_HEADER: ${PHILOGRAPH_REGION_HEADER:?задайте PHILOGRAPH_REGION_HEADER в .env}
+      PHILOGRAPH_CDN_IPS: ${PHILOGRAPH_CDN_IPS:?задайте PHILOGRAPH_CDN_IPS в .env}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
@@ -21,6 +23,8 @@ services:
     environment:
       # Адрес посетителя берётся из X-Forwarded-For, который выставляет Caddy.
       PHILOGRAPH_TRUSTED_PROXY: "1"
+      # Имя заголовка страны, который выставляет CDN (см. .env.example).
+      PHILOGRAPH_REGION_HEADER: ${PHILOGRAPH_REGION_HEADER:?задайте PHILOGRAPH_REGION_HEADER в .env}
 
 volumes:
   caddy-data:

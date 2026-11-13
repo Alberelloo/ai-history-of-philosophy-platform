@@ -1,0 +1,21 @@
+﻿=== 5 прогонов tests/web/test_region_restricted.py ===
+--- прогон 1 (exit 0) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 3.13s
+--- прогон 2 (exit 0) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 2.94s
+--- прогон 3 (exit 0) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 3.50s
+--- прогон 4 (exit 0) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 3.02s
+--- прогон 5 (exit 0) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 2.69s

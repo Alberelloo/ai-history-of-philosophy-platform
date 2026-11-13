@@ -10,7 +10,7 @@ function replace(path: string) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-type Problem = "removed" | "source_unavailable" | "unknown";
+type Problem = "removed" | "source_unavailable" | "region" | "unknown";
 
 // Постоянная ссылка на абзац: открывает его главу, а если абзаца или источника больше нет —
 // честно говорит об этом, а не показывает пустую страницу или чужой абзац.
@@ -28,7 +28,8 @@ export function ParagraphLink({ paragraphId }: { paragraphId: string }) {
         setProblem("removed");
         if (result.chapter_id) setChapterLink(`/read/${result.source_id}/${result.chapter_id}`);
       } else if (result.status === "source_unavailable") {
-        setProblem("source_unavailable");
+        // Причина «регион»: источник открыт только в РФ — говорим об этом, а не «недоступен».
+        setProblem(result.reason === "region" ? "region" : "source_unavailable");
       } else {
         setProblem("unknown");
       }
@@ -39,9 +40,11 @@ export function ParagraphLink({ paragraphId }: { paragraphId: string }) {
   const message =
     problem === "removed"
       ? t.paragraph.removed
-      : problem === "source_unavailable"
-        ? t.errors.source_unavailable
-        : t.paragraph.notFound;
+      : problem === "region"
+        ? t.paragraph.regionOnly
+        : problem === "source_unavailable"
+          ? t.errors.source_unavailable
+          : t.paragraph.notFound;
   return (
     <main className="page page--narrow reader-problem">
       <div className="pg-notice pg-notice--danger" role="alert">

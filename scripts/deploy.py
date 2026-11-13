@@ -2,6 +2,8 @@
 
 Обновление:
 
+0. проверяет конфигурацию ``compose.prod.yaml`` (регион читателя: доверенный прокси и имя
+   заголовка страны от CDN) — при недопустимой конфигурации отказывает до сборки;
 1. собирает образ новой версии (``philograph:<версия>``);
 2. применяет миграции всех схем одноразовым контейнером новой версии — если они упали,
    обновление останавливается, прежние контейнеры продолжают работать;
@@ -21,11 +23,33 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parent.parent
 FILES = ["-f", "compose.yaml", "-f", "compose.prod.yaml"]
 STATE = ROOT / ".deploy" / "state.json"
+PROD_COMPOSE = ROOT / "compose.prod.yaml"
 
 Runner = Callable[[list[str], dict[str, str]], int]
+
+
+def _compose_tag(loader: yaml.SafeLoader, node: yaml.Node) -> object:
+    """Собственные теги Docker Compose (``!reset``, ``!override``): значение как есть."""
+    if isinstance(node, yaml.ScalarNode):
+        return loader.construct_scalar(node)
+    if isinstance(node, yaml.SequenceNode):
+        return loader.construct_sequence(node, deep=True)
+    if isinstance(node, yaml.MappingNode):
+        return loader.construct_mapping(node, deep=True)
+    return None
+
+
+class _ComposeLoader(yaml.SafeLoader):
+    pass
+
+
+for _tag in ("!reset", "!override"):
+    _ComposeLoader.add_constructor(_tag, _compose_tag)
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
@@ -48,8 +72,56 @@ def compose(*args: str) -> list[str]:
     return ["docker", "compose", *FILES, *args]
 
 
-def update(version: str, runner: Runner = run, state_path: Path = STATE) -> int:
+def gateway_env_problems(config: dict) -> list[str]:
+    """Недопустимая конфигурация региона у шлюза (``regional-access``, «Шлюз доступен только
+    через CDN»): сообщения оператору; пустой список — конфигурация в порядке.
+
+    Проверяется ``compose.prod.yaml``: у сервиса ``gateway`` должны быть заданы доверенный
+    прокси (``PHILOGRAPH_TRUSTED_PROXY=1``) и имя заголовка страны от CDN
+    (``PHILOGRAPH_REGION_HEADER``). Без них шлюз не определит страну читателя и закроет
+    ограниченные источники всем.
+    """
+    problems: list[str] = []
+    gateway = ((config or {}).get("services") or {}).get("gateway") or {}
+    environment = gateway.get("environment") or {}
+    if str(environment.get("PHILOGRAPH_TRUSTED_PROXY")) != "1":
+        problems.append(
+            "PHILOGRAPH_TRUSTED_PROXY=1 не задан у сервиса gateway в compose.prod.yaml: "
+            "шлюз не будет доверять заголовку страны от CDN, и ограниченные источники "
+            "закроются всем читателям"
+        )
+    header = environment.get("PHILOGRAPH_REGION_HEADER")
+    if not header or not str(header).strip():
+        problems.append(
+            "PHILOGRAPH_REGION_HEADER не задан у сервиса gateway в compose.prod.yaml: "
+            "шлюз не узнает страну читателя, и ограниченные источники закроются всем читателям"
+        )
+    return problems
+
+
+def check_prod_config(path: Path = PROD_COMPOSE) -> list[str]:
+    """Сообщения оператору о недопустимой конфигурации публичного сервера; пусто — в порядке."""
+    config = yaml.load(path.read_text(encoding="utf-8"), Loader=_ComposeLoader)
+    return gateway_env_problems(config)
+
+
+def update(
+    version: str,
+    runner: Runner = run,
+    state_path: Path = STATE,
+    config_path: Path = PROD_COMPOSE,
+) -> int:
     env = {"PHILOGRAPH_VERSION": version}
+    problems = check_prod_config(config_path)
+    if problems:
+        for problem in problems:
+            print(f"выкладка остановлена: {problem}", file=sys.stderr)
+        print(
+            "Поправьте compose.prod.yaml (или .env) и повторите выкладку: "
+            f"python scripts/deploy.py update {version}",
+            file=sys.stderr,
+        )
+        return 1
     if runner(compose("build"), env) != 0:
         print("сборка не удалась, работает прежняя версия", file=sys.stderr)
         return 1

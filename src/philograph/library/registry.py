@@ -60,6 +60,12 @@ events.define(
     required=("source_id", "fields"),
 )
 events.define(
+    "library.access.changed",
+    "info",
+    "Сменились регионы показа у вида лицензии",
+    required=("code", "sources"),
+)
+events.define(
     "library.version.created",
     "info",
     "Создана версия источника",
@@ -119,6 +125,9 @@ class License:
     translator_death_year: int | None = None
     document_url: str | None = None
     narrowed: dict[str, bool] = field(default_factory=dict)  # сужение разрешений вида
+    # Сужение регионов показа. В JSON лицензии не пишется: регионы живут отдельным столбцом,
+    # иначе старый код при откате упал бы на неизвестном ключе License(**data).
+    regions: list[str] | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -133,6 +142,55 @@ class License:
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> License:
         return cls(**data)
+
+
+def normalize_regions(regions: list[str] | None) -> list[str] | None:
+    """Коды стран ISO 3166-1 в верхнем регистре; ``None`` и пустой список — «везде»."""
+    if not regions:
+        return None
+    codes: list[str] = []
+    for raw in regions:
+        code = str(raw).strip().upper()
+        if not (len(code) == 2 and code.isascii() and code.isalpha()):
+            raise RegistryError(
+                f"код региона — две латинские буквы, получено {raw!r}", fields=["license.regions"]
+            )
+        if code not in codes:
+            codes.append(code)
+    return sorted(codes)
+
+
+def effective_regions(
+    kind_regions: list[str] | None, source_regions: list[str] | None
+) -> frozenset[str] | None:
+    """Действующие регионы источника: пересечение вида и источника.
+
+    ``None`` — везде; пустое множество — нигде (равносильно запрету показа). Значения уже
+    нормализованы: коды в верхнем регистре.
+    """
+    kind_codes = frozenset(kind_regions) if kind_regions else None
+    source_codes = frozenset(source_regions) if source_regions else None
+    if kind_codes is None and source_codes is None:
+        return None
+    if kind_codes is None:
+        return source_codes
+    if source_codes is None:
+        return kind_codes
+    return kind_codes & source_codes
+
+
+def effective_permissions(
+    kind_permissions: dict[str, bool],
+    narrowed: dict[str, bool],
+    regions: frozenset[str] | None,
+) -> dict[str, bool]:
+    """Разрешения с учётом сужения и регионов: пустое пересечение регионов — запрет показа."""
+    effective = {p: bool(kind_permissions.get(p)) for p in PERMISSIONS}
+    for key, value in narrowed.items():
+        effective[key] = effective.get(key, False) and bool(value)
+    if regions is not None and not regions:
+        effective["display"] = False
+    return effective
 
 
 @dataclass
@@ -178,17 +236,69 @@ class Registry:
     # --- виды лицензий ---
 
     def add_license_kind(
-        self, code: str, title: str, url: str | None, permissions: dict[str, bool]
+        self,
+        code: str,
+        title: str,
+        url: str | None,
+        permissions: dict[str, bool],
+        regions: list[str] | None = None,
     ) -> None:
         missing = [p for p in PERMISSIONS if p not in permissions]
         if missing:
             raise RegistryError("у вида лицензии не заданы разрешения", fields=missing)
+        codes = normalize_regions(regions)
+        shared = False
         with self.engine.begin() as conn:
+            previous = (
+                conn.execute(select(t.license_kinds).where(t.license_kinds.c.code == code))
+                .mappings()
+                .first()
+            )
             conn.execute(delete(t.license_kinds).where(t.license_kinds.c.code == code))
             conn.execute(
                 t.license_kinds.insert().values(
-                    code=code, title=title, url=url, permissions=permissions
+                    code=code, title=title, url=url, permissions=permissions, regions=codes
                 )
+            )
+            if previous is not None and list(previous["regions"] or []) != (codes or []):
+                # Регионы вида изменились: у источников этого вида меняются действующие регионы.
+                self._share_kind_access(conn, code, permissions, codes)
+                shared = True
+        if shared:
+            events.emit("library.access.changed", code=code, sources=True)
+
+    def _share_kind_access(
+        self,
+        conn: Connection,
+        code: str,
+        kind_permissions: dict[str, bool],
+        kind_regions: list[str] | None,
+    ) -> None:
+        """Событие ``source.access_changed`` по каждому источнику, чьи регионы зависят от вида."""
+        rows = (
+            conn.execute(
+                select(t.sources.c.id, t.sources.c.license, t.sources.c.regions).where(
+                    t.sources.c.status != "deleted"
+                )
+            )
+            .mappings()
+            .all()
+        )
+        for row in rows:
+            license_json = row["license"] or {}
+            if license_json.get("kind") != code:
+                continue
+            regions = effective_regions(kind_regions, row["regions"])
+            self._outbox(
+                conn,
+                "source.access_changed",
+                row["id"],
+                {
+                    "regions": sorted(regions) if regions is not None else None,
+                    "permissions": effective_permissions(
+                        kind_permissions, license_json.get("narrowed") or {}, regions
+                    ),
+                },
             )
 
     def license_kind(self, code: str) -> dict[str, Any] | None:
@@ -200,12 +310,19 @@ class Registry:
             )
         return dict(row) if row else None
 
+    def license_kinds(self) -> dict[str, dict[str, Any]]:
+        """Все виды лицензий по коду: список источников читается без запроса на каждый вид."""
+        with self.engine.begin() as conn:
+            rows = conn.execute(select(t.license_kinds)).mappings().all()
+        return {row["code"]: dict(row) for row in rows}
+
     # --- регистрация ---
 
     def _validate_license(self, lic: License, translator: str | None) -> str | None:
         """Возвращает причину, по которой источник нельзя обрабатывать, или ``None``."""
         if self.license_kind(lic.kind) is None:
             raise RegistryError(f"неизвестный вид лицензии: {lic.kind}", fields=["license"])
+        source_regions = normalize_regions(lic.regions)  # проверяет формат кодов стран
         if lic.basis == "public_domain":
             if not lic.author_death_years:
                 raise RegistryError(
@@ -229,6 +346,16 @@ class Registry:
             )
         kind = self.license_kind(lic.kind)
         assert kind is not None
+        kind_regions = normalize_regions(kind.get("regions"))
+        if (
+            kind_regions is not None
+            and source_regions is not None
+            and not set(source_regions) <= set(kind_regions)
+        ):
+            raise RegistryError(
+                "регионы источника нельзя расширять относительно вида лицензии",
+                fields=["license.regions"],
+            )
         widened = [k for k, v in lic.narrowed.items() if v and not kind["permissions"].get(k)]
         if widened:
             raise RegistryError(
@@ -271,6 +398,7 @@ class Registry:
                     language=fields["language"],
                     kind=fields["kind"],
                     license={**lic.to_json(), "blocked": blocked},
+                    regions=normalize_regions(lic.regions),
                     scope=fields["scope"],
                     settings=settings,
                     files=list(fields.get("files") or []),
@@ -327,6 +455,7 @@ class Registry:
         if row is None:
             raise RegistryError(f"нет источника {source_id}")
         lic = {k: v for k, v in row["license"].items() if k != "blocked"}
+        lic["regions"] = row["regions"]  # регионы — отдельный столбец, не часть JSON лицензии
         return Source(
             id=row["id"],
             title=row["title"],
@@ -356,10 +485,14 @@ class Registry:
     def permissions(self, source_id: str) -> dict[str, bool]:
         source = self.get(source_id)
         kind = self.license_kind(source.license.kind) or {"permissions": {}}
-        effective = {p: bool(kind["permissions"].get(p)) for p in PERMISSIONS}
-        for key, value in source.license.narrowed.items():
-            effective[key] = effective.get(key, False) and bool(value)
-        return effective
+        regions = effective_regions(kind.get("regions"), source.license.regions)
+        return effective_permissions(kind["permissions"], source.license.narrowed, regions)
+
+    def regions(self, source_id: str) -> frozenset[str] | None:
+        """Действующие регионы показа: ``None`` — везде, пустое множество — нигде."""
+        source = self.get(source_id)
+        kind = self.license_kind(source.license.kind) or {}
+        return effective_regions(kind.get("regions"), source.license.regions)
 
     # --- изменения описания, лицензии, видимости ---
 
@@ -378,13 +511,24 @@ class Registry:
     def change_license(self, actor: str, source_id: str, lic: License) -> None:
         source = self.get(source_id)
         blocked = self._validate_license(lic, source.translator)
+        regions = normalize_regions(lic.regions)
+        kind = self.license_kind(lic.kind) or {"permissions": {}}
+        # В событие — действующие регионы (пересечение с видом), а не сужение источника:
+        # индексы обновляют видимость по ним, и `null` вместо `["RU"]` открыл бы источник всем.
+        effective = effective_regions(kind.get("regions"), regions)
+        access = {
+            "regions": sorted(effective) if effective is not None else None,
+            "permissions": effective_permissions(kind["permissions"], lic.narrowed, effective),
+        }
         with self.engine.begin() as conn:
             conn.execute(
                 update(t.sources)
                 .where(t.sources.c.id == source_id)
-                .values(license={**lic.to_json(), "blocked": blocked})
+                .values(license={**lic.to_json(), "blocked": blocked}, regions=regions)
             )
             self.actions.record(actor, "change_license", source_id, {"kind": lic.kind}, conn=conn)
+            # Регионы и разрешения меняются и без публикации: индексы обновляются по событию.
+            self._outbox(conn, "source.access_changed", source_id, access)
         if (
             not self.permissions(source_id)["display"]
             and source.status == "active"

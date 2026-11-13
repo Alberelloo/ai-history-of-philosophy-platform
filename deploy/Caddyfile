@@ -1,6 +1,22 @@
 # Публичный адрес продукта. Caddy выпускает и обновляет сертификат сам и перенаправляет
 # HTTP на HTTPS. Для localhost сертификат выпускает внутренний центр Caddy (проверка стенда).
+#
+# Caddy стоит за CDN: страну читателя выставляет только CDN в заголовке
+# {$PHILOGRAPH_REGION_HEADER}. Запрос не из диапазонов CDN ({$PHILOGRAPH_CDN_IPS}) не может
+# её передать — заголовок страны и клиентский X-Philograph-Region снимаются до проксирования,
+# иначе клиент пришлёт страну сам и ограничение регионов обходится (design.md, п. 1).
+
 {$PHILOGRAPH_DOMAIN} {
 	encode zstd gzip
+
+	# Только CDN может задать страну читателя.
+	@not_cdn not remote_ip {$PHILOGRAPH_CDN_IPS}
+	request_header @not_cdn -X-Philograph-Region
+	request_header @not_cdn -{$PHILOGRAPH_REGION_HEADER}
+
+	# Ответы API зависят от страны читателя: их нельзя кэшировать между посетителями.
+	@api path /api/*
+	header @api Cache-Control private
+
 	reverse_proxy gateway:8080
 }

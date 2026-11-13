@@ -82,9 +82,12 @@ class Mentions:
         chapter: set[str],
         *,
         keep_ambiguous: bool = False,
+        external: bool = True,
     ) -> list[dict[str, Any]]:
         """Упоминания в тексте. ``keep_ambiguous`` — вместо пропуска неоднозначного названия
-        вернуть всех кандидатов с пометкой: так ассистент ищет по всем с пониженным весом."""
+        вернуть всех кандидатов с пометкой: так ассистент ищет по всем с пониженным весом.
+        ``external`` — разрешена ли внешняя обработка источника; без неё разрешение
+        неоднозначности моделью не выполняется."""
         words = forms(text)
         found: list[dict[str, Any]] = []
         seen: set[str] = set()
@@ -103,7 +106,9 @@ class Mentions:
                 continue
             size, candidates = match
             start, end = words[i][1], words[i + size - 1][2]
-            entity, method = self._choose(text[start:end], sorted(candidates), chapter, text)
+            entity, method = self._choose(
+                text[start:end], sorted(candidates), chapter, text, external=external
+            )
             if entity is None and keep_ambiguous:
                 for candidate in sorted(candidates):
                     if candidate not in seen:
@@ -142,7 +147,13 @@ class Mentions:
         return result
 
     def _choose(
-        self, surface: str, candidates: list[str], chapter: set[str], text: str
+        self,
+        surface: str,
+        candidates: list[str],
+        chapter: set[str],
+        text: str,
+        *,
+        external: bool = True,
     ) -> tuple[str | None, str]:
         if len(candidates) == 1:
             return candidates[0], "name"
@@ -162,7 +173,9 @@ class Mentions:
                 linked.append(candidate)
         if len(linked) == 1:
             return linked[0], "context"
-        if self.resolver is not None:
+        # Источник без внешней обработки: текст не уходит модели, упоминание остаётся
+        # неоднозначным (группа 7). Поиск по словарю локальный и от этого не страдает.
+        if external and self.resolver is not None:
             chosen = self.resolver(surface, candidates, text)
             if chosen in candidates:
                 return chosen, "model"
@@ -196,13 +209,14 @@ class Mentions:
         only_entities: set[str] | None = None,
     ) -> int:
         data = self.library.get(f"internal/versions/{version_id}/paragraphs").json()
+        external = bool(data.get("external_processing", True))
         targets = self._targets(data)
         index, longest = self._index()
         # Сначала однозначные упоминания по главам — контекст для неоднозначных.
         unambiguous = {k: v for k, v in index.items() if len(v) == 1}
         chapters: dict[str | None, set[str]] = defaultdict(set)
         for target in targets:
-            for m in self.scan(target["text"], unambiguous, longest, set()):
+            for m in self.scan(target["text"], unambiguous, longest, set(), external=external):
                 chapters[target["chapter_id"]].add(m["entity_id"])
         for position, target in enumerate(targets):
             target["position"] = position
@@ -215,7 +229,9 @@ class Mentions:
                 cond = cond & t.mentions.c.entity_id.in_(list(only_entities))
             conn.execute(delete(t.mentions).where(cond))
         for target in selected:
-            found = self.scan(target["text"], index, longest, chapters[target["chapter_id"]])
+            found = self.scan(
+                target["text"], index, longest, chapters[target["chapter_id"]], external=external
+            )
             if only_entities is not None:
                 found = [m for m in found if m["entity_id"] in only_entities]
             if not found:
@@ -313,13 +329,16 @@ class Mentions:
 
     # --- чтение ---
 
-    def for_targets(self, target_ids: list[str]) -> list[dict[str, Any]]:
+    def for_targets(
+        self, target_ids: list[str], closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
         with self.engine.begin() as conn:
             rows = (
                 conn.execute(select(t.mentions).where(t.mentions.c.target_id.in_(target_ids)))
                 .mappings()
                 .all()
             )
+        rows = [r for r in rows if r["source_id"] not in closed]
         types = self.entities.types([r["entity_id"] for r in rows])
         return [
             {
@@ -333,11 +352,14 @@ class Mentions:
             for r in rows
         ]
 
-    def where_to_read(self, entity_id: str) -> list[dict[str, Any]]:
+    def where_to_read(
+        self, entity_id: str, closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
         """Главы, где упомянута сущность, с первым абзацем упоминания (N10): «Где читать» ведёт
         к нему, а не к началу главы. Порядок абзацев — ``position`` (строки до миграции 6 без
         него идут после, в порядке вставки); упоминание только в заголовке или сноске абзаца
-        не даёт, тогда ``first_paragraph_id`` пуст."""
+        не даёт, тогда ``first_paragraph_id`` пуст. Источники, закрытые для региона читателя,
+        в списке не показываются."""
         entity_id = self.entities.resolve(entity_id)
         with self.engine.begin() as conn:
             rows = (
@@ -349,6 +371,7 @@ class Mentions:
                 .mappings()
                 .all()
             )
+        rows = [r for r in rows if r["source_id"] not in closed]
         grouped: dict[tuple, list[str]] = defaultdict(list)
         titles: dict[tuple, tuple] = {}
         first: dict[tuple, tuple[tuple[int, int], str]] = {}

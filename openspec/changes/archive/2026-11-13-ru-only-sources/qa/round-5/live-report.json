@@ -1,0 +1,318 @@
+{
+  "stack": {
+    "url": "http://127.0.0.1:49329",
+    "proxy_url": "http://127.0.0.1:51766",
+    "ports": {
+      "llm": 49324,
+      "library": 49325,
+      "search": 49326,
+      "assistant": 49327,
+      "knowledge": 49328
+    },
+    "sources": {
+      "open": "s_adc791fc5a20",
+      "closed": "s_0ab2d10dc685",
+      "version_open": "v_73aa89109dbc",
+      "version_closed": "v_e0215a6f8744"
+    },
+    "seeded": {
+      "entity": "e_7afcf84edb9b",
+      "other": "e_4d13b2e9f13a",
+      "closed_pid": "p_87fa971469a8",
+      "open_pid": "p_542d6884892d",
+      "closed_statement": "st_096fcd97f857",
+      "open_statement": "st_528e5a014fc1"
+    },
+    "logs": "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+  },
+  "checks": [
+    {
+      "id": "TC-41",
+      "ok": true,
+      "expected": "карточка DE: утверждение из закрытого источника остаётся, статус sourced, подтверждений/атрибуций нет, факт (label) на месте",
+      "actual": "{\"row\": {\"statement_id\": \"st_096fcd97f857\", \"type\": \"influenced_by\", \"relation\": \"испытал влияние\", \"inverse\": false, \"entity_id\": \"e_4d13b2e9f13a\", \"label\": \"Брентано\", \"value\": null, \"status\": \"sourced\", \"consensus\": \"prevailing\", \"disputed\": false, \"disputed_by\": [], \"generated\": false, \"derived\": false, \"in_textbook\": null, \"attributed_to\": [], \"attributions\": [], \"evidence\": []}, \"status\": null}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-5\\UC-20-2-card-de.png"
+      ]
+    },
+    {
+      "id": "TC-42",
+      "ok": true,
+      "expected": "карточка DE: подтверждение открытого источника остаётся",
+      "actual": "{\"evidence\": [{\"paragraph_id\": \"p_542d6884892d\", \"quote\": \"Открытая деталь ОМЕГА-7: разум есть способность принципов.\", \"link\": \"/p/p_542d6884892d\"}], \"attributed_to\": [\"Открытый сборник о рассудке\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-39",
+      "ok": true,
+      "expected": "EC-39/EC-38: скрытые поля — пустые массивы, факт утверждения и связь не меняются",
+      "actual": "{\"evidence\": [], \"attributions\": [], \"attributed_to\": [], \"label\": \"Брентано\", \"relation\": \"испытал влияние\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-42/RU",
+      "ok": true,
+      "expected": "читатель из РФ видит как раньше: подтверждение закрытого источника и «где читать» по обоим источникам",
+      "actual": "{\"evidence\": [{\"paragraph_id\": \"p_87fa971469a8\", \"quote\": \"Закрытая деталь ЗЕТА-9: рассудок есть способность правил.\", \"link\": \"/p/p_87fa971469a8\"}], \"attributed_to\": [\"Закрытый учебник [RU]\"], \"where\": [\"s_0ab2d10dc685\", \"s_adc791fc5a20\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-5\\UC-26-1-card-ru.png"
+      ]
+    },
+    {
+      "id": "TC-40",
+      "ok": true,
+      "expected": "регион DE из заголовка CDN доходит до библиотеки: карточка DE скрывает подтверждение",
+      "actual": "{\"card_de_row\": {\"statement_id\": \"st_096fcd97f857\", \"type\": \"influenced_by\", \"relation\": \"испытал влияние\", \"inverse\": false, \"entity_id\": \"e_4d13b2e9f13a\", \"label\": \"Брентано\", \"value\": null, \"status\": \"sourced\", \"consensus\": \"prevailing\", \"disputed\": false, \"disputed_by\": [], \"generated\": false, \"derived\": false, \"in_textbook\": null, \"attributed_to\": [], \"attributions\": [], \"evidence\": []}, \"gateway\": \"http://127.0.0.1:51766\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-44/where",
+      "ok": true,
+      "expected": "«где читать» для DE: только открытый источник",
+      "actual": "{\"where\": [{\"source_id\": \"s_adc791fc5a20\", \"source_title\": \"Открытый сборник о рассудке\", \"chapter_id\": \"sec_3ddbde7950a7\", \"chapter_title\": \"Глава 1. Рассудок и разум\", \"count\": 1, \"targets\": [\"p_542d6884892d\"], \"first_paragraph_id\": \"p_542d6884892d\"}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-44/mentions",
+      "ok": true,
+      "expected": "упоминания DE: выделения закрытого источника не отдаются, открытые остаются; для РФ — оба",
+      "actual": "{\"DE\": [\"p_542d6884892d\"], \"RU\": [\"p_542d6884892d\", \"p_87fa971469a8\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-55/statements",
+      "ok": true,
+      "expected": "сырые утверждения через шлюз: DE не получает цитат/атрибуций закрытого источника, RU получает; открытое подтверждение остаётся",
+      "actual": "{\"DE_closed\": {\"id\": \"st_096fcd97f857\", \"subject\": \"e_7afcf84edb9b\", \"type\": \"influenced_by\", \"object\": \"e_4d13b2e9f13a\", \"value\": null, \"qualifiers\": {}, \"key\": \"a11d42073513fb2b63ce43339eacb193764ebf839062e783e982150fcb6195f8\", \"status\": \"sourced\", \"consensus\": \"prevailing\", \"consensus_manual\": false, \"rank\": \"normal\", \"provenance\": {\"method\": \"extracted\", \"run_id\": null, \"model\": null, \"template\": null, \"actor\": \"qa\", \"extra\": {}}, \"scope\": \"public\", \"warnings\": [], \"attributions\": [], \"evidence\": [], \"derived\": false, \"direction\": \"out\"}, \"DE_open_evidence\": [{\"id\": 2, \"statement_id\": \"st_528e5a014fc1\", \"paragraph_id\": \"p_542d6884892d\", \"source_id\": \"s_adc791fc5a20\", \"quote\": \"Открытая деталь ОМЕГА-7: разум есть способность принципов.\", \"supports\": true, \"lost\": false, \"run_id\": null}], \"RU_closed_evidence\": [{\"id\": 1, \"statement_id\": \"st_096fcd97f857\", \"paragraph_id\": \"p_87fa971469a8\", \"source_id\": \"s_0ab2d10dc685\", \"quote\": \"Закрытая деталь ЗЕТА-9: рассудок есть способность правил.\", \"supports\": true, \"lost\": false, \"run_id\": null}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-55/graph",
+      "ok": true,
+      "expected": "сырой граф через шлюз: у связи закрытого источника нет подтверждений для DE, для RU — есть; узлы те же",
+      "actual": "{\"DE_edge\": {\"id\": \"st_096fcd97f857\", \"subject\": \"e_7afcf84edb9b\", \"type\": \"influenced_by\", \"object\": \"e_4d13b2e9f13a\", \"value\": null, \"qualifiers\": {}, \"key\": \"a11d42073513fb2b63ce43339eacb193764ebf839062e783e982150fcb6195f8\", \"status\": \"sourced\", \"consensus\": \"prevailing\", \"consensus_manual\": false, \"rank\": \"normal\", \"provenance\": {\"method\": \"extracted\", \"run_id\": null, \"model\": null, \"template\": null, \"actor\": \"qa\", \"extra\": {}}, \"scope\": \"public\", \"warnings\": [], \"attributions\": [], \"evidence\": [], \"derived\": false, \"direction\": \"out\"}, \"RU_edge\": {\"id\": \"st_096fcd97f857\", \"subject\": \"e_7afcf84edb9b\", \"type\": \"influenced_by\", \"object\": \"e_4d13b2e9f13a\", \"value\": null, \"qualifiers\": {}, \"key\": \"a11d42073513fb2b63ce43339eacb193764ebf839062e783e982150fcb6195f8\", \"status\": \"sourced\", \"consensus\": \"prevailing\", \"consensus_manual\": false, \"rank\": \"normal\", \"provenance\": {\"method\": \"extracted\", \"run_id\": null, \"model\": null, \"template\": null, \"actor\": \"qa\", \"extra\": {}}, \"scope\": \"public\", \"warnings\": [], \"attributions\": [{\"id\": 1, \"statement_id\": \"st_096fcd97f857\", \"who_kind\": \"source\", \"who\": \"s_0ab2d10dc685\", \"stance\": \"asserts\", \"place\": null, \"run_id\": null, \"hidden\": false}], \"evidence\": [{\"id\": 1, \"statement_id\": \"st_096fcd97f857\", \"paragraph_id\": \"p_87fa971469a8\", \"source_id\": \"s_0ab2d10dc685\", \"quote\": \"Закрытая деталь ЗЕТА-9: рассудок есть способность правил.\", \"supports\": true, \"lost\": false, \"run_id\": null}], \"derived\": false, \"direction\": \"out\"}, \"nodes\": [\"e_4d13b2e9f13a\", \"e_7afcf84edb9b\", \"e_96ff8e50ea75\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-43",
+      "ok": true,
+      "expected": "граф по запросу для DE: связь и узлы те же, подтверждений из закрытого источника нет",
+      "actual": "{\"edge\": {\"id\": \"st_096fcd97f857\", \"subject\": \"e_7afcf84edb9b\", \"object\": \"e_4d13b2e9f13a\", \"type\": \"influenced_by\", \"title\": \"испытал влияние\", \"status\": \"sourced\", \"generated\": false, \"derived\": false, \"pending\": false, \"consensus\": \"prevailing\", \"qualifiers\": {}, \"attributions\": [], \"evidence\": [], \"in_textbook\": null}, \"nodes\": [\"e_7afcf84edb9b\", \"e_4d13b2e9f13a\", \"e_96ff8e50ea75\"], \"nodes_ru\": [\"e_4d13b2e9f13a\", \"e_7afcf84edb9b\", \"e_96ff8e50ea75\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-45",
+      "ok": true,
+      "expected": "контекст ассистента: абзац закрытого источника не попадает в paragraphs для DE, sources/evidence без него; для RU — попадает",
+      "actual": "{\"DE_paragraphs\": [\"p_542d6884892d\"], \"DE_sources\": [\"s_adc791fc5a20\"], \"RU_paragraphs\": [\"p_542d6884892d\", \"p_87fa971469a8\"], \"DE_statements\": [{\"id\": \"st_096fcd97f857\", \"entity_id\": \"e_7afcf84edb9b\", \"text\": \"Гуссерль — испытал влияние — Брентано\", \"type\": \"influenced_by\", \"status\": \"sourced\", \"attributed_to\": [], \"sources\": [], \"evidence\": [], \"year\": null}, {\"id\": \"st_528e5a014fc1\", \"entity_id\": \"e_7afcf84edb9b\", \"text\": \"Гуссерль — испытал влияние — Локк\", \"type\": \"influenced_by\", \"status\": \"sourced\", \"attributed_to\": [\"Открытый сборник о рассудке\"], \"sources\": [\"s_adc791fc5a20\"], \"evidence\": [{\"paragraph_id\": \"p_542d6884892d\", \"source_id\": \"s_adc791fc5a20\"}], \"year\": null}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-49",
+      "ok": true,
+      "expected": "поле region в теле контекста знаний учитывается: источники закрытого источника не упомянуты в контексте для DE",
+      "actual": "{\"sources\": [\"s_adc791fc5a20\"], \"statements\": [{\"id\": \"st_096fcd97f857\", \"entity_id\": \"e_7afcf84edb9b\", \"text\": \"Гуссерль — испытал влияние — Брентано\", \"type\": \"influenced_by\", \"status\": \"sourced\", \"attributed_to\": [], \"sources\": [], \"evidence\": [], \"year\": null}, {\"id\": \"st_528e5a014fc1\", \"entity_id\": \"e_7afcf84edb9b\", \"text\": \"Гуссерль — испытал влияние — Локк\", \"type\": \"influenced_by\", \"status\": \"sourced\", \"attributed_to\": [\"Открытый сборник о рассудке\"], \"sources\": [\"s_adc791fc5a20\"], \"evidence\": [{\"paragraph_id\": \"p_542d6884892d\", \"source_id\": \"s_adc791fc5a20\"}], \"year\": null}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-50",
+      "ok": true,
+      "expected": "вопрос из DE: текста и ссылок закрытого источника нет ни в запросе к модели, ни в ответе",
+      "actual": "{\"sources\": [\"s_adc791fc5a20\"], \"marker_in_prompt\": false, \"answer\": \"Это демонстрационный ответ: он опирается на первый найденный абзац. Настоящая модель подключается в config/llm.yaml.\", \"stats\": {\"fragments\": 2, \"grounded\": 1, \"ungrounded\": 1, \"hidden\": 0, \"removed_citations\": 0, \"removed_quotes\": 0}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\assistant.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-51",
+      "ok": true,
+      "expected": "вопрос из РФ: текст закрытого источника попадает в контекст модели (как раньше)",
+      "actual": "{\"marker_in_prompt\": true, \"sources\": [\"s_0ab2d10dc685\"], \"prompt_excerpt\": \"[system]\\nОтветь на вопрос читателя по истории философии по переданным абзацам. Отвечай только по существу вопроса. Абзацы источников даны в блоке passages под номерами [1], [2] и так далее. После каждого предложения, которое опирается на абзац, ставь его номер в квадратных скобках, например [2] или [1, 3]. Не ставь номер, если предложение не опирается на переданные абзацы. Дословные цитаты бери только из переданных абзацев и заключай в «кавычки». Утверждения онтологии, если они есть, даны в блоке statements под своими номерами: на них ссылайся так же, а сгенерированные не выдавай за установлен\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-47/TC-48",
+      "ok": true,
+      "expected": "регион из заголовка доходит до поиска: для DE закрытые абзацы не попали в контекст, для РФ попали",
+      "actual": "{\"DE\": false, \"RU\": true, \"sources_DE\": [\"s_adc791fc5a20\"], \"sources_RU\": [\"s_0ab2d10dc685\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-34/EC-44",
+      "ok": true,
+      "expected": "без заголовка региона, со служебными XX и T1 — неизвестный регион: закрытый источник не попадает в контекст модели",
+      "actual": "{\"none_marker\": false, \"XX_marker\": false, \"T1_marker\": false}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-44/lowercase",
+      "ok": true,
+      "expected": "код страны « ru » приводится к RU: закрытый источник снова в контексте",
+      "actual": "{\"marker_in_prompt\": true}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-52",
+      "ok": true,
+      "expected": "выделение из закрытого источника для DE: абзацы не попали в passages, текста закрытого источника нет в запросе к модели",
+      "actual": "{\"marker_in_prompt\": false, \"sources\": [\"s_adc791fc5a20\"], \"prompt_excerpt\": \"[system]\\nОтветь на вопрос читателя по истории философии по переданным абзацам. Отвечай только по существу вопроса. Абзацы источников даны в блоке passages под номерами [1], [2] и так далее. После каждого предложения, которое опирается на абзац, ставь его номер в квадратных скобках, например [2] или [1, 3]. Не ставь номер, если предложение не опирается на переданные абзацы. Дословные цитаты бери только из переданных абзацев и заключай в «кавычки». Утверждения онтологии, если они есть, даны в блок\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-54",
+      "ok": true,
+      "expected": "scope=current и source_id закрытого источника для DE: ответ без опоры на библиотеку, ссылок на закрытый источник нет",
+      "actual": "{\"notice\": [{\"type\": \"notice\", \"kind\": \"no_library_support\", \"message\": \"Ответ составлен без опоры на библиотеку.\"}], \"sources\": [], \"stats\": {\"fragments\": 2, \"grounded\": 0, \"ungrounded\": 2, \"hidden\": 0, \"removed_citations\": 1, \"removed_quotes\": 0}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-37/EC-43",
+      "ok": true,
+      "expected": "два запроса подряд с разными регионами: каждый считается по своему региону, состояние не переносится",
+      "actual": "{\"DE\": [], \"RU\": [{\"paragraph_id\": \"p_87fa971469a8\", \"quote\": \"Закрытая деталь ЗЕТА-9: рассудок есть способность правил.\", \"link\": \"/p/p_87fa971469a8\"}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-42",
+      "ok": true,
+      "expected": "повтор вопроса из DE детерминирован: регион читается из заголовка каждый раз",
+      "actual": "{\"marker_in_prompt\": false}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-53",
+      "ok": true,
+      "expected": "ссылка модели на непереданный абзац удалена, фрагмент неподтверждён (второй слой grounding.verify)",
+      "actual": "{\"ready\": true, \"fragments\": [{\"type\": \"fragment\", \"text\": \"Это демонстрационный ответ: он опирается на первый найденный абзац.\", \"grounded\": false, \"unverified_quotes\": [], \"contradicts\": [], \"citations\": []}, {\"type\": \"fragment\", \"text\": \"Настоящая модель подключается в config/llm.yaml.\", \"grounded\": false, \"unverified_quotes\": [], \"contradicts\": [], \"citations\": []}], \"stats\": {\"fragments\": 2, \"grounded\": 0, \"ungrounded\": 2, \"hidden\": 0, \"removed_citations\": 1, \"removed_quotes\": 0}, \"invented_event\": true}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\assistant-invented.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\llm-invented.log"
+      ]
+    },
+    {
+      "id": "UC-20/RU-browser",
+      "ok": true,
+      "expected": "читатель из РФ: карточка показывает подтверждение закрытого источника ссылкой /p/<id> и «где читать» по обоим источникам",
+      "actual": "{\"citations\": [\"/p/p_87fa971469a8\", \"/p/p_542d6884892d\"], \"where\": \"Где читать\\nГлава 1. Рассудок и разум\\nЗакрытый учебник [RU], 1 упоминание\\nГлава 1. Рассудок и разум\\nОткрытый сборник о рассудке, 1 упоминание\", \"console_errors\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-5\\UC-20-1-card-ru.png"
+      ]
+    },
+    {
+      "id": "UC-20/DE-browser",
+      "ok": true,
+      "expected": "читатель из DE: утверждение и связь на месте, цитаты, ссылки /p/ и атрибуции закрытого источника скрыты; «где читать» — только открытый источник",
+      "actual": "{\"citations\": [\"/p/p_542d6884892d\"], \"where\": \"Где читать\\nГлава 1. Рассудок и разум\\nОткрытый сборник о рассудке, 1 упоминание\", \"console_errors\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-5\\UC-20-2-card-de.png"
+      ]
+    },
+    {
+      "id": "EC-console",
+      "ok": true,
+      "expected": "в браузере нет ошибок консоли и сетевых сбоев",
+      "actual": "{\"console_errors\": [], \"failed_requests\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-5\\UC-20-1-card-ru.png"
+      ]
+    },
+    {
+      "id": "TC-46",
+      "ok": true,
+      "expected": "недоступная библиотека при internal/access: сервис знаний отвечает 503 knowledge_unavailable и не отдаёт непроверенные подтверждения",
+      "actual": "{\"status\": 503, \"body\": {\"error\": \"Сервис знаний временно недоступен\", \"kind\": \"knowledge_unavailable\", \"request_id\": \"5ad82aa2842e46faaa998d3cc67efa75\"}, \"context_status\": 503, \"context_body\": \"{\\\"error\\\":\\\"Сервис знаний временно недоступен\\\",\\\"kind\\\":\\\"knowledge_unavailable\\\",\\\"request_id\\\":\\\"ab6aff3584484656a7670a12320de69a\\\"}\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\knowledge.log"
+      ]
+    },
+    {
+      "id": "EC-41/knowledge",
+      "ok": true,
+      "expected": "сервис знаний недоступен: шаг онтологии пропущен, ассистент отвечает по поиску",
+      "actual": "{\"types\": [\"stage\", \"stage\", \"fragment\", \"fragment\", \"done\"], \"notice\": [], \"stats\": {\"fragments\": 2, \"grounded\": 1, \"ungrounded\": 1, \"hidden\": 0, \"removed_citations\": 0, \"removed_quotes\": 0}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\assistant.log"
+      ]
+    },
+    {
+      "id": "EC-41/search",
+      "ok": true,
+      "expected": "поиск недоступен: ответ unavailable с reason search_unavailable",
+      "actual": "{\"events\": [{\"type\": \"stage\", \"name\": \"searching\"}, {\"type\": \"unavailable\", \"reason\": \"search_unavailable\", \"message\": \"Ответ временно недоступен: поиск не отвечает.\"}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-5\\harness\\stand\\logs\\assistant.log"
+      ]
+    }
+  ],
+  "failures": 0
+}

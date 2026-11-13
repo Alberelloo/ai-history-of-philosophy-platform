@@ -65,7 +65,10 @@ export type Turn = {
   selectionParagraphs?: string[];
   fragments: Fragment[];
   status: "streaming" | "done" | "stopped" | "error";
-  message?: Message;
+  // Пометки хода (5.7): уведомления сервера и итоговое сообщение. Их может быть несколько за
+  // один ход (например, «найдено, не пересказывается» и «без опоры на библиотеку»), поэтому
+  // список, а не одно поле. Прежние сессии с единственным ``message`` читаются в normalizeTurn.
+  notices?: Message[];
   suggestion?: Suggestion;
   // Глава, в которой задан вопрос (5.8): у вопроса из другой главы — подпись с её названием.
   chapterId?: string;
@@ -159,6 +162,15 @@ function normalizeTurn(raw: unknown): Turn | null {
   const status = ["streaming", "done", "stopped", "error"].includes(t.status as string)
     ? (t.status as Turn["status"])
     : "done";
+  const isMessage = (m: unknown): m is Message => Boolean(object(m).code || object(m).text);
+  // Новый формат хранит пометки списком; прежний — одним полем ``message``. Если списка нет,
+  // единственную пометку переносим в список, чтобы сохранённые сессии открывались без ошибок.
+  const rawNotices = Array.isArray(t.notices) ? (t.notices as Message[]).filter(isMessage) : [];
+  const notices = rawNotices.length
+    ? rawNotices
+    : isMessage(t.message)
+      ? [t.message as Message]
+      : [];
   return {
     id: typeof t.id === "string" ? t.id : newId(),
     question: t.question,
@@ -170,7 +182,7 @@ function normalizeTurn(raw: unknown): Turn | null {
     // Обмен, который при перезагрузке шёл, восстанавливается как «остановлено» (5.8): поток
     // принадлежал закрытой вкладке и уже не допишется.
     status: status === "streaming" && !liveTurns.has(t.id as string) ? "stopped" : status,
-    message: object(t.message).code || object(t.message).text ? (t.message as Message) : undefined,
+    notices: notices.length ? notices : undefined,
     suggestion: object(t.suggestion).entity_id ? (t.suggestion as Suggestion) : undefined,
     chapterId: typeof t.chapterId === "string" ? t.chapterId : undefined,
     chapterTitle: typeof t.chapterTitle === "string" ? t.chapterTitle : undefined,

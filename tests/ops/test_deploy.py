@@ -44,7 +44,11 @@ def prod_config(tmp_path_factory) -> dict:
     for name in ("compose.yaml", "compose.prod.yaml"):
         shutil.copy(ROOT / name, where / name)
     (where / ".env").write_text(
-        "POSTGRES_PASSWORD=x\nPHILOGRAPH_VISITOR_SECRET=y\nPHILOGRAPH_DOMAIN=philograph.example.org\n",
+        "POSTGRES_PASSWORD=x\n"
+        "PHILOGRAPH_VISITOR_SECRET=y\n"
+        "PHILOGRAPH_DOMAIN=philograph.example.org\n"
+        "PHILOGRAPH_REGION_HEADER=CF-IPCountry\n"
+        "PHILOGRAPH_CDN_IPS=1.2.3.0/24\n",
         encoding="utf-8",
     )
     result = subprocess.run(
@@ -101,6 +105,67 @@ def test_only_http_and_https_published(prod_config):
     # Внутренние адреса и метрики не видны и через шлюз.
     client = TestClient(create_app("gateway", "1.0", Health("gateway", "1.0")))
     assert client.get("/internal/metrics").status_code == 404
+
+
+@req("regional-access", "Шлюз доступен только через CDN")
+def test_deploy_requires_region_config(tmp_path):
+    """update отказывает, если у шлюза нет доверенного прокси или имени заголовка страны.
+
+    Регион читателя работает только когда шлюз доверяет заголовку страны от CDN
+    (``PHILOGRAPH_TRUSTED_PROXY=1``) и знает имя этого заголовка (``PHILOGRAPH_REGION_HEADER``).
+    Без них ограниченные источники закрылись бы всем читателям.
+    """
+    # В коммите compose.prod.yaml настроен правильно.
+    assert deploy.check_prod_config() == []
+
+    # Доверенный прокси выключен или не задан — выкладка останавливается.
+    for environment in (
+        {"PHILOGRAPH_REGION_HEADER": "CF-IPCountry"},
+        {"PHILOGRAPH_TRUSTED_PROXY": "0", "PHILOGRAPH_REGION_HEADER": "CF-IPCountry"},
+    ):
+        assert deploy.gateway_env_problems({"services": {"gateway": {"environment": environment}}})
+
+    # Имя заголовка страны не задано — выкладка останавливается.
+    for environment in (
+        {"PHILOGRAPH_TRUSTED_PROXY": "1"},
+        {"PHILOGRAPH_TRUSTED_PROXY": "1", "PHILOGRAPH_REGION_HEADER": ""},
+    ):
+        assert deploy.gateway_env_problems({"services": {"gateway": {"environment": environment}}})
+
+    good = {
+        "services": {
+            "gateway": {
+                "environment": {
+                    "PHILOGRAPH_TRUSTED_PROXY": "1",
+                    "PHILOGRAPH_REGION_HEADER": "${PHILOGRAPH_REGION_HEADER:?задайте}",
+                }
+            }
+        }
+    }
+    assert deploy.gateway_env_problems(good) == []
+
+    bad = tmp_path / "compose.prod.yaml"
+    bad.write_text(
+        'services:\n  gateway:\n    environment:\n      PHILOGRAPH_TRUSTED_PROXY: "1"\n',
+        encoding="utf-8",
+    )
+    state = tmp_path / "state.json"
+    deploy.write_state({"current": "1.4.0", "previous": "1.3.0"}, state)
+    recorder = Recorder()
+    assert deploy.update("1.5.0", recorder, state, config_path=bad) == 1
+    assert recorder.commands == []  # до сборки не дошло
+    assert deploy.read_state(state)["current"] == "1.4.0"  # работает прежняя версия
+
+
+@req("regional-access", "Шлюз доступен только через CDN")
+def test_caddyfile_strips_region_headers_and_no_api_cache():
+    """Caddy снимает клиентский регион и страну у запросов не от CDN и не кэширует /api/*."""
+    caddyfile = (ROOT / "deploy" / "Caddyfile").read_text(encoding="utf-8")
+    assert "request_header @not_cdn -X-Philograph-Region" in caddyfile
+    assert "request_header @not_cdn -{$PHILOGRAPH_REGION_HEADER}" in caddyfile
+    assert "not remote_ip {$PHILOGRAPH_CDN_IPS}" in caddyfile
+    assert "header @api Cache-Control private" in caddyfile
+    assert "reverse_proxy gateway:8080" in caddyfile
 
 
 def stack_compose() -> list[str] | None:

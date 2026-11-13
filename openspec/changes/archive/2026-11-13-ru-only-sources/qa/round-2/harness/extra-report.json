@@ -1,0 +1,76 @@
+{
+ "url": "http://127.0.0.1:58941",
+ "checks": [
+  {
+   "case": "UC-2",
+   "step": "ссылка на абзац открытого источника открывается",
+   "ok": true,
+   "expected": "переход на главу с якорем #p-<id> и текстом абзаца",
+   "actual": "адрес: http://127.0.0.1:58941/read/s_ca4ffa05614f/sec_0a617c34e270#p-p_056945cf0998; текст: 'Ассистент\\n\\nОглавление\\n\\nChapter 1\\nChapter 1\\n\\nAll our knowledge begins with experience.'",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/UC-2-1-open-paragraph.png"
+   ]
+  },
+  {
+   "case": "TC-8",
+   "step": "фильтр вида оставляет закрытую строку и убирает чужие виды",
+   "ok": true,
+   "expected": "при фильтре «Учебник» остаётся закрытая строка, первоисточник скрыт",
+   "actual": "всего строк было 4, стало 2: ['История теории познания', 'Русский учебник']",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-8-1-kind-filter-restricted.png"
+   ]
+  },
+  {
+   "case": "TC-8",
+   "step": "сброс фильтра возвращает полный список с закрытой строкой",
+   "ok": true,
+   "expected": "снова 4 строк, из них одна закрытая",
+   "actual": "строк: 4; закрытых: 1",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-8-2-filter-reset-full-list.png"
+   ]
+  },
+  {
+   "case": "TC-8",
+   "step": "поиск по автору находит закрытую строку",
+   "ok": true,
+   "expected": "по «Юркевич» — одна строка, и она закрытая",
+   "actual": "строк: 1",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/TC-8-3-search-author-restricted.png"
+   ]
+  },
+  {
+   "case": "EC-4",
+   "step": "после сужения вида до [RU] источник [BY] не показывается в списке",
+   "ok": true,
+   "expected": "regions до сужения {BY}, после — пусто, display=false, строки в списке нет",
+   "actual": "до: ['BY']; после: []; display=False; заголовки списка: ['Critique of Pure Reason', 'История теории познания', 'Русский учебник', 'Философский словарь']",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/EC-4-1-empty-intersection-hidden.png"
+   ]
+  },
+  {
+   "case": "EC-4",
+   "step": "источник с пустым пересечением отсутствует и в ответе API",
+   "ok": true,
+   "expected": "идентификатора источника нет среди sources",
+   "actual": "видимых источников: 4; есть ли закрытый-пустой: False",
+   "evidence": [
+    "openspec/changes/ru-only-sources/qa/screenshots/round-2/EC-4-2-empty-intersection-api.png"
+   ]
+  }
+ ],
+ "failed": [],
+ "console": [
+  {
+   "type": "http",
+   "text": "404 http://127.0.0.1:58941/api/knowledge/v1/mentions?targets=p_056945cf0998"
+  },
+  {
+   "type": "error",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  }
+ ]
+}

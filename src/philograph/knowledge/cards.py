@@ -12,7 +12,7 @@ import json
 from collections.abc import Iterator
 from typing import Any
 
-from philograph.knowledge.graph import attribution_label, recipes_for
+from philograph.knowledge.graph import attribution_label, hidden_by_region, recipes_for
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.statements import Attribution, Provenance, Statements
 from philograph.platform import events
@@ -88,12 +88,18 @@ class Cards:
         self.on_view = on_view  # приоритет очереди проверки: что чаще видят читатели
 
     def _row(
-        self, s: dict[str, Any], entity_id: str, textbook: str | None = None
+        self,
+        s: dict[str, Any],
+        entity_id: str,
+        textbook: str | None = None,
+        closed: frozenset[str] = frozenset(),
     ) -> dict[str, Any]:
         spec = self.registry.relation(s["type"])
         outward = s["subject"] == entity_id
         other = s["object"] if outward else s["subject"]
-        visible = [a for a in s["attributions"] if not a["hidden"]]
+        visible = [
+            a for a in s["attributions"] if not a["hidden"] and not hidden_by_region(a, closed)
+        ]
         who = list(dict.fromkeys(attribution_label(self.statements, a) for a in visible))
         disputers = [
             attribution_label(self.statements, a) for a in visible if a["stance"] == "disputes"
@@ -133,7 +139,7 @@ class Cards:
                     "link": f"/p/{e['paragraph_id']}",
                 }
                 for e in s["evidence"]
-                if not e["lost"]
+                if not e["lost"] and e["source_id"] not in closed
             ],
         }
 
@@ -144,6 +150,7 @@ class Cards:
         attributed_to: str | None = None,
         generation: bool = True,
         textbook: str | None = None,
+        closed: frozenset[str] = frozenset(),
     ) -> dict[str, Any]:
         """``attributed_to`` — режим «только выбранный учебник», ``textbook`` — пометка строк,
         которые есть в выбранном учебнике, в режиме «все источники»."""
@@ -155,7 +162,7 @@ class Cards:
         for code, title, types, direction in SECTIONS.get(entity["type"], []):
             allowed = set().union(*(self.registry.relation_subtypes(x) for x in types))
             rows = [
-                self._row(s, entity_id, textbook)
+                self._row(s, entity_id, textbook, closed)
                 for s in statements
                 if s["type"] in allowed
                 and (
@@ -172,12 +179,12 @@ class Cards:
         description = next(
             (s for s in statements if s["type"] == "description" and s["direction"] == "out"), None
         )
-        myths = self._misconceptions(entity_id)
+        myths = self._misconceptions(entity_id, closed)
         if myths:
             sections.append(
                 {"code": "misconceptions", "title": MISCONCEPTIONS_TITLE, "rows": myths}
             )
-        where = self.mentions.where_to_read(entity_id) if self.mentions else []
+        where = self.mentions.where_to_read(entity_id, closed) if self.mentions else []
         if self.on_view and shown:
             self.on_view(shown)
         result = {
@@ -188,7 +195,9 @@ class Cards:
             "dates": entity["primary"].get("dates"),
             # N3 закрыт монограммами; отбор и хранение — openspec/changes/portrait-sourcing.
             "portraits": [],
-            "description": self._row(description, entity_id) if description else None,
+            "description": self._row(description, entity_id, closed=closed)
+            if description
+            else None,
             "description_pending": description is None
             and generation
             and self.llm is not None
@@ -206,7 +215,9 @@ class Cards:
         )
         return result
 
-    def _misconceptions(self, entity_id: str) -> list[dict[str, Any]]:
+    def _misconceptions(
+        self, entity_id: str, closed: frozenset[str] = frozenset()
+    ) -> list[dict[str, Any]]:
         """Отвергнутые утверждения с атрибуцией «распространённое мнение»."""
         rows = []
         for s in self.statements.about(entity_id, include_deprecated=True, derived=False):
@@ -215,7 +226,7 @@ class Cards:
             if any(
                 a["who_kind"] == "common" and a["stance"] == "asserts" for a in s["attributions"]
             ):
-                rows.append(self._row(s, entity_id))
+                rows.append(self._row(s, entity_id, closed=closed))
         return rows
 
     def describe(self, entity_id: str, *, generation: bool = True) -> Iterator[dict[str, Any]]:

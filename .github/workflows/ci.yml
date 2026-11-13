@@ -157,14 +157,19 @@ jobs:
 
       # Публичный сервер: Caddy с HTTPS (для localhost сертификат выпускает его внутренний
       # центр), закрытый порт шлюза, перезапуск упавшего сервиса.
+      # Значения региона — как у стенда: Caddy считает локальный адрес CDN, страна — CF-IPCountry.
       - name: Развёртывание с HTTPS
         env:
           PHILOGRAPH_DOMAIN: localhost
+          PHILOGRAPH_REGION_HEADER: CF-IPCountry
+          PHILOGRAPH_CDN_IPS: 127.0.0.1/32
         run: docker compose -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml up -d --wait
 
       - name: Проверки развёртывания
         env:
           PHILOGRAPH_DOMAIN: localhost
+          PHILOGRAPH_REGION_HEADER: CF-IPCountry
+          PHILOGRAPH_CDN_IPS: 127.0.0.1/32
           PHILOGRAPH_DEPLOY_URL: https://localhost
           PHILOGRAPH_DEPLOY_COMPOSE: -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml
         run: pytest -q tests/ops/test_deploy.py
@@ -173,4 +178,6 @@ jobs:
         if: failure()
         env:
           PHILOGRAPH_DOMAIN: localhost
+          PHILOGRAPH_REGION_HEADER: CF-IPCountry
+          PHILOGRAPH_CDN_IPS: 127.0.0.1/32
         run: docker compose -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml logs --no-color | tail -300

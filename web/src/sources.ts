@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type SourceItem } from "./api";
+import { api, type RestrictedSourceItem, type SourceItem } from "./api";
 
 // Описания источников (название, авторы, вид) для боковой панели и настроек. Библиотека
 // сообщает то, что уже загрузила; иначе — один запрос полного списка на вкладку.
@@ -8,8 +8,11 @@ const known = new Map<string, SourceItem>();
 const EVENT = "philograph:sources";
 let loading: Promise<void> | null = null;
 
-export function rememberSources(sources: SourceItem[]): void {
-  sources.forEach((s) => known.set(s.id, s));
+export function rememberSources(sources: (SourceItem | RestrictedSourceItem)[]): void {
+  // Строку закрытого по региону источника помнить нечем: у неё нет вида и языка.
+  sources.forEach((s) => {
+    if (!("restricted" in s)) known.set(s.id, s);
+  });
   window.dispatchEvent(new Event(EVENT));
 }
 

@@ -29,6 +29,7 @@ license_kinds = Table(
     Column("title", String(200), nullable=False),
     Column("url", String(500)),
     Column("permissions", JSON, nullable=False),  # display, external_processing, quoting
+    Column("regions", JSON),  # регионы показа вида лицензии; NULL — везде
     schema=SCHEMA,
 )
 
@@ -48,6 +49,7 @@ sources = Table(
     Column("isbn", String(40)),
     Column("original_url", String(1000)),
     Column("license", JSON, nullable=False),  # вид, основание, подробности, разрешения
+    Column("regions", JSON),  # сужение регионов показа источника; NULL — как у вида
     Column("scope", String(100), nullable=False),  # public | user:<id> | group:<id>
     Column("settings", JSON, nullable=False),
     Column("files", JSON, nullable=False),  # [{name, url | path}] по порядку
@@ -289,3 +291,17 @@ def _add_unrendered_codes(conn) -> None:
         conn.execute(text(f"ALTER TABLE {SCHEMA}.blocks ADD COLUMN detail_code VARCHAR(20)"))
     if "page" not in columns:
         conn.execute(text(f"ALTER TABLE {SCHEMA}.blocks ADD COLUMN page VARCHAR(20)"))
+
+
+@migrations.add(5, "регионы показа у вида лицензии и источника")
+def _add_regions(conn) -> None:
+    """Регионы лежат отдельными столбцами, а не в JSON ``license``: старый код при откате читает
+    ``License(**data)`` и упал бы на неизвестном ключе."""
+    from sqlalchemy import inspect, text
+
+    kinds = {c["name"] for c in inspect(conn).get_columns("license_kinds", schema=SCHEMA)}
+    if "regions" not in kinds:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.license_kinds ADD COLUMN regions JSON"))
+    sources = {c["name"] for c in inspect(conn).get_columns("sources", schema=SCHEMA)}
+    if "regions" not in sources:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.sources ADD COLUMN regions JSON"))

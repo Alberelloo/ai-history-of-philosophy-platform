@@ -29,6 +29,10 @@ docs = Table(
     Column("embedded", Boolean, nullable=False),  # есть ли в смысловом индексе
     Column("active", Boolean, nullable=False),  # снятый источник: в поиске нет, данные целы
     Column("quoting", Boolean, nullable=False, server_default="1"),  # можно ли цитировать
+    # Регионы показа источника: "*" (везде) или ",RU,BY," (подстрока "%,RU,%" безопасна).
+    Column("regions", String(100), nullable=False, server_default="*"),
+    # Разрешение внешней обработки: абзацы без него не уходят модели (группа 7).
+    Column("external", Boolean, nullable=False, server_default="1"),
     schema=SCHEMA,
 )
 
@@ -91,3 +95,23 @@ def _add_source_title(conn) -> None:
     columns = {c["name"] for c in inspect(conn).get_columns("docs", schema=SCHEMA)}
     if "source_title" not in columns:  # база, созданная до этой миграции
         conn.execute(text(f"ALTER TABLE {SCHEMA}.docs ADD COLUMN source_title TEXT"))
+
+
+def _add_regions_and_external(conn) -> None:
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("docs", schema=SCHEMA)}
+    if "regions" not in columns:  # база, созданная до этой миграции
+        conn.execute(
+            text(f"ALTER TABLE {SCHEMA}.docs ADD COLUMN regions TEXT NOT NULL DEFAULT '*'")
+        )
+    if "external" not in columns:
+        default = "TRUE" if conn.dialect.name == "postgresql" else "1"
+        conn.execute(
+            text(
+                f"ALTER TABLE {SCHEMA}.docs ADD COLUMN external BOOLEAN NOT NULL DEFAULT {default}"
+            )
+        )
+
+
+migrations.add(4, "регионы показа и внешняя обработка у абзаца")(_add_regions_and_external)

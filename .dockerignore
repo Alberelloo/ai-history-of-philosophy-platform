@@ -1,0 +1,25 @@
+# Контекст сборки. Dockerfile копирует только pyproject.toml, src, config, scripts, demo,
+# sources и web (без node_modules/dist), поэтому всё остальное — лишний перенос в Docker.
+.git/
+.github/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.import_linter_cache/
+.stack/
+.dsh/
+.tmp/
+pytest-of-*/
+debug.log
+tests/
+docs/
+openspec/
+backups/
+data/
+.deploy/
+.env
+web/node_modules/
+web/dist/
+tests/e2e/visual/results/

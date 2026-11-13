@@ -149,6 +149,7 @@ def license_of(entry: dict[str, Any]) -> License | None:
         translator_death_year=translator_year,
         document_url=lic.get("document_url"),
         narrowed=dict(lic.get("narrowed") or {}),
+        regions=list(lic["regions"]) if lic.get("regions") else None,
     )
 
 

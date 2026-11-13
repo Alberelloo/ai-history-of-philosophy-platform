@@ -1,0 +1,49 @@
+{
+  "change": "ru-only-sources",
+  "round": 4,
+  "verdict": "pass",
+  "runner": "dev_cycle-эквивалент: workflow `dev-cycle-round-4` (тестировщик deepseek-flash, схема отчёта та же). Запущено вручную, потому что инструмент dev_cycle прочитал maxRounds=3 при старте профиля; профиль уже обновлён до 5 и вступит в силу после перезапуска DSH.",
+  "tester": {
+    "pass": true,
+    "cases_total": 26,
+    "cases": [
+      { "id": "UC-14", "status": "pass" },
+      { "id": "UC-15", "status": "pass" },
+      { "id": "UC-16", "status": "pass" },
+      { "id": "UC-17", "status": "pass" },
+      { "id": "UC-18", "status": "pass" },
+      { "id": "UC-19", "status": "pass" },
+      { "id": "TC-28", "status": "pass" },
+      { "id": "TC-29", "status": "pass" },
+      { "id": "TC-30", "status": "pass" },
+      { "id": "TC-31", "status": "pass" },
+      { "id": "TC-32", "status": "pass" },
+      { "id": "TC-33", "status": "pass" },
+      { "id": "TC-34", "status": "pass" },
+      { "id": "TC-35", "status": "pass" },
+      { "id": "TC-36", "status": "pass" },
+      { "id": "TC-37", "status": "pass" },
+      { "id": "TC-38", "status": "pass" },
+      { "id": "EC-26", "status": "pass" },
+      { "id": "EC-27", "status": "pass" },
+      { "id": "EC-28", "status": "pass" },
+      { "id": "EC-29", "status": "pass" },
+      { "id": "EC-30", "status": "pass" },
+      { "id": "EC-31", "status": "pass" },
+      { "id": "EC-32", "status": "pass" },
+      { "id": "EC-33", "status": "pass" }
+    ],
+    "findings": [],
+    "environment": "Ветка claude/ru-only-sources, коммит b4dd877. Прогоны: 510 passed / 1 skipped (PostgreSQL) / 93 deselected в `tests` с TMP/TEMP внутри репозитория; 27 целевых тестов `tests/search/test_regions.py` + `tests/library/test_regions.py`. Живой стенд: scripts/dev_stack.py in-process (демо-источники + «Ограниченный учебник [RU]»), PHILOGRAPH_REGION_FALLBACK=RU, gateway :63727, библиотека :63723, поиск :63724, LLM :63722, Qdrant в процессе поиска; 29 живых проверок, 0 провалов; Playwright с TMP внутри репозитория.",
+    "notes": "Что осталось непроверенным: (1) tests/e2e (93 deselected) — нужен подъём стека; поведение 8.2 проверено на живом стенде; (2) настоящий CDN и проверка конфигурации развёртывания (8.6); (3) группы 5–8 — кода ещё нет; (4) на стенде не задан PHILOGRAPH_REGION_HEADER, поэтому Vary на заголовок страны здесь не проверялся (проверен в раунде 3); (5) демо-эмбеддинги шумят в смысловом канале, поэтому TC-30 проверялся по отсутствию ограниченного источника при semantic_used=true; (6) замечание по документации: в «Статусе покрытия (группа 4)» в cases.md не были перечислены TC-38/EC-33 — исправлено после раунда.",
+    "artifacts": {
+      "readme": "openspec/changes/ru-only-sources/qa/round-4/README.md",
+      "live_report": "openspec/changes/ru-only-sources/qa/round-4/live-report.json",
+      "logs": "openspec/changes/ru-only-sources/qa/round-4/*.log",
+      "screenshots": "openspec/changes/ru-only-sources/qa/screenshots/round-4/",
+      "harness": "openspec/changes/ru-only-sources/qa/round-4/harness/"
+    }
+  },
+  "verifier": null,
+  "note": "Судья не вызывался: findings пустые (round.js при pass и пустых findings пропускает фазу разбора причин)."
+}

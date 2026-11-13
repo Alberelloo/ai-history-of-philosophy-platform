@@ -40,6 +40,9 @@ datasets = Table(
     Column("name", String(100), nullable=False, unique=True),
     Column("kind", String(30), nullable=False),
     Column("version", Integer, nullable=False),
+    # Регион, для читателя которого составлен набор: замеры повторяют его условия.
+    # NULL — неизвестный регион (то, что видит читатель вне разрешённых стран).
+    Column("region", String(2)),
     schema=SCHEMA,
 )
 items = Table(
@@ -56,8 +59,32 @@ items = Table(
     Column("decided_at", DateTime(timezone=True)),
     schema=SCHEMA,
 )
+
+
+def _normalize_region(value: str | None) -> str | None:
+    """Две латинские буквы в верхнем регистре; служебные ``XX``/``T1`` — неизвестный регион."""
+    if not value:
+        return None
+    code = str(value).strip().upper()
+    if code in {"XX", "T1"} or not (len(code) == 2 and code.isascii() and code.isalpha()):
+        return None
+    return code
+
+
 migrations = Migrations(SCHEMA, metadata)
 migrations.add(1, "наборы для оценки")(migrations.create_tables("datasets", "items"))
+
+
+def _add_dataset_region(conn) -> None:
+    """Регион набора: без него замеры шли бы без региона и не видели ограниченных источников."""
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("datasets", schema=SCHEMA)}
+    if "region" not in columns:  # база, созданная до этой миграции
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.datasets ADD COLUMN region VARCHAR(2)"))
+
+
+migrations.add(3, "регион набора оценки")(_add_dataset_region)
 
 events.define(
     "evaluation.dataset.changed",
@@ -82,13 +109,19 @@ class Datasets:
         self.engine = engine
         self.clock = clock or SystemClock()
 
-    def create(self, name: str, kind: str) -> int:
+    def create(self, name: str, kind: str, *, region: str | None = None) -> int:
+        """``region`` — для читателя какой страны составлен набор (``None`` — неизвестный)."""
         if kind not in KINDS:
             raise ValueError(f"вид набора: {', '.join(KINDS)}")
+        code = _normalize_region(region)
         with self.engine.begin() as conn:
             return conn.execute(
-                datasets.insert().values(name=name, kind=kind, version=0)
+                datasets.insert().values(name=name, kind=kind, version=0, region=code)
             ).inserted_primary_key[0]
+
+    def region(self, dataset_id: int) -> str | None:
+        with self.engine.begin() as conn:
+            return conn.scalar(select(datasets.c.region).where(datasets.c.id == dataset_id))
 
     def _bump(self, conn, dataset_id: int, change: str) -> int:
         version = conn.scalar(select(datasets.c.version).where(datasets.c.id == dataset_id)) + 1
@@ -174,6 +207,7 @@ class Datasets:
     ) -> list[dict[str, Any]]:
         version = version if version is not None else self.version(dataset_id)
         with self.engine.begin() as conn:
+            region = conn.scalar(select(datasets.c.region).where(datasets.c.id == dataset_id))
             rows = (
                 conn.execute(
                     select(items)
@@ -190,8 +224,9 @@ class Datasets:
                 .all()
             )
         allowed = {"confirmed", "draft"} if include_drafts else {"confirmed"}
+        # Регион набора повторяют замеры: без него запрос идёт как из неизвестного региона.
         return [
-            {"item_id": r["item_id"], "status": r["status"], **r["payload"]}
+            {"item_id": r["item_id"], "status": r["status"], "region": region, **r["payload"]}
             for r in rows
             if r["status"] in allowed
         ]

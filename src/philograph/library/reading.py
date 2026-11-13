@@ -7,14 +7,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, ClassVar
 
 from sqlalchemy import Engine, and_, select
 
 from philograph.library import schema as t
 from philograph.library.lang import normalize_word, words
 from philograph.library.model import Document, Section
-from philograph.library.registry import PUBLIC, Registry
+from philograph.library.registry import (
+    PUBLIC,
+    Registry,
+    effective_permissions,
+    effective_regions,
+)
 from philograph.library.schema import defaults
 from philograph.platform import events
 
@@ -57,11 +62,32 @@ def _norm(text: str) -> str:
     return " ".join(normalize_word(w) for w in words(text))
 
 
+def parse_region(value: str | None) -> str | None:
+    """Код региона из заголовка: две латинские буквы в верхнем регистре.
+
+    Всё прочее (пусто, ``XX``, ``T1``, кириллица) — неизвестный регион: источники с
+    ограничением регионов такому читателю закрыты. ``XX`` — служебное «страна не определена»
+    у CDN, поэтому он не считается кодом страны.
+    """
+    if not value:
+        return None
+    code = value.strip().upper()
+    if code in {"XX", "T1"}:
+        return None
+    if len(code) == 2 and code.isascii() and code.isalpha():
+        return code
+    return None
+
+
 @dataclass
 class Reader:
-    """Кто читает: в первой версии только общая видимость; позже — пользователь и группы."""
+    """Кто читает: в первой версии общая видимость и регион; позже — пользователь и группы."""
 
     scopes: frozenset[str] = frozenset({PUBLIC})
+    region: str | None = None
+    # Служебный регион для внутренних интерфейсов индексации: видит ограниченные источники.
+    # Клиенту такое значение не приходит.
+    ALL_REGIONS: ClassVar[str] = "*"
 
 
 ANONYMOUS = Reader()
@@ -74,7 +100,12 @@ class Reading:
 
     # --- список источников ---
 
-    def _visible_rows(self, reader: Reader) -> list[dict[str, Any]]:
+    def _rows(self, reader: Reader) -> list[dict[str, Any]]:
+        """Опубликованные источники общей видимости, которые лицензия разрешает показывать.
+
+        Регионы здесь не отсекаются: закрытый по региону источник остаётся в списке строкой
+        «доступен в РФ», поэтому решение об открытости принимается отдельно (``_open``).
+        """
         with self.engine.begin() as conn:
             rows = (
                 conn.execute(
@@ -88,14 +119,40 @@ class Reading:
                 .mappings()
                 .all()
             )
-        visible = []
+        kinds = self.registry.license_kinds()
+        result = []
         for row in rows:
             if row["scope"] not in reader.scopes:
                 continue
-            if row["license"].get("blocked") or not self.registry.permissions(row["id"])["display"]:
+            license_json = row["license"] or {}
+            if license_json.get("blocked"):
                 continue
-            visible.append(dict(row))
-        return visible
+            kind = kinds.get(license_json.get("kind")) or {"permissions": {}}
+            regions = effective_regions(kind.get("regions"), row["regions"])
+            permissions = effective_permissions(
+                kind["permissions"], license_json.get("narrowed") or {}, regions
+            )
+            if not permissions["display"]:
+                continue
+            result.append({**dict(row), "effective_regions": regions})
+        return result
+
+    @staticmethod
+    def _open(row: dict[str, Any], reader: Reader) -> bool:
+        regions = row["effective_regions"]
+        if regions is None or reader.region == Reader.ALL_REGIONS:
+            return True
+        return reader.region in regions
+
+    def _visible_rows(self, reader: Reader) -> list[dict[str, Any]]:
+        return [row for row in self._rows(reader) if self._open(row, reader)]
+
+    def _restricted_rows(self, reader: Reader) -> list[dict[str, Any]]:
+        return [row for row in self._rows(reader) if not self._open(row, reader)]
+
+    def closed_source_ids(self, region: str | None) -> list[str]:
+        """Идентификаторы опубликованных источников, закрытых для региона (для индексации)."""
+        return [row["id"] for row in self._restricted_rows(Reader(frozenset({PUBLIC}), region))]
 
     def _describe(self, row: dict[str, Any]) -> dict[str, Any]:
         kind = self.registry.license_kind(row["license"]["kind"]) or {}
@@ -111,6 +168,18 @@ class Reading:
             "edition": row["edition"],
         }
 
+    @staticmethod
+    def _restricted(row: dict[str, Any]) -> dict[str, Any]:
+        """Строка источника, закрытого для региона: название, авторы и пометка, больше ничего."""
+        regions = row["effective_regions"]
+        return {
+            "id": row["id"],
+            "title": row["title"],
+            "authors": row["authors"],
+            "restricted": True,
+            "regions": sorted(regions or []),
+        }
+
     def sources(
         self,
         reader: Reader = ANONYMOUS,
@@ -120,7 +189,7 @@ class Reading:
         query: str = "",
     ) -> dict[str, Any]:
         """Видимые источники с фильтрами и поиском; языки — только те, что есть в библиотеке."""
-        rows = self._visible_rows(reader)
+        rows = self._rows(reader)
         available = sorted({r["language"] for r in rows})
         needle = _norm(query)
         found = []
@@ -133,7 +202,7 @@ class Reading:
                 hay = _norm(row["title"] + " " + " ".join(row["authors"]))
                 if needle not in hay:
                     continue
-            found.append(self._describe(row))
+            found.append(self._describe(row) if self._open(row, reader) else self._restricted(row))
         found.sort(key=lambda s: s["title"])
         events.emit(
             "library.sources.listed",
@@ -304,11 +373,15 @@ class Reading:
     def resolve_paragraph(self, paragraph_id: str, reader: Reader = ANONYMOUS) -> dict[str, Any]:
         resolved = self.registry.resolve_paragraph(paragraph_id)
         status = resolved["status"]
+        closed_by_region = False
         if status in ("found", "removed"):
             try:
                 _, doc = self._document(resolved["source_id"], reader)
             except NotVisible:
                 status = "source_unavailable"
+                closed_by_region = any(
+                    row["id"] == resolved["source_id"] for row in self._restricted_rows(reader)
+                )
             else:
                 section = resolved.get("section_id")
                 chapter = self.chapter_of(doc, section) if section else None
@@ -328,6 +401,14 @@ class Reading:
         result = {**resolved, "status": status}
         if status == "source_unavailable":
             result = {"status": status}
+            if closed_by_region:
+                # Источник закрыт регионом: называем его как в списке, без текста и главы.
+                source = self.registry.get(resolved["source_id"])
+                result = {
+                    "status": status,
+                    "reason": "region",
+                    "source": {"id": source.id, "title": source.title, "authors": source.authors},
+                }
         events.emit("library.paragraph.resolved", paragraph_id=paragraph_id, status=status)
         return result
 
@@ -379,6 +460,8 @@ class Internal:
             {"id": n.id, "text": n.text, "chapter_id": chapter_of.get(sec.id)}
             for sec, n in doc.footnotes()
         ]
+        permissions = self.registry.permissions(source.id)
+        regions = self.registry.regions(source.id)
         return {
             "source_id": source.id,
             "source_title": source.title,
@@ -386,7 +469,9 @@ class Internal:
             "version_id": version_id,
             "scope": source.scope,
             "published": source.published_version == version_id and source.status == "active",
-            "permissions": self.registry.permissions(source.id),
+            "permissions": permissions,
+            "external_processing": permissions["external_processing"],
+            "regions": sorted(regions) if regions is not None else None,
             "paragraphs": paragraphs,
             "headings": headings,
             "footnotes": footnotes,
@@ -408,7 +493,13 @@ class Internal:
         return None
 
     def published(self) -> list[dict[str, str]]:
+        """Все опубликованные источники, включая закрытые по региону: индексация без фильтра."""
         return [
             {"source_id": r["id"], "version_id": r["published_version"]}
-            for r in self.reading._visible_rows(Reader(frozenset({PUBLIC})))
+            for r in self.reading._visible_rows(Reader(frozenset({PUBLIC}), Reader.ALL_REGIONS))
         ]
+
+    def access(self, region: str | None) -> dict[str, Any]:
+        """Идентификаторы источников, закрытых для региона: их скрывает сервис знаний."""
+        code = parse_region(region)
+        return {"region": code, "closed": self.reading.closed_source_ids(code)}

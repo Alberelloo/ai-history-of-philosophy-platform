@@ -1,0 +1,3 @@
+{"event": "service.started", "level": "info", "time": "2026-11-12T17:21:16.256078+00:00", "service": "gateway", "version": "0.1.0", "restarted": false}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-12T17:21:17.606471+00:00", "request_id": "3801e835126949eaa5b596acab973ccb", "service": "gateway", "method": "GET", "route": "/health/live", "status": 200, "duration_ms": 3.37}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-12T17:21:18.429860+00:00", "request_id": "99ba6363d86e40128aaea30af2afdac4", "service": "gateway", "method": "GET", "route": "/api/{path:path}", "status": 200, "duration_ms": 10.15}

@@ -33,6 +33,7 @@ req = pytest.mark.req
 AD = "assistant-dialog"
 AG = "answer-grounding"
 RS = "reader-settings"
+RA = "regional-access"
 UNGROUNDED = "[без опоры на источники]"
 
 
@@ -137,6 +138,121 @@ def test_t22_notice_without_library_support(wide, site):
     # Предупреждение — над ответом.
     assert notice.bounding_box()["y"] < box.locator(".turn .answer").bounding_box()["y"]
     assert box.locator(".fragment.ungrounded").count() == 1
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_t22b_notice_not_retold_with_links(wide, site):
+    """Абзацы без внешней обработки: пометка «найдено, не пересказывается» и ссылки на них."""
+    page = wide
+    (ch1, paras), *_ = chapters(site)
+    sid = site.ids["textbook"]
+    target = paras[0][0]
+    AskStub(page).reply(
+        answer(
+            {
+                "type": "notice",
+                "kind": "found_not_retold",
+                "message": "Найдено в источниках, не пересказывается.",
+                "suggestions": [{"paragraph_id": target, "title": "Глава 1. Опыт"}],
+            },
+            fragment("Ответ без пересказа.", grounded=False),
+        )
+    )
+    open_book(page, site)
+    open_assistant(page)
+    ask(panel(page), "Что пишет Кант?")
+    box = panel(page)
+    box.locator(".copy-answer").wait_for()
+    assert "Найдено в источниках, не пересказывается." in box.locator(".turn").inner_text()
+    link = box.locator(".assistant__suggestions").get_by_role("link", name="Глава 1. Опыт")
+    link.wait_for()
+    link.click()
+    page.wait_for_url(re.compile(rf"/read/{sid}/{ch1}#p-{target}$"))
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_t22c_two_notices_keep_both_with_link(wide, site):
+    """TC-65: два notice за один ход не затирают друг друга; обе пометки видны, ссылка на абзац."""
+    page = wide
+    (ch1, paras), *_ = chapters(site)
+    sid = site.ids["textbook"]
+    target = paras[0][0]
+    AskStub(page).reply(
+        answer(
+            {
+                "type": "notice",
+                "kind": "found_not_retold",
+                "message": "Найдено в источниках, не пересказывается.",
+                "suggestions": [{"paragraph_id": target, "title": "Глава 1. Опыт"}],
+            },
+            {
+                "type": "notice",
+                "kind": "no_library_support",
+                "message": "Ответ составлен без опоры на библиотеку.",
+            },
+            fragment("Ответ без пересказа.", grounded=False),
+        )
+    )
+    open_book(page, site)
+    open_assistant(page)
+    ask(panel(page), "Что пишет Кант?")
+    box = panel(page)
+    box.locator(".copy-answer").wait_for()
+    turn = box.locator(".turn")
+    assert turn.locator(".assistant-notice").count() == 2
+    text = turn.inner_text()
+    assert "Найдено в источниках, не пересказывается." in text
+    assert "без опоры на библиотеку" in text
+    link = turn.locator(".assistant__suggestions").get_by_role("link", name="Глава 1. Опыт")
+    link.wait_for()
+    link.click()
+    page.wait_for_url(re.compile(rf"/read/{sid}/{ch1}#p-{target}$"))
+
+
+@req(RA, "Внешняя обработка закрытых источников")
+def test_t22d_legacy_single_message_session_opens(browser, site):
+    """TC-65: сохранённая сессия с единственным ``message`` читается как список пометок."""
+    sid = site.ids["textbook"]
+    turn = {
+        "id": "t-legacy",
+        "question": "Старый вопрос",
+        "fragments": [],
+        "status": "done",
+        "message": {
+            "code": "no_library_support",
+            "text": "Ответ составлен без опоры на библиотеку.",
+        },
+    }
+    state = {
+        "version": 4,
+        "dialogs": {
+            sid: {
+                "updatedAt": 1,
+                "activeId": "s-1",
+                "sessions": [
+                    {"id": "s-1", "title": "", "createdAt": 1, "updatedAt": 1, "messages": [turn]}
+                ],
+            }
+        },
+    }
+    context = reader_context(browser, viewport={"width": 1440, "height": 900})
+    context.add_init_script(
+        f"""if (!sessionStorage.getItem('seeded')) {{
+        sessionStorage.setItem('seeded', '1');
+        localStorage.setItem('{STORAGE}', {json.dumps(json.dumps(state))});
+    }}"""
+    )
+    page = context.new_page()
+    page.goto(f"{site.url}/read/{sid}")
+    page.wait_for_selector(".chapter [data-paragraph]")
+    open_assistant(page)
+    box = panel(page)
+    box.locator(".turn").wait_for()
+    assert "Старый вопрос" in box.locator(".turn").inner_text()
+    notice = box.locator(".turn .assistant-notice")
+    assert notice.count() == 1
+    assert "без опоры на библиотеку" in notice.inner_text()
+    context.close()
 
 
 def seed_settings(page, site, **settings) -> None:

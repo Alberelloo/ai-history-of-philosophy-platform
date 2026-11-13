@@ -1,0 +1,411 @@
+{
+ "checks": [
+  {
+   "case": "TC-7",
+   "step": "DE: закрытая строка — только id/title/authors/restricted/regions",
+   "ok": true,
+   "expected": "id, title, authors, restricted:true, regions:['RU']",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "TC-7",
+   "step": "DE: у закрытой строки нет года/лицензии/вида/языка",
+   "ok": true,
+   "expected": "нет year, license, kind, language",
+   "actual": "[\"authors\", \"id\", \"regions\", \"restricted\", \"title\"]"
+  },
+  {
+   "case": "TC-7",
+   "step": "DE: default_source_id — открытый учебник",
+   "ok": true,
+   "expected": "default_source_id=s_6e62b64c4489",
+   "actual": "s_6e62b64c4489"
+  },
+  {
+   "case": "EC-7",
+   "step": "неопубликованный источник отсутствует в списке",
+   "ok": true,
+   "expected": "источника нет в списке",
+   "actual": "false"
+  },
+  {
+   "case": "TC-7",
+   "step": "DE: открытая строка обычная (год, вид, лицензия на месте)",
+   "ok": true,
+   "expected": "год 2000, kind primary, лицензия с названием",
+   "actual": "{\"id\": \"s_c33f19522a78\", \"year\": 2000, \"kind\": \"primary\", \"license\": {\"title\": \"Общественное достояние\", \"url\": \"https://example.org/pd\"}}"
+  },
+  {
+   "case": "TC-9",
+   "step": "RU: закрытый источник открыт обычной строкой",
+   "ok": true,
+   "expected": "обычная строка с годом 1865",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"year\": 1865, \"kind\": \"textbook\", \"restricted\": null}"
+  },
+  {
+   "case": "TC-10",
+   "step": "неизвестный регион (без заголовка): ограниченный закрыт",
+   "ok": true,
+   "expected": "restricted:true без года",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "TC-10",
+   "step": "неизвестный регион (пустой заголовок): ограниченный закрыт",
+   "ok": true,
+   "expected": "restricted:true без года",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "TC-10",
+   "step": "неизвестный регион (RU1): ограниченный закрыт",
+   "ok": true,
+   "expected": "restricted:true без года",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "TC-10",
+   "step": "неизвестный регион (XX): ограниченный закрыт",
+   "ok": true,
+   "expected": "restricted:true без года",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "EC-6",
+   "step": "разбор региона: только две латинские буквы",
+   "ok": true,
+   "expected": "ru→RU, RU→RU, остальное → None",
+   "actual": "{\"ru\": \"RU\", \"RU\": \"RU\", \"RU1\": null, \"РФ\": null, \"\": null, \"null\": null, \"T1\": null}"
+  },
+  {
+   "case": "EC-5",
+   "step": "строчный код региона ru приводится к RU",
+   "ok": true,
+   "expected": "источник открыт",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"year\": 1865, \"language\": \"ru\", \"kind\": \"textbook\", \"license\": {\"title\": \"Общественное достояние по праву РФ\", \"url\": null}, \"translator\": null, \"edition\": null}"
+  },
+  {
+   "case": "R5",
+   "step": "оглавление закрытого источника для DE — 404 source_unavailable",
+   "ok": true,
+   "expected": "404 kind=source_unavailable",
+   "actual": "{\"status\": 404, \"body\": {\"error\": \"Источник недоступен\", \"kind\": \"source_unavailable\", \"request_id\": \"4a85ad960b084541bebac18401721556\"}}"
+  },
+  {
+   "case": "TC-9",
+   "step": "оглавление закрытого источника для RU — 200",
+   "ok": true,
+   "expected": "200 и непустое оглавление",
+   "actual": "{\"status\": 200, \"items\": 1}"
+  },
+  {
+   "case": "R5",
+   "step": "глава закрытого источника для DE — 404 и без текста",
+   "ok": true,
+   "expected": "404 source_unavailable, без текста главы",
+   "actual": "{\"status\": 404, \"body\": {\"error\": \"Источник недоступен\", \"kind\": \"source_unavailable\", \"request_id\": \"08e96ba6adc445d7ae973a9b4ae91750\"}}"
+  },
+  {
+   "case": "TC-9",
+   "step": "глава закрытого источника для RU — 200 с текстом",
+   "ok": true,
+   "expected": "200 и текст главы",
+   "actual": "{\"status\": 200, \"blocks\": 2}"
+  },
+  {
+   "case": "TC-12",
+   "step": "закрытый регион: status/reason/source, без text, chapter_id, section_id",
+   "ok": true,
+   "expected": "source_unavailable + reason region + title/authors, без текста",
+   "actual": "{\"status\": \"source_unavailable\", \"reason\": \"region\", \"source\": {\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"]}}"
+  },
+  {
+   "case": "TC-12",
+   "step": "закрытый регион: status/reason/source, без text, chapter_id, section_id",
+   "ok": true,
+   "expected": "source_unavailable + reason region + title/authors, без текста",
+   "actual": "{\"status\": \"source_unavailable\", \"reason\": \"region\", \"source\": {\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"]}}"
+  },
+  {
+   "case": "TC-13",
+   "step": "RU: абзац найден",
+   "ok": true,
+   "expected": "status=found, source_id источника, глава определена",
+   "actual": "{\"status\": \"found\", \"source_id\": \"s_3f95feb26aa8\", \"chapter_id\": \"sec_c9fcb2bc854c\"}"
+  },
+  {
+   "case": "TC-11",
+   "step": "DE: запомненный закрытый → учебник по умолчанию + previous_unavailable",
+   "ok": true,
+   "expected": "source_id=учебник, notice=previous_unavailable",
+   "actual": "{\"source_id\": \"s_6e62b64c4489\", \"notice\": \"previous_unavailable\"}"
+  },
+  {
+   "case": "UC-2",
+   "step": "RU: запомненный закрытый источник остаётся текущим",
+   "ok": true,
+   "expected": "source_id=запомненный",
+   "actual": "{\"source_id\": \"s_3f95feb26aa8\", \"notice\": null}"
+  },
+  {
+   "case": "TC-11",
+   "step": "DE без запомненного: учебник по умолчанию без уведомления",
+   "ok": true,
+   "expected": "source_id=учебник, notice=None",
+   "actual": "{\"source_id\": \"s_6e62b64c4489\", \"notice\": null}"
+  },
+  {
+   "case": "TC-11",
+   "step": "DE: запомненный открытый источник остаётся текущим",
+   "ok": true,
+   "expected": "source_id=запомненный открытый",
+   "actual": "{\"source_id\": \"s_c33f19522a78\", \"notice\": null}"
+  },
+  {
+   "case": "TC-8",
+   "step": "фильтр вида: закрытый учебник остаётся строкой restricted",
+   "ok": true,
+   "expected": "restricted:true в фильтре kind=textbook",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "TC-8",
+   "step": "фильтр вида исключает закрытый учебник из списка первоисточников",
+   "ok": true,
+   "expected": "закрытого учебника нет при kind=primary",
+   "actual": "[\"s_c33f19522a78\"]"
+  },
+  {
+   "case": "TC-8",
+   "step": "поиск по автору находит закрытую строку",
+   "ok": true,
+   "expected": "одна строка restricted по запросу «юркевич»",
+   "actual": "[{\"id\": \"s_3f95feb26aa8\", \"restricted\": true}]"
+  },
+  {
+   "case": "EC-12",
+   "step": "заголовок '*' не открывает закрытый источник (регион неизвестен)",
+   "ok": true,
+   "expected": "restricted:true",
+   "actual": "{\"id\": \"s_3f95feb26aa8\", \"title\": \"Русский учебник\", \"authors\": [\"П. Д. Юркевич\"], \"restricted\": true, \"regions\": [\"RU\"]}"
+  },
+  {
+   "case": "R5",
+   "step": "закрытый источник не отдаётся как учебник по умолчанию читателю вне РФ",
+   "ok": true,
+   "expected": "DE: default=null, current.source_id=null; RU: default=закрытый",
+   "actual": "{\"de_default\": null, \"ru_default\": \"s_3f95feb26aa8\", \"de_current\": {\"source_id\": null, \"notice\": null}}"
+  },
+  {
+   "case": "TC-14",
+   "step": "внутренний published содержит закрытый источник",
+   "ok": true,
+   "expected": "все опубликованные, включая ограниченный",
+   "actual": "{\"published\": [\"s_3f95feb26aa8\", \"s_6e62b64c4489\", \"s_c33f19522a78\", \"s_da8b58a65482\"], \"unpublished_in\": false}"
+  },
+  {
+   "case": "TC-15",
+   "step": "internal/access?region=DE",
+   "ok": true,
+   "expected": "closed=['s_3f95feb26aa8']",
+   "actual": "{\"region\": \"DE\", \"closed\": [\"s_3f95feb26aa8\"]}"
+  },
+  {
+   "case": "TC-15",
+   "step": "internal/access?region=RU",
+   "ok": true,
+   "expected": "closed=[]",
+   "actual": "{\"region\": \"RU\", \"closed\": []}"
+  },
+  {
+   "case": "TC-15",
+   "step": "internal/access?region=ru",
+   "ok": true,
+   "expected": "closed=[]",
+   "actual": "{\"region\": \"RU\", \"closed\": []}"
+  },
+  {
+   "case": "TC-15",
+   "step": "internal/access?region=T1",
+   "ok": true,
+   "expected": "closed=['s_3f95feb26aa8']",
+   "actual": "{\"region\": null, \"closed\": [\"s_3f95feb26aa8\"]}"
+  },
+  {
+   "case": "TC-15",
+   "step": "internal/access без региона — закрытый источник в closed",
+   "ok": true,
+   "expected": "closed=[ограниченный], region=null",
+   "actual": "{\"region\": null, \"closed\": [\"s_3f95feb26aa8\"]}"
+  },
+  {
+   "case": "TC-16",
+   "step": "ответ версии несёт regions, permissions, external_processing",
+   "ok": true,
+   "expected": "regions=['RU'], external_processing=true, permissions.display=true, published=true",
+   "actual": "{\"regions\": [\"RU\"], \"external_processing\": true, \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}, \"published\": true}"
+  },
+  {
+   "case": "EC-1",
+   "step": "у источника без ограничения regions = null («везде»)",
+   "ok": true,
+   "expected": "regions=null",
+   "actual": "null"
+  },
+  {
+   "case": "TC-2",
+   "step": "источник [RU] при виде [RU,BY] → {RU}",
+   "ok": true,
+   "expected": "frozenset({'RU'})",
+   "actual": "[\"RU\"]"
+  },
+  {
+   "case": "TC-2",
+   "step": "источник без сужения при виде [RU,BY] → {RU,BY}",
+   "ok": true,
+   "expected": "frozenset({'RU','BY'})",
+   "actual": "[\"BY\", \"RU\"]"
+  },
+  {
+   "case": "TC-3",
+   "step": "расширение регионов источника относительно вида отклонено",
+   "ok": true,
+   "expected": "RegistryError fields=['license.regions']",
+   "actual": "{\"error\": \"регионы источника нельзя расширять относительно вида лицензии\", \"fields\": [\"license.regions\"]}"
+  },
+  {
+   "case": "EC-6",
+   "step": "код 'RU1' отклонён",
+   "ok": true,
+   "expected": "RegistryError fields=['license.regions']",
+   "actual": "{\"error\": \"код региона — две латинские буквы, получено 'RU1'\", \"fields\": [\"license.regions\"]}"
+  },
+  {
+   "case": "EC-6",
+   "step": "код 'РФ' отклонён",
+   "ok": true,
+   "expected": "RegistryError fields=['license.regions']",
+   "actual": "{\"error\": \"код региона — две латинские буквы, получено 'РФ'\", \"fields\": [\"license.regions\"]}"
+  },
+  {
+   "case": "EC-6",
+   "step": "код '' отклонён",
+   "ok": true,
+   "expected": "RegistryError fields=['license.regions']",
+   "actual": "{\"error\": \"код региона — две латинские буквы, получено ''\", \"fields\": [\"license.regions\"]}"
+  },
+  {
+   "case": "EC-6",
+   "step": "код 'r' отклонён",
+   "ok": true,
+   "expected": "RegistryError fields=['license.regions']",
+   "actual": "{\"error\": \"код региона — две латинские буквы, получено 'r'\", \"fields\": [\"license.regions\"]}"
+  },
+  {
+   "case": "EC-2",
+   "step": "регионы вида [] = «везде» (regions()→None, открыт без региона)",
+   "ok": true,
+   "expected": "regions=None, display=true",
+   "actual": "{\"regions\": null, \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}}"
+  },
+  {
+   "case": "TC-5",
+   "step": "change_license: событие source.access_changed с регионами и разрешениями",
+   "ok": true,
+   "expected": "kind=source.access_changed, payload source_id/regions=['RU']/permissions",
+   "actual": "{\"kinds\": [\"source.access_changed\"], \"payload\": {\"source_id\": \"s_1eb9102ebe34\", \"regions\": [\"RU\"], \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}}}"
+  },
+  {
+   "case": "TC-5",
+   "step": "после смены регионов версия остаётся опубликованной",
+   "ok": true,
+   "expected": "published_version=None",
+   "actual": "null"
+  },
+  {
+   "case": "EC-15",
+   "step": "два change_license подряд: два события по порядку, в БД последнее состояние",
+   "ok": true,
+   "expected": "события [['BY'], ['BY','RU']] (коды отсортированы), в БД ['BY','RU']",
+   "actual": "{\"events\": [[\"BY\"], [\"BY\", \"RU\"]], \"db\": [\"BY\", \"RU\"]}"
+  },
+  {
+   "case": "TC-4",
+   "step": "сужение вида до [RU] при источнике [BY]: пустое пересечение = запрет показа",
+   "ok": true,
+   "expected": "regions=frozenset(), display=false",
+   "actual": "{\"regions\": [], \"permissions\": {\"display\": false, \"external_processing\": true, \"quoting\": true}}"
+  },
+  {
+   "case": "TC-4",
+   "step": "по источнику с пустым пересечением записано событие с пустыми регионами",
+   "ok": true,
+   "expected": "payload regions=[], permissions.display=false",
+   "actual": "{\"source_id\": \"s_c3375ac2dc88\", \"regions\": [], \"permissions\": {\"display\": false, \"external_processing\": true, \"quoting\": true}}"
+  },
+  {
+   "case": "EC-4",
+   "step": "источник с пустым пересечением не показывается ни в одном регионе",
+   "ok": true,
+   "expected": "источника нет в списке ни для RU, ни для DE",
+   "actual": "{\"RU\": false, \"DE\": false}"
+  },
+  {
+   "case": "EC-9",
+   "step": "повторная синхронизация без смены регионов не пишет событий",
+   "ok": true,
+   "expected": "событий нет",
+   "actual": "[]"
+  },
+  {
+   "case": "TC-6",
+   "step": "sync снял регионы вида: событие по источнику вида, регионы null",
+   "ok": true,
+   "expected": "одно событие по s_183211ce480d с regions=null",
+   "actual": "[{\"source_id\": \"s_183211ce480d\", \"regions\": null, \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}}]"
+  },
+  {
+   "case": "TC-6",
+   "step": "sync не задел источник другого вида",
+   "ok": true,
+   "expected": "источник другого вида без события",
+   "actual": "[\"s_183211ce480d\"]"
+  },
+  {
+   "case": "EC-8",
+   "step": "лицензия запретила показ: источника нет в списке",
+   "ok": true,
+   "expected": "источника нет",
+   "actual": "{\"in_list\": false}"
+  },
+  {
+   "case": "EC-8",
+   "step": "событие source.access_changed сообщает display=false",
+   "ok": true,
+   "expected": "permissions.display=false в source.access_changed",
+   "actual": "{\"source_id\": \"s_c33f19522a78\", \"regions\": null, \"permissions\": {\"display\": false, \"external_processing\": true, \"quoting\": true}}"
+  },
+  {
+   "case": "EC-10",
+   "step": "старая строка без регионов читается как «везде»",
+   "ok": true,
+   "expected": "regions=None",
+   "actual": "{\"license_regions\": null, \"effective\": null}"
+  },
+  {
+   "case": "EC-11",
+   "step": "регионы хранятся отдельным столбцом, не в JSON лицензии",
+   "ok": true,
+   "expected": "столбец sources.regions есть, в JSON лицензии regions нет",
+   "actual": "{\"has_column\": true, \"license_keys\": [\"author_death_years\", \"basis\", \"blocked\", \"document_url\", \"kind\", \"narrowed\", \"translator_death_year\"]}"
+  },
+  {
+   "case": "R4 (вне охвата раунда)",
+   "step": "шлюз: клиентский X-Philograph-Region (группа 3 tasks.md)",
+   "ok": true,
+   "expected": "фиксируется факт, решение — задача 3.2",
+   "actual": "{\"client_region_header_reaches_library\": true, \"internal_blocked_status\": 404}"
+  }
+ ],
+ "failed": []
+}

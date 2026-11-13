@@ -101,6 +101,9 @@ def start(data: Path, port: int | None = None, *, demo: bool = True) -> Stack:
         "PHILOGRAPH_VISITOR_SECRET": "dev-stack",
         "PHILOGRAPH_KNOWLEDGE_SERVICE": "1",
         "PHILOGRAPH_KNOWLEDGE_URL": f"http://127.0.0.1:{ports['knowledge']}",
+        # Стенд ходит с локального адреса без CDN: регион неизвестен, подставляем РФ, чтобы
+        # ограниченные источники не пропадали в разработке и сквозных тестах.
+        "PHILOGRAPH_REGION_FALLBACK": "RU",
         # Пароль оператора демо-стенда: demo-operator.
         "PHILOGRAPH_OPERATOR_PASSWORD_HASH": DEMO_OPERATOR_HASH,
     }

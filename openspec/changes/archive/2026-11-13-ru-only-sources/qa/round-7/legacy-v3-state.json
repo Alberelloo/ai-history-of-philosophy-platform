@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "dialogs": [
+    [
+      {
+        "id": "t-legacy",
+        "question": "Старый вопрос",
+        "fragments": [],
+        "status": "done",
+        "message": {
+          "code": "no_library_support",
+          "text": "Ответ составлен без опоры на библиотеку."
+        }
+      },
+      {
+        "id": "t-legacy-2",
+        "question": "Старый вопрос со ссылкой",
+        "fragments": [],
+        "status": "done",
+        "message": {
+          "code": "found_not_retold",
+          "text": "Найдено в источниках, не пересказывается.",
+          "suggestions": [
+            {
+              "paragraph_id": "p_126f932e8f60",
+              "title": "Глава 1. Рассвет"
+            }
+          ]
+        }
+      }
+    ]
+  ]
+}

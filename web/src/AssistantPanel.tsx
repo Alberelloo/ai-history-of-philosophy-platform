@@ -66,6 +66,7 @@ const SERVER_CODES = [
   "search_unavailable",
   "no_answer",
   "no_library_support",
+  "found_not_retold",
   "budget_exhausted",
   "llm_unavailable",
 ] as const;
@@ -83,9 +84,9 @@ function messageText(t: Catalog, message: Message | undefined, legacy?: string):
 }
 
 // Вид сообщения по таблице 5.7: предупреждение, ошибка или обычное.
-function messageTone(turn: Turn): "danger" | "warning" | "" {
-  const code = turn.message?.code;
-  if (turn.status === "error" || code === "broken" || code === "timeout") return "danger";
+function messageTone(status: Turn["status"], message: Message): "danger" | "warning" | "" {
+  const code = message.code;
+  if (status === "error" || code === "broken" || code === "timeout") return "danger";
   if (code === "too_long" || code === "no_library_support" || code === "read_notice") return "warning";
   return "";
 }
@@ -106,6 +107,11 @@ function eventMessage(event: Record<string, unknown>): Message {
     minutes: seconds ? Math.max(1, Math.ceil(seconds / 60)) : undefined,
     suggestions: suggestions?.length ? suggestions : undefined,
   };
+}
+
+// Добавить пометку к ходу, не затирая прежние (5.7): за один ход их может прийти несколько.
+function pushNotice(turn: Turn, message: Message): Message[] {
+  return [...(turn.notices ?? []), message];
 }
 
 // Ответ одной строкой: для истории диалога (пометка всегда по-русски) и для копирования.
@@ -319,7 +325,7 @@ async function ask(a: Ask): Promise<void> {
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
       const message = body.reason ? eventMessage(body) : { code: body.kind ?? "unavailable", text: body.error };
-      finish((t) => ({ ...t, status: "done", message }));
+      finish((t) => ({ ...t, status: "done", notices: pushNotice(t, message) }));
       return;
     }
     const reader = response.body!.getReader();
@@ -348,15 +354,15 @@ async function ask(a: Ask): Promise<void> {
         } else if (event.type === "done") {
           finish((t) => ({ ...t, status: "done" }));
         } else if (event.type === "error") {
-          finish((t) => ({ ...t, status: "error", message: eventMessage(event) }));
+          finish((t) => ({ ...t, status: "error", notices: pushNotice(t, eventMessage(event)) }));
         } else {
           const message = eventMessage(event);
           if (event.reason === "visitor_limit" && Number(event.retry_after_seconds) > 0) {
             // «Спросить» неактивна до конца срока (5.7).
             limitedUntil = Date.now() + Number(event.retry_after_seconds) * 1000;
           }
-          if (event.type === "notice") patch((t) => ({ ...t, message }));
-          else finish((t) => ({ ...t, message, status: "done" }));
+          if (event.type === "notice") patch((t) => ({ ...t, notices: pushNotice(t, message) }));
+          else finish((t) => ({ ...t, notices: pushNotice(t, message), status: "done" }));
         }
       }
     }
@@ -364,11 +370,11 @@ async function ask(a: Ask): Promise<void> {
   } catch (e) {
     const reason = controller.signal.reason;
     if (controller.signal.aborted && reason === "timeout") {
-      finish((t) => ({ ...t, status: "error", message: { code: "timeout" } }));
+      finish((t) => ({ ...t, status: "error", notices: pushNotice(t, { code: "timeout" }) }));
     } else if (controller.signal.aborted || (e as Error).name === "AbortError") {
       finish((t) => ({ ...t, status: "stopped" }));
     } else {
-      finish((t) => ({ ...t, status: "error", message: { code: "broken" } }));
+      finish((t) => ({ ...t, status: "error", notices: pushNotice(t, { code: "broken" }) }));
     }
   } finally {
     window.clearTimeout(timer);
@@ -981,8 +987,7 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
               )}
               <ol className="turns">
                 {active.messages.map((turn) => {
-                  const notice = messageText(t, turn.message);
-                  const tone = messageTone(turn);
+                  const notices = turn.notices ?? [];
                   const isStreaming = turn.status === "streaming" && live.has(turn.id);
                   const st = isStreaming ? live.get(turn.id)?.stage : undefined;
                   const otherChapter = mode === "book" && turn.chapterId && currentChapter && turn.chapterId !== currentChapter;
@@ -1010,17 +1015,58 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                       )}
                       {isStreaming && st && <StageLine t={t} stage={st} />}
                       {!isStreaming && turn.stats && <StageSummary t={t} turn={turn} />}
-                      {notice && (
-                        <div className={tone ? `assistant-notice pg-notice pg-notice--${tone}` : "assistant-notice pg-notice"} role="status">
-                          <Icon name={tone === "danger" || tone === "warning" ? "warning" : "info"} />
-                          <div>{notice}</div>
-                          {turn.message?.code === "read_notice" && (
-                            <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => requestNotice()}>
-                              {t.assistant.showNotice}
-                            </button>
-                          )}
-                        </div>
-                      )}
+                      {notices.map((message, i) => {
+                        const notice = messageText(t, message);
+                        if (!notice) return null;
+                        const tone = messageTone(turn.status, message);
+                        const suggestions =
+                          message.suggestions &&
+                          message.suggestions.length > 0 &&
+                          (message.code === "no_answer" || message.code === "found_not_retold")
+                            ? message.suggestions
+                            : undefined;
+                        return (
+                          <div
+                            key={i}
+                            className={tone ? `assistant-notice pg-notice pg-notice--${tone}` : "assistant-notice pg-notice"}
+                            role="status"
+                          >
+                            <Icon name={tone === "danger" || tone === "warning" ? "warning" : "info"} />
+                            <div>
+                              {notice}
+                              {suggestions && (
+                                <div className="assistant__suggestions">
+                                  {message.code === "no_answer" && <p>{t.assistant.nearby}</p>}
+                                  <ul>
+                                    {suggestions.map((s, k) => (
+                                      <li key={k}>
+                                        {s.paragraph_id ? (
+                                          <a
+                                            href={`/p/${s.paragraph_id}`}
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              navigate(`/p/${s.paragraph_id}`);
+                                            }}
+                                          >
+                                            {s.title}
+                                          </a>
+                                        ) : (
+                                          s.title
+                                        )}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                            {message.code === "read_notice" && (
+                              <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => requestNotice()}>
+                                {t.assistant.showNotice}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                       <div className="answer" data-status={isStreaming ? "streaming" : turn.status}>
                         {turn.fragments.map((f, j) => {
                           const contradicts = f.contradicts && f.contradicts.length > 0;
@@ -1167,30 +1213,6 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                           </button>
                         )}
                       </div>
-                      {turn.message?.code === "no_answer" && turn.message.suggestions && turn.message.suggestions.length > 0 && (
-                        <div className="assistant__suggestions">
-                          <p>{t.assistant.nearby}</p>
-                          <ul>
-                            {turn.message.suggestions.map((s, i) => (
-                              <li key={i}>
-                                {s.paragraph_id ? (
-                                  <a
-                                    href={`/p/${s.paragraph_id}`}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      navigate(`/p/${s.paragraph_id}`);
-                                    }}
-                                  >
-                                    {s.title}
-                                  </a>
-                                ) : (
-                                  s.title
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
                     </li>
                   );
                 })}
@@ -1319,8 +1341,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
 
 // Сообщения, после которых по таблице 5.7 предлагается «Повторить».
 function retryable(turn: Turn): boolean {
-  const code = turn.message?.code;
-  return code === "llm_unavailable" || code === "search_unavailable" || code === "unavailable";
+  return (turn.notices ?? []).some(
+    (m) => m.code === "llm_unavailable" || m.code === "search_unavailable" || m.code === "unavailable",
+  );
 }
 
 // Подсказка ссылки (5.4): книга, глава и начало абзаца; без них — заголовок раздела.

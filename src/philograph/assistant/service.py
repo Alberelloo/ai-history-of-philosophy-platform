@@ -134,6 +134,7 @@ class AskRequest:
     context: str = "library"  # N12: "book" | "library" (по умолчанию library — старые клиенты)
     handoff_declined: bool = False  # читатель выбрал «Продолжить в рамках этого источника»
     handoff_reason: str | None = None  # broader | outside_book — для журнала
+    region: str | None = None  # регион читателя; нет значения — неизвестный регион
 
 
 @dataclass
@@ -243,6 +244,12 @@ class Assistant:
             return None
         return self.library.chapter_titles(result["source_id"]).get(chapter) or None
 
+    @staticmethod
+    def _found_title(result: dict[str, Any]) -> str:
+        """Подпись ссылки на найденный, но не пересказываемый абзац: источник и раздел."""
+        parts = [result.get("source_title"), result.get("section_title")]
+        return " — ".join(p for p in parts if p) or result.get("paragraph_id", "")
+
     def _history_summary(self, request: AskRequest) -> str:
         earlier = (
             request.history[: -self.settings.history_turns]
@@ -277,6 +284,7 @@ class Assistant:
             query: dict[str, Any] = {
                 "query": query_text[:2000],
                 "limit": step["limit"],
+                "region": request.region,
                 "neighbors": step.get("neighbors", 0),
                 "per_chapter": step.get("per_chapter", 3),
                 "extra_terms": list(step.get("extra_terms", []))
@@ -321,6 +329,7 @@ class Assistant:
             paragraphs=list(request.selection_paragraphs),
             recipe=CHAINS[kind].get("recipe"),
             textbook=request.source_id if request.scope == "current" else None,
+            region=request.region,
         )
 
     # --- ответ ---
@@ -397,7 +406,21 @@ class Assistant:
             }
             return
         strict = request.sources_only or not request.generation
-        if not results and strict:
+        # Абзацы без разрешения внешней обработки модели не передаются (группа 7): читатель
+        # получает пометку «найдено в источниках, не пересказывается» со ссылками на них.
+        model_results = [r for r in results if r.get("external", True)]
+        hidden = [r for r in results if not r.get("external", True)]
+        if hidden:
+            yield {
+                "type": "notice",
+                "kind": "found_not_retold",
+                "message": "Найдено в источниках, не пересказывается.",
+                "suggestions": [
+                    {"paragraph_id": r["paragraph_id"], "title": self._found_title(r)}
+                    for r in hidden
+                ],
+            }
+        if not model_results and strict:
             events.emit("assistant.refused", reason="no_sources")
             yield {
                 "type": "no_answer",
@@ -418,7 +441,7 @@ class Assistant:
                 chapter_title=self._chapter_title(r),
                 paragraph_start=r["text"][:120],
             )
-            for i, r in enumerate(results)
+            for i, r in enumerate(model_results)
         }
         # Утверждения онтологии — под своими номерами, проверяются так же, как абзацы.
         for s in ctx.statements if ctx else []:
@@ -438,9 +461,11 @@ class Assistant:
         paragraphs = [p for p in passages.values() if p.kind == "paragraph"]
         if kind == "other_authors":
             # Ответ по авторам: абзацы сгруппированы по источникам.
-            titles = {r["source_id"]: r.get("source_title") or r["source_id"] for r in results}
+            titles = {
+                r["source_id"]: r.get("source_title") or r["source_id"] for r in model_results
+            }
             paragraphs.sort(key=lambda p: (titles.get(p.source_id, ""), p.number))
-        if not results:
+        if not model_results:
             yield {
                 "type": "notice",
                 "kind": "no_library_support",
@@ -450,7 +475,7 @@ class Assistant:
             "question": request.question,
             "history": self._history_summary(request),
             "answer_language": answer_language(request.question),
-            "passages": self._passages_block(kind, paragraphs, results),
+            "passages": self._passages_block(kind, paragraphs, model_results),
         }
         statements = [p for p in passages.values() if p.kind == "statement"]
         if statements:

@@ -1,0 +1,6 @@
+exit=0
+название и автор, что у sofist-platon-karpov-ru-wikisource: проверьте, что это другое издание
+warning: [platon-protagor-ru-wikisource] то же название и автор, что у protagor-platon-karpov-ru-wikisource: проверьте, что это другое издание
+warning: [platon-teetet-ru-wikisource] то же название и автор, что у teetet-platon-karpov-ru-wikisource: проверьте, что это другое издание
+warning: [aristotel-politika-archive] то же название и автор, что у aristotel-politika-ru-wikisource: проверьте, что это другое издание
+записей: 317 {"approved": 304, "rejected": 10, "draft": 3}; ошибок: 0, предупреждений: 6

@@ -189,6 +189,8 @@ export const en: Catalog = {
     notSet: "not set",
     licenseText: "license text",
     read: "Read",
+    restricted: "Available in Russia only",
+    restrictedHint: "This source is open to readers in Russia only.",
   },
   reader: {
     toc: "Contents",
@@ -222,6 +224,7 @@ export const en: Catalog = {
     removed: "Paragraph not found: the new version of the source no longer has it.",
     notFound: "Paragraph not found.",
     openChapter: "Open the chapter where it was",
+    regionOnly: "This source is available in Russia only.",
   },
   errors: {
     generic: "Something went wrong. Reload the page and try again.",
@@ -298,6 +301,7 @@ export const en: Catalog = {
     search_unavailable: "The answer is temporarily unavailable: search is not responding.",
     no_answer: "The sources have no answer.",
     no_library_support: "The answer was written without support from the library.",
+    found_not_retold: "Found in the sources, not retold.",
     budget_exhausted: "The assistant is unavailable today and will be back tomorrow. Reading and cards still work.",
     llm_unavailable: "The assistant is temporarily unavailable. Reading and cards still work.",
     timeout: "The assistant did not respond within 45 seconds. Please ask again.",
