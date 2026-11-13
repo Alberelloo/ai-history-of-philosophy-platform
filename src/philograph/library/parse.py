@@ -599,10 +599,13 @@ def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
         title = entry[1]
         page = entry[2] if len(entry) > 2 else None
         if page is not None and not (1 <= page <= len(raw.pages)):
+            # PyMuPDF отдаёт −1, если целевая страница закладки удалена: номер тут
+            # технический, оператору он ничего не скажет.
+            where = f"на страницу {page}" if page >= 1 else "на страницу, которой нет в документе"
             doc.warn(
                 "toc_mismatch",
-                f"Закладка «{title}» указывает на страницу {page}, которой нет в документе",
-                page=str(page),
+                f"Закладка «{title}» указывает {where}",
+                page=str(page) if page >= 1 else None,
             )
             continue
         key = lang.normalize_text(title)
@@ -616,26 +619,29 @@ def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
             continue
         # Заголовок нашёлся, но не там, куда указывает закладка: печатное оглавление
         # разошлось с текстом — об этом и предупреждаем (сценарий «Расхождение»).
-        actual = actual_pages.get(key)
-        if page is not None and actual is not None and actual != page:
+        # Одноимённый заголовок может встречаться на нескольких страницах, поэтому
+        # сверяем с множеством вхождений, а не с первым.
+        actual = actual_pages.get(key, set())
+        if page is not None and actual and page not in actual:
+            found = ", ".join(str(n) for n in sorted(actual))
             doc.warn(
                 "toc_mismatch",
                 f"Закладка «{title}» указывает на страницу {page}, "
-                f"а заголовок в тексте на странице {actual}",
+                f"а заголовок в тексте на странице {found}",
                 page=str(page),
             )
 
 
-def _heading_pages(raw: RawDocument) -> dict[str, int]:
-    """Нормализованный текст заголовка → номер напечатанной страницы, где он встретился."""
-    pages: dict[str, int] = {}
+def _heading_pages(raw: RawDocument) -> dict[str, set[int]]:
+    """Нормализованный текст заголовка → номера напечатанных страниц, где он встретился."""
+    pages: dict[str, set[int]] = {}
     for index, page in enumerate(raw.pages):
         number = _page_number(page.printed_label) if page.printed_label else index + 1
         if number < 0:
             number = index + 1
         for line in page.lines:
             if line.heading_level:
-                pages.setdefault(lang.normalize_text(line.text), number)
+                pages.setdefault(lang.normalize_text(line.text), set()).add(number)
     return pages
 
 

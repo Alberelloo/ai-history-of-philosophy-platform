@@ -104,6 +104,33 @@ def test_bookmark_on_wrong_page_warns():
 
 
 @req(DS, "Оглавление источника")
+def test_bookmark_beyond_document_without_technical_page():
+    """Закладка на удалённую страницу (PyMuPDF отдаёт −1) не показывает оператору «-1»."""
+    from philograph.library.model import RawDocument, RawPage
+
+    raw = RawDocument(pages=[RawPage(0, [], printed_label="1")], fmt="pdf", paginated=True)
+    raw.printed_toc = [(1, "Conclusion", -1)]
+    doc = parse_raw(raw)
+    messages = [i.message for i in doc.issues if i.code == "toc_mismatch"]
+    assert messages and all("-1" not in m for m in messages)
+    assert any(i.page is None for i in doc.issues if i.code == "toc_mismatch")
+
+
+@req(DS, "Оглавление источника")
+def test_duplicate_heading_on_two_pages_does_not_cry_wolf():
+    """Одноимённый заголовок на двух страницах: закладка на второе вхождение — не расхождение."""
+    data = _pdf(
+        [
+            [("Notes", 16.0), (f"{BODY} First.", 11.0)],
+            [("Notes", 16.0), (f"{BODY} Second.", 11.0)],
+        ],
+        [[1, "Notes", 2]],
+    )
+    doc = parse_raw(extract_pdf(data, languages=["eng"], ocr=None))
+    assert not [i for i in doc.issues if i.code == "toc_mismatch"]
+
+
+@req(DS, "Оглавление источника")
 def test_bookmark_matching_heading_produces_no_warning():
     """Закладка, совпадающая с заголовком на её странице, предупреждений не даёт."""
     data = _pdf(

@@ -1,0 +1,69 @@
+﻿{
+ "cases": {
+  "font-headings": {
+   "identical": true,
+   "sections": [
+    [
+     "Introduction to Philosophy",
+     2,
+     1,
+     0
+    ],
+    [
+     "Ancient Philosophy",
+     1,
+     1,
+     0
+    ],
+    [
+     "Modern Philosophy",
+     2,
+     1,
+     0
+    ]
+   ],
+   "sha256_real": "c7abc25bf937c987",
+   "sha256_mutant": "c7abc25bf937c987"
+  },
+  "font-headings-notes": {
+   "identical": true,
+   "sections": [
+    [
+     "Introduction to Philosophy",
+     1,
+     1,
+     1
+    ],
+    [
+     "Ancient Philosophy",
+     1,
+     1,
+     1
+    ]
+   ],
+   "sha256_real": "e58e3b426962e2c0",
+   "sha256_mutant": "e58e3b426962e2c0"
+  },
+  "bookmarks-matching": {
+   "identical": true,
+   "sections": [
+    [
+     "Chapter One",
+     1,
+     1,
+     0
+    ],
+    [
+     "Chapter Two",
+     1,
+     1,
+     0
+    ]
+   ],
+   "sha256_real": "30e662df93b34268",
+   "sha256_mutant": "30e662df93b34268"
+  }
+ },
+ "identical": true,
+ "finding": "Структура (разделы, блоки, сноски, предупреждения) после фикса идентична прежней"
+}

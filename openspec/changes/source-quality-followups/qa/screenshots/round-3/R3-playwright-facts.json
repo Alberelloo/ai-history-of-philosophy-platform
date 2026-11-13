@@ -1,0 +1,223 @@
+{
+ "base": "http://127.0.0.1:8080",
+ "pages": [
+  {
+   "title": "PhiloGraph",
+   "h1": [
+    "Библиотека"
+   ],
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\SITE-01-home"
+  },
+  {
+   "default_source_id": "s_9523bd67d4ff",
+   "source_titles": [
+    "Empiricism: a demonstration reader",
+    "Теория познания: демонстрационный учебник"
+   ],
+   "toc_items": 4,
+   "toc_root_titles": [
+    "Глава 1. Опыт и врождённые идеи",
+    "Глава 2. Юм и проблема индукции",
+    "Глава 3. Ответ Канта"
+   ],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\TOC-01-sources"
+  },
+  {
+   "url": "http://127.0.0.1:8080/read/s_9523bd67d4ff/sec_36398b8e4ff1",
+   "section_headings": [
+    "Прежде чем начать",
+    "Глава 1. Опыт и врождённые идеи"
+   ],
+   "paragraphs": 11,
+   "toc_visible": 5,
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\READ-01-chapter"
+  },
+  {
+   "chapter": {
+    "id": "sec_36398b8e4ff1",
+    "title": "Глава 1. Опыт и врождённые идеи"
+   },
+   "headings": [
+    "Прежде чем начать",
+    "Глава 1. Опыт и врождённые идеи"
+   ],
+   "paragraphs": 11,
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\READ-02-chapter-1"
+  },
+  {
+   "chapter": {
+    "id": "sec_76cdc86b4d11",
+    "title": "Глава 2. Юм и проблема индукции"
+   },
+   "headings": [
+    "Прежде чем начать",
+    "Глава 2. Юм и проблема индукции",
+    "Привычка и ожидание"
+   ],
+   "paragraphs": 11,
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\READ-03-chapter-2"
+  },
+  {
+   "chapter": {
+    "id": "sec_76cdc86b4d11",
+    "title": "Привычка и ожидание"
+   },
+   "headings": [
+    "Прежде чем начать",
+    "Глава 2. Юм и проблема индукции",
+    "Привычка и ожидание"
+   ],
+   "paragraphs": 11,
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\READ-04-chapter-3"
+  },
+  {
+   "toggle_found": false,
+   "toc_entry_texts": [
+    "Библиотека",
+    "1\nОткрытые книги",
+    "Теория познания: демонстрационный учебникПроект PhiloGraph",
+    "Ассистент",
+    "Граф\nскоро",
+    "Справочник\nскоро",
+    "Эпохи и контекст\nскоро",
+    "Сравнение трактовок\nскоро",
+    "Маршрут изучения\nскоро",
+    "Мои материалы\nскоро",
+    "Подборки\nскоро",
+    "Настройки",
+    "Глава 1. Опыт и врождённые идеи",
+    "Глава 2. Юм и проблема индукции",
+    "Привычка и ожидание"
+   ],
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\CARDS-01-toc"
+  },
+  {
+   "mention_count": 2,
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\CARDS-02-mentions"
+  },
+  {
+   "dialog": 1,
+   "dialog_text": [
+    "Локк\nПерсона\n1632–1704\n\nФилософ, чьи идеи обсуждаются в главах учебника. Описание написано моделью и помечено как сгенерированное.\n\nгоды жизни: 1632–1704\nОткрыт"
+   ],
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\CARDS-03-mention-card"
+  },
+  {
+   "search_inputs": 1,
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\SEARCH-01-home-search"
+  },
+  {
+   "url": "http://127.0.0.1:8080/",
+   "result_links": 2,
+   "console": [],
+   "failures": [],
+   "shot": "openspec\\changes\\source-quality-followups\\qa\\screenshots\\round-3\\SEARCH-02-results"
+  }
+ ],
+ "sources": {
+  "sources": [
+   {
+    "id": "s_d848cdf369c8",
+    "title": "Empiricism: a demonstration reader",
+    "authors": [
+     "PhiloGraph project"
+    ],
+    "year": 2026,
+    "language": "en",
+    "kind": "primary",
+    "license": {
+     "title": "CC BY 4.0",
+     "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "translator": null,
+    "edition": null
+   },
+   {
+    "id": "s_9523bd67d4ff",
+    "title": "Теория познания: демонстрационный учебник",
+    "authors": [
+     "Проект PhiloGraph"
+    ],
+    "year": 2026,
+    "language": "ru",
+    "kind": "textbook",
+    "license": {
+     "title": "CC BY 4.0",
+     "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "translator": null,
+    "edition": null
+   }
+  ],
+  "languages": [
+   "en",
+   "ru"
+  ],
+  "default_source_id": "s_9523bd67d4ff"
+ },
+ "toc": [
+  {
+   "id": "sec_36398b8e4ff1",
+   "title": "Глава 1. Опыт и врождённые идеи",
+   "level": 1,
+   "chapter_id": "sec_36398b8e4ff1",
+   "children": []
+  },
+  {
+   "id": "sec_76cdc86b4d11",
+   "title": "Глава 2. Юм и проблема индукции",
+   "level": 1,
+   "chapter_id": "sec_76cdc86b4d11",
+   "children": [
+    {
+     "id": "sec_bb335dcf2222",
+     "title": "Привычка и ожидание",
+     "level": 2,
+     "chapter_id": "sec_76cdc86b4d11",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "sec_6653c671686c",
+   "title": "Глава 3. Ответ Канта",
+   "level": 1,
+   "chapter_id": "sec_6653c671686c",
+   "children": []
+  }
+ ],
+ "chapters": [
+  {
+   "id": "sec_36398b8e4ff1",
+   "title": "Глава 1. Опыт и врождённые идеи"
+  },
+  {
+   "id": "sec_76cdc86b4d11",
+   "title": "Глава 2. Юм и проблема индукции"
+  },
+  {
+   "id": "sec_76cdc86b4d11",
+   "title": "Привычка и ожидание"
+  },
+  {
+   "id": "sec_6653c671686c",
+   "title": "Глава 3. Ответ Канта"
+  }
+ ],
+ "console_all": [],
+ "failures_all": []
+}
