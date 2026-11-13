@@ -133,8 +133,11 @@
 | TC-60 | — | источник без внешней обработки и вопрос без региона | регион неизвестен → источник `[RU]` закрыт на поиске, текста в passages нет, пометки нет | `tests/assistant/test_regional_access.py::test_region_from_header_reaches_search` (region=None); `tests/search/test_regions.py::test_search_respects_region` |
 | TC-61 | — | разбор неоднозначного упоминания при `external_processing: false` | разрешитель не вызван, упоминание не записано | `tests/knowledge/test_external_processing.py::test_ambiguous_mention_skips_resolver_without_external` |
 | TC-62 | UC-28 | клиент: событие `notice found_not_retold` со suggestions | пометка и ссылки видны, клик ведёт на абзац | `tests/web/test_assistant_dialogs.py::test_t22b_notice_not_retold_with_links` |
-| TC-63 | — | источник с `external_processing: true` | ведёт себя как раньше: текст уходит модели, разрешитель вызывается | `tests/assistant/test_regional_access.py::test_question_outside_rf_has_no_closed_source` (RU); `tests/knowledge/test_external_processing.py::test_ambiguous_mention_uses_resolver_with_external` |
+| TC-63 | — | источник с `external_processing: true` | текст уходит модели, пометки нет, извлечение знаний не пропущено; неоднозначное упоминание остаётся неразрешённым (разрешитель в рабочей сборке не подключён — контракт `Mentions` проверяется с подставным resolver) | `tests/assistant/test_regional_access.py::test_question_outside_rf_has_no_closed_source` (RU); `tests/knowledge/test_external_processing.py::test_ambiguous_mention_uses_resolver_with_external` |
 | TC-64 | — | найдены только непересказываемые абзацы | контекст модели пуст, поток содержит `found_not_retold` и `no_library_support` (ответ честно помечен) | `tests/assistant/test_regional_access.py::test_only_hidden_results_marked_as_unsupported` |
+| TC-65 | UC-28 | клиент: в одном ходе две пометки — `found_not_retold` со ссылкой и `no_library_support` | видны обе пометки (вторая не затирает первую), ссылка на абзац кликабельна и ведёт на `/read/…/…#p-…`; сохранённые сессии со старым единственным `message` открываются без ошибок | `tests/web/test_assistant_dialogs.py::test_t22c_two_notices_keep_both_with_link`, `…::test_t22d_legacy_single_message_session_opens` |
+| TC-66 | — | набор оценки с регионом `RU` и без региона; запуск замера поиска и ассистента | в запросах к поиску и ассистенту есть `region` из набора; без региона — неизвестный; служебное `XX` хранится как «неизвестный» | `tests/evaluation/test_evaluation.py::test_evaluation_queries_carry_dataset_region` |
+| TC-67 | — | `compose.prod.yaml` без `PHILOGRAPH_TRUSTED_PROXY=1` или без `PHILOGRAPH_REGION_HEADER`; проверка `deploy.py update`; Caddyfile | выкладка отказывает с сообщением оператору; в Caddyfile снимаются клиентский регион и заголовок страны не от CDN, `/api/*` не кэшируется | `tests/ops/test_deploy.py::test_deploy_requires_region_config`, `…::test_caddyfile_strips_region_headers_and_no_api_cache` |
 | TC-47 | UC-24 | `X-Philograph-Region: DE`, фиктивный поиск | поиск получает `region="DE"` | `tests/assistant/test_regional_access.py::test_region_from_header_reaches_search` |
 | TC-48 | UC-27 | запрос без заголовка региона (и со служебным `XX`) | поиск получает `region=None` (неизвестный регион) | `…::test_region_from_header_reaches_search` |
 | TC-49 | UC-24 | регион `DE`, фиктивный сервис знаний | тело `internal/assistant/context` содержит `region="DE"` | `…::test_ontology_context_carries_region` |
@@ -199,7 +202,7 @@
 | EC-49 | Повтор/конкурентность | повтор запроса | регион и признак читаются на каждый запрос, состояние не хранится | средний |
 | EC-50 | Локаль | пометка из i18n (`assistant.found_not_retold`), данные источника не переводятся | пометка на языке интерфейса, ссылки — как в источнике | низкий |
 | EC-51 | Доступность | ссылки пометки — обычные `<a href="/p/{id}">`, пометка в `role=status` | фокус и клавиатура как у «Близкое в библиотеке» | средний |
-| EC-52 | Совместимость | источник с `external_processing: true` без регионов | ведёт себя как до группы 7: текст уходит модели, пометки нет | высокий |
+| EC-52 | Совместимость | источник с `external_processing: true` без регионов | ведёт себя как до группы 7: текст уходит модели, пометки нет; разбор неоднозначных упоминаний моделью не выполняется и для него (разрешитель не подключён — отдельное изменение) | высокий |
 
 ## Как проверять
 
@@ -312,3 +315,12 @@ EC-34…EC-39, EC-40…EC-45.
   если найдены только непересказываемые абзацы, в потоке теперь две пометки —
   `found_not_retold` и `no_library_support` (ответ без опоры на библиотеку нельзя выдавать
   за основанный на источниках), кейс TC-64.
+- 2026-11-12: раунд 6 (группа 7 и данные 8.4) — F-1: клиент хранил одну пометку на ход и терял
+  `found_not_retold` со ссылками, когда следом приходила `no_library_support`; заведён TC-65.
+  F-2 (`spec-gap`): разбор неоднозначных упоминаний моделью в рабочей сборке не подключён —
+  уточнено требование `regional-access`, переписаны TC-63 и EC-52 (ждём не «как раньше»,
+  а «разрешитель не подключён»).
+- 2026-11-13: F-1 исправлен (ход хранит список пометок, старые сессии читаются) — TC-65,
+  тесты `test_t22c_two_notices_keep_both_with_link` и `test_t22d_legacy_single_message_session_opens`.
+  Задачи 8.1 и 8.6: TC-66 (регион набора оценки идёт в замеры), TC-67 (проверка конфигурации
+  развёртывания и Caddyfile).

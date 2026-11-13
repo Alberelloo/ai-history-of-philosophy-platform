@@ -2,10 +2,11 @@
 
 - Кто ведёт: ведущий инженер (роль: разработчик), сессия DSH.
 - Ветка: `claude/ru-only-sources` (от `main` 3cc63b4); черновой PR #39.
-- Статус: **группы 1–7 и 8.2 сделаны** (учёт регионов, миграция, каталог, событие, библиотека,
-  HTTP-слой, служебные интерфейсы, клиентская строка списка, шлюз, поиск и индексация, сервис
-  знаний, ассистент, внешняя обработка, запасной регион стенда). Группа 8 (кроме 8.2) не начата.
-- Кейсы: `qa/cases.md` (UC-1…UC-30, TC-1…TC-64, EC-1…EC-52).
+- Статус: **сделаны группы 1–7 и задачи 8.1, 8.2, 8.4, 8.6** (учёт регионов, библиотека, шлюз,
+  поиск, знания, ассистент, внешняя обработка, оценка, стенд, данные каталога, развёртывание
+  и документация). Остались 8.3 (сквозной тест), 8.5 (traceability), 8.7 (финальная проверка
+  и архив).
+- Кейсы: `qa/cases.md` (UC-1…UC-30, TC-1…TC-67, EC-1…EC-52).
 
 ## Что сделано (2026-11-10)
 
@@ -186,6 +187,49 @@
 - `ruff check .`, `ruff format --check .` (425 файлов), `lint-imports` (3 контракта),
   `check_traceability` (322 из 322) — чисто.
 
+## Раунд dev_cycle 6 (2026-11-12) — группа 7 и данные 8.4
+
+- Вердикт: **`fix`**. Тестировщик: 21 из 22 кейсов на живом стенде (533 passed в автотестах);
+  весь серверный путь закрытого источника проверен: индексация без эмбеддера, текст не уходит
+  модели, пометка со ссылками, отсечение для DE, метки 8.4 через настоящий `sync`.
+  Артефакты — `qa/round-6/`, `qa/screenshots/round-6/`.
+- **F-1 (`product-bug`, major) — исправлено 2026-11-13.** Клиент хранил одну пометку на ход
+  (`Turn.message`), поэтому `notice` «без опоры на библиотеку» затирал `found_not_retold`
+  со ссылками на найденные абзацы. Теперь ход хранит список `notices`, каждая пометка рендерится
+  своим блоком со своими ссылками, старые сессии с единственным `message` читаются
+  (`normalizeTurn`). Клиент собран (`npm run build`), тесты
+  `test_t22c_two_notices_keep_both_with_link` и `test_t22d_legacy_single_message_session_opens`,
+  кейс TC-65.
+- **F-2 (`spec-gap`, minor) — исправлено.** Модель-разрешитель неоднозначных упоминаний никогда
+  не подключалась в рабочем сервисе знаний (`Mentions(statements, library)` — без resolver).
+  Это не регресс группы 7: уточнено требование `regional-access` (разбор моделью не подключён —
+  отдельное изменение), переписаны TC-63 и EC-52.
+
+## Что сделано (2026-11-13): задачи 8.1 и 8.6
+
+- 8.1 Оценка: `evaluation/datasets.py` — миграция 3 (`datasets.region`), `create(..., region=...)`
+  с нормализацией (`XX`/`T1` → неизвестный), `Datasets.region()`; `snapshot()` отдаёт `region`
+  в каждом элементе. `evaluation/components.py` — `search_evaluator`, `assistant_evaluator`,
+  `draft_questions` передают регион набора в запросы. Тест
+  `test_evaluation_queries_carry_dataset_region` (TC-66).
+- 8.6 Развёртывание и документация: `docs/architecture/source-ingestion.md` (поле `regions`,
+  `external_processing`), `docs/operations/runbook.md` (шлюз только через CDN, настройка CDN,
+  переменные, что делать при высокой доле неизвестных регионов), `.env.example`
+  (`PHILOGRAPH_REGION_HEADER`, `PHILOGRAPH_TRUSTED_PROXY`, `PHILOGRAPH_REGION_FALLBACK` только
+  для стенда), `deploy/Caddyfile` (снимает клиентский регион и заголовок страны не от CDN,
+  не кэширует `/api/*`), `compose.prod.yaml` (переменные региона у шлюза), `scripts/deploy.py`
+  (проверка конфигурации до сборки, отказ с сообщением оператору). Тесты
+  `test_deploy_requires_region_config`, `test_caddyfile_strips_region_headers_and_no_api_cache`
+  (TC-67).
+
+## Прогоны (2026-11-13, после F-1, 8.1, 8.6)
+
+- `pytest -q -m "not e2e"` с `TMP`/`TEMP` в `.tmp`: **538 passed**, 1 skipped (PostgreSQL),
+  93 deselected.
+- `pytest -q tests/web`: **130 passed** (клиент пересобран, `web/dist` свежий).
+- `ruff check`, `ruff format --check` (426 файлов), `lint-imports` (3 контракта),
+  `check_traceability` 322/322, `openspec validate ru-only-sources` — valid.
+
 ## Раунд dev_cycle 5 (2026-11-12) — группы 5–6
 
 - Вердикт: **`pass`**, findings пустые; судья не вызывался. Тестировщик (Flash): 38 кейсов
@@ -283,9 +327,13 @@
 
 ## Следующий шаг
 
-- 8.4 (данные `licenses.yaml`: `regions: [RU]`, `external_processing: false` у `public-domain-ru`),
-  затем 8.1 (оценка), 8.3 (сквозной тест), 8.5 (traceability), 8.6 (доки и деплой) и 8.7 (архив).
-- Раунд `dev_cycle` по группе 7 — тестировщик и судья.
+- 8.3: сквозной тест «читатель с заголовком региона через шлюз получает библиотеку, главу и поиск
+  из закрытого источника для RU и не получает для DE».
+- 8.5: добавить `regional-access` в `enforce` файла `openspec/traceability.yaml`, добиться
+  зелёного `scripts/check_traceability.py`.
+- Раунд `dev_cycle` 7 по F-1 (две пометки в клиенте) — тестировщик и судья.
+- 8.7: `ruff check .`, `ruff format --check .`, `pytest`, `openspec validate`, архивация
+  изменения в том же PR; затем обновить описание PR #39 и снять с черновика.
 
 ## Проблемы и замечания
 

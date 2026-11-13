@@ -13,7 +13,14 @@ from philograph.platform.client import ServiceClient
 def search_evaluator(search: ServiceClient, limit: int = 10):
     def evaluate(item: dict) -> dict:
         found = search.post(
-            "search", json={"query": item["question"], "limit": limit, "per_chapter": limit}
+            "search",
+            json={
+                "query": item["question"],
+                "limit": limit,
+                "per_chapter": limit,
+                # Регион набора: замер повторяет условия читателя этой страны.
+                "region": item.get("region"),
+            },
         ).json()["results"]
         return {"found": [r["paragraph_id"] for r in found]}
 
@@ -70,6 +77,8 @@ def assistant_evaluator(
             "question": item["question"],
             "selection": item.get("selection"),
             "sources_only": sources_only or not item.get("has_answer", True),
+            # Регион набора: ассистент отвечает так, как ответил бы читателю этой страны.
+            "region": item.get("region"),
         }
         with assistant.stream("POST", "ask", json=body) as response:
             events = [json.loads(line) for line in response.iter_lines() if line.strip()]
@@ -111,7 +120,10 @@ def draft_questions(
     """Черновая разметка моделью: кандидаты в абзацы и эталон — со статусом «черновик»."""
     added = 0
     for i, question in enumerate(questions):
-        found = search.post("search", json={"query": question, "limit": 8}).json()["results"]
+        found = search.post(
+            "search",
+            json={"query": question, "limit": 8, "region": datasets.region(dataset_id)},
+        ).json()["results"]
         passages = "\n\n".join(f"[{n + 1}] {r['text']}" for n, r in enumerate(found))
         response = llm.post(
             "structured",

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from philograph.assistant.app import build_app as assistant_app
@@ -278,3 +280,70 @@ def test_run_cost_estimate(ev, events):
         "assistant", dataset, {}, lambda i: {"cost_usd": 0.001}, assistant_metrics
     )
     assert ev.evaluator.get(run)["cost_usd"] == 0.004
+
+
+class _Response:
+    """Ответ поддельного сервиса: и JSON, и поток событий."""
+
+    def __init__(self, payload: dict, lines: list[dict]) -> None:
+        self.payload, self.lines = payload, lines
+
+    def json(self) -> dict:
+        return self.payload
+
+    def raise_for_status(self) -> None:
+        return None
+
+    def iter_lines(self):
+        return iter(json.dumps(line, ensure_ascii=False) for line in self.lines)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc) -> bool:
+        return False
+
+
+class SearchStub:
+    def __init__(self) -> None:
+        self.bodies: list[dict] = []
+
+    def post(self, path: str, json: dict) -> _Response:
+        self.bodies.append(json)
+        return _Response({"results": []}, [])
+
+
+class AssistantStub:
+    def __init__(self) -> None:
+        self.bodies: list[dict] = []
+
+    def stream(self, method: str, path: str, json: dict) -> _Response:
+        self.bodies.append(json)
+        return _Response({}, [{"type": "done", "stats": {}}])
+
+
+@req("regional-access", "Оценка и служебные запросы задают регион явно")
+def test_evaluation_queries_carry_dataset_region(ev):
+    """Набор хранит регион, и замеры идут от имени читателя этого региона."""
+    dataset = ev.datasets.create("вопросы РФ", "questions", region="ru")
+    assert ev.datasets.region(dataset) == "RU"
+    ev.datasets.add(dataset, "q0", {"question": "что такое опыт?"})
+    item = ev.datasets.snapshot(dataset)[0]
+    assert item["region"] == "RU"
+
+    search = SearchStub()
+    c.search_evaluator(search, limit=3)(item)
+    assert search.bodies[-1]["region"] == "RU"
+
+    assistant = AssistantStub()
+    c.assistant_evaluator(assistant)(item)
+    assert assistant.bodies[-1]["region"] == "RU"
+
+    # Набор без региона (и со служебным XX) идёт как из неизвестного региона.
+    unknown = ev.datasets.create("вопросы без региона", "questions")
+    ev.datasets.add(unknown, "q0", {"question": "что такое опыт?"})
+    assert ev.datasets.snapshot(unknown)[0]["region"] is None
+    c.search_evaluator(search, limit=3)(ev.datasets.snapshot(unknown)[0])
+    assert search.bodies[-1]["region"] is None
+
+    assert ev.datasets.region(ev.datasets.create("набор XX", "questions", region="XX")) is None
