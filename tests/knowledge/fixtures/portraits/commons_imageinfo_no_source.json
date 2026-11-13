@@ -1,0 +1,28 @@
+{
+  "query": {
+    "pages": {
+      "56789": {
+        "pageid": 56789,
+        "ns": 6,
+        "title": "File:Kant_ohne_quelle.jpg",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Kant_ohne_quelle.jpg/400px-Kant_ohne_quelle.jpg",
+            "width": 400,
+            "height": 500,
+            "mime": "image/jpeg",
+            "extmetadata": {
+              "Artist": {"value": "Автор", "source": "commons-desc-page"},
+              "DateTimeOriginal": {"value": "1790", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "Public domain", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/publicdomain/mark/1.0/",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

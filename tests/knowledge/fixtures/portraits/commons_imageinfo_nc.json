@@ -1,0 +1,32 @@
+{
+  "query": {
+    "pages": {
+      "34567": {
+        "pageid": 34567,
+        "ns": 6,
+        "title": "File:Kant_gemalde_2.jpg",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/de/Kant_gemalde_2.jpg/600px-Kant_gemalde_2.jpg",
+            "width": 600,
+            "height": 750,
+            "mime": "image/jpeg",
+            "extmetadata": {
+              "Artist": {"value": "Некий художник", "source": "commons-desc-page"},
+              "DateTimeOriginal": {"value": "1820", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "CC BY-NC 4.0", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/licenses/by-nc/4.0/",
+                "source": "commons-desc-page"
+              },
+              "DescriptionUrl": {
+                "value": "https://commons.wikimedia.org/wiki/File:Kant_gemalde_2.jpg",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

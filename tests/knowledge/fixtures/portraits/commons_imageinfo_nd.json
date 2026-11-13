@@ -1,0 +1,32 @@
+{
+  "query": {
+    "pages": {
+      "45678": {
+        "pageid": 45678,
+        "ns": 6,
+        "title": "File:Kant_zeichnung.jpg",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Kant_zeichnung.jpg/500px-Kant_zeichnung.jpg",
+            "width": 500,
+            "height": 700,
+            "mime": "image/jpeg",
+            "extmetadata": {
+              "Artist": {"value": "График", "source": "commons-desc-page"},
+              "DateTimeOriginal": {"value": "unknown", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "CC BY-ND 4.0", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/licenses/by-nd/4.0/",
+                "source": "commons-desc-page"
+              },
+              "DescriptionUrl": {
+                "value": "https://commons.wikimedia.org/wiki/File:Kant_zeichnung.jpg",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

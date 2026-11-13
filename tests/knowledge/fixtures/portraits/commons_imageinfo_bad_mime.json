@@ -1,0 +1,32 @@
+{
+  "query": {
+    "pages": {
+      "67890": {
+        "pageid": 67890,
+        "ns": 6,
+        "title": "File:Kant_signatur.svg",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/g/gb/Kant_signatur.svg/120px-Kant_signatur.svg.png",
+            "width": 120,
+            "height": 80,
+            "mime": "image/svg+xml",
+            "extmetadata": {
+              "Artist": {"value": "Автор", "source": "commons-desc-page"},
+              "DateTimeOriginal": {"value": "1800", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "Public domain", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/publicdomain/mark/1.0/",
+                "source": "commons-desc-page"
+              },
+              "DescriptionUrl": {
+                "value": "https://commons.wikimedia.org/wiki/File:Kant_signatur.svg",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

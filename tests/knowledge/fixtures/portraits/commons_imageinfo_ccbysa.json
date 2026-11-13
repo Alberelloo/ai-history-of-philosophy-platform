@@ -1,0 +1,32 @@
+{
+  "query": {
+    "pages": {
+      "23456": {
+        "pageid": 23456,
+        "ns": 6,
+        "title": "File:Kant_portrait_3.png",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/cd/Kant_portrait_3.png/800px-Kant_portrait_3.png",
+            "width": 800,
+            "height": 640,
+            "mime": "image/png",
+            "extmetadata": {
+              "Artist": {"value": "Современный фотограф", "source": "commons-desc-page"},
+              "DateTimeOriginal": {"value": "1 January 2015", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "CC BY-SA 4.0", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/licenses/by-sa/4.0/",
+                "source": "commons-desc-page"
+              },
+              "DescriptionUrl": {
+                "value": "https://commons.wikimedia.org/wiki/File:Kant_portrait_3.png",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
