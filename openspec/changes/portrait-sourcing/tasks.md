@@ -37,7 +37,7 @@
 - [ ] 6.1 Визуальные снимки S1 (окно у упоминания) и S4 (полная карточка) с портретами в обеих темах; сверить с `docs/design/reference/` и обновить эталоны только после просмотра.
 - [ ] 6.2 Обновить `docs/design/system/components/Portrait.md` и `PortraitGallery.md` (источник изображения, подпись с лицензией, поведение при ошибке загрузки), `docs/architecture/source-ingestion.md` (раздел о портретах) и `docs/operations/runbook.md` (как обновлять портреты и что делать, если Commons недоступен).
 - [ ] 6.3 `dev_cycle` по изменению: раунд на серверную часть (отбор, лицензии, карточка, раздача, проверка оператором) и раунд на клиент (медальон, подпись, клавиатура, темы). Фиксы по findings — со ссылкой на кейс.
-- [ ] 6.4 Добавить `entity-portraits` в `enforce` файла `openspec/traceability.yaml`; `scripts/check_traceability.py` зелёный.
+- [x] 6.4 Добавить `entity-portraits` в `enforce` файла `openspec/traceability.yaml`; `scripts/check_traceability.py` зелёный.
 - [ ] 6.5 Финальная проверка: `ruff check .`, `ruff format --check .`, `pytest -q`, `lint-imports`, `python scripts/check_traceability.py`, `python -m philograph.knowledge.portraits validate`, `openspec validate portrait-sourcing`; архивация `openspec archive portrait-sourcing --yes` в том же PR.
 
 ## Оценка объёма

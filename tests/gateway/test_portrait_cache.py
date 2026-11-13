@@ -12,7 +12,8 @@ from philograph.gateway.app import build_app
 from philograph.gateway.region import RegionResolver, RegionSettings
 
 req = pytest.mark.req
-RA = "entity-portraits"
+EP = "entity-portraits"
+RA = "regional-access"
 
 
 def knowledge_app() -> FastAPI:
@@ -46,7 +47,7 @@ def gateway() -> TestClient:
     return TestClient(app)
 
 
-@req(RA, "Хранение и раздача изображений")
+@req(EP, "Хранение и раздача изображений")
 def test_portrait_keeps_long_cache_through_gateway():
     """Шлюз не подменяет Cache-Control портрета на private: файл неизменяемый."""
     response = gateway().get("/api/knowledge/v1/portraits/7", headers={"CF-IPCountry": "RU"})

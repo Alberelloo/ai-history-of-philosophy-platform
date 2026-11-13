@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { errorText, pick, useT } from "./i18n";
-import { Icon } from "./ui";
+import { PortraitsReview } from "./PortraitsReview";
+import { Icon, Seg } from "./ui";
 
 // Страница проверки онтологии для оператора: очередь по приоритету и решения.
 // Без входа сервис отвечает 404, как на несуществующую страницу.
@@ -27,6 +28,7 @@ type Context = {
 
 const API = "/api/knowledge/v1";
 const KINDS = ["", "warning", "lost_evidence", "generated", "ambiguous_link", "duplicate", "proposal"];
+type ReviewTab = "statements" | "portraits";
 
 async function post(path: string, body?: unknown) {
   return fetch(`${API}${path}`, {
@@ -57,6 +59,7 @@ export function ReviewPage() {
   const [items, setItems] = useState<QueueItem[]>([]);
   const [open, setOpen] = useState<Context | null>(null);
   const [newType, setNewType] = useState("");
+  const [tab, setTab] = useState<ReviewTab>("statements");
 
   const load = async () => {
     const response = await fetch(`${API}/review/queue${kind ? `?kind=${kind}` : ""}`);
@@ -138,23 +141,34 @@ export function ReviewPage() {
     <main className="page review">
       <header className="page-header">
         <h1 className="page-title">{t.review.title}</h1>
-        <div className="pg-field review-kind">
-          <label className="pg-field__label" htmlFor="review-kind">
-            {t.review.kind}
-          </label>
-          <div className="pg-field__control select">
-            <select id="review-kind" className="pg-input" value={kind} onChange={(e) => setKind(e.target.value)}>
-              {KINDS.map((value) => (
-                <option key={value} value={value}>
-                  {pick(t.review.kinds, value) ?? value}
-                </option>
-              ))}
-            </select>
-            <Icon name="chevronDown" small className="select__chevron" />
-          </div>
-        </div>
+        <Seg<ReviewTab>
+          label={t.review.tab}
+          value={tab}
+          onChange={setTab}
+          items={[
+            { value: "statements", label: t.review.statements },
+            { value: "portraits", label: t.review.portraits },
+          ]}
+        />
       </header>
-      {authorized && items.length === 0 && <p className="muted">{t.review.empty}</p>}
+      {tab === "statements" ? (
+        <>
+          <div className="pg-field review-kind">
+            <label className="pg-field__label" htmlFor="review-kind">
+              {t.review.kind}
+            </label>
+            <div className="pg-field__control select">
+              <select id="review-kind" className="pg-input" value={kind} onChange={(e) => setKind(e.target.value)}>
+                {KINDS.map((value) => (
+                  <option key={value} value={value}>
+                    {pick(t.review.kinds, value) ?? value}
+                  </option>
+                ))}
+              </select>
+              <Icon name="chevronDown" small className="select__chevron" />
+            </div>
+          </div>
+          {authorized && items.length === 0 && <p className="muted">{t.review.empty}</p>}
       <ol className="review-queue">
         {items.map((item, i) => (
           <li key={i} className="review-item" data-kind={item.kind}>
@@ -230,6 +244,10 @@ export function ReviewPage() {
             </button>
           </div>
         </section>
+      )}
+        </>
+      ) : (
+        <PortraitsReview />
       )}
     </main>
   );

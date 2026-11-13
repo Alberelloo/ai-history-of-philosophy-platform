@@ -1,4 +1,4 @@
-﻿# Tasks
+# Tasks
 
 Тесты помечаются `@pytest.mark.req("<возможность>", "<требование>")` (требования `regional-access` и изменённые требования). Возможность `regional-access` добавляется в `openspec/traceability.yaml` в задаче 8.5; до неё `scripts/check_traceability.py` её не проверяет. Группа 7 обязательна: владелец решил, что `external_processing: false` (раздел «Решения владельца» в design.md). Открытых вопросов нет.
 
