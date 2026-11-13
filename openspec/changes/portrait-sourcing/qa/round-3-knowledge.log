@@ -1,0 +1,253 @@
+{"event": "db.migration.applied", "level": "info", "time": "2026-11-13T13:07:20.936467+00:00", "schema": "queue", "version": 1, "name": "jobs"}
+{"event": "db.migration.applied", "level": "info", "time": "2026-11-13T13:07:20.941115+00:00", "schema": "operator", "version": 1, "name": "журнал действий"}
+{"event": "service.started", "level": "info", "time": "2026-11-13T13:07:21.214417+00:00", "service": "knowledge", "version": "0.1.0", "restarted": false}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:36.040167+00:00", "request_id": "7281e96692d54d0fae21bf98ad08c79d", "service": "knowledge", "method": "GET", "route": "/health/ready", "status": 200, "duration_ms": 1.52}
+INFO:     127.0.0.1:52980 - "GET /health/ready HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:36.242784+00:00", "request_id": "968f513f2e3047d2b7bd6d6bf66f159e", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:36.245355+00:00", "request_id": "968f513f2e3047d2b7bd6d6bf66f159e", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 145.56}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card HTTP/1.1" 200 OK
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:07:58.916130+00:00", "request_id": "b03060bdbebd45a783d60816678ca327", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.917447+00:00", "request_id": "b03060bdbebd45a783d60816678ca327", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 404, "duration_ms": 2.08}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:07:58.930053+00:00", "request_id": "828bf0c21e9247ec86ed48d31ed951fe", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.930966+00:00", "request_id": "828bf0c21e9247ec86ed48d31ed951fe", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 404, "duration_ms": 1.64}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/10?action=hide HTTP/1.1" 404 Not Found
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:07:58.937226+00:00", "request_id": "8abd4d49209b4eacb8a23fa9ff7858db", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.938122+00:00", "request_id": "8abd4d49209b4eacb8a23fa9ff7858db", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 404, "duration_ms": 1.83}
+INFO:     127.0.0.1:58442 - "GET /v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.949911+00:00", "request_id": "196850184b6a485180c3f18fc562fb6e", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 3.51}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.965032+00:00", "request_id": "fcb9e3daecfd4596b15a082c82a27e24", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.22}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.984621+00:00", "request_id": "8c8dc839cb6c4295a5e6cd7af63330a0", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 404, "duration_ms": 4.37}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/9999 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.997010+00:00", "request_id": "debb4a585cb641b6877ac09c4de0cc74", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 404, "duration_ms": 2.03}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.008385+00:00", "request_id": "b3c91304a9cf4939862e3bed7781298b", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 404, "duration_ms": 1.95}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/14 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.021473+00:00", "request_id": "a4ee3118323f424eb409d657cc480155", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 404, "duration_ms": 1.66}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/13 HTTP/1.1" 404 Not Found
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:59.066928+00:00", "request_id": "acfe12f85cc74b3aa1a0d4aa17347e37", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.068517+00:00", "request_id": "acfe12f85cc74b3aa1a0d4aa17347e37", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 38.88}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:59.086262+00:00", "request_id": "a3d0592912dc42968ae5e3ef3b567311", "service": "knowledge", "entity_id": "e_72ee479c5708", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.087202+00:00", "request_id": "a3d0592912dc42968ae5e3ef3b567311", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 9.47}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_72ee479c5708/card HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:59.118026+00:00", "request_id": "b6d2c88e969e46beb68e54c4124df72a", "service": "knowledge", "entity_id": "e_b9933ef541ce", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.120277+00:00", "request_id": "b6d2c88e969e46beb68e54c4124df72a", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 22.16}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_b9933ef541ce/card HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:59.166685+00:00", "request_id": "05c3757b465044dc8db4c0f697858e09", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.169171+00:00", "request_id": "05c3757b465044dc8db4c0f697858e09", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 32.74}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:07:59.206167+00:00", "request_id": "146bc53e34204a71b63e146c3bd981ca", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.208076+00:00", "request_id": "146bc53e34204a71b63e146c3bd981ca", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 32.27}
+INFO:     127.0.0.1:58442 - "GET /v1/entities/e_f8d3b4ea3523/card HTTP/1.1" 200 OK
+{"event": "operator.login.succeeded", "level": "info", "time": "2026-11-13T13:07:59.682460+00:00", "request_id": "419343aba3ff440885a9b2b64dcf915c", "service": "knowledge", "actor": "operator"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.684490+00:00", "request_id": "419343aba3ff440885a9b2b64dcf915c", "service": "knowledge", "method": "POST", "route": "/v1/operator/login", "status": 200, "duration_ms": 320.19}
+INFO:     127.0.0.1:0 - "POST /v1/operator/login HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.707890+00:00", "request_id": "64344e91bcb04ba18ad3506ece7ac8e8", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 6.2}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:07:59.885722+00:00", "request_id": "fd40f4a58fb947229e18e4cf4a502ab6", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.886705+00:00", "request_id": "fd40f4a58fb947229e18e4cf4a502ab6", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 404, "duration_ms": 1.67}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:07:59.894194+00:00", "request_id": "b45925b02efc4534a8a8700f5403a8e5", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.895014+00:00", "request_id": "b45925b02efc4534a8a8700f5403a8e5", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 404, "duration_ms": 1.25}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/10?action=hide HTTP/1.1" 404 Not Found
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:08:00.053915+00:00", "request_id": "40e873dd25db44fa9a3a5a24abf564d7", "service": "knowledge", "permission": "review_portraits", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.054565+00:00", "request_id": "40e873dd25db44fa9a3a5a24abf564d7", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 404, "duration_ms": 1.1}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.065360+00:00", "request_id": "1b5a80dcad094cb1996e715e359ad4cf", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 3.27}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.approved", "level": "info", "time": "2026-11-13T13:08:00.075960+00:00", "request_id": "897cc465764047c485d71572a450bfe3", "service": "knowledge", "portrait_id": 12, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:08:00.079439+00:00", "request_id": "897cc465764047c485d71572a450bfe3", "service": "knowledge", "actor": "operator", "action": "portrait_approve", "target": "12", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.080249+00:00", "request_id": "897cc465764047c485d71572a450bfe3", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 8.31}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/12?action=approve HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.approved", "level": "info", "time": "2026-11-13T13:08:00.097824+00:00", "request_id": "2f500cb5241e4448bb4359346fec8516", "service": "knowledge", "portrait_id": 13, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:08:00.100264+00:00", "request_id": "2f500cb5241e4448bb4359346fec8516", "service": "knowledge", "actor": "operator", "action": "portrait_approve", "target": "13", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.101440+00:00", "request_id": "2f500cb5241e4448bb4359346fec8516", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 14.55}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/13?action=approve HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.shown", "level": "info", "time": "2026-11-13T13:08:00.111730+00:00", "request_id": "1ae9dd9a3c5d4ba0969fbdb65093d63c", "service": "knowledge", "portrait_id": 13, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:08:00.114591+00:00", "request_id": "1ae9dd9a3c5d4ba0969fbdb65093d63c", "service": "knowledge", "actor": "operator", "action": "portrait_show", "target": "13", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.115705+00:00", "request_id": "1ae9dd9a3c5d4ba0969fbdb65093d63c", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 6.91}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/13?action=show HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:08:00.157113+00:00", "request_id": "66e40449ecdf44c9963db66432df8abd", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.158194+00:00", "request_id": "66e40449ecdf44c9963db66432df8abd", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 34.69}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:02.907103+00:00", "request_id": "51e13bbc95ad4e4197303a62499b98b3", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.908284+00:00", "request_id": "51e13bbc95ad4e4197303a62499b98b3", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 8.34}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.930529+00:00", "request_id": "c17df44cc71b406bbb5065434ad39d0e", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 1.71}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:03.202927+00:00", "request_id": "00cc2d035d1d4d36ac6c0528b7fd5b46", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:03.203903+00:00", "request_id": "00cc2d035d1d4d36ac6c0528b7fd5b46", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 7.3}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:03.911492+00:00", "request_id": "79d9018341f24edf9a2ba619e29f88be", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.93}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:05.174965+00:00", "request_id": "12eb2add283d426094a678dae5a66eca", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.176428+00:00", "request_id": "12eb2add283d426094a678dae5a66eca", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 31.02}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.206900+00:00", "request_id": "7b3400eece79453b9de999eecd17ab6e", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 1.46}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:05.474891+00:00", "request_id": "4bdb1dfa3dbe4849a9b49f513378d8a0", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.476615+00:00", "request_id": "4bdb1dfa3dbe4849a9b49f513378d8a0", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 37.13}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:33.519162+00:00", "request_id": "113b4af1b06c43a6b4d26617b6a7bed6", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.520445+00:00", "request_id": "113b4af1b06c43a6b4d26617b6a7bed6", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 23.51}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.541950+00:00", "request_id": "8ca05bfdd085425cae48066568d0efe7", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.09}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:33.787282+00:00", "request_id": "93ba3fcbd1d34e20a8eab33aaa108d3b", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.788709+00:00", "request_id": "93ba3fcbd1d34e20a8eab33aaa108d3b", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 10.27}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:34.457865+00:00", "request_id": "c1c15ce77867485f83a75949b774dacf", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 1.31}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:35.642475+00:00", "request_id": "bca80dbca6af459ebaffa69c447ca805", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.643697+00:00", "request_id": "bca80dbca6af459ebaffa69c447ca805", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 13.17}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.673978+00:00", "request_id": "ae45d5c23ea3437d901ab1a86f6b2e6a", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.1}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:35.891495+00:00", "request_id": "161b759b80424a7f8393e3a2be4c75e1", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.892741+00:00", "request_id": "161b759b80424a7f8393e3a2be4c75e1", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 12.78}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:37.246802+00:00", "request_id": "61718f40e667422190dccbd33120523f", "service": "knowledge", "entity_id": "e_b9933ef541ce", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.248388+00:00", "request_id": "61718f40e667422190dccbd33120523f", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 33.76}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_b9933ef541ce/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:37.602803+00:00", "request_id": "d769a52b75ef4318a22b57110248573d", "service": "knowledge", "entity_id": "e_b9933ef541ce", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.605981+00:00", "request_id": "d769a52b75ef4318a22b57110248573d", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 18.12}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_b9933ef541ce/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:38.896402+00:00", "request_id": "0daeb8bf4c5244e591c4fc1d9fe2df8b", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.897893+00:00", "request_id": "0daeb8bf4c5244e591c4fc1d9fe2df8b", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 12.28}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:40.963517+00:00", "request_id": "fb97bbe4f79549fabfeb5a8aef7b89ef", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.965320+00:00", "request_id": "fb97bbe4f79549fabfeb5a8aef7b89ef", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 14.13}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.995472+00:00", "request_id": "00c632ccd3dc49ed83067abfb2d8de42", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.33}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:42.693721+00:00", "request_id": "072e32a9483944c49e68dd90615054c4", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.694751+00:00", "request_id": "072e32a9483944c49e68dd90615054c4", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 25.41}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:42.928327+00:00", "request_id": "26ab9e4762b54d90913602138d6ae13f", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.929953+00:00", "request_id": "26ab9e4762b54d90913602138d6ae13f", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 25.92}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:45.177086+00:00", "request_id": "25cff957271c4dcdab62d33d31a9ae93", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.178364+00:00", "request_id": "25cff957271c4dcdab62d33d31a9ae93", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 12.11}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.209518+00:00", "request_id": "570bd4d51287425f9a4e76948a5fdc86", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.36}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:45.429548+00:00", "request_id": "be7b2238ac654c3c94a9662ca9dd8ae3", "service": "knowledge", "entity_id": "e_f8d3b4ea3523", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.431192+00:00", "request_id": "be7b2238ac654c3c94a9662ca9dd8ae3", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 10.7}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:46.874547+00:00", "request_id": "4e21f64b4c7a42f4b290c6a5bdfe67eb", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.875797+00:00", "request_id": "4e21f64b4c7a42f4b290c6a5bdfe67eb", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 26.21}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.909102+00:00", "request_id": "fe992ef006594ac59175623b019500b9", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.1}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:47.114869+00:00", "request_id": "807f71678d794c418652cc845aa1c11d", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:47.116577+00:00", "request_id": "807f71678d794c418652cc845aa1c11d", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 13.39}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:51.430451+00:00", "request_id": "aaefa2e94dc145edb2084dce1e88f4cc", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.432190+00:00", "request_id": "aaefa2e94dc145edb2084dce1e88f4cc", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 15.21}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.460035+00:00", "request_id": "b9d067d02f96465f87eb8c9e03e8e493", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.1}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:51.695729+00:00", "request_id": "2feae2c2c7fd4cb2aa1aa5ffcc12d404", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.697248+00:00", "request_id": "2feae2c2c7fd4cb2aa1aa5ffcc12d404", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 24.55}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:53.129706+00:00", "request_id": "7e1eef294cb24603860dc30e50f35733", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.131570+00:00", "request_id": "7e1eef294cb24603860dc30e50f35733", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 14.13}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:53.388304+00:00", "request_id": "7c3d45a06b9841c586a867e0ee10d523", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.389993+00:00", "request_id": "7c3d45a06b9841c586a867e0ee10d523", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 15.9}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:55.823359+00:00", "request_id": "f1d52361f37f48f3acaee94f4c4cd57d", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.824647+00:00", "request_id": "f1d52361f37f48f3acaee94f4c4cd57d", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 11.62}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.864516+00:00", "request_id": "f89687b2a61341129b121d9cacee1aad", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.16}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:09:56.111527+00:00", "request_id": "76359ac667834e09bd66776e303c0ae7", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:56.112674+00:00", "request_id": "76359ac667834e09bd66776e303c0ae7", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 30.12}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "operator.access.denied", "level": "warning", "time": "2026-11-13T13:10:16.664354+00:00", "request_id": "f30a99b524bb4a5d82c4592f3ea2931c", "service": "knowledge", "permission": "review_ontology", "reason": "no_session"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.665891+00:00", "request_id": "f30a99b524bb4a5d82c4592f3ea2931c", "service": "knowledge", "method": "GET", "route": "/v1/review/queue", "status": 404, "duration_ms": 2.41}
+INFO:     127.0.0.1:0 - "GET /v1/review/queue HTTP/1.1" 404 Not Found
+{"event": "operator.login.succeeded", "level": "info", "time": "2026-11-13T13:10:18.470458+00:00", "request_id": "bcf32ad9fef24b2eb88c8314feae38ad", "service": "knowledge", "actor": "operator"}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:18.474058+00:00", "request_id": "bcf32ad9fef24b2eb88c8314feae38ad", "service": "knowledge", "method": "POST", "route": "/v1/operator/login", "status": 200, "duration_ms": 249.09}
+INFO:     127.0.0.1:0 - "POST /v1/operator/login HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:18.493003+00:00", "request_id": "2a6c51b8311a4cca89324bc20a219cdb", "service": "knowledge", "method": "GET", "route": "/v1/review/queue", "status": 200, "duration_ms": 9.26}
+INFO:     127.0.0.1:0 - "GET /v1/review/queue HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.009045+00:00", "request_id": "b91f10df5e5b4426b3792fd6b180537d", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 4.53}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.973684+00:00", "request_id": "b0344f564a5f4786b259737edd036ee3", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 13.07}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.021742+00:00", "request_id": "cbb4670ee6a040c390df83a788d2b355", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.47}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.049818+00:00", "request_id": "986a7e6231dc4057a8b1a11a70570bfe", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 11.07}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.052292+00:00", "request_id": "f1c16966e0b84cb1a44c853d60686f82", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 12.0}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/4 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.056417+00:00", "request_id": "42b4fabb96e14052834bec57f17b1429", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 14.65}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/6 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.057823+00:00", "request_id": "72a7034059e146e897e74c02e2d9ebab", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 10.34}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/7 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.060098+00:00", "request_id": "b4c6e60003d241cb9de4b0b64ae16f5c", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 20.1}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/3 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.061342+00:00", "request_id": "cb193326533d4f93bcae417579e5352e", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 19.72}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/5 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.091329+00:00", "request_id": "34bb0ef7716143e395def50182907451", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 3.23}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/8 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.095202+00:00", "request_id": "fae4a0e6dee043ce994ffee996ad4e67", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 1.95}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/9 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.107715+00:00", "request_id": "bee71ffc143a4847bdf28d9ead93e58f", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.69}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.112122+00:00", "request_id": "82c4603e6ce24190a6f0fc039ce5a224", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.1}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/11 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.116922+00:00", "request_id": "aaf48dd8e6514ed38847a75520552c6e", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 1.92}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.129684+00:00", "request_id": "2df45bafd445486a82d5616c5490dfff", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.6}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:21.448767+00:00", "request_id": "318056bb53a14cd995c59965d5cb5bf7", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 3.81}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:22.318438+00:00", "request_id": "2d2e0435a9834e42be800dbaef9c2a16", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 3.15}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.approved", "level": "info", "time": "2026-11-13T13:10:24.278941+00:00", "request_id": "5b4dabe05fe44beeade20c73a38fd68d", "service": "knowledge", "portrait_id": 14, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:10:24.283355+00:00", "request_id": "5b4dabe05fe44beeade20c73a38fd68d", "service": "knowledge", "actor": "operator", "action": "portrait_approve", "target": "14", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:24.284791+00:00", "request_id": "5b4dabe05fe44beeade20c73a38fd68d", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 11.2}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/14?action=approve HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:24.299117+00:00", "request_id": "db5c7a6d035e44168853801a99e93cb8", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 2.76}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:25.371740+00:00", "request_id": "acd7199fc1cd4f0db510628b847f55c0", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 8.27}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:25.423285+00:00", "request_id": "23eadd3f3e1d469685de4e1157e3add4", "service": "knowledge", "method": "GET", "route": "/v1/portraits/{portrait_id}", "status": 200, "duration_ms": 2.77}
+INFO:     127.0.0.1:0 - "GET /v1/portraits/14 HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:10:27.231810+00:00", "request_id": "f5fae19b10f040c39f13a00388c7531f", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.233647+00:00", "request_id": "f5fae19b10f040c39f13a00388c7531f", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 40.27}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.main", "level": "info", "time": "2026-11-13T13:10:27.292604+00:00", "request_id": "69e852fe582346578d7851d9e3651902", "service": "knowledge", "portrait_id": 13, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:10:27.303437+00:00", "request_id": "69e852fe582346578d7851d9e3651902", "service": "knowledge", "actor": "operator", "action": "portrait_main", "target": "13", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.305367+00:00", "request_id": "69e852fe582346578d7851d9e3651902", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 22.18}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/13?action=main HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.329191+00:00", "request_id": "e7149de4caac44ea9ac92e624ca74a24", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 14.73}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:10:29.515309+00:00", "request_id": "fdc5f1e6b5cf403d89428ad9396132de", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.518095+00:00", "request_id": "fdc5f1e6b5cf403d89428ad9396132de", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 11.82}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.hidden", "level": "info", "time": "2026-11-13T13:10:29.628709+00:00", "request_id": "203f9323a798449090e8b11117c93115", "service": "knowledge", "portrait_id": 13, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:10:29.632822+00:00", "request_id": "203f9323a798449090e8b11117c93115", "service": "knowledge", "actor": "operator", "action": "portrait_hide", "target": "13", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.634035+00:00", "request_id": "203f9323a798449090e8b11117c93115", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 10.68}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/13?action=hide HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.651040+00:00", "request_id": "7d2c6c8c832e4f01b8eb06ea1de85bfe", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 7.88}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:10:31.467859+00:00", "request_id": "362ced2cba7b4efeb2e0601c1dbb6e84", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:31.470011+00:00", "request_id": "362ced2cba7b4efeb2e0601c1dbb6e84", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 24.62}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:31.499265+00:00", "request_id": "302711d5ad6348b0bfcc063f0df816d1", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 4.58}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "knowledge.portrait.shown", "level": "info", "time": "2026-11-13T13:10:32.633845+00:00", "request_id": "3eb6fc87bb924faf8de5fc706d5649a1", "service": "knowledge", "portrait_id": 13, "actor": "operator"}
+{"event": "operator.action", "level": "info", "time": "2026-11-13T13:10:32.638282+00:00", "request_id": "3eb6fc87bb924faf8de5fc706d5649a1", "service": "knowledge", "actor": "operator", "action": "portrait_show", "target": "13", "details": null}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:32.639688+00:00", "request_id": "3eb6fc87bb924faf8de5fc706d5649a1", "service": "knowledge", "method": "POST", "route": "/v1/review/portraits/{portrait_id}", "status": 200, "duration_ms": 13.65}
+INFO:     127.0.0.1:0 - "POST /v1/review/portraits/13?action=show HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:32.654110+00:00", "request_id": "0f19dea099a54657b41c60c9c99827b9", "service": "knowledge", "method": "GET", "route": "/v1/review/portraits", "status": 200, "duration_ms": 2.42}
+INFO:     127.0.0.1:0 - "GET /v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "knowledge.card.served", "level": "info", "time": "2026-11-13T13:10:34.528956+00:00", "request_id": "3370d65fc01d4dd58bb73432bb114beb", "service": "knowledge", "entity_id": "e_dcd68cfc0448", "type": "person", "sections": 0, "rows": 0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:34.532198+00:00", "request_id": "3370d65fc01d4dd58bb73432bb114beb", "service": "knowledge", "method": "GET", "route": "/v1/entities/{entity_id}/card", "status": 200, "duration_ms": 37.45}
+INFO:     127.0.0.1:0 - "GET /v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK

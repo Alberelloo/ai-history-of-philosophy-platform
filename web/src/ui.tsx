@@ -413,9 +413,8 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
   const current = shown.length ? shown[Math.min(index, shown.length - 1)] : undefined;
   // Сброс при смене изображения: после ошибки листание должно снова пробовать грузить.
   useEffect(() => setFailed(false), [current?.url]);
-  if (shown.length === 0 || !current || failed) {
-    // Нет изображений или файл не загрузился — монограмма и «Изображений нет»,
-    // как в медальоне (Portrait.md): пустой кадр с битым <img> не показывается.
+  if (shown.length === 0 || !current) {
+    // Изображений нет вовсе — монограмма и «Изображений нет» (Portrait.md).
     return (
       <div className="pg-portrait-gallery pg-portrait-gallery--empty">
         <Portrait name={name} />
@@ -456,18 +455,27 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
         if (e.key === "ArrowRight") move(1);
       }}
     >
-      <img
-        className="pg-portrait-gallery__image"
-        src={current.url}
-        width={current.width}
-        height={current.height}
-        alt={name}
-        aria-label={shown.length > 1 ? t.card.slide(index + 1, shown.length) : undefined}
-        loading="lazy"
-        decoding="async"
-        onError={() => setFailed(true)}
-      />
-      {credit.length > 0 && (
+      {failed ? (
+        // Файл не загрузился: монограмма вместо битого кадра, но галерея и листание живы —
+        // переход к другому портрету повторяет загрузку (сброс failed по current.url).
+        <div className="pg-portrait-gallery--empty">
+          <Portrait name={name} />
+          <p className="pg-portrait-gallery__empty">{t.card.noImages}</p>
+        </div>
+      ) : (
+        <img
+          className="pg-portrait-gallery__image"
+          src={current.url}
+          width={current.width}
+          height={current.height}
+          alt={name}
+          aria-label={shown.length > 1 ? t.card.slide(index + 1, shown.length) : undefined}
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      )}
+      {!failed && credit.length > 0 && (
         <p className="pg-portrait-gallery__credit">
           {credit.map((part, i) => (
             <span key={i}>

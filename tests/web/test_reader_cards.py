@@ -866,15 +866,34 @@ def test_t16_portrait_gallery(browser, site, texts):
         assert credit.locator("a", has_text="Источник").count() == 1
         panel.get_by_role("button", name="Закрыть карточку").click()
 
-        # Ошибка загрузки: вместо битой картинки — пустое состояние с монограммой.
+        # Ошибка загрузки: вместо битой картинки — монограмма и «Изображений нет».
         knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(1))
         page.route("**/portraits/kant-0.jpg", lambda route: route.fulfill(status=500, body=""))
         page.reload()
         panel = open_full(page, site)
         gallery = panel.locator(".pg-portrait-gallery")
-        assert "pg-portrait-gallery--empty" in (gallery.get_attribute("class") or "")
         assert gallery.locator("img").count() == 0
         expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        assert gallery.locator(".pg-portrait-gallery__count").count() == 0  # одно изображение
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Сбой одного из двух: галерея и листание живы, переход пробует другой портрет снова.
+        page.unroute("**/portraits/kant-0.jpg")
+        page.route("**/portraits/kant-1.jpg", lambda route: route.abort())
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(2))
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        expect(gallery.locator("img")).to_have_count(1)
+        gallery.get_by_role("button", name="Следующий портрет").click()
+        assert gallery.locator("img").count() == 0  # сбойный кадр — монограмма
+        expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        expect(gallery.locator(".pg-portrait-gallery__count")).to_have_text("2 из 2")
+        assert gallery.locator(".pg-portrait-gallery__dot").count() == 2
+        gallery.get_by_role("button", name="Предыдущий портрет").click()
+        expect(gallery.locator("img")).to_have_count(1)
+        assert "kant-0" in (gallery.locator("img").get_attribute("src") or "")
+        expect(gallery.locator(".pg-portrait-gallery__count")).to_have_text("1 из 2")
         panel.get_by_role("button", name="Закрыть карточку").click()
 
         # Без изображений: монограмма и «Изображений нет».
