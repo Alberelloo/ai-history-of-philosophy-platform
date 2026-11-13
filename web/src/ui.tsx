@@ -408,8 +408,14 @@ export type PortraitItem = {
 export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]; name: string }) {
   const t = useT();
   const [index, setIndex] = useState(0);
+  const [failed, setFailed] = useState(false);
   const shown = portraits.slice(0, 7);
-  if (shown.length === 0) {
+  const current = shown.length ? shown[Math.min(index, shown.length - 1)] : undefined;
+  // Сброс при смене изображения: после ошибки листание должно снова пробовать грузить.
+  useEffect(() => setFailed(false), [current?.url]);
+  if (shown.length === 0 || !current || failed) {
+    // Нет изображений или файл не загрузился — монограмма и «Изображений нет»,
+    // как в медальоне (Portrait.md): пустой кадр с битым <img> не показывается.
     return (
       <div className="pg-portrait-gallery pg-portrait-gallery--empty">
         <Portrait name={name} />
@@ -417,7 +423,6 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
       </div>
     );
   }
-  const current = shown[Math.min(index, shown.length - 1)];
   const move = (delta: number) => setIndex((i) => (i + delta + shown.length) % shown.length);
   const credit: ReactNode[] = [];
   const authorYear = [current.author, current.year].filter(Boolean).join(", ");
@@ -460,6 +465,7 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
         aria-label={shown.length > 1 ? t.card.slide(index + 1, shown.length) : undefined}
         loading="lazy"
         decoding="async"
+        onError={() => setFailed(true)}
       />
       {credit.length > 0 && (
         <p className="pg-portrait-gallery__credit">

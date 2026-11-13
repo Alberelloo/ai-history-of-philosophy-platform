@@ -866,6 +866,17 @@ def test_t16_portrait_gallery(browser, site, texts):
         assert credit.locator("a", has_text="Источник").count() == 1
         panel.get_by_role("button", name="Закрыть карточку").click()
 
+        # Ошибка загрузки: вместо битой картинки — пустое состояние с монограммой.
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(1))
+        page.route("**/portraits/kant-0.jpg", lambda route: route.fulfill(status=500, body=""))
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        assert "pg-portrait-gallery--empty" in (gallery.get_attribute("class") or "")
+        assert gallery.locator("img").count() == 0
+        expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
         # Без изображений: монограмма и «Изображений нет».
         knowledge.cards[KANT] = dict(CARDS[KANT], portraits=[])
         page.reload()
