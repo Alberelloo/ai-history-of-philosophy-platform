@@ -1,0 +1,338 @@
+[
+ {
+  "case": "dup2-bookmark-p1",
+  "note": "одноимённый заголовок на 2 страницах, закладка на вхождение",
+  "raw_pages": 2,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ]
+  ],
+  "toc_issues": []
+ },
+ {
+  "case": "dup2-bookmark-p2",
+  "note": "одноимённый заголовок на 2 страницах, закладка на вхождение",
+  "raw_pages": 2,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ]
+  ],
+  "toc_issues": []
+ },
+ {
+  "case": "dup2-bookmark-p-outside",
+  "note": "закладка на страницу без вхождения (3-я страница с другим заголовком)",
+  "raw_pages": 3,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Appendix",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Appendix",
+    1
+   ]
+  ],
+  "toc_issues": [
+   {
+    "message": "Закладка «Notes» указывает на страницу 3, а заголовок в тексте на странице 1, 2",
+    "page": "3"
+   }
+  ]
+ },
+ {
+  "case": "dup4-bookmark-p1",
+  "note": "одноимённый заголовок на с. 1 и с. 3, закладка на вхождение",
+  "raw_pages": 4,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Middle Chapter",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Appendix",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Middle Chapter",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Appendix",
+    1
+   ]
+  ],
+  "toc_issues": []
+ },
+ {
+  "case": "dup4-bookmark-p3",
+  "note": "одноимённый заголовок на с. 1 и с. 3, закладка на вхождение",
+  "raw_pages": 4,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Middle Chapter",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Appendix",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Middle Chapter",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Appendix",
+    1
+   ]
+  ],
+  "toc_issues": []
+ },
+ {
+  "case": "dup4-bookmark-p4",
+  "note": "одноимённый заголовок на с. 1 и с. 3, закладка на страницу без вхождения",
+  "raw_pages": 4,
+  "raw_lines": [
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Middle Chapter",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Notes",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ],
+   [
+    [
+     "Appendix",
+     1
+    ],
+    [
+     "All knowledge begins with experience, bu",
+     null
+    ]
+   ]
+  ],
+  "sections": [
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Middle Chapter",
+    1
+   ],
+   [
+    "Notes",
+    1
+   ],
+   [
+    "Appendix",
+    1
+   ]
+  ],
+  "toc_issues": [
+   {
+    "message": "Закладка «Notes» указывает на страницу 4, а заголовок в тексте на странице 1, 3",
+    "page": "4"
+   }
+  ]
+ }
+]

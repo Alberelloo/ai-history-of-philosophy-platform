@@ -45,12 +45,14 @@ postings = Table(
     schema=SCHEMA,
 )
 
-# Готовые эмбеддинги по тексту и модели: тот же текст той же моделью не пересчитывается.
+# Готовые эмбеддинги по тексту, модели и размерности: тот же текст той же моделью той же
+# размерности не пересчитывается. ``dimension`` — NULL у записей, собранных до введения колонки.
 vectors_done = Table(
     "vectors_done",
     metadata,
     Column("text_hash", String(64), primary_key=True),
     Column("model", String(100), primary_key=True),
+    Column("dimension", Integer),
     Column("chunks", Integer, nullable=False),
     schema=SCHEMA,
 )
@@ -115,3 +117,14 @@ def _add_regions_and_external(conn) -> None:
 
 
 migrations.add(4, "регионы показа и внешняя обработка у абзаца")(_add_regions_and_external)
+
+
+def _add_vectors_done_dimension(conn) -> None:
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("vectors_done", schema=SCHEMA)}
+    if "dimension" not in columns:  # база, созданная до этой миграции
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.vectors_done ADD COLUMN dimension INTEGER"))
+
+
+migrations.add(5, "размерность модели в учёте эмбеддингов")(_add_vectors_done_dimension)

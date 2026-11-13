@@ -109,7 +109,36 @@ def test_migration_4_adds_regions_and_external(tmp_path):
     assert {"regions", "external"} <= columns
     assert row.regions == "*"
     assert bool(row.external) is True
-    assert s.migrations.latest() == 4
+    assert s.migrations.latest() == 5
+
+
+def test_migration_5_adds_vectors_done_dimension(tmp_path):
+    """Миграция 5 добавляет ``dimension`` в ``vectors_done``; прежние записи сохраняются."""
+    engine = make_engine(f"sqlite:///{(tmp_path / 's.db').as_posix()}", [s.SCHEMA])
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                f"CREATE TABLE {s.SCHEMA}.vectors_done ("
+                "text_hash VARCHAR(64), model VARCHAR(100), "
+                "chunks INTEGER NOT NULL, PRIMARY KEY (text_hash, model))"
+            )
+        )
+        conn.execute(
+            text(
+                f"INSERT INTO {s.SCHEMA}.vectors_done (text_hash, model, chunks) "
+                "VALUES ('h1', 'concept-v1', 3)"
+            )
+        )
+        s._add_vectors_done_dimension(conn)
+        s._add_vectors_done_dimension(conn)  # повторный прогон безвреден
+        columns = {c["name"] for c in inspect(conn).get_columns("vectors_done", schema=s.SCHEMA)}
+        row = conn.execute(
+            text(f"SELECT text_hash, model, dimension, chunks FROM {s.SCHEMA}.vectors_done")
+        ).one()
+    assert "dimension" in columns
+    assert row.dimension is None  # прежние записи сохраняются, размерность неизвестна
+    assert row.text_hash == "h1" and row.chunks == 3
+    assert s.migrations.latest() == 5
 
 
 @req(PS, "Видимость и публикация")

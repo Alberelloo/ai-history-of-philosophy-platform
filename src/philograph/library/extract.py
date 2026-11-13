@@ -370,6 +370,22 @@ def extract_pdf(
         raise ExtractionError("файл защищён паролем")
     pages: list[RawPage] = []
     textless: list[int] = []
+    # Оглавление-закладки цифрового PDF: по странице каждой закладки ставим заголовок раздела
+    # нужного уровня, а не полагаемся только на размер шрифта. Закладка вне документа не
+    # применяется, но остаётся в printed_toc — разбор выдаст о ней предупреждение.
+    bookmarks: dict[int, list[tuple[int, str]]] = {}
+    bookmark_entries: list[tuple[int, str, int]] = []
+    for entry in doc.get_toc(simple=True) or []:
+        try:
+            level, title, page = int(entry[0]), str(entry[1]).strip(), int(entry[2])
+        except (IndexError, TypeError, ValueError):
+            continue
+        if not title:
+            continue
+        bookmark_entries.append((level, title, page))
+        index = page - 1
+        if 0 <= index < doc.page_count:
+            bookmarks.setdefault(index, []).append((level, title))
     for index in range(doc.page_count):
         if skip_pages and index in skip_pages:
             continue
@@ -387,8 +403,9 @@ def extract_pdf(
             if spreads
             else [None]
         )
-        for clip in clips:
-            lines = _pdf_text_lines(page, clip)
+        lines_per_clip = [_pdf_text_lines(page, clip) for clip in clips]
+        _apply_bookmarks(lines_per_clip, bookmarks.get(index, []))
+        for clip, lines in zip(clips, lines_per_clip, strict=True):
             label = (page.get_label() or None) if clip is None else None
             raw = RawPage(
                 index=len(pages), lines=lines, printed_label=label, has_text_layer=bool(lines)
@@ -414,7 +431,7 @@ def extract_pdf(
             f"{len(textless)} из {doc.page_count} страниц без текста (первая — страница "
             f"{textless[0] + 1}), распознавание не задано"
         )
-    return RawDocument(pages=pages, fmt="pdf", paginated=True)
+    return RawDocument(pages=pages, fmt="pdf", paginated=True, printed_toc=bookmark_entries)
 
 
 def _pdf_text_lines(page, clip=None) -> list[RawLine]:
@@ -452,6 +469,33 @@ def _pdf_text_lines(page, clip=None) -> list[RawLine]:
                 )
                 first = False
     return lines
+
+
+def _bookmark_key(text: str) -> str:
+    """Заголовок закладки для сравнения: регистр и лишние пробелы не важны."""
+    return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def _bookmark_heading(lines: list[RawLine], title: str) -> RawLine | None:
+    """Строка страницы, соответствующая заголовку закладки; ``None`` — не найдена."""
+    key = _bookmark_key(title)
+    if not key:
+        return None
+    for line in lines:
+        line_key = _bookmark_key(line.text)
+        if line_key and (line_key == key or line_key.endswith(key) or key.endswith(line_key)):
+            return line
+    return None
+
+
+def _apply_bookmarks(lines_per_clip: list[list[RawLine]], bookmarks: list[tuple[int, str]]) -> None:
+    """Ставит строкам уровень заголовка из закладок; одна строка — одна закладка."""
+    for level, title in bookmarks:
+        for lines in lines_per_clip:
+            line = _bookmark_heading(lines, title)
+            if line is not None and line.heading_level is None:
+                line.heading_level = max(1, level)
+                break
 
 
 def extract(

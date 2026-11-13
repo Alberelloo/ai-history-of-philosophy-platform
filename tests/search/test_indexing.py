@@ -161,3 +161,51 @@ def test_reconcile_after_lost_event(rig, events):
     assert rig.indexer.reconcile() == {"missing": 1, "extra": 0}
     assert docs(rig, source_id=rig.ids["ru"])
     events.one("search.index.reconciled")
+
+
+@req(PI, "Версия модели эмбеддингов")
+def test_dimension_mismatch_fails_before_writing(rig, events):
+    """Смена размерности эмбеддера при прежней коллекции: ошибка до записи, без лживой пометки."""
+    from dataclasses import dataclass
+
+    from philograph.search.vectors import DimensionMismatch
+
+    rig.publish("ru")  # коллекция paragraphs__concept-v1 с размерностью len(CONCEPTS) + 1
+
+    @dataclass
+    class WrongDim:
+        model: str = "concept-v1"
+        dimension: int = 4
+        called: bool = False
+
+        def embed(self, texts, *, budget):
+            self.called = True
+            return [[0.0] * self.dimension for _ in texts]
+
+    embedder = WrongDim()
+    item = {"id": "p-new", "text": "Новый абзац про индукцию.", "hash": "hash-new"}
+    data = {
+        "source_id": rig.ids["ru"],
+        "scope": "public",
+        "permissions": {"external_processing": True, "quoting": True},
+        "regions": None,
+    }
+    collection = rig.indexer.active_collection
+    with pytest.raises(DimensionMismatch) as info:
+        rig.indexer._embed([item], data, embedder, collection)
+    assert "7" in str(info.value) and "4" in str(info.value)
+    assert embedder.called is False  # размерность проверяется до вызова эмбеддера
+    event = events.one("search.index.dimension_mismatch")
+    assert event["collection"] == collection
+    assert event["collection_dimension"] == 7
+    assert event["embedder_dimension"] == 4
+
+    from sqlalchemy import func, select
+
+    with rig.indexer.engine.begin() as conn:
+        done = conn.scalar(
+            select(func.count())
+            .select_from(t.vectors_done)
+            .where(t.vectors_done.c.text_hash == "hash-new")
+        )
+    assert done == 0  # «лживой» записи в vectors_done нет

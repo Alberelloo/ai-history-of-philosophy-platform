@@ -111,3 +111,52 @@ def test_timings_logged(ready, events):
     event = events.of("search.query.completed")[-1]
     for part in ("embed_ms", "semantic_ms", "lexical_ms", "fusion_ms"):
         assert event[part] >= 0
+
+
+@req(PS, "Деградация")
+def test_dimension_mismatch_degrades_with_reason(ready, events):
+    """Коллекция другой размерности: смысловая часть деградирует с причиной, текст работает."""
+    from dataclasses import dataclass
+
+    @dataclass
+    class WrongDim:
+        model: str = "concept-v1"
+        dimension: int = 4
+
+        def embed(self, texts, *, budget):
+            return [[0.0] * self.dimension for _ in texts]
+
+    ready.searcher.embedder = WrongDim()
+    result = ready.search("привычка ума")
+    assert result["semantic_used"] is False
+    assert result["results"]
+    assert all(r["found_by"] == ["lexical"] for r in result["results"])
+    event = events.one("search.semantic.unavailable")
+    assert event["reason"] == "dimension_mismatch"
+    assert event["model"] == "concept-v1"
+    assert event["collection_dimension"] == 7
+    assert event["embedder_dimension"] == 4
+
+
+@req(PS, "Гибридный поиск")
+def test_search_is_hybrid_again_after_dimension_fixed(ready, events):
+    """После исправления модели поиск снова гибридный, событие больше не выдаётся."""
+    from dataclasses import dataclass
+
+    @dataclass
+    class WrongDim:
+        model: str = "concept-v1"
+        dimension: int = 4
+
+        def embed(self, texts, *, budget):
+            return [[0.0] * self.dimension for _ in texts]
+
+    ready.searcher.embedder = WrongDim()
+    assert ready.search("привычка ума")["semantic_used"] is False
+    events.clear()
+
+    ready.searcher.embedder = ready.indexer.embedder  # исправленная модель
+    result = ready.search("привычка ума")
+    assert result["semantic_used"] is True
+    assert any("semantic" in r["found_by"] for r in result["results"])
+    events.assert_none("search.semantic.unavailable")

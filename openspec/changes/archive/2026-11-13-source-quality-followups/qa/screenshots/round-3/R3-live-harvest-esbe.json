@@ -1,0 +1,55 @@
+﻿{
+ "harvest": [
+  {
+   "url": "https://ru.wikisource.org/wiki/ЭСБЕ/Скептицизм",
+   "title": "ЭСБЕ/Скептицизм",
+   "authors": [
+    {
+     "name": "Э. Радлов",
+     "death_year": null,
+     "wikidata": null
+    }
+   ],
+   "language": "ru",
+   "requests": 4
+  },
+  {
+   "url": "https://ru.wikisource.org/wiki/ЭСБЕ/Теория_познания",
+   "title": "ЭСБЕ/Теория познания",
+   "authors": [
+    {
+     "name": "Н. Г. Дебольский",
+     "death_year": null,
+     "wikidata": null
+    }
+   ],
+   "language": "ru",
+   "requests": 8
+  }
+ ],
+ "events": []
+}
+{
+ "title": "ЭСБЕ/Скептицизм",
+ "authors": [
+  {
+   "name": "Э. Радлов",
+   "death_year": null,
+   "wikidata": null
+  }
+ ],
+ "author_names_repr": [
+  "'Э. Радлов'"
+ ],
+ "contains_markup": [
+  false
+ ],
+ "year": null,
+ "slug_hint": [
+  "Радлов",
+  "ЭСБЕ/Скептицизм",
+  "ru",
+  "wikisource"
+ ],
+ "files": 1
+}

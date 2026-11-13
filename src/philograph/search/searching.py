@@ -14,7 +14,7 @@ from philograph.platform import events
 from philograph.search import schema as t
 from philograph.search.indexing import EmbedPort
 from philograph.search.text import terms
-from philograph.search.vectors import VectorStore
+from philograph.search.vectors import DimensionMismatch, VectorStore
 
 events.define(
     "search.query.completed",
@@ -28,6 +28,7 @@ events.define(
     "warning",
     "Смысловой поиск недоступен, ответ только по словам",
     required=("reason",),
+    optional=("model", "collection", "collection_dimension", "embedder_dimension"),
 )
 
 # Служебные слова не несут смысла запроса: без них «тема, которой нет» не найдёт абзацы
@@ -162,9 +163,22 @@ class Searcher:
                 h.paragraph_id: h.score for h in hits if h.score >= self.settings.min_semantic_score
             }
             timings["semantic_ms"] = round((time.perf_counter() - started) * 1000, 2)
+        except DimensionMismatch as exc:  # размерность запроса не совпала с коллекцией
+            semantic_used = False
+            events.emit(
+                "search.semantic.unavailable",
+                reason="dimension_mismatch",
+                model=self.embedder.model,
+                collection=self.collection(),
+                collection_dimension=exc.collection_dim,
+                embedder_dimension=exc.embedder_dim,
+            )
         except Exception as exc:  # провайдер или векторная база недоступны
             semantic_used = False
-            events.emit("search.semantic.unavailable", reason=type(exc).__name__)
+            events.emit(
+                "search.semantic.unavailable",
+                reason=f"{type(exc).__name__}: {exc}" if str(exc) else type(exc).__name__,
+            )
         started = time.perf_counter()
         base_terms = [w for w in terms(q.text) if w not in STOPWORDS]
         extra = [w for x in q.extra_terms for w in terms(x) if w not in STOPWORDS]

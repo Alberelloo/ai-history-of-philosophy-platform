@@ -1,0 +1,39 @@
+﻿=== МУТАНТ (запись heading_level удалена) ===
+F
+================================== FAILURES ===================================
+______________________ test_bookmark_on_wrong_page_warns ______________________
+
+    @req(DS, "Оглавление источника")
+    def test_bookmark_on_wrong_page_warns():
+        """Заголовок нашёлся, но не там, куда указывает закладка: это расхождение (EC-16).
+    
+        Молча брать структуру по шрифту нельзя: печатное оглавление разошлось с текстом,
+        и оператор должен об этом узнать — с обеими страницами.
+        """
+        data = _pdf(
+            [
+                [("Chapter One", 16.0), (f"{BODY} First.", 11.0)],
+                [("Chapter Two", 16.0), (f"{BODY} Second.", 11.0)],
+            ],
+            [
+                [1, "Chapter One", 1],
+                [1, "Chapter Two", 1],  # закладка врёт: заголовок на второй странице
+            ],
+        )
+        doc = parse_raw(extract_pdf(data, languages=["eng"], ocr=None))
+        messages = [i.message for i in doc.issues if i.code == "toc_mismatch"]
+>       assert any("Chapter Two" in m and "страницу 1" in m and "странице 2" in m for m in messages), (
+            messages
+        )
+E       AssertionError: []
+E       assert False
+E        +  where False = any(<generator object test_bookmark_on_wrong_page_warns.<locals>.<genexpr> at 0x0000029FFA281220>)
+
+tests\library\test_pdf_toc.py:101: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/library/test_pdf_toc.py::test_bookmark_on_wrong_page_warns - Ass...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.16s
+=== ИСХОДНЫЙ КОД (7204d54) ===
+.                                                                        [100%]
+1 passed in 0.10s

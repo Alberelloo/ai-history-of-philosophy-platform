@@ -1,0 +1,23 @@
+{
+  "Q9312": {
+    "name": "Кант",
+    "wikidata_label": "Иммануил Кант",
+    "count": 1,
+    "problems": null,
+    "first": [
+      {
+        "commons_file": "Immanuel Kant - Gemaelde 2.jpg",
+        "width": 275,
+        "height": 480,
+        "license": "pd"
+      }
+    ]
+  },
+  "Q34907": {
+    "name": "Локк",
+    "wikidata_label": "Аманадойч",
+    "count": 0,
+    "problems": null,
+    "first": []
+  }
+}

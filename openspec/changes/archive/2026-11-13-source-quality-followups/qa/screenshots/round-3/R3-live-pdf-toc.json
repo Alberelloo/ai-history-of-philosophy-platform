@@ -1,0 +1,138 @@
+﻿[
+ {
+  "case": "EC-16 закладка 'Chapter Two' на с.1, заголовок на с.2",
+  "expect": "предупреждение toc_mismatch с обеими страницами",
+  "bookmarks": [
+   [
+    1,
+    "Chapter One",
+    1
+   ],
+   [
+    1,
+    "Chapter Two",
+    1
+   ]
+  ],
+  "toc_mismatch": [
+   "Закладка «Chapter Two» указывает на страницу 1, а заголовок в тексте на странице 2"
+  ],
+  "sections": [
+   [
+    "Chapter One",
+    1,
+    1
+   ],
+   [
+    "Chapter Two",
+    1,
+    1
+   ]
+  ],
+  "all_issues": [
+   "toc_mismatch"
+  ]
+ },
+ {
+  "case": "TC-2 закладка 'Ghost Chapter', в тексте заголовка нет",
+  "expect": "одно предупреждение с названием и страницей",
+  "bookmarks": [
+   [
+    1,
+    "Chapter One",
+    1
+   ],
+   [
+    1,
+    "Chapter Two",
+    2
+   ],
+   [
+    1,
+    "Ghost Chapter",
+    2
+   ]
+  ],
+  "toc_mismatch": [
+   "В печатном оглавлении есть «Ghost Chapter», в тексте такого заголовка нет, с. 2"
+  ],
+  "sections": [
+   [
+    "Chapter One",
+    1,
+    1
+   ],
+   [
+    "Chapter Two",
+    1,
+    1
+   ]
+  ],
+  "all_issues": [
+   "toc_mismatch"
+  ]
+ },
+ {
+  "case": "Ложные: совпадающие закладки",
+  "expect": "пусто",
+  "bookmarks": [
+   [
+    1,
+    "Chapter One",
+    1
+   ],
+   [
+    1,
+    "Chapter Two",
+    2
+   ]
+  ],
+  "toc_mismatch": [],
+  "sections": [
+   [
+    "Chapter One",
+    1,
+    1
+   ],
+   [
+    "Chapter Two",
+    1,
+    1
+   ]
+  ],
+  "all_issues": []
+ },
+ {
+  "case": "Ложные: без закладок, крупный шрифт",
+  "expect": "пусто, разделы по шрифту",
+  "bookmarks": [],
+  "toc_mismatch": [],
+  "sections": [
+   [
+    "",
+    1,
+    1
+   ],
+   [
+    "Ancient Philosophy",
+    1,
+    1
+   ]
+  ],
+  "all_issues": []
+ },
+ {
+  "case": "EC-1 пустое оглавление",
+  "expect": "пусто, раздел по шрифту",
+  "bookmarks": [],
+  "toc_mismatch": [],
+  "sections": [
+   [
+    "Introduction to Philosophy",
+    1,
+    1
+   ]
+  ],
+  "all_issues": []
+ }
+]

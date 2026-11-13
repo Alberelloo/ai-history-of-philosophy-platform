@@ -320,6 +320,9 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 and (len(line.text) < 120 and not line.text.rstrip().endswith("."))
             ):
                 level = heading_sizes.index(round(line.size)) + 1
+                # Решение о заголовке записываем в строку: сверка с закладками PDF ищет
+                # заголовки по этому полю, и найденный по шрифту должен быть виден.
+                line.heading_level = level
             if level is not None:
                 current = _Draft(
                     "heading", line.text.strip(), [], [], page_pos=pos, heading_level=level
@@ -504,6 +507,7 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
             owners[pos] = last
     _link_footnotes(doc, raw_notes, new_id, owners, ref_pages, ref_markers)
     _compare_toc(doc)
+    _compare_bookmarks(doc, raw)
     return doc
 
 
@@ -578,3 +582,70 @@ def _compare_toc(doc: Document) -> None:
                 "toc_mismatch",
                 f"В печатном оглавлении есть «{title}», в тексте такого заголовка нет",
             )
+
+
+def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
+    """Закладки PDF (printed_toc) сверяются с заголовками; расхождения — предупреждения.
+
+    Закладка вне документа и заголовок, которого нет в тексте, — предупреждение с названием и
+    страницей из закладки.
+    """
+    if not raw.printed_toc:
+        return
+    titles = {lang.normalize_text(s.title) for s in doc.walk() if s.title and s.kind != "toc"}
+    # Где заголовок встретился в тексте на самом деле: имя закладки → фактическая страница.
+    actual_pages = _heading_pages(raw)
+    for entry in raw.printed_toc:
+        title = entry[1]
+        page = entry[2] if len(entry) > 2 else None
+        if page is not None and not (1 <= page <= len(raw.pages)):
+            # PyMuPDF отдаёт −1, если целевая страница закладки удалена: номер тут
+            # технический, оператору он ничего не скажет.
+            where = f"на страницу {page}" if page >= 1 else "на страницу, которой нет в документе"
+            doc.warn(
+                "toc_mismatch",
+                f"Закладка «{title}» указывает {where}",
+                page=str(page) if page >= 1 else None,
+            )
+            continue
+        key = lang.normalize_text(title)
+        if key not in titles:
+            where = f", с. {page}" if page is not None else ""
+            doc.warn(
+                "toc_mismatch",
+                f"В печатном оглавлении есть «{title}», в тексте такого заголовка нет{where}",
+                page=str(page) if page is not None else None,
+            )
+            continue
+        # Заголовок нашёлся, но не там, куда указывает закладка: печатное оглавление
+        # разошлось с текстом — об этом и предупреждаем (сценарий «Расхождение»).
+        # Одноимённый заголовок может встречаться на нескольких страницах, поэтому
+        # сверяем с множеством вхождений, а не с первым.
+        actual = actual_pages.get(key, set())
+        if page is not None and actual and page not in actual:
+            found = ", ".join(str(n) for n in sorted(actual))
+            doc.warn(
+                "toc_mismatch",
+                f"Закладка «{title}» указывает на страницу {page}, "
+                f"а заголовок в тексте на странице {found}",
+                page=str(page),
+            )
+
+
+def _heading_pages(raw: RawDocument) -> dict[str, set[int]]:
+    """Нормализованный текст заголовка → номера напечатанных страниц, где он встретился."""
+    pages: dict[str, set[int]] = {}
+    for index, page in enumerate(raw.pages):
+        number = _page_number(page.printed_label) if page.printed_label else index + 1
+        if number < 0:
+            number = index + 1
+        for line in page.lines:
+            if line.heading_level:
+                pages.setdefault(lang.normalize_text(line.text), set()).add(number)
+    return pages
+
+
+def _page_number(label: str) -> int:
+    """Номер страницы из подписи: «12» → 12; римские и пустые цифр не дают."""
+    digits = re.sub(r"\D", "", str(label))
+    return int(digits) if digits else -1
