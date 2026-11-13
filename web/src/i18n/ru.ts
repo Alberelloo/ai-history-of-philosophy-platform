@@ -283,6 +283,8 @@ export const ru = {
     slide: (i: number, n: number) => `${i} из ${n}`,
     previousPortrait: "Предыдущий портрет",
     nextPortrait: "Следующий портрет",
+    license: "Лицензия",
+    imageSource: "Источник",
     summary: (v: number, s: number, g: number) =>
       ["Проверено: " + v, "По источникам: " + s, "Сгенерировано: " + g].join(" · "),
     disagree: (who: string) => `не согласны: ${who}`,

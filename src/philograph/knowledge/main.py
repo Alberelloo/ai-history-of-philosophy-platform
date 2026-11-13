@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import threading
 from dataclasses import dataclass
+from pathlib import Path
 
 from sqlalchemy import text
 
@@ -17,6 +18,7 @@ from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
 from philograph.knowledge.statements import Statements
@@ -25,6 +27,7 @@ from philograph.operator.access import migrations as operator_migrations
 from philograph.platform import events
 from philograph.platform.client import ServiceClient
 from philograph.platform.db import make_engine
+from philograph.platform.files import FileStore
 from philograph.platform.health import Health
 from philograph.platform.queue import Queue
 from philograph.platform.queue import migrations as queue_migrations
@@ -38,6 +41,8 @@ class Components:
     review: Review
     auth: OperatorAuth | None
     cards: Cards
+    portraits: Portraits
+    actions: ActionLog
     mentions: Mentions
     graphs: Graphs
     assistant: AssistantKnowledge
@@ -70,13 +75,15 @@ def components(env: dict[str, str]) -> Components:
     queue = Queue(engine)
     mentions = Mentions(statements, library)
     subscribe(queue, statements, filling, mentions)
-    review = Review(statements, ActionLog(engine))
+    actions = ActionLog(engine)
+    review = Review(statements, actions)
     llm = (
         ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=60)
         if env.get("PHILOGRAPH_LLM_URL")
         else None
     )
-    cards = Cards(statements, mentions, llm, on_view=review.record_views)
+    portraits = Portraits(engine, FileStore(Path(env["PHILOGRAPH_FILES_ROOT"])))
+    cards = Cards(statements, mentions, llm, on_view=review.record_views, portraits=portraits)
     graphs = Graphs(
         statements,
         llm,
@@ -90,7 +97,18 @@ def components(env: dict[str, str]) -> Components:
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
     return Components(
-        statements, health, queue, review, auth, cards, mentions, graphs, assistant, library
+        statements,
+        health,
+        queue,
+        review,
+        auth,
+        cards,
+        portraits,
+        actions,
+        mentions,
+        graphs,
+        assistant,
+        library,
     )
 
 
@@ -107,6 +125,8 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         review=_c.review,
         auth=_c.auth,
         cards=_c.cards,
+        portraits=_c.portraits,
+        actions=_c.actions,
         mentions=_c.mentions,
         graphs=_c.graphs,
         assistant=_c.assistant,

@@ -350,13 +350,42 @@ export function monogram(name: string): string {
   return letters.map((w) => w[0].toUpperCase()).join("");
 }
 
-// Медальон персоны. Изображений пока нет — монограмма шрифтом чтения со штриховкой.
-export function Portrait({ name, size = 56 }: { name: string; size?: number }) {
+// Медальон персоны. С изображением — <img> в круге (дуотон — существующим CSS
+// .pg-portrait__disc::after и mix-blend-mode: lighten); без изображения или при ошибке
+// загрузки — монограмма шрифтом чтения со штриховкой.
+export function Portrait({
+  name,
+  size = 56,
+  portrait,
+}: {
+  name: string;
+  size?: number;
+  portrait?: PortraitItem | null;
+}) {
   const t = useT();
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [portrait?.url]);
+  if (!portrait || failed) {
+    return (
+      <div className="pg-portrait pg-portrait--empty" style={{ ["--size" as string]: `${size}px` }}>
+        <div className="pg-portrait__disc" role="img" aria-label={t.card.noImage(name)}>
+          {monogram(name)}
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="pg-portrait pg-portrait--empty" style={{ ["--size" as string]: `${size}px` }}>
-      <div className="pg-portrait__disc" role="img" aria-label={t.card.noImage(name)}>
-        {monogram(name)}
+    <div className="pg-portrait" style={{ ["--size" as string]: `${size}px` }}>
+      <div className="pg-portrait__disc">
+        <img
+          src={portrait.url}
+          alt={name}
+          width={portrait.width}
+          height={portrait.height}
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
       </div>
     </div>
   );
@@ -366,10 +395,11 @@ export type PortraitItem = {
   url: string;
   width: number;
   height: number;
-  author?: string;
-  year?: string;
-  license?: string;
-  source_url?: string;
+  author?: string | null;
+  year?: string | null;
+  license?: string | null;
+  license_url?: string | null;
+  source_url?: string | null;
 };
 
 // Галерея портретов персоны (docs/design/features/reader-panels.md, 4.5): до 7 изображений,
@@ -389,6 +419,26 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
   }
   const current = shown[Math.min(index, shown.length - 1)];
   const move = (delta: number) => setIndex((i) => (i + delta + shown.length) % shown.length);
+  const credit: ReactNode[] = [];
+  const authorYear = [current.author, current.year].filter(Boolean).join(", ");
+  if (authorYear) credit.push(authorYear);
+  if (current.license && current.license_url) {
+    credit.push(
+      <a href={current.license_url} target="_blank" rel="noreferrer">
+        {t.card.license}: {current.license}
+      </a>,
+    );
+  } else if (current.license) {
+    // У общественного достояния Commons часто не отдаёт адрес лицензии: подпись без ссылки.
+    credit.push(`${t.card.license}: ${current.license}`);
+  }
+  if (current.source_url) {
+    credit.push(
+      <a href={current.source_url} target="_blank" rel="noreferrer">
+        {t.card.imageSource}
+      </a>,
+    );
+  }
   return (
     <div
       className="pg-portrait-gallery"
@@ -411,9 +461,14 @@ export function PortraitGallery({ portraits, name }: { portraits: PortraitItem[]
         loading="lazy"
         decoding="async"
       />
-      {(current.author || current.year) && (
+      {credit.length > 0 && (
         <p className="pg-portrait-gallery__credit">
-          {[current.author, current.year].filter(Boolean).join(", ")}
+          {credit.map((part, i) => (
+            <span key={i}>
+              {i > 0 ? " · " : ""}
+              {part}
+            </span>
+          ))}
         </p>
       )}
       {shown.length > 1 && (

@@ -271,6 +271,8 @@ export const en: Catalog = {
     slide: (i: number, n: number) => `${i} of ${n}`,
     previousPortrait: "Previous portrait",
     nextPortrait: "Next portrait",
+    license: "License",
+    imageSource: "Source",
     summary: (v: number, s: number, g: number) =>
       ["Verified: " + v, "From sources: " + s, "Generated: " + g].join(" · "),
     disagree: (who: string) => `disagree: ${who}`,

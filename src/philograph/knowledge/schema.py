@@ -17,6 +17,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     select,
+    text,
     update,
 )
 from sqlalchemy.engine import Connection
@@ -351,3 +352,29 @@ def _mention_position(conn: Connection) -> None:
 
 
 migrations.add(6, "порядок абзаца у упоминания")(_mention_position)
+
+# --- портреты персон (миграция 7) ---
+portraits = Table(
+    "portraits",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("entity_id", String(40), nullable=False, index=True),
+    Column("file_id", String(64), nullable=False),  # sha256 в FileStore
+    Column("width", Integer, nullable=False),
+    Column("height", Integer, nullable=False),
+    Column("author", String(500)),
+    # Год — свободная строка, как его даёт источник: «1790», «after 330 BC», «2009 (фото)».
+    Column("year", String(40)),
+    Column("license", String(50), nullable=False),
+    Column("license_url", String(500)),
+    Column("source_url", String(500), nullable=False),
+    Column("origin", String(200), nullable=False),  # wikidata:{qid} | commons:{File:...}
+    Column("phash", String(64), nullable=False),
+    Column("position", Integer, nullable=False),  # 0 — главное
+    Column("status", String(20), nullable=False, server_default="draft"),  # draft | approved
+    Column("hidden", Boolean, nullable=False, server_default=text("false")),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    UniqueConstraint("entity_id", "phash"),
+    schema=SCHEMA,
+)
+migrations.add(7, "портреты персон")(migrations.create_tables("portraits"))

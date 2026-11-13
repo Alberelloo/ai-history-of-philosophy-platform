@@ -208,15 +208,19 @@ def build_app(
                 status_code=503,
             )
         out_headers = {k: v for k, v in response.headers.items() if k.lower() not in HOP_HEADERS}
-        # Ответ API зависит от региона читателя: CDN не должен кэшировать его между странами.
-        # Прежние значения снимаем без учёта регистра: httpx отдаёт имена в нижнем регистре,
-        # иначе в ответе остались бы два Cache-Control — «public» сервиса и «private» шлюза.
-        for key in [k for k in out_headers if k.lower() == "cache-control"]:
-            out_headers.pop(key)
-        out_headers["Cache-Control"] = "private"
-        vary = regions.vary() if regions is not None else None
-        if vary:
-            _add_vary(out_headers, vary)
+        # Портреты — неизменяемые файлы, не зависящие от региона: их кеш не трогаем, чтобы
+        # читатель получал `public, max-age=31536000, immutable` от сервиса знаний.
+        portrait = target == "knowledge" and path.startswith("v1/portraits/")
+        if not portrait:
+            # Ответ API зависит от региона читателя: CDN не должен кэшировать его между странами.
+            # Прежние значения снимаем без учёта регистра: httpx отдаёт имена в нижнем регистре,
+            # иначе в ответе остались бы два Cache-Control — «public» сервиса и «private» шлюза.
+            for key in [k for k in out_headers if k.lower() == "cache-control"]:
+                out_headers.pop(key)
+            out_headers["Cache-Control"] = "private"
+            vary = regions.vary() if regions is not None else None
+            if vary:
+                _add_vary(out_headers, vary)
         return StreamingResponse(
             response.aiter_raw(),
             status_code=response.status_code,
