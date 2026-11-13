@@ -138,6 +138,7 @@
 | TC-65 | UC-28 | клиент: в одном ходе две пометки — `found_not_retold` со ссылкой и `no_library_support` | видны обе пометки (вторая не затирает первую), ссылка на абзац кликабельна и ведёт на `/read/…/…#p-…`; сохранённые сессии со старым единственным `message` открываются без ошибок | `tests/web/test_assistant_dialogs.py::test_t22c_two_notices_keep_both_with_link`, `…::test_t22d_legacy_single_message_session_opens` |
 | TC-66 | — | набор оценки с регионом `RU` и без региона; запуск замера поиска и ассистента | в запросах к поиску и ассистенту есть `region` из набора; без региона — неизвестный; служебное `XX` хранится как «неизвестный» | `tests/evaluation/test_evaluation.py::test_evaluation_queries_carry_dataset_region` |
 | TC-67 | — | `compose.prod.yaml` без `PHILOGRAPH_TRUSTED_PROXY=1` или без `PHILOGRAPH_REGION_HEADER`; проверка `deploy.py update`; Caddyfile | выкладка отказывает с сообщением оператору; в Caddyfile снимаются клиентский регион и заголовок страны не от CDN, `/api/*` не кэшируется | `tests/ops/test_deploy.py::test_deploy_requires_region_config`, `…::test_caddyfile_strips_region_headers_and_no_api_cache` |
+| TC-68 | UC-2, UC-24 | сквозной путь через настоящий шлюз: библиотека, оглавление, глава и вопрос ассистенту (с настоящим поиском) при `CF-IPCountry: RU` и `DE`; клиентский заголовок региона; недоверенный прокси; запасной регион | RU: источник открыт, глава читается, текст источника попадает в контекст модели; DE: строка `restricted`, глава 404, текста в контексте нет; подделанный заголовок не открывает; недоверенный прокси не даёт регион; запасной регион подставляет RU | `tests/gateway/test_region_scope.py` (5 тестов) |
 | TC-47 | UC-24 | `X-Philograph-Region: DE`, фиктивный поиск | поиск получает `region="DE"` | `tests/assistant/test_regional_access.py::test_region_from_header_reaches_search` |
 | TC-48 | UC-27 | запрос без заголовка региона (и со служебным `XX`) | поиск получает `region=None` (неизвестный регион) | `…::test_region_from_header_reaches_search` |
 | TC-49 | UC-24 | регион `DE`, фиктивный сервис знаний | тело `internal/assistant/context` содержит `region="DE"` | `…::test_ontology_context_carries_region` |
@@ -278,6 +279,16 @@ EC-34…EC-39, EC-40…EC-45.
 - Пометка в клиенте — существующий канал notice (`found_not_retold`) с ссылками `/p/<id>`.
 - Живой раунд `dev_cycle` по группе 7 — после сведения (см. `progress.md`).
 
+## Статус покрытия (группа 8)
+
+Закрыто автотестами: TC-66 (`tests/evaluation/test_evaluation.py`), TC-67
+(`tests/ops/test_deploy.py`), TC-68 (`tests/gateway/test_region_scope.py`); `regional-access`
+внесена в `openspec/traceability.yaml`, `check_traceability.py` — 334 из 334.
+- 8.3 проверяет сквозной путь в одном процессе, но через штатные HTTP-интерфейсы: клиент ходит
+  только в шлюз, шлюз передаёт регион библиотеке и ассистенту, за ассистентом — настоящий поиск.
+- Сквозные тесты `tests/e2e` (реальные процессы) по-прежнему не прогонялись — поведение 8.2
+  и всего пути проверено на живых стендах раундов 4–6 и этим тестом.
+
 ## Журнал кейсов
 
 - 2026-11-10: кейсы заведены для групп 1–2, код и тесты готовы; TC-17 добавлен после реализации
@@ -324,3 +335,6 @@ EC-34…EC-39, EC-40…EC-45.
   тесты `test_t22c_two_notices_keep_both_with_link` и `test_t22d_legacy_single_message_session_opens`.
   Задачи 8.1 и 8.6: TC-66 (регион набора оценки идёт в замеры), TC-67 (проверка конфигурации
   развёртывания и Caddyfile).
+- 2026-11-13: 8.3 — сквозной тест через настоящий шлюз (TC-68): библиотека, оглавление, глава
+  и вопрос ассистенту с настоящим поиском для RU и DE, подделанный заголовок, недоверенный
+  прокси, запасной регион. 8.5 — `regional-access` в `enforce`: 334 из 334 требований с тестами.

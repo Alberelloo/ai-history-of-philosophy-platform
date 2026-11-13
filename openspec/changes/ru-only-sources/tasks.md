@@ -53,9 +53,9 @@
 
 - [x] 8.1 `evaluation/components.py` и наборы оценки: поле `region`, запросы идут с регионом; тесты `regional-access` / «Оценка и служебные запросы задают регион явно» в `tests/evaluation/test_evaluation.py`.
 - [x] 8.2 Стенд разработки: `PHILOGRAPH_REGION_FALLBACK=RU` в `scripts/dev_stack.py` и в окружении `tests/e2e/conftest.py`. Проверка: сквозные тесты зелёные.
-- [ ] 8.3 Сквозной тест: читатель с заголовком региона через шлюз получает библиотеку, главу и поиск из закрытого источника для `RU` и не получает для `DE` (`tests/e2e/` или API-тест на подставных сервисах `tests/gateway/`).
+- [x] 8.3 Сквозной тест: читатель с заголовком региона через шлюз получает библиотеку, главу и поиск из закрытого источника для `RU` и не получает для `DE` (`tests/e2e/` или API-тест на подставных сервисах `tests/gateway/`).
 - [x] 8.4 Данные: `regions: [RU]` и `external_processing: false` (если задача 7 принята) у `public-domain-ru` в `sources/licenses.yaml` с обновлением комментария («метка» → «применяется сервисом»); `python -m philograph.library.catalog check` проходит; `sync` на стенде меняет учёт.
-- [ ] 8.5 Добавить `regional-access` в `enforce` файла `openspec/traceability.yaml`; `python scripts/check_traceability.py` зелёный.
+- [x] 8.5 Добавить `regional-access` в `enforce` файла `openspec/traceability.yaml`; `python scripts/check_traceability.py` зелёный.
 - [x] 8.6 Развёртывание и документация: `docs/architecture/source-ingestion.md` (поле `regions`); `docs/operations/runbook.md` (требование «шлюз только через CDN», настройка CDN: передавать страну, не кэшировать `/api/*`, закрыть прямой доступ к серверу); `.env.example` (`PHILOGRAPH_REGION_HEADER`, `PHILOGRAPH_REGION_FALLBACK` только для стенда); `deploy/Caddyfile` (удаление клиентского `X-Philograph-Region` и заголовка страны, если запрос не от CDN); проверка конфигурации в `scripts/deploy.py` (`update` отказывает, если в `compose.prod.yaml` нет `PHILOGRAPH_TRUSTED_PROXY=1` или не задан `PHILOGRAPH_REGION_HEADER`) с тестом в `tests/platform/` или `tests/ops/` (`regional-access` / «Шлюз доступен только через CDN»).
 - [ ] 8.7 Финальная проверка: `ruff check .`, `ruff format --check .`, `pytest` с `PYTHONPATH=src`, `openspec validate ru-only-sources`; архивация изменения в том же PR (`openspec archive ru-only-sources --yes`).
 
