@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "Q9312": {
+      "type": "item",
+      "id": "Q9312",
+      "labels": {
+        "ru": {"language": "ru", "value": "Иммануил Кант"},
+        "en": {"language": "en", "value": "Immanuel Kant"}
+      },
+      "claims": {
+        "P18": [
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "datavalue": {"value": "Immanuel_Kant_(painted_portrait).jpg"}
+            }
+          }
+        ],
+        "P373": [
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "datavalue": {"value": "Immanuel Kant"}
+            }
+          }
+        ]
+      }
+    }
+  }
+}

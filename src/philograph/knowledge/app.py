@@ -15,11 +15,13 @@ from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
 from philograph.knowledge.statements import Statements
 from philograph.operator.access import (
     SESSION_COOKIE,
+    ActionLog,
     InvalidPassword,
     LoginLocked,
     OperatorAuth,
@@ -121,6 +123,8 @@ def build_app(
     graphs: Graphs | None = None,
     assistant: AssistantKnowledge | None = None,
     library: ServiceClient | None = None,
+    portraits: Portraits | None = None,
+    actions: ActionLog | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -272,15 +276,41 @@ def build_app(
 
             return StreamingResponse(lines(), media_type="application/x-ndjson")
 
+    if portraits is not None:
+
+        @router.get("/portraits/{portrait_id}")
+        def portrait(portrait_id: int) -> Response:
+            """Файл изображения: только подтверждённое и нескрытое, кешируется навсегда."""
+            row = portraits.get(portrait_id)
+            if row is None or row["status"] != "approved" or row["hidden"]:
+                raise UserFacingError("Портрет не найден", status=404, kind="portrait_not_found")
+            try:
+                data = portraits.files.get(row["file_id"])
+            except FileNotFoundError:
+                raise UserFacingError(
+                    "Портрет не найден", status=404, kind="portrait_not_found"
+                ) from None
+            return Response(
+                content=data,
+                media_type=content_type(data),
+                headers={
+                    "ETag": row["file_id"],
+                    "Cache-Control": "public, max-age=31536000, immutable",
+                },
+            )
+
+    if auth is not None:
+        _login_route(router, auth)
     if review is not None and auth is not None:
         _review_routes(router, review, auth)
+    if portraits is not None and auth is not None:
+        _portrait_routes(router, portraits, actions, auth)
     app.include_router(router)
     return app
 
 
-def _review_routes(router: APIRouter, review: Review, auth: OperatorAuth) -> None:
-    """Страница проверки: только оператор с правом «проверять онтологию», иначе 404."""
-    guard = Depends(require(auth, "review_ontology"))
+def _login_route(router: APIRouter, auth: OperatorAuth) -> None:
+    """Вход оператора: общий для всех страниц проверки (онтология, портреты)."""
 
     @router.post("/operator/login")
     def login(body: Login, request: Request, response: Response) -> dict[str, str]:
@@ -297,6 +327,51 @@ def _review_routes(router: APIRouter, review: Review, auth: OperatorAuth) -> Non
             raise UserFacingError("Неверный пароль", status=401, kind="invalid") from exc
         response.set_cookie(SESSION_COOKIE, token, httponly=True, samesite="strict")
         return {"status": "ok"}
+
+
+def _portrait_routes(
+    router: APIRouter,
+    portraits: Portraits,
+    actions: ActionLog | None,
+    auth: OperatorAuth,
+) -> None:
+    """Проверка портретов: только оператор с правом «проверять портреты», иначе 404."""
+    guard = Depends(require(auth, "review_portraits"))
+
+    @router.get("/review/portraits")
+    def queue(status: str | None = "draft", session: Session = guard) -> list[dict[str, Any]]:
+        return portraits.queue(status)
+
+    @router.post("/review/portraits/{portrait_id}")
+    def decide(
+        portrait_id: int,
+        action: str,
+        session: Session = guard,
+    ) -> dict[str, str]:
+        """``approve`` | ``hide`` | ``show`` | ``main``. Действие пишется в журнал оператора."""
+        if action not in ("approve", "hide", "show", "main"):
+            raise UserFacingError(
+                "Неизвестное действие с портретом", status=400, kind="unknown_action"
+            )
+        try:
+            if action == "approve":
+                portraits.approve(portrait_id, session.actor)
+            elif action == "hide":
+                portraits.hide(portrait_id, session.actor)
+            elif action == "show":
+                portraits.show(portrait_id, session.actor)
+            else:
+                portraits.make_main(portrait_id, session.actor)
+        except PortraitNotFound as exc:
+            raise UserFacingError("Портрет не найден", status=404, kind="not_found") from exc
+        if actions is not None:
+            actions.record(session, f"portrait_{action}", str(portrait_id))
+        return {"status": "ok"}
+
+
+def _review_routes(router: APIRouter, review: Review, auth: OperatorAuth) -> None:
+    """Страница проверки: только оператор с правом «проверять онтологию», иначе 404."""
+    guard = Depends(require(auth, "review_ontology"))
 
     @router.get("/review/queue")
     def queue(

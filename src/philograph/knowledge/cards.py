@@ -14,6 +14,7 @@ from typing import Any
 
 from philograph.knowledge.graph import attribution_label, hidden_by_region, recipes_for
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.statements import Attribution, Provenance, Statements
 from philograph.platform import events
 from philograph.platform.client import ServiceClient, ServiceUnavailable
@@ -79,6 +80,8 @@ class Cards:
         mentions: Mentions | None = None,
         llm: ServiceClient | None = None,
         on_view=None,
+        *,
+        portraits: Portraits | None = None,
     ) -> None:
         self.statements = statements
         self.entities = statements.entities
@@ -86,6 +89,7 @@ class Cards:
         self.mentions = mentions
         self.llm = llm
         self.on_view = on_view  # приоритет очереди проверки: что чаще видят читатели
+        self.portraits = portraits
 
     def _row(
         self,
@@ -193,8 +197,10 @@ class Cards:
             "title": self.entities.label(entity_id),
             "names": entity["names"],
             "dates": entity["primary"].get("dates"),
-            # N3 закрыт монограммами; отбор и хранение — openspec/changes/portrait-sourcing.
-            "portraits": [],
+            # Портреты — только подтверждённые и видимые; для не-персон их нет по определению.
+            "portraits": self.portraits.visible(entity_id)
+            if self.portraits is not None and entity["type"] == "person"
+            else [],
             "description": self._row(description, entity_id, closed=closed)
             if description
             else None,

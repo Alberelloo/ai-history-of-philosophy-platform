@@ -34,6 +34,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
             "review_quality",
             "edit_structure",
             "review_ontology",
+            "review_portraits",
             "manage_budget",
             "view_spend",
             "run_evaluation",

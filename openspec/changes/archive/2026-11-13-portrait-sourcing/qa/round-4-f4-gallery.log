@@ -1,0 +1,264 @@
+﻿SHOT R4-f4-500-1-first.png
+SHOT R4-f4-500-2-second-failed.png
+SHOT R4-f4-500-3-back-first.png
+SHOT R4-f4-500-4-second-again.png
+SHOT R4-f4-500-5-dot-first.png
+SHOT R4-f4-500-6-keyboard-right.png
+SHOT R4-f4-500-7-keyboard-left.png
+SHOT R4-f4-500-8-focus-ring.png
+SHOT R4-f4-abort-1-first.png
+SHOT R4-f4-abort-2-second-failed.png
+SHOT R4-f4-abort-3-back-first.png
+SHOT R4-f4-abort-4-second-again.png
+SHOT R4-f4-abort-5-dot-first.png
+SHOT R4-f4-abort-6-keyboard-right.png
+SHOT R4-f4-abort-7-keyboard-left.png
+SHOT R4-f4-abort-8-focus-ring.png
+{
+  "scenario_500": {
+    "mode": "500",
+    "first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "second_failed": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "back_first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "second_again": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "dot_first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "keyboard_right": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "keyboard_left": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "focus_ring": "none",
+    "console_errors": [],
+    "net": []
+  },
+  "scenario_abort": {
+    "mode": "abort",
+    "first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "second_failed": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "back_first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "second_again": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "dot_first": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "keyboard_right": {
+      "class": "pg-portrait-gallery",
+      "text": "Б |  | Изображений нет |  | 2 из 2",
+      "imgs": 0,
+      "src": null,
+      "natural": null,
+      "count": "2 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": "Изображений нет",
+      "monogram": 1,
+      "credit": null
+    },
+    "keyboard_left": {
+      "class": "pg-portrait-gallery",
+      "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+      "imgs": 1,
+      "src": "/api/knowledge/v1/portraits/12",
+      "natural": [
+        346,
+        480
+      ],
+      "count": "1 из 2",
+      "dots": 2,
+      "nav": 1,
+      "prev_btn": 1,
+      "next_btn": 1,
+      "empty_text": null,
+      "monogram": 0,
+      "credit": "M. Wacker · Лицензия: pd · Источник"
+    },
+    "focus_ring": "none",
+    "console_errors": [],
+    "net": []
+  }
+}

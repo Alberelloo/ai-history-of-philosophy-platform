@@ -1,0 +1,220 @@
+persons:
+- name: Платон
+  wikidata: Q859
+  images:
+  - commons_file: Plato Silanion Musei Capitolini MC1377.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Plato_Silanion_Musei_Capitolini_MC1377.jpg
+    license: cc-by-2.5
+    license_url: https://creativecommons.org/licenses/by/2.5
+    author: Marie-Lan Nguyen
+    year: '2009'
+    width: 320
+    height: 480
+    phash: 393cbe1a3e2c3c31
+    decision: accepted
+    reason: null
+    file_id: 2c9ec7ffb02c3ecdc109908985f9ffb4184c7b796174d16672ca08b1955c69fa
+- name: Аристотель
+  wikidata: Q868
+  images:
+  - commons_file: Aristotle Altemps Inv8575.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Aristotle_Altemps_Inv8575.jpg
+    license: pd
+    license_url: null
+    author: After Lysippos
+    year: null
+    width: 359
+    height: 480
+    phash: 034cccd4ec3092cc
+    decision: accepted
+    reason: null
+    file_id: ec40c0fd8afbdc51b1ad802bd6b45cdd30b1fb477437ba7fb46215e9fa1f9246
+- name: Аврелий Августин
+  wikidata: Q8018
+  images:
+  - commons_file: Saint Augustine by Philippe de Champaigne.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Saint_Augustine_by_Philippe_de_Champaigne.jpg
+    license: pd
+    license_url: null
+    author: Philippe de Champaigne
+    year: '1645'
+    width: 376
+    height: 480
+    phash: f4e5cd29581e1f1d
+    decision: accepted
+    reason: null
+    file_id: 6c39667e89300759a86814850b2f3290989cabba53145fe47a5efa7c71d28e25
+- name: Рене Декарт
+  wikidata: Q9191
+  images:
+  - commons_file: Frans Hals - Portret van René Descartes.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Frans_Hals_-_Portret_van_Ren%C3%A9_Descartes.jpg
+    license: pd
+    license_url: null
+    author: After Frans Hals
+    year: '1649'
+    width: 392
+    height: 480
+    phash: f0accccce0f0cccd
+    decision: accepted
+    reason: null
+    file_id: 4245458421a313f5abb0cc740ed6219cde79dd403850e867d563619193e01d48
+- name: Бенедикт Спиноза
+  wikidata: Q35802
+  images:
+  - commons_file: Spinoza.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Spinoza.jpg
+    license: pd
+    license_url: null
+    author: anonymous
+    year: '1665'
+    width: 413
+    height: 480
+    phash: cb4d4c4c4c8d9a84
+    decision: accepted
+    reason: null
+    file_id: 1048a85f5fe444166b9afbf5cce3e9693c3c87333dc3c0396a9b6ec1998cf32f
+- name: Джон Локк
+  wikidata: Q9353
+  images:
+  - commons_file: JohnLocke.png
+    source_url: https://commons.wikimedia.org/wiki/File:JohnLocke.png
+    license: pd
+    license_url: null
+    author: Godfrey Kneller
+    year: '1697'
+    width: 415
+    height: 480
+    phash: ec8e0e2f2d8fc666
+    decision: accepted
+    reason: null
+    file_id: da7d9669c62d95139c44d7d0ad56b292db5fa719f5f79a46fb4f3e2f5f34d7ef
+- name: Готфрид Вильгельм Лейбниц
+  wikidata: Q9047
+  images:
+  - commons_file: Christoph Bernhard Francke - Bildnis des Philosophen Leibniz (ca.
+      1695).jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Christoph_Bernhard_Francke_-_Bildnis_des_Philosophen_Leibniz_(ca._1695).jpg
+    license: pd
+    license_url: null
+    author: Christoph Bernhard Francke
+    year: '1695'
+    width: 389
+    height: 480
+    phash: 326d6d6d6436f6ee
+    decision: accepted
+    reason: null
+    file_id: 13b97b96b165cd845a6600c23f60936d6a7ff2472dd9853e630bf123241aa8ac
+- name: Джордж Беркли
+  wikidata: Q82049
+  images:
+  - commons_file: George Berkeley by Jonh Smibert.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:George_Berkeley_by_Jonh_Smibert.jpg
+    license: pd
+    license_url: null
+    author: John Smibert
+    year: '1728'
+    width: 255
+    height: 350
+    decision: rejected
+    reason: too-small
+  - commons_file: George Berkeley (1685-1753), Protestant Bishop of Cloyne and Philosopher
+      P6708.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:George_Berkeley_(1685-1753),_Protestant_Bishop_of_Cloyne_and_Philosopher_P6708.jpg
+    license: pd
+    license_url: null
+    author: John BrooksAfter James Latham
+    year: null
+    width: 341
+    height: 480
+    phash: 32c88cb498a4b4dc
+    decision: accepted
+    reason: null
+    file_id: 7e24a8adaf19cf11a20596aacd77255c4ae79108d2471ed88ae40d1d7f2fca8a
+- name: Дэвид Юм
+  wikidata: Q37160
+  images:
+  - commons_file: David Hume Ramsay.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:David_Hume_Ramsay.jpg
+    license: pd
+    license_url: null
+    author: Allan Ramsay
+    year: '1766'
+    width: 397
+    height: 480
+    phash: 214c1d4f1f1c1227
+    decision: accepted
+    reason: null
+    file_id: ce85e3ad8fb01fa6b5be35978e7f2b3a94fa93a8129d390e8f873cd429d85408
+- name: Иммануил Кант
+  wikidata: Q9312
+  images:
+  - commons_file: Immanuel Kant - Gemaelde 2.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Immanuel_Kant_-_Gemaelde_2.jpg
+    license: pd
+    license_url: null
+    author: Becker
+    year: '1768'
+    width: 275
+    height: 480
+    phash: 1c3c1c9c66ca6c64
+    decision: accepted
+    reason: null
+    file_id: 5042b9fb5d90c3356213878faf59398ac5d7739213bdfbc55b922d28c8fed8d4
+- name: Георг Вильгельм Фридрих Гегель
+  wikidata: Q9235
+  images:
+  - commons_file: Jakob Schlesinger - Hegel 1831.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Jakob_Schlesinger_-_Hegel_1831.jpg
+    license: pd
+    license_url: null
+    author: Jakob Schlesinger
+    year: '1831'
+    width: 381
+    height: 480
+    phash: 608e9e9f8f1d4d9b
+    decision: accepted
+    reason: null
+    file_id: 540afc0daee1e16b10306a24a55e84d604eb548deabdc297b0e68ee8afea1cd9
+- name: Франц Брентано
+  wikidata: Q57196
+  images:
+  - commons_file: Franz Brentano portrait.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Franz_Brentano_portrait.jpg
+    license: pd
+    license_url: null
+    author: M. Wacker
+    year: null
+    width: 346
+    height: 480
+    phash: 73616c68e8dcf0f0
+    decision: accepted
+    reason: null
+    file_id: e41d643dfca1a788bd04ddb83fc41d0fe6ab2ce579d9bfca81590a45e847a148
+  - commons_file: Franz Brentano in Vienna, 1875.png
+    source_url: https://commons.wikimedia.org/wiki/File:Franz_Brentano_in_Vienna,_1875.png
+    license: pd
+    license_url: null
+    author: Fritz Luckhardt
+    year: '1875'
+    width: 287
+    height: 480
+    phash: b2c8ccc8f89c9af6
+    decision: accepted
+    reason: null
+    file_id: 043a0269f4c1fd6f19727829227a6c5a5159f1842b396ce008a12c32401b24b9
+- name: Людвиг Витгенштейн
+  wikidata: Q9391
+  images:
+  - commons_file: Ludwig Wittgenstein.jpg
+    source_url: https://commons.wikimedia.org/wiki/File:Ludwig_Wittgenstein.jpg
+    license: pd
+    license_url: null
+    author: Moritz Nähr
+    year: '1930'
+    width: 328
+    height: 480
+    phash: f0c0c9c1d24a0b8b
+    decision: accepted
+    reason: null
+    file_id: 3b9c0e278500acac468671ee5c7cce725b17b5ab8941751848b2dcc2576b56b1

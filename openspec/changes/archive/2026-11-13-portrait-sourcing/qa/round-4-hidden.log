@@ -1,0 +1,45 @@
+﻿{
+  "before": {
+    "card": [
+      {
+        "url": "/api/knowledge/v1/portraits/9",
+        "width": 397,
+        "height": 480,
+        "author": "Allan Ramsay",
+        "year": "1766",
+        "license": "pd",
+        "license_url": null,
+        "source_url": "https://commons.wikimedia.org/wiki/File:David_Hume_Ramsay.jpg"
+      }
+    ],
+    "direct": 200
+  },
+  "actions_before": 8,
+  "hide": 200,
+  "actions_after_hide": 9,
+  "hidden": {
+    "card": [],
+    "direct_gateway": 404,
+    "direct_knowledge": 404,
+    "queue_hidden": [
+      9
+    ]
+  },
+  "show": 200,
+  "after_show": {
+    "card": [
+      {
+        "url": "/api/knowledge/v1/portraits/9",
+        "width": 397,
+        "height": 480,
+        "author": "Allan Ramsay",
+        "year": "1766",
+        "license": "pd",
+        "license_url": null,
+        "source_url": "https://commons.wikimedia.org/wiki/File:David_Hume_Ramsay.jpg"
+      }
+    ],
+    "direct": 200
+  },
+  "actions_after_show": 10
+}

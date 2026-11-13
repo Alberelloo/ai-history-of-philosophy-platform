@@ -9,6 +9,7 @@ from philograph.knowledge.dates import lifespan, parse
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.statements import Attribution, Evidence, Provenance, Statements
+from philograph.operator.access import migrations as operator_migrations
 
 PARAGRAPHS = {
     "p1": "Кант признавал, что именно Юм пробудил его от догматического сна.",
@@ -74,7 +75,8 @@ class Onto:
 
 @pytest.fixture
 def onto(engine_for, clock) -> Onto:
-    engine = engine_for(schema.migrations)
+    engine = engine_for(schema.migrations, operator_migrations)  # журнал действий оператора
+    _ = operator_migrations
     registry = OntologyRegistry(engine, clock)
     registry.load_defaults()
     entities = Entities(engine, registry)

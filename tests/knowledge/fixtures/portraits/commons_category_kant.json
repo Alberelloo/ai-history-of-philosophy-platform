@@ -1,0 +1,9 @@
+{
+  "query": {
+    "categorymembers": [
+      {"pageid": 1001, "ns": 6, "title": "File:Immanuel_Kant_(painted_portrait).jpg"},
+      {"pageid": 1002, "ns": 6, "title": "File:Kant_gemalde_2.jpg"},
+      {"pageid": 1003, "ns": 6, "title": "File:Kant_portrait_3.png"}
+    ]
+  }
+}

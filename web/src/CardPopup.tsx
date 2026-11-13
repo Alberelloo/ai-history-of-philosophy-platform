@@ -3,7 +3,7 @@ import { navigate } from "./App";
 import { pick, recipeTitle, relationTitle, useT } from "./i18n";
 import { useScope } from "./scope";
 import { storage } from "./storage";
-import { familyOf, Generated, Icon, Portrait, StatusMark } from "./ui";
+import { familyOf, Generated, Icon, Portrait, StatusMark, type PortraitItem } from "./ui";
 
 // Компактное окно карточки у упоминания (docs/design/features/reader-panels.md, 4.2–4.4):
 // открывается только щелчком, не перекрывает строку упоминания, показывает имя, годы и до двух
@@ -34,6 +34,7 @@ type Card = {
   dates: { original: string } | null;
   description: Row | null;
   description_pending: boolean;
+  portraits?: PortraitItem[];
   sections: { code: string; title: string; rows: Row[] }[];
   where_to_read: {
     source_id: string;
@@ -472,7 +473,7 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
       {card && (
         <>
           <div className="pg-entity-head">
-            {family === "people" ? <Portrait name={card.title} size={56} /> : <span />}
+            {family === "people" ? <Portrait name={card.title} size={56} portrait={card.portraits?.[0]} /> : <span />}
             <div>
               <h3 className="pg-entity-head__name" ref={heading} tabIndex={-1}>
                 {card.title}

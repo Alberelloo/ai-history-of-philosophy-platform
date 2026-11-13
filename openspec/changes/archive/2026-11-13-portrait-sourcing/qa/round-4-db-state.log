@@ -1,0 +1,16 @@
+﻿по статусам: [('approved', 0, 11), ('draft', 0, 3)]
+всего: 14
+(9, 'e_01cf101ff80c', 0, 'approved', 0, 'Allan Ramsay', 'pd')
+(5, 'e_1327bd3b0202', 0, 'approved', 0, 'anonymous', 'pd')
+(11, 'e_246c86a5aaef', 0, 'approved', 0, 'Jakob Schlesinger', 'pd')
+(6, 'e_34f165028fc3', 0, 'approved', 0, 'Godfrey Kneller', 'pd')
+(4, 'e_3b573146941b', 0, 'approved', 0, 'After Frans Hals', 'pd')
+(2, 'e_54a590f026f6', 0, 'approved', 0, 'After Lysippos', 'pd')
+(7, 'e_664558d4d337', 0, 'approved', 0, 'Christoph Bernhard Francke', 'pd')
+(1, 'e_72ee479c5708', 0, 'approved', 0, 'Marie-Lan Nguyen', 'cc-by-2.5')
+(8, 'e_832ef514775f', 0, 'approved', 0, 'John BrooksAfter James Latham', 'pd')
+(14, 'e_b9933ef541ce', 0, 'draft', 0, 'Moritz Nähr', 'pd')
+(3, 'e_cea72d8395c6', 0, 'approved', 0, 'Philippe de Champaigne', 'pd')
+(12, 'e_dcd68cfc0448', 0, 'draft', 0, 'M. Wacker', 'pd')
+(13, 'e_dcd68cfc0448', 1, 'draft', 0, 'Fritz Luckhardt', 'pd')
+(10, 'e_f8d3b4ea3523', 0, 'approved', 0, 'Becker', 'pd')

@@ -1,0 +1,19 @@
+﻿SHOT EC-18-03-empty-medallion.png
+SHOT EC-18-04-empty-gallery.png
+{
+  "hide_14": 200,
+  "wittgenstein_portraits_while_hidden": [],
+  "medallion": {
+    "imgs": 0,
+    "aria": "Витгенштейн: изображения нет",
+    "text": "В"
+  },
+  "empty_element": {
+    "tag": "P",
+    "text": "Изображений нет",
+    "counters": 0,
+    "monogram_aria": "Витгенштейн: изображения нет"
+  },
+  "show_14": 200,
+  "wittgenstein_portraits_after_show": 1
+}

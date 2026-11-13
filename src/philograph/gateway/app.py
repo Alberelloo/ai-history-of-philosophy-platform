@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import http.cookiejar
 import json
 import math
 import os
@@ -35,6 +36,19 @@ events.define(
 events.define(
     "gateway.internal.blocked", "warning", "Запрос к внутреннему адресу снаружи", required=("path",)
 )
+
+
+class _NoStoreCookies(http.cookiejar.CookieJar):
+    """Шлюз не хранит cookie сервисов: общий клиент не должен переносить сессии.
+
+    Иначе `Set-Cookie` от ``/operator/login`` оседал бы в cookie-jar шлюза и подставлялся
+    в запросы других посетителей — очередь проверки открывалась без входа. Cookie посетителя
+    пересылается явно как обычный заголовок, а `Set-Cookie` доходит до браузера в ответе.
+    """
+
+    def set_cookie(self, cookie) -> None:
+        return None
+
 
 HOP_HEADERS = {
     "connection",
@@ -79,7 +93,11 @@ def build_app(
     ``regions`` — определение региона читателя (без него регион всегда неизвестен)."""
     health = Health("gateway", __version__)
     app = create_app("gateway", __version__, health)
-    client = httpx.AsyncClient(timeout=httpx.Timeout(10.0, read=120.0), transport=transport)
+    client = httpx.AsyncClient(
+        timeout=httpx.Timeout(10.0, read=120.0),
+        transport=transport,
+        cookies=_NoStoreCookies(),
+    )
 
     def who(request: Request) -> tuple[str, str]:
         address = limits.address(
@@ -208,15 +226,19 @@ def build_app(
                 status_code=503,
             )
         out_headers = {k: v for k, v in response.headers.items() if k.lower() not in HOP_HEADERS}
-        # Ответ API зависит от региона читателя: CDN не должен кэшировать его между странами.
-        # Прежние значения снимаем без учёта регистра: httpx отдаёт имена в нижнем регистре,
-        # иначе в ответе остались бы два Cache-Control — «public» сервиса и «private» шлюза.
-        for key in [k for k in out_headers if k.lower() == "cache-control"]:
-            out_headers.pop(key)
-        out_headers["Cache-Control"] = "private"
-        vary = regions.vary() if regions is not None else None
-        if vary:
-            _add_vary(out_headers, vary)
+        # Портреты — неизменяемые файлы, не зависящие от региона: их кеш не трогаем, чтобы
+        # читатель получал `public, max-age=31536000, immutable` от сервиса знаний.
+        portrait = target == "knowledge" and path.startswith("v1/portraits/")
+        if not portrait:
+            # Ответ API зависит от региона читателя: CDN не должен кэшировать его между странами.
+            # Прежние значения снимаем без учёта регистра: httpx отдаёт имена в нижнем регистре,
+            # иначе в ответе остались бы два Cache-Control — «public» сервиса и «private» шлюза.
+            for key in [k for k in out_headers if k.lower() == "cache-control"]:
+                out_headers.pop(key)
+            out_headers["Cache-Control"] = "private"
+            vary = regions.vary() if regions is not None else None
+            if vary:
+                _add_vary(out_headers, vary)
         return StreamingResponse(
             response.aiter_raw(),
             status_code=response.status_code,

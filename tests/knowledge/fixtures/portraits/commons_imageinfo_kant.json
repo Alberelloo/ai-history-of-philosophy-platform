@@ -1,0 +1,35 @@
+{
+  "query": {
+    "pages": {
+      "12345": {
+        "pageid": 12345,
+        "ns": 6,
+        "title": "File:Immanuel_Kant_(painted_portrait).jpg",
+        "imageinfo": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Immanuel_Kant_%28painted_portrait%29.jpg/1000px-Immanuel_Kant_%28painted_portrait%29.jpg",
+            "width": 1000,
+            "height": 1250,
+            "mime": "image/jpeg",
+            "extmetadata": {
+              "Artist": {
+                "value": "<a href=\"//commons.wikimedia.org/wiki/User:Example\" title=\"User:Example\">Johann Gottlieb Becker</a>",
+                "source": "commons-desc-page"
+              },
+              "DateTimeOriginal": {"value": "1790", "source": "commons-desc-page"},
+              "LicenseShortName": {"value": "Public domain", "source": "commons-desc-page"},
+              "LicenseUrl": {
+                "value": "https://creativecommons.org/publicdomain/mark/1.0/",
+                "source": "commons-desc-page"
+              },
+              "DescriptionUrl": {
+                "value": "https://commons.wikimedia.org/wiki/File:Immanuel_Kant_(painted_portrait).jpg",
+                "source": "commons-desc-page"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

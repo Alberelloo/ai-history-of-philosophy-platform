@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import re
 from urllib.parse import parse_qs, urlparse
@@ -30,6 +31,10 @@ EC = "entity-cards"
 KANT, HUME, EXPERIENCE = "e_kant", "e_hume", "e_experience"
 # Что ищется в тексте учебника: выражение, сущность, тип. Первое вхождение в абзаце.
 NAMES = [(r"Кант\w*", KANT, "person"), (r"опыт\w*", EXPERIENCE, "concept")]
+
+# 1×1 GIF: ответ на запрос портрета, чтобы <img> реально загружался и медальон
+# не падал в монограмму по onError (T11).
+PORTRAIT_IMAGE = base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")
 
 
 def row(statement_id: str, type_: str, relation: str, **extra) -> dict:
@@ -162,6 +167,10 @@ class Knowledge:
         self.hold = False
         page.route("**/api/knowledge/v1/mentions*", self._mentions)
         page.route("**/api/knowledge/v1/entities/*/card*", self._card)
+        page.route("**/portraits/*", self._portrait)
+
+    def _portrait(self, route) -> None:
+        route.fulfill(status=200, content_type="image/gif", body=PORTRAIT_IMAGE)
 
     def _mentions(self, route) -> None:
         query = parse_qs(urlparse(route.request.url).query)
@@ -514,7 +523,16 @@ def test_t11_popover_contents(browser, site, texts):
     knowledge.cards[KANT] = dict(
         CARDS[KANT],
         portraits=[
-            {"url": f"/portraits/kant-{i}.jpg", "width": 400, "height": 500, "author": "Беккер"}
+            {
+                "url": f"/portraits/kant-{i}.jpg",
+                "width": 400,
+                "height": 500,
+                "author": "Беккер",
+                "year": str(1791 + i),
+                "license": "public domain",
+                "license_url": "https://example.org/license-kant",
+                "source_url": f"https://example.org/kant-{i}",
+            }
             for i in range(3)
         ],
     )
@@ -527,6 +545,13 @@ def test_t11_popover_contents(browser, site, texts):
         medallion = dialog.locator(".pg-portrait")
         assert medallion.count() == 1
         assert medallion.evaluate("el => getComputedStyle(el).getPropertyValue('--size')") == "56px"
+        # С главным изображением: <img> с src, alt персоны и размерами из данных.
+        image = medallion.locator("img")
+        assert image.count() == 1
+        assert image.get_attribute("src").endswith("/portraits/kant-0.jpg")
+        assert image.get_attribute("alt") == "Кант"
+        assert image.get_attribute("width") == "400"
+        assert image.get_attribute("height") == "500"
         assert dialog.locator(".pg-portrait-gallery, .pg-portrait-gallery__count").count() == 0
         assert dialog.locator(".card-popup__facts .card-row").count() == 2  # из трёх строк
         assert "Юм" in dialog.locator(".card-popup__facts").inner_text()  # проверенная первой
@@ -541,6 +566,17 @@ def test_t11_popover_contents(browser, site, texts):
                 .map(el => el.textContent)"""
         )
         assert clipped == []
+
+        # Без изображений: монограмма, без <img>.
+        page.keyboard.press("Escape")
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=[])
+        page.reload()
+        kant(page).click()
+        opened(dialog, "Кант")
+        medallion = dialog.locator(".pg-portrait")
+        assert medallion.count() == 1
+        assert medallion.evaluate("el => el.classList.contains('pg-portrait--empty')") is True
+        assert medallion.locator("img").count() == 0
     finally:
         context.close()
 
@@ -759,6 +795,7 @@ def portraits(n: int) -> list[dict]:
             "author": f"Художник {i}",
             "year": str(1760 + i),
             "license": "public domain",
+            "license_url": f"https://example.org/license-{i}",
             "source_url": f"https://example.org/kant-{i}",
         }
         for i in range(n)
@@ -777,7 +814,15 @@ def test_t16_portrait_gallery(browser, site, texts):
         count = gallery.locator(".pg-portrait-gallery__count")
         expect(count).to_have_text("1 из 5")
         expect(gallery.locator(".pg-portrait-gallery__dot")).to_have_count(5)
-        expect(gallery.locator(".pg-portrait-gallery__credit")).to_have_text("Художник 0, 1760")
+        credit = gallery.locator(".pg-portrait-gallery__credit")
+        expect(credit).to_contain_text("Художник 0")
+        expect(credit).to_contain_text("1760")
+        license_link = credit.locator("a", has_text="Лицензия")
+        expect(license_link).to_have_attribute("href", "https://example.org/license-0")
+        source_link = credit.locator("a", has_text="Источник")
+        expect(source_link).to_have_attribute("href", "https://example.org/kant-0")
+        assert image.get_attribute("width") == "400"
+        assert image.get_attribute("height") == "500"
         seen = {image.get_attribute("src")}
         gallery.get_by_role("button", name="Следующий портрет").click()
         expect(count).to_have_text("2 из 5")
@@ -806,6 +851,49 @@ def test_t16_portrait_gallery(browser, site, texts):
         expect(gallery.locator("img")).to_have_count(1)
         assert gallery.locator(".pg-portrait-gallery__count").count() == 0
         assert gallery.locator(".pg-portrait-gallery__dot").count() == 0
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Общественное достояние без адреса лицензии: лицензия в подписи есть, ссылки нет.
+        one = portraits(1)
+        one[0]["license"] = "pd"
+        one[0]["license_url"] = None
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=one)
+        page.reload()
+        panel = open_full(page, site)
+        credit = panel.locator(".pg-portrait-gallery__credit")
+        expect(credit).to_contain_text("Лицензия: pd")
+        assert credit.locator("a", has_text="Лицензия").count() == 0
+        assert credit.locator("a", has_text="Источник").count() == 1
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Ошибка загрузки: вместо битой картинки — монограмма и «Изображений нет».
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(1))
+        page.route("**/portraits/kant-0.jpg", lambda route: route.fulfill(status=500, body=""))
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        assert gallery.locator("img").count() == 0
+        expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        assert gallery.locator(".pg-portrait-gallery__count").count() == 0  # одно изображение
+        panel.get_by_role("button", name="Закрыть карточку").click()
+
+        # Сбой одного из двух: галерея и листание живы, переход пробует другой портрет снова.
+        page.unroute("**/portraits/kant-0.jpg")
+        page.route("**/portraits/kant-1.jpg", lambda route: route.abort())
+        knowledge.cards[KANT] = dict(CARDS[KANT], portraits=portraits(2))
+        page.reload()
+        panel = open_full(page, site)
+        gallery = panel.locator(".pg-portrait-gallery")
+        expect(gallery.locator("img")).to_have_count(1)
+        gallery.get_by_role("button", name="Следующий портрет").click()
+        expect(gallery.locator("img")).to_have_count(0)  # сбойный кадр — монограмма
+        expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        expect(gallery.locator(".pg-portrait-gallery__count")).to_have_text("2 из 2")
+        assert gallery.locator(".pg-portrait-gallery__dot").count() == 2
+        gallery.get_by_role("button", name="Предыдущий портрет").click()
+        expect(gallery.locator("img")).to_have_count(1)
+        assert "kant-0" in (gallery.locator("img").get_attribute("src") or "")
+        expect(gallery.locator(".pg-portrait-gallery__count")).to_have_text("1 из 2")
         panel.get_by_role("button", name="Закрыть карточку").click()
 
         # Без изображений: монограмма и «Изображений нет».

@@ -1,0 +1,132 @@
+﻿{
+  "files": [
+    {
+      "id": 1,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 2,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 3,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 4,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 5,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 6,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/png",
+      "magic": "89504e470d0a1a0a"
+    },
+    {
+      "id": 7,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 8,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 9,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 10,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 11,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 12,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    },
+    {
+      "id": 13,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/png",
+      "magic": "89504e470d0a1a0a"
+    },
+    {
+      "id": 14,
+      "status": "approved",
+      "hidden": 0,
+      "http": 200,
+      "content_type": "image/jpeg",
+      "magic": "ffd8ffe000104a46"
+    }
+  ],
+  "card_headers": {
+    "status": 200,
+    "cache_control": "private",
+    "vary": null
+  },
+  "png_portrait_id": 13,
+  "png_delivery": {
+    "status": 200,
+    "content_type": "image/png",
+    "cache_control": "public, max-age=31536000, immutable",
+    "magic": "89504e470d0a1a0a"
+  },
+  "png_direct": {
+    "status": 200,
+    "content_type": "image/png"
+  }
+}

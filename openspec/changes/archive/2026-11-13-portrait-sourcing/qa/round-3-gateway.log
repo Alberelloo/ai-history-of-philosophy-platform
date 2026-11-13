@@ -1,0 +1,561 @@
+{"event": "service.started", "level": "info", "time": "2026-11-13T13:07:20.961050+00:00", "service": "gateway", "version": "0.1.0", "restarted": false}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:36.078063+00:00", "request_id": "51b1c6c10ac344b7a1ef8944639e5cca", "service": "gateway", "method": "GET", "route": "/health/ready", "status": 200, "duration_ms": 1.96}
+INFO:     127.0.0.1:52981 - "GET /health/ready HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:36.249429+00:00", "request_id": "968f513f2e3047d2b7bd6d6bf66f159e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 153.83}
+INFO:     127.0.0.1:52981 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.919904+00:00", "request_id": "b03060bdbebd45a783d60816678ca327", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 9.31}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.932496+00:00", "request_id": "828bf0c21e9247ec86ed48d31ed951fe", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 6.82}
+INFO:     127.0.0.1:58440 - "POST /api/knowledge/v1/review/portraits/10?action=hide HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.952027+00:00", "request_id": "196850184b6a485180c3f18fc562fb6e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 10.03}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.972665+00:00", "request_id": "fcb9e3daecfd4596b15a082c82a27e24", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 15.35}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.987540+00:00", "request_id": "8c8dc839cb6c4295a5e6cd7af63330a0", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 10.16}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/9999 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:58.999382+00:00", "request_id": "debb4a585cb641b6877ac09c4de0cc74", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 7.27}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.011785+00:00", "request_id": "b3c91304a9cf4939862e3bed7781298b", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 8.07}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/14 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.023463+00:00", "request_id": "a4ee3118323f424eb409d657cc480155", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 6.27}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/portraits/13 HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.070527+00:00", "request_id": "acfe12f85cc74b3aa1a0d4aa17347e37", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 43.36}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.090344+00:00", "request_id": "a3d0592912dc42968ae5e3ef3b567311", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 15.39}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/entities/e_72ee479c5708/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.123553+00:00", "request_id": "b6d2c88e969e46beb68e54c4124df72a", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 28.8}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/entities/e_b9933ef541ce/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.171718+00:00", "request_id": "05c3757b465044dc8db4c0f697858e09", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 40.21}
+INFO:     127.0.0.1:58440 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.687183+00:00", "request_id": "419343aba3ff440885a9b2b64dcf915c", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 325.19}
+INFO:     127.0.0.1:49729 - "POST /api/knowledge/v1/operator/login HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.711221+00:00", "request_id": "64344e91bcb04ba18ad3506ece7ac8e8", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 15.36}
+INFO:     127.0.0.1:49729 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.888641+00:00", "request_id": "fd40f4a58fb947229e18e4cf4a502ab6", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 6.15}
+INFO:     127.0.0.1:49730 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:07:59.896409+00:00", "request_id": "b45925b02efc4534a8a8700f5403a8e5", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 4.79}
+INFO:     127.0.0.1:49730 - "POST /api/knowledge/v1/review/portraits/10?action=hide HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.056245+00:00", "request_id": "40e873dd25db44fa9a3a5a24abf564d7", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 5.39}
+INFO:     127.0.0.1:49731 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.066823+00:00", "request_id": "1b5a80dcad094cb1996e715e359ad4cf", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.52}
+INFO:     127.0.0.1:49729 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.081894+00:00", "request_id": "897cc465764047c485d71572a450bfe3", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 12.15}
+INFO:     127.0.0.1:49729 - "POST /api/knowledge/v1/review/portraits/12?action=approve HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.103325+00:00", "request_id": "2f500cb5241e4448bb4359346fec8516", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 18.41}
+INFO:     127.0.0.1:49729 - "POST /api/knowledge/v1/review/portraits/13?action=approve HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.117826+00:00", "request_id": "1ae9dd9a3c5d4ba0969fbdb65093d63c", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 11.18}
+INFO:     127.0.0.1:49729 - "POST /api/knowledge/v1/review/portraits/13?action=show HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:08:00.159886+00:00", "request_id": "66e40449ecdf44c9963db66432df8abd", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 38.41}
+INFO:     127.0.0.1:49729 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.488829+00:00", "request_id": "31630f8f9b324651973f5fa4af48ad91", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 30.03}
+INFO:     127.0.0.1:65267 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.502856+00:00", "request_id": "b96878e76b6c461b8141cb98556ba9b9", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 3.02}
+INFO:     127.0.0.1:65267 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.504468+00:00", "request_id": "4f6fa4fd9d044efb90a6a948d139b3b7", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 3.48}
+INFO:     127.0.0.1:61445 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.582486+00:00", "request_id": "95b0ab2795a54e919334c82ff846e5a3", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 5.93}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.583291+00:00", "request_id": "2949b59ddf2f4a669b938abcf8e8b1c5", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 5.88}
+INFO:     127.0.0.1:65267 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61445 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.588039+00:00", "request_id": "315a354bb7c247ac96e29eafa0dcbb53", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 7.93}
+INFO:     127.0.0.1:56507 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.590087+00:00", "request_id": "ffc915b1aadb4787bcb357b20b0057ef", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 8.06}
+INFO:     127.0.0.1:51463 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.592584+00:00", "request_id": "994c84e1bc9441ec92051b198ad131e5", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 8.58}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.593128+00:00", "request_id": "675fc636d7ba4f7fae32202787899fd8", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 10.73}
+INFO:     127.0.0.1:57373 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51472 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.603454+00:00", "request_id": "a506901cc1d74f46a1143745fd43d885", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 5.85}
+INFO:     127.0.0.1:65267 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.608995+00:00", "request_id": "8b1a86f1cb8b4a7ca20512d33f4ab60f", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 1.61}
+INFO:     127.0.0.1:65267 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.739839+00:00", "request_id": "0d14814bde2c4e90a96aa9718aab04b4", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.17}
+INFO:     127.0.0.1:65267 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.754482+00:00", "request_id": "e91d5c19c28e4650be718a64ec45e835", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 1.7}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.754941+00:00", "request_id": "15cf9aa3dd784a3ea8e0e06b54989136", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 1.95}
+INFO:     127.0.0.1:65267 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.787172+00:00", "request_id": "b16e15f5ac3c4af7917534f5d3f2295a", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 4.1}
+INFO:     127.0.0.1:65267 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.789908+00:00", "request_id": "5d5d1e2824534121b97754342ba65e3d", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 5.07}
+INFO:     127.0.0.1:51463 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.792308+00:00", "request_id": "78f26c44215b4bc2b4448471da3c4cab", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 6.35}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.792644+00:00", "request_id": "4801a09b81024202b9c6c2b20cf36e5f", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 7.44}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.792922+00:00", "request_id": "e13f3396b0ae4b55907a6ce0791d5395", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 6.51}
+INFO:     127.0.0.1:51472 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57373 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56507 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.796126+00:00", "request_id": "5f624f00b88444dfa76a5472b216ddc9", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 9.19}
+INFO:     127.0.0.1:61445 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.806191+00:00", "request_id": "cae1626649cb4b568a8b0c5e960a8f4c", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 3.03}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.806981+00:00", "request_id": "b1d2166774b24024974379d9ffd2cd2e", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 3.57}
+INFO:     127.0.0.1:61445 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51472 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.910016+00:00", "request_id": "51e13bbc95ad4e4197303a62499b98b3", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 14.28}
+INFO:     127.0.0.1:61445 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:02.932664+00:00", "request_id": "c17df44cc71b406bbb5065434ad39d0e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.06}
+INFO:     127.0.0.1:61445 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:03.205151+00:00", "request_id": "00cc2d035d1d4d36ac6c0528b7fd5b46", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 10.42}
+INFO:     127.0.0.1:61445 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:03.914655+00:00", "request_id": "79d9018341f24edf9a2ba619e29f88be", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.88}
+INFO:     127.0.0.1:61445 - "GET /api/knowledge/v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.007471+00:00", "request_id": "5995ad30b717474ca0ee47d81b87efcc", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.22}
+INFO:     127.0.0.1:61445 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.021796+00:00", "request_id": "0bc0f41b7351439a83228f4b28518a50", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 1.79}
+INFO:     127.0.0.1:61445 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.023884+00:00", "request_id": "67294a2ce4564e87b400a75dd3ed5293", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 3.5}
+INFO:     127.0.0.1:51472 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.068671+00:00", "request_id": "c2c962c9b49e46279b0633c6bf223b8c", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 6.06}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.069246+00:00", "request_id": "0590d9994cb346df85cdd9d1149e5cb1", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 6.05}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.069707+00:00", "request_id": "6ab77079b26f41e9a369c9ec095660cd", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 4.67}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.070096+00:00", "request_id": "3daeb5d323e74985a74e188655779fef", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 6.32}
+INFO:     127.0.0.1:61445 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51472 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56507 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.074487+00:00", "request_id": "04932b0fb2da41cd944b71f562c34161", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 10.0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.074880+00:00", "request_id": "f4a555f483424b54bcb75613a2337a47", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 9.96}
+INFO:     127.0.0.1:57373 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65267 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.087275+00:00", "request_id": "b304bb59a7b247f391963b0715b63029", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 6.41}
+INFO:     127.0.0.1:51463 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.089538+00:00", "request_id": "a2a0bd16fe814f15bfba8eb7e6d44dbd", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 8.05}
+INFO:     127.0.0.1:56507 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.178139+00:00", "request_id": "12eb2add283d426094a678dae5a66eca", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 34.81}
+INFO:     127.0.0.1:56507 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.208389+00:00", "request_id": "7b3400eece79453b9de999eecd17ab6e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 4.87}
+INFO:     127.0.0.1:56507 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:05.479348+00:00", "request_id": "4bdb1dfa3dbe4849a9b49f513378d8a0", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 43.17}
+INFO:     127.0.0.1:56507 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.632579+00:00", "request_id": "c365dfda481b436dba23b94bdc4f433f", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.64}
+INFO:     127.0.0.1:56507 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.657497+00:00", "request_id": "52505e1e819c4293ab3c2f69862ea2ef", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 3.02}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.658163+00:00", "request_id": "1b6b2ede5cfb4f64952f89a5cd6a6860", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 3.36}
+INFO:     127.0.0.1:56507 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.719147+00:00", "request_id": "def5bb49f5554345be507d89c8f30225", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 13.87}
+INFO:     127.0.0.1:56507 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.727524+00:00", "request_id": "2784482943bd49b88a7ce31cdbbbaaf3", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 17.85}
+INFO:     127.0.0.1:57373 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.730611+00:00", "request_id": "55d35c1261cc4155a99e01d15e9741de", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 14.83}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.731858+00:00", "request_id": "22994e25a35c4caab236320de88bb7ca", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 24.46}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.732649+00:00", "request_id": "207c33285c974d13a3889cf192ef9e1a", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 18.02}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.733223+00:00", "request_id": "cc281870731f4d22bfd14de347e6c4d2", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 22.37}
+INFO:     127.0.0.1:51472 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65267 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61445 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.772556+00:00", "request_id": "eae22cd5d9214ddb9bbcc08554a2fca2", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 11.07}
+INFO:     127.0.0.1:57373 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:06.775780+00:00", "request_id": "7d7e63f982d74baea8539a60aac8144e", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 14.66}
+INFO:     127.0.0.1:56507 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.186341+00:00", "request_id": "3d1e2d3aa544474ba85f5b1b1705dda5", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.23}
+INFO:     127.0.0.1:53569 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.200060+00:00", "request_id": "2148da3ee42a4ee990c2b67406029afd", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 3.31}
+INFO:     127.0.0.1:53569 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.202515+00:00", "request_id": "47bdf34932724e69b61b0875ee41c6ea", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 4.59}
+INFO:     127.0.0.1:58007 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.279493+00:00", "request_id": "58267016d0c841d3bfd109d89d74ea4c", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 8.71}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.280273+00:00", "request_id": "0235dc16e50d4a388d2bfc41d43703a0", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 9.32}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.283422+00:00", "request_id": "4c45576cec5a434da2eff68ab570e851", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 9.75}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.283887+00:00", "request_id": "0d9278e463784ab283cfdd6f74a49059", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 11.03}
+INFO:     127.0.0.1:49813 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.286471+00:00", "request_id": "db2d8984d1c44122a5918f9a8d4a3164", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 12.28}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.286904+00:00", "request_id": "fe21c1ae13df474197cb90abdb2d22b3", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 11.87}
+INFO:     127.0.0.1:52884 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.298880+00:00", "request_id": "0664f60a9176473eaeb2287f4f40dc65", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 7.12}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.301068+00:00", "request_id": "4f87fd2d0428409b80441ba55e51ea20", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 6.48}
+INFO:     127.0.0.1:49813 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.386502+00:00", "request_id": "b740e43e973c44bf86fbfcb76be182de", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.41}
+INFO:     127.0.0.1:49813 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.399920+00:00", "request_id": "7330486688bf499fbad00c89f17ffe74", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 1.87}
+INFO:     127.0.0.1:53569 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.401647+00:00", "request_id": "990f916d49804eb1b2840b0ed20ec55d", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 3.89}
+INFO:     127.0.0.1:49813 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.428490+00:00", "request_id": "1cfae0d6cc8d48bdbb88d7a2d624bb80", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 6.05}
+INFO:     127.0.0.1:49813 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.436020+00:00", "request_id": "738df55db4db4731ac6285dc6f4efafa", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 10.72}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.436818+00:00", "request_id": "ccb42854d3b34070bbd4088b118e860e", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 11.04}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.437355+00:00", "request_id": "02ec402d9934431e8c4c4051f9f7ce81", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 13.36}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.440456+00:00", "request_id": "57e994c92f1a4b0b87027e92a8f58ad5", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 14.76}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.440921+00:00", "request_id": "7deed8b7aed746ff94f5beafab20268d", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 17.65}
+INFO:     127.0.0.1:54967 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.454515+00:00", "request_id": "1d7ffe66e29544059e767dc0b3e820c4", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 6.14}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.455126+00:00", "request_id": "8ebe51a3d7614857bbb4252c1dae0407", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 6.91}
+INFO:     127.0.0.1:58007 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.523600+00:00", "request_id": "113b4af1b06c43a6b4d26617b6a7bed6", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 31.88}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.543923+00:00", "request_id": "8ca05bfdd085425cae48066568d0efe7", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 6.87}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:33.790670+00:00", "request_id": "93ba3fcbd1d34e20a8eab33aaa108d3b", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 15.19}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:34.460717+00:00", "request_id": "c1c15ce77867485f83a75949b774dacf", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 5.91}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.505342+00:00", "request_id": "fc954008905e4d93bb8ef8a8ae3d6e4e", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.57}
+INFO:     127.0.0.1:52730 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.519635+00:00", "request_id": "58a5c02a4c9a42c28d83215f63e0615c", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 2.69}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.520423+00:00", "request_id": "60b3c23130f3400bb1918f240ea7caed", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 3.15}
+INFO:     127.0.0.1:52730 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.555375+00:00", "request_id": "4367a561df944a39a6f1cc4e9674c5dc", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 6.0}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.556356+00:00", "request_id": "bbfba4ca45694a6fb06889085027b270", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 8.08}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.556986+00:00", "request_id": "28e0c4be77ed4615868033929d135105", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 8.88}
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.560309+00:00", "request_id": "8b0e2642f8aa403ea458642c9c4d269c", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 10.34}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.560916+00:00", "request_id": "11e61a7c522b4875be7d582ab3bf7759", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 11.05}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.566723+00:00", "request_id": "9a080ae937c54803b99be6d6fa6dd330", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 17.5}
+INFO:     127.0.0.1:54967 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.579840+00:00", "request_id": "576e287464594e75a3adf954874d3465", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 6.58}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.580629+00:00", "request_id": "01cb969d762f4fe7b1b0cda2a515d5f3", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 7.5}
+INFO:     127.0.0.1:49813 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.645704+00:00", "request_id": "bca80dbca6af459ebaffa69c447ca805", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 21.0}
+INFO:     127.0.0.1:49813 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.675993+00:00", "request_id": "ae45d5c23ea3437d901ab1a86f6b2e6a", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.13}
+INFO:     127.0.0.1:49813 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:35.895610+00:00", "request_id": "161b759b80424a7f8393e3a2be4c75e1", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 18.82}
+INFO:     127.0.0.1:49813 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.021109+00:00", "request_id": "18b55fa9ccca45f2959d917ac3e85785", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.67}
+INFO:     127.0.0.1:49813 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.045035+00:00", "request_id": "5fcd783f482f4df295916f3ada9a636b", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.09}
+INFO:     127.0.0.1:58007 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.047348+00:00", "request_id": "7feec461e8d841718710e3dfb41b9064", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 5.35}
+INFO:     127.0.0.1:49813 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.094169+00:00", "request_id": "012fa04e80494fb7840f25f635808666", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 8.42}
+INFO:     127.0.0.1:49813 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.100395+00:00", "request_id": "ce989be1770c4d098097b96c2276d679", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 12.97}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.101424+00:00", "request_id": "6ba1cbc453094febaf0d2db32ae6843a", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 11.89}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.102852+00:00", "request_id": "69273b72d94a4ec5b8d6531a0c9c1384", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 12.17}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.105456+00:00", "request_id": "160e5d8b261d4c958a94e4305d1abc71", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 14.13}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.106167+00:00", "request_id": "18f841c46eb2449589cd906429bd3ca7", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 17.58}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.125300+00:00", "request_id": "9413999dde0642c2a5cc44ed0c67a6c0", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 6.5}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.126117+00:00", "request_id": "d96ed5283b334ef6ab1e11f93a20b304", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 8.57}
+INFO:     127.0.0.1:53569 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.250958+00:00", "request_id": "61718f40e667422190dccbd33120523f", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 39.26}
+INFO:     127.0.0.1:53569 - "GET /api/knowledge/v1/entities/e_b9933ef541ce/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:37.608705+00:00", "request_id": "d769a52b75ef4318a22b57110248573d", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 24.46}
+INFO:     127.0.0.1:53569 - "GET /api/knowledge/v1/entities/e_b9933ef541ce/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.692791+00:00", "request_id": "c28d4c9212004d2eb8c6a58b4267e60b", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.37}
+INFO:     127.0.0.1:53569 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.718233+00:00", "request_id": "cddd86693a6241f08ee440c7ab06d6f8", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.81}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.718800+00:00", "request_id": "bc7c16f3280f44ef97bc8a83c1d6b134", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 4.32}
+INFO:     127.0.0.1:52730 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.770618+00:00", "request_id": "ea611495ab2149cca9c7be2cc43d79fa", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 4.68}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.771496+00:00", "request_id": "44bdcd5b36ca4d049e801f0bc0fe1f3d", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 7.46}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.772698+00:00", "request_id": "26e04981d2e64998b9849e712f0194e7", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 8.83}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.773288+00:00", "request_id": "6afd9032c5294d6f85771f23bbd87da9", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 9.16}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.781098+00:00", "request_id": "b70fcd7c908243428f129aa6e47e30c5", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 18.16}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.781832+00:00", "request_id": "613728013ebc4b3780472400731fc491", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 20.95}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.800129+00:00", "request_id": "8187eb6867724c9a9467b89deb52e8d0", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 9.96}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.801086+00:00", "request_id": "16d830c718254d578d0a2206b5b5dba7", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 10.76}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:38.900567+00:00", "request_id": "0daeb8bf4c5244e591c4fc1d9fe2df8b", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 18.54}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.742229+00:00", "request_id": "b2ef017d8ea34042be7f22a5f21635dc", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.65}
+INFO:     127.0.0.1:54967 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.772446+00:00", "request_id": "3796176a044e4d46a618aee54f2d2339", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.83}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.773480+00:00", "request_id": "f24615e962e44f97919c53afa147b82b", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 4.54}
+INFO:     127.0.0.1:58007 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.829602+00:00", "request_id": "00b12612a73c425a8326532ef6b02a82", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 7.15}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.830347+00:00", "request_id": "b2cecd32398746329fa7bfdb7ce8eff6", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 9.72}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.830912+00:00", "request_id": "4c717ae7ef1a4bb4825246085d581c47", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 6.36}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.831456+00:00", "request_id": "c048dcac17624d7fb29e562af8e6b76e", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 7.85}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.831945+00:00", "request_id": "55f6fd6adb634799b7dc2207b0eb6c70", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 12.22}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.839914+00:00", "request_id": "7e3f6a609dd34f32a77a365d4cc1840c", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 15.48}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.857156+00:00", "request_id": "80877722ae864895a5079e3f1b68101b", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 8.83}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.858090+00:00", "request_id": "1b58b0f96d7442a09f4aa41056d3907a", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 12.43}
+INFO:     127.0.0.1:53569 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.969479+00:00", "request_id": "fb97bbe4f79549fabfeb5a8aef7b89ef", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 21.89}
+INFO:     127.0.0.1:52884 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:40.997615+00:00", "request_id": "00c632ccd3dc49ed83067abfb2d8de42", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 8.18}
+INFO:     127.0.0.1:52884 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.459009+00:00", "request_id": "887776fd03a24274a9debd95c4fe8af0", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.12}
+INFO:     127.0.0.1:52884 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.482339+00:00", "request_id": "fd007270f5e44017830d128116f04287", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.75}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.483385+00:00", "request_id": "1af45e91904e40998e5c5d9a47a3bec4", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 4.27}
+INFO:     127.0.0.1:53569 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.534603+00:00", "request_id": "69812f589a624430b6fc72b7d5b99a19", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 4.57}
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.538264+00:00", "request_id": "287750a15a8a4ff69813b0a16bff3325", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 10.7}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.539106+00:00", "request_id": "53133333c9bb41cc88befef18424c769", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 7.59}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.539731+00:00", "request_id": "9844dfe58f72471faae7a883b182c0f6", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 10.41}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.540271+00:00", "request_id": "bea2998bb0604c158cf94246102f6556", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 11.85}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.540808+00:00", "request_id": "d894b82d72134c79b996d7d89e12d2c2", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 11.62}
+INFO:     127.0.0.1:52884 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.560884+00:00", "request_id": "6151924ee68e45a99a9da76c80853830", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 10.1}
+INFO:     127.0.0.1:49813 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.563584+00:00", "request_id": "3af5cd93c6a640cc81aee3a64c768783", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 10.17}
+INFO:     127.0.0.1:54967 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.696672+00:00", "request_id": "072e32a9483944c49e68dd90615054c4", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 30.48}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:42.932353+00:00", "request_id": "26ab9e4762b54d90913602138d6ae13f", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 31.45}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:44.958862+00:00", "request_id": "7dab775c69764b2090e818a7e502dd38", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.11}
+INFO:     127.0.0.1:54967 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:44.983069+00:00", "request_id": "ce078a18da9747c785a27f71c6e72be9", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.79}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:44.983864+00:00", "request_id": "c2af1a9d714045e98c13edf384a707db", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 4.07}
+INFO:     127.0.0.1:49813 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.032764+00:00", "request_id": "f7a77c35becf41d5ac46576ce44c54bd", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 4.21}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.037359+00:00", "request_id": "4803ff5b5d3140e29e3dc5918fd45a25", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 11.17}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.038039+00:00", "request_id": "7bbc0b18bad44492a27ca18c5f8d7bab", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 10.85}
+INFO:     127.0.0.1:49813 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.040915+00:00", "request_id": "53ad21cf017a45499da54cffac08c744", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 12.51}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.041460+00:00", "request_id": "25a4bf99295d45b6a658e60214a20646", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 16.03}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.041982+00:00", "request_id": "66d7cc858c994b96ada519ed2a3faef2", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 11.81}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.062928+00:00", "request_id": "4debb3885d4842d2a8b039c3cb3811b0", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 13.65}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.069382+00:00", "request_id": "8c9813d826e24d09964fe05f9fcdbcb8", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 15.27}
+INFO:     127.0.0.1:52884 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.180563+00:00", "request_id": "25cff957271c4dcdab62d33d31a9ae93", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 17.38}
+INFO:     127.0.0.1:53569 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.211653+00:00", "request_id": "570bd4d51287425f9a4e76948a5fdc86", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.96}
+INFO:     127.0.0.1:53569 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:45.434484+00:00", "request_id": "be7b2238ac654c3c94a9662ca9dd8ae3", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 17.02}
+INFO:     127.0.0.1:53569 - "GET /api/knowledge/v1/entities/e_f8d3b4ea3523/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.661940+00:00", "request_id": "d4545da281ee404caf12a3109cf66935", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.69}
+INFO:     127.0.0.1:53569 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.681125+00:00", "request_id": "2e0ef79159c2458bb93bff489facbc3c", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.13}
+INFO:     127.0.0.1:52884 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.683451+00:00", "request_id": "d47a6efa72b345ac8ccaa27f18f07a82", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 4.78}
+INFO:     127.0.0.1:53569 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.729206+00:00", "request_id": "17fcbf61b98a498c982da9cfa9919e65", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 2.46}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.733366+00:00", "request_id": "9f42a867631d4948b1a9cb7c041deddd", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 8.34}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.733937+00:00", "request_id": "2244a896aea443a49c8f1ec9ab9881ed", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 12.98}
+INFO:     127.0.0.1:54967 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53569 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.738797+00:00", "request_id": "6a7e2b27e45e4364aef51902b4ce8fb4", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 13.63}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.739396+00:00", "request_id": "c59ed4878cea48d9ae6d1c465e33dbcd", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 12.77}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.740595+00:00", "request_id": "f1c1bcd4c8284c4db91a060a97bb7246", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 17.97}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.757618+00:00", "request_id": "c25e6f46625a4d6cbc2cfffa867a9e15", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 7.54}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.758281+00:00", "request_id": "494afdaf949644f2ab9adc6475f20334", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 9.3}
+INFO:     127.0.0.1:54967 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.878024+00:00", "request_id": "4e21f64b4c7a42f4b290c6a5bdfe67eb", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 31.61}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:46.911110+00:00", "request_id": "fe992ef006594ac59175623b019500b9", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 6.91}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:47.118749+00:00", "request_id": "807f71678d794c418652cc845aa1c11d", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 18.82}
+INFO:     127.0.0.1:54967 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.185809+00:00", "request_id": "fdf98ac28f124555b6951293725b37e0", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 4.11}
+INFO:     127.0.0.1:54967 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.217895+00:00", "request_id": "0e26f9d791934982b7a6350302f0edb1", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 6.11}
+INFO:     127.0.0.1:54967 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.221524+00:00", "request_id": "2bf52ff25d7f4a679be3ddd95d66bde2", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 8.97}
+INFO:     127.0.0.1:58007 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.285476+00:00", "request_id": "c2c3b40b64f74ca58dcd354dc558eab2", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 9.53}
+INFO:     127.0.0.1:54967 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.289292+00:00", "request_id": "8e1c68a715d349edb4a1768ea27496de", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 5.97}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.289856+00:00", "request_id": "df15e4e7dadc40cb812b7c531cac081e", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 9.14}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.291794+00:00", "request_id": "8364cd7096d24eb0b02ac0beecb21c35", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 12.36}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52884 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.295434+00:00", "request_id": "5e0bb542827d496c8f45e150ccb19aa8", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 18.03}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.296236+00:00", "request_id": "8f9013c3780b4cf983d05a72def3dd90", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 15.12}
+INFO:     127.0.0.1:58007 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.312906+00:00", "request_id": "f86a2a602f8a423da1e802c2331657d1", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 5.97}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.313642+00:00", "request_id": "8adf81f1a3da4153bdd5bbe5e9fde113", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 7.81}
+INFO:     127.0.0.1:52884 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.434459+00:00", "request_id": "aaefa2e94dc145edb2084dce1e88f4cc", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 21.26}
+INFO:     127.0.0.1:52884 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.461918+00:00", "request_id": "b9d067d02f96465f87eb8c9e03e8e493", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.51}
+INFO:     127.0.0.1:52884 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:51.699898+00:00", "request_id": "2feae2c2c7fd4cb2aa1aa5ffcc12d404", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 30.89}
+INFO:     127.0.0.1:52884 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.926786+00:00", "request_id": "47f10243e83d4ef3ae3509ebadcda4df", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.46}
+INFO:     127.0.0.1:52884 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.947700+00:00", "request_id": "2ff1e66c309c4e8399b79df2c4786f0f", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 1.98}
+INFO:     127.0.0.1:49813 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.950564+00:00", "request_id": "f09e8d2ebe4b474eb0de7c88e5c1a077", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 5.5}
+INFO:     127.0.0.1:52884 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.993555+00:00", "request_id": "5c859c1e0aa7474aaf52563b141780b8", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 6.86}
+INFO:     127.0.0.1:52884 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.997857+00:00", "request_id": "89dd42ac7a75462b9e9ef86ecd06cf39", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 7.54}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.999007+00:00", "request_id": "7a29316f66c14b8f8b44753ebac6a771", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 10.41}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:52.999630+00:00", "request_id": "fdee248f26314277b55e55f77ae205c9", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 9.27}
+INFO:     127.0.0.1:52730 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.001631+00:00", "request_id": "69dbe683bbd842dcb722520471939355", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 14.01}
+INFO:     127.0.0.1:58007 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54967 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49813 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.006430+00:00", "request_id": "6aa6dfe9a22e48feac85ccc464cd9e81", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 16.24}
+INFO:     127.0.0.1:53569 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.025620+00:00", "request_id": "2dcd9e6cbbd34b45962d4da1fc5fecc6", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 9.45}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.026348+00:00", "request_id": "6466d4ee86be4600a8916288262fa31a", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 11.68}
+INFO:     127.0.0.1:52884 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52730 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.134222+00:00", "request_id": "7e1eef294cb24603860dc30e50f35733", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 20.03}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:53.392521+00:00", "request_id": "7c3d45a06b9841c586a867e0ee10d523", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 22.1}
+INFO:     127.0.0.1:52730 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.572354+00:00", "request_id": "8694cc2d91a54657802496b14053376b", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 1.61}
+INFO:     127.0.0.1:51550 - "GET /read/stub/ch1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.588687+00:00", "request_id": "3103e5ec9a65434a9ebef7a574f10231", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 2.11}
+INFO:     127.0.0.1:60798 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.591788+00:00", "request_id": "b165c7509a8f49e0bdf24a7478ed1979", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 6.85}
+INFO:     127.0.0.1:51550 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.658901+00:00", "request_id": "9add22e0cc2f417bac2d2787b8108b03", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 4.78}
+INFO:     127.0.0.1:51550 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.664054+00:00", "request_id": "2dafb810837e448e9836829b9d566c68", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 7.15}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.664832+00:00", "request_id": "0e8bf613d89248c6acefeb9cb813fe14", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 8.3}
+INFO:     127.0.0.1:50121 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52980 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.668701+00:00", "request_id": "ac2355a0a5234caa95c8303f798a8798", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 13.99}
+INFO:     127.0.0.1:60798 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.685111+00:00", "request_id": "c09a47e2ee794d429042d0c7a93cd6d0", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 7.81}
+INFO:     127.0.0.1:51550 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.688529+00:00", "request_id": "5266f9b9c4ef4436ad8f700aa8e10d66", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 8.51}
+INFO:     127.0.0.1:61850 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.827129+00:00", "request_id": "f1d52361f37f48f3acaee94f4c4cd57d", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 17.12}
+INFO:     127.0.0.1:61850 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:55.867182+00:00", "request_id": "f89687b2a61341129b121d9cacee1aad", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 8.14}
+INFO:     127.0.0.1:61850 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:09:56.115092+00:00", "request_id": "76359ac667834e09bd66776e303c0ae7", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 36.21}
+INFO:     127.0.0.1:61850 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card?generation=true&textbook=stub HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.547722+00:00", "request_id": "74a2d335a69543e0a65c5930afd99205", "service": "gateway", "method": "GET", "route": "/{path:path}", "status": 200, "duration_ms": 2.39}
+INFO:     127.0.0.1:59725 - "GET /internal/review HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.560723+00:00", "request_id": "1729f3e4124c429d9898acba8b5df8e2", "service": "gateway", "method": "GET", "route": "/assets/index-DSea-vHm.js", "status": 200, "duration_ms": 2.91}
+INFO:     127.0.0.1:59725 - "GET /assets/index-DSea-vHm.js HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.563024+00:00", "request_id": "68315368a9f54ef5b7d7b10b3f796dbb", "service": "gateway", "method": "GET", "route": "/assets/index-wUxl_L5W.css", "status": 200, "duration_ms": 4.16}
+INFO:     127.0.0.1:56969 - "GET /assets/index-wUxl_L5W.css HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.633837+00:00", "request_id": "0f567a2e37b248d1b76e15fa483a300c", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-400-normal-9AYXx_QC.woff2", "status": 200, "duration_ms": 8.9}
+INFO:     127.0.0.1:59725 - "GET /assets/onest-latin-400-normal-9AYXx_QC.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.637927+00:00", "request_id": "d03e49c68c68442798423e9cd9672e25", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-500-normal-CJRUgmys.woff2", "status": 200, "duration_ms": 10.08}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.638393+00:00", "request_id": "277640e0b88b4d7883b8cbf8138d0c68", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-600-normal-BZYKVyuq.woff2", "status": 200, "duration_ms": 11.35}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.639636+00:00", "request_id": "adb13615f7524f6ab493acb1a4751aef", "service": "gateway", "method": "GET", "route": "/assets/literata-latin-opsz-normal-BHZsWIlc.woff2", "status": 200, "duration_ms": 10.86}
+INFO:     127.0.0.1:57185 - "GET /assets/onest-cyrillic-500-normal-CJRUgmys.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56969 - "GET /assets/onest-cyrillic-600-normal-BZYKVyuq.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50808 - "GET /assets/literata-latin-opsz-normal-BHZsWIlc.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.643336+00:00", "request_id": "2c64dd772cdc4f95b8b6cfd654233d8e", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-600-normal-DM19Lk_j.woff2", "status": 200, "duration_ms": 13.92}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.643751+00:00", "request_id": "dff25244a9334d7bad1c77fad8483ef0", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-400-normal-BTdD9fLi.woff2", "status": 200, "duration_ms": 12.24}
+INFO:     127.0.0.1:61158 - "GET /assets/onest-latin-600-normal-DM19Lk_j.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51182 - "GET /assets/onest-cyrillic-400-normal-BTdD9fLi.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.659708+00:00", "request_id": "4df02c09bc2f42c890e47ef5e64e28ac", "service": "gateway", "method": "GET", "route": "/assets/onest-latin-500-normal-2-RsuwM3.woff2", "status": 200, "duration_ms": 11.82}
+INFO:     127.0.0.1:59725 - "GET /assets/onest-latin-500-normal-2-RsuwM3.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:16.667728+00:00", "request_id": "f30a99b524bb4a5d82c4592f3ea2931c", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 404, "duration_ms": 17.36}
+INFO:     127.0.0.1:57185 - "GET /api/knowledge/v1/review/queue HTTP/1.1" 404 Not Found
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:18.476593+00:00", "request_id": "bcf32ad9fef24b2eb88c8314feae38ad", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 255.78}
+INFO:     127.0.0.1:57185 - "POST /api/knowledge/v1/operator/login HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:18.495076+00:00", "request_id": "2a6c51b8311a4cca89324bc20a219cdb", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 14.47}
+INFO:     127.0.0.1:59725 - "GET /api/knowledge/v1/review/queue HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.010714+00:00", "request_id": "b91f10df5e5b4426b3792fd6b180537d", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 8.78}
+INFO:     127.0.0.1:59725 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.039370+00:00", "request_id": "ffaa62a05c654fc3aa754ffa99d69d13", "service": "gateway", "method": "GET", "route": "/assets/onest-cyrillic-700-normal-3rOSeAdn.woff2", "status": 200, "duration_ms": 2.64}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.039864+00:00", "request_id": "e0244620482841f18382ceabefb7103a", "service": "gateway", "method": "GET", "route": "/assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2", "status": 200, "duration_ms": 2.88}
+INFO:     127.0.0.1:59725 - "GET /assets/onest-cyrillic-700-normal-3rOSeAdn.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57185 - "GET /assets/literata-cyrillic-opsz-normal-DgmypKXX.woff2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:19.977671+00:00", "request_id": "b0344f564a5f4786b259737edd036ee3", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 20.65}
+INFO:     127.0.0.1:57185 - "GET /api/knowledge/v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.032188+00:00", "request_id": "cbb4670ee6a040c390df83a788d2b355", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 24.08}
+INFO:     127.0.0.1:57185 - "GET /api/knowledge/v1/portraits/1 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.052944+00:00", "request_id": "986a7e6231dc4057a8b1a11a70570bfe", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 39.96}
+INFO:     127.0.0.1:59725 - "GET /api/knowledge/v1/portraits/2 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.055706+00:00", "request_id": "f1c16966e0b84cb1a44c853d60686f82", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 42.41}
+INFO:     127.0.0.1:51182 - "GET /api/knowledge/v1/portraits/4 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.063497+00:00", "request_id": "42b4fabb96e14052834bec57f17b1429", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 49.91}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/portraits/6 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.068362+00:00", "request_id": "72a7034059e146e897e74c02e2d9ebab", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 25.95}
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.069822+00:00", "request_id": "b4c6e60003d241cb9de4b0b64ae16f5c", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 56.69}
+INFO:     127.0.0.1:57185 - "GET /api/knowledge/v1/portraits/7 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.072449+00:00", "request_id": "cb193326533d4f93bcae417579e5352e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 59.03}
+INFO:     127.0.0.1:50808 - "GET /api/knowledge/v1/portraits/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61158 - "GET /api/knowledge/v1/portraits/5 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.096880+00:00", "request_id": "34bb0ef7716143e395def50182907451", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 27.65}
+INFO:     127.0.0.1:59725 - "GET /api/knowledge/v1/portraits/8 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.105113+00:00", "request_id": "fae4a0e6dee043ce994ffee996ad4e67", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 29.54}
+INFO:     127.0.0.1:51182 - "GET /api/knowledge/v1/portraits/9 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.117077+00:00", "request_id": "bee71ffc143a4847bdf28d9ead93e58f", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 24.28}
+INFO:     127.0.0.1:57185 - "GET /api/knowledge/v1/portraits/10 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.118860+00:00", "request_id": "82c4603e6ce24190a6f0fc039ce5a224", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 25.91}
+INFO:     127.0.0.1:50808 - "GET /api/knowledge/v1/portraits/11 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.125470+00:00", "request_id": "aaf48dd8e6514ed38847a75520552c6e", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 30.97}
+INFO:     127.0.0.1:61158 - "GET /api/knowledge/v1/portraits/12 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:20.131900+00:00", "request_id": "2df45bafd445486a82d5616c5490dfff", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 17.83}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/portraits/13 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:21.451664+00:00", "request_id": "318056bb53a14cd995c59965d5cb5bf7", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 10.34}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:22.322921+00:00", "request_id": "2d2e0435a9834e42be800dbaef9c2a16", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 10.95}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:24.287202+00:00", "request_id": "5b4dabe05fe44beeade20c73a38fd68d", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 17.69}
+INFO:     127.0.0.1:56969 - "POST /api/knowledge/v1/review/portraits/14?action=approve HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:24.301360+00:00", "request_id": "db5c7a6d035e44168853801a99e93cb8", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 8.59}
+INFO:     127.0.0.1:61158 - "GET /api/knowledge/v1/review/portraits?status=draft HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:25.376527+00:00", "request_id": "acd7199fc1cd4f0db510628b847f55c0", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 18.25}
+INFO:     127.0.0.1:61158 - "GET /api/knowledge/v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:25.426227+00:00", "request_id": "23eadd3f3e1d469685de4e1157e3add4", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 10.79}
+INFO:     127.0.0.1:61158 - "GET /api/knowledge/v1/portraits/14 HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.237769+00:00", "request_id": "f5fae19b10f040c39f13a00388c7531f", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 47.49}
+INFO:     127.0.0.1:59351 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.307203+00:00", "request_id": "69e852fe582346578d7851d9e3651902", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 30.87}
+INFO:     127.0.0.1:61158 - "POST /api/knowledge/v1/review/portraits/13?action=main HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:27.332193+00:00", "request_id": "e7149de4caac44ea9ac92e624ca74a24", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 21.02}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.519980+00:00", "request_id": "fdc5f1e6b5cf403d89428ad9396132de", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 16.62}
+INFO:     127.0.0.1:49692 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.636667+00:00", "request_id": "203f9323a798449090e8b11117c93115", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 16.7}
+INFO:     127.0.0.1:56969 - "POST /api/knowledge/v1/review/portraits/13?action=hide HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:29.653002+00:00", "request_id": "7d2c6c8c832e4f01b8eb06ea1de85bfe", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 12.34}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=approved HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:31.472582+00:00", "request_id": "362ced2cba7b4efeb2e0601c1dbb6e84", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 30.42}
+INFO:     127.0.0.1:53290 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:31.502134+00:00", "request_id": "302711d5ad6348b0bfcc063f0df816d1", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 11.58}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:32.641850+00:00", "request_id": "3eb6fc87bb924faf8de5fc706d5649a1", "service": "gateway", "method": "POST", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 19.94}
+INFO:     127.0.0.1:56969 - "POST /api/knowledge/v1/review/portraits/13?action=show HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:32.656237+00:00", "request_id": "0f19dea099a54657b41c60c9c99827b9", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 7.69}
+INFO:     127.0.0.1:56969 - "GET /api/knowledge/v1/review/portraits?status=hidden HTTP/1.1" 200 OK
+{"event": "http.request.completed", "level": "info", "time": "2026-11-13T13:10:34.535930+00:00", "request_id": "3370d65fc01d4dd58bb73432bb114beb", "service": "gateway", "method": "GET", "route": "/api/knowledge/{path:path}", "status": 200, "duration_ms": 46.02}
+INFO:     127.0.0.1:55717 - "GET /api/knowledge/v1/entities/e_dcd68cfc0448/card HTTP/1.1" 200 OK

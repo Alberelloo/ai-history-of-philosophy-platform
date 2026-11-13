@@ -1,0 +1,154 @@
+﻿SHOT TC-19-01-review-no-session.png
+SHOT TC-21-01-draft-queue.png
+SHOT TC-21-02-approved-filter.png
+SHOT TC-21-03-hidden-empty.png
+SHOT TC-21-04-action-error.png
+SHOT TC-21-05-hidden-list.png
+SHOT TC-21-06-after-show.png
+SHOT TC-21-07-after-approve.png
+SHOT TC-21-08-after-main.png
+{
+  "fresh": {
+    "cookies": [
+      "pg_page"
+    ],
+    "login_form": 1,
+    "portraits_tab": 0
+  },
+  "after_login": {
+    "cookies": [
+      "pg_page",
+      "philograph_operator"
+    ],
+    "httpOnly": true
+  },
+  "draft_queue": {
+    "selected": "draft",
+    "rows": [
+      {
+        "id": "14",
+        "status": "draft",
+        "text": "В | Превью появится после подтверждения. | Витгенштейн | Moritz Nähr, 1930 | Лицензия: pd | Источник | 328 × 480 | Подтвердить | Скрыть",
+        "imgs": 0,
+        "img_natural": null,
+        "monogram": 1,
+        "buttons": [
+          "Подтвердить",
+          "Скрыть"
+        ]
+      }
+    ],
+    "preview_pending": 1,
+    "source_links": 1,
+    "license_text": "В | Превью появится после подтверждения. | Витгенштейн | Moritz Nähr, 1930 | Лицензия: pd | Источник | 328 × 480 | Подтвердить | Скрыть"
+  },
+  "approved": {
+    "count": 13,
+    "make_main": 13,
+    "hide": 13,
+    "with_image": 13,
+    "first_two": [
+      {
+        "id": "1",
+        "status": "approved",
+        "text": "Платон | Marie-Lan Nguyen, 2009 | Лицензия: cc-by-2.5 | Источник | 320 × 480 | Сделать главным | Скрыть",
+        "imgs": 1,
+        "img_natural": [
+          320,
+          480
+        ],
+        "monogram": 0,
+        "buttons": [
+          "Сделать главным",
+          "Скрыть"
+        ]
+      },
+      {
+        "id": "2",
+        "status": "approved",
+        "text": "Аристотель | After Lysippos | Лицензия: pd | Источник | 359 × 480 | Сделать главным | Скрыть",
+        "imgs": 1,
+        "img_natural": [
+          359,
+          480
+        ],
+        "monogram": 0,
+        "buttons": [
+          "Сделать главным",
+          "Скрыть"
+        ]
+      }
+    ]
+  },
+  "hidden_empty": {
+    "count": 0,
+    "empty_text": 1
+  },
+  "action_error": {
+    "alert": 1,
+    "alert_text": "Портрет не найден",
+    "rows_still": 1
+  },
+  "hume_before": 1,
+  "hidden_list": [
+    {
+      "id": "9",
+      "status": "approved",
+      "text": "Ю | Юм | Allan Ramsay, 1766 | Лицензия: pd | Источник | 397 × 480 | Вернуть",
+      "imgs": 0,
+      "img_natural": null,
+      "monogram": 1,
+      "buttons": [
+        "Вернуть"
+      ]
+    }
+  ],
+  "hidden_after_show": 0,
+  "approve": {
+    "drafts_left": 0,
+    "empty_text": 1,
+    "statuses": [
+      "200 /api/knowledge/v1/review/portraits/14?action=approve",
+      "200 /api/knowledge/v1/review/portraits/13?action=main"
+    ]
+  },
+  "brentano_rows": [
+    {
+      "id": "12",
+      "text": "Брентано | M. Wacker | Лицензия: pd | Источник | 346 × 480 | Сделать главным | С",
+      "imgs": 1
+    },
+    {
+      "id": "13",
+      "text": "Брентано | Fritz Luckhardt, 1875 | Лицензия: pd | Источник | 287 × 480 | Сделать",
+      "imgs": 1
+    }
+  ],
+  "card_before_main": [
+    {
+      "url": "/api/knowledge/v1/portraits/12",
+      "author": "M. Wacker"
+    },
+    {
+      "url": "/api/knowledge/v1/portraits/13",
+      "author": "Fritz Luckhardt"
+    }
+  ],
+  "card_after_main": [
+    {
+      "url": "/api/knowledge/v1/portraits/13",
+      "author": "Fritz Luckhardt"
+    },
+    {
+      "url": "/api/knowledge/v1/portraits/12",
+      "author": "M. Wacker"
+    }
+  ],
+  "console_errors": [
+    "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  ],
+  "failed_responses": [
+    "404 http://127.0.0.1:8104/api/knowledge/v1/review/queue"
+  ]
+}
