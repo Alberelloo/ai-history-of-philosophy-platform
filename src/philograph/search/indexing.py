@@ -11,12 +11,12 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from sqlalchemy import Engine, and_, delete, func, select, update
+from sqlalchemy import Engine, and_, delete, func, or_, select, update
 
 from philograph.platform import events
 from philograph.search import schema as t
 from philograph.search.text import terms
-from philograph.search.vectors import VectorStore
+from philograph.search.vectors import DimensionMismatch, VectorStore
 
 events.define(
     "search.index.rebuilt",
@@ -54,6 +54,12 @@ events.define(
     "info",
     "Поиск переключён на новый смысловой индекс",
     required=("collection", "model"),
+)
+events.define(
+    "search.index.dimension_mismatch",
+    "error",
+    "Размерность эмбеддингов не совпадает с коллекцией",
+    required=("collection", "collection_dimension", "embedder_dimension"),
 )
 
 
@@ -293,6 +299,18 @@ class Indexer:
         """Считает эмбеддинги только для нового текста; тот же текст той же моделью — готов."""
         if not items:
             return 0
+        # Размерность проверяется до любого вызова эмбеддера и до записи: иначе абзац был бы
+        # помечен готовым с векторами другой формы, а сбой повторился бы бесконечно.
+        existing = self.vectors.collection_dimension(collection)
+        if existing is not None and existing != embedder.dimension:
+            events.emit(
+                "search.index.dimension_mismatch",
+                collection=collection,
+                collection_dimension=existing,
+                embedder_dimension=embedder.dimension,
+                error_kind="dimension_mismatch",
+            )
+            raise DimensionMismatch(collection, existing, embedder.dimension)
         fresh: list[tuple[dict[str, Any], list[str]]] = []
         computed = 0
         for item in items:
@@ -302,6 +320,10 @@ class Indexer:
                         and_(
                             t.vectors_done.c.text_hash == item["hash"],
                             t.vectors_done.c.model == embedder.model,
+                            or_(
+                                t.vectors_done.c.dimension == embedder.dimension,
+                                t.vectors_done.c.dimension.is_(None),
+                            ),
                         )
                     )
                 )
@@ -338,7 +360,10 @@ class Indexer:
                     )
                     conn.execute(
                         t.vectors_done.insert().values(
-                            text_hash=item["hash"], model=embedder.model, chunks=len(parts)
+                            text_hash=item["hash"],
+                            model=embedder.model,
+                            dimension=embedder.dimension,
+                            chunks=len(parts),
                         )
                     )
             self._mark_embedded([item["id"] for item, _ in batch])

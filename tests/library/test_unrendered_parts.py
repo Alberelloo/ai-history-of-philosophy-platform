@@ -57,4 +57,6 @@ def test_placeholder_survives_furniture_and_uses_printed_label():
 def test_pipeline_version_raised_for_placeholders():
     """Источники обрабатываются заново, чтобы заглушки появились и в опубликованных книгах."""
     assert PIPELINE_VERSION == "4"
-    assert STEP_VERSIONS == {"extract": "3", "parse": "4"}
+    # Версии шагов растут вместе с новой логикой: extract 4 — главы по закладкам PDF
+    # (source-quality-followups 1.1), чтобы прежний кеш постраничного извлечения не пережил смену.
+    assert STEP_VERSIONS == {"extract": "4", "parse": "4"}

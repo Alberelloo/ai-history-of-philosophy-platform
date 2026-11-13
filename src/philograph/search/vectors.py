@@ -25,9 +25,45 @@ class Hit:
     score: float
 
 
+class DimensionMismatch(Exception):
+    """Размерность векторов не совпадает с коллекцией.
+
+    Возникает, когда эмбеддер отдаёт вектор другой размерности, чем уже существующая
+    коллекция (например, оператор сменил модель/размерность, а коллекция осталась прежней).
+    """
+
+    def __init__(self, collection: str, collection_dim: int, embedder_dim: int) -> None:
+        self.collection = collection
+        self.collection_dim = collection_dim
+        self.embedder_dim = embedder_dim
+        super().__init__(f"коллекция {collection}: {collection_dim}, эмбеддер: {embedder_dim}")
+
+
+def _params_size(vectors: object) -> int | None:
+    """Размерность конфигурации векторов Qdrant; ``None``, если она неоднозначна."""
+    if isinstance(vectors, qm.VectorParams):
+        return vectors.size
+    if isinstance(vectors, dict):
+        sizes = {v.size for v in vectors.values() if isinstance(v, qm.VectorParams)}
+        return next(iter(sizes)) if len(sizes) == 1 else None
+    return None
+
+
 class VectorStore:
     def __init__(self, client: QdrantClient) -> None:
         self.client = client
+        self._dimension_cache: dict[str, int] = {}
+
+    def collection_dimension(self, collection: str) -> int | None:
+        """Размерность существующей коллекции; ``None``, если коллекции нет."""
+        if not self.client.collection_exists(collection):
+            return None
+        if collection in self._dimension_cache:
+            return self._dimension_cache[collection]
+        size = _params_size(self.client.get_collection(collection).config.params.vectors)
+        if size is not None:
+            self._dimension_cache[collection] = size
+        return size
 
     def ensure(self, collection: str, dimension: int) -> None:
         if not self.client.collection_exists(collection):
@@ -35,13 +71,28 @@ class VectorStore:
                 collection,
                 vectors_config=qm.VectorParams(size=dimension, distance=qm.Distance.COSINE),
             )
+            self._dimension_cache[collection] = dimension
+            return
+        existing = self.collection_dimension(collection)
+        if existing is not None and existing != dimension:
+            raise DimensionMismatch(collection, existing, dimension)
+        self._dimension_cache[collection] = dimension
 
     def exists(self, collection: str) -> bool:
         return self.client.collection_exists(collection)
 
+    def _check_dimension(self, collection: str, vectors: list[list[float]]) -> None:
+        existing = self.collection_dimension(collection)
+        if existing is None:
+            return
+        for vector in vectors:
+            if len(vector) != existing:
+                raise DimensionMismatch(collection, existing, len(vector))
+
     def upsert(
         self, collection: str, paragraph_id: str, vectors: list[list[float]], payload: dict
     ) -> None:
+        self._check_dimension(collection, vectors)
         self.delete(collection, [paragraph_id])  # число фрагментов могло измениться
         self.client.upsert(
             collection,
@@ -92,6 +143,7 @@ class VectorStore:
         exclude_sources: list[str] | None = None,
         region: str | None = None,
     ) -> list[Hit]:
+        self._check_dimension(collection, [vector])
         must = [
             qm.FieldCondition(key="active", match=qm.MatchValue(value=True)),
             qm.FieldCondition(key="scope", match=qm.MatchAny(any=scopes)),

@@ -504,6 +504,7 @@ def parse(raw: RawDocument, settings: ParseSettings, new_id: Callable[[str], str
             owners[pos] = last
     _link_footnotes(doc, raw_notes, new_id, owners, ref_pages, ref_markers)
     _compare_toc(doc)
+    _compare_bookmarks(doc, raw)
     return doc
 
 
@@ -577,4 +578,32 @@ def _compare_toc(doc: Document) -> None:
             doc.warn(
                 "toc_mismatch",
                 f"В печатном оглавлении есть «{title}», в тексте такого заголовка нет",
+            )
+
+
+def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
+    """Закладки PDF (printed_toc) сверяются с заголовками; расхождения — предупреждения.
+
+    Закладка вне документа и заголовок, которого нет в тексте, — предупреждение с названием и
+    страницей из закладки.
+    """
+    if not raw.printed_toc:
+        return
+    headings = {lang.normalize_text(s.title) for s in doc.walk() if s.title and s.kind != "toc"}
+    for entry in raw.printed_toc:
+        title = entry[1]
+        page = entry[2] if len(entry) > 2 else None
+        if page is not None and not (1 <= page <= len(raw.pages)):
+            doc.warn(
+                "toc_mismatch",
+                f"Закладка «{title}» указывает на страницу {page}, которой нет в документе",
+                page=str(page),
+            )
+            continue
+        if lang.normalize_text(title) not in headings:
+            where = f", с. {page}" if page is not None else ""
+            doc.warn(
+                "toc_mismatch",
+                f"В печатном оглавлении есть «{title}», в тексте такого заголовка нет{where}",
+                page=str(page) if page is not None else None,
             )
