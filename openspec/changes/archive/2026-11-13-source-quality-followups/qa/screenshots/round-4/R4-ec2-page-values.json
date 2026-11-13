@@ -1,0 +1,66 @@
+[
+ {
+  "page": 5,
+  "label": "EC-2: закладка на с. 5 при 1 странице",
+  "issues": [
+   {
+    "code": "toc_mismatch",
+    "message": "В печатном оглавлении есть «Introduction to Philosophy», в тексте такого заголовка нет, с. 1",
+    "page": "1"
+   },
+   {
+    "code": "toc_mismatch",
+    "message": "Закладка «Off the Edge» указывает на страницу 5",
+    "page": "5"
+   }
+  ]
+ },
+ {
+  "page": -1,
+  "label": "F1: закладка -1",
+  "issues": [
+   {
+    "code": "toc_mismatch",
+    "message": "В печатном оглавлении есть «Introduction to Philosophy», в тексте такого заголовка нет, с. 1",
+    "page": "1"
+   },
+   {
+    "code": "toc_mismatch",
+    "message": "Закладка «Off the Edge» указывает на страницу, которой нет в документе",
+    "page": null
+   }
+  ]
+ },
+ {
+  "page": 0,
+  "label": "граница: 0",
+  "issues": [
+   {
+    "code": "toc_mismatch",
+    "message": "В печатном оглавлении есть «Introduction to Philosophy», в тексте такого заголовка нет, с. 1",
+    "page": "1"
+   },
+   {
+    "code": "toc_mismatch",
+    "message": "Закладка «Off the Edge» указывает на страницу, которой нет в документе",
+    "page": null
+   }
+  ]
+ },
+ {
+  "page": -7,
+  "label": "граница: -7",
+  "issues": [
+   {
+    "code": "toc_mismatch",
+    "message": "В печатном оглавлении есть «Introduction to Philosophy», в тексте такого заголовка нет, с. 1",
+    "page": "1"
+   },
+   {
+    "code": "toc_mismatch",
+    "message": "Закладка «Off the Edge» указывает на страницу, которой нет в документе",
+    "page": null
+   }
+  ]
+ }
+]

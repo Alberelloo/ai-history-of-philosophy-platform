@@ -1,0 +1,70 @@
+{
+ "harvest": [
+  {
+   "url": "https://ru.wikisource.org/wiki/ЭСБЕ/Теория_познания",
+   "title": "ЭСБЕ/Теория познания",
+   "author_names": [
+    "Н. Г. Дебольский"
+   ],
+   "author_names_repr": [
+    "'Н. Г. Дебольский'"
+   ],
+   "contains_markup": [
+    false
+   ],
+   "authors": [
+    {
+     "name": "Н. Г. Дебольский",
+     "death_year": null,
+     "wikidata": null
+    }
+   ],
+   "slug_hint": [
+    "Дебольский",
+    "ЭСБЕ/Теория познания",
+    "ru",
+    "wikisource"
+   ],
+   "files": 1,
+   "requests": 4
+  },
+  {
+   "url": "https://ru.wikisource.org/wiki/ЭСБЕ/Скептицизм",
+   "title": "ЭСБЕ/Скептицизм",
+   "author_names": [
+    "Э. Радлов"
+   ],
+   "author_names_repr": [
+    "'Э. Радлов'"
+   ],
+   "contains_markup": [
+    false
+   ],
+   "authors": [
+    {
+     "name": "Э. Радлов",
+     "death_year": null,
+     "wikidata": null
+    }
+   ],
+   "slug_hint": [
+    "Радлов",
+    "ЭСБЕ/Скептицизм",
+    "ru",
+    "wikisource"
+   ],
+   "files": 1,
+   "requests": 8
+  }
+ ],
+ "requests": [
+  "https://ru.wikisource.org/w/api.php?action=query&prop=pageprops&redirects=1&format=json&formatversion=2&titles=%D0%AD%D0%A1%D0%91%D0%95/%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F",
+  "https://ru.wikisource.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&page=%D0%AD%D0%A1%D0%91%D0%95/%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F%20%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F",
+  "https://ru.wikisource.org/w/api.php?action=query&prop=pageprops&redirects=1&format=json&formatversion=2&titles=%D0%90%D0%B2%D1%82%D0%BE%D1%80%3A%D0%9D.%20%D0%93.%20%D0%94%D0%B5%D0%B1%D0%BE%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B9",
+  "https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D1%8F",
+  "https://ru.wikisource.org/w/api.php?action=query&prop=pageprops&redirects=1&format=json&formatversion=2&titles=%D0%AD%D0%A1%D0%91%D0%95/%D0%A1%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC",
+  "https://ru.wikisource.org/w/api.php?action=parse&prop=wikitext&format=json&formatversion=2&page=%D0%AD%D0%A1%D0%91%D0%95/%D0%A1%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC",
+  "https://ru.wikisource.org/w/api.php?action=query&prop=pageprops&redirects=1&format=json&formatversion=2&titles=%D0%90%D0%B2%D1%82%D0%BE%D1%80%3A%D0%AD.%20%D0%A0%D0%B0%D0%B4%D0%BB%D0%BE%D0%B2",
+  "https://ru.wikisource.org/api/rest_v1/page/html/%D0%AD%D0%A1%D0%91%D0%95%2F%D0%A1%D0%BA%D0%B5%D0%BF%D1%82%D0%B8%D1%86%D0%B8%D0%B7%D0%BC"
+ ]
+}

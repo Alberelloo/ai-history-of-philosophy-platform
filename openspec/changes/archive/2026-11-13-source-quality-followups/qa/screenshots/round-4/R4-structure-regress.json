@@ -1,0 +1,87 @@
+{
+ "cases": {
+  "font-headings": {
+   "sha256": "4fb77fbb5264d657",
+   "sections": [
+    [
+     "Introduction to Philosophy",
+     2
+    ],
+    [
+     "Ancient Philosophy",
+     1
+    ],
+    [
+     "Modern Philosophy",
+     2
+    ]
+   ],
+   "toc_issues": [],
+   "blocks": 3,
+   "r3_sha256": "c7abc25bf937c987",
+   "r3_sections": [
+    [
+     "Introduction to Philosophy",
+     2,
+     1,
+     0
+    ],
+    [
+     "Ancient Philosophy",
+     1,
+     1,
+     0
+    ],
+    [
+     "Modern Philosophy",
+     2,
+     1,
+     0
+    ]
+   ],
+   "sha_matches_r3": false
+  },
+  "bookmarks-matching": {
+   "sha256": "0d1b3d38fa48d9e7",
+   "sections": [
+    [
+     "Chapter One",
+     1
+    ],
+    [
+     "Chapter Two",
+     1
+    ]
+   ],
+   "toc_issues": [],
+   "blocks": 2,
+   "r3_sha256": "30e662df93b34268",
+   "r3_sections": [
+    [
+     "Chapter One",
+     1,
+     1,
+     0
+    ],
+    [
+     "Chapter Two",
+     1,
+     1,
+     0
+    ]
+   ],
+   "sha_matches_r3": false
+  },
+  "empty-toc": {
+   "sha256": "f2463577f8b22fbd",
+   "sections": [
+    [
+     "Introduction to Philosophy",
+     1
+    ]
+   ],
+   "toc_issues": [],
+   "blocks": 1
+  }
+ }
+}
