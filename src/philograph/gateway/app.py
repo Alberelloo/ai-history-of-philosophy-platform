@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import http.cookiejar
 import json
 import math
 import os
@@ -35,6 +36,19 @@ events.define(
 events.define(
     "gateway.internal.blocked", "warning", "Запрос к внутреннему адресу снаружи", required=("path",)
 )
+
+
+class _NoStoreCookies(http.cookiejar.CookieJar):
+    """Шлюз не хранит cookie сервисов: общий клиент не должен переносить сессии.
+
+    Иначе `Set-Cookie` от ``/operator/login`` оседал бы в cookie-jar шлюза и подставлялся
+    в запросы других посетителей — очередь проверки открывалась без входа. Cookie посетителя
+    пересылается явно как обычный заголовок, а `Set-Cookie` доходит до браузера в ответе.
+    """
+
+    def set_cookie(self, cookie) -> None:
+        return None
+
 
 HOP_HEADERS = {
     "connection",
@@ -79,7 +93,11 @@ def build_app(
     ``regions`` — определение региона читателя (без него регион всегда неизвестен)."""
     health = Health("gateway", __version__)
     app = create_app("gateway", __version__, health)
-    client = httpx.AsyncClient(timeout=httpx.Timeout(10.0, read=120.0), transport=transport)
+    client = httpx.AsyncClient(
+        timeout=httpx.Timeout(10.0, read=120.0),
+        transport=transport,
+        cookies=_NoStoreCookies(),
+    )
 
     def who(request: Request) -> tuple[str, str]:
         address = limits.address(
