@@ -5,7 +5,12 @@ providers:
     kind: openai_compatible
     base_url: https://api.deepseek.com
     api_key_env: DEEPSEEK_API_KEY
-  # Провайдер эмбеддингов выбирается при реализации поиска (add-paragraph-search).
+  # Эмбеддинги — внешние: у DeepSeek API эмбеддингов нет (ADR-0002), берём OpenAI.
+  openai:
+    kind: openai_compatible
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+  # Заглушка — для демо-стенда и сквозных тестов без ключей.
   embeddings-stub:
     kind: fake
 
@@ -13,7 +18,7 @@ roles:
   fast: {provider: deepseek, model: deepseek-flash, max_output_tokens: 200, timeout_seconds: 10}
   main: {provider: deepseek, model: deepseek-flash, max_output_tokens: 1500, timeout_seconds: 60}
   strong: {provider: deepseek, model: deepseek-v4-pro, max_output_tokens: 1500, timeout_seconds: 120}
-  embeddings: {provider: embeddings-stub, model: stub-embeddings}
+  embeddings: {provider: openai, model: text-embedding-3-small}
 
 prices:
   deepseek-flash:
@@ -29,6 +34,11 @@ prices:
   stub-embeddings:
     input_cache_miss: 0.0
     input_cache_hit: 0.0
+  # OpenAI text-embedding-3-small: $0.02 за миллион токенов (ввод), вывод не оплачивается.
+  text-embedding-3-small:
+    input_cache_miss: 0.02
+    input_cache_hit: 0.02
+    output: 0.0
 
 budgets:
   site: {daily_limit_usd: 1.7, monthly_limit_usd: 50, alert_ratio: 0.8}

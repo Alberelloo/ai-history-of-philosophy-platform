@@ -70,9 +70,10 @@ services:
       PHILOGRAPH_LIBRARY_URL: http://library:8001
       PHILOGRAPH_LLM_URL: http://llm:8000
       PHILOGRAPH_QDRANT_URL: http://qdrant:6333
-      # Провайдер эмбеддингов выбирается замером (docs/architecture/adr/0002-embeddings.md).
-      PHILOGRAPH_EMBEDDING_MODEL: stub-embeddings
-      PHILOGRAPH_EMBEDDING_DIMENSION: "8"
+      # Провайдер и размерность эмбеддингов задаются в .env (см. .env.example);
+      # по умолчанию заглушка — для локального стенда и тестов без ключей.
+      PHILOGRAPH_EMBEDDING_MODEL: ${PHILOGRAPH_EMBEDDING_MODEL:-stub-embeddings}
+      PHILOGRAPH_EMBEDDING_DIMENSION: "${PHILOGRAPH_EMBEDDING_DIMENSION:-8}"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8002/health/ready').status == 200 else 1)"]
       interval: 10s
