@@ -247,6 +247,18 @@ def test_wikisource_author_from_signed_template(env):
 
 
 @req(SC, "Добавление источника по ссылке")
+def test_wikisource_author_from_wrapped_signed_template(env):
+    """Подпись в оформлении: «{{right|{{ЭСБЕ/Автор|Э. Радлов}}.}}» — автор без хвоста разметки."""
+    page = "ЭСБЕ/Скептицизм"
+    wikitext = "Тело статьи одной строкой.\n{{right|{{ЭСБЕ/Автор|Э. Радлов}}.}}\n"
+    ws_site(env, wikitext, page=page, author_qid={"Автор:Э. Радлов": None})
+    harvest = Wikisource().harvest(f"https://{HOST}/wiki/{quote(page)}", env.service.fetcher)
+    assert harvest.metadata["authors"] == [
+        {"name": "Э. Радлов", "death_year": None, "wikidata": None}
+    ]
+
+
+@req(SC, "Добавление источника по ссылке")
 def test_wikisource_author_from_bold_name(env):
     page = "Статья"
     ws_site(

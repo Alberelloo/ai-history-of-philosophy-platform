@@ -1,0 +1,191 @@
+[
+  {
+    "name": "EC-16 закладка Chapter Two -> с.1, заголовок на с.2",
+    "bookmarks": [
+      [
+        1,
+        "Chapter One",
+        1
+      ],
+      [
+        1,
+        "Chapter Two",
+        1
+      ]
+    ],
+    "page_lines": [
+      [
+        [
+          "Chapter One",
+          1
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ],
+      [
+        [
+          "Chapter Two",
+          null
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ]
+    ],
+    "sections": [
+      [
+        "Chapter One",
+        1
+      ],
+      [
+        "Chapter Two",
+        1
+      ]
+    ],
+    "toc_mismatch": []
+  },
+  {
+    "name": "вариант: закладка Chapter Two -> с.2, заголовок на с.3",
+    "bookmarks": [
+      [
+        1,
+        "Chapter One",
+        1
+      ],
+      [
+        1,
+        "Chapter Two",
+        2
+      ]
+    ],
+    "page_lines": [
+      [
+        [
+          "Chapter One",
+          1
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ],
+      [
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ],
+      [
+        [
+          "Chapter Two",
+          null
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ]
+    ],
+    "sections": [
+      [
+        "Chapter One",
+        1
+      ],
+      [
+        "Chapter Two",
+        1
+      ]
+    ],
+    "toc_mismatch": []
+  },
+  {
+    "name": "TC-2 закладка Ghost Chapter без текста",
+    "bookmarks": [
+      [
+        1,
+        "Chapter One",
+        1
+      ],
+      [
+        1,
+        "Ghost Chapter",
+        1
+      ]
+    ],
+    "page_lines": [
+      [
+        [
+          "Chapter One",
+          1
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ]
+    ],
+    "sections": [
+      [
+        "Chapter One",
+        1
+      ]
+    ],
+    "toc_mismatch": [
+      {
+        "message": "В печатном оглавлении есть «Ghost Chapter», в тексте такого заголовка нет, с. 1",
+        "page": "1"
+      }
+    ]
+  },
+  {
+    "name": "F5 совпадение: все закладки верны",
+    "bookmarks": [
+      [
+        1,
+        "Chapter One",
+        1
+      ],
+      [
+        1,
+        "Chapter Two",
+        2
+      ]
+    ],
+    "page_lines": [
+      [
+        [
+          "Chapter One",
+          1
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ],
+      [
+        [
+          "Chapter Two",
+          1
+        ],
+        [
+          "All knowledge begins with experience, bu",
+          null
+        ]
+      ]
+    ],
+    "sections": [
+      [
+        "Chapter One",
+        1
+      ],
+      [
+        "Chapter Two",
+        1
+      ]
+    ],
+    "toc_mismatch": []
+  }
+]

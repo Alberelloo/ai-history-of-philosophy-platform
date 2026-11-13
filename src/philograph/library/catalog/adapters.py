@@ -399,10 +399,16 @@ def _template_author(wikitext: str) -> str | None:
     """Подпись автора из подшаблона: «{{ЭСБЕ/Автор|Н. Г. Дебольский}}».
 
     В справочных статьях автора ставят в конце именно так: позиционным параметром
-    подшаблона, а не ссылкой на страницу автора и не жирной строкой.
+    подшаблона, а не ссылкой на страницу автора и не жирной строкой. Подпись бывает
+    завёрнута в оформление — «{{right|{{ЭСБЕ/Автор|Э. Радлов}}.}}», поэтому берём только
+    до первой закрывающей скобки и снимаем разметку.
     """
     match = re.search(r"\{\{\s*[^|}\n]*Автор\s*\|\s*([^|}\n]+)", wikitext)
-    return _plain(match.group(1)).strip() if match else None
+    if not match:
+        return None
+    name = _plain(match.group(1))
+    name = name.split("}}", 1)[0].split("|", 1)[0]
+    return name.strip(" .;,") or None
 
 
 def _author_links(wikitext: str, lang: str) -> list[str]:

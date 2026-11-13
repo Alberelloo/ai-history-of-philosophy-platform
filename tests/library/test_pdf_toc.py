@@ -81,24 +81,26 @@ def test_bookmark_without_text_warns_with_title_and_page():
 
 @req(DS, "Оглавление источника")
 def test_bookmark_on_wrong_page_warns():
-    """Заголовок нашёлся, но не там, куда указывает закладка: это расхождение.
+    """Заголовок нашёлся, но не там, куда указывает закладка: это расхождение (EC-16).
 
     Молча брать структуру по шрифту нельзя: печатное оглавление разошлось с текстом,
-    и оператор должен об этом узнать (сценарий «Расхождение»).
+    и оператор должен об этом узнать — с обеими страницами.
     """
     data = _pdf(
         [
             [("Chapter One", 16.0), (f"{BODY} First.", 11.0)],
-            [("Chapter One", 16.0), (f"{BODY} Again.", 11.0)],
+            [("Chapter Two", 16.0), (f"{BODY} Second.", 11.0)],
         ],
         [
             [1, "Chapter One", 1],
-            [1, "Ghost Chapter", 2],
+            [1, "Chapter Two", 1],  # закладка врёт: заголовок на второй странице
         ],
     )
     doc = parse_raw(extract_pdf(data, languages=["eng"], ocr=None))
-    warnings = [i for i in doc.issues if i.code == "toc_mismatch"]
-    assert any("Ghost Chapter" in w.message for w in warnings)
+    messages = [i.message for i in doc.issues if i.code == "toc_mismatch"]
+    assert any("Chapter Two" in m and "страницу 1" in m and "странице 2" in m for m in messages), (
+        messages
+    )
 
 
 @req(DS, "Оглавление источника")

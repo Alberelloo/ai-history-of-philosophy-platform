@@ -320,6 +320,9 @@ def build_blocks(raw: RawDocument, labels: list[str | None], base: float | None)
                 and (len(line.text) < 120 and not line.text.rstrip().endswith("."))
             ):
                 level = heading_sizes.index(round(line.size)) + 1
+                # Решение о заголовке записываем в строку: сверка с закладками PDF ищет
+                # заголовки по этому полю, и найденный по шрифту должен быть виден.
+                line.heading_level = level
             if level is not None:
                 current = _Draft(
                     "heading", line.text.strip(), [], [], page_pos=pos, heading_level=level
