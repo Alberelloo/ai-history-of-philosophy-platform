@@ -886,7 +886,7 @@ def test_t16_portrait_gallery(browser, site, texts):
         gallery = panel.locator(".pg-portrait-gallery")
         expect(gallery.locator("img")).to_have_count(1)
         gallery.get_by_role("button", name="Следующий портрет").click()
-        assert gallery.locator("img").count() == 0  # сбойный кадр — монограмма
+        expect(gallery.locator("img")).to_have_count(0)  # сбойный кадр — монограмма
         expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
         expect(gallery.locator(".pg-portrait-gallery__count")).to_have_text("2 из 2")
         assert gallery.locator(".pg-portrait-gallery__dot").count() == 2

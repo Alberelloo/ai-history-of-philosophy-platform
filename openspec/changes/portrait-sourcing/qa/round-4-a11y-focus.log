@@ -1,0 +1,31 @@
+﻿SHOT EC-18-01-gallery-focus-ring.png
+SHOT EC-18-02-next-button-focus.png
+{
+  "gallery_focus": {
+    "tag": "DIV",
+    "cls": "pg-portrait-gallery",
+    "label": "Портреты: Брентано",
+    "shadow": "rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px 0px 4px"
+  },
+  "tab_trail": [
+    "BUTTON.pg-btn pg-btn--ghost pg-btn--icon [Оглавление] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "BUTTON.pg-btn pg-btn--ghost pg-btn--icon [Ассистент] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "SPAN.mention pg-mention [None] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "SPAN.mention pg-mention [None] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "SPAN.mention pg-mention [None] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "BUTTON.copy-link pg-btn pg-btn--ghost pg-btn--i [Скопировать ссылку на абзац] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "BUTTON.ask-paragraph pg-btn pg-btn--ghost pg-bt [Спросить об абзаце] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "BUTTON.pg-btn pg-btn--ghost pg-btn--icon pg-btn [Закрыть карточку] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px",
+    "DIV.pg-portrait-gallery [Портреты: Брентано] shadow=rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px"
+  ],
+  "gallery_reached_by_tab": true,
+  "count_after_arrow": "2 из 2",
+  "next_button_focus": {
+    "label": null,
+    "shadow": "rgb(239, 241, 236) 0px 0px 0px 2px, rgb(56, 91, 143) 0px 0px 0px 4px",
+    "outline": "none"
+  },
+  "img_alt": "Брентано",
+  "gallery_aria": "Портреты: Брентано",
+  "gallery_role": "region"
+}

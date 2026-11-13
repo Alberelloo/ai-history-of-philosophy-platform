@@ -1,0 +1,191 @@
+﻿{
+  "anon": {
+    "gateway_queue": 404,
+    "gateway_hide": 404,
+    "knowledge_queue": 404
+  },
+  "delivery": {
+    "approved_jpeg_10": {
+      "status": 200,
+      "content_type": "image/jpeg",
+      "cache_control": "public, max-age=31536000, immutable",
+      "etag": "5042b9fb5d90c3356213878faf59398ac5d7739213bdfbc55b922d28c8fed8d4",
+      "bytes": 28687,
+      "magic": "ffd8ffe0"
+    },
+    "approved_png_1": {
+      "status": 200,
+      "content_type": "image/jpeg",
+      "cache_control": "public, max-age=31536000, immutable",
+      "magic": "ffd8ffe000104a46"
+    },
+    "draft_12": 404,
+    "draft_13": 404,
+    "draft_14": 404,
+    "missing_9999": 404,
+    "direct_knowledge_10": 200
+  },
+  "card_before": {
+    "kant": {
+      "status": 200,
+      "count": 1,
+      "portraits": [
+        {
+          "url": "/api/knowledge/v1/portraits/10",
+          "width": 275,
+          "height": 480,
+          "author": "Becker",
+          "year": "1768",
+          "license": "pd",
+          "license_url": null,
+          "source_url": "https://commons.wikimedia.org/wiki/File:Immanuel_Kant_-_Gemaelde_2.jpg"
+        }
+      ]
+    },
+    "plato": {
+      "status": 200,
+      "count": 1,
+      "portraits": [
+        {
+          "url": "/api/knowledge/v1/portraits/1",
+          "width": 320,
+          "height": 480,
+          "author": "Marie-Lan Nguyen",
+          "year": "2009",
+          "license": "cc-by-2.5",
+          "license_url": "https://creativecommons.org/licenses/by/2.5",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Plato_Silanion_Musei_Capitolini_MC1377.jpg"
+        }
+      ]
+    },
+    "hume": {
+      "status": 200,
+      "count": 1,
+      "portraits": [
+        {
+          "url": "/api/knowledge/v1/portraits/9",
+          "width": 397,
+          "height": 480,
+          "author": "Allan Ramsay",
+          "year": "1766",
+          "license": "pd",
+          "license_url": null,
+          "source_url": "https://commons.wikimedia.org/wiki/File:David_Hume_Ramsay.jpg"
+        }
+      ]
+    },
+    "brentano": {
+      "status": 200,
+      "count": 0,
+      "portraits": []
+    },
+    "wittgenstein": {
+      "status": 200,
+      "count": 0,
+      "portraits": []
+    }
+  },
+  "login": {
+    "status": 200,
+    "set_cookie": true,
+    "cookies": [
+      "philograph_operator"
+    ]
+  },
+  "stranger": {
+    "queue": 404,
+    "hide": 404,
+    "actions": 0
+  },
+  "operator_queue_draft": {
+    "status": 200,
+    "items": [
+      {
+        "id": 12,
+        "entity_id": "e_dcd68cfc0448",
+        "author": "M. Wacker",
+        "license": "pd",
+        "license_url": null,
+        "source_url": "https://commons.wikimedia.org/wiki/File:Franz_Brentano_portrait.jpg",
+        "width": 346,
+        "height": 480
+      },
+      {
+        "id": 14,
+        "entity_id": "e_b9933ef541ce",
+        "author": "Moritz Nähr",
+        "license": "pd",
+        "license_url": null,
+        "source_url": "https://commons.wikimedia.org/wiki/File:Ludwig_Wittgenstein.jpg",
+        "width": 328,
+        "height": 480
+      },
+      {
+        "id": 13,
+        "entity_id": "e_dcd68cfc0448",
+        "author": "Fritz Luckhardt",
+        "license": "pd",
+        "license_url": null,
+        "source_url": "https://commons.wikimedia.org/wiki/File:Franz_Brentano_in_Vienna,_1875.png",
+        "width": 287,
+        "height": 480
+      }
+    ]
+  },
+  "approve_12": 200,
+  "approve_13": 200,
+  "actions_after": 2,
+  "card_after": {
+    "brentano": {
+      "status": 200,
+      "count": 2,
+      "portraits": [
+        {
+          "url": "/api/knowledge/v1/portraits/12",
+          "width": 346,
+          "height": 480,
+          "author": "M. Wacker",
+          "year": null,
+          "license": "pd",
+          "license_url": null,
+          "source_url": "https://commons.wikimedia.org/wiki/File:Franz_Brentano_portrait.jpg"
+        },
+        {
+          "url": "/api/knowledge/v1/portraits/13",
+          "width": 287,
+          "height": 480,
+          "author": "Fritz Luckhardt",
+          "year": "1875",
+          "license": "pd",
+          "license_url": null,
+          "source_url": "https://commons.wikimedia.org/wiki/File:Franz_Brentano_in_Vienna,_1875.png"
+        }
+      ]
+    },
+    "wittgenstein": {
+      "status": 200,
+      "count": 0,
+      "portraits": []
+    },
+    "kant": {
+      "status": 200,
+      "count": 1,
+      "portraits": [
+        {
+          "url": "/api/knowledge/v1/portraits/10",
+          "width": 275,
+          "height": 480,
+          "author": "Becker",
+          "year": "1768",
+          "license": "pd",
+          "license_url": null,
+          "source_url": "https://commons.wikimedia.org/wiki/File:Immanuel_Kant_-_Gemaelde_2.jpg"
+        }
+      ]
+    }
+  },
+  "delivery_after": {
+    "12": 200,
+    "13": 200
+  }
+}

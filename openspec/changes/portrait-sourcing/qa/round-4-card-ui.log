@@ -1,0 +1,376 @@
+﻿SHOT F4-01-two-portraits-first.png
+SHOT F4-02-two-portraits-second.png
+SHOT F4-03-second-500-state.png
+SHOT F4-04-back-to-first-loaded.png
+SHOT F4-05-second-again-failed.png
+SHOT F4-06-dot-first-loaded.png
+SHOT F4-07-keyboard-right-failed.png
+SHOT F4-08-keyboard-left-loaded.png
+SHOT F4-09-second-abort-state.png
+SHOT F4-10-abort-back-loaded.png
+SHOT EC-6-01-medallion-kant.png
+SHOT EC-6-02-single-portrait.png
+SHOT EC-19-01-medallion-broken.png
+SHOT EC-19-02-single-broken.png
+SHOT TC-18-01-medallion-empty.png
+SHOT TC-18-02-gallery-empty.png
+SHOT TC-1-01-card-fields.png
+SHOT EC-17-01-english-labels.png
+{
+  "brentano_medallion": {
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "aria": null,
+    "counters": 0
+  },
+  "brentano_first": {
+    "class": "pg-portrait-gallery",
+    "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "1 из 2",
+    "dots": 2,
+    "active_dot": "1 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "M. Wacker · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "brentano_second": {
+    "class": "pg-portrait-gallery",
+    "text": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник |  | 2 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/13",
+    "natural": [
+      287,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "2 из 2",
+    "dots": 2,
+    "active_dot": "2 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_after_second_500": {
+    "class": "pg-portrait-gallery",
+    "text": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник |  | 2 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/13",
+    "natural": [
+      287,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "2 из 2",
+    "dots": 2,
+    "active_dot": "2 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_back_to_first": {
+    "class": "pg-portrait-gallery",
+    "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "1 из 2",
+    "dots": 2,
+    "active_dot": "1 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "M. Wacker · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_second_again": {
+    "class": "pg-portrait-gallery",
+    "text": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник |  | 2 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/13",
+    "natural": [
+      287,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "2 из 2",
+    "dots": 2,
+    "active_dot": "2 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_dot_to_first": {
+    "class": "pg-portrait-gallery",
+    "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "1 из 2",
+    "dots": 2,
+    "active_dot": "1 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "M. Wacker · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_keyboard_right": {
+    "class": "pg-portrait-gallery",
+    "text": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник |  | 2 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/13",
+    "natural": [
+      287,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "2 из 2",
+    "dots": 2,
+    "active_dot": "2 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "Fritz Luckhardt, 1875 · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_keyboard_left": {
+    "class": "pg-portrait-gallery",
+    "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "1 из 2",
+    "dots": 2,
+    "active_dot": "1 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "M. Wacker · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "f4_abort_second": {
+    "class": "pg-portrait-gallery",
+    "text": "Б |  | Изображений нет |  | 2 из 2",
+    "imgs": 0,
+    "src": null,
+    "natural": null,
+    "alt": null,
+    "count": "2 из 2",
+    "dots": 2,
+    "active_dot": "2 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 1,
+    "empty_text": "Изображений нет",
+    "monogram": 1,
+    "credit": null,
+    "license_links": 0,
+    "source_links": 0
+  },
+  "f4_abort_back": {
+    "class": "pg-portrait-gallery",
+    "text": "M. Wacker · Лицензия: pd · Источник |  | 1 из 2",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/12",
+    "natural": [
+      346,
+      480
+    ],
+    "alt": "Брентано",
+    "count": "1 из 2",
+    "dots": 2,
+    "active_dot": "1 из 2",
+    "nav": 1,
+    "prev_btn": 1,
+    "next_btn": 1,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "M. Wacker · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "kant_medallion": {
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/10",
+    "natural": [
+      275,
+      480
+    ],
+    "alt": "Кант",
+    "aria": null,
+    "counters": 0
+  },
+  "kant_single": {
+    "class": "pg-portrait-gallery",
+    "text": "Becker, 1768 · Лицензия: pd · Источник",
+    "imgs": 1,
+    "src": "/api/knowledge/v1/portraits/10",
+    "natural": [
+      275,
+      480
+    ],
+    "alt": "Кант",
+    "count": null,
+    "dots": 0,
+    "active_dot": null,
+    "nav": 0,
+    "prev_btn": 0,
+    "next_btn": 0,
+    "empty": 0,
+    "empty_text": null,
+    "monogram": 0,
+    "credit": "Becker, 1768 · Лицензия: pd · Источник",
+    "license_links": 0,
+    "source_links": 1
+  },
+  "kant_medallion_broken": {
+    "imgs": 0,
+    "src": null,
+    "natural": null,
+    "alt": null,
+    "aria": "Кант: изображения нет",
+    "counters": 0
+  },
+  "kant_single_broken": {
+    "class": "pg-portrait-gallery",
+    "text": "К |  | Изображений нет",
+    "imgs": 0,
+    "src": null,
+    "natural": null,
+    "alt": null,
+    "count": null,
+    "dots": 0,
+    "active_dot": null,
+    "nav": 0,
+    "prev_btn": 0,
+    "next_btn": 0,
+    "empty": 1,
+    "empty_text": "Изображений нет",
+    "monogram": 1,
+    "credit": null,
+    "license_links": 0,
+    "source_links": 0
+  },
+  "witt_medallion": {
+    "imgs": 0,
+    "src": null,
+    "natural": null,
+    "alt": null,
+    "aria": "Витгенштейн: изображения нет",
+    "counters": 0
+  },
+  "witt_empty": {
+    "class": "pg-portrait-gallery pg-portrait-gallery--empty",
+    "text": "В |  | Изображений нет",
+    "imgs": 0,
+    "src": null,
+    "natural": null,
+    "alt": null,
+    "count": null,
+    "dots": 0,
+    "active_dot": null,
+    "nav": 0,
+    "prev_btn": 0,
+    "next_btn": 0,
+    "empty": 0,
+    "empty_text": "Изображений нет",
+    "monogram": 1,
+    "credit": null,
+    "license_links": 0,
+    "source_links": 0
+  },
+  "kant_fields": {
+    "width": "275",
+    "height": "480",
+    "alt": "Кант",
+    "src": "/api/knowledge/v1/portraits/10",
+    "credit": "Becker, 1768 · Лицензия: pd · Источник"
+  },
+  "console_errors": [
+    "[f4-second-abort] error: Failed to load resource: net::ERR_FAILED",
+    "[single-500] error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+    "[single-500] error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  ],
+  "failed_responses": [
+    "[single-500] 500 http://127.0.0.1:8104/api/knowledge/v1/portraits/10",
+    "[single-500] 500 http://127.0.0.1:8104/api/knowledge/v1/portraits/10"
+  ],
+  "english": {
+    "credit": "M. Wacker · License: pd · Source",
+    "license_label": true,
+    "source_label": true,
+    "count": "1 of 2",
+    "dots": 2,
+    "prev_aria": 1,
+    "next_aria": 1,
+    "author_untranslated": true,
+    "gallery_aria": "Portraits: Брентано"
+  },
+  "console_errors_en": []
+}
