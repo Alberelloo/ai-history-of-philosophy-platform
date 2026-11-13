@@ -1,0 +1,42 @@
+{
+  "source_id": "s_61847bfc3a76",
+  "before": {
+    "regions": [],
+    "permissions": {
+      "display": true,
+      "external_processing": true,
+      "quoting": true
+    }
+  },
+  "after": {
+    "regions": [
+      "RU"
+    ],
+    "permissions": {
+      "display": true,
+      "external_processing": false,
+      "quoting": true
+    }
+  },
+  "kind_regions": [
+    "RU"
+  ],
+  "kind_permissions": {
+    "display": true,
+    "external_processing": false,
+    "quoting": true
+  },
+  "events": [
+    {
+      "source_id": "s_61847bfc3a76",
+      "regions": [
+        "RU"
+      ],
+      "permissions": {
+        "display": true,
+        "external_processing": false,
+        "quoting": true
+      }
+    }
+  ]
+}

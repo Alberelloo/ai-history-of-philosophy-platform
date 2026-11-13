@@ -1,0 +1,355 @@
+{
+  "stack": {
+    "url": "http://127.0.0.1:53893",
+    "proxy_url": "http://127.0.0.1:53681",
+    "ports": {
+      "llm": 53888,
+      "library": 53889,
+      "search": 53890,
+      "assistant": 53891,
+      "knowledge": 53892
+    },
+    "sources": {
+      "open": "s_dd48e910faf9",
+      "nonext": "s_88a0fe4f75ae",
+      "extru": "s_908d0a9996b0",
+      "version_open": "v_2c0c7f5ae55b",
+      "version_nonext": "v_05ce3da2fd90",
+      "version_extru": "v_61878a6865cf"
+    },
+    "pids": {
+      "open": [
+        "p_6bdfc8a3ae2c",
+        "p_8ca4dc9624fd"
+      ],
+      "nonext": [
+        "p_126f932e8f60",
+        "p_7a6a1d454e66"
+      ],
+      "extru": [
+        "p_045ceadd815d",
+        "p_e32e29cec37a"
+      ]
+    },
+    "logs": "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+  },
+  "catalog": {
+    "validate_exit": 0,
+    "validate_tail": "название и автор, что у sofist-platon-karpov-ru-wikisource: проверьте, что это другое издание\nwarning: [platon-protagor-ru-wikisource] то же название и автор, что у protagor-platon-karpov-ru-wikisource: проверьте, что это другое издание\nwarning: [platon-teetet-ru-wikisource] то же название и автор, что у teetet-platon-karpov-ru-wikisource: проверьте, что это другое издание\nwarning: [aristotel-politika-archive] то же название и автор, что у aristotel-politika-ru-wikisource: проверьте, что это другое издание\nзаписей: 317 {\"approved\": 304, \"rejected\": 10, \"draft\": 3}; ошибок: 0, предупреждений: 6",
+    "kind": {
+      "code": "public-domain-ru",
+      "title": "Общественное достояние по праву РФ",
+      "url": null,
+      "regions": [
+        "RU"
+      ],
+      "permissions": {
+        "display": true,
+        "external_processing": false,
+        "quoting": true
+      }
+    },
+    "codes": [
+      "cc-by-4.0",
+      "cc-by-nc-4.0",
+      "cc-by-nc-sa-4.0",
+      "cc-by-sa-3.0",
+      "cc-by-sa-4.0",
+      "gfdl-1.3",
+      "pd-site",
+      "public-domain",
+      "public-domain-ru"
+    ]
+  },
+  "sync": {
+    "source_id": "s_61847bfc3a76",
+    "before": {
+      "regions": [],
+      "permissions": {
+        "display": true,
+        "external_processing": true,
+        "quoting": true
+      }
+    },
+    "after": {
+      "regions": [
+        "RU"
+      ],
+      "permissions": {
+        "display": true,
+        "external_processing": false,
+        "quoting": true
+      }
+    },
+    "kind_regions": [
+      "RU"
+    ],
+    "kind_permissions": {
+      "display": true,
+      "external_processing": false,
+      "quoting": true
+    },
+    "events": [
+      {
+        "source_id": "s_61847bfc3a76",
+        "regions": [
+          "RU"
+        ],
+        "permissions": {
+          "display": true,
+          "external_processing": false,
+          "quoting": true
+        }
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "TC-8.4/data",
+      "ok": true,
+      "expected": "`catalog validate` зелёный; у вида public-domain-ru регионы [RU], external_processing false, display true",
+      "actual": "{\"validate_exit\": 0, \"validate_tail\": \"название и автор, что у sofist-platon-karpov-ru-wikisource: проверьте, что это другое издание\\nwarning: [platon-protagor-ru-wikisource] то же название и автор, что у protagor-platon-karpov-ru-wikisource: проверьте, что это другое издание\\nwarning: [platon-teetet-ru-wikisource] то же название и автор, что у teetet-platon-karpov-ru-wikisource: проверьте, что это другое издание\\nwarning: [aristotel-politika-archive] то же название и автор, что у aristotel-politika-ru-wikisource: проверьте, что это другое издание\\nзаписей: 317 {\\\"approved\\\": 304, \\\"rejected\\\": 10, \\\"draft\\\": 3}; ошибок: 0, предупреждений: 6\", \"kind\": {\"code\": \"public-domain-ru\", \"title\": \"Общественное достояние по праву РФ\", \"url\": null, \"regions\": [\"RU\"], \"permissions\": {\"display\": true, \"external_processing\": false, \"quoting\": true}}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\catalog-validate.log"
+      ]
+    },
+    {
+      "id": "TC-8.4/sync",
+      "ok": true,
+      "expected": "sync вида меняет учёт источника: действующие регионы [RU], внешняя обработка выключена, записано source.access_changed",
+      "actual": "{\"source_id\": \"s_61847bfc3a76\", \"before\": {\"regions\": [], \"permissions\": {\"display\": true, \"external_processing\": true, \"quoting\": true}}, \"after\": {\"regions\": [\"RU\"], \"permissions\": {\"display\": true, \"external_processing\": false, \"quoting\": true}}, \"kind_regions\": [\"RU\"], \"kind_permissions\": {\"display\": true, \"external_processing\": false, \"quoting\": true}, \"events\": [{\"source_id\": \"s_61847bfc3a76\", \"regions\": [\"RU\"], \"permissions\": {\"display\": true, \"external_processing\": false, \"quoting\": true}}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\sync-accounting.json"
+      ]
+    },
+    {
+      "id": "TC-56",
+      "ok": true,
+      "expected": "абзацы источника без внешней обработки: docs.external = false, embedded = false; у открытого источника они в смысловом индексе; событие external_forbidden",
+      "actual": "{\"nonext\": [[false, false], [false, false]], \"open\": [[true, true], [true, true]], \"forbidden_events\": [{\"event\": \"search.index.external_forbidden\", \"level\": \"info\", \"time\": \"2026-11-13T10:56:06.890190+00:00\", \"source_id\": \"s_88a0fe4f75ae\"}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\search.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\library.log"
+      ]
+    },
+    {
+      "id": "EC-48",
+      "ok": true,
+      "expected": "индексация не зовёт эмбеддер и не падает: строки есть, embedded = false",
+      "actual": "{\"nonext\": [[false, false], [false, false]]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\search.log"
+      ]
+    },
+    {
+      "id": "TC-57",
+      "ok": true,
+      "expected": "поиск из РФ отдаёт абзац с external: false; из DE и без региона — не отдаёт",
+      "actual": "{\"ru\": {\"paragraph_id\": \"p_126f932e8f60\", \"source_id\": \"s_88a0fe4f75ae\", \"chapter_id\": \"sec_e5e2dc042d35\", \"section_title\": \"Глава 1. Рассудок и разум\", \"source_title\": \"Закрытый учебник без внешней обработки\", \"text\": \"Каллистика — учение о прекрасном. Рассудок даёт правила. Закрытая деталь СИГМА-3: рассудок подчиняет разум правилам.\", \"lang\": \"ru\", \"quoting\": true, \"external\": false, \"score\": 0.016393, \"found_by\": [\"lexical\"], \"neighbors\": {\"before\": [], \"after\": []}}, \"de_has\": false, \"none_has\": false, \"semantic_used_ru\": true, \"mixed_has_nonext\": [\"s_dd48e910faf9\", \"s_88a0fe4f75ae\", \"s_dd48e910faf9\", \"s_908d0a9996b0\", \"s_908d0a9996b0\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-58",
+      "ok": true,
+      "expected": "вопрос из РФ, лучший абзац без внешней обработки: текста нет в промпте, в потоке found_not_retold со ссылкой, в citations его нет",
+      "actual": "{\"notices\": [\"found_not_retold\"], \"suggestions\": [[{\"paragraph_id\": \"p_126f932e8f60\", \"title\": \"Закрытый учебник без внешней обработки — Глава 1. Рассудок и разум\"}]], \"citations\": [\"p_6bdfc8a3ae2c\"], \"prompt_has_mark\": false, \"prompt_tail\": \"А-7: разум задаёт принципы, а рассудок следует правилам.\\n\\n[2] Глава 1. Рассудок и разум\\nГилеморфизм у Аристотеля. Рассудок и разум. Закрытая деталь ДЕЛЬТА-5: внешняя обработка разрешена.\\n\\n[3] Глава 1. Рассудок и разум\\nВторой абзац: Бэкон писал об оптике.\\n\\n[4] Глава 1. Рассудок и разум\\nВторой абзац открытого источника: рассудок и разум у Канта.\\n</data>\\n\\n<data name=\\\"answer_language\\\">\\nрусский\\n</data>\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\assistant.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-59",
+      "ok": true,
+      "expected": "смешанная выдача: открытый абзац уходит модели, абзац без внешней обработки — только ссылкой с пометкой",
+      "actual": "{\"notices\": [\"found_not_retold\"], \"suggestions\": [[{\"paragraph_id\": \"p_126f932e8f60\", \"title\": \"Закрытый учебник без внешней обработки — Глава 1. Рассудок и разум\"}]], \"open_mark_in_prompt\": true, \"nonext_mark_in_prompt\": false, \"prompt_tail\": \"</data>\\n\\n<data name=\\\"passages\\\">\\n[1] Глава 1. Рассудок и разум\\nРассудок и разум. Открытая деталь ОМЕГА-7: разум задаёт принципы, а рассудок следует правилам.\\n\\n[2] Глава 1. Рассудок и разум\\nГилеморфизм у Аристотеля. Рассудок и разум. Закрытая деталь ДЕЛЬТА-5: внешняя обработка разрешена.\\n\\n[3] Глава 1. Рассудок и разум\\nВторой абзац: Бэкон писал об оптике.\\n\\n[4] Глава 1. Рассудок и разум\\nВторой абзац открытого источника: рассудок и разум у Канта.\\n</data>\\n\\n<data name=\\\"answer_language\\\">\\nрусский\\n</data>\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-64",
+      "ok": true,
+      "expected": "найдены только непересказываемые абзацы: контекст модели пуст, в потоке found_not_retold и no_library_support",
+      "actual": "{\"notices\": [\"found_not_retold\", \"no_library_support\"], \"passages\": 0, \"suggestions\": [[{\"paragraph_id\": \"p_126f932e8f60\", \"title\": \"Закрытый учебник без внешней обработки — Глава 1. Рассудок и разум\"}]], \"prompt_has_mark\": false, \"prompt_len\": 954}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-47",
+      "ok": true,
+      "expected": "«только по источникам»: все найденные абзацы непересказываемые — пометка со ссылками и no_answer",
+      "actual": "{\"types\": [\"stage\", \"notice\", \"no_answer\"], \"notices\": [\"found_not_retold\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "EC-49",
+      "ok": true,
+      "expected": "повтор вопроса: регион и признак читаются на каждый запрос, выдача та же",
+      "actual": "{\"repeat\": [\"found_not_retold\"], \"first\": [\"found_not_retold\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-63",
+      "ok": true,
+      "expected": "источник с external_processing: true ведёт себя как раньше: текст уходит модели, пометки нет, извлечение знаний не пропущено",
+      "actual": "{\"notices\": [], \"mark_in_prompt\": true, \"extraction_skipped\": [{\"event\": \"knowledge.extraction.skipped\", \"level\": \"info\", \"time\": \"2026-11-13T10:56:06.708400+00:00\", \"source_id\": \"s_88a0fe4f75ae\", \"reason\": \"external_processing_forbidden\"}], \"prompt_tail\": \"азум. Закрытая деталь ДЕЛЬТА-5: внешняя обработка разрешена.\\n\\n[2] Глава 1. Рассудок и разум\\nВторой абзац: Бэкон писал об оптике.\\n\\n[3] Глава 1. Рассудок и разум\\nВторой абзац открытого источника: рассудок и разум у Канта.\\n\\n[4] Глава 1. Рассудок и разум\\nРассудок и разум. Открытая деталь ОМЕГА-7: разум задаёт принципы, а рассудок следует правилам.\\n</data>\\n\\n<data name=\\\"answer_language\\\">\\nрусский\\n</data>\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-61",
+      "ok": true,
+      "expected": "без external_processing модель-разрешитель не вызывается, неоднозначное упоминание не поставлено, однозначное — по словарю",
+      "actual": "{\"unresolved\": [{\"event\": \"knowledge.mentions.unresolved\", \"level\": \"info\", \"time\": \"2026-11-13T10:56:06.862443+00:00\", \"surface\": \"Бэкон\", \"candidates\": 2}], \"nonext_mentions\": [[\"p_7a6a1d454e66\", \"e_a0119be1689d\", \"name\"]], \"bacon_mentions\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\knowledge.log"
+      ]
+    },
+    {
+      "id": "TC-61/no-text",
+      "ok": true,
+      "expected": "текста источника без внешней обработки нет ни в одном запросе к модели (извлечение и разбор упоминаний пропущены)",
+      "actual": "{\"knowledge_calls_with_mark\": 0}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\knowledge.log"
+      ]
+    },
+    {
+      "id": "UC-28/DE",
+      "ok": true,
+      "expected": "для читателя из DE источник закрыт целиком: строка restricted с regions [RU] без года и лицензии, поиск его не отдаёт",
+      "actual": "{\"row\": {\"id\": \"s_88a0fe4f75ae\", \"title\": \"Закрытый учебник без внешней обработки\", \"authors\": [\"QA тестировщик\"], \"restricted\": true, \"regions\": [\"RU\"]}, \"search\": [{\"paragraph_id\": \"p_8ca4dc9624fd\", \"source_id\": \"s_dd48e910faf9\", \"chapter_id\": \"sec_202b66406d6c\", \"section_title\": \"Глава 1. Рассудок и разум\", \"source_title\": \"Открытый сборник о рассудке\", \"text\": \"Второй абзац открытого источника: рассудок и разум у Канта.\", \"lang\": \"ru\", \"quoting\": true, \"external\": true, \"score\": 0.016393, \"found_by\": [\"semantic\"], \"neighbors\": {\"before\": [], \"after\": []}}, {\"paragraph_id\": \"p_6bdfc8a3ae2c\", \"source_id\": \"s_dd48e910faf9\", \"chapter_id\": \"sec_202b66406d6c\", \"section_title\": \"Глава 1. Рассудок и разум\", \"source_title\": \"Открытый сборник о рассудке\", \"text\": \"Рассудок и разум. Открытая деталь ОМЕГА-7: разум задаёт принципы, а рассудок следует правилам.\", \"lang\": \"ru\", \"quoting\": true, \"external\": true, \"score\": 0.016129, \"found_by\": [\"semantic\"], \"neighbors\": {\"before\": [], \"after\": []}}]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "UC-28/DE-no-text",
+      "ok": true,
+      "expected": "вопрос из DE: текста закрытого источника нет в промпте и нет пометки о найденном в закрытом источнике",
+      "actual": "{\"notices\": [], \"mark_in_prompt\": false}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "TC-60",
+      "ok": true,
+      "expected": "вопрос без региона: источник [RU] закрыт на поиске, текста нет в passages и пометки о найденном нет",
+      "actual": "{\"notices\": [], \"mark_in_prompt\": false, \"prompt_tail\": \"data>\\n\\n<data name=\\\"passages\\\">\\n[1] Глава 1. Рассудок и разум\\nРассудок и разум. Открытая деталь ОМЕГА-7: разум задаёт принципы, а рассудок следует правилам.\\n\\n[2] Глава 1. Рассудок и разум\\nВторой абзац открытого источника: рассудок и разум у Канта.\\n</data>\\n\\n<data name=\\\"answer_language\\\">\\nрусский\\n</data>\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs\\llm.log"
+      ]
+    },
+    {
+      "id": "EC-50",
+      "ok": true,
+      "expected": "пометка приходит строкой i18n (assistant.found_not_retold), данные источника не переводятся",
+      "actual": "{\"notice\": {\"type\": \"notice\", \"kind\": \"found_not_retold\", \"message\": \"Найдено в источниках, не пересказывается.\", \"suggestions\": [{\"paragraph_id\": \"p_126f932e8f60\", \"title\": \"Закрытый учебник без внешней обработки — Глава 1. Рассудок и разум\"}]}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\live-report.json",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\harness\\stand\\logs"
+      ]
+    },
+    {
+      "id": "TC-65/two-notices",
+      "ok": true,
+      "expected": "в одном ходе две пометки: «Найдено в источниках, не пересказывается.» со ссылкой на абзац и «Ответ составлен без опоры на библиотеку.» — видны обе, по порядку, над ответом, роль status",
+      "actual": "{\"count\": 2, \"notices\": [{\"text\": \"Найдено в источниках, не пересказывается.\\nЗакрытый учебник без внешней обработки — Глава 1. Рассудок и разум\", \"role\": \"status\", \"class\": \"assistant-notice pg-notice\"}, {\"text\": \"Ответ составлен без опоры на библиотеку.\", \"role\": \"status\", \"class\": \"assistant-notice pg-notice pg-notice--warning\"}], \"hrefs\": [\"/p/p_126f932e8f60\"]}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-1-two-notices.png"
+      ]
+    },
+    {
+      "id": "TC-65/link",
+      "ok": true,
+      "expected": "клик по ссылке пометки ведёт на этот абзац: адрес оканчивается #p-<абзац>, абзац в окне просмотра",
+      "actual": "{\"url\": \"http://127.0.0.1:53893/read/s_88a0fe4f75ae/sec_e5e2dc042d35#p-p_126f932e8f60\", \"rect\": {\"top\": 120, \"height\": 62}}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-2-link-opened.png"
+      ]
+    },
+    {
+      "id": "TC-65/legacy",
+      "ok": true,
+      "expected": "старая сессия формата 3 с единственным message открывается без ошибок: вопросы, пометки и ссылки на месте",
+      "actual": "{\"turns\": 2, \"texts\": [\"Старый вопрос\\n\\nОтвет составлен без опоры на библиотеку.\", \"Старый вопрос со ссылкой\\n\\nНайдено в источниках, не пересказывается.\\nГлава 1. Рассвет\"], \"notices_per_turn\": [1, 1], \"links\": 1, \"page_errors\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-3-legacy-v3-session.png",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\legacy-v3-state.json"
+      ]
+    },
+    {
+      "id": "TC-65/notice-no-library-support",
+      "ok": true,
+      "expected": "обычная пометка no_library_support по-прежнему показывается",
+      "actual": "{\"text\": \"Сколько весит луна в граммах?\\n\\nОтвет за\\n0 с\\n\\nОтвет составлен без опоры на библиотеку.\\nЭто демонстрационный ответ: он опирается на первый найденный абзац. Настоящая модель подключается в config/llm.yaml.\\n\\nВ этой книге ответа нет. В разделе «Ассистент» на вопрос ответят по всей библиотеке.\\n\\nПродолжить\", \"notices\": 1}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-4-ordinary-notices.png"
+      ]
+    },
+    {
+      "id": "TC-65/notice-no-answer",
+      "ok": true,
+      "expected": "пометка no_answer с «Близкое в библиотеке» показывается (клиент, подставной поток)",
+      "actual": "{\"text\": \"Что было в источниках про единорогов?\\n\\nОтвет за\\n0 с\\n\\nВ источниках ответа не нашлось.\\n\\nБлизкое в библиотеке:\\n\\nГлава 1. Рассвет\"}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-6-no-answer-notice.png",
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\round-7\\notices-stub-no-answer.ndjson"
+      ]
+    },
+    {
+      "id": "TC-65/notice-error",
+      "ok": true,
+      "expected": "ошибка соединения по-прежнему показывается: «Ответ оборвался. Можно повторить.» и кнопка «Повторить»",
+      "actual": "{\"text\": \"Что такое Каллистика?\\n\\nОборвалось на стадии «Разбираем вопрос» ·\\n0 с\\n\\nОтвет оборвался. Можно повторить.\\nПовторить\", \"retry_buttons\": 1}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-5-error-notice.png"
+      ]
+    },
+    {
+      "id": "TC-65/console",
+      "ok": true,
+      "expected": "в сценариях двух пометок, перехода по ссылке и старой сессии нет ошибок консоли и необработанных исключений страницы",
+      "actual": "{\"console_errors\": [], \"page_errors\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-1-two-notices.png"
+      ]
+    },
+    {
+      "id": "EC-console",
+      "ok": true,
+      "expected": "в браузере нет ошибок консоли и необработанных исключений страницы (кроме ожидаемого `net::ERR_FAILED` от намеренно оборванного запроса в проверке ошибки соединения)",
+      "actual": "{\"console_errors_normal_flow\": [], \"console_errors_total\": [\"error: Failed to load resource: net::ERR_FAILED\"], \"page_errors\": [], \"failed_requests\": []}",
+      "evidence": [
+        "C:\\Users\\Ivano\\Desktop\\ai-philosophy-platform\\ai-history-of-philosophy-platform\\openspec\\changes\\ru-only-sources\\qa\\screenshots\\round-7\\TC-65-1-two-notices.png"
+      ]
+    }
+  ],
+  "failures": 0
+}

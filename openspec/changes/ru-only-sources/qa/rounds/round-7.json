@@ -1,0 +1,29 @@
+{
+  "change": "ru-only-sources",
+  "round": 7,
+  "verdict": "pass",
+  "runner": "dev_cycle-эквивалент: workflow `dev-cycle-round-7` (тестировщик deepseek-flash, промпты и схемы из плагина).",
+  "focus": "Проверка фикса F-1 (кейс TC-65) и регресс группы 7.",
+  "tester": {
+    "pass": true,
+    "cases_total": 22,
+    "failed": [],
+    "findings": [],
+    "environment": "Ветка claude/ru-only-sources, HEAD 16e19fa (фикс F-1 — 570b559). 543 passed / 1 skipped / 93 deselected; целевые тесты TC-65 — 4 passed. Живой стенд scripts/dev_stack.py (библиотека, поиск, ассистент, знания, LLM, шлюз с CF-IPCountry и доверенным прокси), источник с настоящим видом public-domain-ru (regions [RU], external_processing: false), Chromium + Playwright, web/dist после правки клиента.",
+    "confirmed": {
+      "two_notices": "в одном ходе видны обе пометки: «Найдено в источниках, не пересказывается.» со ссылкой и «Ответ составлен без опоры на библиотеку.»",
+      "link": "клик ведёт на /read/<источник>/<глава>#p-<абзац>, абзац подсвечен",
+      "legacy": "старая сессия с единственным message открывается без ошибок",
+      "ordinary_notices": "no_answer, no_library_support и ошибка соединения показываются как раньше",
+      "regression": "TC-56…TC-64, EC-47…EC-50, UC-28/DE, данные 8.4 — без расхождений"
+    },
+    "notes": "Не проверено: no_answer живьём (демо-провайдер эмбеддингов находит попадания на любой вопрос — отрисовка проверена по подставному потоку); tests/e2e (исключены командой человека; сквозной путь покрыт tests/gateway/test_region_scope.py); настоящий CDN (8.6); EC-51 — клавиатурный обход ссылки отдельно не проверялся. Наблюдение вне кейсов: в разделе «Ассистент» есть переключатель «Только выбранный учебник», хотя вопрос идёт по всей библиотеке — поведение было и раньше, в спецификации не описано."
+  },
+  "verifier": null,
+  "note": "Судья не вызывался: findings пустые.",
+  "artifacts": {
+    "live_report": "openspec/changes/ru-only-sources/qa/round-7/live-report.json",
+    "logs": "openspec/changes/ru-only-sources/qa/round-7/*.log",
+    "screenshots": "openspec/changes/ru-only-sources/qa/screenshots/round-7/"
+  }
+}
