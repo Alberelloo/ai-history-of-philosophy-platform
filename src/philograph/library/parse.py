@@ -589,7 +589,9 @@ def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
     """
     if not raw.printed_toc:
         return
-    headings = {lang.normalize_text(s.title) for s in doc.walk() if s.title and s.kind != "toc"}
+    titles = {lang.normalize_text(s.title) for s in doc.walk() if s.title and s.kind != "toc"}
+    # Где заголовок встретился в тексте на самом деле: имя закладки → фактическая страница.
+    actual_pages = _heading_pages(raw)
     for entry in raw.printed_toc:
         title = entry[1]
         page = entry[2] if len(entry) > 2 else None
@@ -600,10 +602,41 @@ def _compare_bookmarks(doc: Document, raw: RawDocument) -> None:
                 page=str(page),
             )
             continue
-        if lang.normalize_text(title) not in headings:
+        key = lang.normalize_text(title)
+        if key not in titles:
             where = f", с. {page}" if page is not None else ""
             doc.warn(
                 "toc_mismatch",
                 f"В печатном оглавлении есть «{title}», в тексте такого заголовка нет{where}",
                 page=str(page) if page is not None else None,
             )
+            continue
+        # Заголовок нашёлся, но не там, куда указывает закладка: печатное оглавление
+        # разошлось с текстом — об этом и предупреждаем (сценарий «Расхождение»).
+        actual = actual_pages.get(key)
+        if page is not None and actual is not None and actual != page:
+            doc.warn(
+                "toc_mismatch",
+                f"Закладка «{title}» указывает на страницу {page}, "
+                f"а заголовок в тексте на странице {actual}",
+                page=str(page),
+            )
+
+
+def _heading_pages(raw: RawDocument) -> dict[str, int]:
+    """Нормализованный текст заголовка → номер напечатанной страницы, где он встретился."""
+    pages: dict[str, int] = {}
+    for index, page in enumerate(raw.pages):
+        number = _page_number(page.printed_label) if page.printed_label else index + 1
+        if number < 0:
+            number = index + 1
+        for line in page.lines:
+            if line.heading_level:
+                pages.setdefault(lang.normalize_text(line.text), number)
+    return pages
+
+
+def _page_number(label: str) -> int:
+    """Номер страницы из подписи: «12» → 12; римские и пустые цифр не дают."""
+    digits = re.sub(r"\D", "", str(label))
+    return int(digits) if digits else -1

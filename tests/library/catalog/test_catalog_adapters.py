@@ -230,6 +230,23 @@ def test_wikisource_author_from_link(env):
 
 
 @req(SC, "Добавление источника по ссылке")
+def test_wikisource_author_from_signed_template(env):
+    """ЭСБЕ подписывает статью подшаблоном: «{{ЭСБЕ/Автор|Н. Г. Дебольский}}» в конце."""
+    page = "ЭСБЕ/Теория познания"
+    wikitext = (
+        "{{ЭСБЕ\n|КАЧЕСТВО=2\n}}\n"
+        "'''Теория познания.''' — текст статьи одной строкой.\n"
+        "{{ЭСБЕ/Автор|Н. Г. Дебольский}}.\n"
+        "[[Категория:ЭСБЕ:Философия]]"
+    )
+    ws_site(env, wikitext, page=page, author_qid={"Автор:Н. Г. Дебольский": None})
+    harvest = Wikisource().harvest(f"https://{HOST}/wiki/{quote(page)}", env.service.fetcher)
+    assert harvest.metadata["authors"] == [
+        {"name": "Н. Г. Дебольский", "death_year": None, "wikidata": None}
+    ]
+
+
+@req(SC, "Добавление источника по ссылке")
 def test_wikisource_author_from_bold_name(env):
     page = "Статья"
     ws_site(
@@ -266,3 +283,4 @@ def test_wikisource_header_author_unchanged(env):
     ws_site(env, wikitext, page=page, author_qid={"Автор:Платон": None})
     harvest = Wikisource().harvest(f"https://{HOST}/wiki/{quote(page)}", env.service.fetcher)
     assert harvest.metadata["authors"] == [{"name": "Платон", "death_year": None, "wikidata": None}]
+

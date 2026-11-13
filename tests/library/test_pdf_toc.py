@@ -80,6 +80,39 @@ def test_bookmark_without_text_warns_with_title_and_page():
 
 
 @req(DS, "Оглавление источника")
+def test_bookmark_on_wrong_page_warns():
+    """Заголовок нашёлся, но не там, куда указывает закладка: это расхождение.
+
+    Молча брать структуру по шрифту нельзя: печатное оглавление разошлось с текстом,
+    и оператор должен об этом узнать (сценарий «Расхождение»).
+    """
+    data = _pdf(
+        [
+            [("Chapter One", 16.0), (f"{BODY} First.", 11.0)],
+            [("Chapter One", 16.0), (f"{BODY} Again.", 11.0)],
+        ],
+        [
+            [1, "Chapter One", 1],
+            [1, "Ghost Chapter", 2],
+        ],
+    )
+    doc = parse_raw(extract_pdf(data, languages=["eng"], ocr=None))
+    warnings = [i for i in doc.issues if i.code == "toc_mismatch"]
+    assert any("Ghost Chapter" in w.message for w in warnings)
+
+
+@req(DS, "Оглавление источника")
+def test_bookmark_matching_heading_produces_no_warning():
+    """Закладка, совпадающая с заголовком на её странице, предупреждений не даёт."""
+    data = _pdf(
+        [[("Chapter One", 16.0), (f"{BODY} First.", 11.0)]],
+        [[1, "Chapter One", 1]],
+    )
+    doc = parse_raw(extract_pdf(data, languages=["eng"], ocr=None))
+    assert not [i for i in doc.issues if i.code == "toc_mismatch"]
+
+
+@req(DS, "Оглавление источника")
 def test_without_bookmarks_uses_font_sizes():
     data = _pdf(
         [

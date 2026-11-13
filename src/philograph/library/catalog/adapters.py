@@ -395,6 +395,16 @@ def _bold_name(wikitext: str, page: str) -> str | None:
     return name if _looks_like_person(name) else None
 
 
+def _template_author(wikitext: str) -> str | None:
+    """Подпись автора из подшаблона: «{{ЭСБЕ/Автор|Н. Г. Дебольский}}».
+
+    В справочных статьях автора ставят в конце именно так: позиционным параметром
+    подшаблона, а не ссылкой на страницу автора и не жирной строкой.
+    """
+    match = re.search(r"\{\{\s*[^|}\n]*Автор\s*\|\s*([^|}\n]+)", wikitext)
+    return _plain(match.group(1)).strip() if match else None
+
+
 def _author_links(wikitext: str, lang: str) -> list[str]:
     """Ссылки на страницы авторов: «[[Автор:Фамилия, Имя]]», «[[Author:...]]» и т. п."""
     prefixes = tuple(
@@ -509,7 +519,12 @@ class Wikisource:
             return _resolve_people(targets, api=api, lang=lang, fetcher=fetcher, wikidata=wikidata)
 
         def fallback_authors() -> list[dict[str, Any]]:
-            """Авторы на страницах без шапки: жирная подпись или ссылка на страницу автора."""
+            """Авторы на страницах без шапки: подпись в подшаблоне, жирная строка, ссылка."""
+            signed = _template_author(wikitext)
+            if signed:
+                return _resolve_people(
+                    [signed], api=api, lang=lang, fetcher=fetcher, wikidata=wikidata
+                )
             bold = _bold_name(wikitext, page)
             if bold:
                 return _resolve_people(
