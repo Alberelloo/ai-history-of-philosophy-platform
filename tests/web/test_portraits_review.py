@@ -52,7 +52,7 @@ class Knowledge:
         self.errors: dict[tuple[int, str], tuple[int, dict]] = {}
         page.route("**/api/knowledge/v1/operator/login", self._login)
         page.route("**/api/knowledge/v1/review/queue*", self._queue)
-        page.route("**/api/knowledge/v1/review/portraits*", self._portraits)
+        page.route("**/api/knowledge/v1/review/portraits**", self._portraits)
         page.route("**/api/knowledge/v1/portraits/*", self._image)
 
     def _login(self, route) -> None:
@@ -251,7 +251,10 @@ def test_portraits_action_error_text(browser, site):
         drafts=[portrait(1)],
         errors={
             (1, "approve"): (404, {"kind": "not_found", "error": "Портрет не найден"}),
-            (1, "hide"): (400, {"kind": "unknown_action", "error": "Неизвестное действие с портретом"}),
+            (1, "hide"): (
+                400,
+                {"kind": "unknown_action", "error": "Неизвестное действие с портретом"},
+            ),
         },
     )
     try:
