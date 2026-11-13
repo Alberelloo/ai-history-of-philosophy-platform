@@ -1,0 +1,43 @@
+{
+  "change": "ru-only-sources",
+  "round": 6,
+  "verdict": "fix",
+  "runner": "dev_cycle-эквивалент: workflow `dev-cycle-round-6` (тестировщик deepseek-flash, судья deepseek-v4-pro; промпты и схемы из плагина).",
+  "tester": {
+    "pass": false,
+    "cases_total": 22,
+    "failed": ["TC-64/client"],
+    "blocked": ["EC-46"],
+    "findings": [
+      {
+        "id": "F-1",
+        "severity": "major",
+        "title": "Клиент теряет пометку found_not_retold и ссылки, когда следом приходит no_library_support",
+        "status": "fixed-2026-11-13",
+        "fix": "Turn.notices (список), рендер каждой пометки своим блоком, normalizeTurn читает старый message; тесты test_t22c_two_notices_keep_both_with_link и test_t22d_legacy_single_message_session_opens; TC-65."
+      },
+      {
+        "id": "F-2",
+        "severity": "minor",
+        "category": "spec-gap",
+        "title": "Разрешитель неоднозначных упоминаний не подключён в рабочем сервисе знаний",
+        "status": "fixed-2026-11-13",
+        "fix": "уточнено требование regional-access (разбор моделью не подключён — отдельное изменение), переписаны TC-63 и EC-52."
+      }
+    ],
+    "environment": "Ветка claude/ru-only-sources, коммит 625acdb. 533 passed / 1 skipped / 93 deselected; 22 целевых теста. Живой стенд scripts/dev_stack.py (SQLite + локальный Qdrant, PHILOGRAPH_REGION_FALLBACK=RU) + второй шлюз с CF-IPCountry и доверенным прокси; три источника через настоящий конвейер библиотеки, вид public-domain-ru из sources/licenses.yaml; HTTP + Playwright по web/dist.",
+    "notes": "EC-46 (пустой результат поиска) на демо-провайдере эмбеддингов невоспроизводим — покрыт автотестом; tests/e2e (93 deselected) не прогонялись; настоящий CDN — задача 8.6 (проверка конфигурации сделана)."
+  },
+  "verifier": {
+    "verdict": "fix",
+    "rootCauses": [
+      { "findingId": "F-1", "category": "product-bug" },
+      { "findingId": "F-2", "category": "spec-gap" }
+    ]
+  },
+  "artifacts": {
+    "live_report": "openspec/changes/ru-only-sources/qa/round-6/live-report.json",
+    "logs": "openspec/changes/ru-only-sources/qa/round-6/*.log",
+    "screenshots": "openspec/changes/ru-only-sources/qa/screenshots/round-6/"
+  }
+}
