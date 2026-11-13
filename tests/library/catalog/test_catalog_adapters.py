@@ -283,4 +283,3 @@ def test_wikisource_header_author_unchanged(env):
     ws_site(env, wikitext, page=page, author_qid={"Автор:Платон": None})
     harvest = Wikisource().harvest(f"https://{HOST}/wiki/{quote(page)}", env.service.fetcher)
     assert harvest.metadata["authors"] == [{"name": "Платон", "death_year": None, "wikidata": None}]
-
