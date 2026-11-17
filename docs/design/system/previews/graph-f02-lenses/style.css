@@ -74,4 +74,18 @@ h1{font:500 32px/40px Literata,Georgia,serif;letter-spacing:-.03em;margin:12px 0
 .concept-mark{fill:var(--graph-sheet);stroke:var(--ideas);stroke-width:1.25}
 .concept-title{font:500 12px Literata,Georgia,serif;fill:var(--graph-ink)}
 .authorship{fill:none;stroke:var(--texts);stroke-width:1.25;stroke-dasharray:2 3;opacity:.8}
+/* v2: линзы-тогглы (иконка-глаз), приглушение контекста, подсветка */
+.lens{border:0;background:none;cursor:pointer;border-radius:4px;padding:5px 9px 5px 7px}
+.lens .eye{width:15px;height:11px;display:inline-block;position:relative;opacity:.9}
+.lens .eye::before{content:"";position:absolute;inset:0;border:1.3px solid currentColor;border-radius:11px 11px 11px 11px/13px 13px 13px 13px;clip-path:inset(0)}
+.lens .eye::after{content:"";position:absolute;left:5px;top:3px;width:5px;height:5px;border-radius:50%;background:currentColor}
+.lens.on{color:var(--graph-ink);background:color-mix(in srgb,var(--graph-ink) 5%,transparent)}
+.lens.off{color:var(--graph-ink-muted);opacity:.7}
+.lens.off .eye::after{display:none}
+.lens.off .eye::before{border-style:solid;opacity:.6}
+.lens.off{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,var(--graph-ink-muted) 60%,transparent)}
+.dim{opacity:.26}
+.band-collapsed .band-label{fill:var(--graph-ink-muted)}
+.sel-name{font:700 15px Literata,Georgia,serif;fill:var(--graph-ink)}
+.work-active-title{font:italic 600 12px Literata,Georgia,serif;fill:var(--texts)}
 .edition{margin-top:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--graph-ink-muted)}
