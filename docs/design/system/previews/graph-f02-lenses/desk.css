@@ -81,3 +81,18 @@
 .scene[data-theme=dark] .prop.shadowed{filter:brightness(.72) drop-shadow(1px 2px 1.5px rgba(10,5,0,.6)) drop-shadow(8px 14px 14px rgba(8,4,0,.55))}
 .scene[data-theme=dark] .card{filter:brightness(.78)}
 .scene[data-theme=dark] .page{filter:brightness(.9)}
+/* Прогон 1: таймлайн, ленты Пристли, труды */
+.dim{opacity:.42}
+.dim-soft{opacity:.5}
+.collapsed-note{font:italic 400 11px Literata,Georgia,serif;fill:var(--graph-ink-muted)}
+.axis-year{font:400 12px Literata,Georgia,serif;font-variant-numeric:oldstyle-nums;fill:var(--graph-ink-secondary);text-anchor:middle}
+.scene .person-name{font:600 13.5px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .sel-name{font:700 14px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .person-years{font:400 11px Onest,Arial,sans-serif;fill:var(--graph-ink-muted)}
+.scene .era-text{font:italic 500 12.5px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.scene .era-span{stroke:var(--context);opacity:.6}
+.scene .work-year{font:400 10px Onest,Arial,sans-serif;fill:var(--graph-ink-muted);text-anchor:middle}
+.scene .work-title,.scene .concept-title{font:italic 500 11.5px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .concept-title{font-style:normal}
+.scene .work-active-title{font:italic 600 12px Literata,Georgia,serif;fill:var(--texts)}
+.chart-notes{display:none}

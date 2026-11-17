@@ -105,20 +105,4 @@
     svg.append(g);
   });
 
-  /* ---------- Рукописные пометки поверх графа (та же система координат, что #svg) ---------- */
-  const chart=document.querySelector('.chart');
-  if(chart){
-    const notes=S('svg',{class:'chart-notes',viewBox:'0 0 1160 560','aria-hidden':'true'});
-    const T=(x,y,s,txt,rot)=>notes.append(S('text',{x,y,class:'hand','font-size':s,transform:rot?`rotate(${rot} ${x} ${y})`:''},txt));
-    T(828,178,19,'«Юм пробудил меня',-3);
-    T(842,203,19,'от догматического сна»',-3);
-    T(940,226,14,'— Кант, 1783',-3);
-    notes.append(S('path',{d:'M884 236 C876 262 852 290 816 318',class:'hand-stroke'}));
-    notes.append(S('path',{d:'M823 306 L815 319 L829 317',class:'hand-stroke'}));
-    T(596,214,15,'а Спиноза?',-4);
-    T(178,444,18,'Опыт или разум?',-2);
-    T(196,468,16,'— вот спор целой эпохи',-2);
-    notes.append(S('path',{d:'M932 473 Q1004 479 1078 469',class:'hand-stroke'}));
-    chart.append(notes);
-  }
 })();
