@@ -1,0 +1,2435 @@
+{
+  "A1_frames": [
+    {
+      "w": 1440,
+      "h": 900,
+      "theme": "light",
+      "lang": "ru",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-light-ru-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-light-ru.png",
+      "overflow": 0,
+      "zoom": 0.891,
+      "graphH": 520,
+      "graphTop": 235,
+      "noteBelow": false,
+      "zoomAfterShot": 0.891,
+      "signScreenOutOf16_24": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      }
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "theme": "light",
+      "lang": "en",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-light-en-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-light-en.png",
+      "overflow": 0,
+      "zoom": 0.891,
+      "graphH": 520,
+      "graphTop": 235,
+      "noteBelow": false,
+      "zoomAfterShot": 0.891,
+      "signScreenOutOf16_24": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      }
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "theme": "dark",
+      "lang": "ru",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-dark-ru-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-dark-ru.png",
+      "overflow": 0,
+      "zoom": 0.891,
+      "graphH": 520,
+      "graphTop": 235,
+      "noteBelow": false,
+      "zoomAfterShot": 0.891,
+      "signScreenOutOf16_24": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      }
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "theme": "dark",
+      "lang": "en",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-dark-en-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1440x900-dark-en.png",
+      "overflow": 0,
+      "zoom": 0.891,
+      "graphH": 520,
+      "graphTop": 235,
+      "noteBelow": false,
+      "zoomAfterShot": 0.891,
+      "signScreenOutOf16_24": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      }
+    },
+    {
+      "w": 1024,
+      "h": 768,
+      "theme": "light",
+      "lang": "ru",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-light-ru-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-light-ru.png",
+      "overflow": 0,
+      "zoom": 0.846,
+      "graphH": 480,
+      "graphTop": 263,
+      "noteBelow": true,
+      "zoomAfterShot": 0.846,
+      "signScreenOutOf16_24": {}
+    },
+    {
+      "w": 1024,
+      "h": 768,
+      "theme": "light",
+      "lang": "en",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-light-en-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-light-en.png",
+      "overflow": 0,
+      "zoom": 0.846,
+      "graphH": 480,
+      "graphTop": 201,
+      "noteBelow": true,
+      "zoomAfterShot": 0.846,
+      "signScreenOutOf16_24": {}
+    },
+    {
+      "w": 1024,
+      "h": 768,
+      "theme": "dark",
+      "lang": "ru",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-dark-ru-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-dark-ru.png",
+      "overflow": 0,
+      "zoom": 0.846,
+      "graphH": 480,
+      "graphTop": 263,
+      "noteBelow": true,
+      "zoomAfterShot": 0.846,
+      "signScreenOutOf16_24": {}
+    },
+    {
+      "w": 1024,
+      "h": 768,
+      "theme": "dark",
+      "lang": "en",
+      "graphShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-dark-en-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-01-06-F1-1024x768-dark-en.png",
+      "overflow": 0,
+      "zoom": 0.846,
+      "graphH": 480,
+      "graphTop": 201,
+      "noteBelow": true,
+      "zoomAfterShot": 0.846,
+      "signScreenOutOf16_24": {}
+    }
+  ],
+  "A2_layout": [
+    {
+      "w": 1280,
+      "pinned": false,
+      "below": false,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-04-05-F1-1280x900-pinned-False.png",
+      "graphShareOfBodyRow": 0.735,
+      "shareOfRowWithNote": 0.735,
+      "graphH": 520,
+      "overflow": 0,
+      "shadow": "rgba(0, 0, 0, 0.18) 0px 16px 40px 0px"
+    },
+    {
+      "w": 1280,
+      "pinned": true,
+      "below": true,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-04-05-F1-1280x900-pinned-True.png",
+      "graphShareOfBodyRow": 1.0,
+      "shareOfRowWithNote": null,
+      "graphH": 480,
+      "overflow": 0,
+      "shadow": "rgba(0, 0, 0, 0.18) 0px 16px 40px 0px"
+    },
+    {
+      "w": 1920,
+      "pinned": false,
+      "below": false,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-04-05-F1-1920x1080-pinned-False.png",
+      "graphShareOfBodyRow": 0.833,
+      "shareOfRowWithNote": 0.833,
+      "graphH": 520,
+      "overflow": 0,
+      "shadow": "rgba(0, 0, 0, 0.18) 0px 16px 40px 0px"
+    }
+  ],
+  "A3_selection": {
+    "humePressed": "true",
+    "startAfterSelect": "kant",
+    "restartOk": true,
+    "titleAfterRestart": "Дэвид Юм",
+    "shots": [
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-09-F1-selected-nonstart-hume-graph.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-09-F1-selected-nonstart-hume.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-10-F1-selected-edge-kant-hume-graph.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-17-F1-keyboard-focus-hume-graph.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-17-F1-keyboard-focus-hume.png"
+    ],
+    "edgeDom": {
+      "id": "kant-hume",
+      "family": "genesis",
+      "status": "verified",
+      "stroke": "rgb(67, 88, 130)",
+      "dash": "none",
+      "width": "2px",
+      "markerEnd": "url(#arrow-genesis)",
+      "selected": true,
+      "hitWidth": "12px"
+    },
+    "edgeSem": {
+      "subject": "kant",
+      "object": "hume",
+      "from": "kant",
+      "to": "hume",
+      "marker": "url(#arrow-genesis)"
+    },
+    "edgeNote": {
+      "blockquotes": 1,
+      "statuses": 1,
+      "hasType": true,
+      "hasAttributions": true,
+      "hasQualifiers": true,
+      "sourceLinks": 1,
+      "demoQuoteLabel": true,
+      "ownCard": 0
+    },
+    "focusInfo": {
+      "focusRing": "hidden",
+      "selectedRing": "hidden",
+      "aria": "Дэвид Юм · Люди"
+    },
+    "axes": {
+      "axisLines": 5,
+      "axisTexts": [
+        "1600",
+        "1650",
+        "1700",
+        "1750",
+        "Без даты"
+      ]
+    }
+  },
+  "A4_theme": {
+    "themes": {
+      "light": {
+        "tokens": {
+          "--graph-desk": "#302e2a",
+          "--graph-sheet": "#f6f3ea",
+          "--graph-sheet-edge": "#e9e4d8",
+          "--graph-ink": "#1a222f",
+          "--graph-ink-secondary": "#48505d",
+          "--graph-ink-muted": "#646d78",
+          "--graph-rule": "#c9c2b5",
+          "--graph-selected": "#923f32",
+          "--graph-focus": "#385b8f",
+          "--graph-generated": "#8d5d1c",
+          "--graph-generated-tint": "#fbefd6",
+          "--genesis": "#435882",
+          "--consequences": "#456c62",
+          "--polemic": "#8d4550",
+          "--context": "#7a633a",
+          "--structure": "#6a547b",
+          "--biography": "#516570"
+        },
+        "contrast": {
+          "--graph-ink": {
+            "hex": "#1a222f",
+            "vs_sheet": 14.41
+          },
+          "--graph-ink-secondary": {
+            "hex": "#48505d",
+            "vs_sheet": 7.33
+          },
+          "--graph-ink-muted": {
+            "hex": "#646d78",
+            "vs_sheet": 4.73
+          },
+          "--graph-selected": {
+            "hex": "#923f32",
+            "vs_sheet": 6.35
+          },
+          "--graph-focus": {
+            "hex": "#385b8f",
+            "vs_sheet": 6.18
+          },
+          "--graph-generated": {
+            "hex": "#8d5d1c",
+            "vs_sheet": 5.09,
+            "vs_tint": 4.96
+          },
+          "--genesis": {
+            "hex": "#435882",
+            "vs_sheet": 6.4
+          },
+          "--consequences": {
+            "hex": "#456c62",
+            "vs_sheet": 5.3
+          },
+          "--polemic": {
+            "hex": "#8d4550",
+            "vs_sheet": 6.11
+          },
+          "--context": {
+            "hex": "#7a633a",
+            "vs_sheet": 5.15
+          },
+          "--structure": {
+            "hex": "#6a547b",
+            "vs_sheet": 5.98
+          },
+          "--biography": {
+            "hex": "#516570",
+            "vs_sheet": 5.49
+          }
+        },
+        "shadow": "rgba(0, 0, 0, 0.18) 0px 16px 40px 0px",
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-06-F1-theme-light-light-graph.png"
+      },
+      "dark": {
+        "tokens": {
+          "--graph-desk": "#101318",
+          "--graph-sheet": "#20242b",
+          "--graph-sheet-edge": "#191d23",
+          "--graph-ink": "#e7e6df",
+          "--graph-ink-secondary": "#bfbeb5",
+          "--graph-ink-muted": "#9a9990",
+          "--graph-rule": "#505966",
+          "--graph-selected": "#e9a18d",
+          "--graph-focus": "#a4beef",
+          "--graph-generated": "#e9c67d",
+          "--graph-generated-tint": "#382c15",
+          "--genesis": "#a8bce4",
+          "--consequences": "#a0c8b7",
+          "--polemic": "#dfa5af",
+          "--context": "#cfb887",
+          "--structure": "#c6b1df",
+          "--biography": "#a8bfca"
+        },
+        "contrast": {
+          "--graph-ink": {
+            "hex": "#e7e6df",
+            "vs_sheet": 12.44
+          },
+          "--graph-ink-secondary": {
+            "hex": "#bfbeb5",
+            "vs_sheet": 8.34
+          },
+          "--graph-ink-muted": {
+            "hex": "#9a9990",
+            "vs_sheet": 5.44
+          },
+          "--graph-selected": {
+            "hex": "#e9a18d",
+            "vs_sheet": 7.38
+          },
+          "--graph-focus": {
+            "hex": "#a4beef",
+            "vs_sheet": 8.3
+          },
+          "--graph-generated": {
+            "hex": "#e9c67d",
+            "vs_sheet": 9.52,
+            "vs_tint": 8.34
+          },
+          "--genesis": {
+            "hex": "#a8bce4",
+            "vs_sheet": 8.14
+          },
+          "--consequences": {
+            "hex": "#a0c8b7",
+            "vs_sheet": 8.48
+          },
+          "--polemic": {
+            "hex": "#dfa5af",
+            "vs_sheet": 7.52
+          },
+          "--context": {
+            "hex": "#cfb887",
+            "vs_sheet": 8.05
+          },
+          "--structure": {
+            "hex": "#c6b1df",
+            "vs_sheet": 7.98
+          },
+          "--biography": {
+            "hex": "#a8bfca",
+            "vs_sheet": 8.13
+          }
+        },
+        "shadow": "rgba(0, 0, 0, 0.32) 0px 16px 40px 0px",
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-06-F1-theme-dark-light-graph.png"
+      }
+    },
+    "selectedEdge": {
+      "stroke": "rgb(67, 88, 130)",
+      "width": "2px",
+      "family": "#435882",
+      "selectedColor": "#923f32",
+      "marker": "url(#arrow-genesis)"
+    },
+    "generatedEdge": {
+      "dash": "5px, 4px",
+      "width": "1.25px",
+      "marker": "url(#arrow-genesis)"
+    },
+    "hitTarget": "12px",
+    "markerShapes": {
+      "generated": "M0 -5 5 0 0 5 -5 0",
+      "verified": "m-4 0 3 3 5-6",
+      "sourced": "M0-3Q-3-5-5-3v7q3-"
+    }
+  },
+  "A5_f1": {
+    "fit": {
+      "zoom": 0.891,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-13-F1-fit-graph.png",
+      "edges_into_label": [],
+      "edges_into_foreign_sign": [],
+      "min_gap_edge_label_lt8_user": {},
+      "min_gap_edge_sign_lt8_user": {},
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [],
+      "marker_on_cluster": [],
+      "edges_merged_lt8_user": [
+        [
+          "kant-hume",
+          "kant-critique",
+          7.0,
+          0.75,
+          0.82,
+          "near-node"
+        ],
+        [
+          "kant-hume",
+          "kant-causality",
+          7.77,
+          0.57,
+          0.21,
+          "mid"
+        ],
+        [
+          "hume-locke",
+          "reason-descartes",
+          6.99,
+          0.89,
+          0.5,
+          "near-node"
+        ],
+        [
+          "hume-locke",
+          "enquiry-hume",
+          7.09,
+          0.64,
+          0.57,
+          "mid"
+        ],
+        [
+          "kant-reason",
+          "enquiry-hume",
+          5.07,
+          0.43,
+          0.32,
+          "mid"
+        ]
+      ],
+      "edges_near_8_16_user": [],
+      "edges_outside_frame": [
+        {
+          "edge": "kant-critique",
+          "samples": 14,
+          "max_outside_screen_px": 43.1
+        },
+        {
+          "edge": "causality-hume",
+          "samples": 21,
+          "max_outside_screen_px": 83.2
+        }
+      ],
+      "anchor_pad_user": {
+        "kant-hume": [
+          4.0,
+          4.0
+        ],
+        "hume-locke": [
+          4.0,
+          4.0
+        ],
+        "locke-descartes": [
+          5.1,
+          5.1
+        ],
+        "reason-descartes": [
+          4.0,
+          4.0
+        ],
+        "kant-reason": [
+          4.0,
+          4.0
+        ],
+        "kant-critique": [
+          4.0,
+          4.0
+        ],
+        "enquiry-hume": [
+          4.0,
+          4.0
+        ],
+        "causality-hume": [
+          4.0,
+          4.0
+        ],
+        "critique-enquiry": [
+          4.0,
+          4.0
+        ],
+        "kant-causality": [
+          4.0,
+          4.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 8,
+      "nodes_shown": 8,
+      "edges_shown": 10,
+      "sign_screen_w": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      },
+      "sign_screen_out_of_16_24": {
+        "kant": 42.8,
+        "descartes": 42.8,
+        "locke": 42.8,
+        "hume": 42.8,
+        "reason": 26.7,
+        "causality": 26.7,
+        "enquiry": 25.0,
+        "critique": 25.0
+      },
+      "hit_screen_lt32": {}
+    },
+    "z05": {
+      "zoom": 0.5,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-14-F1-overview-z05-graph.png",
+      "edges_into_label": [
+        {
+          "edge": "enquiry-hume",
+          "labels": [
+            "kant"
+          ]
+        }
+      ],
+      "edges_into_foreign_sign": [],
+      "min_gap_edge_label_lt8_user": {},
+      "min_gap_edge_sign_lt8_user": {},
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [],
+      "marker_on_cluster": [],
+      "edges_merged_lt8_user": [
+        [
+          "enquiry-hume",
+          "kant-causality",
+          6.52,
+          0.75,
+          0.32,
+          "mid"
+        ]
+      ],
+      "edges_near_8_16_user": [
+        [
+          "hume-locke",
+          "reason-descartes",
+          12.07,
+          0.89,
+          0.43,
+          "near-node"
+        ],
+        [
+          "kant-critique",
+          "enquiry-hume",
+          8.67,
+          0.32,
+          0.68,
+          "mid"
+        ],
+        [
+          "enquiry-hume",
+          "critique-enquiry",
+          12.21,
+          0.14,
+          0.89,
+          "near-node"
+        ]
+      ],
+      "edges_outside_frame": [],
+      "anchor_pad_user": {
+        "kant-hume": [
+          10.0,
+          10.0
+        ],
+        "hume-locke": [
+          8.8,
+          8.8
+        ],
+        "locke-descartes": [
+          12.8,
+          12.8
+        ],
+        "reason-descartes": [
+          3.0,
+          10.0
+        ],
+        "kant-reason": [
+          8.8,
+          3.0
+        ],
+        "kant-critique": [
+          2.0,
+          8.8
+        ],
+        "enquiry-hume": [
+          1.4,
+          10.0
+        ],
+        "causality-hume": [
+          3.0,
+          8.8
+        ],
+        "critique-enquiry": [
+          1.4,
+          1.4
+        ],
+        "kant-causality": [
+          8.8,
+          3.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 1,
+      "nodes_shown": 8,
+      "edges_shown": 10,
+      "sign_screen_w": {
+        "kant": 19.2,
+        "descartes": 19.2,
+        "locke": 19.2,
+        "hume": 19.2,
+        "reason": 16,
+        "causality": 16,
+        "enquiry": 16,
+        "critique": 16
+      },
+      "sign_screen_out_of_16_24": {},
+      "hit_screen_lt32": {},
+      "labelsDrawn": [
+        "kant"
+      ],
+      "crossings": [
+        {
+          "edge": "enquiry-hume",
+          "label": "kant",
+          "x": 625,
+          "y": 394
+        }
+      ]
+    }
+  },
+  "A6_long_names": {
+    "en": {
+      "label": {
+        "x": 546.0540575858874,
+        "y": 442.968742957482,
+        "w": 175.99998865372095,
+        "h": 69.15621635241386
+      },
+      "text": "An Enquiry Concerning Human Understanding",
+      "inner": {
+        "sw": 176,
+        "cw": 176,
+        "sh": 41,
+        "ch": 40,
+        "lines": 2
+      },
+      "style": {
+        "font": "italic 600 15px / 20px Literata, Georgia, serif",
+        "lineClamp": "3",
+        "overflow": "hidden",
+        "textOverflow": "clip",
+        "bg": "rgb(246, 243, 234)"
+      },
+      "aria": "An Enquiry Concerning Human Understanding · Works",
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-19-F1-long-en-name-enquiry-graph.png"
+    },
+    "en_note": {
+      "head": {
+        "sw": 256,
+        "cw": 256,
+        "text": "An Enquiry Concerning Human Understanding"
+      },
+      "snippet": "×\n01 / WORKS\nAn Enquiry Concerning Human Understanding\n\n1748\n\nA node in this demonstration graph. Select a relation to examine its provenance.\n\nMake starting point ↗\nRELATIONS · 2\nwas influenced by — "
+    },
+    "ru_unbreakable": {
+      "label": {
+        "x": 732.0000217322147,
+        "y": 121.39064488266455,
+        "w": 176.0000342166785,
+        "h": 123.89061829538056
+      },
+      "text": "ОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятия",
+      "inner": {
+        "sw": 178,
+        "cw": 176,
+        "sh": 323,
+        "ch": 80,
+        "lines": 12
+      },
+      "style": {
+        "font": "600 20.0909px / 26.7879px Literata, Georgia, serif",
+        "lineClamp": "3",
+        "overflow": "hidden",
+        "textOverflow": "clip",
+        "bg": "rgb(246, 243, 234)"
+      },
+      "aria": "ОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятия · Учения",
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-19-F2-long-unbreakable-ru-selected-graph.png"
+    },
+    "en2": {
+      "inner": {
+        "sw": 119,
+        "cw": 119,
+        "sh": 28,
+        "ch": 27,
+        "lines": 1
+      },
+      "aria": "Specimen 3 · Teachings"
+    },
+    "dates_en": {
+      "s-4": "Date unknown",
+      "s-0": "384–322 BCE"
+    },
+    "dates_ru": {
+      "s-4": "Дата неизвестна",
+      "s-0": "384–322 до н. э."
+    },
+    "shot_bce": "docs/design/features/graph-page-qa/screenshots/round-3/TC-19-F2-specimen-en-bce-graph.png"
+  },
+  "A7_f2": {
+    "fit": {
+      "zoom": 0.597,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-08-11-F2-specimens-light.png",
+      "edges_into_label": [],
+      "edges_into_foreign_sign": [],
+      "min_gap_edge_label_lt8_user": {},
+      "min_gap_edge_sign_lt8_user": {},
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [],
+      "marker_on_cluster": [],
+      "edges_merged_lt8_user": [
+        [
+          "spec-2",
+          "spec-loop",
+          5.11,
+          0.14,
+          0.11,
+          "near-node"
+        ]
+      ],
+      "edges_near_8_16_user": [
+        [
+          "spec-0",
+          "spec-parallel",
+          13.59,
+          0.89,
+          0.89,
+          "near-node"
+        ]
+      ],
+      "edges_outside_frame": [],
+      "anchor_pad_user": {
+        "spec-0": [
+          11.9,
+          4.0
+        ],
+        "spec-1": [
+          4.0,
+          4.0
+        ],
+        "spec-2": [
+          4.0,
+          4.0
+        ],
+        "spec-3": [
+          4.0,
+          4.0
+        ],
+        "spec-4": [
+          4.0,
+          4.0
+        ],
+        "spec-5": [
+          4.0,
+          4.0
+        ],
+        "spec-6": [
+          4.0,
+          11.9
+        ],
+        "spec-7": [
+          11.9,
+          4.0
+        ],
+        "spec-8": [
+          4.0,
+          4.0
+        ],
+        "spec-9": [
+          4.0,
+          4.0
+        ],
+        "spec-10": [
+          4.0,
+          4.0
+        ],
+        "spec-11": [
+          4.0,
+          4.0
+        ],
+        "spec-12": [
+          4.0,
+          4.0
+        ],
+        "spec-13": [
+          4.0,
+          11.9
+        ],
+        "spec-14": [
+          11.9,
+          4.0
+        ],
+        "spec-15": [
+          4.0,
+          4.0
+        ],
+        "spec-16": [
+          4.0,
+          4.0
+        ],
+        "spec-17": [
+          4.0,
+          4.0
+        ],
+        "spec-parallel": [
+          11.9,
+          4.0
+        ],
+        "spec-loop": [
+          6.0,
+          6.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 1,
+      "nodes_shown": 36,
+      "edges_shown": 20,
+      "sign_screen_w": {
+        "s-0": 19.2,
+        "s-1": 17.9,
+        "s-2": 17.9,
+        "s-3": 21.5,
+        "s-4": 21.5,
+        "s-5": 16.7,
+        "s-6": 16.7,
+        "s-7": 19.1,
+        "s-8": 19.1,
+        "s-9": 23.9,
+        "s-10": 23.9,
+        "s-11": 19.1,
+        "s-12": 19.1,
+        "s-13": 19.2,
+        "s-14": 19.2,
+        "s-15": 17.9,
+        "s-16": 17.9,
+        "s-17": 21.5,
+        "s-18": 21.5,
+        "s-19": 16.7,
+        "s-20": 16.7,
+        "s-21": 19.1,
+        "s-22": 19.1,
+        "s-23": 23.9,
+        "s-24": 23.9,
+        "s-25": 19.1,
+        "s-26": 19.1,
+        "s-27": 19.2,
+        "s-28": 19.2,
+        "s-29": 17.9,
+        "s-30": 17.9,
+        "s-31": 21.5,
+        "s-32": 21.5,
+        "s-33": 16.7,
+        "s-34": 16.7,
+        "s-35": 19.1
+      },
+      "sign_screen_out_of_16_24": {},
+      "hit_screen_lt32": {}
+    },
+    "dark": {
+      "shadow": "rgba(0, 0, 0, 0.32) 0px 16px 40px 0px",
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-08-11-F2-specimens-dark.png"
+    },
+    "z1": {
+      "zoom": 1,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-08-11-F2-specimens-light-z1-graph.png",
+      "edges_into_label": [],
+      "edges_into_foreign_sign": [],
+      "min_gap_edge_label_lt8_user": {},
+      "min_gap_edge_sign_lt8_user": {},
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [],
+      "marker_on_cluster": [],
+      "edges_merged_lt8_user": [
+        [
+          "spec-2",
+          "spec-loop",
+          5.11,
+          0.14,
+          0.11,
+          "near-node"
+        ]
+      ],
+      "edges_near_8_16_user": [
+        [
+          "spec-0",
+          "spec-parallel",
+          13.59,
+          0.89,
+          0.89,
+          "near-node"
+        ]
+      ],
+      "edges_outside_frame": [
+        {
+          "edge": "spec-0",
+          "samples": 29,
+          "max_outside_screen_px": 161.0
+        },
+        {
+          "edge": "spec-1",
+          "samples": 29,
+          "max_outside_screen_px": 161.0
+        },
+        {
+          "edge": "spec-2",
+          "samples": 29,
+          "max_outside_screen_px": 161.0
+        },
+        {
+          "edge": "spec-15",
+          "samples": 29,
+          "max_outside_screen_px": 44.0
+        },
+        {
+          "edge": "spec-16",
+          "samples": 29,
+          "max_outside_screen_px": 44.0
+        },
+        {
+          "edge": "spec-17",
+          "samples": 29,
+          "max_outside_screen_px": 44.0
+        },
+        {
+          "edge": "spec-parallel",
+          "samples": 29,
+          "max_outside_screen_px": 196.5
+        },
+        {
+          "edge": "spec-loop",
+          "samples": 29,
+          "max_outside_screen_px": 209.6
+        }
+      ],
+      "anchor_pad_user": {
+        "spec-0": [
+          4.0,
+          4.0
+        ],
+        "spec-1": [
+          4.0,
+          4.0
+        ],
+        "spec-2": [
+          4.0,
+          4.0
+        ],
+        "spec-3": [
+          4.0,
+          4.0
+        ],
+        "spec-4": [
+          4.0,
+          4.0
+        ],
+        "spec-5": [
+          4.0,
+          4.0
+        ],
+        "spec-6": [
+          4.0,
+          4.0
+        ],
+        "spec-7": [
+          4.0,
+          4.0
+        ],
+        "spec-8": [
+          4.0,
+          4.0
+        ],
+        "spec-9": [
+          4.0,
+          4.0
+        ],
+        "spec-10": [
+          4.0,
+          4.0
+        ],
+        "spec-11": [
+          4.0,
+          4.0
+        ],
+        "spec-12": [
+          4.0,
+          4.0
+        ],
+        "spec-13": [
+          4.0,
+          4.0
+        ],
+        "spec-14": [
+          4.0,
+          4.0
+        ],
+        "spec-15": [
+          4.0,
+          4.0
+        ],
+        "spec-16": [
+          4.0,
+          4.0
+        ],
+        "spec-17": [
+          4.0,
+          4.0
+        ],
+        "spec-parallel": [
+          4.0,
+          4.0
+        ],
+        "spec-loop": [
+          6.0,
+          6.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 35,
+      "nodes_shown": 36,
+      "edges_shown": 20,
+      "sign_screen_w": {
+        "s-0": 48,
+        "s-1": 30,
+        "s-2": 30,
+        "s-3": 36,
+        "s-4": 36,
+        "s-5": 28,
+        "s-6": 28,
+        "s-7": 32,
+        "s-8": 32,
+        "s-9": 40,
+        "s-10": 40,
+        "s-11": 32,
+        "s-12": 32,
+        "s-13": 48,
+        "s-14": 48,
+        "s-15": 30,
+        "s-16": 30,
+        "s-17": 36,
+        "s-18": 36,
+        "s-19": 28,
+        "s-20": 28,
+        "s-21": 32,
+        "s-22": 32,
+        "s-23": 40,
+        "s-24": 40,
+        "s-25": 32,
+        "s-26": 32,
+        "s-27": 48,
+        "s-28": 48,
+        "s-29": 30,
+        "s-30": 30,
+        "s-31": 36,
+        "s-32": 36,
+        "s-33": 28,
+        "s-34": 28,
+        "s-35": 32
+      },
+      "sign_screen_out_of_16_24": {
+        "s-0": 48,
+        "s-1": 30,
+        "s-2": 30,
+        "s-3": 36,
+        "s-4": 36,
+        "s-5": 28,
+        "s-6": 28,
+        "s-7": 32,
+        "s-8": 32,
+        "s-9": 40,
+        "s-10": 40,
+        "s-11": 32,
+        "s-12": 32,
+        "s-13": 48,
+        "s-14": 48,
+        "s-15": 30,
+        "s-16": 30,
+        "s-17": 36,
+        "s-18": 36,
+        "s-19": 28,
+        "s-20": 28,
+        "s-21": 32,
+        "s-22": 32,
+        "s-23": 40,
+        "s-24": 40,
+        "s-25": 32,
+        "s-26": 32,
+        "s-27": 48,
+        "s-28": 48,
+        "s-29": 30,
+        "s-30": 30,
+        "s-31": 36,
+        "s-32": 36,
+        "s-33": 28,
+        "s-34": 28,
+        "s-35": 32
+      },
+      "hit_screen_lt32": {}
+    },
+    "counts": {
+      "nodes": 36,
+      "edges": 20,
+      "labels": 1
+    },
+    "combos": {
+      "genesis": {
+        "verified": 1,
+        "sourced": 1,
+        "generated": 2
+      },
+      "consequences": {
+        "verified": 1,
+        "sourced": 1,
+        "generated": 1
+      },
+      "polemic": {
+        "verified": 1,
+        "sourced": 1,
+        "generated": 1
+      },
+      "context": {
+        "verified": 1,
+        "sourced": 1,
+        "generated": 1
+      },
+      "structure": {
+        "verified": 1,
+        "sourced": 2,
+        "generated": 1
+      },
+      "biography": {
+        "verified": 1,
+        "sourced": 1,
+        "generated": 1
+      }
+    },
+    "parallel": {
+      "midDist": 37.1,
+      "minDist": 20.8,
+      "atFraction": 0.18,
+      "sameD": false
+    },
+    "loop": [
+      {
+        "id": "spec-loop",
+        "family": "structure",
+        "status": "sourced",
+        "stroke": "rgb(106, 84, 123)",
+        "dash": "none",
+        "width": "1.25px",
+        "markerEnd": "url(#arrow-structure)",
+        "selected": false,
+        "hitWidth": "12px"
+      }
+    ],
+    "symmetric_no_arrow": [
+      "spec-9",
+      "spec-10",
+      "spec-11"
+    ],
+    "status_marker_shapes": {
+      "verified": "m-4 0 3 3 5-6",
+      "sourced": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+      "generated": "M0 -5 5 0 0 5 -5 0Z"
+    }
+  },
+  "A8_f3": {
+    "overviewLight": {
+      "zoom": 0.5,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-14-F3-dense-overview-light-z05-graph.png",
+      "edge_into_own_sign": [
+        {
+          "edge": "d-e-7",
+          "signs": [
+            "d-3"
+          ]
+        }
+      ],
+      "edges_into_label": [
+        {
+          "edge": "d-e-4",
+          "labels": [
+            "d-0"
+          ]
+        },
+        {
+          "edge": "dense-loop",
+          "labels": [
+            "d-0"
+          ]
+        }
+      ],
+      "edges_into_foreign_sign": [
+        {
+          "edge": "d-e-6",
+          "signs": [
+            "d-3"
+          ]
+        }
+      ],
+      "min_gap_edge_label_lt8_user": {
+        "d-e-4": 0.0,
+        "dense-loop": 0.0
+      },
+      "min_gap_edge_sign_lt8_user": {
+        "d-e-3": 4.64,
+        "d-e-5": 7.36,
+        "d-e-6": 0.0,
+        "d-e-7": 0.0,
+        "d-e-10": 6.18,
+        "d-e-13": 3.49
+      },
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [
+        [
+          "d-e-1",
+          "d-e-4"
+        ]
+      ],
+      "marker_on_cluster": [
+        [
+          "d-e-15",
+          "cluster-1"
+        ]
+      ],
+      "edges_merged_lt8_user": [
+        [
+          "d-e-1",
+          "d-e-4",
+          1.72,
+          0.32,
+          0.82,
+          "near-node"
+        ],
+        [
+          "d-e-2",
+          "d-e-5",
+          4.8,
+          0.11,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-3",
+          "d-e-5",
+          5.05,
+          0.89,
+          0.68,
+          "near-node"
+        ],
+        [
+          "d-e-4",
+          "dense-loop",
+          7.36,
+          0.11,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-6",
+          "d-e-11",
+          3.68,
+          0.11,
+          0.36,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-11",
+          1.9,
+          0.29,
+          0.11,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-13",
+          5.84,
+          0.43,
+          0.75,
+          "mid"
+        ],
+        [
+          "d-e-9",
+          "d-e-12",
+          5.75,
+          0.75,
+          0.86,
+          "near-node"
+        ],
+        [
+          "d-e-9",
+          "dense-loop",
+          4.59,
+          0.86,
+          0.11,
+          "near-node"
+        ]
+      ],
+      "edges_near_8_16_user": [
+        [
+          "d-e-3",
+          "d-e-6",
+          12.6,
+          0.11,
+          0.71,
+          "near-node"
+        ],
+        [
+          "d-e-7",
+          "d-e-13",
+          15.92,
+          0.11,
+          0.86,
+          "near-node"
+        ],
+        [
+          "d-e-7",
+          "d-e-14",
+          15.83,
+          0.11,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-14",
+          9.51,
+          0.43,
+          0.79,
+          "mid"
+        ],
+        [
+          "d-e-8",
+          "d-e-15",
+          12.81,
+          0.5,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-12",
+          "dense-loop",
+          13.33,
+          0.86,
+          0.14,
+          "near-node"
+        ],
+        [
+          "d-e-13",
+          "d-e-14",
+          10.39,
+          0.79,
+          0.82,
+          "near-node"
+        ]
+      ],
+      "edges_outside_frame": [],
+      "anchor_pad_user": {
+        "d-e-1": [
+          3.0,
+          8.8
+        ],
+        "d-e-2": [
+          4.0,
+          8.8
+        ],
+        "d-e-3": [
+          2.0,
+          3.0
+        ],
+        "d-e-4": [
+          4.0,
+          3.0
+        ],
+        "d-e-5": [
+          4.0,
+          4.0
+        ],
+        "d-e-6": [
+          10.0,
+          4.0
+        ],
+        "d-e-7": [
+          3.0,
+          1.4
+        ],
+        "d-e-8": [
+          4.2,
+          2.0
+        ],
+        "d-e-9": [
+          1.7,
+          4.0
+        ],
+        "d-e-10": [
+          4.0,
+          4.0
+        ],
+        "d-e-11": [
+          4.0,
+          4.0
+        ],
+        "d-e-12": [
+          10.0,
+          4.0
+        ],
+        "d-e-13": [
+          3.0,
+          10.0
+        ],
+        "d-e-14": [
+          4.0,
+          10.0
+        ],
+        "d-e-15": [
+          1.4,
+          3.0
+        ],
+        "dense-parallel": [
+          8.8,
+          3.0
+        ],
+        "dense-loop": [
+          6.0,
+          6.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 1,
+      "nodes_shown": 16,
+      "edges_shown": 17,
+      "sign_screen_w": {
+        "d-0": 19.2,
+        "d-1": 16,
+        "d-2": 18,
+        "d-3": 16,
+        "d-4": 16,
+        "d-5": 20,
+        "d-6": 19.2,
+        "d-7": 16,
+        "d-8": 18,
+        "d-9": 16,
+        "d-10": 16,
+        "d-11": 20,
+        "d-12": 19.2,
+        "d-13": 16,
+        "d-14": 18,
+        "d-15": 16
+      },
+      "sign_screen_out_of_16_24": {},
+      "hit_screen_lt32": {},
+      "clusters": [
+        {
+          "id": "cluster-1",
+          "aria": "Группа связей 2 16 узлов. Раскрыть",
+          "screen": {
+            "x": 582.890625,
+            "y": 399.76776123046875,
+            "w": 129.1790771484375,
+            "h": 102
+          },
+          "texts": [
+            "Группа связей 2",
+            "16 узлов · Раскрыть",
+            "✓ 5 · ▤ 6 · ◇ 5"
+          ]
+        },
+        {
+          "id": "cluster-2",
+          "aria": "Группа связей 3 16 узлов. Раскрыть",
+          "screen": {
+            "x": 872.65625,
+            "y": 399.76776123046875,
+            "w": 129.1790771484375,
+            "h": 102
+          },
+          "texts": [
+            "Группа связей 3",
+            "16 узлов · Раскрыть",
+            "✓ 5 · ▤ 6 · ◇ 5"
+          ]
+        }
+      ],
+      "summary": "16 узлов · 17 связей · 2 группы",
+      "marksByStatus": {
+        "sourced": 5,
+        "generated": 6,
+        "verified": 6
+      }
+    },
+    "overviewDark": {
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-14-F3-dense-overview-dark-z05-graph.png",
+      "shadow": "rgba(0, 0, 0, 0.32) 0px 16px 40px 0px"
+    },
+    "fit": {
+      "zoom": 0.611,
+      "summary": "16 узлов · 17 связей · 2 группы"
+    },
+    "expanded": {
+      "zoom": 0.611,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-15-F3-dense-expanded-light-graph.png",
+      "fullShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-15-F3-dense-expanded-light.png",
+      "summary": "32 узлов · 33 связей · 1 группы",
+      "clusters": [
+        {
+          "id": "cluster-2",
+          "aria": "Группа связей 3 16 узлов. Раскрыть",
+          "screen": {
+            "x": 946.4546508789062,
+            "y": 390.9346008300781,
+            "w": 129.17913818359375,
+            "h": 104.43685913085938
+          },
+          "texts": [
+            "Группа связей 3",
+            "16 узлов · Раскрыть",
+            "✓ 5 · ▤ 6 · ◇ 5"
+          ]
+        }
+      ],
+      "edges_into_label": [],
+      "edges_into_foreign_sign": [],
+      "min_gap_edge_label_lt8_user": {
+        "dense-loop": 4.59
+      },
+      "min_gap_edge_sign_lt8_user": {
+        "d-e-3": 4.64,
+        "d-e-5": 7.82,
+        "d-e-6": 3.57,
+        "d-e-13": 4.49,
+        "d-e-14": 6.89,
+        "d-e-15": 5.89,
+        "d-e-20": 5.28,
+        "d-e-29": 3.75
+      },
+      "label_overlaps": [],
+      "marker_size_off": [],
+      "marker_on_label": [],
+      "marker_on_sign": [],
+      "marker_overlaps": [
+        [
+          "d-e-4",
+          "d-e-6"
+        ]
+      ],
+      "marker_on_cluster": [],
+      "edges_merged_lt8_user": [
+        [
+          "d-e-2",
+          "d-e-5",
+          5.05,
+          0.36,
+          0.21,
+          "mid"
+        ],
+        [
+          "d-e-2",
+          "d-e-6",
+          1.14,
+          0.11,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-3",
+          "d-e-4",
+          3.24,
+          0.82,
+          0.68,
+          "near-node"
+        ],
+        [
+          "d-e-4",
+          "d-e-5",
+          4.17,
+          0.89,
+          0.18,
+          "near-node"
+        ],
+        [
+          "d-e-4",
+          "d-e-6",
+          4.3,
+          0.36,
+          0.32,
+          "mid"
+        ],
+        [
+          "d-e-4",
+          "dense-loop",
+          4.3,
+          0.14,
+          0.43,
+          "near-node"
+        ],
+        [
+          "d-e-5",
+          "d-e-6",
+          2.11,
+          0.14,
+          0.68,
+          "near-node"
+        ],
+        [
+          "d-e-7",
+          "d-e-8",
+          6.4,
+          0.75,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-13",
+          5.84,
+          0.43,
+          0.75,
+          "mid"
+        ],
+        [
+          "d-e-8",
+          "d-e-14",
+          7.59,
+          0.29,
+          0.68,
+          "mid"
+        ],
+        [
+          "d-e-9",
+          "d-e-12",
+          5.75,
+          0.75,
+          0.86,
+          "near-node"
+        ],
+        [
+          "d-e-9",
+          "dense-loop",
+          4.59,
+          0.86,
+          0.11,
+          "near-node"
+        ],
+        [
+          "d-e-21",
+          "d-e-26",
+          7.84,
+          0.71,
+          0.18,
+          "near-node"
+        ],
+        [
+          "d-e-21",
+          "d-e-28",
+          3.2,
+          0.54,
+          0.61,
+          "mid"
+        ],
+        [
+          "d-e-21",
+          "d-e-29",
+          7.3,
+          0.11,
+          0.75,
+          "near-node"
+        ],
+        [
+          "d-e-24",
+          "d-e-27",
+          4.98,
+          0.11,
+          0.86,
+          "near-node"
+        ],
+        [
+          "d-e-25",
+          "d-e-29",
+          2.55,
+          0.32,
+          0.61,
+          "mid"
+        ],
+        [
+          "d-e-27",
+          "d-e-28",
+          6.56,
+          0.79,
+          0.43,
+          "mid"
+        ],
+        [
+          "d-e-27",
+          "d-e-30",
+          1.91,
+          0.25,
+          0.11,
+          "near-node"
+        ],
+        [
+          "d-e-28",
+          "d-e-29",
+          5.67,
+          0.18,
+          0.14,
+          "near-node"
+        ]
+      ],
+      "edges_near_8_16_user": [
+        [
+          "d-e-1",
+          "dense-parallel",
+          12.88,
+          0.11,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-3",
+          "d-e-6",
+          13.36,
+          0.89,
+          0.71,
+          "near-node"
+        ],
+        [
+          "d-e-6",
+          "d-e-11",
+          10.42,
+          0.11,
+          0.86,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-11",
+          14.11,
+          0.29,
+          0.14,
+          "near-node"
+        ],
+        [
+          "d-e-8",
+          "d-e-15",
+          12.81,
+          0.5,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-11",
+          "d-e-14",
+          12.6,
+          0.11,
+          0.61,
+          "near-node"
+        ],
+        [
+          "d-e-12",
+          "dense-loop",
+          13.33,
+          0.86,
+          0.14,
+          "near-node"
+        ],
+        [
+          "d-e-15",
+          "d-e-29",
+          15.09,
+          0.46,
+          0.46,
+          "mid"
+        ],
+        [
+          "d-e-17",
+          "d-e-20",
+          8.95,
+          0.89,
+          0.14,
+          "near-node"
+        ],
+        [
+          "d-e-19",
+          "d-e-21",
+          12.66,
+          0.64,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-19",
+          "d-e-22",
+          9.87,
+          0.11,
+          0.71,
+          "near-node"
+        ],
+        [
+          "d-e-21",
+          "d-e-27",
+          9.23,
+          0.29,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-23",
+          "d-e-24",
+          8.81,
+          0.75,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-24",
+          "d-e-30",
+          8.01,
+          0.32,
+          0.79,
+          "mid"
+        ],
+        [
+          "d-e-24",
+          "d-e-31",
+          8.63,
+          0.43,
+          0.89,
+          "near-node"
+        ],
+        [
+          "d-e-26",
+          "d-e-29",
+          8.13,
+          0.29,
+          0.89,
+          "near-node"
+        ]
+      ],
+      "edges_outside_frame": [
+        {
+          "edge": "d-e-5",
+          "samples": 3,
+          "max_outside_screen_px": 0.7
+        },
+        {
+          "edge": "bridge-1",
+          "samples": 13,
+          "max_outside_screen_px": 22.6
+        }
+      ],
+      "anchor_pad_user": {
+        "d-e-1": [
+          4.0,
+          12.3
+        ],
+        "d-e-2": [
+          4.0,
+          12.3
+        ],
+        "d-e-3": [
+          4.0,
+          4.0
+        ],
+        "d-e-4": [
+          4.0,
+          4.0
+        ],
+        "d-e-5": [
+          4.4,
+          4.0
+        ],
+        "d-e-6": [
+          14.4,
+          4.0
+        ],
+        "d-e-7": [
+          4.0,
+          4.0
+        ],
+        "d-e-8": [
+          4.2,
+          4.0
+        ],
+        "d-e-9": [
+          4.9,
+          4.0
+        ],
+        "d-e-10": [
+          4.0,
+          4.0
+        ],
+        "d-e-11": [
+          4.4,
+          4.4
+        ],
+        "d-e-12": [
+          14.4,
+          4.4
+        ],
+        "d-e-13": [
+          4.0,
+          14.4
+        ],
+        "d-e-14": [
+          4.0,
+          14.4
+        ],
+        "d-e-15": [
+          4.0,
+          4.0
+        ],
+        "d-e-17": [
+          4.4,
+          4.0
+        ],
+        "d-e-18": [
+          12.3,
+          4.0
+        ],
+        "d-e-19": [
+          4.0,
+          4.4
+        ],
+        "d-e-20": [
+          4.0,
+          4.4
+        ],
+        "d-e-21": [
+          4.9,
+          17.7
+        ],
+        "d-e-22": [
+          4.0,
+          14.4
+        ],
+        "d-e-23": [
+          4.4,
+          4.0
+        ],
+        "d-e-24": [
+          13.2,
+          4.3
+        ],
+        "d-e-25": [
+          4.0,
+          4.0
+        ],
+        "d-e-26": [
+          4.0,
+          4.0
+        ],
+        "d-e-27": [
+          4.0,
+          4.0
+        ],
+        "d-e-28": [
+          4.0,
+          4.0
+        ],
+        "d-e-29": [
+          4.4,
+          4.0
+        ],
+        "d-e-30": [
+          14.4,
+          4.0
+        ],
+        "d-e-31": [
+          4.0,
+          4.4
+        ],
+        "bridge-1": [
+          4.0,
+          12.3
+        ],
+        "dense-parallel": [
+          12.3,
+          4.0
+        ],
+        "dense-loop": [
+          6.0,
+          6.0
+        ]
+      },
+      "label_clipped": [],
+      "labels_shown": 1,
+      "nodes_shown": 32,
+      "edges_shown": 33,
+      "sign_screen_w": {
+        "d-0": 19.2,
+        "d-1": 18.3,
+        "d-2": 22.0,
+        "d-3": 17.1,
+        "d-4": 19.5,
+        "d-5": 24.0,
+        "d-6": 19.2,
+        "d-7": 18.3,
+        "d-8": 22.0,
+        "d-9": 17.1,
+        "d-10": 19.5,
+        "d-11": 24.0,
+        "d-12": 19.2,
+        "d-13": 18.3,
+        "d-14": 22.0,
+        "d-15": 17.1,
+        "d-16": 19.5,
+        "d-17": 24,
+        "d-18": 19.2,
+        "d-19": 18.3,
+        "d-20": 22.0,
+        "d-21": 17.1,
+        "d-22": 19.5,
+        "d-23": 24,
+        "d-24": 19.2,
+        "d-25": 18.3,
+        "d-26": 22.0,
+        "d-27": 17.1,
+        "d-28": 19.5,
+        "d-29": 24,
+        "d-30": 19.2,
+        "d-31": 18.3
+      },
+      "sign_screen_out_of_16_24": {},
+      "hit_screen_lt32": {}
+    },
+    "clusterCounts": {
+      "aria": "Группа связей 3 16 узлов. Раскрыть",
+      "texts": [
+        "Группа связей 3",
+        "16 узлов · Раскрыть",
+        "✓ 5 · ▤ 6 · ◇ 5"
+      ]
+    }
+  },
+  "A9_states": [
+    {
+      "scenario": "loading",
+      "notice": "Загружаем сохранённые связи…",
+      "empty": "Загружаем сохранённые связи…",
+      "nodes": 0,
+      "edges": 0,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-loading.png",
+      "actions": [],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": true
+    },
+    {
+      "scenario": "extending",
+      "notice": "Достраиваем связи…",
+      "empty": null,
+      "nodes": 8,
+      "edges": 10,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-extending.png",
+      "actions": [],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": false
+    },
+    {
+      "scenario": "off",
+      "notice": "Достройка выключена",
+      "empty": null,
+      "nodes": 8,
+      "edges": 10,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-off.png",
+      "actions": [],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": false
+    },
+    {
+      "scenario": "unavailable",
+      "notice": "Достройка временно недоступна. Сохранённые связи показаны.\nПовторить",
+      "empty": null,
+      "nodes": 8,
+      "edges": 10,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-unavailable.png",
+      "actions": [
+        "Повторить"
+      ],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": false
+    },
+    {
+      "scenario": "error",
+      "notice": "Не удалось загрузить граф. Параметры сохранены.\nПовторить",
+      "empty": "Не удалось загрузить граф. Параметры сохранены.",
+      "nodes": 0,
+      "edges": 0,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-error.png",
+      "actions": [
+        "Повторить"
+      ],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": true
+    },
+    {
+      "scenario": "empty",
+      "notice": "Связей пока нет\nСбросить фильтры",
+      "empty": null,
+      "nodes": 1,
+      "edges": 0,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-empty.png",
+      "actions": [
+        "Сбросить фильтры"
+      ],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": false
+    },
+    {
+      "scenario": "filtered",
+      "notice": "Нет связей с этими фильтрами\nСбросить фильтры",
+      "empty": "Нет связей с этими фильтрами",
+      "nodes": 0,
+      "edges": 0,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-filtered.png",
+      "actions": [
+        "Сбросить фильтры"
+      ],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": true
+    },
+    {
+      "scenario": "limited",
+      "notice": "Показана часть графа. Раскройте конкретный узел.\nРаскрыть узел",
+      "empty": null,
+      "nodes": 8,
+      "edges": 10,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-state-limited.png",
+      "actions": [
+        "Раскрыть узел"
+      ],
+      "title": "Иммануил Кант",
+      "noticeVisible": true,
+      "emptyVisible": false
+    }
+  ],
+  "A10_motion": {
+    "reduced": {
+      "opacity": "1",
+      "transition": "none",
+      "animation": "none",
+      "edges": 10,
+      "worldOpacity": "1",
+      "nodeOpacity": "1"
+    },
+    "shots": [
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-21-reduced-motion-F1-graph.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-07-grayscale-no-shadow-graph.png"
+    ],
+    "darkSheet": "#20242b",
+    "lightSheet": "#f6f3ea",
+    "darkEdge": "rgb(168, 188, 228)"
+  },
+  "A11_keyboard": {
+    "tabSequence": [
+      "Граф",
+      "language",
+      "theme",
+      "pin",
+      "fixture",
+      "depth",
+      "scope",
+      "generation",
+      "search",
+      "filter-button",
+      "list-button",
+      "graph",
+      "node-kant",
+      "node-descartes",
+      "node-locke",
+      "node-hume"
+    ],
+    "enterSelects": {
+      "kind": "node",
+      "id": "kant"
+    },
+    "escapeClears": null,
+    "search": {
+      "enter": {
+        "kind": "node",
+        "id": "locke"
+      },
+      "emptyMessage": "×\n01 / ОГЛАВЛЕНИЕ\nНайдено на карте\n\nНичего не найдено\n\nСбросить поиск",
+      "emptyReset": 1
+    },
+    "listCount": 8,
+    "listNoteHead": "×\n01 / ОГЛАВЛЕНИЕ\nВсе узлы\nРене Декарт\nДжон Локк\nДэвид Юм\nИммануил Кант\nРазум\nПр",
+    "afterListClick": {
+      "kind": "node",
+      "id": "descartes"
+    },
+    "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-17-keyboard-search-list.png",
+    "filteredEmpty": "Нет связей с этими фильтрами\n\nСбросить фильтры",
+    "surfaceResetCount": 1,
+    "afterReset": {
+      "families": 0,
+      "empty": false
+    },
+    "filteredShot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-20-filtered-real-filters-graph.png"
+  },
+  "A12_pan": {
+    "afterDrag": {
+      "sel": null,
+      "note": "×\n01 / ЛЮДИ\nРене Декарт\n\n1596–1650\n\nУзел"
+    },
+    "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-23a-after-drag-no-selection-graph.png",
+    "click1": {
+      "sel": {
+        "kind": "node",
+        "id": "hume"
+      },
+      "start": "kant",
+      "notes": 1
+    },
+    "click2": {
+      "sel": {
+        "kind": "node",
+        "id": "hume"
+      },
+      "start": "hume",
+      "title": "Дэвид Юм",
+      "noteCount": 1
+    }
+  },
+  "A13_minimap": {
+    "visibleWhenClipped": {
+      "visible": true,
+      "zoom": 2
+    },
+    "hiddenAfterFit": {
+      "visible": false,
+      "zoom": 0.8914285714285715
+    },
+    "shot": "docs/design/features/graph-page-qa/screenshots/round-3/TC-16-minimap-visible-graph.png"
+  },
+  "A14_f1_names": {
+    "drawn": [
+      "causality",
+      "critique",
+      "descartes",
+      "enquiry",
+      "hume",
+      "kant",
+      "locke",
+      "reason"
+    ],
+    "missing": [],
+    "summary": "8 узлов · 10 связей",
+    "demoLabel": "Демонстрационные данные · Ф0.2 · Не исторический датасет",
+    "axisTexts": [
+      "1600",
+      "1650",
+      "1700",
+      "1750",
+      "Без даты"
+    ],
+    "titleEqStart": true
+  },
+  "A15_roles": {
+    "buttons": [
+      "Читать",
+      "Атлас идей",
+      "ENЯзык",
+      "Сменить тему",
+      "Закрепить",
+      "Фильтры ⌄",
+      "Сбросить",
+      "Оглавление карты",
+      "Мини-карта: нажмите, чтобы переместиться",
+      "−",
+      "+",
+      "Вписать",
+      "Оглавление карты ↗"
+    ],
+    "forbidden": []
+  },
+  "B_zoom200": {
+    "sw": 720,
+    "iw": 720,
+    "sh": 1453,
+    "ih": 450,
+    "buttonsUnder36": [],
+    "anyInvisible": [
+      {
+        "id": "filter-reset",
+        "w": 0,
+        "h": 0,
+        "visible": false
+      },
+      {
+        "id": "minimap",
+        "w": 0,
+        "h": 0,
+        "visible": false
+      }
+    ],
+    "graphW": 608,
+    "graphH": 480,
+    "compact": true,
+    "shots": [
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-22-zoom200-top.png",
+      "docs/design/features/graph-page-qa/screenshots/round-3/TC-22-zoom200-note.png"
+    ],
+    "zoomButton": {
+      "before": "56%",
+      "after": "76%"
+    },
+    "graphWheel": {
+      "before": "76%",
+      "after": "76%"
+    },
+    "pageScroll": {
+      "before": 0,
+      "after": 400
+    },
+    "note": {
+      "top": -18,
+      "h": 485,
+      "w": 608,
+      "text": "×\n01 / ЛЮДИ\nИммануил Кант\n\n1724–1804\n\nУзел текущег"
+    },
+    "overflowAfter": 0
+  },
+  "C_runtime": {
+    "nonFileRequests": [],
+    "schemes": [
+      "file:///C"
+    ],
+    "requestCount": 187,
+    "failedRequests": [
+      "file:///C:/Users/Ivano/Desktop/ai-philosophy-platform/ai-history-of-philosophy-platform/docs/design/system/previews/graph-f02/assets/does-not-exist.jpg :: net::ERR_FILE_NOT_FOUND"
+    ],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_FILE_NOT_FOUND"
+    ],
+    "pageErrors": [],
+    "portrait": {
+      "before": {
+        "x": 604.6505126953125,
+        "y": 425.612060546875,
+        "w": 42.78851318359375,
+        "h": 53.4857177734375
+      },
+      "after": {
+        "x": 604.6505126953125,
+        "y": 425.612060546875,
+        "w": 42.78851318359375,
+        "h": 53.4857177734375
+      },
+      "labelSame": true,
+      "monogram": 1,
+      "shot": "docs/design/features/graph-page-qa/screenshots/round-3/EC-04-portrait-404-monogram-graph.png"
+    }
+  }
+}

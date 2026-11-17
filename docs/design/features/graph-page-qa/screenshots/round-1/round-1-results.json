@@ -1,0 +1,1820 @@
+{
+  "results": [
+    {
+      "case": "ISO-01",
+      "ok": true,
+      "expected": "isolated prototype from file://, no server and no external requests",
+      "actual": "url=file:///C:/Users/Ivano/Desktop/ai-philosophy-platform/ai-history-of-philosophy-platform/docs/design/system/previews/graph-f02/index.html; requests=15; external=[]; failed=[]",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/ISO-01-loaded.png"
+      ]
+    },
+    {
+      "case": "ISO-02",
+      "ok": true,
+      "expected": "local Literata and Onest fonts load, no Google Fonts",
+      "actual": "status=loaded; check={'literata': True, 'onest': True}; faces=[('Literata', 'loaded'), ('Literata', 'loaded'), ('Onest', 'loaded'), ('Onest', 'loaded'), ('Onest', 'unloaded'), ('Onest', 'unloaded'), ('Onest', 'loaded'), ('Onest', 'loaded')]",
+      "evidence": []
+    },
+    {
+      "case": "TC-01",
+      "ok": true,
+      "expected": "one sheet; graph and note have no own background/shadow/panel; sheet radius 3px",
+      "actual": "graph bg=rgba(0, 0, 0, 0) shadow=none; note bg=rgba(0, 0, 0, 0) shadow=none; folio shadow=rgba(0, 0, 0, 0.2) 0px 16px 40px 0px; radius=3px; lower layers display=['block', 'block']",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-01-single-sheet.png"
+      ]
+    },
+    {
+      "case": "TC-02",
+      "ok": true,
+      "expected": "network width share >=70% of the network+margin row, height >=480",
+      "actual": "graph=960x520, share=0.769",
+      "evidence": []
+    },
+    {
+      "case": "TC-03",
+      "ok": true,
+      "expected": "1024x768: margins below the graph, no lower decorative layers, graph >=420 high, no page h-scroll",
+      "actual": "{\"below\": true, \"gh\": 480, \"overflow\": false, \"layers\": [\"none\", \"none\"], \"compact\": true}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-03-1024x768.png"
+      ]
+    },
+    {
+      "case": "TC-04",
+      "ok": true,
+      "expected": "S=56 -> margins right; S=280 (A=1000<1040) -> margins below",
+      "actual": "{\"False\": {\"below\": false, \"gw\": 800, \"cls\": \"atlas-app\", \"A\": 1224}, \"True\": {\"below\": true, \"gw\": 944, \"cls\": \"atlas-app pinned compact\", \"A\": 1000}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-04-1280-pinned-False.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-04-1280-pinned-True.png"
+      ]
+    },
+    {
+      "case": "TC-05",
+      "ok": true,
+      "expected": "1920x1080: graph takes the width, decor does not grow instead of it",
+      "actual": "graph width=1440 (0.75 of viewport), folio=1808, desk padding=28px",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-05-1920x1080.png"
+      ]
+    },
+    {
+      "case": "GD-02-sheet-height",
+      "ok": false,
+      "expected": "sheet height is driven by its content, not by a fixed 100vh minimum (GD-02)",
+      "actual": "{\"folioH\": 1018, \"contentBottom\": 910.9, \"paddingBottom\": \"24px\", \"minHeight\": \"1018px\", \"bottomGap\": 111.1, \"lastChild\": \"demo-tools\"}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-05-1920x1080.png"
+      ]
+    },
+    {
+      "case": "TC-06",
+      "ok": true,
+      "expected": "computed graph-* and relation-family colors match GD-04/GD-05 tables; text contrast >=4.5 (main >=7)",
+      "actual": "mismatches=[]; contrast min=4.73 (light/muted); rows=[('light', 'ink', 14.41), ('light', 'secondary', 7.33), ('light', 'muted', 4.73), ('dark', 'ink', 12.44), ('dark', 'secondary', 8.34), ('dark', 'muted', 5.44), ('light', 'genesis', 6.4), ('light', 'consequences', 5.3), ('light', 'polemic', 6.11), ('light', 'context', 5.15), ('light', 'structure', 5.98), ('light', 'biography', 5.49), ('dark', 'genesis', 8.14), ('dark', 'consequences', 8.48), ('dark', 'polemic', 7.52), ('dark', 'context', 8.05), ('dark', 'structure', 7.98), ('dark', 'biography', 8.13)]",
+      "evidence": []
+    },
+    {
+      "case": "TC-07",
+      "ok": true,
+      "expected": "without colour/texture the hierarchy remains; families and statuses still distinguishable by shape/mark",
+      "actual": "{\"nodes\": 8, \"signs\": 8, \"statuses\": [\"verified\", \"sourced\", \"verified\", \"generated\", \"sourced\", \"verified\", \"sourced\", \"generated\", \"verified\", \"generated\"]}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-07-grayscale-no-texture.png"
+      ]
+    },
+    {
+      "case": "TC-08",
+      "ok": true,
+      "expected": "sign shapes and sizes follow familyOf: person 48x60 oval, group 40, ideas 30, teachings 36, texts 28x36, history 32",
+      "actual": "measured={'people': {'id': 's-0', 'w': 48, 'h': 60}, 'ideas': {'id': 's-1', 'w': 30, 'h': 30}, 'teachings': {'id': 's-3', 'w': 36, 'h': 36}, 'texts': {'id': 's-5', 'w': 28, 'h': 36}, 'history': {'id': 's-7', 'w': 32, 'h': 32}}; mismatches={}; unknown(hexagon)={'path:': {'w': 32, 'h': 28}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-08-specimens-shapes.png"
+      ]
+    },
+    {
+      "case": "GD-08-unknown-shape",
+      "ok": false,
+      "expected": "unknown entity type: neutral hexagon 32x32 (GD-08 table)",
+      "actual": "measured unknown-type sign bbox={'w': 32, 'h': 28}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-08-specimens-shapes.png"
+      ]
+    },
+    {
+      "case": "TC-09",
+      "ok": true,
+      "expected": "selecting another node: 'Начало' stays on the old start, selected state moves, focus ring is independent",
+      "actual": "{\"selected\": {\"kind\": \"node\", \"id\": \"hume\"}, \"start\": [\"Начало\"], \"startParent\": \"kant\", \"pressedHume\": \"true\", \"selectionRing\": \"visible\", \"focusRingOnSelected\": \"hidden\", \"keyboardRing\": {\"focusVisible\": true, \"fr\": \"visible\", \"selected\": {\"kind\": \"node\", \"id\": \"hume\"}, \"selRing\": \"visible\"}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-09-selected-node.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-09-independent-focus.png"
+      ]
+    },
+    {
+      "case": "TC-10",
+      "ok": true,
+      "expected": "edge kant->hume: subject/object from the statement, arrowhead ends at Hume (object), exact relation in the note, direction independent of the time axis",
+      "actual": "{\"heading\": \"Иммануил Кант — испытал влияние — Дэвид Юм\", \"markers\": \"url(#arrow-genesis)\", \"lastNearHume\": 3.60662841796875, \"lastNearKant\": 114.10287475585938, \"nearestLast\": [\"hume\", 3.60662841796875], \"nearestFirst\": [\"kant\", 3.59222412109375], \"timeOrder\": {\"kantYear\": 1724, \"humeYear\": 1711, \"kantX\": 549.7297297297298, \"humeX\": 504.05405405405406}, \"authorPredicate\": false}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-10-selected-edge-kant-hume.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-10-edge-arrow-closeup.png"
+      ]
+    },
+    {
+      "case": "TC-18",
+      "ok": true,
+      "expected": "edge note: status, qualifiers, attributions, marked demonstration quote, local source link; no own card",
+      "actual": "{\"status\": 1, \"blockquotes\": 1, \"qualifiers\": true, \"attributions\": true, \"quoteLabel\": true, \"localLink\": true, \"card\": \"rgba(0, 0, 0, 0);none\", \"heading\": \"Иммануил Кант — испытал влияние — Дэвид Юм\", \"localNoteVisible\": true}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-18-edge-note.png"
+      ]
+    },
+    {
+      "case": "TC-11",
+      "ok": true,
+      "expected": "18 family x status combinations: family color does not change with status; generated dashed + diamond; verified check; sourced book",
+      "actual": "{\"combos\": 18, \"keys\": [\"biography:generated\", \"biography:sourced\", \"biography:verified\", \"consequences:generated\", \"consequences:sourced\", \"consequences:verified\", \"context:generated\", \"context:sourced\", \"context:verified\", \"genesis:generated\", \"genesis:sourced\", \"genesis:verified\", \"polemic:generated\", \"polemic:sourced\", \"polemic:verified\", \"structure:generated\", \"structure:sourced\", \"structure:verified\"], \"marks\": {\"verified\": 1, \"sourced\": 1, \"generated\": 1}, \"generatedDash\": [\"5px, 4px\"], \"generatedMark\": [\"M0 -5 5 0 0 5 -5 0Z\"], \"markerSizes\": [[16, 16]], \"edges\": 20}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-dark.png"
+      ]
+    },
+    {
+      "case": "GD-11-marker-size",
+      "ok": false,
+      "expected": "status marker keeps the screen size 14x14 at any zoom (GD-11)",
+      "actual": "measured marker screen sizes (deduped)=[(16, 16)]",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-dark.png"
+      ]
+    },
+    {
+      "case": "TC-12",
+      "ok": true,
+      "expected": "parallel edges separated by 16px, loop drawn as an arc, symmetric relations have no arrowhead, deterministic family colour",
+      "actual": "{\"families\": [\"genesis\", \"consequences\", \"polemic\", \"context\", \"structure\", \"biography\"], \"loopW\": 72, \"loopH\": 76, \"parallelDy\": 16, \"symmetricEdges\": [\"spec-9\", \"spec-10\", \"spec-11\"], \"parallelFamilies\": [[\"spec-0\", \"genesis\"], [\"spec-parallel\", \"genesis\"]]}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-12-families-relations.png"
+      ]
+    },
+    {
+      "case": "TC-13",
+      "ok": true,
+      "expected": "static frame: no sign/label or line/label collisions, gaps >=8px",
+      "actual": "{\"overlaps\": [], \"labelSign\": [], \"edgeLabel\": [], \"edgeLabelForeign\": [], \"minEdgeLabel\": 8.6, \"edges\": 10, \"labels\": 8}",
+      "evidence": []
+    },
+    {
+      "case": "GD-13-cluster-text",
+      "ok": false,
+      "expected": "cluster caption and its split status counts stay readable (>=12px on screen) in the overview",
+      "actual": "{\"zoom\": 0.5, \"title\": 8, \"count\": 6, \"countStatus\": 6, \"texts\": [\"16 узлов · Раскрыть\", \"✓ 5 · ▤ 6 · ◇ 5\", \"16 узлов · Раскрыть\", \"✓ 5 · ▤ 6 · ◇ 5\"]}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-light.png"
+      ]
+    },
+    {
+      "case": "TC-14",
+      "ok": true,
+      "expected": "dense z=.5: smaller signs, readable selected label, list available; every visible relation keeps a distinguishable check/book/diamond mark; clusters show separate status counts",
+      "actual": "{\"nodes\": 16, \"clusters\": 2, \"edgeCount\": 17, \"zoom\": 0.5, \"clusterTexts\": [\"Группа связей 216 узлов · Раскрыть✓ 5 · ▤ 6 · ◇ 5\", \"Группа связей 316 узлов · Раскрыть✓ 5 · ▤ 6 · ◇ 5\"], \"markSizes\": [[16, 16]]}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-dark.png"
+      ]
+    },
+    {
+      "case": "TC-15",
+      "ok": true,
+      "expected": "expanding a group reveals exactly the fixture nodes (16+16=32) and keeps start/selected/statuses",
+      "actual": "{\"before\": {\"nodes\": 16, \"clusters\": 2, \"start\": \"d-0\", \"selected\": {\"kind\": \"node\", \"id\": \"d-0\"}, \"startMark\": \"d-0\"}, \"after\": {\"nodes\": 32, \"clusters\": 1, \"start\": \"d-0\", \"selected\": {\"kind\": \"node\", \"id\": \"d-0\"}, \"startMark\": \"d-0\", \"summary\": \"32 узлов · 33 связей · 1 группы\"}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-15-dense-expanded.png"
+      ]
+    },
+    {
+      "case": "TC-16",
+      "ok": true,
+      "expected": "minimap appears only when the graph bounds leave the viewport and disappears after fit",
+      "actual": "{\"hiddenAfterFit\": true, \"visibleAfterZoom\": true, \"panChanged\": true, \"hiddenAfterFitAgain\": true}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-16-minimap-visible.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-16-after-fit.png"
+      ]
+    },
+    {
+      "case": "TC-17",
+      "ok": true,
+      "expected": "Tab/search/Enter/'Сделать началом'/Escape: everything reachable, focus predictable, Escape returns focus to the initiator, double click not required",
+      "actual": "{\"tabOrderTail\": [\"BUTTON|испытало влияние — Иссле\", \"A|Материалы и лицензии ↗\", \"scenario|Демонстрационное состояние\", \"BODY|φ PhiloGraph\\n Читать\\n Ат\", \"BUTTON|Граф\", \"language|Переключить язык\", \"theme|Переключить тему\", \"pin|Закрепить навигацию\"], \"search\": {\"selected\": {\"kind\": \"node\", \"id\": \"locke\"}, \"heading\": \"Джон Локк\"}, \"enter\": {\"selected\": {\"kind\": \"node\", \"id\": \"hume\"}, \"pressed\": \"true\"}, \"escape\": {\"active\": \"node-hume\", \"selected\": null, \"focus\": \"hume\", \"focusVisible\": true, \"ring\": \"visible\", \"note\": \"×\\n01 / ЛЮДИ\\nДэвид Юм\\n\\n1711–1776\\n\\nУзел те\"}, \"restart\": {\"start\": \"hume\", \"title\": \"Дэвид Юм\", \"startMark\": \"hume\"}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-search-enter.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-focus-after-escape.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-make-start.png"
+      ]
+    },
+    {
+      "case": "TC-19",
+      "ok": true,
+      "expected": "long names: up to 3 lines with ellipsis in the network, no font shrink, full name in accessible name and note; null date and BCE honest; RU/EN",
+      "actual": "{\"longNameLen\": 150, \"ariaStartsWithFullName\": true, \"clamp\": \"3\", \"lines\": 2.99, \"fontSize\": \"20.0909px\", \"labelWidth\": \"176\", \"noteHeadingEqual\": true, \"noteClipped\": false, \"nullDateLabels\": 2, \"bceLabels\": [\"384–322 до н. э.\"], \"en\": {\"aria\": \"Specimen 1 · People\", \"date\": \"384–322 до н. э.\", \"note\": \"Specimen 3\", \"clamp\": \"3\"}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-long-name-network.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-long-name-note.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-en-locale.png"
+      ]
+    },
+    {
+      "case": "GD-15-overlay-overlap",
+      "ok": false,
+      "expected": "the 'no relations with these filters' message is readable and does not overlap node captions",
+      "actual": "{\"overlaps\": [\"kant\"], \"bg\": \"rgba(0, 0, 0, 0)\", \"rect\": {\"x\": 445.2, \"y\": 442.6, \"w\": 317.6, \"h\": 104}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-filtered-by-real-filters.png"
+      ]
+    },
+    {
+      "case": "TC-20",
+      "ok": true,
+      "expected": "F4 states each show the honest message and an accessible action, never a fake graph; all-relations filter says 'Нет связей с этими фильтрами' + reset and reset restores the graph",
+      "actual": "{\"notice/empty per state\": {\"loading\": \"Загружаем сохранённые связи…\", \"extending\": \"Достраиваем связи…\", \"off\": \"Достройка выключена\", \"unavailable\": \"Достройка временно недоступна. Сохранённые связи показаны.\\nП\", \"error\": \"Не удалось загрузить граф. Параметры сохранены.\\nПовторить\", \"empty\": \"Связей пока нет\\nСбросить фильтры\", \"filtered\": \"Нет связей с этими фильтрами\\nСбросить фильтры\", \"limited\": \"Показана часть графа. Раскройте конкретный узел.\\nРаскрыть уз\"}, \"nodeCounts\": {\"loading\": 0, \"extending\": 8, \"off\": 8, \"unavailable\": 8, \"error\": 0, \"empty\": 1, \"filtered\": 0, \"limited\": 8}, \"actions\": {\"unavailable\": true, \"error\": true, \"filtered\": true, \"limited\": true, \"empty\": true}, \"filterAllRelations\": {\"edges\": 0, \"nodes\": 8, \"empty\": \"Нет связей с этими фильтрами\\n\\nСбросить фильтры\", \"count\": \"6\", \"overlayVisible\": true}, \"afterReset\": {\"edges\": 10, \"nodes\": 8, \"empty\": true, \"uncheckedBoxes\": [\"genesis\", \"consequences\", \"polemic\", \"context\", \"structure\", \"biography\"], \"filterCount\": \"\", \"panelOpen\": false}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-loading.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-extending.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-off.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-unavailable.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-error.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-empty.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-filtered.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-limited.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-filtered-by-real-filters.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-after-reset.png"
+      ]
+    },
+    {
+      "case": "TC-21",
+      "ok": true,
+      "expected": "reduced motion: lines visible without waiting, no transition, theme switch leaves no wrong intermediate colour",
+      "actual": "{\"edges\": 10, \"transition\": \"none\", \"strokeImmediately\": \"rgb(168, 188, 228)\", \"strokeAfter\": \"rgb(168, 188, 228)\"}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-21-reduced-motion.png"
+      ]
+    },
+    {
+      "case": "TC-22",
+      "ok": true,
+      "expected": "browser zoom 200%: no lost buttons/notes, the page scrolls, the scheme is zoomed separately",
+      "actual": "{\"dpr\": 2, \"cssViewport\": [720, 450], \"hOverflow\": false, \"vScroll\": true, \"clipped\": [], \"graphZoomBefore\": \"56%\", \"graphZoomAfter\": {\"level\": \"76%\", \"pageScroll\": false}, \"bottom\": {\"#fit\": {\"vis\": true, \"top\": -200, \"bottom\": -164, \"h\": 36}, \"#notice\": {\"vis\": false, \"top\": 0, \"bottom\": 0, \"h\": 0}, \"#note\": {\"vis\": true, \"top\": -138, \"bottom\": 320, \"h\": 457}, \"#minimap\": {\"vis\": false, \"top\": 0, \"bottom\": 0, \"h\": 0}, \"#filter-button\": {\"vis\": true, \"top\": -744, \"bottom\": -708, \"h\": 36}, \"#zoom-in\": {\"vis\": true, \"top\": -200, \"bottom\": -164, \"h\": 36}, \"#zoom-out\": {\"vis\": true, \"top\": -200, \"bottom\": -164, \"h\": 36}}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-22-zoom200-top.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-22-zoom200-bottom.png"
+      ]
+    },
+    {
+      "case": "TC-23a",
+      "ok": true,
+      "expected": "pan/drag then pointerup: no stray click; one note for a node; fast double selection does not duplicate notes",
+      "actual": "{\"afterDrag\": {\"selected\": null, \"pan\": {\"x\": 12, \"y\": -12.274285714285739}}, \"afterClick\": {\"selected\": {\"kind\": \"node\", \"id\": \"hume\"}}, \"afterDblclick\": {\"start\": \"kant\", \"notes\": 1, \"heading\": \"Иммануил Кант\", \"selected\": {\"kind\": \"node\", \"id\": \"kant\"}, \"startMark\": \"kant\"}}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-23a-drag-and-dblclick.png"
+      ]
+    },
+    {
+      "case": "TC-24",
+      "ok": true,
+      "expected": "portraits are local; on load failure the monogram replaces the image and the geometry does not jump",
+      "actual": "{\"portraits\": 4, \"imagesAfterFailure\": 0, \"monogramsAfterFailure\": 4, \"sameBoxes\": true}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-24-portrait-failure.png"
+      ]
+    },
+    {
+      "case": "EC-05/EC-11",
+      "ok": true,
+      "expected": "reader gets no verification/editing/admin actions; graph tokens are scoped to the page root and do not override global design tokens",
+      "actual": "{\"operatorActions\": [], \"rootGraphToken\": \"\", \"appToken\": \"#302e2a\", \"bodyBg\": \"rgba(0, 0, 0, 0)\", \"bodyMargin\": \"0px\", \"htmlInline\": \"\"}",
+      "evidence": []
+    },
+    {
+      "case": "TC-25",
+      "ok": true,
+      "expected": "'Демонстрационные данные' label, working licence link, start = title, no fake quote/export button",
+      "actual": "{\"edition\": \"Демонстрационные данные · Ф0.2 · Не исторический датасет\\nМатериалы и лицензии ↗\", \"hrefExists\": true, \"title\": \"Иммануил Кант\", \"exportButton\": false, \"quote\": \"Демонстрационная цитата: пример того, как источник обосновывает связь.\", \"quoteLabel\": [\"Демонстрационная цитата\"]}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/TC-25-honest-data.png"
+      ]
+    },
+    {
+      "case": "GD-10/17-routes",
+      "ok": false,
+      "expected": "relation lines are calm Bezier curves without decorative detours; no shared straight channels; a status marker never sits on another relation",
+      "actual": "avg axis-aligned share=0.894; edges with axisShare>0.6 and >=2 corners=[('kant-hume', 0.825, 4), ('locke-descartes', 0.917, 2), ('reason-descartes', 0.85, 5), ('kant-reason', 0.883, 3), ('kant-critique', 0.892, 4), ('enquiry-hume', 0.8, 6), ('causality-hume', 0.942, 3), ('kant-causality', 0.917, 3)]; shared collinear channel pairs=[{'a': 'kant-hume', 'b': 'kant-critique', 'vert': False, 'c': 197.7, 'ov': 23.4}, {'a': 'kant-hume', 'b': 'enquiry-hume', 'vert': True, 'c': 606.1, 'ov': 70.7}, {'a': 'locke-descartes', 'b': 'reason-descartes', 'vert': False, 'c': 127, 'ov': 70.5}, {'a': 'kant-critique', 'b': 'critique-enquiry', 'vert': False, 'c': 100, 'ov': 79.9}, {'a': 'kant-critique', 'b': 'enquiry-hume', 'vert': True, 'c': 606.1, 'ov': 70.7}]; markers on foreign paths=[['locke-descartes', 'reason-descartes', 1.3], ['kant-critique', 'critique-enquiry', 1], ['critique-enquiry', 'kant-causality', 0.4]]",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-route-grid-kant-hume.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-route-grid-full.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-merged-channels-crop.png"
+      ]
+    },
+    {
+      "case": "EVIDENCE",
+      "ok": true,
+      "expected": "mandatory frame set; light/dark verified by computed sheet colour, not by click order; no page h-scroll",
+      "actual": "{\"frames\": [[1440, \"light\", \"ru\", \"rgb(246, 243, 234)\", false], [1440, \"light\", \"en\", \"rgb(246, 243, 234)\", false], [1440, \"dark\", \"ru\", \"rgb(32, 36, 43)\", false], [1440, \"dark\", \"en\", \"rgb(32, 36, 43)\", false], [1024, \"light\", \"ru\", \"rgb(246, 243, 234)\", false], [1024, \"light\", \"en\", \"rgb(246, 243, 234)\", false], [1024, \"dark\", \"ru\", \"rgb(32, 36, 43)\", false], [1024, \"dark\", \"en\", \"rgb(32, 36, 43)\", false]], \"bad\": []}",
+      "evidence": [
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1440.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1440.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1440.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1440.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1024.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1024.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1024.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1024.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F2-specimen-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F2-specimen-dark.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-overview-light.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-overview-dark.png",
+        "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-expanded-light.png"
+      ]
+    }
+  ],
+  "logs": {
+    "isolation": {
+      "url": "file:///C:/Users/Ivano/Desktop/ai-philosophy-platform/ai-history-of-philosophy-platform/docs/design/system/previews/graph-f02/index.html",
+      "fontsReady": "loaded",
+      "fontCheck": {
+        "literata": true,
+        "onest": true
+      },
+      "title": "Атлас идей · PhiloGraph · Ф0.2",
+      "hasExport": false
+    },
+    "tokens": {
+      "light": {
+        "--graph-desk": "#302e2a",
+        "--graph-sheet": "#f6f3ea",
+        "--graph-sheet-edge": "#e9e4d8",
+        "--graph-ink": "#1a222f",
+        "--graph-ink-secondary": "#48505d",
+        "--graph-ink-muted": "#646d78",
+        "--graph-rule": "#c9c2b5",
+        "--graph-selected": "#923f32",
+        "--graph-focus": "#385b8f",
+        "--graph-generated": "#8d5d1c",
+        "--graph-generated-tint": "#fbefd6",
+        "--people": "#425490",
+        "--ideas": "#25624b",
+        "--teachings": "#644a80",
+        "--texts": "#25616f",
+        "--history": "#834860",
+        "--genesis": "#435882",
+        "--consequences": "#456c62",
+        "--polemic": "#8d4550",
+        "--context": "#7a633a",
+        "--structure": "#6a547b",
+        "--biography": "#516570"
+      },
+      "dark": {
+        "--graph-desk": "#101318",
+        "--graph-sheet": "#20242b",
+        "--graph-sheet-edge": "#191d23",
+        "--graph-ink": "#e7e6df",
+        "--graph-ink-secondary": "#bfbeb5",
+        "--graph-ink-muted": "#9a9990",
+        "--graph-rule": "#505966",
+        "--graph-selected": "#e9a18d",
+        "--graph-focus": "#a4beef",
+        "--graph-generated": "#e9c67d",
+        "--graph-generated-tint": "#382c15",
+        "--people": "#b1c2f6",
+        "--ideas": "#a0d5bd",
+        "--teachings": "#ceb9e9",
+        "--texts": "#9fd1de",
+        "--history": "#ebb6c9",
+        "--genesis": "#a8bce4",
+        "--consequences": "#a0c8b7",
+        "--polemic": "#dfa5af",
+        "--context": "#cfb887",
+        "--structure": "#c6b1df",
+        "--biography": "#a8bfca"
+      }
+    },
+    "tc01": {
+      "graphBg": "rgba(0, 0, 0, 0)",
+      "graphShadow": "none",
+      "noteBg": "rgba(0, 0, 0, 0)",
+      "noteShadow": "none",
+      "folioBg": "rgb(246, 243, 234)",
+      "folioShadow": "rgba(0, 0, 0, 0.2) 0px 16px 40px 0px",
+      "folioRadius": "3px",
+      "graphBgImage": "none",
+      "noteBorder": "0px",
+      "layers": [
+        "block",
+        "block"
+      ],
+      "decorPE": [
+        "none",
+        "none"
+      ]
+    },
+    "tc03": {
+      "below": true,
+      "gh": 480,
+      "overflow": false,
+      "layers": [
+        "none",
+        "none"
+      ],
+      "compact": true
+    },
+    "sheet-height-1920": {
+      "folioH": 1018,
+      "contentBottom": 910.9,
+      "paddingBottom": "24px",
+      "minHeight": "1018px",
+      "bottomGap": 111.1,
+      "lastChild": "demo-tools"
+    },
+    "contrast": [
+      [
+        "light",
+        "ink",
+        14.41
+      ],
+      [
+        "light",
+        "secondary",
+        7.33
+      ],
+      [
+        "light",
+        "muted",
+        4.73
+      ],
+      [
+        "dark",
+        "ink",
+        12.44
+      ],
+      [
+        "dark",
+        "secondary",
+        8.34
+      ],
+      [
+        "dark",
+        "muted",
+        5.44
+      ],
+      [
+        "light",
+        "genesis",
+        6.4
+      ],
+      [
+        "light",
+        "consequences",
+        5.3
+      ],
+      [
+        "light",
+        "polemic",
+        6.11
+      ],
+      [
+        "light",
+        "context",
+        5.15
+      ],
+      [
+        "light",
+        "structure",
+        5.98
+      ],
+      [
+        "light",
+        "biography",
+        5.49
+      ],
+      [
+        "dark",
+        "genesis",
+        8.14
+      ],
+      [
+        "dark",
+        "consequences",
+        8.48
+      ],
+      [
+        "dark",
+        "polemic",
+        7.52
+      ],
+      [
+        "dark",
+        "context",
+        8.05
+      ],
+      [
+        "dark",
+        "structure",
+        7.98
+      ],
+      [
+        "dark",
+        "biography",
+        8.13
+      ]
+    ],
+    "rendered-colors": [
+      [
+        "light",
+        {
+          "title": "rgb(26, 34, 47)",
+          "nodeName": "rgb(26, 34, 47)",
+          "sheet": "rgb(246, 243, 234)"
+        }
+      ],
+      [
+        "dark",
+        {
+          "title": "rgb(231, 230, 223)",
+          "nodeName": "rgb(231, 230, 223)",
+          "sheet": "rgb(32, 36, 43)"
+        }
+      ]
+    ],
+    "shapes": {
+      "seen": {
+        "people": {
+          "id": "s-0",
+          "w": 48,
+          "h": 60
+        },
+        "ideas": {
+          "id": "s-1",
+          "w": 30,
+          "h": 30
+        },
+        "teachings": {
+          "id": "s-3",
+          "w": 36,
+          "h": 36
+        },
+        "texts": {
+          "id": "s-5",
+          "w": 28,
+          "h": 36
+        },
+        "history": {
+          "id": "s-7",
+          "w": 32,
+          "h": 32
+        }
+      },
+      "unknown": "s-11",
+      "unknownBox": {
+        "path:": {
+          "w": 32,
+          "h": 28
+        }
+      },
+      "sample": [
+        [
+          "s-0",
+          {
+            "label": "Образец 1",
+            "mark": {
+              "ellipse:24": {
+                "w": 48,
+                "h": 60
+              }
+            },
+            "date": "384–322 до н. э.",
+            "cls": "node people",
+            "nameRect": {
+              "w": 105.1221923828125,
+              "h": 15.99603271484375
+            },
+            "font": "20.0909px",
+            "clamp": "3"
+          }
+        ],
+        [
+          "s-1",
+          {
+            "label": "",
+            "mark": {
+              "rect:2": {
+                "w": 30,
+                "h": 30
+              }
+            },
+            "date": "",
+            "cls": "node ideas",
+            "nameRect": null,
+            "font": null,
+            "clamp": null
+          }
+        ],
+        [
+          "s-2",
+          {
+            "label": "",
+            "mark": {
+              "rect:2": {
+                "w": 30,
+                "h": 30
+              }
+            },
+            "date": "",
+            "cls": "node ideas",
+            "nameRect": null,
+            "font": null,
+            "clamp": null
+          }
+        ],
+        [
+          "s-3",
+          {
+            "label": "",
+            "mark": {
+              "path:": {
+                "w": 36,
+                "h": 36
+              }
+            },
+            "date": "",
+            "cls": "node teachings",
+            "nameRect": null,
+            "font": null,
+            "clamp": null
+          }
+        ],
+        [
+          "s-4",
+          {
+            "label": "",
+            "mark": {
+              "path:": {
+                "w": 36,
+                "h": 36
+              }
+            },
+            "date": "",
+            "cls": "node teachings",
+            "nameRect": null,
+            "font": null,
+            "clamp": null
+          }
+        ],
+        [
+          "s-5",
+          {
+            "label": "",
+            "mark": {
+              "path:": {
+                "w": 28,
+                "h": 36
+              }
+            },
+            "date": "",
+            "cls": "node texts",
+            "nameRect": null,
+            "font": null,
+            "clamp": null
+          }
+        ]
+      ]
+    },
+    "tc09": {
+      "a": {
+        "pressed": {
+          "hume": "true",
+          "kant": "false",
+          "descartes": "false",
+          "locke": "false",
+          "reason": "false",
+          "causality": "false",
+          "enquiry": "false",
+          "critique": "false"
+        },
+        "start": [
+          "Начало"
+        ],
+        "startParent": "kant",
+        "ringSel": "visible",
+        "focusRingVisible": "hidden",
+        "selected": {
+          "kind": "node",
+          "id": "hume"
+        },
+        "focus": null
+      },
+      "b": {
+        "focusVisible": true,
+        "fr": "visible",
+        "selected": {
+          "kind": "node",
+          "id": "hume"
+        },
+        "selRing": "visible"
+      }
+    },
+    "tc10": {
+      "edge": {
+        "id": "kant-hume",
+        "subject": "kant",
+        "object": "hume",
+        "type": "influenced_by",
+        "title": "испытал влияние",
+        "titleEn": "was influenced by",
+        "families": [
+          "genesis",
+          "consequences"
+        ],
+        "status": "verified",
+        "qualifiers": {
+          "aspect": "Демонстрационный аспект"
+        },
+        "attributions": [
+          {
+            "who": "Демонстрационный учебник",
+            "kind": "source",
+            "stance": "supports",
+            "place": "§ 1"
+          }
+        ],
+        "evidence": [
+          {
+            "quote": "Демонстрационная цитата: пример того, как источник обосновывает связь.",
+            "link": "#demo-source"
+          }
+        ]
+      },
+      "heading": "Иммануил Кант — испытал влияние — Дэвид Юм",
+      "note": "×\n01 / СВЯЗЬ\nИммануил Кант — испытал влияние — Дэвид Юм\nПроверено\n\nГенезис\n\nУТОЧНЕНИЯ\n\naspect: Демонстрационный аспект\n\nАТРИБУЦИИ\n\nДемонстрационный учебник\n\nДемонстрационная цитата: пример того, как источник обосновывает связь.\n\nДемонстрационная цитата\nОткрыть локальную сноску ↗",
+      "markers": "url(#arrow-genesis)",
+      "dash": "none",
+      "last": {},
+      "first": {},
+      "lastNearHume": 3.60662841796875,
+      "lastNearKant": 114.10287475585938,
+      "firstNearKant": 3.59222412109375,
+      "firstNearHume": 114.10284423828125,
+      "nearestLast": [
+        "hume",
+        3.60662841796875
+      ],
+      "nearestFirst": [
+        "kant",
+        3.59222412109375
+      ],
+      "zoom": 0.8914285714285715,
+      "timeOrder": {
+        "kantYear": 1724,
+        "humeYear": 1711,
+        "kantX": 549.7297297297298,
+        "humeX": 504.05405405405406
+      },
+      "authorPredicate": false
+    },
+    "tc11": {
+      "rows": [
+        {
+          "id": "spec-0",
+          "family": "genesis",
+          "status": "verified",
+          "dash": "none",
+          "marker": "url(#arrow-genesis)",
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-1",
+          "family": "genesis",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-genesis)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-2",
+          "family": "genesis",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-genesis)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-3",
+          "family": "consequences",
+          "status": "verified",
+          "dash": "none",
+          "marker": "url(#arrow-consequences)",
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-4",
+          "family": "consequences",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-consequences)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-5",
+          "family": "consequences",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-consequences)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-6",
+          "family": "polemic",
+          "status": "verified",
+          "dash": "none",
+          "marker": "url(#arrow-polemic)",
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-7",
+          "family": "polemic",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-polemic)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-8",
+          "family": "polemic",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-polemic)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-9",
+          "family": "context",
+          "status": "verified",
+          "dash": "none",
+          "marker": null,
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-10",
+          "family": "context",
+          "status": "sourced",
+          "dash": "none",
+          "marker": null,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-11",
+          "family": "context",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": null,
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-12",
+          "family": "structure",
+          "status": "verified",
+          "dash": "none",
+          "marker": "url(#arrow-structure)",
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-13",
+          "family": "structure",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-structure)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-14",
+          "family": "structure",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-structure)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-15",
+          "family": "biography",
+          "status": "verified",
+          "dash": "none",
+          "marker": "url(#arrow-biography)",
+          "sym": "m-4 0 3 3 5-6",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-16",
+          "family": "biography",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-biography)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-17",
+          "family": "biography",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-biography)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-parallel",
+          "family": "genesis",
+          "status": "generated",
+          "dash": "5px, 4px",
+          "marker": "url(#arrow-genesis)",
+          "sym": "M0 -5 5 0 0 5 -5 0Z",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        },
+        {
+          "id": "spec-loop",
+          "family": "structure",
+          "status": "sourced",
+          "dash": "none",
+          "marker": "url(#arrow-structure)",
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7",
+          "markBox": {
+            "w": 16,
+            "h": 16
+          }
+        }
+      ],
+      "combo": {
+        "genesis:verified": 1,
+        "genesis:sourced": 1,
+        "genesis:generated": 1,
+        "consequences:verified": 1,
+        "consequences:sourced": 1,
+        "consequences:generated": 1,
+        "polemic:verified": 1,
+        "polemic:sourced": 1,
+        "polemic:generated": 1,
+        "context:verified": 1,
+        "context:sourced": 1,
+        "context:generated": 1,
+        "structure:verified": 1,
+        "structure:sourced": 1,
+        "structure:generated": 1,
+        "biography:verified": 1,
+        "biography:sourced": 1,
+        "biography:generated": 1
+      },
+      "count": 20
+    },
+    "tc11_mark_sizes": [
+      [
+        16,
+        16
+      ]
+    ],
+    "tc12": {
+      "loop": {
+        "id": "spec-loop",
+        "family": "structure",
+        "status": "sourced",
+        "marker": "url(#arrow-structure)",
+        "stroke": "rgb(106, 84, 123)",
+        "points": [
+          {
+            "x": 842,
+            "y": 90
+          },
+          {
+            "x": 892,
+            "y": 90
+          },
+          {
+            "x": 892,
+            "y": 14
+          },
+          {
+            "x": 820,
+            "y": 14
+          },
+          {
+            "x": 820,
+            "y": 68
+          }
+        ],
+        "totalLength": 236.17591857910156
+      },
+      "parallel": [
+        {
+          "id": "spec-0",
+          "family": "genesis",
+          "status": "verified",
+          "marker": "url(#arrow-genesis)",
+          "stroke": "rgb(67, 88, 130)",
+          "points": [
+            {
+              "x": 120.1,
+              "y": 90
+            },
+            {
+              "x": 276,
+              "y": 90
+            }
+          ],
+          "totalLength": 155.89999389648438
+        },
+        {
+          "id": "spec-parallel",
+          "family": "genesis",
+          "status": "generated",
+          "marker": "url(#arrow-genesis)",
+          "stroke": "rgb(67, 88, 130)",
+          "points": [
+            {
+              "x": 120.1,
+              "y": 74
+            },
+            {
+              "x": 276,
+              "y": 74
+            }
+          ],
+          "totalLength": 155.89999389648438
+        }
+      ],
+      "families": [
+        "genesis",
+        "consequences",
+        "polemic",
+        "context",
+        "structure",
+        "biography"
+      ],
+      "loop_w": 72,
+      "loop_h": 76,
+      "par_dy": 16
+    },
+    "tc13": {
+      "overlaps": [],
+      "labelSign": [],
+      "edgeLabel": [],
+      "edgeLabelForeign": [],
+      "edgeSign": [],
+      "minEdgeLabel": 8.6,
+      "labels": 8,
+      "signs": 8,
+      "edges": 10
+    },
+    "tc14": {
+      "nodes": 16,
+      "clusters": 2,
+      "edgeCount": 17,
+      "marks": [
+        {
+          "status": "sourced",
+          "w": 16,
+          "h": 16,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        },
+        {
+          "status": "sourced",
+          "w": 16,
+          "h": 16,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        },
+        {
+          "status": "sourced",
+          "w": 16,
+          "h": 16,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        },
+        {
+          "status": "sourced",
+          "w": 16,
+          "h": 16,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        },
+        {
+          "status": "sourced",
+          "w": 16,
+          "h": 16,
+          "sym": "M0-3Q-3-5-5-3v7q3-2 5 0 2-2 5 0v-7q-2-2-5 0v7"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        },
+        {
+          "status": "generated",
+          "w": 16,
+          "h": 16,
+          "sym": "M0 -5 5 0 0 5 -5 0Z"
+        },
+        {
+          "status": "verified",
+          "w": 16,
+          "h": 16,
+          "sym": "m-4 0 3 3 5-6"
+        }
+      ],
+      "noteHasIndex": true,
+      "listBtn": true,
+      "clusterTexts": [
+        "Группа связей 216 узлов · Раскрыть✓ 5 · ▤ 6 · ◇ 5",
+        "Группа связей 316 узлов · Раскрыть✓ 5 · ▤ 6 · ◇ 5"
+      ],
+      "zoom": 0.5
+    },
+    "cluster-text": {
+      "zoom": 0.5,
+      "title": 8,
+      "count": 6,
+      "countStatus": 6,
+      "texts": [
+        "16 узлов · Раскрыть",
+        "✓ 5 · ▤ 6 · ◇ 5",
+        "16 узлов · Раскрыть",
+        "✓ 5 · ▤ 6 · ◇ 5"
+      ]
+    },
+    "tc14b": {
+      "fs": 24,
+      "screen": 12,
+      "clamp": "3",
+      "present": true,
+      "zoom": 0.5
+    },
+    "tc15": {
+      "before": {
+        "nodes": 16,
+        "clusters": 2,
+        "start": "d-0",
+        "selected": {
+          "kind": "node",
+          "id": "d-0"
+        },
+        "startMark": "d-0"
+      },
+      "after": {
+        "nodes": 32,
+        "clusters": 1,
+        "start": "d-0",
+        "selected": {
+          "kind": "node",
+          "id": "d-0"
+        },
+        "startMark": "d-0",
+        "summary": "32 узлов · 33 связей · 1 группы"
+      }
+    },
+    "tab-order": [
+      "node-kant|Иммануил Кант · Люди",
+      "node-descartes|Рене Декарт · Люди",
+      "node-locke|Джон Локк · Люди",
+      "node-hume|Дэвид Юм · Люди",
+      "node-reason|Разум · Понятия",
+      "node-causality|Причинность · Понятия",
+      "node-enquiry|Исследование о человеческом познании · Произведения",
+      "node-critique|Критика чистого разума · Произведения",
+      "zoom-out|Уменьшить масштаб",
+      "zoom-in|Увеличить масштаб",
+      "fit|Вписать",
+      "close-note|Снять выбор",
+      "restart-node|Сделать началом ↗",
+      "BUTTON|испытало влияние — Имман",
+      "BUTTON|испытало влияние — Иссле",
+      "A|Материалы и лицензии ↗",
+      "scenario|Демонстрационное состояние",
+      "BODY|φ PhiloGraph\n Читать\n Ат",
+      "BUTTON|Граф",
+      "language|Переключить язык",
+      "theme|Переключить тему",
+      "pin|Закрепить навигацию"
+    ],
+    "keyboard": {
+      "search": {
+        "selected": {
+          "kind": "node",
+          "id": "locke"
+        },
+        "heading": "Джон Локк"
+      },
+      "selected": {
+        "selected": {
+          "kind": "node",
+          "id": "hume"
+        },
+        "pressed": "true"
+      },
+      "escape": {
+        "active": "node-hume",
+        "selected": null,
+        "focus": "hume",
+        "focusVisible": true,
+        "ring": "visible",
+        "note": "×\n01 / ЛЮДИ\nДэвид Юм\n\n1711–1776\n\nУзел те"
+      },
+      "restart": {
+        "start": "hume",
+        "title": "Дэвид Юм",
+        "startMark": "hume"
+      }
+    },
+    "tc19": {
+      "long": {
+        "id": "s-4",
+        "text": "ОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятия",
+        "len": 150,
+        "aria": "ОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятия · Учения",
+        "fontSize": "20.0909px",
+        "lineHeight": "26.7879px",
+        "clamp": "3",
+        "overflow": "hidden",
+        "clientH": 80,
+        "scrollH": 323,
+        "rect": {
+          "w": 105.1,
+          "h": 48
+        },
+        "zoom": 0.5972850678733032,
+        "labelWidth": "176"
+      },
+      "note": {
+        "heading": "ОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятияОченьдлинноенеразрывноеназваниефилософскогопонятия",
+        "headingLen": 150,
+        "clipped": false,
+        "width": 256,
+        "noteClipped": false
+      },
+      "dates": {
+        "nullDate": 2,
+        "bce": [
+          "384–322 до н. э."
+        ]
+      },
+      "en": {
+        "aria": "Specimen 1 · People",
+        "date": "384–322 до н. э.",
+        "note": "Specimen 3",
+        "clamp": "3"
+      },
+      "lines": 2.9864229745519433
+    },
+    "filtered-overlay": {
+      "overlaps": [
+        "kant"
+      ],
+      "bg": "rgba(0, 0, 0, 0)",
+      "rect": {
+        "x": 445.2,
+        "y": 442.6,
+        "w": 317.6,
+        "h": 104
+      }
+    },
+    "tc20": {
+      "states": {
+        "loading": {
+          "notice": "Загружаем сохранённые связи…",
+          "empty": "Загружаем сохранённые связи…",
+          "nodes": 0,
+          "edges": 0,
+          "buttons": [],
+          "summary": "0 узлов · 0 связей"
+        },
+        "extending": {
+          "notice": "Достраиваем связи…",
+          "empty": "",
+          "nodes": 8,
+          "edges": 10,
+          "buttons": [],
+          "summary": "8 узлов · 10 связей"
+        },
+        "off": {
+          "notice": "Достройка выключена",
+          "empty": "",
+          "nodes": 8,
+          "edges": 10,
+          "buttons": [],
+          "summary": "8 узлов · 10 связей"
+        },
+        "unavailable": {
+          "notice": "Достройка временно недоступна. Сохранённые связи показаны.\nПовторить",
+          "empty": "",
+          "nodes": 8,
+          "edges": 10,
+          "buttons": [
+            "Повторить"
+          ],
+          "summary": "8 узлов · 10 связей"
+        },
+        "error": {
+          "notice": "Не удалось загрузить граф. Параметры сохранены.\nПовторить",
+          "empty": "Не удалось загрузить граф. Параметры сохранены.",
+          "nodes": 0,
+          "edges": 0,
+          "buttons": [
+            "Повторить"
+          ],
+          "summary": "0 узлов · 0 связей"
+        },
+        "empty": {
+          "notice": "Связей пока нет\nСбросить фильтры",
+          "empty": "",
+          "nodes": 1,
+          "edges": 0,
+          "buttons": [
+            "Сбросить фильтры"
+          ],
+          "summary": "1 узлов · 0 связей"
+        },
+        "filtered": {
+          "notice": "Нет связей с этими фильтрами\nСбросить фильтры",
+          "empty": "Нет связей с этими фильтрами",
+          "nodes": 0,
+          "edges": 0,
+          "buttons": [
+            "Сбросить фильтры"
+          ],
+          "summary": "0 узлов · 0 связей"
+        },
+        "limited": {
+          "notice": "Показана часть графа. Раскройте конкретный узел.\nРаскрыть узел",
+          "empty": "",
+          "nodes": 8,
+          "edges": 10,
+          "buttons": [
+            "Раскрыть узел"
+          ],
+          "summary": "8 узлов · 10 связей"
+        }
+      },
+      "filterAllRelations": {
+        "edges": 0,
+        "nodes": 8,
+        "empty": "Нет связей с этими фильтрами\n\nСбросить фильтры",
+        "count": "6",
+        "overlayVisible": true
+      },
+      "afterReset": {
+        "edges": 10,
+        "nodes": 8,
+        "empty": true,
+        "uncheckedBoxes": [
+          "genesis",
+          "consequences",
+          "polemic",
+          "context",
+          "structure",
+          "biography"
+        ],
+        "filterCount": "",
+        "panelOpen": false
+      }
+    },
+    "ec": {
+      "operatorActions": [],
+      "rootGraphToken": "",
+      "appToken": "#302e2a",
+      "bodyBg": "rgba(0, 0, 0, 0)",
+      "bodyMargin": "0px",
+      "htmlInline": ""
+    },
+    "routes": {
+      "edges": [
+        {
+          "id": "kant-hume",
+          "family": "genesis",
+          "status": "verified",
+          "len": 297.2,
+          "axisShare": 0.825,
+          "corners": 4
+        },
+        {
+          "id": "hume-locke",
+          "family": "genesis",
+          "status": "sourced",
+          "len": 374.3,
+          "axisShare": 0.958,
+          "corners": 1
+        },
+        {
+          "id": "locke-descartes",
+          "family": "genesis",
+          "status": "verified",
+          "len": 219.8,
+          "axisShare": 0.917,
+          "corners": 2
+        },
+        {
+          "id": "reason-descartes",
+          "family": "genesis",
+          "status": "generated",
+          "len": 519,
+          "axisShare": 0.85,
+          "corners": 5
+        },
+        {
+          "id": "kant-reason",
+          "family": "genesis",
+          "status": "sourced",
+          "len": 418.4,
+          "axisShare": 0.883,
+          "corners": 3
+        },
+        {
+          "id": "kant-critique",
+          "family": "genesis",
+          "status": "verified",
+          "len": 300.5,
+          "axisShare": 0.892,
+          "corners": 4
+        },
+        {
+          "id": "enquiry-hume",
+          "family": "genesis",
+          "status": "sourced",
+          "len": 436.6,
+          "axisShare": 0.8,
+          "corners": 6
+        },
+        {
+          "id": "causality-hume",
+          "family": "genesis",
+          "status": "generated",
+          "len": 437.9,
+          "axisShare": 0.942,
+          "corners": 3
+        },
+        {
+          "id": "critique-enquiry",
+          "family": "genesis",
+          "status": "verified",
+          "len": 390.6,
+          "axisShare": 0.958,
+          "corners": 1
+        },
+        {
+          "id": "kant-causality",
+          "family": "genesis",
+          "status": "generated",
+          "len": 499.1,
+          "axisShare": 0.917,
+          "corners": 3
+        }
+      ],
+      "sharedChannels": [
+        {
+          "a": "kant-hume",
+          "b": "kant-critique",
+          "vert": false,
+          "c": 197.7,
+          "ov": 23.4
+        },
+        {
+          "a": "kant-hume",
+          "b": "enquiry-hume",
+          "vert": true,
+          "c": 606.1,
+          "ov": 70.7
+        },
+        {
+          "a": "locke-descartes",
+          "b": "reason-descartes",
+          "vert": false,
+          "c": 127,
+          "ov": 70.5
+        },
+        {
+          "a": "kant-critique",
+          "b": "critique-enquiry",
+          "vert": false,
+          "c": 100,
+          "ov": 79.9
+        },
+        {
+          "a": "kant-critique",
+          "b": "enquiry-hume",
+          "vert": true,
+          "c": 606.1,
+          "ov": 70.7
+        }
+      ],
+      "markerForeign": [
+        [
+          "locke-descartes",
+          "reason-descartes",
+          1.3
+        ],
+        [
+          "kant-critique",
+          "critique-enquiry",
+          1
+        ],
+        [
+          "critique-enquiry",
+          "kant-causality",
+          0.4
+        ]
+      ],
+      "zoom": 0.8914285714285715
+    },
+    "evidence": [
+      {
+        "w": 1440,
+        "theme": "light",
+        "lang": "ru",
+        "appliedTheme": "light",
+        "sheet": "rgb(246, 243, 234)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1440.png"
+      },
+      {
+        "w": 1440,
+        "theme": "light",
+        "lang": "en",
+        "appliedTheme": "light",
+        "sheet": "rgb(246, 243, 234)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1440.png"
+      },
+      {
+        "w": 1440,
+        "theme": "dark",
+        "lang": "ru",
+        "appliedTheme": "dark",
+        "sheet": "rgb(32, 36, 43)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1440.png"
+      },
+      {
+        "w": 1440,
+        "theme": "dark",
+        "lang": "en",
+        "appliedTheme": "dark",
+        "sheet": "rgb(32, 36, 43)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1440.png"
+      },
+      {
+        "w": 1024,
+        "theme": "light",
+        "lang": "ru",
+        "appliedTheme": "light",
+        "sheet": "rgb(246, 243, 234)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1024.png"
+      },
+      {
+        "w": 1024,
+        "theme": "light",
+        "lang": "en",
+        "appliedTheme": "light",
+        "sheet": "rgb(246, 243, 234)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1024.png"
+      },
+      {
+        "w": 1024,
+        "theme": "dark",
+        "lang": "ru",
+        "appliedTheme": "dark",
+        "sheet": "rgb(32, 36, 43)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1024.png"
+      },
+      {
+        "w": 1024,
+        "theme": "dark",
+        "lang": "en",
+        "appliedTheme": "dark",
+        "sheet": "rgb(32, 36, 43)",
+        "overflow": false,
+        "shot": "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1024.png"
+      }
+    ]
+  },
+  "browser": {
+    "console": [
+      "error: Failed to load resource: net::ERR_FILE_NOT_FOUND"
+    ],
+    "errors": [],
+    "failed": [
+      "file:///C:/Users/Ivano/Desktop/ai-philosophy-platform/ai-history-of-philosophy-platform/docs/design/system/previews/graph-f02/assets/__missing__.jpg :: net::ERR_FILE_NOT_FOUND"
+    ],
+    "externalRequests": []
+  },
+  "screenshots": [
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1024.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-en-1440.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1024.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-dark-ru-1440.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1024.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-en-1440.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1024.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-genesis-light-ru-1440.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-keyboard-focus.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-layout-1280-pinned-False.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-layout-1280-pinned-True.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-layout-1920.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-selected-edge.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F1-selected-nonstart-node.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F2-specimen-dark.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F2-specimen-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-expanded-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-overview-dark.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/F3-dense-overview-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-edge-under-label-descartes.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-edge-under-label-hume.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-merged-channels-crop.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-merged-channels-kant-focus.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-route-grid-full.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-route-grid-kant-hume.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/GD-10-route-kant-hume-crop.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/ISO-01-loaded.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-01-single-sheet.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-03-1024x768.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-04-1280-pinned-False.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-04-1280-pinned-True.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-05-1920x1080.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-06-palette-dark.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-06-palette-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-07-grayscale-no-texture.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-08-specimens-shapes.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-09-independent-focus.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-09-selected-node.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-10-edge-arrow-closeup.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-10-selected-edge-kant-hume.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-dark.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-11-specimens-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-12-families-relations.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-dark.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-overview-light.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-14-dense-selected-label.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-15-dense-expanded.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-16-after-fit.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-16-minimap-visible.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-focus-after-escape.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-make-start.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-17-search-enter.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-18-edge-note.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-en-locale.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-long-name-network.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-19-long-name-note.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-after-reset.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-filtered-by-real-filters.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-empty.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-error.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-extending.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-filtered.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-limited.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-loading.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-off.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-20-state-unavailable.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-21-reduced-motion.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-22-zoom200-bottom.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-22-zoom200-top.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-23a-drag-and-dblclick.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-24-portrait-failure.png",
+    "docs/design/features/graph-page-qa/screenshots/round-1/TC-25-honest-data.png"
+  ]
+}
