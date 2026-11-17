@@ -194,7 +194,7 @@
     }
   ],
   "errors": [],
-  "screenshots": 29,
+  "screenshots": 33,
   "not_tested": [
     "TC-22 real browser zoom 200%",
     "TC-23b streaming API (not applicable)",
