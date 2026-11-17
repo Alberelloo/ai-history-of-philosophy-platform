@@ -3,14 +3,14 @@
    (влияния — киноварный поток, труды — бирюзовая нить, эпоха — подсветка без линий). */
 (function(){
   const NS='http://www.w3.org/2000/svg';
-  const W=1160,PLOT_L=150,PLOT_R=W-26,TOP=28,BODY=492,AXIS_H=46,COLL=22;
+  const W=1160,PLOT_L=150,PLOT_R=W-26,TOP=28,BODY=500,AXIS_H=50,COLL=28;
   const Y0=1580,Y1=1812,X=y=>PLOT_L+(y-Y0)/(Y1-Y0)*(PLOT_R-PLOT_L);
   const ORDER=['events','eras','people','works'];
   const META={
     events:{label:'События',w:.10,max:90,count:'3 события'},
     eras:{label:'Эпохи',w:.11,max:80,count:'2 эпохи'},
-    people:{label:'Люди',w:.55,max:9999,count:'5 философов'},
-    works:{label:'Труды',w:.24,max:200,count:'4 труда'},
+    people:{label:'Люди',w:.52,max:9999,count:'5 философов'},
+    works:{label:'Труды',w:.27,max:210,count:'4 труда'},
   };
   const state={sel:'kant',on:{events:false,eras:true,people:true,works:true}};
 
@@ -33,7 +33,7 @@
   const eras=[{label:'Научная революция',from:1600,to:1687},{label:'Просвещение',from:1687,to:1804}];
   const events=[{year:1687,label:'«Начала» Ньютона'},{year:1751,label:'Энциклопедия'},{year:1789,label:'Французская революция'}];
 
-  const RX=19,RY=23,BAND=20;
+  const RX=22,RY=27,BAND=24;
   const S=(t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e;};
   const cub=(P,t)=>{const u=1-t;return{x:u*u*u*P[0].x+3*u*u*t*P[1].x+3*u*t*t*P[2].x+t*t*t*P[3].x,y:u*u*u*P[0].y+3*u*u*t*P[1].y+3*u*t*t*P[2].y+t*t*t*P[3].y};};
   const tan=(P,t)=>{const u=1-t;return{x:3*u*u*(P[1].x-P[0].x)+6*u*t*(P[2].x-P[1].x)+3*t*t*(P[3].x-P[2].x),y:3*u*u*(P[1].y-P[0].y)+6*u*t*(P[2].y-P[1].y)+3*t*t*(P[3].y-P[2].y)};};
@@ -78,7 +78,7 @@
     /* сетка времени и границы страт */
     for(let y=1600;y<=1800;y+=25){const x=X(y);L.grid.append(S('line',{x1:x,y1:TOP,x2:x,y2:bands.works.bot,class:'time-grid'}));}
     ORDER.forEach(k=>{const b=bands[k];L.bands.append(S('line',{x1:PLOT_L-6,y1:b.top,x2:PLOT_R,y2:b.top,class:'band-sep'}));
-      if(b.collapsed)L.bands.append(S('text',{x:PLOT_L+4,y:b.top+15,class:'collapsed-note'},`${b.count} · линза свёрнута`));});
+      if(b.collapsed)L.bands.append(S('text',{x:PLOT_L+4,y:b.top+18,class:'collapsed-note'},`${b.count} · линза свёрнута`));});
 
     /* люди: геометрия заранее (нужна эпохам и связям) */
     const bp=bands.people,LANES=Math.max(...people.map(p=>p.lane))+1;
@@ -107,26 +107,28 @@
     if(bp.collapsed){people.forEach(p=>L.people.append(S('rect',{x:p.bx,y:bp.top+COLL-7,width:p.dx-p.bx,height:3,rx:1.5,fill:'var(--people)',opacity:.35})));}
     else people.forEach(p=>{
       const sel=p.id===state.sel,on=!R||R.people.has(p.id);
-      const g=S('g',{class:'person'+(isDim(on)?' dim':''),'data-person':p.id,tabindex:0,role:'button','aria-pressed':String(sel),'aria-label':`${p.name}, ${p.birth}–${p.death}`});
-      g.append(S('rect',{x:p.bx,y:p.y-BAND/2,width:p.dx-p.bx,height:BAND,rx:BAND/2,fill:'var(--people)','fill-opacity':sel?.2:.12}));
-      g.append(S('path',{d:`M${p.bx+RX} ${p.y+BAND/2-.5} H${p.dx-BAND/2}`,stroke:'var(--people)','stroke-opacity':sel?.45:.28,'stroke-width':1}));
-      const name=S('text',{x:p.bx+RX+8,y:p.y+4.6,class:sel?'sel-name':'person-name'},p.name);g.append(name);
-      const yrIn=p.dx+74>W-4;g.append(S('text',{x:yrIn?p.dx-12:p.dx+7,y:p.y+4,class:'person-years','text-anchor':yrIn?'end':'start'},`${p.birth}–${p.death}`));
-      if(sel)g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+4,ry:RY+4,fill:'none',stroke:'var(--graph-selected)','stroke-width':1.8,'stroke-opacity':.85,filter:'url(#glow)'}));
-      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+7,ry:RY+7,class:'focus-ring'}));
+      const g=S('g',{class:'person'+(isDim(on)?' dim':''),'data-person':p.id,tabindex:0,role:'button','aria-pressed':String(sel),'aria-label':`${p.name}, ${p.birth}–${p.death}`});L.people.append(g);
+      g.append(S('rect',{x:p.bx,y:p.y-BAND/2,width:p.dx-p.bx,height:BAND,rx:BAND/2,fill:sel?'var(--graph-selected)':'var(--graph-ink-secondary)','fill-opacity':sel?.12:.1}));
+      g.append(S('path',{d:`M${p.bx+RX} ${p.y+BAND/2-.5} H${p.dx-BAND/2}`,stroke:sel?'var(--graph-selected)':'var(--graph-ink-secondary)','stroke-opacity':sel?.45:.25,'stroke-width':1}));
+      const name=S('text',{x:p.bx+RX+8,y:p.y+5.4,class:sel?'sel-name':'person-name'},p.name);g.append(name);
+      const yr=S('text',{x:p.dx+7,y:p.y+4.5,class:'person-years'},`${p.birth}–${p.death}`);g.append(yr);if(p.dx+7+yr.getComputedTextLength()>W-4){yr.setAttribute('x',p.dx-12);yr.setAttribute('text-anchor','end');}
+      if(sel)g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+6,ry:RY+6,fill:'none',stroke:'var(--graph-selected)','stroke-width':1.8,'stroke-opacity':.85,filter:'url(#glow)'}));
+      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+9,ry:RY+9,class:'focus-ring'}));
       const cp=S('clipPath',{id:'clip-'+p.id});cp.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY}));defs.append(cp);
+      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+3.5,ry:RY+3.5,fill:'var(--graph-sheet)',stroke:'var(--graph-ink-secondary)','stroke-opacity':.35,'stroke-width':.7}));
       g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,class:'medallion-ring'}));
       if(p.portrait){g.append(S('image',{href:'../graph-f02/assets/'+p.portrait,x:p.bx-RX,y:p.y-RY,width:RX*2,height:RY*2,preserveAspectRatio:'xMidYMid slice','clip-path':`url(#clip-${p.id})`,filter:'url(#duo)'}));
-                     g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,fill:'none',stroke:'var(--people)','stroke-width':1.2}));}
-      else g.append(S('text',{x:p.bx,y:p.y+6,class:'monogram'},p.mono));
-      L.people.append(g);p.labelEnd=p.bx+RX+8+name.getComputedTextLength();
+                     g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,fill:'none',stroke:'var(--graph-ink-secondary)','stroke-opacity':.8,'stroke-width':1.1}));}
+      else g.append(S('text',{x:p.bx,y:p.y+7,class:'monogram'},p.mono));
+      p.labelEnd=p.bx+RX+8+name.getComputedTextLength();
     });
 
     /* влияния: от года труда учителя к ленте ученика */
     const mids={};
     if(!bp.collapsed)influences.forEach((e,i)=>{
       const s=byId[e.a],t=byId[e.b],act=!!(R&&R.edges.has(e.a+'-'+e.b));
-      const A={x:Math.min(Math.max(X(e.via),s.labelEnd+10),s.dx-8),y:s.y+BAND/2},B={x:Math.min(Math.max(X(t.birth+22),t.labelEnd+14),t.dx-10),y:t.y-BAND/2};
+      const A={x:Math.min(Math.max(X(e.via),s.labelEnd+10),s.dx-8),y:s.y+BAND/2},bx0=Math.max(X(t.birth+22),t.labelEnd+14);
+      const B=bx0>t.dx-8?{x:t.dx-3,y:t.y-BAND/2+5}:{x:bx0,y:t.y-BAND/2};
       const dx=B.x-A.x,dy=B.y-A.y,P=[A,{x:A.x+dx*.5,y:A.y+dy*.15},{x:B.x-dx*.15,y:B.y-dy*.65},B];mids[e.a+'-'+e.b]=cub(P,.5);
       const d=`M${A.x},${A.y} C${P[1].x},${P[1].y} ${P[2].x},${P[2].y} ${B.x},${B.y}`;
       if(R&&!act){L.threads.append(S('path',{d,fill:'none',stroke:'var(--graph-ink-muted)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'2 3','stroke-linecap':'round'}));return;}
@@ -151,12 +153,12 @@
           g.append(S('rect',{x:x-9,y:my-11,width:4.5,height:22,rx:1.2,fill:'var(--texts)','fill-opacity':.55}));
           g.append(S('path',{d:`M${x-1} ${my-4} h6 M${x-1} ${my} h6`,stroke:'var(--texts)','stroke-width':1,'stroke-opacity':.8}));}
         else{g.append(S('path',{d:`M${x} ${my-10} L${x+10} ${my} L${x} ${my+10} L${x-10} ${my} Z`,class:'concept-mark'}));g.append(S('circle',{cx:x,cy:my,r:2,fill:'var(--ideas)'}));}
-        g.append(act?S('text',{x:x+25,y:my+4,class:'work-year','text-anchor':'start'},it.year):S('text',{x,y:my-21,class:'work-year','text-anchor':'middle'},it.year));
+        g.append(act?S('text',{x:x+25,y:my+4,class:'work-year','text-anchor':'start'},it.year):S('text',{x,y:my-22,class:'work-year','text-anchor':'middle'},it.year));
         const t=S('text',{x,class:act?'work-active-title':(it.kind==='work'?'work-title':'concept-title'),'text-anchor':'middle'});g.append(t);L.works.append(g);
-        const lines=[''];it.title.split(' ').forEach(w=>{const c=(lines[lines.length-1]+' '+w).trim();t.textContent=c;if(t.getComputedTextLength()>150&&lines[lines.length-1])lines.push(w);else lines[lines.length-1]=c;});
-        t.textContent='';lines.forEach((ln,k)=>t.append(S('tspan',{x,dy:k?13:0},ln)));
+        const lines=[''];it.title.split(' ').forEach(w=>{const c=(lines[lines.length-1]+' '+w).trim();t.textContent=c;if(t.getComputedTextLength()>170&&lines[lines.length-1])lines.push(w);else lines[lines.length-1]=c;});
+        t.textContent='';lines.forEach((ln,k)=>t.append(S('tspan',{x,dy:k?15:0},ln)));
         const w2=t.getBBox().width,x0=x-w2/2-6,x1=x+w2/2+6,row=rows[0].every(([a,b])=>x1<a||x0>b)?0:1;rows[row].push([x0,x1]);
-        t.setAttribute('y',my+28+row*34);t.firstChild.setAttribute('y',my+28+row*34);it.titleBox=t;
+        t.setAttribute('y',my+30+row*38);t.firstChild.setAttribute('y',my+30+row*38);it.titleBox=t;
         if(act){L.works.insertBefore(S('circle',{cx:x,cy:my,r:15.5,fill:'none',stroke:'var(--texts)','stroke-width':1.8,'stroke-opacity':.5,filter:'url(#glow)'}),g);
           if(!bp.collapsed){const au=byId[it.author],A={x:Math.min(Math.max(x-28,au.labelEnd+10),au.dx-10),y:au.y+BAND/2},B={x,y:my-13};
             L.threads.append(S('path',{d:`M${A.x},${A.y} C${A.x},${A.y+22} ${B.x},${B.y-22} ${B.x},${B.y}`,fill:'none',stroke:'var(--texts)','stroke-width':1.5,'stroke-opacity':.85,'stroke-dasharray':'1 4','stroke-linecap':'round',filter:'url(#glow)'}));}}
@@ -167,7 +169,7 @@
     L.axis.append(S('line',{x1:PLOT_L-6,y1:ay,x2:PLOT_R,y2:ay,stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));
     L.axis.append(S('line',{x1:X(1600),y1:ay+5,x2:X(1800),y2:ay+5,stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));
     for(let y=1600,k=0;y<1800;y+=25,k++)if(k%2===0)L.axis.append(S('rect',{x:X(y),y:ay,width:X(y+25)-X(y),height:5,fill:'var(--graph-ink)','fill-opacity':.5}));
-    for(let y=1600;y<=1800;y+=25){const x=X(y),maj=y%50===0;L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+(maj?9:5),stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));if(maj)L.axis.append(S('text',{x,y:ay+24,class:'axis-year'},y));}
+    for(let y=1600;y<=1800;y+=25){const x=X(y),maj=y%50===0;L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+(maj?9:5),stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));if(maj)L.axis.append(S('text',{x,y:ay+27,class:'axis-year'},y));}
 
     /* рукописные пометки философа */
     const hand=(x,y,s,txt,rot,anchor)=>L.notes.append(S('text',{x,y,class:'hand','font-size':s,'text-anchor':anchor||'start',transform:`rotate(${rot} ${x} ${y})`},txt));

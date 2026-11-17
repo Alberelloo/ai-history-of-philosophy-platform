@@ -137,3 +137,18 @@
 .legend svg{height:12px;width:auto}
 .legend-title{font:italic 600 12px Literata,Georgia,serif;color:var(--graph-ink)}
 .edition-note{font-size:11px;color:var(--graph-ink-muted)}
+/* Прогон 4: масштаб текста графа, камеи, компактные тогглы */
+.scene .person-name{font:600 16px Literata,Georgia,serif}
+.scene .sel-name{font:700 17px Literata,Georgia,serif;fill:#6e2416}
+.scene .person-years{font:400 12.5px Onest,Arial,sans-serif}
+.scene .monogram{font:500 19px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.scene .medallion-ring{fill:#efe4c8;stroke:var(--graph-ink-secondary);stroke-opacity:.8;stroke-width:1.1}
+.scene .work-title,.scene .concept-title{font-size:13px}
+.scene .work-active-title{font-size:13.5px}
+.scene .work-year{font-size:11.5px}
+.scene .era-text{font-size:14px}
+.scene .axis-year{font-size:13.5px}
+.scene .event-year{font-size:12.5px}
+.scene .event-text{font-size:13px}
+.collapsed-note{font-size:12.5px}
+.lens-toggle{min-height:22px;padding:2px 6px 2px 2px;transform:translateY(3px)}
