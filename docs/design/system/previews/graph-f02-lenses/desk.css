@@ -96,3 +96,5 @@
 .scene .concept-title{font-style:normal}
 .scene .work-active-title{font:italic 600 12px Literata,Georgia,serif;fill:var(--texts)}
 .chart-notes{display:none}
+/* Прогон 2: эпоха выбранного — подсветка без линий */
+.scene .era-text.era-active{fill:var(--context);font-weight:600}

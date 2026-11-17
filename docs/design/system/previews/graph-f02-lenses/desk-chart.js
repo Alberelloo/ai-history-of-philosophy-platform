@@ -21,8 +21,9 @@
   ];
   const chain=new Set(['descartes','locke','hume','kant']);
   const influences=[
-    {a:'descartes',b:'locke',active:true},{a:'locke',b:'hume',active:true},
-    {a:'hume',b:'kant',active:true},{a:'descartes',b:'spinoza',active:false},
+    // via — год ключевого труда учителя: влияние идёт через труды, а не в момент смерти
+    {a:'descartes',b:'locke',via:1637,active:true},{a:'locke',b:'hume',via:1690,active:true},
+    {a:'hume',b:'kant',via:1748,active:true},{a:'descartes',b:'spinoza',via:1641,active:false},
   ];
   const works=[
     {id:'essay',title:'Опыт о человеческом разумении',year:1690,author:'locke',kind:'work'},
@@ -95,21 +96,34 @@
   const ribbon=(P,w0,w1,N=28)=>{const a=[],b=[];for(let i=0;i<=N;i++){const t=i/N,p=cub(P,t),d=tan(P,t),l=Math.hypot(d.x,d.y)||1,nx=-d.y/l,ny=d.x/l,w=(w0*(1-t)+w1*t)/2;a.push(`${(p.x+nx*w).toFixed(1)},${(p.y+ny*w).toFixed(1)}`);b.unshift(`${(p.x-nx*w).toFixed(1)},${(p.y-ny*w).toFixed(1)}`);}return 'M'+a.join(' L')+' L'+b.join(' L')+' Z';};
   window.deskLayout={people:byId,threads:{}};
   influences.forEach((e,i)=>{
-    const s=byId[e.a],t=byId[e.b],recv=t.birth+20;
-    const xs=X(Math.min(s.death,Math.max(recv,s.birth+12)));
-    const xt=Math.max(X(Math.max(recv,t.birth)),t.labelEnd+14);
-    const A={x:Math.min(xs,s.dx-6),y:s.y+BAND/2},B={x:xt,y:t.y-BAND/2},dy=B.y-A.y;
-    const P=[A,{x:A.x+(B.x-A.x)*.12,y:A.y+dy*.6},{x:B.x-(B.x-A.x)*.12,y:B.y-dy*.6},B];
+    const s=byId[e.a],t=byId[e.b];
+    const A={x:Math.min(Math.max(X(e.via),s.labelEnd+10),s.dx-8),y:s.y+BAND/2};
+    const B={x:Math.min(Math.max(X(t.birth+22),t.labelEnd+14),t.dx-10),y:t.y-BAND/2};
+    const dx=B.x-A.x,dy=B.y-A.y;
+    // уход по касательной, приход круто сверху — нить не задевает подпись ученика
+    const P=[A,{x:A.x+dx*.5,y:A.y+dy*.15},{x:B.x-dx*.15,y:B.y-dy*.65},B];
     window.deskLayout.threads[e.a+'-'+e.b]=cub(P,.5);
-    if(!e.active){L.threads.append(S('path',{d:`M${A.x},${A.y} C${P[1].x},${P[1].y} ${P[2].x},${P[2].y} ${B.x},${B.y}`,fill:'none',stroke:'var(--graph-ink-muted)','stroke-opacity':.35,'stroke-width':1,'stroke-dasharray':'2 3'}));return;}
+    const d=`M${A.x},${A.y} C${P[1].x},${P[1].y} ${P[2].x},${P[2].y} ${B.x},${B.y}`;
+    if(!e.active){L.threads.append(S('path',{d,fill:'none',stroke:'var(--graph-ink-muted)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'2 3','stroke-linecap':'round'}));return;}
     const gid='dg'+i,lg=S('linearGradient',{id:gid,gradientUnits:'userSpaceOnUse',x1:A.x,y1:A.y,x2:B.x,y2:B.y});
-    lg.append(S('stop',{offset:'0%','stop-color':'var(--people)','stop-opacity':.8}));lg.append(S('stop',{offset:'100%','stop-color':'var(--graph-selected)','stop-opacity':.95}));defs.append(lg);
+    lg.append(S('stop',{offset:'0%','stop-color':'var(--people)','stop-opacity':.75}));
+    lg.append(S('stop',{offset:'100%','stop-color':'var(--graph-selected)','stop-opacity':.95}));defs.append(lg);
     const g=S('g',{filter:'url(#glow)'});
-    g.append(S('path',{d:ribbon(P,4,1.2),fill:`url(#${gid})`}));
-    g.append(S('circle',{cx:A.x,cy:A.y,r:2.4,fill:'var(--people)'}));
-    g.append(S('circle',{cx:B.x,cy:B.y,r:2.4,fill:'var(--graph-selected)'}));
+    // пряди-спутники: пучок, а не одиночная линия
+    [[2.6,-2.2],[-2.2,2.6]].forEach(([ox,oy])=>g.append(S('path',{d:`M${A.x},${A.y} C${P[1].x+ox},${P[1].y+oy} ${P[2].x+ox},${P[2].y+oy} ${B.x},${B.y}`,fill:'none',stroke:`url(#${gid})`,'stroke-width':.6,'stroke-opacity':.45})));
+    g.append(S('path',{d:ribbon(P,4.6,1.3),fill:`url(#${gid})`}));
+    [.36,.64].forEach(tt=>{const q=cub(P,tt);g.append(S('circle',{cx:q.x,cy:q.y,r:1.4,fill:'#fff3e0','fill-opacity':.9}));});
+    g.append(S('circle',{cx:A.x,cy:A.y,r:2.2,fill:'var(--people)'}));
+    g.append(S('circle',{cx:B.x,cy:B.y,r:2.6,fill:'var(--graph-selected)'}));
     L.threads.append(g);
   });
+
+  /* ---------- контекст выбранного: подсветка эпохи без линий ---------- */
+  const selP=byId[SEL],mid=(selP.birth+selP.death)/2,era=eras.find(e=>mid>=e.from&&mid<e.to);
+  if(era){const x1=X(era.from),x2=X(era.to);
+    L.eras.insertBefore(S('rect',{x:x1,y:bands.eras.top+1,width:x2-x1,height:bands.eras.bot-bands.eras.top-2,fill:'var(--context)',opacity:.12}),L.eras.firstChild);
+    [...L.eras.querySelectorAll('text')].forEach(t=>{if(t.textContent===era.label)t.setAttribute('class','era-text era-active');});
+    L.eras.append(S('path',{d:`M${selP.bx} ${bands.eras.bot-2} V${bands.eras.bot+6}`,stroke:'var(--context)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'1 3'}));}
 
   /* ---------- труды: значки, подписи без столкновений ---------- */
   const my=bands.works.top+36,rowsEnd=[[],[]];
@@ -125,7 +139,7 @@
       g.append(S('path',{d:`M${x} ${my-10} L${x+10} ${my} L${x} ${my+10} L${x-10} ${my} Z`,class:'concept-mark'}));
       g.append(S('circle',{cx:x,cy:my,r:2,fill:'var(--ideas)'}));
     }
-    g.append(it.active?S('text',{x:x+20,y:my+4,class:'work-year','text-anchor':'start'},it.year):S('text',{x,y:my-21,class:'work-year','text-anchor':'middle'},it.year));
+    g.append(it.active?S('text',{x:x+25,y:my+4,class:'work-year','text-anchor':'start'},it.year):S('text',{x,y:my-21,class:'work-year','text-anchor':'middle'},it.year));
     // подпись: перенос в 2 строки по ширине 124
     const t=S('text',{x,class:it.active?'work-active-title':(it.kind==='work'?'work-title':'concept-title'),'text-anchor':'middle'});g.append(t);
     L.works.append(g);
