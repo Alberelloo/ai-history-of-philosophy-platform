@@ -1,0 +1,77 @@
+/* Hero-концепт раскладки «линзы». Материал унаследован от graph-f02 (v1). Только статичный кадр. */
+*{box-sizing:border-box}body{margin:0}
+.atlas-app{
+  --graph-desk:#302e2a;--graph-sheet:#f6f3ea;--graph-sheet-edge:#e9e4d8;
+  --graph-ink:#1a222f;--graph-ink-secondary:#48505d;--graph-ink-muted:#646d78;--graph-rule:#c9c2b5;
+  --graticule:color-mix(in srgb,var(--graph-ink) 7%,transparent);
+  --graph-selected:#923f32;--graph-focus:#385b8f;--graph-generated:#8d5d1c;--graph-generated-tint:#fbefd6;
+  --people:#425490;--people-tint:#dee6fc;--ideas:#25624b;--teachings:#644a80;--texts:#25616f;--history:#834860;
+  --genesis:#435882;--consequences:#456c62;--polemic:#8d4550;--context:#7a633a;--structure:#6a547b;--biography:#516570;
+  --grain:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='160'%20height='160'%20filter='url(%23n)'/%3E%3C/svg%3E");
+  color:var(--graph-ink);font:400 .875rem/1.57 Onest,Arial,sans-serif;min-height:100vh;
+  background-color:var(--graph-desk);
+  background-image:radial-gradient(130% 115% at 50% 40%,transparent 40%,rgba(0,0,0,.62)),radial-gradient(900px 560px at 18% -6%,rgba(176,122,72,.42),transparent 55%),var(--grain),repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 5px,rgba(192,152,112,.05) 5px 6px,transparent 6px 11px),linear-gradient(165deg,rgba(76,53,34,.88),rgba(41,29,20,.92) 55%,rgba(26,18,12,.94));
+  background-size:auto,auto,170px 170px,auto,auto;background-blend-mode:multiply,screen,soft-light,overlay,normal;background-attachment:fixed;
+}
+.atlas-app[data-theme=dark]{
+  --graph-desk:#101318;--graph-sheet:#20242b;--graph-sheet-edge:#191d23;
+  --graph-ink:#e7e6df;--graph-ink-secondary:#bfbeb5;--graph-ink-muted:#9a9990;--graph-rule:#505966;
+  --graph-selected:#e9a18d;--graph-focus:#a4beef;--graph-generated:#e9c67d;--graph-generated-tint:#382c15;
+  --people:#b1c2f6;--people-tint:#282f45;--ideas:#a0d5bd;--teachings:#ceb9e9;--texts:#9fd1de;--history:#ebb6c9;
+  --genesis:#a8bce4;--consequences:#a0c8b7;--polemic:#dfa5af;--context:#cfb887;--structure:#c6b1df;--biography:#a8bfca;
+  background-image:radial-gradient(130% 115% at 50% 40%,transparent 38%,rgba(0,0,0,.68)),radial-gradient(900px 560px at 20% -6%,rgba(132,152,186,.15),transparent 55%),var(--grain),repeating-linear-gradient(90deg,rgba(0,0,0,.1) 0 2px,transparent 2px 5px,rgba(255,255,255,.012) 5px 6px,transparent 6px 11px),linear-gradient(165deg,rgba(31,35,43,.9),rgba(16,19,25,.94) 55%,rgba(9,11,15,.96));
+  background-blend-mode:multiply,screen,soft-light,overlay,normal;
+}
+.desk{padding:34px;min-height:100vh}
+.folio{position:relative;max-width:1240px;margin:0 auto;background-color:var(--graph-sheet);
+  background-image:radial-gradient(150% 120% at 24% 6%,rgba(255,251,242,.5),transparent 58%),linear-gradient(156deg,rgba(255,255,255,.1),transparent 30%,rgba(0,0,0,.028) 96%),var(--grain);
+  background-size:auto,auto,150px 150px;background-blend-mode:screen,normal,soft-light;
+  border-radius:3px;padding:32px 40px 22px;isolation:isolate;
+  box-shadow:0 1px 1.5px rgba(0,0,0,.12),2px 4px 7px rgba(0,0,0,.1),10px 16px 30px rgba(0,0,0,.2),26px 40px 66px rgba(0,0,0,.13);}
+.atlas-app[data-theme=dark] .folio{box-shadow:0 1px 2px rgba(0,0,0,.3),2px 4px 8px rgba(0,0,0,.28),12px 18px 34px rgba(0,0,0,.4),28px 44px 72px rgba(0,0,0,.26);
+  background-image:radial-gradient(150% 120% at 24% 6%,rgba(210,220,235,.06),transparent 58%),linear-gradient(156deg,rgba(255,255,255,.04),transparent 30%,rgba(0,0,0,.05) 96%),var(--grain);background-blend-mode:screen,normal,soft-light;}
+.folio::before,.folio::after{content:"";position:absolute;inset:0;z-index:-1;background:transparent;border-radius:3px;pointer-events:none}
+.folio::before{box-shadow:3px 4px 0 var(--graph-sheet-edge),4px 5px 2px rgba(0,0,0,.05)}
+.folio::after{box-shadow:6px 9px 0 color-mix(in srgb,var(--graph-sheet-edge) 82%,var(--graph-desk)),7px 10px 3px rgba(0,0,0,.05);z-index:-2}
+.fold{position:absolute;inset:14px auto 14px 0;width:18px;pointer-events:none;border-radius:3px;background:linear-gradient(90deg,rgba(0,0,0,.05),rgba(255,253,247,.5) 42%,rgba(0,0,0,.06) 66%,rgba(0,0,0,.02) 80%,transparent)}
+.atlas-app[data-theme=dark] .fold{background:linear-gradient(90deg,rgba(0,0,0,.14),rgba(220,228,240,.14) 42%,rgba(0,0,0,.16) 66%,rgba(0,0,0,.06) 80%,transparent)}
+.neatline{position:absolute;inset:13px;pointer-events:none;border:1px solid color-mix(in srgb,var(--graph-ink) 22%,transparent);border-radius:2px}
+.neatline::after{content:"";position:absolute;inset:3px;border:1px solid color-mix(in srgb,var(--graph-ink) 10%,transparent);border-radius:1px}
+
+.eyebrow{font:600 11px/16px Onest,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--graph-ink-secondary)}
+h1{font:500 32px/40px Literata,Georgia,serif;letter-spacing:-.03em;margin:12px 0 3px}
+.subtitle{color:var(--graph-ink-secondary);font-size:13px;margin:0}
+.lenses{display:flex;align-items:center;gap:16px;margin:18px 0 2px;font-size:13px;color:var(--graph-ink-secondary);flex-wrap:wrap}
+.lenses-label{color:var(--graph-ink-muted);font-size:12px}
+.lens{display:inline-flex;align-items:center;gap:7px;padding:4px 2px}
+.lens .dot{width:10px;height:10px;border-radius:2px;background:var(--c);display:inline-block}
+.lens.on{color:var(--graph-ink)}
+
+.chart{margin-top:14px}
+#svg{display:block;width:100%;height:auto;overflow:visible;user-select:none}
+.band-label{font:600 10px Onest,Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;fill:var(--graph-ink-muted)}
+.band-sep{stroke:var(--graph-rule);stroke-width:1}
+.band-fill{opacity:.35}
+.time-grid{stroke:var(--graticule);stroke-width:1}
+.time-tick{stroke:var(--graph-rule);stroke-width:1}
+.time-text{font:400 11px Onest,Arial,sans-serif;fill:var(--graph-ink-muted);text-anchor:middle}
+.era-span{fill:none;stroke:var(--context);stroke-width:1.25;opacity:.55}
+.era-text{font:500 12px Literata,Georgia,serif;fill:var(--graph-ink-secondary);text-anchor:middle}
+.era-tint{opacity:.06}
+.event-ring{fill:var(--graph-sheet);stroke:var(--history);stroke-width:1.25}
+.event-text{font:400 11px Onest,Arial,sans-serif;fill:var(--graph-ink-secondary)}
+.event-year{font:600 11px Onest,Arial,sans-serif;fill:var(--history)}
+.lifeline{stroke:var(--people);stroke-width:1.5;opacity:.5;stroke-linecap:round}
+.life-cap{stroke:var(--people);stroke-width:1.5;opacity:.7}
+.medallion-ring{fill:var(--people-tint);stroke:var(--people);stroke-width:1.25}
+.monogram{font:500 17px Literata,Georgia,serif;fill:var(--people);text-anchor:middle}
+.person-name{font:600 14px Literata,Georgia,serif;fill:var(--graph-ink)}
+.person-years{font:400 11px Onest,Arial,sans-serif;fill:var(--graph-ink-muted)}
+.influence{fill:none;stroke:var(--genesis);stroke-width:1.5}
+.work-mark{fill:var(--graph-sheet);stroke:var(--texts);stroke-width:1.25}
+.work-title{font:italic 500 12px Literata,Georgia,serif;fill:var(--graph-ink)}
+.work-year{font:400 10px Onest,Arial,sans-serif;fill:var(--graph-ink-muted)}
+.concept-mark{fill:var(--graph-sheet);stroke:var(--ideas);stroke-width:1.25}
+.concept-title{font:500 12px Literata,Georgia,serif;fill:var(--graph-ink)}
+.authorship{fill:none;stroke:var(--texts);stroke-width:1.25;stroke-dasharray:2 3;opacity:.8}
+.edition{margin-top:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--graph-ink-muted)}
