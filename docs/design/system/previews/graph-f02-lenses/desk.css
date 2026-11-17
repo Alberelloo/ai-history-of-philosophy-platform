@@ -152,3 +152,21 @@
 .scene .event-text{font-size:13px}
 .collapsed-note{font-size:12.5px}
 .lens-toggle{min-height:22px;padding:2px 6px 2px 2px;transform:translateY(3px)}
+/* Прогон 5: палитра листа не зависит от темы (бумага под лампой одинакова днём и вечером) */
+.scene .folio,.scene[data-theme=dark] .folio{
+  --graph-sheet:#f4ead3;--graph-ink:#2f2318;--graph-ink-secondary:#5a4632;--graph-ink-muted:#6f5c45;
+  --graph-rule:#cfbd98;--graticule:rgba(90,64,36,.10);--people:#3c4d78;--people-tint:#e3dcc8;
+  --ideas:#25624b;--teachings:#644a80;--texts:#2f6670;--context:#8a6a35;--history:#8a3b45;
+  --graph-selected:#a8371f;--graph-focus:#385b8f;--graph-generated:#8d5d1c;--graph-generated-tint:#fbefd6;
+}
+/* Приглушение контекста без «таяния» текста: бледнеют изображения и знаки, подписи — читаемый приглушённый цвет */
+.dim,.dim-soft{opacity:1}
+.dim image,.dim ellipse,.dim rect,.dim path,.dim-soft rect,.dim-soft path,.dim-soft circle{opacity:.4}
+.dim text,.dim-soft text{fill:var(--graph-ink-muted)}
+.dim .monogram{fill-opacity:.7}
+.lens-toggle.off{opacity:1}
+.dim .monogram{fill-opacity:1}
+.scene .era-text.era-active{fill:#6a4f22}
+/* Контекст отличается начертанием, а не таянием: читается, но не спорит с фокусом */
+.dim .person-name{font-weight:400}
+.dim-soft .work-title,.dim-soft .concept-title{font-weight:400}
