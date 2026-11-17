@@ -98,3 +98,42 @@
 .chart-notes{display:none}
 /* Прогон 2: эпоха выбранного — подсветка без линий */
 .scene .era-text.era-active{fill:var(--context);font-weight:600}
+/* Прогон 3: структура вокруг графа */
+.scene .head{display:flex;justify-content:space-between;align-items:flex-start;gap:32px}
+.scene .head-main{min-width:0}
+.selnote{width:330px;flex:none;margin-top:4px;padding:12px 0 0 16px;border-left:1px solid rgba(90,64,36,.28);color:var(--graph-ink-secondary);font:400 12.5px/1.5 Onest,Arial,sans-serif}
+.selnote .kicker{font:600 10px/14px Onest,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--graph-ink-muted);margin-bottom:5px}
+.selnote .selname{font:600 17px/22px Literata,Georgia,serif;color:var(--graph-ink);margin-bottom:6px}
+.selnote .selname span{font:400 12px Onest,Arial,sans-serif;color:var(--graph-ink-muted);margin-left:4px}
+.selnote ul{list-style:none;margin:0;padding:0}
+.selnote li{display:flex;align-items:baseline;gap:8px;margin:2px 0}
+.selnote .hint{margin:0;font-style:italic;font-family:Literata,Georgia,serif;font-size:13px}
+.k{flex:none;display:inline-block;width:20px;height:8px;position:relative;top:-1px}
+.k-flow{background:linear-gradient(90deg,var(--people),var(--graph-selected));height:3px;border-radius:2px;top:-3px}
+.k-works{border-top:2px dotted var(--texts);height:0;top:-4px}
+.k-era{background:var(--context);opacity:.35;border-radius:1px}
+.chart{position:relative}
+.gutter{position:absolute;left:0;top:0;bottom:0;width:12.6%;z-index:2}
+.lens-toggle{position:absolute;left:0;transform:translateY(5px);display:flex;align-items:center;gap:7px;border:0;background:none;padding:4px 6px 4px 2px;min-height:28px;
+  font:600 10px/12px Onest,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--graph-ink-secondary);cursor:pointer;border-radius:3px;text-align:left}
+.lens-toggle:hover{color:var(--graph-ink);background:rgba(90,64,36,.07)}
+.lens-toggle:focus-visible{outline:2px solid var(--graph-focus);outline-offset:1px}
+.lens-toggle .eye{width:16px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:1.2}
+.lens-toggle .eye circle{fill:currentColor;stroke:none}
+.lens-toggle .eye .slash{display:none}
+.lens-toggle.off{color:var(--graph-ink-muted);opacity:.8}
+.lens-toggle.off .eye circle{display:none}
+.lens-toggle.off .eye .slash{display:inline}
+.person{cursor:pointer;outline:none}
+.person .focus-ring{fill:none;stroke:var(--graph-focus);stroke-width:2;visibility:hidden}
+.person:focus-visible .focus-ring{visibility:visible}
+.person:hover .person-name{text-decoration:underline;text-decoration-color:rgba(90,64,36,.4)}
+#svg{cursor:default}
+.scene .event-year{font:600 11px Onest,Arial,sans-serif;fill:var(--history)}
+.scene .event-text{font:italic 400 11.5px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.legend-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,64,36,.22);font:400 11.5px Onest,Arial,sans-serif;color:var(--graph-ink-secondary)}
+.legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{height:12px;width:auto}
+.legend-title{font:italic 600 12px Literata,Georgia,serif;color:var(--graph-ink)}
+.edition-note{font-size:11px;color:var(--graph-ink-muted)}

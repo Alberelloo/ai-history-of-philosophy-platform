@@ -90,19 +90,29 @@
       </svg>
       <div class="neatline" aria-hidden="true"></div>
       <header class="head">
-        <div class="eyebrow">АТЛАС ИДЕЙ · ТЕОРИЯ ПОЗНАНИЯ</div>
-        <h1>Иммануил Кант</h1>
-        <p class="subtitle">Откуда пришла его мысль — и что он из неё сделал</p>
-        <div class="lenses" role="group" aria-label="Линзы">
-          <span class="lenses-label">Линзы:</span>
-          <button class="lens on"><span class="eye" aria-hidden="true"></span><span class="dot" style="--c:var(--people)"></span>Люди</button>
-          <button class="lens on"><span class="eye" aria-hidden="true"></span><span class="dot" style="--c:var(--context)"></span>Контекст</button>
-          <button class="lens on"><span class="eye" aria-hidden="true"></span><span class="dot" style="--c:var(--texts)"></span>Труды</button>
-          <button class="lens off"><span class="eye" aria-hidden="true"></span><span class="dot" style="--c:var(--history)"></span>События мира</button>
+        <div class="head-main">
+          <div class="eyebrow">АТЛАС ИДЕЙ · ТЕОРИЯ ПОЗНАНИЯ</div>
+          <h1>Иммануил Кант</h1>
+          <p class="subtitle">Откуда пришла мысль философа — и что он из неё сделал</p>
         </div>
+        <aside class="selnote" aria-live="polite"></aside>
       </header>
-      <div class="chart"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
-      <footer class="edition"><span>Демонстрационные данные · пробный кадр «стол философа»</span><span>Спиноза — демо-персона без связей</span></footer>
+      <div class="chart">
+        <div class="gutter" role="group" aria-label="Линзы: свернуть или развернуть страту"></div>
+        <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Синхронологическая карта: события, эпохи, философы и их труды на оси времени"></svg>
+      </div>
+      <footer class="legend-row">
+        <div class="legend" aria-label="Условные знаки">
+          <span class="legend-title">Условные знаки</span>
+          <span><svg viewBox="0 0 34 12"><rect x="1" y="2" width="32" height="8" rx="4" fill="var(--people)" fill-opacity=".14"/></svg>годы жизни</span>
+          <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="var(--graph-selected)" stroke-width="2.2" stroke-linecap="round"/></svg>влияние</span>
+          <span><svg viewBox="0 0 14 16"><rect x="2" y="1.5" width="10" height="13" rx="1" fill="none" stroke="var(--texts)" stroke-width="1.2"/><rect x="2" y="1.5" width="2.6" height="13" fill="var(--texts)" fill-opacity=".55"/></svg>труд</span>
+          <span><svg viewBox="0 0 16 16"><path d="M8 2 L14 8 L8 14 L2 8 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>понятие</span>
+          <span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="var(--history)" stroke-width="1.2"/><circle cx="8" cy="8" r="1.8" fill="var(--history)"/></svg>событие</span>
+          <span><svg viewBox="0 0 34 12"><rect x="1" y="4" width="16" height="4" fill="var(--graph-ink)" fill-opacity=".5"/><path d="M1 4 H33 M1 8 H33" stroke="var(--graph-ink)" stroke-opacity=".55" stroke-width=".8"/></svg>25 лет</span>
+        </div>
+        <div class="edition-note">Демонстрационные данные · Спиноза — демо-персона</div>
+      </footer>
     </article>
 
     <!-- предметы НАД столом, вокруг листа -->
