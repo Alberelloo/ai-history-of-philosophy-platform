@@ -52,6 +52,9 @@ type Props = {
 
 type Section = "search" | "selected" | "filters" | "legend";
 
+// Названия значений из реестра (ontology.*.json → values) — со строчной; в списке — с прописной.
+const cap = (s: string) => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
+
 const SECTION_ICON: Record<Section, IconName> = { search: "search", selected: "check", filters: "filter", legend: "legend" };
 
 export function MapPanel(props: Props) {
@@ -162,7 +165,7 @@ function hitSub(t: Catalog, data: MapData, h: SearchHit): string {
   }
   if (h.type === "work") {
     const w = ix.works.get(h.id)!;
-    const a = ix.people.get(w.author)?.short ?? "";
+    const a = (w.author != null && ix.people.get(w.author)?.short) || "";
     return w.kind === "work" ? `${a}, ${w.year}` : `${t.map.kinds[w.kind]} · ${a}`;
   }
   if (h.type === "event") return String(ix.events.get(h.id)!.year);
@@ -171,7 +174,7 @@ function hitSub(t: Catalog, data: MapData, h: SearchHit): string {
     return `${e.from}–${e.to}`;
   }
   const g = ix.groups.get(h.id)!;
-  return pick(t.map.groupKinds, g.kind) ?? g.kind;
+  return cap(pick(t.onto.values.group_kind, g.kind) ?? "");
 }
 
 function SearchBox({
@@ -368,7 +371,7 @@ function Selected(props: Props) {
     );
   } else if (rel.type === "work") {
     const w = rel.obj;
-    const a = ix.people.get(w.author);
+    const a = w.author != null ? ix.people.get(w.author) : undefined;
     kicker = t.map.kinds[w.kind];
     title = w.kind === "work" ? `«${w.label}»` : w.label;
     sub = String(w.year);
@@ -389,7 +392,7 @@ function Selected(props: Props) {
   } else {
     const o = rel.obj;
     kicker =
-      rel.type === "era" ? t.map.types.era : rel.type === "event" ? t.map.types.event : (pick(t.map.groupKinds, rel.obj.kind) ?? t.map.types.group);
+      rel.type === "era" ? t.map.types.era : rel.type === "event" ? t.map.types.event : (cap(pick(t.onto.values.group_kind, rel.obj.kind) ?? "") || t.map.types.group);
     title = o.label;
     sub = rel.type === "era" ? `${rel.obj.from}–${rel.obj.to}` : rel.type === "event" ? String(rel.obj.year) : "";
     if (rel.legend.length)
@@ -591,7 +594,7 @@ function Filters({ data, vis, state, onState }: Props) {
         {codes.map((code) => (
           <Check
             key={code}
-            label={pick(names, code) ?? code}
+            label={cap(pick(names, code) ?? code)}
             count={tally[code]}
             checked={f[key].includes(code)}
             onChange={(on) => set({ [key]: toggle(f[key], code, on) } as Partial<Filter>)}
@@ -622,16 +625,16 @@ function Filters({ data, vis, state, onState }: Props) {
       </p>
       <Facet title={t.map.facets.time} value={f.from != null || f.to != null ? `${from}–${to}` : undefined}>
         <div className="map-range">
-          <YearInput label={t.map.from} value={from} onCommit={(v) => set({ from: v <= data.range[0] ? undefined : Math.min(v, to - 1) })} />
-          <YearInput label={t.map.to} value={to} onCommit={(v) => set({ to: v >= data.range[1] ? undefined : Math.max(v, from + 1) })} />
+          <YearInput label={t.map.from} value={from} onCommit={(v) => set({ from: v <= (data.range ?? vis.range)[0] ? undefined : Math.min(v, to - 1) })} />
+          <YearInput label={t.map.to} value={to} onCommit={(v) => set({ to: v >= (data.range ?? vis.range)[1] ? undefined : Math.max(v, from + 1) })} />
         </div>
         <p className="map-facet__hint">{t.map.timeHint}</p>
       </Facet>
       {groupFacet("direction", t.map.facets.direction)}
       {groupFacet("school", t.map.facets.school)}
-      {listFacet("roles", t.map.facets.role, t.map.roles, c.roles)}
+      {listFacet("roles", t.map.facets.role, t.onto.values.person_role, c.roles)}
       {listFacet("kinds", t.map.facets.kind, t.map.kinds, c.kinds)}
-      {listFacet("ekinds", t.map.facets.events, t.map.ekinds, c.ekinds)}
+      {listFacet("ekinds", t.map.facets.events, t.onto.values.event_kind, c.ekinds)}
       <Facet title={t.map.facets.links} value={f.verified ? t.map.verifiedShort : undefined}>
         <Check label={t.map.onlyVerified} count={c.verified} checked={f.verified} onChange={(on) => set({ verified: on })} />
         <p className="map-facet__hint">{t.map.verifiedHint}</p>

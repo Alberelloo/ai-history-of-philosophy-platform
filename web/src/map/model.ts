@@ -20,8 +20,9 @@ export type Visible = {
 };
 
 export function visible(data: MapData, filter: Filter): Visible {
-  const from = filter.from ?? data.range[0];
-  const to = filter.to ?? data.range[1];
+  const range = data.range ?? [0, 1];
+  const from = filter.from ?? range[0];
+  const to = filter.to ?? range[1];
   const gs = data.groups.filter((g) => filter.groups.includes(g.id));
   const people = data.people.filter(
     (p) =>
@@ -31,11 +32,15 @@ export function visible(data: MapData, filter: Filter): Visible {
       p.birth <= to,
   );
   const ids = new Set(people.map((p) => p.id));
+  const known = index(data).people;
+  // труд без автора на карте (автора нет или он вне области) виден, пока не фильтруют людей
+  const authorShown = (w: MapWork) =>
+    w.author != null && known.has(w.author) ? ids.has(w.author) : !gs.length && !filter.roles.length;
   return {
     range: [from, to],
     people,
     works: data.works.filter(
-      (w) => ids.has(w.author) && (!filter.kinds.length || filter.kinds.includes(w.kind)) && w.year >= from && w.year <= to,
+      (w) => authorShown(w) && (!filter.kinds.length || filter.kinds.includes(w.kind)) && w.year >= from && w.year <= to,
     ),
     events: data.events.filter(
       (e) => (!filter.ekinds.length || (e.kind != null && filter.ekinds.includes(e.kind))) && e.year >= from && e.year <= to,
@@ -184,11 +189,12 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
   } else if (f.type === "work") {
     const w = f.obj;
     primary = w.id;
-    if (index(data).people.has(w.author)) {
-      people.set(w.author, "self");
-      legend = [{ role: "self", people: [w.author] }];
+    const author = w.author != null && index(data).people.has(w.author) ? w.author : null;
+    if (author) {
+      people.set(author, "self");
+      legend = [{ role: "self", people: [author] }];
     }
-    works = new Set(v.works.filter((x) => x.author === w.author).map((x) => x.id));
+    works = new Set(author ? v.works.filter((x) => x.author === author).map((x) => x.id) : []);
     works.add(w.id);
     era = eraOf(v.eras, w.year);
     events = new Set(v.events.filter((e) => Math.abs(e.year - w.year) <= WORKS_AROUND_EVENT).map((e) => e.id));
@@ -196,20 +202,20 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
     const e = f.obj;
     group(v.people.filter((p) => midLife(p) >= e.from && midLife(p) < e.to));
     era = e;
-    works = new Set(v.works.filter((w) => people.has(w.author) && w.year >= e.from && w.year < e.to).map((w) => w.id));
+    works = new Set(v.works.filter((w) => w.author != null && people.has(w.author) && w.year >= e.from && w.year < e.to).map((w) => w.id));
     events = new Set(v.events.filter((x) => x.year >= e.from && x.year < e.to).map((x) => x.id));
   } else if (f.type === "event") {
     const e = f.obj;
     group(v.people.filter((p) => p.birth <= e.year && p.death >= e.year));
     era = eraOf(v.eras, e.year);
     works = new Set(
-      v.works.filter((w) => people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT).map((w) => w.id),
+      v.works.filter((w) => w.author != null && people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT).map((w) => w.id),
     );
     events = new Set([e.id]);
   } else {
     const g = f.obj;
     group(v.people.filter((p) => g.members.includes(p.id)));
-    works = new Set(v.works.filter((w) => people.has(w.author)).map((w) => w.id));
+    works = new Set(v.works.filter((w) => w.author != null && people.has(w.author)).map((w) => w.id));
     // влияния внутри группы — цветом учителя (object)
     v.links.forEach((l) => {
       if (people.has(l.subject) && people.has(l.object)) links.push({ link: l, role: people.get(l.object)! });

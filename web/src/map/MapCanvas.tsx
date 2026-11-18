@@ -1,4 +1,4 @@
-import { useMemo, type KeyboardEvent, type MouseEvent, type MutableRefObject, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type KeyboardEvent, type MouseEvent, type MutableRefObject, type ReactNode } from "react";
 import { useT } from "../i18n";
 import { Icon, monogram } from "../ui";
 import { layout, type MapLayout, type Measure } from "./layout";
@@ -43,6 +43,17 @@ export function MapCanvas(props: Props) {
   const peopleH = L.bands.people.bot - top;
   const contentH = L.peopleScroll ? L.peopleScroll.contentHeight : peopleH;
   const bottomH = L.height - L.bands.people.bot;
+
+  // Прокрутка людей: выбранный (или автор выбранного труда) — в видимой части страты.
+  const scroller = useRef<HTMLDivElement>(null);
+  const focusId = rel ? (rel.type === "person" ? rel.obj.id : rel.type === "work" ? rel.obj.author : null) : null;
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el || !L.peopleScroll || !focusId) return;
+    const p = L.people.find((x) => x.id === focusId);
+    if (!p) return;
+    if (p.y - 20 < el.scrollTop || p.y + 20 > el.scrollTop + el.clientHeight) el.scrollTop = Math.max(0, p.y - el.clientHeight / 2);
+  }, [focusId, L]);
 
   // Выгрузка: три части складываются в один рисунок; люди — целиком, со всеми дорожками.
   props.exportRef.current = () => {
@@ -157,6 +168,7 @@ export function MapCanvas(props: Props) {
       </svg>
 
       <div
+        ref={scroller}
         className={L.peopleScroll ? "map-people is-scroll" : "map-people"}
         style={{ height: peopleH }}
         tabIndex={L.peopleScroll ? 0 : undefined}
@@ -490,7 +502,7 @@ function Works({ L, data }: { L: MapLayout; data: MapData }) {
     <g>
       {L.works.map((it) => {
         const w = it.work;
-        const author = people.get(w.author);
+        const author = w.author != null ? people.get(w.author) : undefined;
         const cls = ["map-entity", "map-work", `map-kind-${w.kind}`, it.role ? `map-role-${it.role}` : "", it.primary ? "is-primary" : ""].join(" ");
         const x = it.bx;
         const iy = it.y;

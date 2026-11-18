@@ -245,7 +245,7 @@ function planWorks(v: Visible, rel: Related | null, s: TimeScale, measure: Measu
     lines: [],
     w: 0,
     key: keys.has(w.id),
-    role: rel ? (rel.people.get(w.author) ?? "other") : null,
+    role: rel ? ((w.author != null ? rel.people.get(w.author) : undefined) ?? "other") : null,
     primary: !!rel && rel.primary === w.id,
   }));
   const cand = items

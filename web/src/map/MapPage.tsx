@@ -38,7 +38,7 @@ const INFLUENCE = new Set([
 const EMPTY: MapData = { range: [0, 1], truncated: false, limit: 0, people: [], works: [], events: [], eras: [], groups: [], links: [], undated: [] };
 
 const MIN_HEIGHT = 420;
-const BOTTOM_GAP = 20; // отступ под обзорной шкалой
+const BOTTOM_GAP = 44; // под обзорной шкалой: её отступ, поля листа и страницы
 
 export function MapPage({ entityId, query }: { entityId?: string; query: URLSearchParams }) {
   const t = useT();
@@ -288,7 +288,9 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     if (text) downloadSvg(text, `map${state.sel ? `-${state.sel}` : ""}.svg`);
   }
 
-  const empty = load.status === "missing" || (load.status === "ok" && !data.people.length && !data.works.length && !data.events.length && !data.eras.length);
+  const empty =
+    load.status === "missing" ||
+    (load.status === "ok" && (!data.range || (!data.people.length && !data.works.length && !data.events.length && !data.eras.length)));
   const title = found ? found.obj.label : t.map.title;
   const ready = load.status === "ok" && !empty;
 
@@ -318,7 +320,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
         {ready && data.truncated && (
           <div className="pg-notice map-notice" role="status">
             <Icon name="info" />
-            <div>{t.map.truncated(data.people.length + data.works.length + data.events.length, data.limit)}</div>
+            <div>{t.map.truncated(data.limit)}</div>
           </div>
         )}
         {ready && state.sel && !found && (
@@ -359,7 +361,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                     exportRef={exportRef}
                   />
                   <Overview
-                    range={data.range}
+                    range={data.range ?? vis.range}
                     win={vis.range}
                     people={data.people}
                     width={size.width}

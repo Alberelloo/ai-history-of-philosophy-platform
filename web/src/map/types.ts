@@ -28,13 +28,13 @@ export type MapWork = {
   type: string; // код типа сущности в реестре (work, concept, doctrine…)
   kind: WorkKind;
   year: number; // год труда; у идеи — год самого раннего труда, где она высказана
-  author: string; // id персоны
+  author: string | null; // id персоны; может не быть или указывать на персону вне карты
   weight: number;
 };
 
-export type MapEvent = { id: string; label: string; year: number; kind?: string };
+export type MapEvent = { id: string; label: string; year: number; kind?: string | null };
 export type MapEra = { id: string; label: string; from: number; to: number };
-export type MapGroup = { id: string; label: string; kind: GroupKind; members: string[] };
+export type MapGroup = { id: string; label: string; kind: GroupKind | null; members: string[] };
 
 // Связь между персонами (influenced_by и подтипы, studied_with).
 // Направление: subject испытал влияние object (subject — ученик, object — учитель).
@@ -51,7 +51,7 @@ export type MapLink = {
 export type MapUndated = { id: string; label: string; type: string };
 
 export type MapData = {
-  range: [number, number];
+  range: [number, number] | null; // null — карта пуста (нет датированных сущностей)
   truncated: boolean;
   limit: number;
   people: MapPerson[];
