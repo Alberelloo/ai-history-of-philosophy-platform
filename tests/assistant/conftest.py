@@ -48,6 +48,8 @@ class ScriptedModel(ConceptProvider):
         )
         if isinstance(item, Exception):
             raise item
+        if callable(item):  # структурированный ответ по запросу (ключи кандидатов вида карты)
+            item = item(request.messages[-1].content)
         return Completion(json.dumps(item, ensure_ascii=False), Usage(100, 0, 20))
 
     def stream(self, request):

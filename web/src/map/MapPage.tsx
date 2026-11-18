@@ -14,12 +14,14 @@ import { canvasMeasure, loadMapFonts } from "./measure";
 import { find, index, related, visible } from "./model";
 import { OVERVIEW_HEIGHT, Overview } from "./Overview";
 import { KNOWLEDGE_API, ndjson } from "./stream";
-import { parseState, toQuery, type MapData, type MapLink, type MapState } from "./types";
+import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapState } from "./types";
 
 // Страница графа — синхронологическая карта раздела (openspec/changes/archive/2026-11-18-synchro-map).
 // /graph — карта; /graph/<id> — карта с выбранной сущностью. Состояние (выбор, поиск,
 // фильтры, линзы) — в параметрах адреса через replaceState: без записи истории на каждую галочку.
 // ?fixture=dense — плотный набор без сервиса (проверка вида и раскладки); ?recipe= — рецепт достройки.
+// ?via=assistant — вид подобран ассистентом: пометка с перечнем применённого и «Сбросить вид»;
+// уходит при ручной смене фильтров и линз.
 
 type Load = { status: "loading" | "ok" | "missing" | "error"; data: MapData | null };
 
@@ -50,8 +52,10 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const onlyTextbook = scope.onlyTextbook && Boolean(textbook);
   const fixture = query.get("fixture");
   const recipeParam = query.get("recipe");
+  const [fromAssistant, setFromAssistant] = useState(query.get("via") === "assistant");
   const [state, setState] = useState<MapState>(() => {
-    const s = parseState(query);
+    // Ссылка ассистента поиска не несёт: дописанный в неё текст в поле поиска не показываем.
+    const s = { ...parseState(query), ...(query.get("via") === "assistant" ? { q: "" } : {}) };
     return entityId ? { ...s, sel: entityId } : s;
   });
   const [load, setLoad] = useState<Load>({ status: "loading", data: null });
@@ -124,13 +128,14 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.
   useEffect(() => {
     const q = new URLSearchParams(toQuery({ ...state, sel: null }));
+    if (fromAssistant) q.set("via", "assistant");
     if (fixture) q.set("fixture", fixture);
     if (recipeParam) q.set("recipe", recipeParam);
     const text = q.toString().replace(/%2C/gi, ",");
     const path = state.sel ? `/graph/${encodeURIComponent(state.sel)}` : "/graph";
     const next = `${path}${text ? `?${text}` : ""}`;
     if (window.location.pathname + window.location.search !== next) window.history.replaceState(window.history.state, "", next);
-  }, [state, fixture, recipeParam]);
+  }, [state, fixture, recipeParam, fromAssistant]);
 
   // Ширина — по контейнеру карты (сворачивание панели, окно); высота — до низа окна.
   const remeasure = useCallback(() => {
@@ -164,10 +169,19 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     };
   }, [remeasure, load.status]);
 
-  const patch = useCallback((p: Partial<MapState>) => setState((s) => ({ ...s, ...p })), []);
+  // Ручная смена фильтров или линз снимает пометку ассистента: вид уже не его.
+  const patch = useCallback((p: Partial<MapState>) => {
+    if (p.filter || p.collapsed) setFromAssistant(false);
+    setState((s) => ({ ...s, ...p }));
+  }, []);
+  const resetView = useCallback(() => {
+    setFromAssistant(false);
+    setState((s) => ({ ...s, filter: emptyFilter(), collapsed: [] }));
+  }, []);
   const select = useCallback((id: string | null, resetFilter?: boolean) => {
     setLink(null);
     setBuild(idleBuild());
+    if (resetFilter) setFromAssistant(false);
     setState((s) => ({ ...s, sel: id, ...(resetFilter ? { filter: { ...s.filter, from: undefined, to: undefined, groups: [], roles: [], kinds: [], ekinds: [] } } : {}) }));
   }, []);
 
@@ -378,7 +392,10 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                       win={vis.range}
                       people={data.people}
                       width={size.width}
-                      onChange={(from, to) => setState((s) => ({ ...s, filter: { ...s.filter, from, to } }))}
+                      onChange={(from, to) => {
+                        setFromAssistant(false);
+                        setState((s) => ({ ...s, filter: { ...s.filter, from, to } }));
+                      }}
                     />
                   </>
                 )}
@@ -391,6 +408,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                 collapsed={panelCollapsed}
                 onCollapse={(c) => storage.setMapPanelCollapsed(c)}
                 onState={patch}
+                onResetView={fromAssistant ? resetView : undefined}
                 onSelect={select}
                 link={link}
                 onCloseLink={() => setLink(null)}

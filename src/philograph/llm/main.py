@@ -33,7 +33,9 @@ def create(env: dict[str, str] | None = None) -> FastAPI:
     for name, provider in config.providers.items():
         if provider.kind == "fake":
             providers[name] = FakeProvider(
-                default=provider.fake_reply or "ok", replies=dict(provider.fake_replies)
+                default=provider.fake_reply or "ok",
+                replies=dict(provider.fake_replies),
+                rules=[(r.template, r.contains, r.reply, r.block) for r in provider.fake_rules],
             )
         else:
             key = env.get(provider.api_key_env or "", "")

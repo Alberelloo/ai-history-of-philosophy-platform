@@ -19,6 +19,18 @@ from philograph.platform.settings import ServiceSettings, SettingsError
 Budget = Literal["site", "filling"]
 
 
+class FakeRule(BaseModel):
+    """Ответ фальшивого провайдера по шаблону и подстроке последнего сообщения (без
+    учёта регистра): демо-стенду нужны разные ответы маршрутизатора на разные вопросы."""
+
+    template: str
+    contains: str
+    reply: str
+    # Искать только в блоке данных с этим именем (``<data name="question">``): иначе правило
+    # срабатывает и по истории диалога, которую маршрутизатор тоже получает.
+    block: str | None = None
+
+
 class ProviderConfig(BaseModel):
     kind: Literal["openai_compatible", "fake"]
     base_url: str | None = None
@@ -26,6 +38,7 @@ class ProviderConfig(BaseModel):
     # Только для kind=fake: постоянный ответ (демо-стенд и сквозные тесты без ключей).
     fake_reply: str | None = None
     fake_replies: dict[str, str] = {}  # ответ по имени шаблона, иначе fake_reply
+    fake_rules: list[FakeRule] = []  # раньше fake_replies: по шаблону и тексту вопроса
 
 
 class RoleConfig(BaseModel):

@@ -100,6 +100,12 @@ class KnowledgeHttp:
             raise ServiceUnavailable("knowledge", f"ответ {response.status_code}")
         return response.json()
 
+    def post(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
+        response = self.client.post(path, json=body)
+        if response.status_code != 200:
+            raise ServiceUnavailable("knowledge", f"ответ {response.status_code}")
+        return response.json()
+
 
 class Ontology:
     def __init__(self, knowledge: KnowledgeHttp, steps: OntologySteps | None = None) -> None:
@@ -155,6 +161,26 @@ class Ontology:
             facts=len(ctx.facts),
         )
         return ctx
+
+    # --- вид карты (assistant-map-view) ---
+
+    def map_options(
+        self, entity_ids: list[str], textbook: str | None, only_textbook: bool
+    ) -> dict[str, Any]:
+        """Сущности вопроса, которые есть на карте, коды фильтров и пределы раздела.
+        Недоступный сервис знаний — ``ServiceUnavailable``: цепочка отвечает без карты."""
+        return self.knowledge.post(
+            "internal/assistant/map-options",
+            {"entities": entity_ids, "textbook": textbook, "only_textbook": only_textbook},
+        )
+
+    def map_view(
+        self, draft: dict[str, Any], textbook: str | None, only_textbook: bool
+    ) -> dict[str, Any]:
+        """Проверка черновика вида сервером знаний: вид, адрес, отброшенное, сколько видно."""
+        return self.knowledge.post(
+            "map/view", {**draft, "textbook": textbook, "only_textbook": only_textbook}
+        )
 
     # --- проверка ответа ---
 
