@@ -16,7 +16,7 @@ import { OVERVIEW_HEIGHT, Overview } from "./Overview";
 import { KNOWLEDGE_API, ndjson } from "./stream";
 import { parseState, toQuery, type MapData, type MapLink, type MapState } from "./types";
 
-// Страница графа — синхронологическая карта раздела (openspec/changes/synchro-map).
+// Страница графа — синхронологическая карта раздела (openspec/changes/archive/2026-11-18-synchro-map).
 // /graph — карта; /graph/<id> — карта с выбранной сущностью. Состояние (выбор, поиск,
 // фильтры, линзы) — в параметрах адреса через replaceState: без записи истории на каждую галочку.
 // ?fixture=dense — плотный набор без сервиса (проверка вида и раскладки); ?recipe= — рецепт достройки.

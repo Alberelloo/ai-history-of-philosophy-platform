@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useMedia } from "../SidePanel";
 
-// Сцена карты (openspec/changes/synchro-map, «Сцена карты»): лист бумаги на столе философа.
+// Сцена карты (openspec/changes/archive/2026-11-18-synchro-map, «Сцена карты»): лист бумаги на столе философа.
 // Стол, бювар, предметы вокруг листа и свет — декорация (aria-hidden); лист — children.
 // Материалы — SVG-фильтры без растровых файлов (перенос из макета graph-f02-lenses/desk.js),
 // все цвета — токены сцены (`--desk-*`, `--blotter`, `--sheet*`, `--lamp`, `--sel-*`).

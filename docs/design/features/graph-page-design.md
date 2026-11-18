@@ -5,7 +5,7 @@
 Область: следующий HTML-макет и визуальный контракт будущей страницы. Это не разрешение
 реализовывать продуктовую фичу до одобрения макета и OpenSpec-дельты.
 
-> **Реализация (2026-11-18):** макет «стол философа» v6 ([desk.html](../system/previews/graph-f02-lenses/desk.html)) одобрен и реализуется изменением [`openspec/changes/synchro-map`](../../../openspec/changes/synchro-map/proposal.md): страница графа заменяется синхронологической картой раздела.
+> **Реализация (2026-11-18):** макет «стол философа» v6 ([desk.html](../system/previews/graph-f02-lenses/desk.html)) одобрен и реализован изменением [`openspec/changes/archive/2026-11-18-synchro-map`](../../../openspec/changes/archive/2026-11-18-synchro-map/proposal.md): страница графа заменена синхронологической картой раздела.
 
 ## 0. Как исполнять ТЗ
 

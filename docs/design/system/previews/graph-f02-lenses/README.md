@@ -1,6 +1,6 @@
 # graph-f02-lenses — hero-концепт раскладки «линзы»
 
-> Макет v6 реализуется в продукте изменением [`synchro-map`](../../../../../openspec/changes/synchro-map/proposal.md).
+> Макет v6 реализуется в продукте изменением [`synchro-map`](../../../../../openspec/changes/archive/2026-11-18-synchro-map/proposal.md).
 
 Статичный **концепт** нового решения графа Ф0.2 из
 [предложения о линзах](../../../features/graph-lenses-design-proposal.md). Не продуктовый макет и не

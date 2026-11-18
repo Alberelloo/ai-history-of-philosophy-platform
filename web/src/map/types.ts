@@ -1,4 +1,4 @@
-// Карта раздела (openspec/changes/synchro-map): типы ответа GET /api/knowledge/v1/map,
+// Карта раздела (openspec/changes/archive/2026-11-18-synchro-map): типы ответа GET /api/knowledge/v1/map,
 // состояние страницы (выбор, поиск, фильтр, линзы) и его запись в параметры адреса.
 // Без React и DOM: модуль используют модель, раскладка и страница.
 
