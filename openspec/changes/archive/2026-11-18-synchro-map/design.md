@@ -1,6 +1,6 @@
 # Design
 
-Образец поведения и вида — макет [desk.html](../../../docs/design/system/previews/graph-f02-lenses/desk.html) (v6) и его код `desk-chart.js`; решения владельца — [graph-desk-scene-direction.md](../../../docs/design/features/graph-desk-scene-direction.md). Здесь — решения по коду, которых нет в макете.
+Образец поведения и вида — макет [desk.html](../../../../docs/design/system/previews/graph-f02-lenses/desk.html) (v6) и его код `desk-chart.js`; решения владельца — [graph-desk-scene-direction.md](../../../../docs/design/features/graph-desk-scene-direction.md). Здесь — решения по коду, которых нет в макете.
 
 ## Контекст
 
