@@ -111,3 +111,38 @@ window.DESK_NOTES=[
   {about:'hume',lines:['«Разум есть и должен быть','лишь рабом аффектов»'],cite:'«Трактат о человеческой природе»'},
   {about:'spinoza',lines:['«Порядок и связь идей те же,','что порядок и связь вещей»'],cite:'«Этика», ч. II, теор. 7'},
 ];
+
+/* Фасеты для фильтров (синтетика по мотивам онтологии: группы вида «направление» и «школа»,
+   роли персон, виды произведений и событий, проверенность связей). */
+(function(){
+  const D=window.DESK_SETS.dense;
+  D.groups=[
+    {id:'g-emp',kind:'direction',label:'Эмпиризм',members:['bacon','hobbes','gassendi','locke','berkeley','hume','condillac']},
+    {id:'g-rat',kind:'direction',label:'Рационализм',members:['descartes','spinoza','malebranche','leibniz','wolff','arnauld','baumgarten']},
+    {id:'g-skep',kind:'direction',label:'Скептицизм',members:['montaigne','bayle','hume']},
+    {id:'g-enl',kind:'direction',label:'Французское Просвещение',members:['voltaire','diderot','dalembert','helvetius','lamettrie','montesquieu','rousseau','condillac']},
+    {id:'g-crit',kind:'direction',label:'Критицизм и идеализм',members:['kant','fichte','schelling','hegel','schopenhauer']},
+    {id:'g-faith',kind:'direction',label:'Философия веры и чувства',members:['hamann','jacobi','herder']},
+    {id:'g-moral',kind:'direction',label:'Философия морального чувства',members:['shaftesbury','hutcheson']},
+    {id:'s-cart',kind:'school',label:'Картезианство',members:['descartes','malebranche','arnauld']},
+    {id:'s-lw',kind:'school',label:'Лейбнице-вольфовская школа',members:['leibniz','wolff','baumgarten','mendelssohn']},
+    {id:'s-scot',kind:'school',label:'Шотландская школа здравого смысла',members:['reid']},
+    {id:'s-enc',kind:'school',label:'Энциклопедисты',members:['diderot','dalembert','helvetius','voltaire','montesquieu','rousseau']},
+    {id:'s-jena',kind:'school',label:'Йенский кружок',members:['fichte','schelling','hegel']},
+  ];
+  const roles={scientist:['galileo','mersenne','pascal','newton','leibniz','dalembert'],writer:['montaigne','voltaire','rousseau','diderot','montesquieu'],theologian:['mersenne','malebranche','arnauld','berkeley','hamann']};
+  D.people.forEach(p=>{p.roles=['philosopher',...Object.keys(roles).filter(r=>roles[r].includes(p.id))];});
+  D.roleLabels={philosopher:'Философ',scientist:'Учёный',writer:'Писатель',theologian:'Богослов'};
+  const pos={'Синтетическое априори':1,'Esse est percipi':1,'Tabula rasa':1},arg={'Cogito':1};
+  D.works.forEach(w=>{if(pos[w.title])w.kind='position';if(arg[w.title])w.kind='argument';});
+  D.kindLabels={work:'Произведения',concept:'Понятия',position:'Позиции',argument:'Аргументы'};
+  const ek=['political','political','scientific','political','scientific','scientific','political','scientific','intellectual','intellectual','political','political','political','political'];
+  D.events.forEach((e,i)=>{e.id='e'+i;e.kind=ek[i];});
+  D.eventKindLabels={political:'Политические',scientific:'Научные',religious:'Религиозные',intellectual:'Интеллектуальные'};
+  // часть связей достроена LLM и не проверена человеком — в интерфейсе помечается пунктиром
+  const unv=['montaigne-descartes','galileo-hobbes','bayle-hume','rousseau-kant','condillac-biran','locke-leibniz','spinoza-hegel'];
+  D.influences.forEach(e=>{e.verified=!unv.includes(e.a+'-'+e.b);});
+  D.eras.forEach((e,i)=>e.id='era'+i);
+  const M=window.DESK_SETS.demo;M.groups=[];M.events.forEach((e,i)=>{e.id='e'+i;e.kind='intellectual';});M.eras.forEach((e,i)=>e.id='era'+i);
+  M.influences.forEach(e=>e.verified=true);M.people.forEach(p=>p.roles=['philosopher']);
+})();
