@@ -310,9 +310,27 @@ def entity_id(stack, name: str) -> str:
     return found[0]["id"]
 
 
-def open_graph(page, stack, name: str, recipe: str) -> None:
-    open_textbook(page, stack)  # выбранный учебник — для переключателя источников
-    page.goto(f"{stack.url}/graph/{entity_id(stack, name)}?recipe={recipe}")
+def open_graph(page, stack, name: str, recipe: str | None = None) -> str:
+    """Карта с выбранной сущностью; выбранный учебник — для переключателя источников."""
+    open_textbook(page, stack)
+    entity = entity_id(stack, name)
+    page.goto(f"{stack.url}/graph/{entity}{f'?recipe={recipe}' if recipe else ''}")
+    page.locator(".map-canvas").wait_for()
+    return entity
+
+
+def life(page, entity: str) -> dict:
+    return page.locator(f".map-person[data-person='{entity}'] .map-person__life").bounding_box()
+
+
+def pick_link(page, name: str) -> None:
+    """Линия влияния на карте: фокус на цели нажатия и Enter (как с клавиатуры)."""
+    page.get_by_role("button", name=name, exact=True).focus()
+    page.keyboard.press("Enter")
+
+
+def build_links(page) -> None:
+    page.locator(".map-selected").get_by_role("button", name="Достроить связи").click()
 
 
 @req("knowledge-graph", "Запрос графа")
@@ -321,7 +339,7 @@ def open_graph(page, stack, name: str, recipe: str) -> None:
 @req("knowledge-graph", "Отложенное сохранение")
 @req("knowledge-graph", "Показ графа")
 @req("knowledge-graph", "Подробности связи")
-@req("source-scope", "Сравнение с другими")
+@req("knowledge-graph", "Выбор на карте")
 def test_genesis_graph_from_card(page, stack, tmp_path):
     open_textbook(page, stack)
     page.get_by_role("link", name="Глава 3. Ответ Канта").click()
@@ -330,70 +348,87 @@ def test_genesis_graph_from_card(page, stack, tmp_path):
     ).click()
     card = page.get_by_role("dialog", name="Карточка")
     card.get_by_role("button", name="Генезис").click()
-    page.wait_for_selector("h1:text('Генезис: Кант')")
-    # Сохранённая связь видна сразу, достроенные приходят следом и помечены.
-    page.locator(".graph-edge[data-generated=false]").first.wait_for()
-    kant_dates = page.locator(".graph-node[aria-label='Кант'] .graph-dates")
-    assert kant_dates.text_content() == "1724–1804"
-    page.wait_for_function(
-        "document.querySelectorAll('.graph-edge[data-generated=true]').length === 2"
+    # Карта раздела с выбранным Кантом: адрес — его, Юм выделен цветом учителя.
+    kant, hume, locke = (entity_id(stack, n) for n in ("Кант", "Юм", "Локк"))
+    page.wait_for_url(f"**/graph/{kant}*")
+    page.locator(f".map-person.map-role-self[data-person='{kant}']").wait_for()
+    assert page.locator("h1").inner_text() == "Кант"
+    assert "map-role-teacher" in page.locator(f".map-person[data-person='{hume}']").get_attribute(
+        "class"
     )
-    x = {
-        name: float(page.get_by_role("button", name=name, exact=True).get_attribute("data-x"))
-        for name in ("Локк", "Юм", "Кант")
-    }
+    assert (
+        page.locator(f".map-person[data-person='{kant}']").get_attribute("aria-label")
+        == "Кант, 1724–1804"
+    )
+    x = {n: life(page, e)["x"] for n, e in (("Локк", locke), ("Юм", hume), ("Кант", kant))}
     assert x["Локк"] < x["Юм"] < x["Кант"]  # по времени
-    page.get_by_role("button", name="Кант — испытал влияние — Юм").click()
+    # Сохранённая связь видна сразу; подробности — атрибуции и цитата с абзацем.
+    pick_link(page, "Кант испытал влияние: Юм")
     details = page.get_by_role("region", name="Связь")
+    details.wait_for()
     assert f"так считает: {TEXTBOOK}" in details.inner_text()
     assert "Юм пробудил его от догматического сна" in details.inner_text()
-    page.get_by_role("button", name="Кант — развивает — Лейбниц").click()
+    page.keyboard.press("Escape")  # закрывает подробности, выбор Канта остаётся
+    # Достройка: новые связи между людьми карты — пунктиром.
+    build_links(page)
+    page.locator(".map-selected", has_text="Добавлено на карту").wait_for()
+    page.locator(".map-thread[data-generated='true']").first.wait_for()
+    pick_link(page, "Кант испытал влияние: Лейбниц (достроено моделью, не проверено)")
     assert "достроена моделью и не подтверждена" in details.inner_text()
     with page.expect_download() as download:
         page.get_by_role("button", name="Сохранить изображение").click()
-    image = tmp_path / "graph.svg"
+    image = tmp_path / "map.svg"
     download.value.save_as(image)
-    exported = image.read_text(encoding="utf-8")
-    assert exported.count('stroke-dasharray="6 4"') == 2 and "◇" in exported
+    assert 'stroke-dasharray="4 3"' in image.read_text(encoding="utf-8")
 
     extended = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.extended")
     assert extended[-1]["proposed"] == 2 and extended[-1]["dropped"] == 1  # «жил в» вне рецепта
     assert wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.saved")
 
-    # Повторный запрос: достроенное уже сохранено, модель не вызывается.
+    # Повторное открытие: достроенное сохранено и приходит с картой, модель не вызывается.
     page.reload()
-    proposed = ("Кант — развивает — Лейбниц", "Юм — испытал влияние — Локк")
-    for name in proposed:
-        page.locator(f".graph-edge[data-generated=true][aria-label='{name}']").wait_for()
-    built = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.built")
-    assert built[-1]["extension"] == "done_before"
+    page.locator(".map-thread[data-generated='true']").first.wait_for()
+    build_links(page)
+    built = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.graph.built" and e.get("extension") == "done_before",
+    )
+    assert built
     assert (
         len(wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.extended")) == 1
     )
-    page.get_by_role("button", name="Мельче").click()
-    page.wait_for_selector("text=Глубина 2 из 3")
-    for name in proposed:  # пометка не теряется при смене глубины
-        assert page.get_by_role("button", name=name).get_attribute("data-generated") == "true"
-    # Сравнение: чего нет в моём учебнике.
-    page.get_by_label("Нет в моём учебнике").check()
-    page.wait_for_function("!document.querySelector('.graph-edge[data-generated=false]')")
-    labels = page.locator(".graph-edge").evaluate_all("els => els.map(e => e.ariaLabel)")
-    assert set(proposed) <= set(labels) and "Кант — испытал влияние — Юм" not in labels
+    # Пометка не теряется при смене фильтра (окно времени).
+    window = page.locator(".map-facet", has=page.locator("summary", has_text="Время"))
+    window.locator("summary").click()
+    start = window.locator(".map-year").first
+    start.fill("1640")
+    start.press("Enter")
+    page.wait_for_url("**from=1640*")
+    assert page.locator(".map-thread[data-generated='true']").count() >= 1
 
 
 @req("source-scope", "Переключатель источников")
 @req("source-scope", "Фильтр по атрибуции")
 @req("source-scope", "Достройка в режиме учебника")
 def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
-    open_graph(page, stack, "Кант", "genesis")
-    page.wait_for_selector("h1:text('Генезис: Кант')")
+    kant = open_graph(page, stack, "Кант", "genesis")
     page.get_by_label("Только выбранный учебник").check()
+    page.wait_for_function(
+        "() => document.querySelectorAll('.map-thread-hit').length === 1"
+        " && !document.querySelector('.map-page .loading')"
+    )
+    assert page.locator(".map-thread-hit").get_attribute("aria-label") == "Кант испытал влияние: Юм"
+    page.locator(f".map-person.map-role-self[data-person='{kant}']").wait_for()
+    build_links(page)
     notice = page.get_by_role("status").filter(has_text="только выбранный учебник")
     notice.wait_for()
-    page.wait_for_function("document.querySelectorAll('.graph-edge').length === 1")
-    assert page.locator(".graph-edge").get_attribute("aria-label") == "Кант — испытал влияние — Юм"
-    built = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.built")
-    assert built[-1]["extension"] == "scope"
+    built = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.graph.built" and e.get("extension") == "scope",
+    )
+    assert built
     # Переключатель источников переехал в полную карточку в панели (этап 3); здесь проверяется
     # то же значение в ассистенте.
     via_sidebar(page, TEXTBOOK)
@@ -413,10 +448,10 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
         stack, "assistant", lambda e: e["event"] == "assistant.searched" and e["scope"] == "current"
     )
     assert searched
-    # Снятие флажка в ассистенте возвращает «все источники» и графу.
+    # Снятие флажка в ассистенте возвращает «все источники» и карте.
     panel.get_by_label("Только выбранный учебник").uncheck()
-    page.goto(f"{stack.url}/graph/{entity_id(stack, 'Кант')}?recipe=genesis")
-    page.wait_for_selector("h1:text('Генезис: Кант')")
+    page.goto(f"{stack.url}/graph/{kant}")
+    page.locator(".map-canvas").wait_for()
     assert not page.get_by_label("Только выбранный учебник").is_checked()
 
 
@@ -425,20 +460,33 @@ def test_textbook_scope_shared_by_graph_card_and_assistant(page, stack):
 @req("knowledge-graph", "Запрос графа")
 def test_empty_graph_and_unsuitable_recipe(page, stack):
     open_graph(page, stack, "Кант", "answers")
+    build_links(page)
     alert = page.get_by_role("alert")
     assert "не подходит" in alert.inner_text()
     alert.get_by_role("button", name="Генезис").click()
-    page.wait_for_selector("h1:text('Генезис: Кант')")
-
-    page.goto(f"{stack.url}/graph/{entity_id(stack, 'Причинность')}?recipe=genesis")
+    wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.graph.built" and e.get("recipe") == "genesis",
+    )
+    # У Фихте на карте связей нет: «Выбрано» говорит об этом и предлагает генерацию.
+    fichte = entity_id(stack, "Фихте")
+    page.goto(f"{stack.url}/graph/{fichte}")
+    page.locator(f".map-person.map-role-self[data-person='{fichte}']").wait_for()
     page.get_by_label("Достраивать моделью").uncheck()
-    page.wait_for_selector("text=Связей пока нет.")
-    assert "выключена" in page.get_by_role("status").inner_text()
-    built = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.built")
-    assert built[-1]["extension"] == "disabled" and built[-1]["edges"] == 0
-    page.get_by_role("button", name="Включить достройку моделью").wait_for()
-    page.get_by_role("button", name="Попробовать: Полемика").click()
-    page.wait_for_selector("h1:text('Полемика: Причинность')")
+    selected = page.locator(".map-selected")
+    selected.get_by_text("Связей пока нет.").wait_for()
+    selected.get_by_role("button", name="Включить достройку моделью").wait_for()
+    build_links(page)
+    assert "выключена" in selected.get_by_role("status").inner_text()
+    built = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.graph.built" and e.get("extension") == "disabled",
+    )
+    assert built[-1]["edges"] == 0
+    selected.get_by_role("button", name="Включить достройку моделью").click()
+    assert page.get_by_label("Достраивать моделью").is_checked()
 
 
 @req("ontology-retrieval", "Сущности вопроса")

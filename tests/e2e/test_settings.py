@@ -134,9 +134,16 @@ def test_settings_defaults_and_effect(page, stack):
     # Граф не достраивается, карточка без описания моделью.
     locke = httpx.get(stack.url + "/api/knowledge/v1/entities", params={"name": "Локк"}).json()[0]
     page.goto(f"{stack.url}/graph/{locke['id']}?recipe=polemic")
-    page.wait_for_selector("text=Связей пока нет.")
-    built = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.graph.built")
+    page.locator(f".map-person.map-role-self[data-person='{locke['id']}']").wait_for()
+    assert not page.get_by_label("Достраивать моделью").is_checked()
+    page.locator(".map-selected").get_by_role("button", name="Достроить связи").click()
+    built = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: e["event"] == "knowledge.graph.built" and e["entity_id"] == locke["id"],
+    )
     assert built[-1]["extension"] == "disabled"
+    assert page.locator(".map-thread[data-generated='true']").count() == 0
     page.goto(stack.url + "/read")
     page.locator("p.block", has_text="Локк сравнивал").locator(".mention", has_text="Локк").click()
     page.get_by_role("dialog", name="Карточка").locator("h3:text('Локк')").wait_for()

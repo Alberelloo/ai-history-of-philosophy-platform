@@ -207,9 +207,9 @@ def graph(page, site, ids):
         " s.settings = {...(s.settings || {}), generation: false};"
         f" localStorage.setItem('{KEY}', JSON.stringify(s)); }}"
     )
-    page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
-    page.wait_for_selector(".graph-page h1")
-    page.wait_for_function("() => !document.querySelector('.graph-page .loading')")
+    page.goto(f"{site.url}/graph/{ids['kant']}")
+    page.locator(".map-canvas").wait_for()
+    page.wait_for_function("() => !document.querySelector('.map-page .loading')")
 
 
 def settings(page, site, ids):
@@ -228,7 +228,7 @@ SCREENS = {
         [".sidebar", ".page"],
         [(".filters__search", "width", 22.5), (".page", "max-width", 75)],
     ),
-    "graph": (graph, [".sidebar", ".graph-page"], [(".graph-recipe", "width", 15)]),
+    "graph": (graph, [".sidebar", ".map-chart", ".map-panel"], [(".map-panel", "width", 18.75)]),
     "settings": (
         settings,
         [".sidebar", ".settings__toc", ".settings__sections"],
@@ -288,22 +288,15 @@ def test_scale_across_product(browser, site, ids, screen):
                 measure = chapter_measure(page)
                 assert 62 - 0.5 <= measure <= 68 + 0.5, (width, measure)
             if screen == "graph":
-                # Рисунок растёт с корневым кеглем (узлы, ручки, подписи), viewBox прежний;
-                # шире холста он не становится (max-width: 100%).
-                ratio, canvas = page.evaluate(
-                    "() => { const s = document.querySelector('svg.graph');"
-                    " const c = document.querySelector('.graph-canvas');"
-                    " return [s.getBoundingClientRect().width / s.viewBox.baseVal.width,"
-                    " c.clientWidth / s.viewBox.baseVal.width]; }"
+                # Карта рисуется в пикселях контейнера (synchro-map): холст занимает ширину
+                # области карты без масштабирования viewBox и не выходит за неё.
+                svg, chart = page.evaluate(
+                    "() => { const s = document.querySelector("
+                    " \".map-canvas svg[data-part='bottom']\");"
+                    " const c = document.querySelector('.map-chart');"
+                    " return [s.getBoundingClientRect().width, c.clientWidth]; }"
                 )
-                expected_ratio = min(root / 16, canvas)
-                assert abs(ratio - expected_ratio) <= 0.01, (width, ratio, expected_ratio)
-                if width == 2560:
-                    assert ratio > 1.1, (width, ratio)  # на 2560 граф крупнее, чем на 1920
-                label = page.locator(".graph-label").first.evaluate(
-                    "el => el.getBoundingClientRect().height"
-                )
-                assert label <= 13 * 1.6 * ratio, (width, label)  # кегль не умножен дважды
+                assert abs(svg - chart) <= 1, (width, svg, chart)
         finally:
             context.close()
 
