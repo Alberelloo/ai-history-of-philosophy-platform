@@ -176,6 +176,12 @@ class Graphs:
             "in_textbook": self.statements._attributed(s, textbook) if textbook else None,
         }
 
+    def edge(
+        self, statement: dict[str, Any], textbook: str | None, closed: frozenset[str] = frozenset()
+    ) -> dict[str, Any]:
+        """Связь в виде ребра графа: подписи атрибуций, скрытие закрытых по региону источников."""
+        return self._edge(statement, textbook, closed)
+
     # --- построение ---
 
     def build(

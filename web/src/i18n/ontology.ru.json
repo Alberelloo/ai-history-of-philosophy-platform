@@ -203,11 +203,43 @@
     "dating": {
       "title": "датировка"
     },
+    "group_kind": {
+      "title": "вид группы"
+    },
+    "person_role": {
+      "title": "роль"
+    },
+    "event_kind": {
+      "title": "вид события"
+    },
     "definition": {
       "title": "определение"
     },
     "description": {
       "title": "описание"
+    }
+  },
+  "values": {
+    "group_kind": {
+      "school": "школа",
+      "direction": "направление",
+      "institution": "институция",
+      "circle": "кружок"
+    },
+    "person_role": {
+      "philosopher": "философ",
+      "scientist": "учёный",
+      "writer": "писатель",
+      "theologian": "богослов",
+      "ruler": "правитель",
+      "translator": "переводчик"
+    },
+    "event_kind": {
+      "political": "политическое",
+      "scientific": "научное",
+      "religious": "религиозное",
+      "intellectual": "интеллектуальное",
+      "biographical": "биографическое"
     }
   },
   "recipes": {

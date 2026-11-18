@@ -1,0 +1,52 @@
+{
+  "axis_aligned_share": {
+    "kant-hume": 0.07142857142857142,
+    "hume-locke": 0.0,
+    "locke-descartes": 0.0,
+    "reason-descartes": 0.07142857142857142,
+    "kant-reason": 0.0,
+    "kant-critique": 0.0,
+    "enquiry-hume": 0.07142857142857142,
+    "causality-hume": 0.0,
+    "critique-enquiry": 0.03571428571428571,
+    "kant-causality": 0.03571428571428571
+  },
+  "merged_pairs_lt6px": [
+    [
+      "kant-hume",
+      "enquiry-hume",
+      4.16
+    ],
+    [
+      "kant-hume",
+      "kant-causality",
+      5.5
+    ],
+    [
+      "hume-locke",
+      "reason-descartes",
+      5.36
+    ],
+    [
+      "locke-descartes",
+      "reason-descartes",
+      1.31
+    ],
+    [
+      "kant-reason",
+      "enquiry-hume",
+      5.07
+    ],
+    [
+      "kant-critique",
+      "kant-causality",
+      5.3
+    ],
+    [
+      "causality-hume",
+      "kant-causality",
+      3.6
+    ]
+  ],
+  "marker_foreign": []
+}

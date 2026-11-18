@@ -81,6 +81,25 @@ WIKIDATA_SIMPLE = {
 }
 WIKIDATA_SKIPPED = {"P737": "связи влияния только из библиотеки или достройкой"}
 
+# Род занятий (P106) → роль персоны. Чего нет в таблице, не записывается.
+WIKIDATA_ROLES = {
+    "Q4964182": "philosopher",  # философ
+    "Q170790": "scientist",  # математик
+    "Q169470": "scientist",  # физик
+    "Q11063": "scientist",  # астроном
+    "Q18805": "scientist",  # естествоиспытатель
+    "Q901": "scientist",  # учёный
+    "Q36180": "writer",  # писатель
+    "Q49757": "writer",  # поэт
+    "Q11774202": "writer",  # эссеист
+    "Q1234713": "theologian",  # богослов
+    "Q42603": "theologian",  # священник
+    "Q250867": "theologian",  # католический священник
+    "Q116": "ruler",  # монарх
+    "Q82955": "ruler",  # политик
+    "Q333634": "translator",  # переводчик
+}
+
 
 class Filling:
     def __init__(
@@ -519,6 +538,18 @@ class Filling:
                     entity,
                     "dating",
                     value=dating.to_json(),
+                    attributions=attribution,
+                    provenance=imported,
+                    status="sourced",
+                )
+            )
+        roles = {WIKIDATA_ROLES[q] for q in claims.get("P106", []) if q in WIKIDATA_ROLES}
+        for role in sorted(roles):
+            created.append(
+                self.statements.add(
+                    entity,
+                    "person_role",
+                    value=role,
                     attributions=attribution,
                     provenance=imported,
                     status="sourced",

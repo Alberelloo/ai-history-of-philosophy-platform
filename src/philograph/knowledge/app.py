@@ -8,12 +8,14 @@ from typing import Any
 from fastapi import APIRouter, Depends, FastAPI, Query, Request, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy.exc import NoResultFound
 
 from philograph import __version__
 from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
+from philograph.knowledge.map import SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
@@ -125,6 +127,7 @@ def build_app(
     library: ServiceClient | None = None,
     portraits: Portraits | None = None,
     actions: ActionLog | None = None,
+    section_map: SectionMap | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -181,6 +184,14 @@ def build_app(
             "edges": [without_closed(edge, closed) for edge in result["edges"]],
         }
 
+    if section_map is not None:
+
+        @router.get("/map")
+        def map_of(textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
+            """Карта раздела из сохранённых утверждений, без модели. Цитат и атрибуций в ней
+            нет — подробности связи клиент берёт из ``/entities/{id}/statements``."""
+            return section_map.build(textbook=textbook, only_textbook=only_textbook)
+
     if assistant is not None:
 
         @router.post("/internal/assistant/context")
@@ -201,6 +212,23 @@ def build_app(
         @router.get("/entities/{entity_id}/recipes")
         def recipes(entity_id: str) -> list[dict[str, Any]]:
             return graphs.recipes_for(entity_id)
+
+        @router.get("/graph/edges/{statement_id}")
+        def edge(
+            statement_id: str,
+            textbook: str | None = None,
+            closed: frozenset[str] = Depends(region_closed),
+        ) -> dict[str, Any]:
+            """Подробности одной связи карты в том же виде, что рёбра потока графа."""
+            try:
+                statement = graphs.statements.get(statement_id)
+            except NoResultFound as exc:
+                raise UserFacingError(
+                    "Связь не найдена", status=404, kind="edge_not_found"
+                ) from exc
+            if statement["status"] == "rejected":
+                raise UserFacingError("Связь не найдена", status=404, kind="edge_not_found")
+            return graphs.edge(statement, textbook, closed)
 
         @router.post("/graph/build")
         def build(

@@ -87,12 +87,12 @@ def seed(database_url: str, files_root: Path) -> dict[str, str]:
 
 
 def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
-    """Маленькая демо-онтология: связь с цитатой из учебника и одна на проверку."""
+    """Маленькая демо-онтология: связь с цитатой из учебника и одна на проверку; эпохи,
+    события, группы и роли — чтобы карта раздела не была пустой."""
     from philograph.knowledge import schema as knowledge_schema
-    from philograph.knowledge.dates import lifespan, parse
     from philograph.knowledge.entities import Entities
     from philograph.knowledge.registry import OntologyRegistry
-    from philograph.knowledge.statements import Attribution, Evidence, Provenance, Statements
+    from philograph.knowledge.statements import Statements
     from philograph.library.reading import Internal
 
     engine = make_engine(database_url, [knowledge_schema.SCHEMA])
@@ -100,12 +100,21 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
     registry = OntologyRegistry(engine)
     registry.load_defaults()
     entities = Entities(engine, registry)
-    if entities.find("Кант"):
-        return
     internal = Internal(reading.registry, reading)
     paragraphs = internal.version_paragraphs(reading.registry.get(textbook).published_version)
     text_of = {p["id"]: p["text"] for p in paragraphs["paragraphs"]}
     statements = Statements(engine, registry, entities, text_of.get)
+    if not entities.find("Кант"):
+        seed_core(entities, statements, reading, textbook, text_of)
+    if not entities.find("Просвещение"):
+        seed_map(entities, statements)
+
+
+def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
+    """Связь с цитатой из учебника и одна на проверку."""
+    from philograph.knowledge.dates import lifespan, parse
+    from philograph.knowledge.statements import Attribution, Evidence, Provenance
+
     entities.source_entity(textbook, reading.registry.get(textbook).title)
     people = {}
     for name, birth, death in (
@@ -157,6 +166,105 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         "influenced_by",
         obj=new_essays,
         attributions=[Attribution("common")],
+        provenance=Provenance("generated"),
+    )
+
+
+def seed_map(entities, statements) -> None:
+    """Карта раздела: эпохи с датировкой, события с видом, группы с видом и участниками, роли.
+
+    Новые персоны и труды не связаны с Кантом и Юмом связями, которые видны в их карточках
+    и графе генезиса: эталонные снимки чтения от демо-данных карты не меняются. Названия
+    не встречаются в тексте демо-учебника — новых упоминаний в главах нет."""
+    from philograph.knowledge.dates import lifespan, parse
+    from philograph.knowledge.statements import Attribution, Provenance
+
+    common = [Attribution("common")]
+
+    def entity(type_: str, name: str, dating: str | None = None) -> str:
+        found = entities.find(name)
+        if found:
+            return found[0]["id"]
+        entity_id = entities.create(type_, [("ru", name, "primary")])
+        if dating:
+            statements.add(entity_id, "dating", value=parse(dating).to_json(), attributions=common)
+        return entity_id
+
+    def person(name: str, birth: str, death: str, roles: tuple[str, ...]) -> str:
+        found = entities.find(name)
+        if found:
+            entity_id = found[0]["id"]
+        else:
+            entity_id = entities.create("person", [("ru", name, "primary")])
+            statements.add(
+                entity_id,
+                "lifespan",
+                value=lifespan(birth, death).to_json(),
+                attributions=common,
+            )
+        for role in roles:
+            statements.add(entity_id, "person_role", value=role, attributions=common)
+        return entity_id
+
+    people = {
+        "Кант": person("Кант", "1724", "1804", ("philosopher", "scientist")),
+        "Юм": person("Юм", "1711", "1776", ("philosopher", "writer")),
+        "Локк": person("Локк", "1632", "1704", ("philosopher",)),
+        "Лейбниц": person("Лейбниц", "1646", "1716", ("philosopher", "scientist")),
+        "Декарт": person("Декарт", "1596", "1650", ("philosopher", "scientist")),
+        "Беркли": person("Беркли", "1685", "1753", ("philosopher", "theologian")),
+        "Вольф": person("Вольф", "1679", "1754", ("philosopher", "scientist")),
+        "Фихте": person("Фихте", "1762", "1814", ("philosopher",)),
+    }
+    entity("epoch", "Научная революция", "1543–1687")
+    entity("epoch", "Просвещение", "1680–1800")
+    for name, year, kind in (
+        ("Смерть Декарта в Стокгольме", "1650", "biographical"),
+        ("Отлучение Спинозы", "1656", "religious"),
+        ("Основание Лондонского королевского общества", "1660", "scientific"),
+        ("Славная революция", "1688", "political"),
+        ("Выход первого тома «Энциклопедии»", "1751", "intellectual"),
+    ):
+        event = entity("event", name, year)
+        statements.add(event, "event_kind", value=kind, attributions=common)
+    works = {}
+    for title, year, author in (
+        ("Рассуждение о методе", "1637", "Декарт"),
+        ("Трактат о принципах человеческого знания", "1710", "Беркли"),
+        ("Разумные мысли о Боге, мире и душе человека", "1720", "Вольф"),
+        ("Основа общего наукоучения", "1794", "Фихте"),
+    ):
+        works[title] = entity("work", title, year)
+        statements.add(works[title], "author", obj=people[author], attributions=common)
+    # Идеи ставятся на год труда, где высказаны; «Субстанция» без труда — «без даты».
+    doubt = entity("position", "Методическое сомнение")
+    statements.add(works["Рассуждение о методе"], "expresses", obj=doubt, attributions=common)
+    immaterialism = entity("doctrine", "Имматериализм")
+    statements.add(
+        works["Трактат о принципах человеческого знания"],
+        "discusses",
+        obj=immaterialism,
+        attributions=common,
+    )
+    entity("concept", "Субстанция")
+    for name, kind, members in (
+        ("Рационализм", "direction", ("Декарт", "Вольф")),
+        ("Эмпиризм", "direction", ("Беркли",)),
+        ("Немецкий идеализм", "direction", ("Фихте",)),
+        ("Школа Вольфа", "school", ("Вольф",)),
+    ):
+        group = entity("group", name)
+        statements.add(group, "group_kind", value=kind, attributions=common)
+        for member in members:
+            statements.add(people[member], "member_of", obj=group, attributions=common)
+    statements.add(people["Вольф"], "influenced_by", obj=people["Лейбниц"], attributions=common)
+    statements.add(people["Беркли"], "influenced_by", obj=people["Локк"], attributions=common)
+    # Достроенная моделью связь — пунктир на карте.
+    statements.add(
+        people["Беркли"],
+        "criticizes",
+        obj=people["Декарт"],
+        attributions=common,
         provenance=Provenance("generated"),
     )
 

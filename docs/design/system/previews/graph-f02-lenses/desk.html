@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Граф Ф0.2 — стол философа (пробный кадр)</title>
+<link rel="stylesheet" href="../graph-f02/assets/fonts.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="desk.css">
+</head>
+<body>
+<div class="atlas-app scene" id="app" data-theme="light">
+
+  <!-- Материалы: только SVG-фильтры, без внешних картинок -->
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- Орех: вытянутые волокна + изгиб + широкие полосы -->
+      <filter id="woodTex" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.115" numOctaves="4" seed="7" result="g"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="2" seed="11" result="warp"/>
+        <feDisplacementMap in="g" in2="warp" scale="46" xChannelSelector="R" yChannelSelector="G" result="gw"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.0011 0.018" numOctaves="2" seed="3" result="b"/>
+        <feBlend in="gw" in2="b" mode="multiply" result="gb"/>
+        <feColorMatrix in="gb" type="matrix" values="0.78 0 0 0 0.13  0.52 0 0 0 0.07  0.33 0 0 0 0.035  0 0 0 0 1" result="wood"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="pore"/>
+        <feColorMatrix in="pore" type="matrix" values="0 0 0 0 0.1  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 -0.5 0.32" result="poreA"/>
+        <feComposite in="poreA" in2="wood" operator="over"/>
+      </filter>
+      <!-- Кожа: шум + диффузный свет (az 225 = свет сверху слева), умножение на цвет фигуры -->
+      <filter id="leather" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="5" result="n"/>
+        <feDiffuseLighting in="n" surfaceScale="1.7" diffuseConstant="1.18" lighting-color="#ffffff" result="lit"><feDistantLight azimuth="225" elevation="55"/></feDiffuseLighting>
+        <feBlend in="SourceGraphic" in2="lit" mode="multiply" result="m"/>
+        <feComposite in="m" in2="SourceGraphic" operator="in"/>
+      </filter>
+      <!-- Бумага: микрорельеф + пятнистость + неровная кромка -->
+      <filter id="paper" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="3" seed="3" result="n"/>
+        <feDiffuseLighting in="n" surfaceScale="0.42" diffuseConstant="1.12" lighting-color="#fff8ec" result="lit"><feDistantLight azimuth="225" elevation="62"/></feDiffuseLighting>
+        <feBlend in="SourceGraphic" in2="lit" mode="multiply" result="p1"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.007" numOctaves="2" seed="9" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.41  0 0 0 0 0.24  0.16 0 0 0 -0.05" result="mot"/>
+        <feComposite in="mot" in2="p1" operator="over" result="p2"/>
+        <feComposite in="p2" in2="SourceGraphic" operator="in" result="p3"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="2" result="d"/>
+        <feDisplacementMap in="p3" in2="d" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <!-- Сургуч: неровный край -->
+      <filter id="wax" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="8" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <radialGradient id="paperEdge" cx="46%" cy="40%" r="78%">
+        <stop offset="58%" stop-color="#8c6432" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#8c6432" stop-opacity=".14"/>
+      </radialGradient>
+      <radialGradient id="brass" cx="38%" cy="32%" r="70%">
+        <stop offset="0%" stop-color="#f6dc9c"/><stop offset="45%" stop-color="#c39645"/><stop offset="100%" stop-color="#5e3f15"/>
+      </radialGradient>
+      <linearGradient id="gutter" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="#5a3c1e" stop-opacity="0"/><stop offset="50%" stop-color="#5a3c1e" stop-opacity=".32"/><stop offset="100%" stop-color="#5a3c1e" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <svg class="wood" aria-hidden="true" preserveAspectRatio="none"><rect width="100%" height="100%" filter="url(#woodTex)"/></svg>
+  <div class="wood-veil" aria-hidden="true"></div>
+
+  <div class="stage">
+    <!-- бювар под листом -->
+    <div class="blotter" aria-hidden="true">
+      <svg preserveAspectRatio="none"><rect width="100%" height="100%" rx="6" fill="#2c3d31" filter="url(#leather)"/></svg>
+      <div class="stitch"></div>
+    </div>
+
+    <!-- предметы ПОД листом -->
+    <div class="card" id="card-under" aria-hidden="true" style="left:calc(50% + 40px);bottom:-176px;width:250px;transform:rotate(5deg);z-index:2">
+      <div class="t big">Юм → Кант</div>
+      <div class="t">«пробудил от догм. сна»</div>
+      <div class="t">см. Пролегомены, 1783</div>
+    </div>
+    <div class="page p2" aria-hidden="true"><svg preserveAspectRatio="none"><rect width="100%" height="100%" fill="#e7d9b8" filter="url(#paper)"/></svg></div>
+    <div class="page p1" aria-hidden="true"><svg preserveAspectRatio="none"><rect width="100%" height="100%" fill="#ede1c4" filter="url(#paper)"/></svg></div>
+
+    <!-- рабочий лист -->
+    <article class="folio">
+      <svg class="paper" aria-hidden="true" preserveAspectRatio="none">
+        <rect width="100%" height="100%" fill="#f8f0de" filter="url(#paper)"/>
+        <rect width="100%" height="100%" fill="url(#paperEdge)"/>
+      </svg>
+      <div class="neatline" aria-hidden="true"></div>
+      <header class="head">
+        <div class="head-main">
+          <div class="eyebrow">АТЛАС ИДЕЙ · ТЕОРИЯ ПОЗНАНИЯ</div>
+          <h1>Иммануил Кант</h1>
+          <p class="subtitle">Откуда пришла мысль философа — и что он из неё сделал</p>
+        </div>
+      </header>
+      <!-- рабочая область: карта слева, панель справа (как в GraphPage: холст + aside 22.5rem); панель сворачивается -->
+      <div class="workspace">
+        <div class="chart">
+          <div class="gutter" role="group" aria-label="Линзы: свернуть или развернуть страту"></div>
+          <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Синхронологическая карта: события, эпохи, философы и их труды на оси времени"></svg>
+        </div>
+        <aside class="panel" id="panel" aria-label="Поиск, выбранное, фильтры и условные знаки">
+          <div class="panel-bar">
+            <span class="panel-title">Панель карты</span>
+            <button type="button" class="panel-toggle" aria-expanded="true" aria-controls="panel-body" title="Свернуть панель">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13"/></svg><span class="sr">Свернуть панель</span>
+            </button>
+          </div>
+          <div class="panel-rail" aria-hidden="true"></div>
+          <div class="panel-body" id="panel-body">
+            <div class="tools"></div>
+            <section class="selnote panel-sec" aria-live="polite"></section>
+            <section class="filters panel-sec" aria-label="Фильтры"></section>
+            <section class="legend panel-sec" aria-label="Условные знаки">
+              <h2 class="sec-h">Условные знаки</h2>
+              <div class="legend-grid">
+                <span><svg viewBox="0 0 34 12"><rect x="1" y="2" width="32" height="8" rx="4" fill="var(--graph-ink-secondary)" fill-opacity=".14"/></svg>годы жизни</span>
+                <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-linecap="round"/></svg>влияние</span>
+                <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-dasharray="4 3"/></svg>не проверено</span>
+                <span><svg viewBox="0 0 14 16"><rect x="2" y="1.5" width="10" height="13" rx="1" fill="none" stroke="var(--texts)" stroke-width="1.2"/><rect x="2" y="1.5" width="2.6" height="13" fill="var(--texts)" fill-opacity=".55"/></svg>труд</span>
+                <span><svg viewBox="0 0 16 16"><path d="M8 2 L14 8 L8 14 L2 8 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>понятие</span>
+                <span><svg viewBox="0 0 16 16"><path d="M8 1.5 L14.5 13.5 L1.5 13.5 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>позиция</span>
+                <span><svg viewBox="0 0 16 16"><path d="M1.5 1.5 H14.5 V14.5 H1.5 Z M5 8 H11 M8.5 5.5 L11 8 L8.5 10.5" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>аргумент</span>
+                <span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="var(--history)" stroke-width="1.2"/><circle cx="8" cy="8" r="1.8" fill="var(--history)"/></svg>событие</span>
+              </div>
+              <p class="legend-note">Цвет — принадлежность: труды окрашены цветом автора. Расшифровка — в «Выбрано».</p>
+            </section>
+          </div>
+        </aside>
+      </div>
+      <footer class="legend-row">
+        <div class="edition-note">Демонстрационные данные</div>
+      </footer>
+    </article>
+
+    <!-- предметы НАД столом, вокруг листа -->
+    <div class="prop shadowed" id="books" aria-hidden="true" style="left:-318px;top:-128px;width:350px"></div>
+    <div class="prop shadowed" id="inkwell" aria-hidden="true" style="right:-196px;top:-66px;width:300px"></div>
+    <div class="card" id="card-top" aria-hidden="true" style="left:calc(50% - 250px);bottom:-168px;width:236px;transform:rotate(-4deg);z-index:2">
+      <span class="pin"></span>
+      <div class="t big" style="margin-top:6px">Что я могу знать?</div>
+      <div class="t">Что я должен делать?</div>
+      <div class="t">На что смею надеяться?</div>
+    </div>
+    <div class="prop shadowed" id="openbook" aria-hidden="true" style="left:-372px;bottom:-212px;width:480px"></div>
+    <div class="prop shadowed" id="glasses" aria-hidden="true" style="right:96px;bottom:-150px;width:220px"></div>
+    <div class="prop shadowed" id="letter" aria-hidden="true" style="right:-262px;bottom:-196px;width:300px"></div>
+  </div>
+
+  <div class="lamp" aria-hidden="true"></div>
+</div>
+<script src="desk-data.js"></script>
+<script src="desk-chart.js"></script>
+<script src="desk.js"></script>
+</body>
+</html>

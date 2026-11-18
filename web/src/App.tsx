@@ -2,7 +2,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { AssistantPanel, useAnsweringStage } from "./AssistantPanel";
 import { AssistantPage } from "./AssistantPage";
 import { FullCard, OPEN_CARD_EVENT } from "./FullCard";
-import { GraphPage } from "./GraphPage";
+import { MapPage } from "./map/MapPage";
 import { useT } from "./i18n";
 import { LibraryPage } from "./LibraryPage";
 import { FirstRunNotice } from "./Notice";
@@ -20,7 +20,7 @@ import { Icon } from "./ui";
 // Адреса: /                   — библиотека
 //         /read/:source[/:chapter][#p-<абзац> | #s-<раздел>] — чтение
 //         /p/:paragraph       — постоянная ссылка на абзац
-//         /graph/:entity?recipe=… — граф по запросу
+//         /graph[/:entity]?sel,q,from,to,…,recipe — карта раздела (synchro-map)
 //         /settings[#раздел]  — настройки читателя
 //         /soon/:раздел       — раздел в разработке
 export function navigate(path: string, state?: unknown): void {
@@ -190,11 +190,17 @@ function Page({
       window.history.replaceState(null, "", "/assistant");
       return <AssistantPage />;
     }
+    if (parts[1] === "graph") {
+      // Заглушка раздела «Граф» снята: старая закладка ведёт на карту без записи в историю.
+      window.history.replaceState(null, "", "/graph");
+      return <MapPage query={new URLSearchParams()} />;
+    }
     return <SoonPage key={parts[1]} code={parts[1]} />;
   }
   if (parts[0] === "assistant") return <AssistantPage search={search} />;
-  if (parts[0] === "graph" && parts[1]) {
-    return <GraphPage key={parts[1]} entityId={parts[1]} query={new URLSearchParams(search)} />;
+  if (parts[0] === "graph") {
+    // Карта не пересоздаётся при смене выбранной сущности: /graph/<id> только меняет выбор.
+    return <MapPage entityId={parts[1] ? decodeURIComponent(parts[1]) : undefined} query={new URLSearchParams(search)} />;
   }
   if (parts[0] === "read") {
     return (

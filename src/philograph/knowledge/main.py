@@ -17,6 +17,7 @@ from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
 from philograph.knowledge.graph import Graphs, GraphSettings
+from philograph.knowledge.map import MapSettings, SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
@@ -47,6 +48,7 @@ class Components:
     graphs: Graphs
     assistant: AssistantKnowledge
     library: ServiceClient
+    section_map: SectionMap
 
 
 def components(env: dict[str, str]) -> Components:
@@ -96,6 +98,10 @@ def components(env: dict[str, str]) -> Components:
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
+    section_map = SectionMap(
+        statements,
+        MapSettings(max_entities=int(env.get("PHILOGRAPH_MAP_MAX_ENTITIES", "400"))),
+    )
     return Components(
         statements,
         health,
@@ -109,6 +115,7 @@ def components(env: dict[str, str]) -> Components:
         graphs,
         assistant,
         library,
+        section_map,
     )
 
 
@@ -131,4 +138,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         graphs=_c.graphs,
         assistant=_c.assistant,
         library=_c.library,
+        section_map=_c.section_map,
     )

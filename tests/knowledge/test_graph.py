@@ -273,6 +273,12 @@ def test_edge_details(gx):
     assert quotes == {"Кант испытал влияние Юма", "Юм пробудил его от догматического сна"}
     assert all(e["link"] == f"/p/{e['paragraph_id']}" for e in edge["evidence"])
     assert edge["consensus"] and edge["qualifiers"] == {}
+    # Щелчок по линии на карте: та же связь отдельным запросом, с подписями атрибуций.
+    client = TestClient(build_app(gx.onto.statements, graphs=gx.graphs))
+    one = client.get(f"/v1/graph/edges/{gx.kant_hume}", params={"textbook": TEXTBOOK}).json()
+    assert {a["who"] for a in one["attributions"]} == {"Учебник N", "Кант"}
+    assert {e["quote"] for e in one["evidence"]} == quotes and one["in_textbook"] is True
+    assert client.get("/v1/graph/edges/nope").status_code == 404
 
 
 @req(KG, "Ограничение размера")

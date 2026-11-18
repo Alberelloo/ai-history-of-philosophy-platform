@@ -54,6 +54,11 @@ class Upstreams:
         def card(entity_id: str):
             return {"id": entity_id}
 
+        @app.get("/knowledge/v1/map")
+        def section_map(request: Request):
+            self.calls.append(("map", dict(request.query_params)))
+            return {"people": []}
+
         @app.get("/library/api/v1/sources")
         def sources():
             return {"items": []}
@@ -74,7 +79,12 @@ def gw(tmp_path, clock):
     settings = LimitSettings(
         rate_per_second=1000.0,
         burst=1000,
-        quotas={"ask": Quota(2, 3), "graph": Quota(1, 5), "description": Quota(1, 5)},
+        quotas={
+            "ask": Quota(2, 3),
+            "graph": Quota(1, 5),
+            "description": Quota(1, 5),
+            "map": Quota(2, 5),
+        },
         trusted_proxy=True,
     )
     limits = Limits(settings, "секрет", clock, monotonic=lambda: tick["now"])
@@ -157,6 +167,18 @@ def test_free_operations_after_limit(gw):
     # Граф всё равно строится — из сохранённых связей, без достройки моделью.
     assert second["request"]["generation"] is False and second["request"]["visitor_limited"] is True
     assert gw.up.count("graph") == 2
+
+
+@req(AP, "Общий лимит частоты")
+def test_map_limited_without_page_token(gw):
+    """Карта раздела модель не вызывает: токен страницы не нужен, но частота считается."""
+    script = TestClient(gw.app, headers={**UA, "X-Forwarded-For": "198.51.100.7"})
+    statuses = [script.get("/api/knowledge/v1/map?textbook=s1").status_code for _ in range(3)]
+    assert statuses == [200, 200, 429]
+    limited = script.get("/api/knowledge/v1/map")
+    assert limited.json()["kind"] == "rate_limited" and int(limited.headers["Retry-After"]) >= 1
+    assert gw.up.calls[0] == ("map", {"textbook": "s1"}) and gw.up.count("map") == 2
+    assert script.get("/api/knowledge/v1/entities/e1/card").json() == {"id": "e1"}
 
 
 @req(AP, "Общий лимит частоты")

@@ -203,11 +203,43 @@
     "dating": {
       "title": "dating"
     },
+    "group_kind": {
+      "title": "group kind"
+    },
+    "person_role": {
+      "title": "role"
+    },
+    "event_kind": {
+      "title": "event kind"
+    },
     "definition": {
       "title": "definition"
     },
     "description": {
       "title": "description"
+    }
+  },
+  "values": {
+    "group_kind": {
+      "school": "school",
+      "direction": "movement",
+      "institution": "institution",
+      "circle": "circle"
+    },
+    "person_role": {
+      "philosopher": "philosopher",
+      "scientist": "scientist",
+      "writer": "writer",
+      "theologian": "theologian",
+      "ruler": "ruler",
+      "translator": "translator"
+    },
+    "event_kind": {
+      "political": "political",
+      "scientific": "scientific",
+      "religious": "religious",
+      "intellectual": "intellectual",
+      "biographical": "biographical"
     }
   },
   "recipes": {

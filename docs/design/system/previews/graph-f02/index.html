@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Атлас идей · PhiloGraph · Ф0.2</title>
+<link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="atlas-app" id="atlas-app" data-theme="light">
+<aside class="sidebar" aria-label="Навигация демонстрации">
+ <div class="brand">φ<span class="nav-label"> PhiloGraph</span></div>
+ <button class="nav-button" title="Книга — в продуктовой версии" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4q5-2 9 1 4-3 9-1v15q-5-2-9 1-4-3-9-1ZM12 5v15"/></svg><span class="nav-label" data-ru="Читать" data-en="Read">Читать</span></button>
+ <button class="nav-button current" aria-label="Граф" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="16" r="2.5"/><circle cx="12" cy="5" r="2.5"/><circle cx="20" cy="17" r="2.5"/><path d="m6 14 5-7m3 0 5 7M8 16h9"/></svg><span class="nav-label" data-ru="Атлас идей" data-en="Atlas of ideas">Атлас идей</span></button>
+ <div class="nav-bottom">
+ <button class="nav-button" id="language" title="RU / EN"><span id="language-code">EN</span><span class="nav-label" data-ru="Язык" data-en="Language">Язык</span></button>
+ <button class="nav-button" id="theme" title="Светлая / тёмная тема" data-testid="theme"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15A8 8 0 0 1 9 4a8 8 0 1 0 9 11Z"/></svg><span class="nav-label" data-ru="Сменить тему" data-en="Change theme">Сменить тему</span></button>
+ <button class="nav-button" id="pin" title="Закрепить навигацию (от 1280px)" data-testid="pin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 3 9 0-2 7 3 4H6l3-4ZM12 14v8"/></svg><span class="nav-label" data-ru="Закрепить" data-en="Pin navigation">Закрепить</span></button>
+ </div>
+</aside>
+<main class="desk" id="desk">
+<article class="folio" id="folio" data-testid="folio">
+ <div class="fold" aria-hidden="true"></div>
+ <div class="neatline" aria-hidden="true"></div>
+ <header id="page-header">
+ <div class="topline"><span class="eyebrow" data-ru="АТЛАС ИДЕЙ" data-en="ATLAS OF IDEAS">АТЛАС ИДЕЙ</span><span class="context" id="scope-context" data-ru="Вся библиотека · локальная демонстрация" data-en="Entire library · local demonstration">Вся библиотека · локальная демонстрация</span></div>
+ <h1 id="title" data-testid="graph-title">Иммануил Кант</h1>
+ <p class="subtitle" data-ru="Происхождение мысли и её связи" data-en="The origins of thought and its connections">Происхождение мысли и её связи</p>
+ <div class="controls">
+ <div class="control-group">
+ <label><span data-ru="Рецепт" data-en="View">Рецепт</span><select id="fixture" aria-label="Рецепт / набор данных" data-testid="fixture"><option value="genesis" data-ru="Генезис" data-en="Origins">Генезис</option><option value="specimens" data-ru="Образцы знаков" data-en="Specimens">Образцы знаков</option><option value="dense" data-ru="Обзор связей" data-en="Network overview">Обзор связей</option></select></label>
+ <label><span data-ru="Глубина" data-en="Depth">Глубина</span><select id="depth" aria-label="Глубина"><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></label>
+ <label><select id="scope" aria-label="Область источников"><option value="all" data-ru="Вся библиотека" data-en="Entire library">Вся библиотека</option><option value="book" data-ru="Учебник" data-en="Textbook">Учебник</option></select></label>
+ <label><select id="generation" aria-label="Достройка"><option value="on" data-ru="Достройка вкл." data-en="Generation on">Достройка вкл.</option><option value="off" data-ru="Достройка выкл." data-en="Generation off">Достройка выкл.</option></select></label>
+ </div>
+ <div class="control-group">
+ <label class="search"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="m12 12 5 5"/></svg><input id="search" type="search" autocomplete="off" placeholder="Найти на карте" aria-label="Поиск по узлам" data-testid="search"></label>
+ <div class="filter-wrap"><button class="quiet-button" id="filter-button" aria-expanded="false" aria-controls="filter-panel"><span data-ru="Фильтры" data-en="Filters">Фильтры</span> <span id="filter-count"></span><span aria-hidden="true">⌄</span></button><div id="filter-panel" class="filter-panel" hidden></div></div>
+ <button class="quiet-button" id="list-button" aria-label="Оглавление карты" title="Оглавление карты"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button>
+ </div>
+ </div>
+ </header>
+ <div id="notice" class="notice" role="status" aria-live="polite" data-testid="notice"></div>
+ <div class="body-row" id="body-row">
+ <section class="network-column" aria-label="Карта связей">
+ <div class="graph" id="graph" tabindex="0" role="region" aria-label="Интерактивный граф. Масштаб: плюс и минус, вписать: ноль." data-testid="graph">
+ <svg id="network" xmlns="http://www.w3.org/2000/svg" aria-label="Сеть связей">
+ <defs>
+ <filter id="portrait-duotone" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="table" tableValues=".14 .94"/><feFuncG type="table" tableValues=".18 .94"/><feFuncB type="table" tableValues=".23 .90"/></feComponentTransfer></filter>
+ <marker id="arrow-genesis" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--genesis)" stroke-width="1.25"/></marker>
+ <marker id="arrow-consequences" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--consequences)" stroke-width="1.25"/></marker>
+ <marker id="arrow-polemic" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--polemic)" stroke-width="1.25"/></marker>
+ <marker id="arrow-context" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--context)" stroke-width="1.25"/></marker>
+ <marker id="arrow-structure" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--structure)" stroke-width="1.25"/></marker>
+ <marker id="arrow-biography" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--biography)" stroke-width="1.25"/></marker>
+ <marker id="arrow-unknown" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="m1 1 6 3-6 3" fill="none" stroke="var(--graph-ink-secondary)" stroke-width="1.25"/></marker>
+ </defs>
+ <g id="world"></g><g id="axis" aria-hidden="true"></g>
+ </svg>
+ <div class="empty-overlay" id="empty-message" hidden></div>
+ <button id="minimap" class="minimap" aria-label="Мини-карта: нажмите, чтобы переместиться" hidden data-testid="minimap"><svg id="minimap-svg" aria-hidden="true"></svg></button>
+ </div>
+ <footer class="graph-footer"><span class="graph-summary" id="graph-summary" data-testid="summary"></span><div class="zoom-controls"><button class="quiet-button" id="zoom-out" aria-label="Уменьшить масштаб">−</button><output id="zoom-level" data-testid="zoom-level">100%</output><button class="quiet-button" id="zoom-in" aria-label="Увеличить масштаб">+</button><button class="quiet-button" id="fit" data-ru="Вписать" data-en="Fit" data-testid="fit">Вписать</button></div></footer>
+ </section>
+ <aside class="marginalia" id="note" data-testid="note" aria-label="Пояснение выбранного элемента" aria-live="polite"></aside>
+ </div>
+ <footer class="edition"><span data-ru="Демонстрационные данные · Ф0.2 · Не исторический датасет" data-en="Demonstration data · F0.2 · Not a historical dataset">Демонстрационные данные · Ф0.2 · Не исторический датасет</span><a href="assets/README.md" data-ru="Материалы и лицензии ↗" data-en="Sources and licenses ↗">Материалы и лицензии ↗</a></footer>
+ <div class="demo-tools"><span data-ru="Локальный прототип · без API" data-en="Local prototype · no API">Локальный прототип · без API</span><label><span data-ru="Состояние" data-en="State">Состояние</span><select id="scenario" aria-label="Демонстрационное состояние" data-testid="scenario"><option value="normal" data-ru="Обычное" data-en="Normal">Обычное</option><option value="loading" data-ru="Загрузка" data-en="Loading">Загрузка</option><option value="extending" data-ru="Достройка" data-en="Extending">Достройка</option><option value="off" data-ru="Генерация выключена" data-en="Generation off">Генерация выключена</option><option value="unavailable" data-ru="Модель недоступна" data-en="Model unavailable">Модель недоступна</option><option value="error" data-ru="Ошибка" data-en="Error">Ошибка</option><option value="empty" data-ru="Нет связей" data-en="Empty">Нет связей</option><option value="filtered" data-ru="Скрыто фильтрами" data-en="Filtered">Скрыто фильтрами</option><option value="limited" data-ru="Достигнут лимит" data-en="Size limit">Достигнут лимит</option></select></label></div>
+</article>
+</main>
+</div>
+<script src="fixtures.js"></script><script src="app.js"></script>
+</body>
+</html>

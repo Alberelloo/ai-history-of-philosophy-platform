@@ -141,17 +141,15 @@ def assistant(page, site, ids):
 
 
 def graph(page, site, ids):
+    """Карта раздела с выбранным Кантом и подробностями связи «Кант — Юм» в панели."""
     # Выбранный учебник — для открытых книг в боковой панели и пометок «есть в учебнике».
     page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
     page.wait_for_selector(".chapter p")
-    page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
-    page.wait_for_selector("h1:text('Генезис: Кант')")
-    page.wait_for_function(
-        "() => document.querySelectorAll('.graph-edge').length >= 3"
-        " && !document.querySelector('.graph-page .loading')"
-    )
-    page.get_by_role("button", name="Кант — испытал влияние — Юм").click()
-    page.get_by_role("region", name="Связь").wait_for()
+    page.goto(f"{site.url}/graph/{ids['kant']}")
+    page.locator(f".map-person.map-role-self[data-person='{ids['kant']}']").wait_for()
+    page.get_by_role("button", name="Кант испытал влияние: Юм", exact=True).focus()
+    page.keyboard.press("Enter")
+    page.get_by_role("region", name="Связь").locator(".graph-who").wait_for()
     aside(page)  # не 0,0: указатель в левом верхнем углу раскрыл бы боковую панель
 
 
@@ -197,7 +195,8 @@ def test_main_screens_in_both_themes(browser, site, ids, theme):
         try:
             open_screen(page, site, ids)
             check_screen(page, theme)
-            snaps(page, f"{name}-{theme}-1280")
+            if name != "graph":  # карта снимается кадром 16:9: test_map_frames_16_9
+                snaps(page, f"{name}-{theme}-1280")
         finally:
             context.close()
     snaps.check()
@@ -231,11 +230,41 @@ def test_layout_at_supported_widths(browser, site, ids, width):
                 for name in ("chapter", "card", "assistant", "graph"):
                     SCREENS[name](dark_page, site, ids)
                     check_screen(dark_page, "dark")
-                    snaps(dark_page, f"{name}-dark-{width}")
+                    if name != "graph":
+                        snaps(dark_page, f"{name}-dark-{width}")
             finally:
                 dark.close()
     finally:
         context.close()
+    snaps.check()
+
+
+# Кадры карты 16:9 (synchro-map): снимок — окно целиком, карта вписана в его высоту.
+MAP_FRAMES = [(1920, 1080), (1280, 720), (1024, 576)]
+
+
+@req(VD, "Раскладка без наложений")
+@req(VD, "Визуальная проверка")
+@req(VD, "Сцена карты")
+@pytest.mark.parametrize("theme", ["light", "dark"])
+def test_map_frames_16_9(browser, site, ids, theme):
+    """Карта с выбранным Кантом кадром 16:9: без прокрутки по горизонтали, карта и панель
+    не накладываются; снимки ``map-<тема>-<ширина>x<высота>``."""
+    snaps = visual.Snaps()
+    for width, height in MAP_FRAMES:
+        context, page = open_context(browser, theme=theme, width=width)
+        try:
+            page.set_viewport_size({"width": width, "height": height})
+            graph(page, site, ids)
+            visual.settle(page)
+            visual.assert_no_horizontal_scroll(page)
+            visual.assert_no_overlap(page, [".sidebar", ".map-chart", ".map-panel"])
+            # Бумагу рисует лист сцены стола (.desk-sheet), сама карта на нём прозрачна.
+            sheet = visual.computed(page, ".desk-sheet", "backgroundColor")
+            assert min(sheet[:3]) > 180, sheet  # лист светлый в обеих темах
+            snaps(page, f"map-{theme}-{width}x{height}")
+        finally:
+            context.close()
     snaps.check()
 
 
@@ -379,10 +408,18 @@ def test_english_card_and_graph(browser, site, ids):
         assert labels and not [text for text in labels if cyrillic.search(text)], labels
         # Рецепт графа — из компактного окна у упоминания.
         card.locator(".card-recipe", has_text="Genesis").click()
-        page.wait_for_selector("h1:text('Genesis: Юм')")
-        page.locator(".graph-edge").first.wait_for()
-        options = page.locator("#graph-recipe option").all_inner_texts()
-        assert options and not [text for text in options if cyrillic.search(text)], options
+        # Карта с выбранным Юмом: линзы, разделы панели, фильтры и условные знаки — английские.
+        page.locator(".map-person.map-role-self").wait_for()
+        assert page.locator("h1").inner_text() == "Юм"
+        chrome = [
+            *page.locator(".map-lens span").all_inner_texts(),
+            *page.locator(".map-panel__h").all_inner_texts(),
+            *page.locator(".map-facet summary").all_inner_texts(),
+            *page.locator(".map-legend").all_inner_texts(),
+            *page.locator(".map-selected button").all_inner_texts(),
+            page.locator(".map-search input").get_attribute("placeholder"),
+        ]
+        assert chrome and not [text for text in chrome if cyrillic.search(text)], chrome
         # Полная карточка в панели: разделы на английском.
         page.goto(f"{site.url}/read/{ids['source']}/{ids['chapter']}")
         page.locator("p.block", has_text="догматического сна").locator(
@@ -396,9 +433,11 @@ def test_english_card_and_graph(browser, site, ids):
             section_labels
         )
         assert "common opinion" in panel.locator(".card-section").first.inner_text()
-        page.goto(f"{site.url}/graph/{ids['kant']}?recipe=genesis")
-        page.get_by_role("button", name="Кант — influenced by — Юм").click()
+        page.goto(f"{site.url}/graph/{ids['kant']}")
+        page.get_by_role("button", name="Кант was influenced by Юм", exact=True).focus()
+        page.keyboard.press("Enter")
         details = page.get_by_role("region", name="Link")
+        details.locator(".graph-who").wait_for()
         assert "according to" in details.locator(".graph-who").inner_text()
     finally:
         context.close()
@@ -584,8 +623,11 @@ def test_future_sections_marked_and_described(browser, site, ids):
         nav = page.get_by_role("navigation", name="Разделы")
         # Раздел «Ассистент» реализован (этап 6): без метки «скоро».
         assert "скоро" not in nav.get_by_role("link", name="Ассистент").inner_text()
+        # «Граф» — карта раздела (synchro-map): ведёт на /graph, без метки «скоро».
+        graph_link = nav.get_by_role("link", name="Граф")
+        assert "скоро" not in graph_link.inner_text()
+        assert graph_link.get_attribute("href") == "/graph"
         future = [
-            "Граф",
             "Справочник",
             "Эпохи и контекст",
             "Сравнение трактовок",
@@ -618,11 +660,11 @@ def test_future_sections_marked_and_described(browser, site, ids):
         page.goto(site.url + "/soon/assistant")
         page.wait_for_url("**/assistant")
         assert "В разработке" not in page.get_by_role("main").inner_text()
-        # Граф: поиск сущности ведёт на её граф.
+        # Заглушка «Граф» снята: старая закладка ведёт на карту, поиск на карте выбирает сущность.
         page.goto(site.url + "/soon/graph")
-        page.get_by_label("Найти сущность").fill("Кант")
-        page.get_by_role("button", name="Найти", exact=True).click()
-        page.get_by_role("main").get_by_role("link", name="Кант").click()
+        page.wait_for_function("location.pathname === '/graph'")
+        page.get_by_role("combobox", name="Поиск по карте").fill("Кант")
+        page.get_by_role("option", name="Кант").first.click()
         page.wait_for_function(f"location.pathname === '/graph/{ids['kant']}'")
         page.wait_for_selector("h1:has-text('Кант')")
     finally:

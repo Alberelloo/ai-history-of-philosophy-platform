@@ -353,6 +353,23 @@ def test_wikidata_simple_facts(fill, events):
     assert fill.onto.entities.get(kant)["primary"]["dates"]["earliest_start"] == 1724
 
 
+@req("ontology-registry", "Виды групп, роли персон и виды событий")
+def test_wikidata_roles(fill):
+    """Род занятий: философ и математик → философ и учёный; чего нет в таблице — не пишется."""
+    records = {
+        "Q9047": {
+            "labels": {"ru": "Готфрид Лейбниц"},
+            # философ, математик, ещё раз математик (физик) и дипломат — его в таблице нет
+            "claims": {"P106": ["Q4964182", "Q170790", "Q169470", "Q193391"]},
+        },
+    }
+    created = fill.filling.import_wikidata("Q9047", records.__getitem__)
+    roles = [fill.onto.statements.get(i) for i in created]
+    assert sorted(s["value"] for s in roles) == ["philosopher", "scientist"]
+    assert {s["type"] for s in roles} == {"person_role"}
+    assert all(s["attributions"][0]["who"] == "wikidata:Q9047" for s in roles)
+
+
 @req(EX, "Запуски наполнения")
 def test_runs_estimate_and_rollback(fill, events):
     source = fill.lib.register()

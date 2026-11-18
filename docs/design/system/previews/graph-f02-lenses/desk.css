@@ -1,0 +1,316 @@
+/* Пробный кадр «Стол философа»: сцена вокруг рабочего листа. Только статичный кадр.
+   Материалы — SVG-фильтры (шум + диффузный свет), без внешних картинок. */
+@font-face{font-family:"Bad Script";src:url(assets/badscript-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;font-display:block}
+@font-face{font-family:"Bad Script";src:url(assets/badscript-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F;font-display:block}
+
+.scene{
+  --wood-veil:rgba(40,22,10,0);
+  --pool:rgba(255,214,150,.26);--pool-2:rgba(255,196,120,.10);
+  --vignette:rgba(24,13,5,.62);
+  --hand:#4a3626;
+  position:relative;overflow:hidden;min-height:100vh;padding:104px 0 190px;
+  background:#3a2415;isolation:isolate;
+}
+.scene[data-theme=dark]{
+  --pool:rgba(255,200,120,.32);--pool-2:rgba(214,140,60,.14);
+  --vignette:rgba(10,6,3,.86);
+  --wood-veil:rgba(12,7,3,.5);
+}
+.defs{position:absolute;width:0;height:0}
+.wood{position:absolute;inset:0;width:100%;height:100%;z-index:-3;display:block}
+.wood-veil{position:absolute;inset:0;z-index:-2;background:var(--wood-veil)}
+
+/* Сцена привязана к листу: предметы висят от его краёв, срезаются краем экрана */
+.stage{position:relative;width:min(1120px,calc(100% - 300px));margin:0 auto}
+.prop{position:absolute;pointer-events:none;display:block}
+.prop svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* Кожаный бювар (приём Вермеера: сукно под листом) */
+.blotter{position:absolute;inset:-58px -76px -64px;z-index:-1;border-radius:6px;
+  box-shadow:0 2px 3px rgba(10,5,0,.45),10px 18px 36px rgba(10,5,0,.42)}
+.blotter svg{position:absolute;inset:0;width:100%;height:100%;border-radius:6px;display:block}
+.blotter .stitch{position:absolute;inset:11px;border:1.5px dashed rgba(206,186,132,.32);border-radius:4px}
+
+/* Подложенные листы — чуть повёрнуты: ломают «прямоугольник на прямоугольнике» */
+.page{position:absolute;inset:0;z-index:0;border-radius:2px}
+.page svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.page.p2{transform:rotate(-1.15deg) translate(-6px,6px);box-shadow:0 1px 2px rgba(50,30,10,.35),4px 9px 16px rgba(30,16,4,.35)}
+.page.p1{transform:rotate(.7deg) translate(5px,3px);box-shadow:0 1px 2px rgba(50,30,10,.3),3px 6px 12px rgba(30,16,4,.28)}
+
+/* Рабочий лист */
+.scene .folio{
+  --graph-sheet:#f4ead3;--graph-ink:#2f2318;--graph-ink-secondary:#5a4632;--graph-ink-muted:#7d6a52;
+  --graph-rule:#cfbd98;--graticule:rgba(90,64,36,.10);--people:#3c4d78;--people-tint:#e3dcc8;
+  --graph-selected:#a8371f;--texts:#2f6670;--context:#8a6a35;--history:#8a3b45;
+  position:relative;z-index:1;max-width:none;background:none;box-shadow:0 1px 1.5px rgba(50,30,10,.4),0 10px 22px -6px rgba(40,22,6,.5),14px 26px 50px rgba(20,10,2,.35);
+  border-radius:2px;color:var(--graph-ink)
+}
+.scene .folio::before,.scene .folio::after,.scene .fold{display:none}
+.scene .neatline{border-color:rgba(90,64,36,.30)}.scene .neatline::after{border-color:rgba(90,64,36,.14)}
+.paper{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:-1;display:block;pointer-events:none}
+.scene .lens.on{background:rgba(90,64,36,.08)}
+.scene h1{color:#2a1e14}
+
+/* Рукописные пометки на полях графа */
+.chart{position:relative}
+.chart-notes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.hand{font-family:"Bad Script",cursive;fill:var(--hand);fill-opacity:.88}
+.hand-stroke{fill:none;stroke:var(--hand);stroke-opacity:.7;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* Карточки-заметки */
+.card{position:absolute;pointer-events:none;padding:16px 18px 14px;border-radius:2px;color:var(--hand);font-family:"Bad Script",cursive;
+  background:linear-gradient(160deg,rgba(255,252,240,.6),transparent 40%),
+    repeating-linear-gradient(180deg,transparent 0 25px,rgba(70,100,140,.18) 25px 26px),#f2e8d0;
+  box-shadow:0 1px 1.5px rgba(50,30,10,.4),5px 10px 18px rgba(20,10,2,.42)}
+.card::before{content:"";position:absolute;left:0;right:0;top:34px;height:1px;background:rgba(170,50,40,.35)}
+.card .t{font-size:17px;line-height:26px;white-space:nowrap}
+.card .t.big{font-size:19px}
+.card .pin{position:absolute;top:9px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f3d58e,#b88a3e 55%,#6b4a1a);box-shadow:2px 3px 3px rgba(20,10,2,.5)}
+
+/* Свет лампы: тёплое пятно + виньетка по сцене */
+.lamp{position:absolute;inset:0;z-index:5;pointer-events:none}
+.lamp::before{content:"";position:absolute;inset:0;mix-blend-mode:soft-light;
+  background:radial-gradient(ellipse 66% 56% at 38% 34%,var(--pool),var(--pool-2) 45%,transparent 74%)}
+.lamp::after{content:"";position:absolute;inset:0;mix-blend-mode:multiply;
+  background:radial-gradient(ellipse 72% 68% at 46% 40%,transparent 46%,var(--vignette) 100%)}
+.prop.shadowed{filter:drop-shadow(1px 2px 1.5px rgba(30,15,4,.45)) drop-shadow(8px 14px 14px rgba(20,10,2,.4))}
+/* Вечер при лампе: бювар и предметы уходят в полутень, лист остаётся самым светлым */
+.scene[data-theme=dark] .blotter svg{filter:brightness(.6)}
+.scene[data-theme=dark] .blotter .stitch{border-color:rgba(206,186,132,.18)}
+.scene[data-theme=dark] .prop.shadowed{filter:brightness(.72) drop-shadow(1px 2px 1.5px rgba(10,5,0,.6)) drop-shadow(8px 14px 14px rgba(8,4,0,.55))}
+.scene[data-theme=dark] .card{filter:brightness(.78)}
+.scene[data-theme=dark] .page{filter:brightness(.9)}
+/* Прогон 1: таймлайн, ленты Пристли, труды */
+.dim{opacity:.42}
+.dim-soft{opacity:.5}
+.collapsed-note{font:italic 400 11px Literata,Georgia,serif;fill:var(--graph-ink-muted)}
+.axis-year{font:400 12px Literata,Georgia,serif;font-variant-numeric:oldstyle-nums;fill:var(--graph-ink-secondary);text-anchor:middle}
+.scene .person-name{font:600 13.5px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .sel-name{font:700 14px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .person-years{font:400 11px Onest,Arial,sans-serif;fill:var(--graph-ink-muted)}
+.scene .era-text{font:italic 500 12.5px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.scene .era-span{stroke:var(--context);opacity:.6}
+.scene .work-year{font:400 10px Onest,Arial,sans-serif;fill:var(--graph-ink-muted);text-anchor:middle}
+.scene .work-title,.scene .concept-title{font:italic 500 11.5px Literata,Georgia,serif;fill:var(--graph-ink)}
+.scene .concept-title{font-style:normal}
+.scene .work-active-title{font:italic 600 12px Literata,Georgia,serif;fill:var(--texts)}
+.chart-notes{display:none}
+/* Прогон 2: эпоха выбранного — подсветка без линий */
+.scene .era-text.era-active{fill:var(--context);font-weight:600}
+/* Прогон 3: структура вокруг графа */
+.scene .head{display:flex;justify-content:space-between;align-items:flex-start;gap:32px}
+.scene .head-main{min-width:0}
+.selnote{width:330px;flex:none;margin-top:4px;padding:12px 0 0 16px;border-left:1px solid rgba(90,64,36,.28);color:var(--graph-ink-secondary);font:400 12.5px/1.5 Onest,Arial,sans-serif}
+.selnote .kicker{font:600 10px/14px Onest,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--graph-ink-muted);margin-bottom:5px}
+.selnote .selname{font:600 17px/22px Literata,Georgia,serif;color:var(--graph-ink);margin-bottom:6px}
+.selnote .selname span{font:400 12px Onest,Arial,sans-serif;color:var(--graph-ink-muted);margin-left:4px}
+.selnote ul{list-style:none;margin:0;padding:0}
+.selnote li{display:flex;align-items:baseline;gap:8px;margin:2px 0}
+.selnote .hint{margin:0;font-style:italic;font-family:Literata,Georgia,serif;font-size:13px}
+.k{flex:none;display:inline-block;width:20px;height:8px;position:relative;top:-1px}
+.k-flow{background:linear-gradient(90deg,var(--people),var(--graph-selected));height:3px;border-radius:2px;top:-3px}
+.k-works{border-top:2px dotted var(--texts);height:0;top:-4px}
+.k-era{background:var(--context);opacity:.35;border-radius:1px}
+.chart{position:relative}
+.gutter{position:absolute;left:0;top:0;bottom:0;width:12.6%;z-index:2}
+.lens-toggle{position:absolute;left:0;transform:translateY(5px);display:flex;align-items:center;gap:7px;border:0;background:none;padding:4px 6px 4px 2px;min-height:28px;
+  font:600 10px/12px Onest,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--graph-ink-secondary);cursor:pointer;border-radius:3px;text-align:left}
+.lens-toggle:hover{color:var(--graph-ink);background:rgba(90,64,36,.07)}
+.lens-toggle:focus-visible{outline:2px solid var(--graph-focus);outline-offset:1px}
+.lens-toggle .eye{width:16px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:1.2}
+.lens-toggle .eye circle{fill:currentColor;stroke:none}
+.lens-toggle .eye .slash{display:none}
+.lens-toggle.off{color:var(--graph-ink-muted);opacity:.8}
+.lens-toggle.off .eye circle{display:none}
+.lens-toggle.off .eye .slash{display:inline}
+.person{cursor:pointer;outline:none}
+.person .focus-ring{fill:none;stroke:var(--graph-focus);stroke-width:2;visibility:hidden}
+.person:focus-visible .focus-ring{visibility:visible}
+.person:hover .person-name{text-decoration:underline;text-decoration-color:rgba(90,64,36,.4)}
+#svg{cursor:default}
+.scene .event-year{font:600 11px Onest,Arial,sans-serif;fill:var(--history)}
+.scene .event-text{font:italic 400 11.5px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.legend-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px solid rgba(90,64,36,.22);font:400 11.5px Onest,Arial,sans-serif;color:var(--graph-ink-secondary)}
+.legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{height:12px;width:auto}
+.legend-title{font:italic 600 12px Literata,Georgia,serif;color:var(--graph-ink)}
+.edition-note{font-size:11px;color:var(--graph-ink-muted)}
+/* Прогон 4: масштаб текста графа, камеи, компактные тогглы */
+.scene .person-name{font:600 16px Literata,Georgia,serif}
+.scene .sel-name{font:700 17px Literata,Georgia,serif;fill:#6e2416}
+.scene .person-years{font:400 12.5px Onest,Arial,sans-serif}
+.scene .monogram{font:500 19px Literata,Georgia,serif;fill:var(--graph-ink-secondary)}
+.scene .medallion-ring{fill:#efe4c8;stroke:var(--graph-ink-secondary);stroke-opacity:.8;stroke-width:1.1}
+.scene .work-title,.scene .concept-title{font-size:13px}
+.scene .work-active-title{font-size:13.5px}
+.scene .work-year{font-size:11.5px}
+.scene .era-text{font-size:14px}
+.scene .axis-year{font-size:13.5px}
+.scene .event-year{font-size:12.5px}
+.scene .event-text{font-size:13px}
+.collapsed-note{font-size:12.5px}
+.lens-toggle{min-height:22px;padding:2px 6px 2px 2px;transform:translateY(3px)}
+/* Прогон 5: палитра листа не зависит от темы (бумага под лампой одинакова днём и вечером) */
+.scene .folio,.scene[data-theme=dark] .folio{
+  --graph-sheet:#f4ead3;--graph-ink:#2f2318;--graph-ink-secondary:#5a4632;--graph-ink-muted:#6f5c45;
+  --graph-rule:#cfbd98;--graticule:rgba(90,64,36,.10);--people:#3c4d78;--people-tint:#e3dcc8;
+  --ideas:#25624b;--teachings:#644a80;--texts:#2f6670;--context:#8a6a35;--history:#8a3b45;
+  --graph-selected:#a8371f;--graph-focus:#385b8f;--graph-generated:#8d5d1c;--graph-generated-tint:#fbefd6;
+}
+/* Приглушение контекста без «таяния» текста: бледнеют изображения и знаки, подписи — читаемый приглушённый цвет */
+.dim,.dim-soft{opacity:1}
+.dim image,.dim ellipse,.dim rect,.dim path,.dim-soft rect,.dim-soft path,.dim-soft circle{opacity:.4}
+.dim text,.dim-soft text{fill:var(--graph-ink-muted)}
+.dim .monogram{fill-opacity:.7}
+.lens-toggle.off{opacity:1}
+.dim .monogram{fill-opacity:1}
+.scene .era-text.era-active{fill:#6a4f22}
+/* Контекст отличается начертанием, а не таянием: читается, но не спорит с фокусом */
+.dim .person-name{font-weight:400}
+.dim-soft .work-title,.dim-soft .concept-title{font-weight:400}
+/* v3 (отзыв 2026-11-18): лист — главный, стол — рамка. Лист почти во всю ширину и высоту окна,
+   предметы срезаются краем кадра и заходят только на поля листа. */
+.scene{padding:30px 0 150px}
+.stage{width:calc(100% - 2*clamp(40px,4.2vw,120px));max-width:1800px}
+.blotter{inset:-26px -34px -34px}
+.blotter .stitch{inset:8px}
+.scene .folio{padding:24px 34px 16px}
+.scene h1{font-size:28px;line-height:34px;margin:6px 0 2px}
+.scene .chart{margin-top:8px}
+.card[hidden]{display:none}
+.selnote .q{font:italic 400 12.5px/1.45 Literata,Georgia,serif;color:var(--graph-ink-secondary);margin-top:4px}
+/* шапка фиксированной высоты: смена выбора не двигает график */
+.scene .head{height:166px;box-sizing:border-box}
+/* v4: чистка — одна линия на смысл */
+.thread-quiet{fill:none;stroke:var(--people);stroke-opacity:.38;stroke-width:1.2;stroke-linecap:round}
+.tether{fill:none;stroke:var(--texts);stroke-width:1.5;stroke-opacity:.85;stroke-dasharray:1 4;stroke-linecap:round}
+.work-tick{fill:var(--texts);fill-opacity:.55}
+.dim-soft .work-tick{fill-opacity:.3}
+.scene .time-grid{stroke:rgba(90,64,36,.10);stroke-width:1}
+.selnote li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* плотный набор: компактнее подписи лент */
+.compact .person-name{font-size:14px}
+.compact .sel-name{font-size:15px}
+.compact .person-years{font-size:11.5px}
+.compact .work-title,.compact .concept-title{font-size:12.5px}
+.life-dot{fill:var(--graph-ink-secondary);fill-opacity:.6}
+.dim .life-dot{opacity:.4}
+.person:focus-visible rect.focus-ring{visibility:visible}
+rect.focus-ring{fill:none;stroke:var(--graph-focus);stroke-width:2;visibility:hidden}
+.scene .lifeline{stroke:none;opacity:1}
+.scene .dim .lifeline{opacity:.4}
+/* v5: выбор любых сущностей, булавки, поиск и фильтры (кадр) */
+.scene .head{height:188px}
+.tools{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;position:relative;font:400 12.5px Onest,Arial,sans-serif;color:var(--graph-ink-secondary)}
+.search{display:flex;align-items:center;gap:7px;width:320px;max-width:100%;height:32px;padding:0 8px 0 10px;border:1px solid rgba(90,64,36,.32);border-radius:4px;background:rgba(255,252,244,.55)}
+.search.active{border-color:var(--graph-focus);box-shadow:0 0 0 2px rgba(56,91,143,.15)}
+.search svg{width:15px;height:15px;flex:none;fill:none;stroke:var(--graph-ink-muted);stroke-width:1.4}
+.search input{flex:1;min-width:0;border:0;background:none;font:inherit;color:var(--graph-ink);outline:none}
+.search input::placeholder{color:var(--graph-ink-muted)}
+.search kbd{font:500 11px Onest,Arial,sans-serif;color:var(--graph-ink-muted);border:1px solid rgba(90,64,36,.3);border-radius:3px;padding:0 5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:28px;padding:0 10px;border:1px solid rgba(90,64,36,.28);border-radius:14px;background:none;font:inherit;font-size:12px;color:var(--graph-ink-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.chip:hover{background:rgba(90,64,36,.06)}
+.chip .caret{font-size:9px;opacity:.7}
+.chip.on{background:rgba(60,77,120,.10);border-color:rgba(60,77,120,.45);color:#2c3a5e}
+.chip.on b{font-weight:600}
+.chip .x{margin-left:4px;font-size:14px;line-height:1;opacity:.7}
+.chip.open{border-color:var(--graph-focus)}
+.shown{font-size:11.5px;color:var(--graph-ink-muted);white-space:nowrap}
+.dropdown{position:absolute;top:40px;left:0;z-index:20;min-width:320px;max-width:420px;padding:6px 0;background:#fbf5e6;border:1px solid rgba(90,64,36,.3);border-radius:5px;box-shadow:0 8px 24px rgba(40,22,6,.22),0 1px 2px rgba(40,22,6,.2)}
+.dd-group{font:600 10px/14px Onest,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--graph-ink-muted);padding:8px 14px 3px}
+.dd-row{display:flex;align-items:baseline;gap:8px;padding:5px 14px;color:var(--graph-ink)}
+.dd-row:first-of-type{background:rgba(56,91,143,.09)}
+.dd-row.out{color:var(--graph-ink-muted)}
+.dd-ico{width:12px;flex:none;color:var(--graph-ink-muted);font-size:11px;text-align:center}
+.dd-main{font:400 13px Literata,Georgia,serif}
+.dd-main mark{background:rgba(196,150,69,.32);color:inherit;border-radius:2px}
+.dd-sub{margin-left:auto;font-size:11.5px;color:var(--graph-ink-muted);white-space:nowrap}
+.dd-foot{margin-top:4px;padding:6px 14px 2px;border-top:1px solid rgba(90,64,36,.15);font-size:11px;color:var(--graph-ink-muted)}
+.filter-dd{min-width:280px}
+.dd-check{display:flex;align-items:center;gap:8px;padding:5px 14px;color:var(--graph-ink);font-size:13px}
+.dd-check input{accent-color:#3c4d78;margin:0}
+.dd-count{margin-left:auto;font-size:11.5px;color:var(--graph-ink-muted)}
+.stem{fill:none;stroke:var(--graph-ink-secondary);stroke-opacity:.45;stroke-width:1}
+.work-tick{fill:var(--texts);fill-opacity:.6}
+.event-tick{fill:var(--history);fill-opacity:.6}
+.event-ring.on{stroke-width:2.2}
+.era-fill{fill:var(--context)}
+.thread-on{fill:none;stroke-width:1.7;stroke-linecap:round;stroke-opacity:.9}
+.thread-quiet{fill:none;stroke:var(--people);stroke-opacity:.4;stroke-width:1.2;stroke-linecap:round}
+.entity{cursor:pointer;outline:none}
+.entity:focus-visible{outline:2px solid var(--graph-focus);outline-offset:2px}
+.entity:hover .work-title,.entity:hover .concept-title,.entity:hover .event-text{text-decoration:underline;text-decoration-color:rgba(90,64,36,.4)}
+.dim-soft .event-text,.dim-soft .event-year{fill:var(--graph-ink-muted)}
+.dim-soft .era-text{fill:var(--graph-ink-muted)}
+.overview-label{font:600 9.5px Onest,Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;fill:var(--graph-ink-muted)}
+.overview-rail{stroke:var(--graph-ink);stroke-opacity:.35;stroke-width:1}
+.overview-year{font:400 10.5px Onest,Arial,sans-serif;fill:var(--graph-ink-muted);text-anchor:middle}
+.overview-life{stroke:var(--graph-ink-secondary);stroke-opacity:.18;stroke-width:3}
+.overview-window{fill:rgba(56,91,143,.08);stroke:var(--graph-focus);stroke-opacity:.6;stroke-width:1}
+.overview-handle{fill:#fbf5e6;stroke:var(--graph-focus);stroke-width:1.2}
+.selnote .kicker{white-space:nowrap}
+.sw{flex:none;display:inline-block;width:10px;height:10px;border-radius:50%;position:relative;top:1px}
+.legend-names{display:flex;flex-wrap:wrap;gap:2px 10px;white-space:normal!important}
+.legend-names b{font-weight:400;display:inline-flex;align-items:center;gap:5px;color:var(--graph-ink)}
+.k-unv{border-top:1.6px dashed #3c4d78;height:0;top:-4px}
+.selnote li{align-items:center}
+.era-dim .era-text{fill:var(--graph-ink-muted)}
+/* v6: правая панель по образцу GraphPage (холст + aside), сворачиваемая */
+.scene{overflow:clip}                      /* clip, а не hidden: иначе липкая панель не липнет */
+.scene .head{height:auto}
+.scene .chart{margin-top:0}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start;margin-top:12px}
+.workspace.panel-collapsed{grid-template-columns:minmax(0,1fr) 36px}
+.panel{position:sticky;top:16px;padding:0 2px 8px 18px;border-left:1px solid rgba(90,64,36,.25);
+  font:400 12.5px/1.45 Onest,Arial,sans-serif;color:var(--graph-ink-secondary);scrollbar-width:thin}
+.panel-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;height:30px;margin-bottom:8px}
+.panel-title{font:600 10px/14px Onest,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--graph-ink-muted)}
+.panel-toggle{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(90,64,36,.28);border-radius:4px;background:none;color:var(--graph-ink-secondary);cursor:pointer}
+.panel-toggle:hover{background:rgba(90,64,36,.07)}
+.panel-toggle:focus-visible,.rail-btn:focus-visible,.facet summary:focus-visible{outline:2px solid var(--graph-focus);outline-offset:1px}
+.panel-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.panel-rail{display:none}
+.panel-collapsed .panel{padding-left:6px;overflow:visible}
+.panel-collapsed .panel-title,.panel-collapsed .panel-body{display:none}
+.panel-collapsed .panel-toggle svg{transform:rotate(180deg)}
+.panel-collapsed .panel-rail{display:grid;gap:6px;justify-items:start}
+.rail-btn{width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:4px;background:none;color:var(--graph-ink-muted);cursor:pointer}
+.rail-btn:hover{background:rgba(90,64,36,.07);color:var(--graph-ink)}
+.rail-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.4}
+.rail-btn svg .f{fill:currentColor;stroke:none}
+.panel .tools{display:block;margin:0;position:relative}
+.panel .search{width:100%;box-sizing:border-box}
+.panel .dropdown.search-dd{top:38px;left:auto;right:0;width:380px;max-width:none}
+.panel-sec{padding:14px 0 12px;border-top:1px solid rgba(90,64,36,.18);margin-top:12px}
+.sec-h{margin:0 0 8px;font:600 10px/14px Onest,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--graph-ink-muted)}
+.sec-row{display:flex;align-items:baseline;justify-content:space-between}
+.badge{display:inline-block;min-width:16px;padding:0 5px;border-radius:8px;background:#3c4d78;color:#fbf5e6;font:600 10px/16px Onest,Arial,sans-serif;letter-spacing:0;text-align:center}
+.link{border:0;background:none;padding:0;font:inherit;font-size:12px;color:#2c3a5e;text-decoration:underline;text-decoration-color:rgba(44,58,94,.4);cursor:pointer}
+.panel .shown{margin:0 0 6px;white-space:normal}
+.facet{border-bottom:1px solid rgba(90,64,36,.12)}
+.facet summary{display:flex;align-items:center;gap:8px;min-height:32px;cursor:pointer;list-style:none;color:var(--graph-ink);font-size:13px}
+.facet summary::-webkit-details-marker{display:none}
+.facet summary::after{content:"";margin-left:auto;width:6px;height:6px;border-right:1.4px solid var(--graph-ink-muted);border-bottom:1.4px solid var(--graph-ink-muted);transform:rotate(45deg) translateY(-2px);flex:none}
+.facet[open] summary::after{transform:rotate(-135deg) translateY(-1px)}
+.facet summary b{font-weight:600;color:#2c3a5e;background:rgba(60,77,120,.1);border-radius:8px;padding:0 7px;font-size:11.5px}
+.facet-body{padding:0 0 8px}
+.facet .dd-check{padding:3px 0;font-size:12.5px}
+.facet-hint{margin:4px 0 0;font-size:11px;color:var(--graph-ink-muted)}
+.range{display:flex;gap:10px}
+.range label{display:flex;align-items:center;gap:6px;font-size:12px}
+.range input{width:64px;height:26px;box-sizing:border-box;padding:0 6px;border:1px solid rgba(90,64,36,.3);border-radius:3px;background:rgba(255,252,244,.6);font:inherit;color:var(--graph-ink)}
+/* «Выбрано» в панели */
+.scene .panel .selnote{width:auto;margin:12px 0 0;padding:14px 0 12px;border-left:0;flex:none}
+.panel .selnote li span{white-space:normal}
+.panel .legend-names{gap:3px 10px}
+/* условные знаки столбиком */
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.legend-grid>span{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--graph-ink-secondary)}
+.legend-grid svg{height:12px;width:auto;flex:none}
+.legend-note{margin:10px 0 0;font-size:11.5px;color:var(--graph-ink-muted)}
+.panel .legend{display:block}
+.scene .legend-row{justify-content:flex-end;margin-top:10px}

@@ -1,0 +1,204 @@
+{
+  "results": [
+    {
+      "case": "TC-03/06/1440/light/ru",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1440/light/en",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1440/dark/ru",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1440/dark/en",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1024/light/ru",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1024/light/en",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1024/dark/ru",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-03/06/1024/dark/en",
+      "passed": true,
+      "detail": "No page horizontal overflow"
+    },
+    {
+      "case": "TC-04/05/1280/False",
+      "passed": true,
+      "detail": {
+        "below": false,
+        "gw": 800,
+        "gh": 520
+      }
+    },
+    {
+      "case": "TC-04/05/1280/True",
+      "passed": true,
+      "detail": {
+        "below": true,
+        "gw": 944,
+        "gh": 480
+      }
+    },
+    {
+      "case": "TC-04/05/1920/False",
+      "passed": true,
+      "detail": {
+        "below": false,
+        "gw": 1440,
+        "gh": 520
+      }
+    },
+    {
+      "case": "TC-02",
+      "passed": true,
+      "detail": {
+        "x": 124,
+        "y": 234.640625,
+        "width": 960,
+        "height": 520
+      }
+    },
+    {
+      "case": "TC-09",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-17/restart",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-10",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-18",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-17/focus",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-17/search",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-17/empty-search",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-16/minimap",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-16/fit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-11/light",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-11/dark",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-14",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-15",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/loading",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/extending",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/off",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/unavailable",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/empty",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/filtered",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-20/limited",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "TC-21",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "case": "JS-errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "screenshots": 33,
+  "not_tested": [
+    "TC-22 real browser zoom 200%",
+    "TC-23b streaming API (not applicable)",
+    "full route-label collision audit",
+    "portrait failure interception"
+  ]
+}
