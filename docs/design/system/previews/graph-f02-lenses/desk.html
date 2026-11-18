@@ -94,27 +94,45 @@
           <div class="eyebrow">АТЛАС ИДЕЙ · ТЕОРИЯ ПОЗНАНИЯ</div>
           <h1>Иммануил Кант</h1>
           <p class="subtitle">Откуда пришла мысль философа — и что он из неё сделал</p>
-          <div class="tools"></div>
         </div>
-        <aside class="selnote" aria-live="polite"></aside>
       </header>
-      <div class="chart">
-        <div class="gutter" role="group" aria-label="Линзы: свернуть или развернуть страту"></div>
-        <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Синхронологическая карта: события, эпохи, философы и их труды на оси времени"></svg>
+      <!-- рабочая область: карта слева, панель справа (как в GraphPage: холст + aside 22.5rem); панель сворачивается -->
+      <div class="workspace">
+        <div class="chart">
+          <div class="gutter" role="group" aria-label="Линзы: свернуть или развернуть страту"></div>
+          <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Синхронологическая карта: события, эпохи, философы и их труды на оси времени"></svg>
+        </div>
+        <aside class="panel" id="panel" aria-label="Поиск, выбранное, фильтры и условные знаки">
+          <div class="panel-bar">
+            <span class="panel-title">Панель карты</span>
+            <button type="button" class="panel-toggle" aria-expanded="true" aria-controls="panel-body" title="Свернуть панель">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13"/></svg><span class="sr">Свернуть панель</span>
+            </button>
+          </div>
+          <div class="panel-rail" aria-hidden="true"></div>
+          <div class="panel-body" id="panel-body">
+            <div class="tools"></div>
+            <section class="selnote panel-sec" aria-live="polite"></section>
+            <section class="filters panel-sec" aria-label="Фильтры"></section>
+            <section class="legend panel-sec" aria-label="Условные знаки">
+              <h2 class="sec-h">Условные знаки</h2>
+              <div class="legend-grid">
+                <span><svg viewBox="0 0 34 12"><rect x="1" y="2" width="32" height="8" rx="4" fill="var(--graph-ink-secondary)" fill-opacity=".14"/></svg>годы жизни</span>
+                <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-linecap="round"/></svg>влияние</span>
+                <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-dasharray="4 3"/></svg>не проверено</span>
+                <span><svg viewBox="0 0 14 16"><rect x="2" y="1.5" width="10" height="13" rx="1" fill="none" stroke="var(--texts)" stroke-width="1.2"/><rect x="2" y="1.5" width="2.6" height="13" fill="var(--texts)" fill-opacity=".55"/></svg>труд</span>
+                <span><svg viewBox="0 0 16 16"><path d="M8 2 L14 8 L8 14 L2 8 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>понятие</span>
+                <span><svg viewBox="0 0 16 16"><path d="M8 1.5 L14.5 13.5 L1.5 13.5 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>позиция</span>
+                <span><svg viewBox="0 0 16 16"><path d="M1.5 1.5 H14.5 V14.5 H1.5 Z M5 8 H11 M8.5 5.5 L11 8 L8.5 10.5" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>аргумент</span>
+                <span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="var(--history)" stroke-width="1.2"/><circle cx="8" cy="8" r="1.8" fill="var(--history)"/></svg>событие</span>
+              </div>
+              <p class="legend-note">Цвет — принадлежность: труды окрашены цветом автора. Расшифровка — в «Выбрано».</p>
+            </section>
+          </div>
+        </aside>
       </div>
       <footer class="legend-row">
-        <div class="legend" aria-label="Условные знаки">
-          <span class="legend-title">Условные знаки</span>
-          <span><svg viewBox="0 0 34 12"><rect x="1" y="2" width="32" height="8" rx="4" fill="var(--graph-ink-secondary)" fill-opacity=".14"/></svg>годы жизни</span>
-          <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-linecap="round"/></svg>влияние</span>
-          <span><svg viewBox="0 0 34 12"><path d="M2 9 C12 9 20 3 32 3" fill="none" stroke="#3c4d78" stroke-width="1.6" stroke-dasharray="4 3"/></svg>не проверено</span>
-          <span><svg viewBox="0 0 14 16"><rect x="2" y="1.5" width="10" height="13" rx="1" fill="none" stroke="var(--texts)" stroke-width="1.2"/><rect x="2" y="1.5" width="2.6" height="13" fill="var(--texts)" fill-opacity=".55"/></svg>труд</span>
-          <span><svg viewBox="0 0 16 16"><path d="M8 2 L14 8 L8 14 L2 8 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>понятие</span>
-          <span><svg viewBox="0 0 16 16"><path d="M8 1.5 L14.5 13.5 L1.5 13.5 Z" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>позиция</span>
-          <span><svg viewBox="0 0 16 16"><path d="M1.5 1.5 H14.5 V14.5 H1.5 Z M5 8 H11 M8.5 5.5 L11 8 L8.5 10.5" fill="none" stroke="var(--ideas)" stroke-width="1.2"/></svg>аргумент</span>
-          <span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="var(--history)" stroke-width="1.2"/><circle cx="8" cy="8" r="1.8" fill="var(--history)"/></svg>событие</span>
-        </div>
-        <div class="edition-note">Демонстрационные данные · Спиноза — демо-персона</div>
+        <div class="edition-note">Демонстрационные данные</div>
       </footer>
     </article>
 

@@ -37,11 +37,11 @@
 с именем внутри, медальон только у выбранного, связи — по выбору.
 
 Выбрать можно философа, труд, событие, эпоху (и направление — `?sel=g-emp`). Цвет = принадлежность:
-труды окрашены цветом автора, линии — только влияния между людьми. Поиск и фильтры — пока кадр,
-состояние из адреса: `?data=dense&q=крит`, `?data=dense&from=1630&to=1800&groups=g-emp,g-rat&open=dir`.
+труды окрашены цветом автора, линии — только влияния между людьми. Поиск, «Выбрано», фильтры и условные знаки — в правой панели (как aside в GraphPage); панель сворачивается
+в узкий рельс (`?panel=0`). Поиск и фильтры — пока кадр, состояние из адреса: `?data=dense&q=крит`, `?data=dense&from=1630&to=1800&groups=g-emp,g-rat&open=dir`.
 
 Файлы: `desk.html` · `desk.css` · `desk-data.js` · `desk-chart.js` (граф от данных и состояния) · `desk.js` (предметы) ·
-`desk-light.png`/`desk-dark.png` · кадры v5 — `cycle/v5-dense-*.jpg`. Направление — [graph-desk-scene-direction.md](../../../features/graph-desk-scene-direction.md),
+`desk-light.png`/`desk-dark.png` · кадры v6 — `cycle/v6-*.jpg`. Направление — [graph-desk-scene-direction.md](../../../features/graph-desk-scene-direction.md),
 журнал доводки — [design-cycle-log.md](../../../features/graph-page-qa/design-cycle-log.md).
 Проверки (Playwright + Chromium): `cycle/check.js` (рендер, геометрия), `cycle/ixn.js` (интеракции),
 `cycle/audit.js` (контраст), `cycle/dense.js` и `cycle/frames.js` (кадры); запуск — `node cycle/<скрипт>.js` из папки с `playwright-core`.

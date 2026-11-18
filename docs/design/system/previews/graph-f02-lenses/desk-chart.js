@@ -162,7 +162,7 @@
 
     const LANES=packPeople(dense?4:22),laneMin=dense?27:56;
     const wp=planWorks(R,dense?(R?4:3):2),ep=planEvents(R,dense?4:2);
-    const need={people:LANES*laneMin+34,works:22+Math.max(wp.rows,1)*W_ROW+6,events:12+Math.max(ep.rows,1)*E_ROW+4};
+    const need={people:LANES*laneMin+34,works:22+Math.max(wp.rows,1)*W_ROW+6,events:20+Math.max(ep.rows,1)*E_ROW+4};
     const bands=layoutBands(need),H=bands.works.bot+AXIS_H;
     svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
 
@@ -201,8 +201,9 @@
     if(!bv.collapsed){
       ep.items.forEach(e=>{const act=!R||!R.events||R.events.has(e.id),g=S('g',{class:act?'':'dim-soft'});L.events.append(g);hit(g,e.id,`Событие: ${e.year}, ${e.label}`);
         g.append(S('title',{},`${e.year} — ${e.label}`));
-        const ry=bv.top+12+Math.max(0,e.row)*E_ROW;
-        if(e.row<0){g.append(S('circle',{cx:e.x,cy:ry,r:3.5,class:'event-ring'}));g.append(S('rect',{x:e.x-7,y:ry-7,width:14,height:14,fill:'transparent'}));return;}
+        const ry=bv.top+20+Math.max(0,e.row)*E_ROW;
+        // без подписи — засечка на кромке страты, вне рядов с текстом
+        if(e.row<0){g.append(S('circle',{cx:e.x,cy:bv.top+5,r:2.5,class:'event-ring'}));g.append(S('rect',{x:e.x-6,y:bv.top,width:12,height:11,fill:'transparent'}));return;}
         g.append(S('circle',{cx:e.bx,cy:ry,r:5,class:'event-ring'+(state.sel===e.id?' on':'')}));g.append(S('circle',{cx:e.bx,cy:ry,r:1.8,fill:'var(--history)'}));
         const t=S('text',{x:e.side>0?e.bx+12:e.bx-12,y:ry+4.5,class:'event-text','text-anchor':e.side>0?'start':'end'});t.append(S('tspan',{class:'event-year'},e.year+' '));t.append(document.createTextNode(e.label));g.append(t);});}
     else V.events.forEach(e=>L.events.append(S('rect',{x:X(e.year)-.75,y:bv.top+COLL/2-4,width:1.5,height:8,class:'event-tick'})));
@@ -344,22 +345,16 @@
     if(h1)h1.textContent=title.replace(/[«»]/g,'');
   }
 
-  /* панель поиска и фильтров — пока кадр: состояние берётся из адреса (?q= &open= &groups= &from= &to= …) */
+  /* правая панель (как aside в GraphPage): поиск, «Выбрано», фильтры столбиком, условные знаки.
+     Поиск и фильтры — пока кадр: состояние из адреса (?q= &from= &to= &groups= &roles= &kinds= &ekinds= &verified=). */
   function renderTools(){
-    const host=document.querySelector('.tools');if(!host)return;
-    const q=(Q.get('q')||'').trim(),open=Q.get('open');
-    const gsel=k=>ALL.groups.filter(g=>g.kind===k&&filter.groups.includes(g.id)).map(g=>g.label);
-    const chip=(key,label,val)=>`<button type="button" class="chip${val?' on':''}${open===key?' open':''}" data-filter="${key}">${label}${val?`: <b>${val}</b><span class="x" aria-label="Снять">×</span>`:' <span class="caret">▾</span>'}</button>`;
-    const time=filter.from||filter.to?`${Y0}–${Y1}`:'';
-    const kinds=(lbl,arr)=>arr.map(k=>lbl[k]).join(', ');
-    let html=`<label class="search${q?' active':''}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 L14 14"/></svg><input type="search" placeholder="Найти философа, труд, понятие, событие" value="${q}" aria-label="Поиск по карте"><kbd>/</kbd></label>`;
-    html+=`<div class="chips" role="group" aria-label="Фильтры">${chip('time','Время',time)}${chip('dir','Направление',gsel('direction').join(', '))}${chip('school','Школа',gsel('school').join(', '))}${chip('role','Роль',kinds(DS.roleLabels||{},filter.roles))}${chip('kind','Вид',kinds(DS.kindLabels||{},filter.kinds))}${chip('ekind','События',kinds(DS.eventKindLabels||{},filter.ekinds))}${chip('verified','Связи',filter.verified?'только проверенные':'')}</div>`;
-    html+=`<div class="shown">${filtered?`Показано ${V.people.length} из ${plural(ALL.people.length,['философа','философов','философов'])} · ${V.works.length} из ${plural(ALL.works.length,['труда','трудов','трудов'])}`:`${plural(ALL.people.length,F.people)} · ${plural(ALL.works.length,F.works)} · ${plural(ALL.influences.length,F.links)}`}</div>`;
-    // выпадающий список поиска: по типам; найденное вне фильтра — пометка
+    const host=document.querySelector('.tools'),fh=document.querySelector('.filters');if(!host)return;
+    const q=(Q.get('q')||'').trim(),esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    let html=`<label class="search${q?' active':''}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 L14 14"/></svg><input type="search" placeholder="Найти философа, труд, событие" value="${q}" aria-label="Поиск по карте"><kbd>/</kbd></label>`;
     if(q){const m=s=>s.toLowerCase().includes(q.toLowerCase()),inV=new Set([...V.people,...V.works].map(x=>x.id));
       const grp=(title,arr,fmt)=>arr.length?`<div class="dd-group">${title}</div>${arr.slice(0,4).map(fmt).join('')}`:'';
       const row=(icon,main,sub,id)=>`<div class="dd-row${inV.has(id)||!id?'':' out'}"><span class="dd-ico">${icon}</span><span class="dd-main">${main}</span><span class="dd-sub">${sub}${id&&!inV.has(id)?' · скрыт фильтром':''}</span></div>`;
-      const hl=s=>s.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'i'),'<mark>$1</mark>');
+      const hl=s=>s.replace(new RegExp(`(${esc(q)})`,'i'),'<mark>$1</mark>');
       html+=`<div class="dropdown search-dd" role="listbox">${
         grp('Философы',ALL.people.filter(p=>m(p.name)),p=>row('●',hl(p.name),`${p.birth}–${p.death}`,p.id))+
         grp('Труды',ALL.works.filter(w=>w.kind==='work'&&m(w.title)),w=>row('▯',hl(`«${w.title}»`),`${byId[w.author].short}, ${w.year}`,w.id))+
@@ -367,11 +362,38 @@
         grp('События',ALL.events.filter(e=>m(e.label)),e=>row('◉',hl(e.label),String(e.year),null))+
         grp('Эпохи и направления',[...ALL.eras.filter(e=>m(e.label)),...ALL.groups.filter(g=>m(g.label))],o=>row('▭',hl(o.label),o.from?`${o.from}–${o.to}`:(o.kind==='school'?'школа':'направление'),null))
       }<div class="dd-foot">↑↓ — выбрать · Enter — показать на карте</div></div>`;}
-    // открытое меню фильтра: варианты с количеством
-    if(open==='dir'||open==='school'){const kind=open==='dir'?'direction':'school';
-      html+=`<div class="dropdown filter-dd" data-for="${open}">${ALL.groups.filter(g=>g.kind===kind).map(g=>`<label class="dd-check"><input type="checkbox"${filter.groups.includes(g.id)?' checked':''}><span>${g.label}</span><span class="dd-count">${g.members.length}</span></label>`).join('')}<div class="dd-foot">Несколько значений — «или»</div></div>`;}
     host.innerHTML=html;
-    const dd=host.querySelector('.filter-dd');if(dd){const c=host.querySelector(`.chip[data-filter="${open}"]`),hb=host.getBoundingClientRect(),cb=c.getBoundingClientRect();dd.style.left=(cb.left-hb.left)+'px';dd.style.top=(cb.bottom-hb.top+6)+'px';}
+    if(!fh)return;
+    // фильтры столбиком: каждый фасет — раскрывающаяся секция со списком и количеством
+    const cnt=(arr,f)=>arr.filter(f).length,checked=b=>b?' checked':'';
+    const box=(label,n,on)=>`<label class="dd-check"><input type="checkbox"${checked(on)}><span>${label}</span><span class="dd-count">${n}</span></label>`;
+    const facet=(key,title,val,body,open)=>`<details class="facet${val?' on':''}"${open||val?' open':''}><summary><span>${title}</span>${val?`<b>${val}</b>`:''}</summary><div class="facet-body">${body}</div></details>`;
+    const groups=k=>ALL.groups.filter(g=>g.kind===k),gval=k=>{const n=groups(k).filter(g=>filter.groups.includes(g.id)).length;return n?String(n):'';};
+    const lbl=(m,arr)=>Object.entries(m||{}).map(([k,l])=>box(l,cnt(arr,x=>(x.roles||[x.kind]).includes(k)),(filter.roles.includes(k)||filter.kinds.includes(k)||filter.ekinds.includes(k))));
+    const nAct=[filter.from||filter.to,gval('direction'),gval('school'),filter.roles.length,filter.kinds.length,filter.ekinds.length,filter.verified].filter(Boolean).length;
+    fh.innerHTML=`<div class="sec-row"><h2 class="sec-h">Фильтры${nAct?` <span class="badge">${nAct}</span>`:''}</h2>${nAct?'<button type="button" class="link">Сбросить</button>':''}</div>
+      <p class="shown">${filtered?`Показано ${V.people.length} из ${plural(ALL.people.length,['философа','философов','философов'])} · ${V.works.length} из ${plural(ALL.works.length,['труда','трудов','трудов'])}`:`${plural(ALL.people.length,F.people)} · ${plural(ALL.works.length,F.works)} · ${plural(ALL.influences.length,F.links)}`}</p>`+
+      facet('time','Время',filter.from||filter.to?`${Y0}–${Y1}`:'',`<div class="range"><label>с <input type="number" value="${Y0}" aria-label="С года"></label><label>по <input type="number" value="${Y1}" aria-label="По год"></label></div><p class="facet-hint">или рамка «Окно времени» под шкалой</p>`)+
+      (ALL.groups.length?facet('dir','Направление',gval('direction'),groups('direction').map(g=>box(g.label,g.members.length,filter.groups.includes(g.id))).join(''),Q.get('open')==='dir')+
+      facet('school','Школа',gval('school'),groups('school').map(g=>box(g.label,g.members.length,filter.groups.includes(g.id))).join('')):'')+
+      (DS.roleLabels?facet('role','Роль',filter.roles.length?String(filter.roles.length):'',lbl(DS.roleLabels,ALL.people).join('')):'')+
+      (DS.kindLabels?facet('kind','Вид',filter.kinds.length?String(filter.kinds.length):'',lbl(DS.kindLabels,ALL.works).join('')):'')+
+      (DS.eventKindLabels?facet('ekind','События',filter.ekinds.length?String(filter.ekinds.length):'',lbl(DS.eventKindLabels,ALL.events).join('')):'')+
+      facet('verified','Связи',filter.verified?'проверенные':'',`<label class="dd-check"><input type="checkbox"${checked(filter.verified)}><span>Только проверенные человеком</span><span class="dd-count">${cnt(ALL.influences,e=>e.verified!==false)}</span></label><p class="facet-hint">Достроенные LLM — пунктиром</p>`);
+  }
+
+  /* сворачивание панели: карта забирает ширину; в свёрнутом виде — узкая полоса со значками */
+  const panel=document.getElementById('panel'),ws=document.querySelector('.workspace');
+  function setPanel(open){if(!panel)return;ws.classList.toggle('panel-collapsed',!open);const b=panel.querySelector('.panel-toggle');
+    b.setAttribute('aria-expanded',String(open));b.title=open?'Свернуть панель':'Развернуть панель';b.querySelector('.sr').textContent=b.title;draw();}
+  if(panel){
+    const rail=panel.querySelector('.panel-rail');
+    rail.innerHTML=[['search','Поиск','<circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 L14 14"/>'],['sel','Выбрано','<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2" class="f"/>'],['filter','Фильтры','<path d="M2 3 H14 L9.5 8.5 V13 L6.5 11.5 V8.5 Z"/>'],['legend','Условные знаки','<path d="M3 4 H13 M3 8 H13 M3 12 H9"/>']]
+      .map(([k,t,d])=>`<button type="button" class="rail-btn" data-k="${k}" title="${t}" tabindex="-1"><svg viewBox="0 0 16 16">${d}</svg></button>`).join('');
+    panel.querySelector('.panel-toggle').addEventListener('click',()=>setPanel(ws.classList.contains('panel-collapsed')));
+    rail.addEventListener('click',()=>setPanel(true));
+    if(Q.get('panel')==='0')ws.classList.add('panel-collapsed');
+    panel.querySelector('.panel-toggle').setAttribute('aria-expanded',String(Q.get('panel')!=='0'));
   }
 
   /* выбор: клик/Enter по философу, труду, событию, эпохе; клик по полю или Esc — снять */
@@ -380,7 +402,9 @@
   svg.addEventListener('keydown',ev=>{const id=pick(ev.target);if(id&&(ev.key==='Enter'||ev.key===' ')){ev.preventDefault();state.sel=id;draw();}});
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&state.sel){state.sel=null;draw();}});
   window.desk={state,draw,select:id=>{state.sel=id;draw();},toggleLens:k=>{state.on[k]=!state.on[k];draw();},visible:V};
-  let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(draw,120);});
+  let rz,lastW=0;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(draw,120);});
+  // карта перерисовывается, когда меняется её ширина (сворачивание панели, окно)
+  if(window.ResizeObserver)new ResizeObserver(()=>{const w=Math.round(svg.getBoundingClientRect().width);if(lastW&&Math.abs(w-lastW)>2){clearTimeout(rz);rz=setTimeout(draw,60);}lastW=w;}).observe(svg.parentNode);
   document.fonts.ready.then(draw);
   draw();
 })();
