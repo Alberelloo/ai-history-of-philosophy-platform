@@ -101,6 +101,7 @@ export type State = {
   libraryDialogs: DialogSet; // раздел «Ассистент»
   mentions: "underline" | "hover";
   notice?: string;
+  mapPanelCollapsed?: boolean; // панель карты свёрнута в рельс (synchro-map)
 };
 
 export const DEFAULT_SETTINGS: Settings = { generation: true, sourcesOnly: false, onlyTextbook: false };
@@ -267,6 +268,7 @@ function normalize(raw: unknown): State {
     libraryDialogs: normalizeDialogSet(data.libraryDialogs),
     mentions: data.mentions === "hover" ? "hover" : "underline",
     notice: typeof data.notice === "string" ? data.notice : undefined,
+    mapPanelCollapsed: data.mapPanelCollapsed === true ? true : undefined,
   };
 }
 
@@ -533,6 +535,10 @@ export const storage = {
   settings: (): Settings => read().settings,
   setSettings(change: Partial<Settings>): void {
     update((s) => ({ ...s, settings: { ...s.settings, ...change } }));
+  },
+  mapPanelCollapsed: (): boolean => read().mapPanelCollapsed === true,
+  setMapPanelCollapsed(collapsed: boolean): void {
+    update((s) => ({ ...s, mapPanelCollapsed: collapsed || undefined }));
   },
   mentionsView: (): "underline" | "hover" => read().mentions,
   setMentionsView(mentions: "underline" | "hover"): void {
