@@ -25,7 +25,7 @@
 [токены](../tokens.json), [Portrait](../system/components/Portrait.md),
 [StatusMark](../system/components/StatusMark.md),
 [спецификация графа](../../../openspec/specs/knowledge-graph/spec.md),
-[референсы](graph-references/README.md).
+[референсы](graph-lenses-design-proposal.md#10-v2--интерактив-и-эстетика-по-отзыву-2026-11-17).
 Проверки: [cases.md](graph-page-qa/cases.md). Учёт: [progress.md](graph-page-qa/progress.md).
 
 ### Инструкция модели-исполнителю
