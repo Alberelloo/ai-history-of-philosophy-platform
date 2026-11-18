@@ -832,3 +832,21 @@ def test_fixture_matches_expectations():
     assert len(people) == TOTAL_PEOPLE
     assert '[1751, "Энциклопедия", "intellectual"]' in source
     assert json.dumps("g-emp") in source
+
+
+@req(VD, "Разделы в разработке")
+def test_soon_graph_bookmark_leads_to_map(browser, site):
+    """Заглушка «Граф» снята: пункт без «скоро» ведёт на /graph, старая закладка — на карту."""
+    context, page = open_map(browser, site)
+    try:
+        item = page.locator(".sidebar").get_by_role("link", name=re.compile("Граф"))
+        assert item.get_attribute("href") == "/graph"
+        assert "скоро" not in item.inner_text().lower()
+        history = page.evaluate("history.length")
+        page.goto(f"{site.url}/soon/graph")
+        page.wait_for_function("location.pathname === '/graph'")
+        page.locator(".map-canvas, .map-empty").first.wait_for()
+        assert page.evaluate("history.length") == history + 1  # заменён без новой записи
+        assert page.locator(".soon").count() == 0
+    finally:
+        context.close()

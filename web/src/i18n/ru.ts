@@ -50,10 +50,6 @@ export const ru = {
     later: "Позже",
     scenario: "Сценарий",
     now: "Что есть сейчас",
-    findEntity: "Найти сущность",
-    find: "Найти",
-    findPlaceholder: "Имя, понятие или учение",
-    nothingFound: "Ничего не найдено.",
     goReading: "Перейти к чтению",
     sections: {
       assistant: {

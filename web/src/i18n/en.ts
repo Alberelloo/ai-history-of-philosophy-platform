@@ -38,10 +38,6 @@ export const en: Catalog = {
     later: "Later",
     scenario: "Scenario",
     now: "What works now",
-    findEntity: "Find an entity",
-    find: "Find",
-    findPlaceholder: "Name, concept or teaching",
-    nothingFound: "Nothing found.",
     goReading: "Go to reading",
     sections: {
       assistant: {

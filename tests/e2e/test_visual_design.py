@@ -659,11 +659,11 @@ def test_future_sections_marked_and_described(browser, site, ids):
         page.goto(site.url + "/soon/assistant")
         page.wait_for_url("**/assistant")
         assert "В разработке" not in page.get_by_role("main").inner_text()
-        # Граф: поиск сущности ведёт на её граф.
+        # Заглушка «Граф» снята: старая закладка ведёт на карту, поиск на карте выбирает сущность.
         page.goto(site.url + "/soon/graph")
-        page.get_by_label("Найти сущность").fill("Кант")
-        page.get_by_role("button", name="Найти", exact=True).click()
-        page.get_by_role("main").get_by_role("link", name="Кант").click()
+        page.wait_for_function("location.pathname === '/graph'")
+        page.get_by_role("combobox", name="Поиск по карте").fill("Кант")
+        page.get_by_role("option", name="Кант").first.click()
         page.wait_for_function(f"location.pathname === '/graph/{ids['kant']}'")
         page.wait_for_selector("h1:has-text('Кант')")
     finally:

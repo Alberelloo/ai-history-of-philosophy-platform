@@ -190,6 +190,11 @@ function Page({
       window.history.replaceState(null, "", "/assistant");
       return <AssistantPage />;
     }
+    if (parts[1] === "graph") {
+      // Заглушка раздела «Граф» снята: старая закладка ведёт на карту без записи в историю.
+      window.history.replaceState(null, "", "/graph");
+      return <MapPage query={new URLSearchParams()} />;
+    }
     return <SoonPage key={parts[1]} code={parts[1]} />;
   }
   if (parts[0] === "assistant") return <AssistantPage search={search} />;

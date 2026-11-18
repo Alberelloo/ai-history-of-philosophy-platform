@@ -1,6 +1,5 @@
-import { useState, type FormEvent } from "react";
 import { navigate } from "./App";
-import { pick, useT } from "./i18n";
+import { useT } from "./i18n";
 import { Icon, type IconName } from "./ui";
 
 // Разделы продукта, которые видны в боковой панели сразу, но ещё не работают
@@ -27,68 +26,6 @@ export const SOON: { code: SoonCode; icon: IconName; group: "explore" | "mine"; 
   { code: "materials", icon: "upload", group: "mine", status: "later" },
   { code: "collections", icon: "share", group: "mine", status: "later" },
 ];
-
-type Found = { id: string; type: string; names: { text: string; kind: string; lang: string }[] };
-
-// Граф по сущности уже работает: поиск по имени ведёт на него.
-function EntitySearch() {
-  const t = useT();
-  const [query, setQuery] = useState("");
-  const [found, setFound] = useState<Found[] | null>(null);
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    fetch(`/api/knowledge/v1/entities?name=${encodeURIComponent(query.trim())}`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((items: Found[]) => setFound(items))
-      .catch(() => setFound([]));
-  };
-  const name = (e: Found) => (e.names.find((n) => n.kind === "primary") ?? e.names[0])?.text ?? e.id;
-  return (
-    <form className="soon__search" onSubmit={submit} role="search">
-      <div className="pg-field">
-        <label className="pg-field__label" htmlFor="soon-entity">
-          {t.soon.findEntity}
-        </label>
-        <div className="soon__search-row">
-          <div className="pg-field__control">
-            <Icon name="search" />
-            <input
-              id="soon-entity"
-              className="pg-input"
-              type="search"
-              placeholder={t.soon.findPlaceholder}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-          <button className="pg-btn pg-btn--secondary" type="submit">
-            {t.soon.find}
-          </button>
-        </div>
-      </div>
-      {found && found.length === 0 && <p className="muted">{t.soon.nothingFound}</p>}
-      {found && found.length > 0 && (
-        <ul className="soon__found">
-          {found.map((e) => (
-            <li key={e.id}>
-              <a
-                href={`/graph/${e.id}`}
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  navigate(`/graph/${e.id}`);
-                }}
-              >
-                {name(e)}
-              </a>
-              <span className="muted"> · {pick(t.family, e.type) ?? e.type}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </form>
-  );
-}
 
 export function SoonPage({ code }: { code: string }) {
   const t = useT();
@@ -126,7 +63,6 @@ export function SoonPage({ code }: { code: string }) {
       <section className="soon__now" aria-label={t.soon.now}>
         <h2 className="section-title">{t.soon.now}</h2>
         <p>{text.now}</p>
-        {item.code === "graph" && <EntitySearch />}
         {item.code === "assistant" && (
           <div className="actions">
             <button className="pg-btn pg-btn--secondary" onClick={() => navigate("/read")}>

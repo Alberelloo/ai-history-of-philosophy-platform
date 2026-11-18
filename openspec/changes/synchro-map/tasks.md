@@ -46,4 +46,4 @@
 - [x] 7.1 Сервис: `tests/knowledge/test_map.py`, тесты реестра — с метками `@req` для новых и изменённых требований
 - [x] 7.2 UI: `tests/web/test_map.py` — выбор, приглушение, фильтры, поиск, панель, линзы, окно времени, 16:9, без наложений подписей
 - [ ] 7.3 E2E: `test_genesis_graph_from_card` под карту; визуальные эталоны графа (1024/1280/1920, обе темы) кадром 16:9
-- [ ] 7.4 `check_traceability.py`, `ruff`, `tsc --noEmit`, `vite build`, `pytest -q`
+- [x] 7.4 `check_traceability.py`, `ruff`, `tsc --noEmit`, `vite build`, `pytest -q`
