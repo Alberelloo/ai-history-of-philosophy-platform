@@ -41,7 +41,7 @@
     {about:'hume',lines:['«Разум есть и должен быть','лишь рабом аффектов»'],cite:'«Трактат о человеческой природе»'},
     {about:'spinoza',lines:['«Порядок и связь идей те же,','что порядок и связь вещей»'],cite:'«Этика», ч. II, теор. 7'},
   ];
-  const theme=['Опыт или разум?','— вот спор целой эпохи'];  // тема листа, не про персону
+  const theme=['Опыт или разум?','— вот спор целой эпохи'];  // тема листа — только на карточке на столе, не на графе
   // карточки на столе: главный вопрос выбранного (редакторская выжимка, не цитата)
   const questions={
     descartes:['Что можно знать','несомненно?','— путь сомнения'],
@@ -196,7 +196,7 @@
     for(let y=1600;y<=1800;y+=25){const x=X(y),maj=y%50===0;L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+(maj?9:5),stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));if(maj)L.axis.append(S('text',{x,y:ay+27,class:'axis-year'},y));}
 
     /* рукописные пометки: ищут свободное место у своего «якоря» */
-    placeNotes({R,bw,active});
+    placeNotes({R});
 
     renderGutter(bands,H);renderNote(R);renderDesk(R);
     window.deskLayout={bands,H,people:byId,mids,state,BODY,svgTop:top};
@@ -208,23 +208,11 @@
     if(!sel)return null;
     return notes.find(n=>n.about.endsWith('-'+sel))||notes.find(n=>n.about===sel)||notes.find(n=>n.about.startsWith(sel+'-'))||null;
   }
-  // Пометки на листе. Цитата выбранного — в постоянном месте на поле шапки: не зависит от плотности
-  // графа и не тянет стрелок через карту. Тема листа — в свободном месте страты трудов; места нет — не рисуется.
-  function placeNotes({R,bw,active}){
-    const L=svg.lastChild;
+  // На самом таймлайне рукописных пометок нет: карта только показывает данные.
+  // Цитата выбранного — эпиграф на поле шапки, вне графа.
+  function placeNotes({R}){
     const ep=document.querySelector('.epigraph'),n=R?noteFor(state.sel):null;
     if(ep){ep.innerHTML=n?`<blockquote>${n.lines.join(' ')}</blockquote><figcaption>— ${n.cite}</figcaption>`:'';ep.hidden=!n;}
-    if(!bw.collapsed){
-      const pad=(r,m)=>({x:r.x-m,y:r.y-m,w:r.width+2*m,h:r.height+2*m}),boxes=[];
-      svg.querySelectorAll('text,.work-mark,.concept-mark').forEach(t=>{const b=t.getBBox();if(b.width)boxes.push(pad(b,6));});
-      const g=S('g',{class:'notes-layer'});L.append(g);
-      theme.forEach((ln,i)=>g.append(S('text',{x:i*14,y:i*26,class:'hand','font-size':19-i*2},ln)));
-      const bb=g.getBBox(),w=bb.width+12,h=bb.height+10;let spot=null;
-      for(let x=PLOT_L+14;x+w<PLOT_R&&!spot;x+=16)for(let y=bw.top+8;y+h<bw.bot-4&&!spot;y+=10){
-        const box={x,y,w,h};if(!boxes.some(b=>box.x<b.x+b.w&&b.x<box.x+box.w&&box.y<b.y+b.h&&b.y<box.y+box.h))spot=box;}
-      if(spot)g.setAttribute('transform',`translate(${spot.x+6-bb.x} ${spot.y+5-bb.y}) rotate(-2 ${bb.x+bb.width/2} ${bb.y+bb.height/2})`);else g.remove();
-    }
-    if(active&&active.titleBox){const bb=active.titleBox.getBBox();L.append(S('path',{d:`M${bb.x-4} ${bb.y+bb.height+4} Q${bb.x+bb.width/2} ${bb.y+bb.height+9} ${bb.x+bb.width+6} ${bb.y+bb.height+2}`,class:'hand-stroke'}));}
   }
   // карточки на столе следуют за выбором: вопрос философа и его труды «к чтению»
   function renderDesk(R){
