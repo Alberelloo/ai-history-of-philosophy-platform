@@ -3,7 +3,9 @@
    (влияния — киноварный поток, труды — бирюзовая нить, эпоха — подсветка без линий). */
 (function(){
   const NS='http://www.w3.org/2000/svg';
-  const W=1160,PLOT_L=150,PLOT_R=W-26,TOP=28,BODY=500,AXIS_H=50,COLL=28;
+  // Ширина и высота графа — в реальных пикселях листа (не масштабированный viewBox):
+  // шире лист — больше места на годы, а не крупнее шрифт. Пересчёт при resize.
+  let W=1160,PLOT_R=W-26,BODY=500;const PLOT_L=150,TOP=28,AXIS_H=50,COLL=28;
   const Y0=1580,Y1=1812,X=y=>PLOT_L+(y-Y0)/(Y1-Y0)*(PLOT_R-PLOT_L);
   const ORDER=['events','eras','people','works'];
   const META={
@@ -30,6 +32,24 @@
     {id:'enquiry',title:'Исследование о человеческом познании',year:1748,author:'hume',kind:'work'},
     {id:'critique',title:'Критика чистого разума',year:1781,author:'kant',kind:'work'},
   ];
+  // Пометки на полях — данные (цитата + источник), а не текст макета: у каждой есть «про что» —
+  // связь (a-b) или персона. Показывается одна, про выбранного; нет места на листе — уходит в сноску.
+  const notes=[
+    {about:'hume-kant',lines:['«…впервые прервало мою','догматическую дремоту»'],cite:'Кант о Юме, «Пролегомены», 1783'},
+    {about:'descartes',lines:['«Я мыслю, следовательно,','я существую»'],cite:'«Рассуждение о методе», 1637'},
+    {about:'locke',lines:['«…ум есть, так сказать,','белая бумага без всяких знаков»'],cite:'«Опыт…», кн. II, гл. 1'},
+    {about:'hume',lines:['«Разум есть и должен быть','лишь рабом аффектов»'],cite:'«Трактат о человеческой природе»'},
+    {about:'spinoza',lines:['«Порядок и связь идей те же,','что порядок и связь вещей»'],cite:'«Этика», ч. II, теор. 7'},
+  ];
+  const theme=['Опыт или разум?','— вот спор целой эпохи'];  // тема листа, не про персону
+  // карточки на столе: главный вопрос выбранного (редакторская выжимка, не цитата)
+  const questions={
+    descartes:['Что можно знать','несомненно?','— путь сомнения'],
+    locke:['Откуда берутся','наши идеи?','— только из опыта'],
+    spinoza:['Как связаны','мышление и протяжение?','— одна субстанция'],
+    hume:['Откуда мы знаем','о причинах?','— из привычки'],
+    kant:['Что я могу знать?','Что я должен делать?','На что смею надеяться?'],
+  };
   const eras=[{label:'Научная революция',from:1600,to:1687},{label:'Просвещение',from:1687,to:1804}];
   const events=[{year:1687,label:'«Начала» Ньютона'},{year:1751,label:'Энциклопедия'},{year:1789,label:'Французская революция'}];
 
@@ -46,6 +66,7 @@
   function layoutBands(){
     const on=ORDER.filter(k=>state.on[k]),free=BODY-(ORDER.length-on.length)*COLL,sw=on.reduce((a,k)=>a+META[k].w,0),h={};
     ORDER.forEach(k=>h[k]=state.on[k]?Math.min(META[k].max,free*META[k].w/sw):COLL);
+    if(state.on.works)h.works=Math.max(h.works,136);  // две строки названий в два ряда — не налезают на шкалу
     if(state.on.people)h.people+=BODY-ORDER.reduce((a,k)=>a+h[k],0);
     let y=TOP;const b={};ORDER.forEach(k=>{b[k]={key:k,top:y,bot:y+h[k],collapsed:!state.on[k],...META[k]};y+=h[k];});return b;
   }
@@ -62,6 +83,9 @@
   function draw(){
     const ae=document.activeElement,focusId=ae&&ae.dataset?ae.dataset.person:null;
     svg.innerHTML='';
+    const cw=Math.round(svg.getBoundingClientRect().width)||1160;W=Math.max(900,cw);PLOT_R=W-26;
+    const top=svg.getBoundingClientRect().top+scrollY;BODY=Math.round(Math.min(760,Math.max(440,innerHeight-top-AXIS_H-TOP-96)));
+    if(gutter)gutter.style.width=PLOT_L+'px';
     const bands=layoutBands(),H=bands.works.bot+AXIS_H,R=related();
     svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
 
@@ -134,7 +158,7 @@
       if(R&&!act){L.threads.append(S('path',{d,fill:'none',stroke:'var(--graph-ink-muted)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'2 3','stroke-linecap':'round'}));return;}
       const gid='dg'+i,lg=S('linearGradient',{id:gid,gradientUnits:'userSpaceOnUse',x1:A.x,y1:A.y,x2:B.x,y2:B.y});
       lg.append(S('stop',{offset:'0%','stop-color':'var(--people)','stop-opacity':.75}));lg.append(S('stop',{offset:'100%','stop-color':act?'var(--graph-selected)':'var(--people)','stop-opacity':act?.95:.6}));defs.append(lg);
-      const g=S('g',act?{filter:'url(#glow)'}:{});
+      const g=S('g',act?{filter:'url(#glow)',class:'thread-active'}:{});
       if(act)[[2.6,-2.2],[-2.2,2.6]].forEach(([ox,oy])=>g.append(S('path',{d:`M${A.x},${A.y} C${P[1].x+ox},${P[1].y+oy} ${P[2].x+ox},${P[2].y+oy} ${B.x},${B.y}`,fill:'none',stroke:`url(#${gid})`,'stroke-width':.6,'stroke-opacity':.45})));
       g.append(S('path',{d:ribbon(P,act?4.6:3.2,act?1.3:1),fill:`url(#${gid})`}));
       if(act)[.36,.64].forEach(tt=>{const q=cub(P,tt);g.append(S('circle',{cx:q.x,cy:q.y,r:1.4,fill:'#fff3e0','fill-opacity':.9}));});
@@ -171,19 +195,45 @@
     for(let y=1600,k=0;y<1800;y+=25,k++)if(k%2===0)L.axis.append(S('rect',{x:X(y),y:ay,width:X(y+25)-X(y),height:5,fill:'var(--graph-ink)','fill-opacity':.5}));
     for(let y=1600;y<=1800;y+=25){const x=X(y),maj=y%50===0;L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+(maj?9:5),stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));if(maj)L.axis.append(S('text',{x,y:ay+27,class:'axis-year'},y));}
 
-    /* рукописные пометки философа */
-    const hand=(x,y,s,txt,rot,anchor)=>L.notes.append(S('text',{x,y,class:'hand','font-size':s,'text-anchor':anchor||'start',transform:`rotate(${rot} ${x} ${y})`},txt));
-    const hs=d=>L.notes.append(S('path',{d,class:'hand-stroke'}));
-    if(!bp.collapsed){const q=bp.top+66;hand(838,q,19,'«Юм пробудил меня',-3);hand(852,q+27,19,'от догматического сна»',-3);hand(958,q+52,14,'— Кант, 1783',-3);
-      const m=mids['hume-kant'];if(m){hs(`M910 ${q+62} C906 ${q+92} ${m.x+20} ${m.y-30} ${m.x+5} ${m.y-8}`);hs(`M${m.x+1} ${m.y-19} L${m.x+5} ${m.y-7} L${m.x+15} ${m.y-15}`);}
-      const sp=byId.spinoza;hand(sp.bx-30,sp.y+5,15,'а Спиноза? →',-4,'end');}
-    if(!bw.collapsed){hand(178,bw.top+52,18,'Опыт или разум?',-2);hand(196,bw.top+78,16,'— вот спор целой эпохи',-2);}
-    if(active&&active.titleBox){const bb=active.titleBox.getBBox();hs(`M${bb.x-4} ${bb.y+bb.height+4} Q${bb.x+bb.width/2} ${bb.y+bb.height+9} ${bb.x+bb.width+6} ${bb.y+bb.height+2}`);}
+    /* рукописные пометки: ищут свободное место у своего «якоря» */
+    placeNotes({R,bw,active});
 
-    renderGutter(bands,H);renderNote(R);
-    window.deskLayout={bands,H,people:byId,mids,state};
+    renderGutter(bands,H);renderNote(R);renderDesk(R);
+    window.deskLayout={bands,H,people:byId,mids,state,BODY,svgTop:top};
     if(focusId){const f=svg.querySelector(`[data-person="${focusId}"]`);if(f)f.focus();}
     if(!reduce&&svg.animate)svg.animate([{opacity:.55},{opacity:1}],{duration:180,easing:'ease-out'});
+  }
+
+  function noteFor(sel){
+    if(!sel)return null;
+    return notes.find(n=>n.about.endsWith('-'+sel))||notes.find(n=>n.about===sel)||notes.find(n=>n.about.startsWith(sel+'-'))||null;
+  }
+  // Пометки на листе. Цитата выбранного — в постоянном месте на поле шапки: не зависит от плотности
+  // графа и не тянет стрелок через карту. Тема листа — в свободном месте страты трудов; места нет — не рисуется.
+  function placeNotes({R,bw,active}){
+    const L=svg.lastChild;
+    const ep=document.querySelector('.epigraph'),n=R?noteFor(state.sel):null;
+    if(ep){ep.innerHTML=n?`<blockquote>${n.lines.join(' ')}</blockquote><figcaption>— ${n.cite}</figcaption>`:'';ep.hidden=!n;}
+    if(!bw.collapsed){
+      const pad=(r,m)=>({x:r.x-m,y:r.y-m,w:r.width+2*m,h:r.height+2*m}),boxes=[];
+      svg.querySelectorAll('text,.work-mark,.concept-mark').forEach(t=>{const b=t.getBBox();if(b.width)boxes.push(pad(b,6));});
+      const g=S('g',{class:'notes-layer'});L.append(g);
+      theme.forEach((ln,i)=>g.append(S('text',{x:i*14,y:i*26,class:'hand','font-size':19-i*2},ln)));
+      const bb=g.getBBox(),w=bb.width+12,h=bb.height+10;let spot=null;
+      for(let x=PLOT_L+14;x+w<PLOT_R&&!spot;x+=16)for(let y=bw.top+8;y+h<bw.bot-4&&!spot;y+=10){
+        const box={x,y,w,h};if(!boxes.some(b=>box.x<b.x+b.w&&b.x<box.x+box.w&&box.y<b.y+b.h&&b.y<box.y+box.h))spot=box;}
+      if(spot)g.setAttribute('transform',`translate(${spot.x+6-bb.x} ${spot.y+5-bb.y}) rotate(-2 ${bb.x+bb.width/2} ${bb.y+bb.height/2})`);else g.remove();
+    }
+    if(active&&active.titleBox){const bb=active.titleBox.getBBox();L.append(S('path',{d:`M${bb.x-4} ${bb.y+bb.height+4} Q${bb.x+bb.width/2} ${bb.y+bb.height+9} ${bb.x+bb.width+6} ${bb.y+bb.height+2}`,class:'hand-stroke'}));}
+  }
+  // карточки на столе следуют за выбором: вопрос философа и его труды «к чтению»
+  function renderDesk(R){
+    const top=document.getElementById('card-top'),under=document.getElementById('card-under');
+    const lines=(el,arr)=>{if(!el)return;el.querySelectorAll('.t').forEach(t=>t.remove());arr.forEach((x,i)=>{const d=document.createElement('div');d.className='t'+(i===0?' big':'');d.textContent=x;if(i===0&&el===top)d.style.marginTop='6px';el.append(d);});el.hidden=!arr.length;};
+    const sel=state.sel;
+    lines(top,sel?(questions[sel]||[]):theme.concat(['Декарт · Локк · Юм · Кант']));
+    const ws=sel?works.filter(w=>w.author===sel&&w.kind==='work'):[];
+    lines(under,ws.length?['К чтению:',...ws.map(w=>`«${w.title}», ${w.year}`)]:[]);
   }
 
   /* линзы — у своих страт, в левом поле */
@@ -218,5 +268,7 @@
   svg.addEventListener('keydown',ev=>{const g=ev.target.closest&&ev.target.closest('[data-person]');if(g&&(ev.key==='Enter'||ev.key===' ')){ev.preventDefault();state.sel=g.dataset.person;draw();}});
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&state.sel){state.sel=null;draw();}});
   window.desk={state,draw,select:id=>{state.sel=id;draw();},toggleLens:k=>{state.on[k]=!state.on[k];draw();}};
+  let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(draw,120);});
+  document.fonts.ready.then(draw);
   draw();
 })();

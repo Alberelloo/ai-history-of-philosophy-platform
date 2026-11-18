@@ -170,3 +170,22 @@
 /* Контекст отличается начертанием, а не таянием: читается, но не спорит с фокусом */
 .dim .person-name{font-weight:400}
 .dim-soft .work-title,.dim-soft .concept-title{font-weight:400}
+/* v3 (отзыв 2026-11-18): лист — главный, стол — рамка. Лист почти во всю ширину и высоту окна,
+   предметы срезаются краем кадра и заходят только на поля листа. */
+.scene{padding:30px 0 150px}
+.stage{width:calc(100% - 2*clamp(40px,4.2vw,120px));max-width:1800px}
+.blotter{inset:-26px -34px -34px}
+.blotter .stitch{inset:8px}
+.scene .folio{padding:24px 34px 16px}
+.scene h1{font-size:28px;line-height:34px;margin:6px 0 2px}
+.scene .chart{margin-top:8px}
+.card[hidden]{display:none}
+.selnote .q{font:italic 400 12.5px/1.45 Literata,Georgia,serif;color:var(--graph-ink-secondary);margin-top:4px}
+/* шапка фиксированной высоты: смена выбора не двигает график */
+.scene .head{height:166px;box-sizing:border-box}
+/* эпиграф на поле шапки: цитата выбранного, рукой философа-читателя */
+.scene .head-main{flex:0 1 auto}
+.epigraph{flex:1 1 0;min-width:0;max-width:440px;margin:18px auto 0;padding:0 8px;color:var(--hand);font-family:"Bad Script",cursive;transform:rotate(-2deg);text-align:center}
+.epigraph[hidden]{display:block;visibility:hidden}
+.epigraph blockquote{margin:0;font-size:20px;line-height:28px}
+.epigraph figcaption{margin-top:4px;font-size:14px;text-align:right;opacity:.85}

@@ -27,8 +27,12 @@
 сворачивает её (остальные забирают высоту); клик/Enter по философу — его влияния, труды, эпоха;
 клик по полю или Esc — снять выбор. Светлая тема — день, тёмная — вечер при лампе.
 
+Всё на листе строится из данных и следует за выбором: ленты, нити, труды, эпоха, сноска «Выбрано»,
+заголовок, цитата-эпиграф на поле шапки (`notes`), карточки на столе (`questions`, труды). Нет данных —
+нет пометки. Граф рисуется в реальных пикселях листа и пересчитывается при изменении окна.
+
 Файлы: `desk.html` · `desk.css` · `desk-chart.js` (граф от состояния) · `desk.js` (предметы) ·
-`desk-light.png`/`desk-dark.png`. Направление — [graph-desk-scene-direction.md](../../../features/graph-desk-scene-direction.md),
+`desk-light.png`/`desk-dark.png` · кадры других выборов — `cycle/v3-sel-*.png`. Направление — [graph-desk-scene-direction.md](../../../features/graph-desk-scene-direction.md),
 журнал доводки — [design-cycle-log.md](../../../features/graph-page-qa/design-cycle-log.md).
 Проверки (Playwright + Chromium): `cycle/check.js` (рендер, геометрия), `cycle/ixn.js` (интеракции),
 `cycle/audit.js` (контраст); запуск — `node cycle/<скрипт>.js` из папки с `playwright-core`.
