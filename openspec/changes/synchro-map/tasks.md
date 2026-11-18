@@ -3,7 +3,7 @@
 ## 1. Задача и документы
 
 - [x] 1.1 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, дельты `knowledge-graph`, `ontology-registry`, `visual-design`, `progress.md`, `qa/cases.md`
-- [ ] 1.2 `graph-page-design.md` и README макета: ссылка на `synchro-map` как на реализацию; `docs/product/ontology.md` — значения вида группы, ролей, видов событий совпадают с реестром
+- [x] 1.2 `graph-page-design.md` и README макета: ссылка на `synchro-map` как на реализацию; `docs/product/ontology.md` — значения вида группы, ролей, видов событий совпадают с реестром
 
 ## 2. Онтология
 
