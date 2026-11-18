@@ -4,6 +4,8 @@ import { useT } from "../i18n";
 import { ScopeToggle, setScope, useScope } from "../scope";
 import { storage, useStored } from "../storage";
 import { Icon, Switch } from "../ui";
+import { DeskNotes, type DeskQuote, type DeskReading } from "./DeskNotes";
+import { DeskScene } from "./DeskScene";
 import { downloadSvg } from "./exportSvg";
 import { DENSE_MAP } from "./fixture";
 import { edgeFromStatement, type GEdge } from "./LinkDetails";
@@ -38,7 +40,20 @@ const INFLUENCE = new Set([
 const EMPTY: MapData = { range: [0, 1], truncated: false, limit: 0, people: [], works: [], events: [], eras: [], groups: [], links: [], undated: [] };
 
 const MIN_HEIGHT = 420;
-const BOTTOM_GAP = 44; // под обзорной шкалой: её отступ, поля листа и страницы
+// Под обзорной шкалой: её отступ, нижнее поле листа (desk-sheet-body), рамка и полоска стола
+const BOTTOM_GAP = 60;
+const READING_MAX = 3;
+
+// Цитата для записки: первая цитата-подтверждение связи влияния выбранной персоны
+type QuoteRow = { type?: string; subject?: string; object?: string; evidence?: { quote?: string; lost?: boolean }[] };
+function firstQuote(rows: QuoteRow[], sel: string): { quote: string; subject: string; object: string } | null {
+  for (const r of rows) {
+    if (!r.type || !INFLUENCE.has(r.type) || (r.subject !== sel && r.object !== sel)) continue;
+    const ev = (r.evidence ?? []).find((e) => !e.lost && e.quote && e.quote.trim());
+    if (ev) return { quote: ev.quote!.trim(), subject: r.subject!, object: r.object! };
+  }
+  return null;
+}
 
 export function MapPage({ entityId, query }: { entityId?: string; query: URLSearchParams }) {
   const t = useT();
@@ -116,6 +131,44 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const vis = useMemo(() => visible(data, state.filter), [data, state.filter]);
   const rel = useMemo(() => related(data, vis, state.sel), [data, vis, state.sel]);
   const found = state.sel ? find(data, state.sel) : null;
+  const selPerson = found?.type === "person" ? found.obj.id : null;
+
+  // Записки на столе: цитата из подтверждений связей выбранной персоны (ответ карты цитат не несёт —
+  // берутся утверждения семьи genesis; без сервиса — из рёбер достройки) и её труды «к чтению».
+  const [quoteRows, setQuoteRows] = useState<{ id: string; rows: QuoteRow[] } | null>(null);
+  useEffect(() => {
+    if (!selPerson || fixture) return;
+    let live = true;
+    fetch(`${KNOWLEDGE_API}/entities/${encodeURIComponent(selPerson)}/statements?family=genesis`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: QuoteRow[]) => live && setQuoteRows({ id: selPerson, rows: Array.isArray(rows) ? rows : [] }))
+      .catch(() => live && setQuoteRows({ id: selPerson, rows: [] }));
+    return () => {
+      live = false;
+    };
+  }, [selPerson, fixture]);
+  const deskQuote = useMemo<DeskQuote | null>(() => {
+    if (!selPerson) return null;
+    const rows: QuoteRow[] = [
+      ...(quoteRows?.id === selPerson ? quoteRows.rows : []),
+      ...[...edges.current.values()].map((e) => ({ type: e.type, subject: e.subject, object: e.object, evidence: e.evidence })),
+      ...(link?.edge ? [{ type: link.edge.type, subject: link.edge.subject, object: link.edge.object, evidence: link.edge.evidence }] : []),
+    ];
+    const q = firstQuote(rows, selPerson);
+    if (!q) return null;
+    const people = index(data).people;
+    const name = (id: string) => people.get(id)?.short ?? people.get(id)?.label ?? id;
+    return { text: t.map.desk.quote(q.quote), source: t.map.desk.quoteSource(name(q.subject), name(q.object)) };
+  }, [selPerson, quoteRows, link, data, t, build.added]);
+  const deskReading = useMemo<DeskReading[]>(() => {
+    if (!selPerson) return [];
+    return data.works
+      .filter((w) => w.author === selPerson && w.kind === "work")
+      .sort((a, b) => b.weight - a.weight || a.year - b.year)
+      .slice(0, READING_MAX)
+      .sort((a, b) => a.year - b.year)
+      .map((w) => ({ title: t.map.desk.quote(w.label), year: w.year }));
+  }, [selPerson, data, t]);
 
   // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.
   useEffect(() => {
@@ -296,100 +349,104 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
 
   return (
     <main className="page map-page">
-      <div className="map-sheet">
-        <header className="map-head">
-          <div className="map-head__main">
-            <div className="map-head__eyebrow">{t.map.eyebrow}</div>
-            <h1 className="map-head__title">{title}</h1>
-          </div>
-          <div className="map-head__tools">
-            <ScopeToggle textbook={textbook} />
-            <Switch label={t.graph.extend} checked={scope.generation} onChange={(value) => setScope({ generation: value })} />
-            <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={download} disabled={!ready}>
-              <Icon name="download" small />
-              {t.graph.download}
-            </button>
-          </div>
-        </header>
-        {load.status === "error" && (
-          <div className="pg-notice pg-notice--danger map-notice" role="alert">
-            <Icon name="warning" />
-            <div>{t.graph.serviceDown}</div>
-          </div>
-        )}
-        {ready && data.truncated && (
-          <div className="pg-notice map-notice" role="status">
-            <Icon name="info" />
-            <div>{t.map.truncated(data.limit)}</div>
-          </div>
-        )}
-        {ready && state.sel && !found && (
-          <div className="pg-notice map-notice" role="status">
-            <Icon name="info" />
-            <div>{t.map.notOnMap}</div>
-            <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => openCardInPanel(state.sel!, state.sel!)}>
-              {t.graph.openCard}
-            </button>
-          </div>
-        )}
-        {load.status === "loading" && !load.data && <p className="loading muted">{t.app.loading}</p>}
-        {empty && (
-          <div className="map-empty">
-            <p>{t.map.empty}</p>
-            <p className="muted">{t.map.emptyHint}</p>
-          </div>
-        )}
-        {ready && (
-          <div className={panelCollapsed ? "map-workspace is-panel-collapsed" : "map-workspace"}>
-            <div className="map-chart" ref={chart}>
-              {size.width > 0 && (
-                <>
-                  <MapCanvas
-                    data={data}
-                    vis={vis}
-                    rel={rel}
-                    sel={state.sel}
-                    collapsed={state.collapsed}
-                    width={size.width}
-                    height={size.height}
-                    measure={measure}
-                    fontsVersion={fontsVersion}
-                    linkSel={link?.id ?? null}
-                    onSelect={select}
-                    onLink={openLink}
-                    onLens={(collapsed) => patch({ collapsed })}
-                    exportRef={exportRef}
-                  />
-                  <Overview
-                    range={data.range ?? vis.range}
-                    win={vis.range}
-                    people={data.people}
-                    width={size.width}
-                    onChange={(from, to) => setState((s) => ({ ...s, filter: { ...s.filter, from, to } }))}
-                  />
-                </>
-              )}
+      <DeskScene
+        notes={<DeskNotes quote={deskQuote} reading={deskReading} readingTitle={t.map.desk.reading} label={t.map.desk.notes} />}
+      >
+        <div className="map-sheet">
+          <header className="map-head">
+            <div className="map-head__main">
+              <div className="map-head__eyebrow">{t.map.eyebrow}</div>
+              <h1 className="map-head__title">{title}</h1>
             </div>
-            <MapPanel
-              data={data}
-              vis={vis}
-              rel={rel}
-              state={state}
-              collapsed={panelCollapsed}
-              onCollapse={(c) => storage.setMapPanelCollapsed(c)}
-              onState={patch}
-              onSelect={select}
-              link={link}
-              onCloseLink={() => setLink(null)}
-              build={build}
-              onBuild={runBuild}
-              generation={scope.generation}
-              onEnableGeneration={() => setScope({ generation: true })}
-              onOpenCard={(id, label) => openCardInPanel(id, label)}
-            />
-          </div>
-        )}
-      </div>
+            <div className="map-head__tools">
+              <ScopeToggle textbook={textbook} />
+              <Switch label={t.graph.extend} checked={scope.generation} onChange={(value) => setScope({ generation: value })} />
+              <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={download} disabled={!ready}>
+                <Icon name="download" small />
+                {t.graph.download}
+              </button>
+            </div>
+          </header>
+          {load.status === "error" && (
+            <div className="pg-notice pg-notice--danger map-notice" role="alert">
+              <Icon name="warning" />
+              <div>{t.graph.serviceDown}</div>
+            </div>
+          )}
+          {ready && data.truncated && (
+            <div className="pg-notice map-notice" role="status">
+              <Icon name="info" />
+              <div>{t.map.truncated(data.limit)}</div>
+            </div>
+          )}
+          {ready && state.sel && !found && (
+            <div className="pg-notice map-notice" role="status">
+              <Icon name="info" />
+              <div>{t.map.notOnMap}</div>
+              <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={() => openCardInPanel(state.sel!, state.sel!)}>
+                {t.graph.openCard}
+              </button>
+            </div>
+          )}
+          {load.status === "loading" && !load.data && <p className="loading muted">{t.app.loading}</p>}
+          {empty && (
+            <div className="map-empty">
+              <p>{t.map.empty}</p>
+              <p className="muted">{t.map.emptyHint}</p>
+            </div>
+          )}
+          {ready && (
+            <div className={panelCollapsed ? "map-workspace is-panel-collapsed" : "map-workspace"}>
+              <div className="map-chart" ref={chart}>
+                {size.width > 0 && (
+                  <>
+                    <MapCanvas
+                      data={data}
+                      vis={vis}
+                      rel={rel}
+                      sel={state.sel}
+                      collapsed={state.collapsed}
+                      width={size.width}
+                      height={size.height}
+                      measure={measure}
+                      fontsVersion={fontsVersion}
+                      linkSel={link?.id ?? null}
+                      onSelect={select}
+                      onLink={openLink}
+                      onLens={(collapsed) => patch({ collapsed })}
+                      exportRef={exportRef}
+                    />
+                    <Overview
+                      range={data.range ?? vis.range}
+                      win={vis.range}
+                      people={data.people}
+                      width={size.width}
+                      onChange={(from, to) => setState((s) => ({ ...s, filter: { ...s.filter, from, to } }))}
+                    />
+                  </>
+                )}
+              </div>
+              <MapPanel
+                data={data}
+                vis={vis}
+                rel={rel}
+                state={state}
+                collapsed={panelCollapsed}
+                onCollapse={(c) => storage.setMapPanelCollapsed(c)}
+                onState={patch}
+                onSelect={select}
+                link={link}
+                onCloseLink={() => setLink(null)}
+                build={build}
+                onBuild={runBuild}
+                generation={scope.generation}
+                onEnableGeneration={() => setScope({ generation: true })}
+                onOpenCard={(id, label) => openCardInPanel(id, label)}
+              />
+            </div>
+          )}
+        </div>
+      </DeskScene>
     </main>
   );
 }

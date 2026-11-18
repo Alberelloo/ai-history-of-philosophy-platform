@@ -4,9 +4,10 @@
    Размеры — rem; px только у линий. Кегли подписей на холсте задаёт раскладка (layout.ts:
    тот же шрифт меряется canvas measureText), поэтому здесь у текста SVG — только цвет. */
 
+/* Страница — стол во всю рабочую область: поля и фон даёт сцена (DeskScene, styles/map.css) */
 .map-page {
   max-width: none;
-  padding: var(--space-4) var(--space-6);
+  padding: 0;
 }
 
 /* Лист вне темы: бумага одинакова днём и вечером (токены --sheet*, --sel-* общие для тем).
@@ -48,10 +49,7 @@
   --m-focus: var(--sel-teacher, var(--accent));
   --m-era: var(--sel-6, var(--generated));
 
-  padding: var(--space-4) var(--space-6) var(--space-3);
-  border: 1px solid var(--m-rule);
-  border-radius: var(--radius-xs, 0.25rem);
-  background: var(--m-paper);
+  /* Бумага, рамка и поля — у листа сцены (.desk-sheet); здесь только цвет текста */
   color: var(--m-ink);
 }
 

@@ -54,6 +54,9 @@ export const allMapFonts = (): string[] => [...new Set([...Object.values(mapFont
 export const W_ROW = 56; // ряд «булавок» трудов
 export const E_ROW = 24; // ряд событий
 export const ERA_H = 48; // страта эпох
+export const LANE_STRETCH_DENSE = 1.3; // предел растяжения дорожки в плотном режиме
+export const LANE_STRETCH = 2.4; // в редком режиме
+export const WORKS_ROWS_SPARE = 5; // рядов трудов, когда люди оставляют место
 export const DENSE_PEOPLE = 12; // больше — плотный режим: тонкие ленты, имя внутри
 
 export type LayoutOptions = {
@@ -232,7 +235,17 @@ function keyWorks(works: MapWork[]): Set<string> {
 
 type WorkPin = WorkPlace & { w: number; key: boolean };
 
-function planWorks(v: Visible, rel: Related | null, s: TimeScale, measure: Measure, fonts: MapFonts, dense: boolean, maxRows: number, right: number) {
+function planWorks(
+  v: Visible,
+  rel: Related | null,
+  s: TimeScale,
+  measure: Measure,
+  fonts: MapFonts,
+  dense: boolean,
+  maxRows: number,
+  right: number,
+  all = false,
+) {
   const vis = v.works.filter((w) => !rel || !rel.works || rel.works.has(w.id)).sort((a, b) => a.year - b.year);
   const keys = keyWorks(v.works);
   const items: WorkPin[] = vis.map((w) => ({
@@ -249,7 +262,7 @@ function planWorks(v: Visible, rel: Related | null, s: TimeScale, measure: Measu
     primary: !!rel && rel.primary === w.id,
   }));
   const cand = items
-    .filter((it) => rel || it.key)
+    .filter((it) => rel || all || it.key)
     .sort((a, b) => Number(b.primary) - Number(a.primary) || Number(b.key) - Number(a.key) || b.work.weight - a.work.weight || a.work.year - b.work.year);
   cand.forEach((it) => {
     const font = rel ? fonts.workActive : it.work.kind === "work" ? fonts.workTitle : fonts.conceptTitle;
@@ -402,13 +415,25 @@ export function layout(input: LayoutInput): MapLayout {
   const worksCap = on("people")
     ? Math.max(22 + W_ROW + 6, body * 0.38)
     : body - erasH - COLL - (on("events") ? 20 + E_ROW + 4 : COLL);
-  const worksMaxRows = Math.max(1, Math.min(on("people") ? (dense ? (rel ? 4 : 3) : 2) : 8, Math.floor((worksCap - 28) / W_ROW)));
   const eventsMaxRows = Math.max(1, Math.min(dense ? 4 : 2, Math.floor((eventsCap - 24) / E_ROW)));
-  const wp = planWorks(v, rel, s, measure, fonts, dense, on("works") ? worksMaxRows : 0, right);
   const ep = planEvents(v, rel, s, measure, fonts, on("events") ? eventsMaxRows : 0, right);
+  const eventsH = on("events") ? 20 + ep.rows * E_ROW + 4 : COLL;
+  let worksMaxRows = Math.max(1, Math.min(on("people") ? (dense ? (rel ? 4 : 3) : 2) : 8, Math.floor((worksCap - 28) / W_ROW)));
+  // Дорожек мало (фильтр) — люди не займут страту даже растянутыми: лишние ряды отдаются
+  // подписям трудов, но не больше WORKS_ROWS_SPARE.
+  let allWorks = false; // подписывать не только ключевые труды
+  if (on("people") && dense) {
+    const peopleFit = 30 + LANES * laneMin * LANE_STRETCH_DENSE;
+    const spare = body - eventsH - erasH - peopleFit - (22 + worksMaxRows * W_ROW + 6);
+    if (spare > W_ROW) {
+      worksMaxRows = Math.min(WORKS_ROWS_SPARE, worksMaxRows + Math.floor(spare / W_ROW));
+      allWorks = true;
+    }
+  }
+  const wp = planWorks(v, rel, s, measure, fonts, dense, on("works") ? worksMaxRows : 0, right, allWorks);
 
   const h: Record<Stratum, number> = {
-    events: on("events") ? 20 + ep.rows * E_ROW + 4 : COLL,
+    events: eventsH,
     eras: erasH,
     people: COLL,
     works: on("works") ? 22 + Math.max(wp.rows, 1) * W_ROW + 6 : COLL,
@@ -419,8 +444,10 @@ export function layout(input: LayoutInput): MapLayout {
     const viewport = Math.max(peopleMin, body - h.events - h.eras - h.works);
     h.people = viewport;
     if (peopleNeed > viewport) peopleScroll = { contentHeight: peopleNeed, viewportHeight: viewport };
-    // дорожки растягиваются на высоту страты, но не шире 2,4 минимальной (иначе редкие ленты разлетаются)
-    else laneH = Math.min(laneMin * 2.4, (viewport - 30) / LANES);
+    // Дорожки растягиваются на высоту страты, но не больше предела: в плотном разделе — 1,3
+    // минимальной (отфильтрованная карта из нескольких лент не разлетается по высоте, остаток
+    // страты остаётся пустым внизу), в редком — 2,4 (немного крупных лент с медальонами).
+    else laneH = Math.min(laneMin * (dense ? LANE_STRETCH_DENSE : LANE_STRETCH), (viewport - 30) / LANES);
   }
   const bands = {} as Record<Stratum, Band>;
   let y = o.top;
@@ -478,34 +505,59 @@ export function layout(input: LayoutInput): MapLayout {
         ? []
         : v.links.map((link) => ({ link, role: null }));
   const drawn = shown.filter((x) => byId.has(x.link.subject) && byId.has(x.link.object) && x.link.subject !== x.link.object);
-  const slotOut = new Map<string, number>();
-  const slotIn = new Map<string, number>();
-  people.forEach((p) => {
-    drawn
-      .filter((x) => x.link.subject === p.id)
-      .sort((a, b) => byId.get(a.link.object)!.y - byId.get(b.link.object)!.y)
-      .forEach((x, k) => slotIn.set(x.link.id, k));
-    drawn
-      .filter((x) => x.link.object === p.id)
-      .sort((a, b) => byId.get(a.link.subject)!.y - byId.get(b.link.subject)!.y)
-      .forEach((x, k) => slotOut.set(x.link.id, k));
-  });
-  const threads: ThreadPlace[] = drawn.map(({ link, role }) => {
+  // Концы линии — на свободной части ленты: после подписи имени и до годов (или конца ленты).
+  // Линия выходит из ленты учителя и входит в ленту ученика почти отвесно (касательные
+  // вертикальны), поэтому не тянется вдоль чужих лент и вдоль ленты выбранного; середина
+  // кривой между соседними дорожками ложится в промежуток между ними. Если концы обеих
+  // лент перекрываются по времени — линия отвесная. Концы у одной кромки ленты разводятся
+  // по слотам (шаг SLOT), в порядке x противоположных концов — чтобы линии не перекрещивались.
+  const SLOT = 9;
+  const span = (p: PersonPlace) => {
+    const m = pById.get(p.id)!;
+    const lo = p.labelEnd + 10;
+    const yw = !dense && p.yearsIn ? measure(`${m.birth}–${m.death}`, fonts.personYears) + 8 : 0;
+    const hi = p.dx - 8 - yw;
+    // подпись длиннее ленты — конец у точки в начале ленты, до подписи
+    if (hi < lo) return { lo: p.bx + BAND / 2, hi: p.bx + BAND / 2 };
+    return { lo, hi };
+  };
+  type End = { key: string; x: number; other: number; lo: number; hi: number };
+  const plans = drawn.map(({ link, role }) => {
     const sp = byId.get(link.object)!; // учитель
     const tp = byId.get(link.subject)!; // ученик
     const sm = pById.get(link.object)!;
-    const tm = pById.get(link.subject)!;
-    const si = (slotOut.get(link.id) ?? 0) * 9;
-    const ti = (slotIn.get(link.id) ?? 0) * 9;
-    const down = tp.y > sp.y;
-    // точка выхода: через 40 лет после рождения учителя (в макете — год влияния via)
-    const via = Math.min(sm.death - 5, sm.birth + 40);
-    const A = { x: Math.min(Math.max(s.x(via), sp.labelEnd + 10) + si, sp.dx - 8), y: sp.y + (down ? BAND / 2 : -BAND / 2) };
-    const bx0 = Math.max(s.x(tm.birth + 22), tp.labelEnd + 14) + ti;
-    const B = bx0 > tp.dx - 8 ? { x: tp.dx - 3, y: tp.y + (down ? -BAND / 2 + 5 : BAND / 2 - 5) } : { x: bx0, y: tp.y + (down ? -BAND / 2 : BAND / 2) };
-    const dx = B.x - A.x;
+    const sR = span(sp);
+    const tR = span(tp);
+    const via = s.x(Math.min(sm.death - 5, sm.birth + 40)); // в макете — год влияния
+    const lo = Math.max(sR.lo, tR.lo);
+    const hi = Math.min(sR.hi, tR.hi);
+    let ax: number;
+    let bx: number;
+    if (lo <= hi) ax = bx = Math.min(Math.max(via, lo), hi);
+    else if (sR.hi < tR.lo) [ax, bx] = [sR.hi, tR.lo];
+    else [ax, bx] = [sR.lo, tR.hi];
+    // кромка: к другой ленте; на одной дорожке — обе верхние (дуга над дорожкой)
+    const same = sp.lane === tp.lane;
+    const aSide = same ? -1 : tp.y > sp.y ? 1 : -1;
+    const bSide = same ? -1 : -aSide;
+    const A: End = { key: `${sp.id}:${aSide}`, x: ax, other: bx, lo: sR.lo, hi: sR.hi };
+    const B: End = { key: `${tp.id}:${bSide}`, x: bx, other: ax, lo: tR.lo, hi: tR.hi };
+    return { link, role, sp, tp, aSide, bSide, same, A, B };
+  });
+  const groups = new Map<string, End[]>();
+  plans.forEach(({ A, B }) => [A, B].forEach((e) => groups.set(e.key, [...(groups.get(e.key) ?? []), e])));
+  groups.forEach((list) => {
+    list.sort((a, b) => a.x - b.x || a.other - b.other);
+    for (let k = 1; k < list.length; k++) list[k].x = Math.max(list[k].x, list[k - 1].x + SLOT);
+    const over = list[list.length - 1].x - list[0].hi;
+    if (over > 0) list.forEach((e) => (e.x = Math.max(e.lo, e.x - over)));
+  });
+  const threads: ThreadPlace[] = plans.map(({ link, role, sp, tp, aSide, bSide, same, A: a, B: b }) => {
+    const A = { x: a.x, y: sp.y + (aSide * BAND) / 2 };
+    const B = { x: b.x, y: tp.y + (bSide * BAND) / 2 };
     const dy = B.y - A.y;
-    const P = [A, { x: A.x + dx * 0.5, y: A.y + dy * 0.15 }, { x: B.x - dx * 0.15, y: B.y - dy * 0.65 }, B];
+    const lift = same ? -Math.max(laneH * 0.55, 10) : 0;
+    const P = [A, { x: A.x, y: A.y + dy * 0.5 + lift }, { x: B.x, y: B.y - dy * 0.5 + lift }, B];
     return {
       linkId: link.id,
       role,

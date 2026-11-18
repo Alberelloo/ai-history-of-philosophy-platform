@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type MouseEvent } from "react";
 import { navigate } from "./App";
 import { pick, useLang, useT } from "./i18n";
-import { SOON } from "./SoonPage";
+import { SOON, type SoonCode } from "./SoonPage";
 import { useSources } from "./sources";
 import { storage, THEMES, useStored, type Lang, type Theme } from "./storage";
 import { useTheme } from "./theme";
 import { Icon, Mark, type IconName } from "./ui";
+
+// Разделы из списка SOON, которые уже работают, и их адреса.
+const LIVE: Partial<Record<SoonCode, string>> = { assistant: "/assistant", graph: "/graph" };
 
 // Боковая панель навигации (docs/design/system/components/Sidebar.md): свёрнута до значков,
 // раскрывается при наведении или фокусе поверх содержимого, закрепляется и тогда сдвигает его.
@@ -216,15 +219,16 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
               </p>
               {SOON.filter((s) => s.group === group).map((s) => {
                 const text = t.soon.sections[s.code];
-                const isAssistant = s.code === "assistant";
+                // Работающие разделы ведут на себя и без метки «скоро»: ассистент и карта графа.
+                const live = LIVE[s.code];
                 return (
                   <Item
                     key={s.code}
-                    href={isAssistant ? "/assistant" : `/soon/${s.code}`}
+                    href={live ?? `/soon/${s.code}`}
                     icon={s.icon}
                     label={text.title}
-                    soon={!isAssistant}
-                    title={isAssistant ? undefined : text.hint}
+                    soon={!live}
+                    title={live ? undefined : text.hint}
                     current={active === s.code}
                   />
                 );

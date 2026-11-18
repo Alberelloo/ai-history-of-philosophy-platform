@@ -421,6 +421,12 @@ export const ru = {
     },
   },
   map: {
+    desk: {
+      notes: "Записки на столе",
+      reading: "К чтению:",
+      quote: (text: string) => `«${text}»`,
+      quoteSource: (a: string, b: string) => `${a} и ${b}, по учебнику`,
+    },
     title: "Карта раздела",
     eyebrow: "Синхронологическая карта",
     truncated: (limit: number) =>
