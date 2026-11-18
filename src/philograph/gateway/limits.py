@@ -42,7 +42,10 @@ PAID: tuple[tuple[str, re.Pattern[str], str], ...] = (
     ("POST", re.compile(r"^/api/assistant/v1/ask$"), "ask"),
     ("POST", re.compile(r"^/api/knowledge/v1/graph/build$"), "graph"),
     ("POST", re.compile(r"^/api/knowledge/v1/entities/[^/]+/description$"), "description"),
+    # Карта раздела модель не вызывает, но читает всю область: счётчик без токена страницы.
+    ("GET", re.compile(r"^/api/knowledge/v1/map$"), "map"),
 )
+WITHOUT_PAGE_TOKEN = frozenset({"map"})
 
 
 @dataclass(frozen=True)
@@ -66,6 +69,7 @@ class LimitSettings:
             "ask": Quota(20, 100),
             "graph": Quota(30, 200),
             "description": Quota(60, 300),
+            "map": Quota(300, 2000),
         }
     )
     token_ttl_seconds: int = 12 * 3600
@@ -162,7 +166,9 @@ class Limits:
 
     def paid(self, visitor: str, operation: str) -> tuple[str, int] | None:
         """``None`` — можно и учтено; иначе вид лимита и через сколько секунд."""
-        quota = self.settings.quotas[operation]
+        quota = self.settings.quotas.get(operation)
+        if quota is None:
+            return None  # для операции лимит не задан
         now = self.clock.now()
         moment = now.timestamp()
         window = self._hour[(visitor, operation)]

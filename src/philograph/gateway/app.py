@@ -23,7 +23,13 @@ from fastapi.staticfiles import StaticFiles
 from starlette.background import BackgroundTask
 
 from philograph import __version__
-from philograph.gateway.limits import PAGE_COOKIE, Limits, LimitSettings, paid_operation
+from philograph.gateway.limits import (
+    PAGE_COOKIE,
+    WITHOUT_PAGE_TOKEN,
+    Limits,
+    LimitSettings,
+    paid_operation,
+)
 from philograph.gateway.region import REGION_HEADER, RegionResolver, RegionSettings
 from philograph.platform import context, events
 from philograph.platform.health import Health
@@ -140,7 +146,9 @@ def build_app(
             return body
         address, user_agent = who(request)
         visitor = limits.visitor(address, user_agent)
-        if not limits.check_token(request.cookies.get(PAGE_COOKIE), user_agent):
+        if operation not in WITHOUT_PAGE_TOKEN and not limits.check_token(
+            request.cookies.get(PAGE_COOKIE), user_agent
+        ):
             events.emit(
                 "gateway.limit.triggered", kind="page_token", visitor=visitor, operation=operation
             )
@@ -172,6 +180,16 @@ def build_app(
             return json.dumps({**payload, "generation": False, "visitor_limited": True}).encode()
         if operation == "description":
             return _ndjson({"type": "unavailable", "reason": "visitor_limit"})
+        if operation == "map":
+            return JSONResponse(
+                {
+                    "error": "Слишком много запросов карты, попробуйте чуть позже",
+                    "kind": "rate_limited",
+                    "retry_after_seconds": seconds,
+                },
+                status_code=429,
+                headers={"Retry-After": str(seconds)},
+            )
         minutes = max(1, seconds // 60)
         return _ndjson(
             {

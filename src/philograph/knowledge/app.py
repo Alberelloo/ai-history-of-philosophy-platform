@@ -14,6 +14,7 @@ from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
+from philograph.knowledge.map import SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
@@ -125,6 +126,7 @@ def build_app(
     library: ServiceClient | None = None,
     portraits: Portraits | None = None,
     actions: ActionLog | None = None,
+    section_map: SectionMap | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -180,6 +182,14 @@ def build_app(
             **result,
             "edges": [without_closed(edge, closed) for edge in result["edges"]],
         }
+
+    if section_map is not None:
+
+        @router.get("/map")
+        def map_of(textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
+            """Карта раздела из сохранённых утверждений, без модели. Цитат и атрибуций в ней
+            нет — подробности связи клиент берёт из ``/entities/{id}/statements``."""
+            return section_map.build(textbook=textbook, only_textbook=only_textbook)
 
     if assistant is not None:
 
