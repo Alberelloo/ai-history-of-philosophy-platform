@@ -1192,6 +1192,31 @@ blockquote.block {
   display: none;
 }
 
+/* Вид карты от ассистента: подпись, сколько видно, что не вошло (assistant-map-view) */
+.turn__map {
+  margin-block: var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line);
+  font: var(--type-ui-body-sm);
+}
+
+.turn__map p {
+  margin: 0;
+}
+
+.turn__map-caption {
+  font: var(--type-ui-label);
+}
+
+.turn__map-dropped {
+  margin-top: var(--space-1);
+  color: var(--ink-2);
+}
+
+.turn__map-card {
+  vertical-align: baseline;
+}
+
 .status-mark {
   margin-left: var(--space-1);
   color: var(--ink-3);

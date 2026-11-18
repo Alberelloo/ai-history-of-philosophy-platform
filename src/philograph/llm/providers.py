@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import deque
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -79,6 +80,8 @@ class FakeProvider:
     script: deque[Any] = field(default_factory=deque)
     default: str = "ok"
     replies: dict[str, str] = field(default_factory=dict)  # постоянный ответ по шаблону
+    # (шаблон, подстрока последнего сообщения, ответ, блок данных или None) — раньше ``replies``
+    rules: list[tuple[str, str, str, str | None]] = field(default_factory=list)
     calls: list[ProviderRequest] = field(default_factory=list)
     embed_calls: list[list[str]] = field(default_factory=list)
     dimension: int = 8
@@ -89,6 +92,17 @@ class FakeProvider:
     def _next(self, request: ProviderRequest | None = None) -> Any:
         if self.script:
             return self.script.popleft()
+        if request is not None and request.messages:
+            last = request.messages[-1].content
+            for template, contains, reply, block in self.rules:
+                text = last
+                if block is not None:
+                    found = re.search(
+                        rf'<data name="{re.escape(block)}">\n(.*?)\n</data>', last, re.S
+                    )
+                    text = found.group(1) if found else ""
+                if request.template == template and contains.lower() in text.lower():
+                    return reply
         if request is not None and request.template in self.replies:
             return self.replies[request.template]
         return self.default

@@ -12,13 +12,16 @@ import { useSources } from "./sources";
 import {
   LIBRARY,
   liveTurns,
+  isMapHref,
   newId,
+  normalizeMapView,
   storage,
   useDialogSet,
   type Citation,
   type DialogSet,
   type Fragment,
   type Message,
+  type MapView,
   type Session,
   type Suggestion,
   type Turn,
@@ -69,6 +72,8 @@ const SERVER_CODES = [
   "found_not_retold",
   "budget_exhausted",
   "llm_unavailable",
+  "map_no_candidates",
+  "map_unavailable",
 ] as const;
 type ServerCode = (typeof SERVER_CODES)[number];
 
@@ -347,6 +352,8 @@ async function ask(a: Ask): Promise<void> {
         } else if (event.type === "fragment") {
           setStage(turnId, (s) => ({ ...s, step: 3 }));
           patch((t) => ({ ...t, fragments: [...t.fragments, event as Fragment] }));
+        } else if (event.type === "suggestion" && event.kind === "map") {
+          if (isMapHref(event.href)) patch((t) => ({ ...t, mapView: normalizeMapView(event) }));
         } else if (event.type === "suggestion") {
           patch((t) => ({ ...t, suggestion: event as Suggestion }));
         } else if (event.type === "handoff") {
@@ -1188,7 +1195,25 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
                         ) : (
                           <span className="status-mark pg-status handoff-deleted">{t.assistant.handoff.deleted}</span>
                         ))}
+                      {turn.mapView && <MapViewNote view={turn.mapView} />}
                       <div className="turn__actions">
+                        {turn.mapView && (
+                          // Адрес — от сервера знаний; переход внутри приложения, диалог остаётся
+                          // в истории и в хранилище, «Назад» возвращает к нему.
+                          <a
+                            className="pg-btn pg-btn--secondary pg-btn--sm turn__open-map"
+                            href={turn.mapView.href}
+                            onClick={(e) => {
+                              if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+                              e.preventDefault();
+                              if (mode === "book") onClose();
+                              navigate(turn.mapView!.href);
+                            }}
+                          >
+                            <Icon name="graph" small />
+                            {t.assistant.openMap}
+                          </a>
+                        )}
                         {turn.suggestion && (
                           <button className="pg-btn pg-btn--secondary pg-btn--sm" onClick={() => navigate(`/graph/${turn.suggestion!.entity_id}?recipe=${turn.suggestion!.recipe}`)}>
                             <Icon name="graph" small />
@@ -1407,5 +1432,38 @@ function StageSummary({ t, turn }: { t: Catalog; turn: Turn }) {
       {turn.status === "error" && <Icon name="warning" small />}
       {withElapsed(text, t.assistant.elapsed(stats.seconds))}
     </p>
+  );
+}
+
+// Подпись вида карты под ответом: подпись модели, сколько видно и что не вошло. Сущность, которой
+// нет на карте, открывается карточкой в правой панели.
+function MapViewNote({ view }: { view: MapView }) {
+  const t = useT();
+  // Свёрнутые страты, которые нельзя свернуть все разом, читателю неинтересны.
+  const dropped = view.dropped.filter((d) => d.reason !== "all_strata");
+  return (
+    <div className="turn__map">
+      {view.caption && <p className="turn__map-caption">{view.caption}</p>}
+      <p className="turn__map-shown muted">{t.assistant.mapShown(view.shown.people, view.shown.works)}</p>
+      {dropped.length > 0 && (
+        <p className="turn__map-dropped">
+          {t.assistant.mapDropped}:{" "}
+          {dropped.map((d, i) => (
+            <span key={`${d.field}-${d.value}-${i}`} className="turn__map-drop">
+              {i > 0 && "; "}
+              {d.label ?? String(d.value)} — {t.assistant.mapReasons[d.reason] ?? d.reason}
+              {d.field === "sel" && d.reason === "not_on_map" && typeof d.value === "string" && (
+                <>
+                  {" "}
+                  <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm turn__map-card" onClick={() => openCardInPanel(d.value as string, d.label ?? String(d.value))}>
+                    {t.assistant.mapCard}
+                  </button>
+                </>
+              )}
+            </span>
+          ))}
+        </p>
+      )}
+    </div>
   );
 }

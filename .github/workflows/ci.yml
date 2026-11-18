@@ -16,7 +16,9 @@ jobs:
   checks:
     name: checks
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Два прогона pytest (SQLite и PostgreSQL) с браузерными тестами: в ноябре 2026 — до 15 мин,
+    # прогон #42 отменён по прежнему пределу в 15 мин при зелёных тестах.
+    timeout-minutes: 25
     env:
       PYTHONUTF8: "1"
     services:

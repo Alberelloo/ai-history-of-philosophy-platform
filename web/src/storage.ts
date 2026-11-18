@@ -48,6 +48,13 @@ export type Fragment = {
   contradicts?: Contradiction[];
 };
 export type Suggestion = { entity_id: string; recipe: string; label?: string; title: string };
+// Вид карты от ассистента (assistant-map-view): адрес проверен сервером знаний, подпись —
+// текст модели, только для панели ассистента; на карту она не попадает.
+export type MapDropped = { field: string; value: string | number; label?: string; reason: string };
+export type MapView = { href: string; caption: string; shown: { people: number; works: number }; dropped: MapDropped[] };
+
+// На карту ведёт только адрес раздела карты: иной адрес (испорченное хранилище) не показываем.
+export const isMapHref = (href: unknown): href is string => typeof href === "string" && /^\/graph(\/[^/?#]+)?(\?[^#]*)?$/.test(href);
 export type Message = {
   code?: string;
   text?: string;
@@ -70,6 +77,7 @@ export type Turn = {
   // список, а не одно поле. Прежние сессии с единственным ``message`` читаются в normalizeTurn.
   notices?: Message[];
   suggestion?: Suggestion;
+  mapView?: MapView;
   // Глава, в которой задан вопрос (5.8): у вопроса из другой главы — подпись с её названием.
   chapterId?: string;
   chapterTitle?: string;
@@ -157,6 +165,24 @@ function object(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
 
+export function normalizeMapView(v: Record<string, unknown>): MapView {
+  const shown = object(v.shown);
+  return {
+    href: v.href as string,
+    caption: typeof v.caption === "string" ? v.caption : "",
+    shown: { people: Number(shown.people) || 0, works: Number(shown.works) || 0 },
+    dropped: (Array.isArray(v.dropped) ? v.dropped : [])
+      .map((d) => object(d))
+      .filter((d) => typeof d.field === "string" && typeof d.reason === "string")
+      .map((d) => ({
+        field: d.field as string,
+        value: typeof d.value === "number" ? d.value : String(d.value ?? ""),
+        label: typeof d.label === "string" ? d.label : undefined,
+        reason: d.reason as string,
+      })),
+  };
+}
+
 function normalizeTurn(raw: unknown): Turn | null {
   const t = object(raw);
   if (typeof t.question !== "string") return null;
@@ -185,6 +211,7 @@ function normalizeTurn(raw: unknown): Turn | null {
     status: status === "streaming" && !liveTurns.has(t.id as string) ? "stopped" : status,
     notices: notices.length ? notices : undefined,
     suggestion: object(t.suggestion).entity_id ? (t.suggestion as Suggestion) : undefined,
+    mapView: isMapHref(object(t.mapView).href) ? normalizeMapView(object(t.mapView)) : undefined,
     chapterId: typeof t.chapterId === "string" ? t.chapterId : undefined,
     chapterTitle: typeof t.chapterTitle === "string" ? t.chapterTitle : undefined,
     handoff: t.handoff ? (t.handoff as Handoff) : undefined,

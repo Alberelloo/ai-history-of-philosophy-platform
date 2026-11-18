@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import { pick, useT, type Catalog } from "../i18n";
+import { ViaNotice } from "./ViaNotice";
 import { Icon, type IconName } from "../ui";
 import { LinkDetails, type GEdge } from "./LinkDetails";
 import {
@@ -46,6 +47,8 @@ type Props = {
   collapsed: boolean;
   onCollapse: (collapsed: boolean) => void;
   onState: (patch: Partial<MapState>) => void;
+  // Вид подобран ассистентом (?via=assistant): пометка в панели и «Сбросить вид».
+  onResetView?: () => void;
   onSelect: (id: string | null, resetFilter?: boolean) => void;
   link: LinkView | null;
   onCloseLink: () => void;
@@ -239,6 +242,7 @@ export function MapPanel(props: Props) {
       ) : (
         <div className="map-panel__body" id="map-panel-body" ref={body}>
           <SearchBox {...props} inputRef={searchInput} />
+          {props.onResetView && <ViaNotice data={props.data} state={props.state} onReset={props.onResetView} />}
           <section className="map-panel__sec map-selected" data-section="selected" id="map-sec-selected" aria-live="polite">
             {fold.closed("selected") ? (
               <FoldHead k="selected">

@@ -1,9 +1,24 @@
 # Демо-стенд и сквозные тесты без ключей провайдеров: модели отвечают постоянным текстом.
-# Маршрутизатор всегда относит вопрос к «базе знаний», ответ ссылается на первый найденный абзац.
+# Маршрутизатор относит вопрос к «базе знаний» (просьбы показать на карте — к «карте»),
+# ответ ссылается на первый найденный абзац.
 providers:
   demo-router:
     kind: fake
     fake_reply: '{"type": "knowledge", "confidence": 0.9, "names": []}'
+    # Вопросы о карте (assistant-map-view): правила проверяются раньше постоянного ответа.
+    fake_rules:
+      - template: assistant.route
+        contains: эмпирист
+        block: question
+        reply: '{"type": "map", "confidence": 0.9, "names": ["эмпиризм"]}'
+      - template: assistant.route
+        contains: на карте
+        block: question
+        reply: '{"type": "map", "confidence": 0.9, "names": []}'
+      - template: assistant.map.view
+        contains: эмпирист
+        block: question
+        reply: '{"sel": null, "groups": ["c1"], "from": 1700, "to": 1800, "roles": [], "kinds": [], "ekinds": [], "verified": false, "lens": [], "caption": "Эмпиристы XVIII века"}'
   demo-answer:
     kind: fake
     fake_reply: "Это демонстрационный ответ: он опирается на первый найденный абзац [1]. Настоящая модель подключается в config/llm.yaml."

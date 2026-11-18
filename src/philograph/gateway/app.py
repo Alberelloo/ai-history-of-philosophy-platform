@@ -180,7 +180,7 @@ def build_app(
             return json.dumps({**payload, "generation": False, "visitor_limited": True}).encode()
         if operation == "description":
             return _ndjson({"type": "unavailable", "reason": "visitor_limit"})
-        if operation == "map":
+        if operation in ("map", "map_view"):
             return JSONResponse(
                 {
                     "error": "Слишком много запросов карты, попробуйте чуть позже",

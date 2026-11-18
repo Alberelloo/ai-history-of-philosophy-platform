@@ -1148,3 +1148,39 @@
 html:has(.map-page) {
   scrollbar-gutter: stable;
 }
+
+/* ---------- вид подобран ассистентом (assistant-map-view) ---------- */
+/* Пометка в панели, под поиском: перечень применённого и «Сбросить вид». В панели, а не над
+   картой: на 1024×576 высота карты уже на пределе раскладки, а панель сама сворачивает разделы.
+   Селектор с .map-panel — сильнее отступов разделов в плотном режиме. */
+.map-panel .map-panel__sec.map-via {
+  display: grid;
+  justify-items: start;
+  gap: 0.25rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--m-focus) 35%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--m-focus) 7%, transparent);
+}
+
+.map-via p {
+  margin: 0;
+}
+
+.map-via__title {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--m-ink);
+  font: var(--type-ui-label);
+}
+
+.map-via__parts {
+  color: var(--m-ink-2);
+  font-size: 0.78125rem;
+  line-height: 1.35;
+}
+
+.map-panel .map-via__reset {
+  margin-left: calc(-1 * var(--space-2));
+}

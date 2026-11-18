@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, FastAPI, Query, Request, Response
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.exc import NoResultFound
 
 from philograph import __version__
@@ -15,7 +15,7 @@ from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
-from philograph.knowledge.map import SectionMap
+from philograph.knowledge.map import MapViews, SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
@@ -108,6 +108,28 @@ class AssistantContextRequest(BaseModel):
     region: str | None = None  # регион читателя от ассистента (вызов сервис-сервис)
 
 
+class MapViewRequest(BaseModel):
+    """Черновик вида карты; лишние поля и значения не того типа сервер отбрасывает сам."""
+
+    sel: str | None = None
+    groups: list[Any] = []
+    from_: Any = Field(default=None, alias="from")
+    to: Any = None
+    roles: list[Any] = []
+    kinds: list[Any] = []
+    ekinds: list[Any] = []
+    verified: bool = False
+    lens: list[Any] = []
+    textbook: str | None = None
+    only_textbook: bool = False
+
+
+class MapOptionsRequest(BaseModel):
+    entities: list[str] = []
+    textbook: str | None = None
+    only_textbook: bool = False
+
+
 class SampleRequest(BaseModel):
     relation: str
     size: int = 20
@@ -191,6 +213,22 @@ def build_app(
             """Карта раздела из сохранённых утверждений, без модели. Цитат и атрибуций в ней
             нет — подробности связи клиент берёт из ``/entities/{id}/statements``."""
             return section_map.build(textbook=textbook, only_textbook=only_textbook)
+
+        views = MapViews(section_map)
+
+        @router.post("/map/view")
+        def map_view(body: MapViewRequest) -> dict[str, Any]:
+            """Проверка вида карты: на карте остаётся только то, что в ней есть; адрес — тот
+            же, что пишет клиент. Без модели."""
+            draft = body.model_dump(by_alias=True, exclude={"textbook", "only_textbook"})
+            return views.normalize(draft, textbook=body.textbook, only_textbook=body.only_textbook)
+
+        @router.post("/internal/assistant/map-options")
+        def map_options(body: MapOptionsRequest) -> dict[str, Any]:
+            """Только для ассистента: что из сущностей вопроса есть на карте, коды фильтров."""
+            return views.options(
+                body.entities[:20], textbook=body.textbook, only_textbook=body.only_textbook
+            )
 
     if assistant is not None:
 

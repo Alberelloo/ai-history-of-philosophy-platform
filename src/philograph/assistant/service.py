@@ -22,7 +22,7 @@ from philograph.platform.client import ServiceUnavailable
 from philograph.platform.clock import Clock, SystemClock
 from philograph.platform.metrics import metrics
 
-TYPES = ("local", "knowledge", "other_authors", "genesis", "off_topic")
+TYPES = ("local", "knowledge", "other_authors", "genesis", "map", "off_topic")
 
 # Цепочки как данные: какие поиски, с какими фильтрами, каким шаблоном отвечать.
 CHAINS: dict[str, dict[str, Any]] = {
@@ -48,7 +48,39 @@ CHAINS: dict[str, dict[str, Any]] = {
             {"scope": "toggle", "limit": 8, "extra_terms": ["истоки", "предшественники", "впервые"]}
         ],
     },
+    # Вид карты под просьбу читателя (assistant-map-view): подбор вида — отдельный вызов
+    # быстрой модели; без вида цепочка отвечает как «база знаний».
+    "map": {
+        "template": "assistant.answer.map",
+        "map_view": True,
+        "fallback": "knowledge",
+        "searches": [{"scope": "toggle", "limit": 8}],
+    },
     "off_topic": {"refuse": True},
+}
+
+STRATA = ("events", "eras", "people", "works")
+CANDIDATE_KINDS = {
+    "person": "персона",
+    "group": "направление или школа",
+    "work": "труд",
+    "concept": "понятие",
+    "position": "позиция",
+    "argument": "аргумент",
+    "event": "событие",
+    "era": "эпоха",
+}
+DROP_REASONS = {
+    "not_on_map": "нет на карте",
+    "unknown_code": "нет такого фильтра",
+    "out_of_range": "вне раздела",
+    "empty_result": "карта вышла бы пустой",
+    "all_strata": "все страты свернуть нельзя",
+}
+MAP_NOTICES = {
+    "no_candidates": "Собрать карту не из чего: в базе нет подходящих философов, школ, трудов "
+    "или событий. Ответ — по библиотеке.",
+    "unavailable": "Карту сейчас собрать не удалось. Ответ — по библиотеке.",
 }
 
 ROUTER_SCHEMA = {
@@ -111,6 +143,19 @@ events.define(
     "error",
     "Ответ ассистента оборвался",
     required=("type", "fragments"),
+)
+events.define(
+    "assistant.map_view.drafted",
+    "info",
+    "Ассистент подобрал вид карты",
+    required=("candidates", "fields", "dropped", "shown", "duration_ms"),
+)
+events.define(
+    "assistant.map_view.failed",
+    "warning",
+    "Вид карты не подобран: ответ без карты",
+    required=("reason",),
+    optional=("error",),
 )
 events.define("assistant.stopped", "info", "Читатель остановил ответ", required=("fragments",))
 events.define(
@@ -332,6 +377,178 @@ class Assistant:
             region=request.region,
         )
 
+    # --- вид карты ---
+
+    def _map_view(
+        self, request: AskRequest, ctx: OntologyContext | None, calls: int
+    ) -> tuple[dict[str, Any] | None, str | None, int]:
+        """Вид карты под вопрос: кандидаты с карты → черновик модели → проверка сервером.
+        Возвращает (вид, причина неудачи, число вызовов модели после подбора)."""
+        if ctx is None or self.ontology is None:
+            events.emit("assistant.map_view.failed", reason="ontology_unavailable")
+            return None, "unavailable", calls
+        textbook = request.source_id if request.scope == "current" else None
+        only = textbook is not None
+        try:
+            options = self.ontology.map_options([e["id"] for e in ctx.entities], textbook, only)
+        except ServiceUnavailable as exc:
+            events.emit(
+                "assistant.map_view.failed", reason="knowledge_unavailable", error=exc.reason
+            )
+            return None, "unavailable", calls
+        candidates = options["candidates"]
+        if not candidates:
+            events.emit("assistant.map_view.failed", reason="no_candidates")
+            return None, "no_candidates", calls
+        # Ответ ещё нужен: подбор вида не должен съесть последний разрешённый вызов модели.
+        if calls + 2 > self.settings.max_llm_calls:
+            events.emit("assistant.map_view.failed", reason="call_limit")
+            return None, "unavailable", calls
+        keys = {f"c{i + 1}": c for i, c in enumerate(candidates)}
+        groups = [k for k, c in keys.items() if c["kind"] == "group"]
+        codes = options["codes"]
+
+        def enum(values: list[str]) -> dict[str, Any]:
+            return (
+                {"type": "array", "items": {"enum": values}}
+                if values
+                else {
+                    "type": "array",
+                    "maxItems": 0,
+                }
+            )
+
+        schema = {
+            "type": "object",
+            "required": ["sel", "groups", "from", "to", "caption"],
+            "properties": {
+                "sel": {"enum": [*keys, None]},
+                "groups": enum(groups),
+                "from": {"type": ["integer", "null"]},
+                "to": {"type": ["integer", "null"]},
+                "roles": enum(codes["roles"]),
+                "kinds": enum(codes["kinds"]),
+                "ekinds": enum(codes["ekinds"]),
+                "verified": {"type": "boolean"},
+                "lens": enum(list(STRATA)),
+                "caption": {"type": "string", "maxLength": 120},
+            },
+        }
+
+        def year(y: int) -> str:
+            # Годы до н. э. — отрицательные числа (384 до н. э. = −383): модель видит оба вида.
+            return f"{y} ({1 - y} до н. э.)" if y <= 0 else str(y)
+
+        def years(c: dict[str, Any]) -> str:
+            if c.get("from") is None:
+                return "без дат"
+            return year(c["from"]) if c["from"] == c["to"] else f"{year(c['from'])}–{year(c['to'])}"
+
+        rng = options["range"]
+        data = {
+            "question": request.question,
+            "candidates": "\n".join(
+                f"{k} — {CANDIDATE_KINDS.get(c['kind'], c['kind'])} «{c['label']}», {years(c)}"
+                for k, c in keys.items()
+            ),
+            "codes": "\n".join(f"{name}: {', '.join(v) or '—'}" for name, v in codes.items()),
+            "range": f"{year(rng[0])}–{year(rng[1])}" if rng else "—",
+            "answer_language": answer_language(request.question),
+        }
+        started = time.perf_counter()
+        calls += 1
+        try:
+            draft = self.llm.structured("fast", "assistant.map.view", data, schema, "map_view")
+        except (LlmUnavailable, ServiceUnavailable) as exc:
+            events.emit(
+                "assistant.map_view.failed",
+                reason="draft_failed",
+                error=getattr(exc, "kind", None) or getattr(exc, "reason", ""),
+            )
+            return None, "unavailable", calls
+        caption = " ".join(str(draft.get("caption") or "").split())[:120]
+        view = {
+            "sel": keys[draft["sel"]]["id"] if draft.get("sel") in keys else None,
+            "groups": [keys[g]["id"] for g in draft.get("groups", []) if g in keys],
+            "from": draft.get("from"),
+            "to": draft.get("to"),
+            **{k: list(draft.get(k) or []) for k in ("roles", "kinds", "ekinds", "lens")},
+            "verified": draft.get("verified") is True,
+        }
+        try:
+            checked = self.ontology.map_view(view, textbook, only)
+        except ServiceUnavailable as exc:
+            events.emit(
+                "assistant.map_view.failed", reason="knowledge_unavailable", error=exc.reason
+            )
+            return None, "unavailable", calls
+        shown = checked["shown"]
+        if shown["people"] + shown["works"] == 0:
+            events.emit("assistant.map_view.failed", reason="empty_map")
+            return None, "no_candidates", calls
+        labels = {c["id"]: c["label"] for c in candidates}
+        # Сущности вопроса, которых нет на карте (без дат, места, термины): читатель узнаёт,
+        # что их нет, и может открыть карточку. Неоднозначные (вес < 1) не называем.
+        missing = [
+            {"field": "sel", "value": e["id"], "label": e["label"], "reason": "not_on_map"}
+            for e in ctx.entities
+            if e["weight"] >= 1.0 and e["id"] not in labels
+        ]
+        events.emit(
+            "assistant.map_view.drafted",
+            candidates=len(candidates),
+            fields=sorted(k for k, v in checked["view"].items() if v not in (None, [], False)),
+            dropped=len(checked["dropped"]) + len(missing),
+            shown=shown,
+            duration_ms=round((time.perf_counter() - started) * 1000, 2),
+        )
+        return (
+            {
+                "href": checked["href"],
+                "caption": caption,
+                "shown": shown,
+                "view": checked["view"],
+                "labels": labels,
+                "dropped": missing
+                + [
+                    {**d, "label": d.get("label") or labels.get(d["value"], str(d["value"]))}
+                    for d in checked["dropped"]
+                ],
+            },
+            None,
+            calls,
+        )
+
+    @staticmethod
+    def _map_view_block(found: dict[str, Any]) -> str:
+        """Вид карты для модели ответа: что на карте и что не вошло — без идентификаторов."""
+        view, labels = found["view"], found["labels"]
+        lines = []
+        if view["sel"]:
+            lines.append(f"Выбрано: {labels.get(view['sel'], view['sel'])}")
+        if view["groups"]:
+            lines.append(
+                "Направления и школы: " + ", ".join(labels.get(g, g) for g in view["groups"])
+            )
+        if view["from"] is not None or view["to"] is not None:
+            lines.append(f"Годы: {view['from'] or '…'}–{view['to'] or '…'}")
+        for key, title in (("roles", "Роли"), ("kinds", "Виды трудов"), ("ekinds", "Виды событий")):
+            if view[key]:
+                lines.append(f"{title}: {', '.join(view[key])}")
+        lines.append(
+            f"На карте видно: персон {found['shown']['people']}, трудов и идей "
+            f"{found['shown']['works']}"
+        )
+        if found["dropped"]:
+            lines.append(
+                "Не вошло: "
+                + "; ".join(
+                    f"{d['label']} — {DROP_REASONS.get(d['reason'], d['reason'])}"
+                    for d in found["dropped"]
+                )
+            )
+        return "\n".join(lines)
+
     # --- ответ ---
 
     def ask(self, request: AskRequest) -> Iterator[dict[str, Any]]:
@@ -395,6 +612,13 @@ class Assistant:
             }
             return
         ctx = self._ontology(kind, request, names)
+        found_view: dict[str, Any] | None = None
+        if CHAINS[kind].get("map_view"):
+            yield {"type": "stage", "name": "map_view"}
+            found_view, problem, calls = self._map_view(request, ctx, calls)
+            if found_view is None:
+                yield {"type": "notice", "kind": "map_" + problem, "message": MAP_NOTICES[problem]}
+                kind = CHAINS[kind]["fallback"]
         yield {"type": "stage", "name": "searching"}
         try:
             results = self._gather(kind, request, names, ctx)
@@ -485,8 +709,10 @@ class Assistant:
                 f"статус: {STATUS_TITLES.get(s['status'], s['status'])})"
                 for p, s in zip(statements, ctx.statements, strict=True)
             )
-        if kind != "knowledge":
+        if kind not in ("knowledge", "map"):
             data["selection"] = request.selection or ""
+        if found_view is not None:
+            data["map_view"] = self._map_view_block(found_view)
         stream = FragmentStream(passages)
         stats = {
             "fragments": 0,
@@ -566,6 +792,16 @@ class Assistant:
             }
         if ctx is not None and ctx.graph and stats["fragments"]:
             yield {"type": "suggestion", "kind": "graph", **ctx.graph}
+        if found_view is not None:
+            # Кнопка ведёт на проверенный сервером адрес; текст модели — только подпись.
+            yield {
+                "type": "suggestion",
+                "kind": "map",
+                "href": found_view["href"],
+                "caption": found_view["caption"],
+                "shown": found_view["shown"],
+                "dropped": found_view["dropped"],
+            }
         # N12: ответ составлен, но ни один фрагмент не опёрся на абзацы книги (5.10).
         if (
             request.context == "book"

@@ -508,6 +508,59 @@ def test_assistant_answer_uses_ontology(page, stack):
     )
 
 
+@req("question-routing", "Цепочка «карта»")
+@req("assistant-dialog", "Карта по запросу")
+@req("knowledge-graph", "Вид от ассистента")
+def test_assistant_builds_map_view(page, stack):
+    """Демо-модели: «покажи на карте эмпиристов XVIII века» → кнопка → карта с видом."""
+    open_textbook(page, stack)
+    page.get_by_role("button", name="Ассистент").click()
+    panel = page.get_by_role("complementary", name="Ассистент")
+    panel.get_by_label("Вопрос ассистенту").fill("покажи на карте эмпиристов XVIII века")
+    panel.get_by_role("button", name="Спросить").click()
+    button = panel.get_by_role("link", name="Открыть на карте")
+    button.wait_for(timeout=20000)
+    assert panel.locator(".turn__map-caption").inner_text() == "Эмпиристы XVIII века"
+    drafted = wait_logs(stack, "assistant", lambda e: e["event"] == "assistant.map_view.drafted")
+    request_id = drafted[-1]["request_id"]
+    assert drafted[-1]["fields"] == ["from", "groups", "to"]
+    normalized = wait_logs(
+        stack,
+        "knowledge",
+        lambda e: (
+            e["event"] == "knowledge.map_view.normalized" and e.get("request_id") == request_id
+        ),
+    )
+    assert normalized and normalized[-1]["shown"]["people"] >= 1
+    completed = wait_logs(
+        stack,
+        "assistant",
+        lambda e: e["event"] == "assistant.answer.completed" and e.get("request_id") == request_id,
+    )
+    assert completed[-1]["type"] == "map" and completed[-1]["llm_calls"] <= 3
+    # Карты не из чего: ответ по библиотеке с пометкой и без кнопки. Прошлый вопрос об
+    # эмпиристах в истории диалога кандидатов не добавляет.
+    panel.get_by_label("Вопрос ассистенту").fill("покажи на карте философию Древнего Китая")
+    panel.get_by_role("button", name="Спросить").click()
+    second = panel.locator(".turn").nth(1)
+    second.locator(".copy-answer").wait_for(timeout=20000)
+    assert "Собрать карту не из чего" in second.inner_text()
+    assert second.get_by_role("link", name="Открыть на карте").count() == 0
+    failed = wait_logs(stack, "assistant", lambda e: e["event"] == "assistant.map_view.failed")
+    assert failed[-1]["reason"] == "no_candidates"
+    button.click()
+    page.wait_for_url("**/graph?from=1700&to=1800&groups=*&via=assistant")
+    notice = page.locator(".map-via")
+    notice.wait_for()
+    assert notice.locator(".map-via__parts").inner_text() == (
+        "направления и школы: Эмпиризм; годы: 1700–1800"
+    )
+    assert page.locator(".map-person", has_text="Беркли").count() == 1
+    notice.get_by_role("button", name="Сбросить вид").click()
+    page.wait_for_url(stack.url + "/graph")
+    assert page.locator(".map-via").count() == 0
+
+
 @req("abuse-protection", "Защита от автоматических запросов")
 def test_direct_paid_call_without_page_rejected(stack):
     response = httpx.post(stack.url + "/api/assistant/v1/ask", json={"question": "что такое опыт?"})

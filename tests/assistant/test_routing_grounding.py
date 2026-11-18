@@ -21,7 +21,7 @@ def fragments(items):
 
 @req(QR, "Типы вопросов")
 def test_question_types(bot, events):
-    for kind in ("local", "other_authors", "genesis"):
+    for kind in ("local", "other_authors", "genesis", "map"):
         bot.model.routes.append({"type": kind, "confidence": 0.9, "names": []})
         bot.ask(
             question=f"вопрос типа {kind}",
@@ -32,10 +32,22 @@ def test_question_types(bot, events):
         "local",
         "other_authors",
         "genesis",
+        "map",
     ]
-    from philograph.assistant.service import CHAINS
+    from philograph.assistant.service import CHAINS, TYPES
 
-    assert set(CHAINS) == {"local", "knowledge", "other_authors", "genesis", "off_topic"}
+    assert (
+        set(CHAINS)
+        == set(TYPES)
+        == {
+            "local",
+            "knowledge",
+            "other_authors",
+            "genesis",
+            "map",
+            "off_topic",
+        }
+    )
 
 
 @req(QR, "Быстрая модель")

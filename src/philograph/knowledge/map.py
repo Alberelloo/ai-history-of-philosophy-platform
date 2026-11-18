@@ -16,10 +16,12 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import quote, urlencode
 
 from sqlalchemy import and_, func, select
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.statements import INFLUENCE, STRENGTH, Statements
 from philograph.platform import events
 
@@ -406,3 +408,256 @@ class SectionMap:
             for p in result["people"]
         ]
         return {**result, "people": people}
+
+
+# --- вид карты от ассистента (assistant-map-view) ---
+
+events.define(
+    "knowledge.map_view.normalized",
+    "info",
+    "Проверен вид карты",
+    required=("dropped", "shown", "relaxed"),
+)
+
+STRATA = ("events", "eras", "people", "works")
+WORK_KINDS = ("work", "concept", "position", "argument")
+FILTER_GROUP_KINDS = ("direction", "school")  # группы, которые есть в фильтрах карты
+# Порядок, в котором снимаются фильтры, если вид дал пустую карту.
+RELAX_ORDER = ("ekinds", "kinds", "roles", "years", "groups")
+LIST_FIELDS = ("groups", "roles", "kinds", "ekinds")
+
+
+def map_href(view: dict[str, Any], via: str | None = "assistant") -> str:
+    """Адрес карты для вида — тот же, что пишет клиент (``web/src/map/types.ts`` →
+    ``writeState`` и запись адреса в ``MapPage``): выбор в пути, списки через запятую,
+    значения по умолчанию не пишутся, служебный ``via`` — последним."""
+    params: list[tuple[str, str]] = []
+    if view.get("from") is not None:
+        params.append(("from", str(view["from"])))
+    if view.get("to") is not None:
+        params.append(("to", str(view["to"])))
+    for key in LIST_FIELDS:
+        if view.get(key):
+            params.append((key, ",".join(view[key])))
+    if view.get("verified"):
+        params.append(("verified", "1"))
+    lens = [k for k in STRATA if k in (view.get("lens") or [])]
+    if lens:
+        params.append(("lens", ",".join(lens)))
+    if via:
+        params.append(("via", via))
+    path = "/graph" + (f"/{quote(view['sel'], safe='')}" if view.get("sel") else "")
+    query = urlencode(params).replace("%2C", ",")
+    return path + (f"?{query}" if query else "")
+
+
+def visible_counts(data: dict[str, Any], view: dict[str, Any]) -> dict[str, int]:
+    """Сколько персон и трудов видно при фильтрах вида — как ``visible`` клиента
+    (``web/src/map/model.ts``)."""
+    lo, hi = data["range"] or (0, 1)
+    start = view["from"] if view.get("from") is not None else lo
+    end = view["to"] if view.get("to") is not None else hi
+    groups = [g for g in data["groups"] if g["id"] in view["groups"]]
+    roles = view["roles"]
+    people = [
+        p
+        for p in data["people"]
+        if (not groups or any(p["id"] in g["members"] for g in groups))
+        and (not roles or any(r in roles for r in p["roles"]))
+        and p["death"] >= start
+        and p["birth"] <= end
+    ]
+    shown = {p["id"] for p in people}
+    known = {p["id"] for p in data["people"]}
+
+    def author_shown(w: dict[str, Any]) -> bool:
+        if w.get("author") is not None and w["author"] in known:
+            return w["author"] in shown
+        return not groups and not roles
+
+    works = [
+        w
+        for w in data["works"]
+        if author_shown(w)
+        and (not view["kinds"] or w["kind"] in view["kinds"])
+        and start <= w["year"] <= end
+    ]
+    return {"people": len(people), "works": len(works)}
+
+
+class MapViews:
+    """Проверка черновика вида карты: оставляет только то, что есть на карте раздела и в
+    реестре, и ослабляет фильтры, если карта вышла пустой. Модель не вызывается."""
+
+    def __init__(self, section_map: SectionMap) -> None:
+        self.section_map = section_map
+
+    def _label(self, entity_id: str) -> str:
+        try:
+            return self.section_map.statements.entities.label(entity_id)
+        except EntityNotFound:  # неизвестный id: подписью остаётся он сам
+            return entity_id
+
+    def options(
+        self, entity_ids: list[str], textbook: str | None = None, only_textbook: bool = False
+    ) -> dict[str, Any]:
+        """Что ассистент может выбрать: сущности вопроса, которые есть на карте (с датами и
+        разделом), коды фильтров, встречающиеся на карте, и пределы раздела."""
+        data = self.section_map.build(textbook=textbook, only_textbook=only_textbook)
+        placed: dict[str, dict[str, Any]] = {}
+        for p in data["people"]:
+            placed[p["id"]] = {"kind": "person", "from": p["birth"], "to": p["death"]}
+        for w in data["works"]:
+            placed[w["id"]] = {"kind": w["kind"], "from": w["year"], "to": w["year"]}
+        for e in data["events"]:
+            placed[e["id"]] = {"kind": "event", "from": e["year"], "to": e["year"]}
+        for e in data["eras"]:
+            placed[e["id"]] = {"kind": "era", "from": e["from"], "to": e["to"]}
+        for g in data["groups"]:
+            if g["kind"] in FILTER_GROUP_KINDS:
+                people = {p["id"]: p for p in data["people"]}
+                years = [
+                    y
+                    for m in g["members"]
+                    if m in people
+                    for y in (people[m]["birth"], people[m]["death"])
+                ]
+                placed[g["id"]] = {
+                    "kind": "group",
+                    "from": min(years) if years else None,
+                    "to": max(years) if years else None,
+                }
+        candidates = []
+        for entity_id in dict.fromkeys(entity_ids):
+            if entity_id in placed:
+                candidates.append(
+                    {"id": entity_id, "label": self._label(entity_id), **placed[entity_id]}
+                )
+        return {
+            "candidates": candidates,
+            "range": data["range"],
+            "codes": {
+                "roles": sorted({r for p in data["people"] for r in p["roles"]}),
+                "kinds": [k for k in WORK_KINDS if any(w["kind"] == k for w in data["works"])],
+                "ekinds": sorted({e["kind"] for e in data["events"] if e.get("kind")}),
+            },
+        }
+
+    def normalize(
+        self, draft: dict[str, Any], textbook: str | None = None, only_textbook: bool = False
+    ) -> dict[str, Any]:
+        data = self.section_map.build(textbook=textbook, only_textbook=only_textbook)
+        dropped: list[dict[str, Any]] = []
+
+        def drop(field: str, value: Any, reason: str) -> None:
+            item: dict[str, Any] = {"field": field, "value": value, "reason": reason}
+            if field in ("sel", "groups"):
+                item["label"] = self._label(value)
+            dropped.append(item)
+
+        on_map = {
+            item["id"]
+            for section in ("people", "works", "events", "eras", "groups")
+            for item in data[section]
+        }
+        groups_on_map = {g["id"] for g in data["groups"] if g["kind"] in FILTER_GROUP_KINDS}
+        codes = {
+            "roles": {r for p in data["people"] for r in p["roles"]},
+            "kinds": {w["kind"] for w in data["works"]},
+            "ekinds": {e["kind"] for e in data["events"] if e.get("kind")},
+        }
+        view: dict[str, Any] = {"sel": None, "from": None, "to": None, "verified": False}
+
+        sel = draft.get("sel")
+        if isinstance(sel, str) and sel:
+            if sel in on_map:
+                view["sel"] = sel
+            else:
+                drop("sel", sel, "not_on_map")
+
+        def strings(value: Any) -> list[str]:
+            if not isinstance(value, list):
+                return []
+            return list(dict.fromkeys(v for v in value if isinstance(v, str) and v))
+
+        view["groups"] = []
+        for g in strings(draft.get("groups")):
+            if g in groups_on_map:
+                view["groups"].append(g)
+            else:
+                drop("groups", g, "not_on_map")
+        for key in ("roles", "kinds", "ekinds"):
+            view[key] = []
+            for code in strings(draft.get(key)):
+                if code in codes[key]:
+                    view[key].append(code)
+                else:
+                    drop(key, code, "unknown_code")
+
+        lo, hi = data["range"] or (None, None)
+
+        def year(value: Any) -> int | None:
+            return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+        start, end = year(draft.get("from")), year(draft.get("to"))
+        if lo is not None:
+            # Граница на краю раздела или за ним ничего не ограничивает — как на клиенте.
+            if start is not None and start <= lo:
+                start = None
+            if end is not None and end >= hi:
+                end = None
+            if start is not None and start >= hi:
+                drop("from", start, "out_of_range")
+                start = None
+            if end is not None and end <= lo:
+                drop("to", end, "out_of_range")
+                end = None
+            if start is not None and end is not None and start >= end:
+                drop("from", start, "out_of_range")
+                drop("to", end, "out_of_range")
+                start = end = None
+        else:
+            start = end = None
+        view["from"], view["to"] = start, end
+        view["verified"] = draft.get("verified") is True
+
+        lens = [k for k in STRATA if k in strings(draft.get("lens"))]
+        if len(lens) >= len(STRATA):
+            for k in lens:
+                drop("lens", k, "all_strata")
+            lens = []
+        view["lens"] = lens
+
+        # Пустая карта: фильтры снимаются по одному, пока не появится хоть кто-то.
+        relaxed: list[str] = []
+        base = visible_counts(
+            data, {**view, **{k: [] for k in LIST_FIELDS}, "from": None, "to": None}
+        )
+        shown = visible_counts(data, view)
+        if base["people"] + base["works"] > 0:
+            for step in RELAX_ORDER:
+                if shown["people"] + shown["works"] > 0:
+                    break
+                if step == "years":
+                    for key in ("from", "to"):
+                        if view[key] is not None:
+                            drop(key, view[key], "empty_result")
+                            view[key] = None
+                            relaxed.append(key)
+                else:
+                    for value in view[step]:
+                        drop(step, value, "empty_result")
+                    if view[step]:
+                        relaxed.append(step)
+                    view[step] = []
+                shown = visible_counts(data, view)
+        reasons: dict[str, int] = defaultdict(int)
+        for item in dropped:
+            reasons[item["reason"]] += 1
+        events.emit(
+            "knowledge.map_view.normalized",
+            dropped=dict(reasons),
+            shown=shown,
+            relaxed=relaxed,
+        )
+        return {"view": view, "href": map_href(view), "dropped": dropped, "shown": shown}
