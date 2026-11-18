@@ -872,8 +872,9 @@ def test_t16_portrait_gallery(browser, site, texts):
         page.reload()
         panel = open_full(page, site)
         gallery = panel.locator(".pg-portrait-gallery")
-        assert gallery.locator("img").count() == 0
+        # Картинка уходит из DOM только после onerror: ждём, а не проверяем мгновенно.
         expect(gallery.locator(".pg-portrait-gallery__empty")).to_contain_text("Изображений нет")
+        expect(gallery.locator("img")).to_have_count(0)
         assert gallery.locator(".pg-portrait-gallery__count").count() == 0  # одно изображение
         panel.get_by_role("button", name="Закрыть карточку").click()
 
