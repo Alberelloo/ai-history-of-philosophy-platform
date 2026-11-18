@@ -1,59 +1,31 @@
-/* Граф на рабочем листе сцены «стол философа». Рендер от состояния:
-   линзы (страты сворачиваются, остальные забирают высоту) и выбранный философ
-   (влияния — киноварный поток, труды — бирюзовая нить, эпоха — подсветка без линий). */
+/* Граф на рабочем листе сцены «стол философа». Рендер от данных и состояния, без ручных координат:
+   - линзы: страта сворачивается, остальные забирают высоту;
+   - люди: ленты жизни раскладываются по дорожкам автоматически (жадная упаковка с учётом подписей);
+   - труды: отметка у каждого, подпись — только у ключевых и у трудов выбранного, если есть место;
+   - выбор: прямые влияния (к нему и от него) — киноварный поток, его труды — бирюзовая нить,
+     его эпоха — подсветка. Остальные связи при выборе скрыты.
+   Данные — desk-data.js (?data=demo | dense). */
 (function(){
   const NS='http://www.w3.org/2000/svg';
-  // Ширина и высота графа — в реальных пикселях листа (не масштабированный viewBox):
-  // шире лист — больше места на годы, а не крупнее шрифт. Пересчёт при resize.
-  let W=1160,PLOT_R=W-26,BODY=500;const PLOT_L=150,TOP=28,AXIS_H=50,COLL=28;
-  const Y0=1580,Y1=1812,X=y=>PLOT_L+(y-Y0)/(Y1-Y0)*(PLOT_R-PLOT_L);
+  const DS=window.DESK_SETS[new URLSearchParams(location.search).get('data')]||window.DESK_SETS.demo;
+  const {people,influences,works,eras,events}=DS,notes=window.DESK_NOTES||[];
+  const dense=people.length>12;
+
+  // Ширина — реальные пиксели листа (шире лист — больше места на годы, а не крупнее шрифт).
+  let W=1160,PLOT_R=W-26,BODY=500;const PLOT_L=150,TOP=28,AXIS_H=46,COLL=28;
+  const [Y0,Y1]=DS.range,X=y=>PLOT_L+(y-Y0)/(Y1-Y0)*(PLOT_R-PLOT_L);
+  const plural=(n,f)=>{const a=n%10,b=n%100;return `${n} ${a===1&&b!==11?f[0]:a>=2&&a<=4&&(b<10||b>=20)?f[1]:f[2]}`;};
   const ORDER=['events','eras','people','works'];
   const META={
-    events:{label:'События',w:.10,max:90,count:'3 события'},
-    eras:{label:'Эпохи',w:.11,max:80,count:'2 эпохи'},
-    people:{label:'Люди',w:.52,max:9999,count:'5 философов'},
-    works:{label:'Труды',w:.27,max:210,count:'4 труда'},
+    events:{label:'События',w:.10,max:90,count:plural(events.length,['событие','события','событий'])},
+    eras:{label:'Эпохи',w:.11,max:70,count:plural(eras.length,['эпоха','эпохи','эпох'])},
+    people:{label:'Люди',w:.52,max:1e4,count:plural(people.length,['философ','философа','философов'])},
+    works:{label:'Труды',w:.27,max:240,count:plural(works.length,['труд','труда','трудов'])},
   };
-  const state={sel:'kant',on:{events:false,eras:true,people:true,works:true}};
-
-  const people=[
-    {id:'descartes',lane:0,name:'Рене Декарт',     short:'Декарт', mono:'РД',birth:1596,death:1650,portrait:'descartes.jpg'},
-    {id:'locke',    lane:1,name:'Джон Локк',       short:'Локк',   mono:'ДЛ',birth:1632,death:1704,portrait:'locke.jpg'},
-    {id:'spinoza',  lane:2,name:'Бенедикт Спиноза',short:'Спиноза',mono:'БС',birth:1632,death:1677,portrait:null},
-    {id:'hume',     lane:2,name:'Дэвид Юм',        short:'Юм',     mono:'ДЮ',birth:1711,death:1776,portrait:'hume.jpg'},
-    {id:'kant',     lane:3,name:'Иммануил Кант',   short:'Кант',   mono:'ИК',birth:1724,death:1804,portrait:'kant.jpg'},
-  ];
+  const state={sel:DS.sel||null,on:{events:false,eras:true,people:true,works:true}};
   const byId=Object.fromEntries(people.map(p=>[p.id,p]));
-  // via — год ключевого труда учителя: влияние идёт через труды
-  const influences=[{a:'descartes',b:'locke',via:1637},{a:'locke',b:'hume',via:1690},{a:'hume',b:'kant',via:1748},{a:'descartes',b:'spinoza',via:1641}];
-  const works=[
-    {id:'essay',title:'Опыт о человеческом разумении',year:1690,author:'locke',kind:'work'},
-    {id:'causality',title:'Причинность',year:1739,author:'hume',kind:'concept'},
-    {id:'enquiry',title:'Исследование о человеческом познании',year:1748,author:'hume',kind:'work'},
-    {id:'critique',title:'Критика чистого разума',year:1781,author:'kant',kind:'work'},
-  ];
-  // Пометки на полях — данные (цитата + источник), а не текст макета: у каждой есть «про что» —
-  // связь (a-b) или персона. Показывается одна, про выбранного; нет места на листе — уходит в сноску.
-  const notes=[
-    {about:'hume-kant',lines:['«…впервые прервало мою','догматическую дремоту»'],cite:'Кант о Юме, «Пролегомены», 1783'},
-    {about:'descartes',lines:['«Я мыслю, следовательно,','я существую»'],cite:'«Рассуждение о методе», 1637'},
-    {about:'locke',lines:['«…ум есть, так сказать,','белая бумага без всяких знаков»'],cite:'«Опыт…», кн. II, гл. 1'},
-    {about:'hume',lines:['«Разум есть и должен быть','лишь рабом аффектов»'],cite:'«Трактат о человеческой природе»'},
-    {about:'spinoza',lines:['«Порядок и связь идей те же,','что порядок и связь вещей»'],cite:'«Этика», ч. II, теор. 7'},
-  ];
-  const theme=['Опыт или разум?','— вот спор целой эпохи'];  // тема листа — только на карточке на столе, не на графе
-  // карточки на столе: главный вопрос выбранного (редакторская выжимка, не цитата)
-  const questions={
-    descartes:['Что можно знать','несомненно?','— путь сомнения'],
-    locke:['Откуда берутся','наши идеи?','— только из опыта'],
-    spinoza:['Как связаны','мышление и протяжение?','— одна субстанция'],
-    hume:['Откуда мы знаем','о причинах?','— из привычки'],
-    kant:['Что я могу знать?','Что я должен делать?','На что смею надеяться?'],
-  };
-  const eras=[{label:'Научная революция',from:1600,to:1687},{label:'Просвещение',from:1687,to:1804}];
-  const events=[{year:1687,label:'«Начала» Ньютона'},{year:1751,label:'Энциклопедия'},{year:1789,label:'Французская революция'}];
+  const mono=p=>p.name.split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase();
 
-  const RX=22,RY=27,BAND=24;
   const S=(t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e;};
   const cub=(P,t)=>{const u=1-t;return{x:u*u*u*P[0].x+3*u*u*t*P[1].x+3*u*t*t*P[2].x+t*t*t*P[3].x,y:u*u*u*P[0].y+3*u*u*t*P[1].y+3*u*t*t*P[2].y+t*t*t*P[3].y};};
   const tan=(P,t)=>{const u=1-t;return{x:3*u*u*(P[1].x-P[0].x)+6*u*t*(P[2].x-P[1].x)+3*t*t*(P[3].x-P[2].x),y:3*u*u*(P[1].y-P[0].y)+6*u*t*(P[2].y-P[1].y)+3*t*t*(P[3].y-P[2].y)};};
@@ -62,22 +34,63 @@
   const svg=document.getElementById('svg');
   const gutter=document.querySelector('.gutter'),selnote=document.querySelector('.selnote');
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  svg.classList.toggle('compact',dense);
+  const measure=(cls,txt)=>{const t=S('text',{class:cls},txt);svg.append(t);const w=t.getComputedTextLength();t.remove();return w;};
 
-  function layoutBands(){
-    const on=ORDER.filter(k=>state.on[k]),free=BODY-(ORDER.length-on.length)*COLL,sw=on.reduce((a,k)=>a+META[k].w,0),h={};
-    ORDER.forEach(k=>h[k]=state.on[k]?Math.min(META[k].max,free*META[k].w/sw):COLL);
-    if(state.on.works)h.works=Math.max(h.works,136);  // две строки названий в два ряда — не налезают на шкалу
-    if(state.on.people)h.people+=BODY-ORDER.reduce((a,k)=>a+h[k],0);
-    let y=TOP;const b={};ORDER.forEach(k=>{b[k]={key:k,top:y,bot:y+h[k],collapsed:!state.on[k],...META[k]};y+=h[k];});return b;
-  }
-  // что связано с выбранным: вверх по цепочке влияний + его ученики, его труды, его эпоха
+  // что связано с выбранным: прямые учителя и ученики, его труды, его эпоха
   function related(){
     const sel=state.sel;if(!sel)return null;
-    const up=new Set([sel]);let ch=true;while(ch){ch=false;influences.forEach(e=>{if(up.has(e.b)&&!up.has(e.a)){up.add(e.a);ch=true;}});}
-    const down=influences.filter(e=>e.a===sel).map(e=>e.b);
-    const edges=new Set(influences.filter(e=>(up.has(e.a)&&up.has(e.b))||e.a===sel).map(e=>e.a+'-'+e.b));
+    const ins=influences.filter(e=>e.b===sel),outs=influences.filter(e=>e.a===sel);
     const p=byId[sel],mid=(p.birth+p.death)/2;
-    return {up,down,edges,people:new Set([...up,...down]),works:new Set(works.filter(w=>w.author===sel).map(w=>w.id)),era:eras.find(e=>mid>=e.from&&mid<e.to)};
+    return {up:ins.map(e=>e.a),down:outs.map(e=>e.b),edges:new Set([...ins,...outs].map(e=>e.a+'-'+e.b)),
+      people:new Set([sel,...ins.map(e=>e.a),...outs.map(e=>e.b)]),works:new Set(works.filter(w=>w.author===sel).map(w=>w.id)),
+      era:eras.find(e=>mid>=e.from&&mid<e.to)};
+  }
+
+  /* дорожки людей: жадная упаковка по году рождения; занятый отрезок — лента + подписи */
+  function packPeople(R0){
+    people.forEach(p=>{
+      p.bx=X(p.birth);p.dx=X(p.death);
+      const full=measure('person-name',p.name),short=measure('person-name',p.short);
+      p.label=(p.dx-p.bx>=full+R0+30||!dense)?p.name:p.short;
+      const lw=p.label===p.name?full:short,yw=dense?0:measure('person-years',`${p.birth}–${p.death}`);
+      p.nameEnd=p.bx+R0+8+lw;p.yearsIn=dense||p.dx-p.nameEnd>=yw+26;
+      p.occ=[p.bx-R0-6,p.yearsIn?Math.max(p.dx,p.nameEnd)+6:Math.max(p.dx,p.nameEnd)+8+yw+12];
+    });
+    const lanes=[];[...people].sort((a,b)=>a.birth-b.birth).forEach(p=>{
+      let k=lanes.findIndex(end=>end<p.occ[0]);if(k<0){k=lanes.length;lanes.push(0);}lanes[k]=p.occ[1];p.lane=k;});
+    return lanes.length;
+  }
+
+  /* подписи трудов: приоритет — труды выбранного, затем ключевые; ряд — первый свободный; нет места — без подписи */
+  function planWorks(R,maxRows){
+    const items=[...works].sort((a,b)=>a.year-b.year);let prev=-1e9;
+    items.forEach(it=>{it.x=X(it.year);it.labeled=false;});
+    const mine=it=>!!(R&&R.works.has(it.id));
+    const cand=items.filter(it=>mine(it)||it.key).sort((a,b)=>(mine(b)-mine(a))||(a.year-b.year));
+    const rows=[];
+    cand.forEach(it=>{
+      const lines=wrap(mine(it)?`${it.title}, ${it.year}`:it.title,dense?150:170,it.kind==='concept'?'concept-title':'work-title');
+      const w=Math.max(...lines.map(l=>l.w)),x0=it.x-w/2-8,x1=it.x+w/2+8;
+      if(x0<PLOT_L-10||x1>W-4)return;
+      for(let r=0;r<maxRows;r++){rows[r]=rows[r]||[];if(rows[r].every(([a,b])=>x1<a||x0>b)){rows[r].push([x0,x1]);it.labeled=true;it.row=r;it.lines=lines;break;}}
+    });
+    // значки подписанных трудов одного года раздвигаются, чтобы не слипались
+    items.filter(it=>it.labeled).forEach(it=>{it.ix=Math.max(it.x,prev+(mine(it)?34:24));prev=it.ix;});
+    items.filter(it=>!it.labeled).forEach(it=>it.ix=it.x);
+    return {items,rows:Math.max(1,rows.filter(r=>r&&r.length).length)};
+  }
+  function wrap(title,max,cls){
+    const lines=[''];title.split(' ').forEach(w=>{const c=(lines[lines.length-1]+' '+w).trim();if(measure(cls,c)>max&&lines[lines.length-1])lines.push(w);else lines[lines.length-1]=c;});
+    return lines.slice(0,2).map((t,i)=>{const s=i===1&&lines.length>2?t+'…':t;return {t:s,w:measure(cls,s)};});
+  }
+
+  function layoutBands(need){
+    const on=ORDER.filter(k=>state.on[k]),free=BODY-(ORDER.length-on.length)*COLL,sw=on.reduce((a,k)=>a+META[k].w,0),h={};
+    ORDER.forEach(k=>h[k]=state.on[k]?Math.min(META[k].max,free*META[k].w/sw):COLL);
+    ORDER.forEach(k=>{if(state.on[k]&&need[k])h[k]=Math.max(h[k],need[k]);});
+    if(state.on.people)h.people=Math.max(h.people,h.people+BODY-ORDER.reduce((a,k)=>a+h[k],0));
+    let y=TOP;const b={};ORDER.forEach(k=>{b[k]={key:k,top:y,bot:y+h[k],collapsed:!state.on[k],...META[k]};y+=h[k];});return b;
   }
 
   function draw(){
@@ -86,142 +99,148 @@
     const cw=Math.round(svg.getBoundingClientRect().width)||1160;W=Math.max(900,cw);PLOT_R=W-26;
     const top=svg.getBoundingClientRect().top+scrollY;BODY=Math.round(Math.min(760,Math.max(440,innerHeight-top-AXIS_H-TOP-96)));
     if(gutter)gutter.style.width=PLOT_L+'px';
-    const bands=layoutBands(),H=bands.works.bot+AXIS_H,R=related();
+    const R=related();
+
+    // размеры от данных: дорожки людей и ряды подписей трудов
+    const LANES=packPeople(dense?4:22),laneMin=dense?27:56;
+    const plan=planWorks(R,dense?3:2);
+    const need={people:LANES*laneMin+34,works:46+plan.rows*38+(dense?8:20),events:dense?78:64};
+    const bands=layoutBands(need),H=bands.works.bot+AXIS_H;
     svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
 
     const defs=S('defs',{});
     const duo=S('filter',{id:'duo'});duo.append(S('feColorMatrix',{type:'saturate',values:'0'}));
     const ct=S('feComponentTransfer',{});[['R','.16 .95'],['G','.13 .92'],['B','.10 .84']].forEach(([c,v])=>ct.append(S('feFunc'+c,{type:'table',tableValues:v})));duo.append(ct);defs.append(duo);
     const glow=S('filter',{id:'glow',x:'-60%',y:'-60%',width:'220%',height:'220%'});
-    glow.append(S('feGaussianBlur',{in:'SourceGraphic',stdDeviation:'2.6',result:'b'}));
+    glow.append(S('feGaussianBlur',{in:'SourceGraphic',stdDeviation:'2.4',result:'b'}));
     const fm=S('feMerge',{});fm.append(S('feMergeNode',{in:'b'}));fm.append(S('feMergeNode',{in:'SourceGraphic'}));glow.append(fm);defs.append(glow);
     svg.append(defs);
-    const L={};['grid','bands','eras','events','threads','works','people','axis','notes'].forEach(k=>{L[k]=S('g',{});svg.append(L[k]);});
+    const L={};['grid','bands','eras','events','threads','works','people','axis'].forEach(k=>{L[k]=S('g',{});svg.append(L[k]);});
     const isDim=on=>R&&!on;
 
-    /* сетка времени и границы страт */
-    for(let y=1600;y<=1800;y+=25){const x=X(y);L.grid.append(S('line',{x1:x,y1:TOP,x2:x,y2:bands.works.bot,class:'time-grid'}));}
+    /* шаг шкалы: подписи не ближе ~70 px */
+    const pxYear=(PLOT_R-PLOT_L)/(Y1-Y0),step=[10,25,50,100].find(s=>s*pxYear>=70)||100;
+    const ticks=[];for(let y=Math.ceil(Y0/step)*step;y<=Y1;y+=step)ticks.push(y);
+    ticks.forEach(y=>L.grid.append(S('line',{x1:X(y),y1:TOP,x2:X(y),y2:bands.works.bot,class:'time-grid'})));
     ORDER.forEach(k=>{const b=bands[k];L.bands.append(S('line',{x1:PLOT_L-6,y1:b.top,x2:PLOT_R,y2:b.top,class:'band-sep'}));
       if(b.collapsed)L.bands.append(S('text',{x:PLOT_L+4,y:b.top+18,class:'collapsed-note'},`${b.count} · линза свёрнута`));});
 
-    /* люди: геометрия заранее (нужна эпохам и связям) */
-    const bp=bands.people,LANES=Math.max(...people.map(p=>p.lane))+1;
-    people.forEach(p=>{p.bx=X(p.birth);p.dx=X(p.death);p.y=bp.top+24+(p.lane+.5)*((bp.bot-bp.top-34)/LANES);});
+    /* люди: геометрия (нужна эпохам и связям) */
+    const bp=bands.people,laneH=(bp.bot-bp.top-30)/LANES;
+    // плотный режим (Пристли): тонкие ленты без медальонов; медальон — только у выбранного
+    const RY=dense?4:Math.min(27,laneH*.4),RX=dense?4:RY*.82,BAND=dense?Math.min(18,laneH*.66):Math.min(24,Math.max(14,laneH*.46));
+    people.forEach(p=>{p.y=bp.top+20+(p.lane+.5)*laneH;});
 
-    /* эпохи */
+    /* эпохи — только заливка и подпись */
     const be=bands.eras;
-    if(!be.collapsed){eras.forEach(e=>{const x1=X(e.from),x2=X(e.to),act=R&&R.era===e,y=be.bot-Math.min(16,(be.bot-be.top)*.32);
-      L.eras.append(S('rect',{x:x1,y:be.top+1,width:x2-x1,height:be.bot-be.top-2,fill:'var(--context)',opacity:act?.13:.07}));
-      L.eras.append(S('path',{d:`M${x1+3},${y-5} L${x1+3},${y} L${x2-3},${y} L${x2-3},${y-5}`,class:'era-span'}));
-      L.eras.append(S('text',{x:(x1+x2)/2,y:y-9,class:'era-text'+(act?' era-active':'')},e.label));});
-      if(R&&R.era&&!bp.collapsed){const p=byId[state.sel];L.eras.append(S('path',{d:`M${p.bx} ${be.bot-2} V${be.bot+6}`,stroke:'var(--context)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'1 3'}));}}
-    else eras.forEach(e=>L.eras.append(S('rect',{x:X(e.from),y:be.top+COLL-6,width:X(e.to)-X(e.from)-2,height:3,fill:'var(--context)',opacity:.35})));
+    if(!be.collapsed)eras.forEach(e=>{const x1=Math.max(X(e.from),PLOT_L),x2=Math.min(X(e.to),PLOT_R),act=R&&R.era===e;
+      L.eras.append(S('rect',{x:x1,y:be.top+1,width:x2-x1-1,height:be.bot-be.top-2,fill:'var(--context)',opacity:act?.15:.06}));
+      const t=S('text',{x:(x1+x2)/2,y:(be.top+be.bot)/2+5,class:'era-text'+(act?' era-active':'')},e.label);L.eras.append(t);
+      if(t.getComputedTextLength()>x2-x1-12)t.remove();});
 
-    /* события мира */
+    /* события мира: кольцо + «год событие»; подписи в два ряда, без места — только кольцо */
     const bv=bands.events;
-    events.forEach(e=>{const x=X(e.year);
-      if(bv.collapsed){const y=(bv.top+bv.bot)/2;L.events.append(S('path',{d:`M${x} ${y-4} L${x+4} ${y} L${x} ${y+4} L${x-4} ${y} Z`,fill:'var(--history)','fill-opacity':.45}));return;}
-      const y=bv.top+(bv.bot-bv.top)*.5;
-      L.events.append(S('circle',{cx:x,cy:y,r:5.5,class:'event-ring'}));L.events.append(S('circle',{cx:x,cy:y,r:2,fill:'var(--history)'}));
-      const yt=S('text',{x:x+11,y:y-2,class:'event-year'},e.year),lt=S('text',{x:x+11,y:y+11,class:'event-text'},e.label);L.events.append(yt);L.events.append(lt);
-      // подпись прижимается к правому полю и уходит под кольцо — не за край листа и не на соседа
-      const lw=lt.getComputedTextLength(),lx=Math.min(x+11,PLOT_R-lw);if(lx<x+11){lt.setAttribute('x',lx);lt.setAttribute('y',y+17);}});
+    if(!bv.collapsed){const ry=bv.top+20,rings=events.map(e=>[X(e.year)-8,X(e.year)+8]),rows=[[],[]];
+      events.forEach((e,ei)=>{const x=X(e.year),g=S('g',{});L.events.append(g);
+        g.append(S('circle',{cx:x,cy:ry,r:5,class:'event-ring'}));g.append(S('circle',{cx:x,cy:ry,r:1.8,fill:'var(--history)'}));
+        g.append(S('title',{},`${e.year} — ${e.label}`));
+        const t=S('text',{class:'event-text'});t.append(S('tspan',{class:'event-year'},e.year+' '));t.append(document.createTextNode(e.label));g.append(t);
+        const w=t.getComputedTextLength();
+        for(let r=0;r<2;r++){const x0=r?x-4:x+10,x1=x0+w;if(x1>PLOT_R)continue;
+          if(rows[r].every(([a,b])=>x1+10<a||x0>b+10)&&(r||rings.every(([a,b],k)=>k===ei||x1+4<a||x0>b+4))){rows[r].push([x0,x1]);t.setAttribute('x',x0);t.setAttribute('y',r?ry+26:ry+4.5);return;}}
+        t.remove();});}
 
     /* люди: ленты Пристли */
-    if(bp.collapsed){people.forEach(p=>L.people.append(S('rect',{x:p.bx,y:bp.top+COLL-7,width:p.dx-p.bx,height:3,rx:1.5,fill:'var(--people)',opacity:.35})));}
+    if(bp.collapsed)people.forEach(p=>L.people.append(S('rect',{x:p.bx,y:bp.top+COLL-7,width:p.dx-p.bx,height:3,rx:1.5,fill:'var(--people)',opacity:.35})));
     else people.forEach(p=>{
       const sel=p.id===state.sel,on=!R||R.people.has(p.id);
       const g=S('g',{class:'person'+(isDim(on)?' dim':''),'data-person':p.id,tabindex:0,role:'button','aria-pressed':String(sel),'aria-label':`${p.name}, ${p.birth}–${p.death}`});L.people.append(g);
-      g.append(S('rect',{x:p.bx,y:p.y-BAND/2,width:p.dx-p.bx,height:BAND,rx:BAND/2,fill:sel?'var(--graph-selected)':'var(--graph-ink-secondary)','fill-opacity':sel?.12:.1}));
-      g.append(S('path',{d:`M${p.bx+RX} ${p.y+BAND/2-.5} H${p.dx-BAND/2}`,stroke:sel?'var(--graph-selected)':'var(--graph-ink-secondary)','stroke-opacity':sel?.45:.25,'stroke-width':1}));
-      const name=S('text',{x:p.bx+RX+8,y:p.y+5.4,class:sel?'sel-name':'person-name'},p.name);g.append(name);
-      const yr=S('text',{x:p.dx+7,y:p.y+4.5,class:'person-years'},`${p.birth}–${p.death}`);g.append(yr);if(p.dx+7+yr.getComputedTextLength()>W-4){yr.setAttribute('x',p.dx-12);yr.setAttribute('text-anchor','end');}
-      if(sel)g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+6,ry:RY+6,fill:'none',stroke:'var(--graph-selected)','stroke-width':1.8,'stroke-opacity':.85,filter:'url(#glow)'}));
-      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+9,ry:RY+9,class:'focus-ring'}));
-      const cp=S('clipPath',{id:'clip-'+p.id});cp.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY}));defs.append(cp);
-      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+3.5,ry:RY+3.5,fill:'var(--graph-sheet)',stroke:'var(--graph-ink-secondary)','stroke-opacity':.35,'stroke-width':.7}));
+      g.append(S('rect',{x:p.bx,y:p.y-BAND/2,width:p.dx-p.bx,height:BAND,rx:BAND/2,class:'lifeline',fill:sel?'var(--graph-selected)':'var(--graph-ink-secondary)','fill-opacity':sel?.16:(dense?.17:.09)}));
+      const name=S('text',{x:p.bx+(dense?10:RX+8),y:p.y+(dense?4.6:5.4),class:sel?'sel-name':'person-name'},p.label);g.append(name);
+      g.append(S('title',{},`${p.name}, ${p.birth}–${p.death}`));
+      const yr=S('text',{y:p.y+4.3,class:'person-years'},`${p.birth}–${p.death}`);if(!dense)g.append(yr);
+      if(p.yearsIn){yr.setAttribute('x',p.dx-BAND/2);yr.setAttribute('text-anchor','end');}else yr.setAttribute('x',Math.max(p.dx,p.bx+RX+8+name.getComputedTextLength())+8);
+      if(dense){g.append(S('circle',{cx:p.bx+BAND/2,cy:p.y,r:2.2,class:'life-dot'}));
+        if(sel){const r=13;g.append(S('circle',{cx:p.bx,cy:p.y,r:r+3,fill:'none',stroke:'var(--graph-selected)','stroke-width':1.6,filter:'url(#glow)'}));
+          g.append(S('circle',{cx:p.bx,cy:p.y,r,class:'medallion-ring'}));
+          if(p.portrait){const cp=S('clipPath',{id:'clip-'+p.id});cp.append(S('circle',{cx:p.bx,cy:p.y,r}));defs.append(cp);
+            g.append(S('image',{href:'../graph-f02/assets/'+p.portrait,x:p.bx-r,y:p.y-r,width:r*2,height:r*2,preserveAspectRatio:'xMidYMid slice','clip-path':`url(#clip-${p.id})`,filter:'url(#duo)'}));}
+          else g.append(S('text',{x:p.bx,y:p.y+3.5,class:'monogram',style:'font-size:10px'},mono(p)));
+          name.setAttribute('x',p.bx+r+7);}
+        g.append(S('rect',{x:p.bx-6,y:p.y-BAND/2-3,width:p.dx-p.bx+12,height:BAND+6,rx:4,class:'focus-ring'}));
+        p.labelEnd=+name.getAttribute('x')+name.getComputedTextLength();return;}
+      if(sel)g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+4,ry:RY+4,fill:'none',stroke:'var(--graph-selected)','stroke-width':1.8,'stroke-opacity':.85,filter:'url(#glow)'}));
+      g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX+7,ry:RY+7,class:'focus-ring'}));
       g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,class:'medallion-ring'}));
-      if(p.portrait){g.append(S('image',{href:'../graph-f02/assets/'+p.portrait,x:p.bx-RX,y:p.y-RY,width:RX*2,height:RY*2,preserveAspectRatio:'xMidYMid slice','clip-path':`url(#clip-${p.id})`,filter:'url(#duo)'}));
-                     g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,fill:'none',stroke:'var(--graph-ink-secondary)','stroke-opacity':.8,'stroke-width':1.1}));}
-      else g.append(S('text',{x:p.bx,y:p.y+7,class:'monogram'},p.mono));
+      if(p.portrait){const cp=S('clipPath',{id:'clip-'+p.id});cp.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY}));defs.append(cp);
+        g.append(S('image',{href:'../graph-f02/assets/'+p.portrait,x:p.bx-RX,y:p.y-RY,width:RX*2,height:RY*2,preserveAspectRatio:'xMidYMid slice','clip-path':`url(#clip-${p.id})`,filter:'url(#duo)'}));
+        g.append(S('ellipse',{cx:p.bx,cy:p.y,rx:RX,ry:RY,fill:'none',stroke:'var(--graph-ink-secondary)','stroke-opacity':.8,'stroke-width':1}));}
+      else g.append(S('text',{x:p.bx,y:p.y+RY*.27,class:'monogram',style:`font-size:${(RY*.72).toFixed(1)}px`},mono(p)));
       p.labelEnd=p.bx+RX+8+name.getComputedTextLength();
     });
 
-    /* влияния: от года труда учителя к ленте ученика */
+    /* влияния: без выбора — тонкие линии; при выборе — только прямые связи выбранного, потоком */
     const mids={};
-    if(!bp.collapsed)influences.forEach((e,i)=>{
-      const s=byId[e.a],t=byId[e.b],act=!!(R&&R.edges.has(e.a+'-'+e.b));
-      const A={x:Math.min(Math.max(X(e.via),s.labelEnd+10),s.dx-8),y:s.y+BAND/2},bx0=Math.max(X(t.birth+22),t.labelEnd+14);
-      const B=bx0>t.dx-8?{x:t.dx-3,y:t.y-BAND/2+5}:{x:bx0,y:t.y-BAND/2};
+    // концы нитей одного философа раздвигаются вдоль его ленты — пучок не сходится в одну точку
+    // без выбора тонкие линии рисуются, только пока их немного: на плотных данных это паутина — связи видны по выбору
+    const shown=bp.collapsed||(!R&&influences.length>15)?[]:influences.filter(e=>byId[e.a]&&byId[e.b]&&(!R||R.edges.has(e.a+'-'+e.b)));
+    const slot={};const order=(key,list)=>list.forEach((e,k)=>slot[key(e)]=k);
+    people.forEach(p=>{order(e=>'in'+e.a+'-'+e.b,shown.filter(e=>e.b===p.id).sort((x,y)=>byId[x.a].y-byId[y.a].y));
+      order(e=>'out'+e.a+'-'+e.b,shown.filter(e=>e.a===p.id).sort((x,y)=>byId[x.b].y-byId[y.b].y));});
+    shown.forEach((e,i)=>{
+      const s=byId[e.a],t=byId[e.b],act=!!R,si=slot['out'+e.a+'-'+e.b]*9,ti=slot['in'+e.a+'-'+e.b]*9;
+      const down=t.y>s.y,via=e.via||Math.min(s.death-5,s.birth+40);
+      const A={x:Math.min(Math.max(X(via),s.labelEnd+10)+si,s.dx-8),y:s.y+(down?BAND/2:-BAND/2)},bx0=Math.max(X(t.birth+22),t.labelEnd+14)+ti;
+      const B=bx0>t.dx-8?{x:t.dx-3,y:t.y+(down?-BAND/2+5:BAND/2-5)}:{x:bx0,y:t.y+(down?-BAND/2:BAND/2)};
       const dx=B.x-A.x,dy=B.y-A.y,P=[A,{x:A.x+dx*.5,y:A.y+dy*.15},{x:B.x-dx*.15,y:B.y-dy*.65},B];mids[e.a+'-'+e.b]=cub(P,.5);
-      const d=`M${A.x},${A.y} C${P[1].x},${P[1].y} ${P[2].x},${P[2].y} ${B.x},${B.y}`;
-      if(R&&!act){L.threads.append(S('path',{d,fill:'none',stroke:'var(--graph-ink-muted)','stroke-opacity':.5,'stroke-width':1,'stroke-dasharray':'2 3','stroke-linecap':'round'}));return;}
+      if(!act){L.threads.append(S('path',{d:`M${A.x},${A.y} C${P[1].x},${P[1].y} ${P[2].x},${P[2].y} ${B.x},${B.y}`,class:'thread-quiet'}));return;}
       const gid='dg'+i,lg=S('linearGradient',{id:gid,gradientUnits:'userSpaceOnUse',x1:A.x,y1:A.y,x2:B.x,y2:B.y});
-      lg.append(S('stop',{offset:'0%','stop-color':'var(--people)','stop-opacity':.75}));lg.append(S('stop',{offset:'100%','stop-color':act?'var(--graph-selected)':'var(--people)','stop-opacity':act?.95:.6}));defs.append(lg);
-      const g=S('g',act?{filter:'url(#glow)',class:'thread-active'}:{});
-      if(act)[[2.6,-2.2],[-2.2,2.6]].forEach(([ox,oy])=>g.append(S('path',{d:`M${A.x},${A.y} C${P[1].x+ox},${P[1].y+oy} ${P[2].x+ox},${P[2].y+oy} ${B.x},${B.y}`,fill:'none',stroke:`url(#${gid})`,'stroke-width':.6,'stroke-opacity':.45})));
-      g.append(S('path',{d:ribbon(P,act?4.6:3.2,act?1.3:1),fill:`url(#${gid})`}));
-      if(act)[.36,.64].forEach(tt=>{const q=cub(P,tt);g.append(S('circle',{cx:q.x,cy:q.y,r:1.4,fill:'#fff3e0','fill-opacity':.9}));});
-      g.append(S('circle',{cx:A.x,cy:A.y,r:2.2,fill:'var(--people)'}));g.append(S('circle',{cx:B.x,cy:B.y,r:2.6,fill:act?'var(--graph-selected)':'var(--people)'}));
+      lg.append(S('stop',{offset:'0%','stop-color':'var(--people)','stop-opacity':.7}));lg.append(S('stop',{offset:'100%','stop-color':'var(--graph-selected)','stop-opacity':.95}));defs.append(lg);
+      const g=S('g',{filter:'url(#glow)',class:'thread-active'});
+      g.append(S('path',{d:ribbon(P,dense?3.6:4.4,1.2),fill:`url(#${gid})`}));
+      g.append(S('circle',{cx:B.x,cy:B.y,r:2.6,fill:'var(--graph-selected)'}));
       L.threads.append(g);
     });
 
     /* труды */
-    const bw=bands.works,items=[...works].sort((a,b)=>a.year-b.year);let active=null;
-    if(bw.collapsed){items.forEach(it=>{const x=X(it.year),y=bw.top+COLL/2+1;L.works.append(S('rect',{x:x-3,y:y-4,width:6,height:8,rx:1,fill:'var(--texts)',opacity:.45}));});}
-    else{const my=bw.top+36,rows=[[],[]];
-      items.forEach(it=>{
-        const x=X(it.year),act=!!(R&&R.works.has(it.id));if(act)active=it;
-        const g=S('g',isDim(act)?{class:'dim-soft'}:{});
-        if(it.kind==='work'){g.append(S('rect',{x:x-9,y:my-11,width:18,height:22,rx:1.5,class:'work-mark',...(act?{'stroke-width':1.6}:{})}));
-          g.append(S('rect',{x:x-9,y:my-11,width:4.5,height:22,rx:1.2,fill:'var(--texts)','fill-opacity':.55}));
-          g.append(S('path',{d:`M${x-1} ${my-4} h6 M${x-1} ${my} h6`,stroke:'var(--texts)','stroke-width':1,'stroke-opacity':.8}));}
-        else{g.append(S('path',{d:`M${x} ${my-10} L${x+10} ${my} L${x} ${my+10} L${x-10} ${my} Z`,class:'concept-mark'}));g.append(S('circle',{cx:x,cy:my,r:2,fill:'var(--ideas)'}));}
-        g.append(act?S('text',{x:x+25,y:my+4,class:'work-year','text-anchor':'start'},it.year):S('text',{x,y:my-22,class:'work-year','text-anchor':'middle'},it.year));
-        const t=S('text',{x,class:act?'work-active-title':(it.kind==='work'?'work-title':'concept-title'),'text-anchor':'middle'});g.append(t);L.works.append(g);
-        const lines=[''];it.title.split(' ').forEach(w=>{const c=(lines[lines.length-1]+' '+w).trim();t.textContent=c;if(t.getComputedTextLength()>170&&lines[lines.length-1])lines.push(w);else lines[lines.length-1]=c;});
-        t.textContent='';lines.forEach((ln,k)=>t.append(S('tspan',{x,dy:k?15:0},ln)));
-        const w2=t.getBBox().width,x0=x-w2/2-6,x1=x+w2/2+6,row=rows[0].every(([a,b])=>x1<a||x0>b)?0:1;rows[row].push([x0,x1]);
-        t.setAttribute('y',my+30+row*38);t.firstChild.setAttribute('y',my+30+row*38);it.titleBox=t;
-        if(act){L.works.insertBefore(S('circle',{cx:x,cy:my,r:15.5,fill:'none',stroke:'var(--texts)','stroke-width':1.8,'stroke-opacity':.5,filter:'url(#glow)'}),g);
-          if(!bp.collapsed){const au=byId[it.author],A={x:Math.min(Math.max(x-28,au.labelEnd+10),au.dx-10),y:au.y+BAND/2},B={x,y:my-13};
-            L.threads.append(S('path',{d:`M${A.x},${A.y} C${A.x},${A.y+22} ${B.x},${B.y-22} ${B.x},${B.y}`,fill:'none',stroke:'var(--texts)','stroke-width':1.5,'stroke-opacity':.85,'stroke-dasharray':'1 4','stroke-linecap':'round',filter:'url(#glow)'}));}}
+    const bw=bands.works;
+    if(bw.collapsed)plan.items.forEach(it=>L.works.append(S('rect',{x:it.x-1,y:bw.top+COLL/2-5,width:2,height:10,fill:'var(--texts)',opacity:.45})));
+    else{const my=bw.top+24;
+      plan.items.forEach(it=>{
+        const act=!!(R&&R.works.has(it.id)),x=it.ix;
+        const g=S('g',isDim(act)?{class:'dim-soft'}:{});L.works.append(g);g.append(S('title',{},`${it.title}, ${it.year} — ${byId[it.author]?byId[it.author].name:''}`));
+        if(!it.labeled){g.append(S('rect',{x:x-1,y:my-8,width:2,height:16,rx:1,class:'work-tick'}));return;}
+        if(it.kind==='work'){g.append(S('rect',{x:x-8,y:my-10,width:16,height:20,rx:1.5,class:'work-mark',...(act?{'stroke-width':1.6}:{})}));
+          g.append(S('rect',{x:x-8,y:my-10,width:4,height:20,rx:1.2,fill:'var(--texts)','fill-opacity':.55}));}
+        else{g.append(S('path',{d:`M${x} ${my-9} L${x+9} ${my} L${x} ${my+9} L${x-9} ${my} Z`,class:'concept-mark'}));g.append(S('circle',{cx:x,cy:my,r:1.8,fill:'var(--ideas)'}));}
+        const ty=my+30+it.row*38,t=S('text',{x,y:ty,class:act?'work-active-title':(it.kind==='work'?'work-title':'concept-title'),'text-anchor':'middle'});
+        it.lines.forEach((ln,k)=>t.append(S('tspan',{x,dy:k?15:0},ln.t)));g.append(t);
+        if(act){L.works.insertBefore(S('circle',{cx:x,cy:my,r:14.5,fill:'none',stroke:'var(--texts)','stroke-width':1.8,'stroke-opacity':.5,filter:'url(#glow)'}),g);
+          const au=byId[it.author];if(!bp.collapsed&&au){const A={x:Math.min(Math.max(x-28,au.labelEnd+10),au.dx-10),y:au.y+BAND/2},B={x,y:my-12};
+            L.threads.append(S('path',{d:`M${A.x},${A.y} C${A.x},${A.y+22} ${B.x},${B.y-22} ${B.x},${B.y}`,class:'tether'}));}}
       });}
 
-    /* ось — гравированная масштабная линейка */
+    /* ось: линия, деления, годы */
     const ay=bw.bot;
-    L.axis.append(S('line',{x1:PLOT_L-6,y1:ay,x2:PLOT_R,y2:ay,stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));
-    L.axis.append(S('line',{x1:X(1600),y1:ay+5,x2:X(1800),y2:ay+5,stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));
-    for(let y=1600,k=0;y<1800;y+=25,k++)if(k%2===0)L.axis.append(S('rect',{x:X(y),y:ay,width:X(y+25)-X(y),height:5,fill:'var(--graph-ink)','fill-opacity':.5}));
-    for(let y=1600;y<=1800;y+=25){const x=X(y),maj=y%50===0;L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+(maj?9:5),stroke:'var(--graph-ink)','stroke-opacity':.55,'stroke-width':.8}));if(maj)L.axis.append(S('text',{x,y:ay+27,class:'axis-year'},y));}
-
-    /* рукописные пометки: ищут свободное место у своего «якоря» */
-    placeNotes({R});
+    L.axis.append(S('line',{x1:PLOT_L-6,y1:ay,x2:PLOT_R,y2:ay,stroke:'var(--graph-ink)','stroke-opacity':.5,'stroke-width':.8}));
+    ticks.forEach(y=>{const x=X(y);L.axis.append(S('line',{x1:x,y1:ay,x2:x,y2:ay+6,stroke:'var(--graph-ink)','stroke-opacity':.5,'stroke-width':.8}));L.axis.append(S('text',{x,y:ay+24,class:'axis-year'},y));});
 
     renderGutter(bands,H);renderNote(R);renderDesk(R);
-    window.deskLayout={bands,H,people:byId,mids,state,BODY,svgTop:top};
+    window.deskLayout={bands,H,people:byId,mids,state,BODY,svgTop:top,lanes:LANES,labeledWorks:plan.items.filter(i=>i.labeled).length};
     if(focusId){const f=svg.querySelector(`[data-person="${focusId}"]`);if(f)f.focus();}
     if(!reduce&&svg.animate)svg.animate([{opacity:.55},{opacity:1}],{duration:180,easing:'ease-out'});
   }
 
-  function noteFor(sel){
-    if(!sel)return null;
-    return notes.find(n=>n.about.endsWith('-'+sel))||notes.find(n=>n.about===sel)||notes.find(n=>n.about.startsWith(sel+'-'))||null;
-  }
-  // На самом таймлайне рукописных пометок нет: карта только показывает данные.
-  // Цитата выбранного — эпиграф на поле шапки, вне графа.
-  function placeNotes({R}){
-    const ep=document.querySelector('.epigraph'),n=R?noteFor(state.sel):null;
-    if(ep){ep.innerHTML=n?`<blockquote>${n.lines.join(' ')}</blockquote><figcaption>— ${n.cite}</figcaption>`:'';ep.hidden=!n;}
-  }
-  // карточки на столе следуют за выбором: вопрос философа и его труды «к чтению»
+  // карточки на столе следуют за выбором: цитата (с источником) и труды «к чтению»; нет данных — нет карточки
   function renderDesk(R){
     const top=document.getElementById('card-top'),under=document.getElementById('card-under');
     const lines=(el,arr)=>{if(!el)return;el.querySelectorAll('.t').forEach(t=>t.remove());arr.forEach((x,i)=>{const d=document.createElement('div');d.className='t'+(i===0?' big':'');d.textContent=x;if(i===0&&el===top)d.style.marginTop='6px';el.append(d);});el.hidden=!arr.length;};
-    const sel=state.sel;
-    lines(top,sel?(questions[sel]||[]):theme.concat(['Декарт · Локк · Юм · Кант']));
-    const ws=sel?works.filter(w=>w.author===sel&&w.kind==='work'):[];
+    const n=R&&notes.find(x=>x.about===state.sel);
+    lines(top,n?[...n.lines,'— '+n.cite]:[]);
+    const ws=R?works.filter(w=>w.author===state.sel&&w.kind==='work').sort((a,b)=>b.key-a.key).slice(0,3):[];
     lines(under,ws.length?['К чтению:',...ws.map(w=>`«${w.title}», ${w.year}`)]:[]);
+    const ed=document.querySelector('.edition-note');
+    if(ed)ed.textContent=dense?`Синтетический набор для проверки плотности · ${META.people.count} · ${META.works.count} · ${plural(influences.length,['влияние','влияния','влияний'])}`:'Демонстрационные данные';
   }
 
   /* линзы — у своих страт, в левом поле */
@@ -234,19 +253,20 @@
       b.title=state.on[k]?'Свернуть линзу':'Развернуть линзу';b.classList.toggle('off',!state.on[k]);});
   }
 
-  /* сноска «Выбрано» — словами объясняет подсветку и служит легендой фокуса */
+  /* сноска «Выбрано» — словами объясняет подсветку; длинные списки сокращаются */
   function renderNote(R){
     if(!selnote)return;
     const h1=document.querySelector('.scene h1');
-    if(!R){selnote.innerHTML='<div class="kicker">Как читать</div><p class="hint">Нажмите на философа — проявятся его влияния, труды и эпоха. Нажмите на поле листа или Esc, чтобы снять выбор.</p>';
-      if(h1)h1.textContent='От Декарта до Канта';return;}
-    const p=byId[state.sel];
-    const ups=[...R.up].filter(id=>id!==p.id).map(id=>byId[id]).sort((a,b)=>a.birth-b.birth).map(x=>x.short);
-    const downs=R.down.map(id=>byId[id].short),ws=works.filter(w=>R.works.has(w.id)),li=[];
-    if(ups.length)li.push(`<li><i class="k k-flow"></i>Влияли: ${ups.join(' → ')}</li>`);
-    if(downs.length)li.push(`<li><i class="k k-flow"></i>Повлиял на: ${downs.join(', ')}</li>`);
-    li.push(ws.length?`<li><i class="k k-works"></i>Труды: ${ws.map(w=>`«${w.title}», ${w.year}`).join('; ')}</li>`:`<li><i class="k k-works"></i>Трудов в выборке нет</li>`);
-    if(R.era)li.push(`<li><i class="k k-era"></i>Эпоха: ${R.era.label}</li>`);
+    if(!R){const more=influences.length>15?` Связей ${influences.length} — они показываются по выбору.`:'';
+      selnote.innerHTML=`<div class="kicker">Как читать</div><p class="hint">Нажмите на философа — проявятся его влияния, труды и эпоха.${more} Нажмите на поле листа или Esc, чтобы снять выбор.</p>`;
+      if(h1)h1.textContent=DS.title;return;}
+    const p=byId[state.sel],cut=(a,n)=>a.length>n?a.slice(0,n).join(', ')+` и ещё ${a.length-n}`:a.join(', ');
+    const ups=R.up.map(id=>byId[id]).sort((a,b)=>a.birth-b.birth).map(x=>x.short),downs=R.down.map(id=>byId[id]).sort((a,b)=>a.birth-b.birth).map(x=>x.short);
+    const ws=works.filter(w=>R.works.has(w.id)&&w.kind==='work'),li=[];
+    if(ups.length)li.push(`<li><i class="k k-flow"></i><span>Влияли: ${cut(ups,3)}</span></li>`);
+    if(downs.length)li.push(`<li><i class="k k-flow"></i><span>Повлиял на: ${cut(downs,3)}</span></li>`);
+    li.push(ws.length?`<li><i class="k k-works"></i><span>Труды: ${ws.length>1?plural(ws.length,['труд','труда','трудов'])+', главный — ':''}«${(ws.find(w=>w.key)||ws[0]).title}»</span></li>`:`<li><i class="k k-works"></i><span>Трудов в выборке нет</span></li>`);
+    if(R.era)li.push(`<li><i class="k k-era"></i><span>Эпоха: ${R.era.label}</span></li>`);
     selnote.innerHTML=`<div class="kicker">Выбрано</div><div class="selname">${p.name} <span>${p.birth}–${p.death}</span></div><ul>${li.join('')}</ul>`;
     if(h1)h1.textContent=p.name;
   }

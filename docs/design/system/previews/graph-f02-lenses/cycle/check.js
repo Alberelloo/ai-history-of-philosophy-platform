@@ -28,7 +28,7 @@ const OUT=__dirname+'/out/';const tag=process.argv[2]||'run';
    const texts=[...document.querySelectorAll('#svg text, .chart-notes text')].filter(t=>t.textContent.trim()&&getComputedStyle(t).opacity!=='0');
    const tt=[];for(let i=0;i<texts.length;i++)for(let j=i+1;j<texts.length;j++){if(inter(R(texts[i]),R(texts[j]),1))tt.push(texts[i].textContent.trim().slice(0,22)+' ✕ '+texts[j].textContent.trim().slice(0,22));}
    const lines=[...document.querySelectorAll('#svg line.lifeline, #svg .lifeline')];
-   const tl=[];texts.forEach(t=>lines.forEach(l=>{if(inter(R(t),R(l),0.5))tl.push(t.textContent.trim().slice(0,22));}));
+   const tl=[];texts.forEach(t=>lines.forEach(l=>{if(l.closest('.person')&&l.closest('.person')===t.closest('.person'))return;/* имя и годы внутри своей ленты — по замыслу */if(inter(R(t),R(l),0.5))tl.push(t.textContent.trim().slice(0,22));}));
    return {fontBad:document.fonts.check('20px "Bad Script"','Юм'),hOverflow:document.documentElement.scrollWidth>innerWidth,textOverlaps:tt,textOnLifeline:[...new Set(tl)]};
   });
   report[w]={errors:errs,...geo};await p.close();
