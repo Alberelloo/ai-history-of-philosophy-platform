@@ -4,7 +4,7 @@ import { useT } from "../i18n";
 import { ScopeToggle, setScope, useScope } from "../scope";
 import { storage, useStored } from "../storage";
 import { Icon, Switch } from "../ui";
-import { DeskNotes, type DeskQuote, type DeskReading } from "./DeskNotes";
+import { DeskNotes, type DeskQuote } from "./DeskNotes";
 import { DeskScene } from "./DeskScene";
 import { downloadSvg } from "./exportSvg";
 import { DENSE_MAP } from "./fixture";
@@ -42,7 +42,6 @@ const EMPTY: MapData = { range: [0, 1], truncated: false, limit: 0, people: [], 
 const MIN_HEIGHT = 420;
 // Под обзорной шкалой: её отступ, нижнее поле листа (desk-sheet-body), рамка и полоска стола
 const BOTTOM_GAP = 60;
-const READING_MAX = 3;
 
 // Цитата для записки: первая цитата-подтверждение связи влияния выбранной персоны
 type QuoteRow = { type?: string; subject?: string; object?: string; evidence?: { quote?: string; lost?: boolean }[] };
@@ -161,15 +160,6 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const name = (id: string) => people.get(id)?.short ?? people.get(id)?.label ?? id;
     return { text: t.map.desk.quote(q.quote), source: t.map.desk.quoteSource(name(q.subject), name(q.object)) };
   }, [selPerson, quoteRows, link, data, t, build.added]);
-  const deskReading = useMemo<DeskReading[]>(() => {
-    if (!selPerson) return [];
-    return data.works
-      .filter((w) => w.author === selPerson && w.kind === "work")
-      .sort((a, b) => b.weight - a.weight || a.year - b.year)
-      .slice(0, READING_MAX)
-      .sort((a, b) => a.year - b.year)
-      .map((w) => ({ title: t.map.desk.quote(w.label), year: w.year }));
-  }, [selPerson, data, t]);
 
   // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.
   useEffect(() => {
@@ -359,7 +349,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   return (
     <main className="page map-page">
       <DeskScene
-        notes={<DeskNotes quote={deskQuote} reading={deskReading} readingTitle={t.map.desk.reading} label={t.map.desk.notes} />}
+        notes={<DeskNotes quote={deskQuote} label={t.map.desk.notes} />}
       >
         <div className="map-sheet">
           <header className="map-head">

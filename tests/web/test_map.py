@@ -435,6 +435,85 @@ def test_panel_collapses_to_rail_and_is_remembered(browser, site):
 # --- линзы и окно времени ---------------------------------------------------------------
 
 
+def era_h(page) -> float:
+    return page.locator(".map-era__fill").first.bounding_box()["height"]
+
+
+PANEL_FIT = """() => {
+  const p = document.querySelector('.map-panel'), b = document.querySelector('.map-panel__body');
+  const scrolls = [p, ...p.querySelectorAll('*')].filter(e => {
+    const s = getComputedStyle(e);
+    return /(auto|scroll)/.test(s.overflowY) && e.scrollHeight > e.clientHeight + 1
+      && !e.closest('.map-search__list');
+  });
+  return {over: b.getBoundingClientRect().bottom - p.getBoundingClientRect().bottom,
+          scrolls: scrolls.map(e => e.className)};
+}"""
+
+
+@req(KG, "Панель карты")
+@pytest.mark.parametrize("width,height", [(1920, 1080), (1280, 720), (1024, 576)])
+def test_panel_fits_without_scroll(browser, site, width, height):
+    """Панель целиком видна без прокрутки: разделы, которым не хватает места, сложены до
+    заголовков; окно значений фильтра открыто поверх карты и высоту панели не меняет."""
+    context, page = open_map(
+        browser, site, "/graph/kant", viewport={"width": width, "height": height}
+    )
+    try:
+        fit = page.evaluate(PANEL_FIT)
+        assert fit["over"] <= 0.5 and not fit["scrolls"], fit
+        folds = page.locator(".map-panel .map-fold")
+        filters = page.locator(".map-fold", has_text="Фильтры")
+        if filters.get_attribute("aria-expanded") == "false":
+            filters.click()  # раскрытый читателем раздел остаётся, место уступают другие
+            expect(filters).to_have_attribute("aria-expanded", "true")
+        page.wait_for_timeout(200)
+        fit = page.evaluate(PANEL_FIT)
+        assert fit["over"] <= 0.5 and not fit["scrolls"], fit
+        body_h = page.locator(".map-panel__body").bounding_box()["height"]
+        page.locator(".map-facet summary", has_text="Направление").click()
+        flyout = page.locator(".map-facet[open] .map-facet__body")
+        expect(flyout).to_be_visible()
+        box, chart = flyout.bounding_box(), page.locator(".map-chart").bounding_box()
+        panel = page.locator(".map-panel").bounding_box()
+        assert box["x"] + box["width"] <= panel["x"]  # поверх карты, слева от панели
+        assert box["x"] >= chart["x"]
+        assert box["y"] + box["height"] <= min(height, panel["y"] + panel["height"]) + 1
+        assert page.locator(".map-panel__body").bounding_box()["height"] == body_h
+        page.keyboard.press("Escape")  # закрывает окно, выбор остаётся
+        expect(flyout).to_have_count(0)
+        assert address(page)[0] == "/graph/kant"
+        assert folds.count() >= 2
+    finally:
+        context.close()
+
+
+@req(KG, "Линзы и окно времени")
+@pytest.mark.parametrize("lenses", [["people"], ["events", "people"], ["eras", "people", "works"]])
+def test_canvas_size_fixed_when_lenses_collapse(browser, site, lenses):
+    """Полотно постоянного размера: свёрнутые линзы отдают высоту остальным стратам, пустого
+    низа нет — ось стоит на месте."""
+    context, page = open_map(browser, site)
+    try:
+        canvas = page.locator(".map-canvas")
+        before = canvas.bounding_box()
+        axis_y = page.locator(".map-canvas svg[data-part='bottom']").bounding_box()
+        era_before = era_h(page)
+        for k in lenses:
+            page.locator(f".map-lens[data-lens='{k}']").click()
+        settle(page)
+        after = canvas.bounding_box()
+        assert abs(after["height"] - before["height"]) <= 1, (before, after)
+        assert abs(after["width"] - before["width"]) <= 1
+        bottom = page.locator(".map-canvas svg[data-part='bottom']").bounding_box()
+        assert abs(bottom["y"] + bottom["height"] - (axis_y["y"] + axis_y["height"])) <= 1
+        # Развёрнутые страты делят освободившуюся высоту: полоса эпох стала выше.
+        if "eras" not in lenses:
+            assert era_h(page) > era_before + 4, (era_before, era_h(page))
+    finally:
+        context.close()
+
+
 @req(KG, "Линзы и окно времени")
 def test_collapse_events_lens_gives_height_to_people(browser, site):
     context, page = open_map(browser, site)
@@ -802,18 +881,45 @@ def test_map_labels_do_not_overlap(browser, site, size, selection):
         context.close()
 
 
+QUOTE_ROWS = [
+    {
+        "type": "influenced_by",
+        "subject": "kant",
+        "object": "hume",
+        "evidence": [{"quote": "Юм пробудил меня от догматического сна", "lost": False}],
+    }
+]
+
+
 @req(VD, "Шрифты")
 def test_desk_notes_in_bad_script_from_same_origin(browser, site):
-    context, page = open_map(browser, site, "/graph/kant")
+    """Записка с цитатой связи выбранного набрана Bad Script с самого сайта; списка
+    «К чтению» на столе нет (снят по правке владельца)."""
+    hume = {
+        "id": "hume",
+        "label": "Дэвид Юм",
+        "short": "Юм",
+        "birth": 1711,
+        "death": 1776,
+        "precision": "year",
+        "roles": ["philosopher"],
+        "weight": 4,
+    }
+    data = kant_alone()
+    data["people"].append(hume)
+    context = reader_context(browser, viewport={"width": 1920, "height": 1080})
+    page = context.new_page()
     fonts: list[str] = []
     try:
+        page.route(MAP_API, lambda route: route.fulfill(json=data))
+        page.route("**/entities/kant/statements*", lambda route: route.fulfill(json=QUOTE_ROWS))
         page.on("request", lambda r: fonts.append(r.url) if r.resource_type == "font" else None)
-        page.reload()
+        page.goto(f"{site.url}/graph/kant")
         page.locator(".map-canvas").wait_for()
+        note = page.locator(".desk-note-quote")
+        expect(note).to_contain_text("догматического сна")
         settle(page)
-        note = page.locator(".desk-note-quote, .desk-note").first
-        if note.count() == 0:
-            pytest.skip("записки на столе ещё не выводятся на странице карты (DeskNotes)")
+        assert page.get_by_text("К чтению").count() == 0
         family = note.evaluate("e => getComputedStyle(e).fontFamily")
         assert family.split(",")[0].strip("\"' ") == "Bad Script", family
         assert "Bad Script" in visual.loaded_families(page)

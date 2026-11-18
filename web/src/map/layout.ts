@@ -442,12 +442,31 @@ export function layout(input: LayoutInput): MapLayout {
   let laneH = laneMin;
   if (on("people")) {
     const viewport = Math.max(peopleMin, body - h.events - h.eras - h.works);
-    h.people = viewport;
-    if (peopleNeed > viewport) peopleScroll = { contentHeight: peopleNeed, viewportHeight: viewport };
-    // Дорожки растягиваются на высоту страты, но не больше предела: в плотном разделе — 1,3
-    // минимальной (отфильтрованная карта из нескольких лент не разлетается по высоте, остаток
-    // страты остаётся пустым внизу), в редком — 2,4 (немного крупных лент с медальонами).
-    else laneH = Math.min(laneMin * (dense ? LANE_STRETCH_DENSE : LANE_STRETCH), (viewport - 30) / LANES);
+    if (peopleNeed > viewport) {
+      h.people = viewport;
+      peopleScroll = { contentHeight: peopleNeed, viewportHeight: viewport };
+    } else {
+      // Естественная высота: дорожки растянуты до предела — в плотном разделе 1,3 минимальной,
+      // в редком 2,4. Остаток кадра ниже делится между всеми развёрнутыми стратами.
+      laneH = Math.min(laneMin * (dense ? LANE_STRETCH_DENSE : LANE_STRETCH), (viewport - 30) / LANES);
+      h.people = 30 + LANES * laneH;
+    }
+  }
+  // Полотно постоянного размера (правка владельца 2026-11-18): страты заполняют кадр целиком.
+  // Свободная высота — от свёрнутых линз или коротких страт — делится между развёрнутыми
+  // стратами пропорционально их высоте; ряды событий и трудов, дорожки людей и полоса эпох
+  // растягиваются вместе со своей стратой, пустого низа не остаётся.
+  const open = STRATA.filter((k) => on(k));
+  const natural = open.reduce((sum, k) => sum + h[k], 0);
+  const free = body - STRATA.reduce((sum, k) => sum + h[k], 0);
+  let eRow = E_ROW;
+  let wRow = W_ROW;
+  if (free > 0.5 && natural > 0 && !peopleScroll) {
+    const k = (natural + free) / natural;
+    for (const key of open) h[key] *= k;
+    if (on("events") && ep.rows > 0) eRow = (h.events - 24) / ep.rows;
+    if (on("works") && wp.rows > 0) wRow = (h.works - 28) / wp.rows;
+    if (on("people")) laneH = (h.people - 30) / LANES;
   }
   const bands = {} as Record<Stratum, Band>;
   let y = o.top;
@@ -486,8 +505,8 @@ export function layout(input: LayoutInput): MapLayout {
   });
 
   // труды и события — координаты в кадре
-  const works: WorkPlace[] = wp.items.map(({ w: _w, key: _k, ...it }) => ({ ...it, y: it.row >= 0 ? bands.works.top + 22 + it.row * W_ROW : bands.works.top }));
-  const events: EventPlace[] = ep.items.map(({ w: _w, ...e }) => ({ ...e, y: e.row >= 0 ? bands.events.top + 20 + e.row * E_ROW : bands.events.top + 5 }));
+  const works: WorkPlace[] = wp.items.map(({ w: _w, key: _k, ...it }) => ({ ...it, y: it.row >= 0 ? bands.works.top + 22 + it.row * wRow : bands.works.top }));
+  const events: EventPlace[] = ep.items.map(({ w: _w, ...e }) => ({ ...e, y: e.row >= 0 ? bands.events.top + 20 + e.row * eRow : bands.events.top + 5 }));
   const eras: EraPlace[] = v.eras.map((e) => {
     const x1 = s.clampX(s.x(e.from));
     const x2 = s.clampX(s.x(e.to));

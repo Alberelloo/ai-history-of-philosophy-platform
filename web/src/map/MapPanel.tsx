@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import { pick, useT, type Catalog } from "../i18n";
 import { Icon, type IconName } from "../ui";
 import { LinkDetails, type GEdge } from "./LinkDetails";
@@ -19,6 +19,12 @@ import { emptyFilter, type Filter, type MapData, type MapState } from "./types";
 // Правая панель карты (макет v6): поиск с подсказками по типам, «Выбрано» с расшифровкой
 // цветов и действиями, фильтры столбиком (<details> со счётчиками), условные знаки.
 // Свёрнутая панель — узкий рельс со значками; любой значок разворачивает её к своему разделу.
+//
+// Без прокрутки (правка владельца 2026-11-18): панель всегда помещается в высоту карты.
+// Разделы, которым не хватает места, складываются до заголовка — первыми условные знаки,
+// затем фильтры, последним «Выбрано»; раздел, раскрытый читателем, не складывается. Когда
+// место освобождается, сложенные подгонкой разделы раскрываются снова. Значения фильтра
+// открываются всплывающим окном слева от панели, поверх карты, и высоту панели не меняют.
 
 export type BuildState = {
   running: boolean;
@@ -57,12 +63,112 @@ const cap = (s: string) => (s ? s[0].toLocaleUpperCase() + s.slice(1) : s);
 
 const SECTION_ICON: Record<Section, IconName> = { search: "search", selected: "check", filters: "filter", legend: "legend" };
 
+type Fold = Exclude<Section, "search">;
+type Step = Fold | "tight";
+// Что уступает место первым: плотный режим (заголовок панели в строке поиска, меньше
+// отступы), затем разделы. Раскрываются обратно в обратном порядке.
+const FOLD_ORDER: Step[] = ["tight", "legend", "filters", "selected"];
+
+type FoldApi = { closed: (k: Fold) => boolean; toggle: (k: Fold) => void };
+const FoldContext = createContext<FoldApi>({ closed: () => false, toggle: () => {} });
+
+// Заголовок складываемого раздела: кнопка со стрелкой, раскрывает и складывает раздел.
+function FoldHead({ k, children, extra }: { k: Fold; children: ReactNode; extra?: ReactNode }) {
+  const fold = useContext(FoldContext);
+  const closed = fold.closed(k);
+  return (
+    <div className="map-panel__row">
+      <h2 className="map-panel__h">
+        <button type="button" className="pg-btn map-fold" aria-expanded={!closed} aria-controls={`map-sec-${k}`} onClick={() => fold.toggle(k)}>
+          {children}
+          <Icon name={closed ? "chevronRight" : "chevronDown"} small />
+        </button>
+      </h2>
+      {extra}
+    </div>
+  );
+}
+
+// Подгонка разделов под высоту панели: складывает по FOLD_ORDER, пока содержимое выше
+// панели, и раскрывает сложенные подгонкой, когда освобождённого места снова хватает.
+function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, active: boolean, focusKey: string) {
+  const [closed, setClosed] = useState<ReadonlySet<Step>>(new Set());
+  const [pin, setPin] = useState<Fold | null>(null);
+  const [, setTick] = useState(0);
+  const freed = useRef(new Map<Step, number>()); // сложенные подгонкой: сколько места освободили
+  const pending = useRef<{ k: Step; before: number } | null>(null);
+  const byUser = useRef(new Set<Fold>()); // сложенные читателем — подгонка их не раскрывает
+
+  useEffect(() => {
+    if (!active) return;
+    const ro = new ResizeObserver(() => setTick((n) => n + 1));
+    if (panel.current) ro.observe(panel.current);
+    if (body.current) ro.observe(body.current);
+    return () => ro.disconnect();
+  }, [active, panel, body]);
+
+  // Новый выбор или связь — «Выбрано» раскрывается: читатель хочет его видеть.
+  useEffect(() => {
+    if (!focusKey) return;
+    byUser.current.delete("selected");
+    freed.current.delete("selected");
+    setPin("selected");
+    setClosed((c) => (c.has("selected") ? new Set([...c].filter((x) => x !== "selected")) : c));
+  }, [focusKey]);
+
+  useLayoutEffect(() => {
+    const p = panel.current;
+    const b = body.current;
+    if (!active || !p || !b) return;
+    const style = getComputedStyle(p);
+    const avail = p.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    const need = b.offsetTop - p.offsetTop - parseFloat(style.paddingTop) + b.offsetHeight;
+    if (pending.current) {
+      freed.current.set(pending.current.k, Math.max(1, pending.current.before - need));
+      pending.current = null;
+    }
+    if (need > avail + 0.5) {
+      // Последнее средство — сложить и раскрытый читателем раздел: прокрутки не бывает.
+      const victim = FOLD_ORDER.find((k) => !closed.has(k) && k !== pin) ?? (pin && !closed.has(pin) ? pin : undefined);
+      if (!victim) return;
+      pending.current = { k: victim, before: need };
+      setClosed(new Set([...closed, victim]));
+      return;
+    }
+    const back = [...FOLD_ORDER].reverse().find((k) => closed.has(k) && freed.current.has(k) && !(k !== "tight" && byUser.current.has(k)));
+    if (back && avail - need >= freed.current.get(back)!) {
+      freed.current.delete(back);
+      setClosed(new Set([...closed].filter((x) => x !== back)));
+    }
+  });
+
+  const api: FoldApi = {
+    closed: (k) => closed.has(k),
+    toggle: (k) => {
+      freed.current.delete(k);
+      if (closed.has(k)) {
+        byUser.current.delete(k);
+        setPin(k);
+        setClosed(new Set([...closed].filter((x) => x !== k)));
+      } else {
+        byUser.current.add(k);
+        if (pin === k) setPin(null);
+        setClosed(new Set([...closed, k]));
+      }
+    },
+  };
+  return { api, tight: closed.has("tight") };
+}
+
 export function MapPanel(props: Props) {
   const { collapsed, onCollapse } = props;
   const t = useT();
   const body = useRef<HTMLDivElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const [focus, setFocus] = useState<Section | null>(null);
+  const aside = useRef<HTMLElement>(null);
+  const focusKey = props.link?.id ?? props.rel?.obj.id ?? "";
+  const { api: fold, tight } = useFit(aside, body, !collapsed, focusKey);
 
   // После разворачивания — к разделу, с которого его открыли.
   useEffect(() => {
@@ -89,7 +195,8 @@ export function MapPanel(props: Props) {
   }, [collapsed, onCollapse]);
 
   return (
-    <aside className={collapsed ? "map-panel is-collapsed" : "map-panel"} aria-label={t.map.panel}>
+    <FoldContext.Provider value={fold}>
+    <aside ref={aside} className={["map-panel", collapsed ? "is-collapsed" : "", !collapsed && tight ? "is-tight" : ""].join(" ").trim()} aria-label={t.map.panel}>
       <div className="map-panel__bar">
         {!collapsed && <span className="map-panel__title">{t.map.panelTitle}</span>}
         <button
@@ -126,18 +233,27 @@ export function MapPanel(props: Props) {
       ) : (
         <div className="map-panel__body" id="map-panel-body" ref={body}>
           <SearchBox {...props} inputRef={searchInput} />
-          <section className="map-panel__sec map-selected" data-section="selected" aria-live="polite">
-            <Selected {...props} />
+          <section className="map-panel__sec map-selected" data-section="selected" id="map-sec-selected" aria-live="polite">
+            {fold.closed("selected") ? (
+              <FoldHead k="selected">
+                {t.map.sections.selected}
+                {props.rel ? ` · ${props.rel.obj.label}` : ""}
+              </FoldHead>
+            ) : (
+              <Selected {...props} />
+            )}
           </section>
-          <section className="map-panel__sec" data-section="filters" aria-label={t.map.sections.filters}>
+          <section className="map-panel__sec" data-section="filters" id="map-sec-filters" aria-label={t.map.sections.filters}>
             <Filters {...props} />
           </section>
-          <section className="map-panel__sec" data-section="legend" aria-label={t.map.sections.legend}>
-            <Legend />
+          <section className="map-panel__sec" data-section="legend" id="map-sec-legend" aria-label={t.map.sections.legend}>
+            <FoldHead k="legend">{t.map.sections.legend}</FoldHead>
+            {!fold.closed("legend") && <Legend />}
           </section>
         </div>
       )}
     </aside>
+    </FoldContext.Provider>
   );
 }
 
@@ -514,14 +630,69 @@ function Selected(props: Props) {
 
 /* ---------- фильтры ---------- */
 
-function Facet({ title, value, open, children }: { title: string; value?: string; open?: boolean; children: ReactNode }) {
+// Значения фильтра — всплывающим окном слева от панели, поверх карты: высота панели не
+// меняется. Открыто одно окно; щелчок вне окна и Esc закрывают его.
+function Facet({
+  title,
+  value,
+  open,
+  onOpen,
+  children,
+}: {
+  title: string;
+  value?: string;
+  open: boolean;
+  onOpen: (open: boolean) => void;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const pop = useRef<HTMLDivElement>(null);
+  const [shift, setShift] = useState(0);
+  // Окно не выходит за низ панели: поднимается на сколько нужно.
+  useLayoutEffect(() => {
+    if (!open || !pop.current || !ref.current) return setShift(0);
+    const panel = ref.current.closest(".map-panel");
+    if (!panel) return;
+    const r = pop.current.getBoundingClientRect();
+    const limit = Math.min(panel.getBoundingClientRect().bottom, window.innerHeight - 8);
+    const over = r.bottom - shift - limit;
+    setShift(over > 0 ? -over : 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) onOpen(false);
+    };
+    const esc = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // Esc закрывает окно фильтра, а не снимает выбор на карте
+      e.stopImmediatePropagation();
+      onOpen(false);
+      ref.current?.querySelector("summary")?.focus();
+    };
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", esc, true);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      document.removeEventListener("keydown", esc, true);
+    };
+  }, [open, onOpen]);
   return (
-    <details className={value ? "map-facet is-on" : "map-facet"} open={open || !!value || undefined}>
-      <summary>
+    <details ref={ref} className={value ? "map-facet is-on" : "map-facet"} open={open}>
+      <summary
+        onClick={(e) => {
+          e.preventDefault();
+          onOpen(!open);
+        }}
+      >
         <span>{title}</span>
         {value && <b>{value}</b>}
       </summary>
-      <div className="map-facet__body">{children}</div>
+      <div className="map-facet__body" ref={pop} role="group" aria-label={title} style={shift ? { marginTop: shift } : undefined}>
+        <div className="map-facet__title">{title}</div>
+        {children}
+      </div>
     </details>
   );
 }
@@ -572,7 +743,7 @@ function Filters({ data, vis, state, onState }: Props) {
     if (!gs.length) return null;
     const n = gs.filter((g) => f.groups.includes(g.id)).length;
     return (
-      <Facet title={title} value={n ? String(n) : undefined}>
+      <Facet {...facet(title)} value={n ? String(n) : undefined}>
         {gs.map((g) => (
           <Check
             key={g.id}
@@ -591,7 +762,7 @@ function Filters({ data, vis, state, onState }: Props) {
     const order = Object.keys(names);
     codes.sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
     return (
-      <Facet title={title} value={f[key].length ? String(f[key].length) : undefined}>
+      <Facet {...facet(title)} value={f[key].length ? String(f[key].length) : undefined}>
         {codes.map((code) => (
           <Check
             key={code}
@@ -606,25 +777,38 @@ function Filters({ data, vis, state, onState }: Props) {
   };
   const filtered = isFiltered(f);
   const [from, to] = vis.range;
-  return (
-    <>
-      <div className="map-panel__row">
-        <h2 className="map-panel__h">
-          {t.map.sections.filters}
-          {c.active > 0 && <span className="badge badge--accent map-badge">{c.active}</span>}
-        </h2>
-        {c.active > 0 && (
+  const fold = useContext(FoldContext);
+  const [openFacet, setOpenFacet] = useState<string | null>(null);
+  const facet = (title: string) => ({
+    title,
+    open: openFacet === title,
+    onOpen: (on: boolean) => setOpenFacet(on ? title : null),
+  });
+  const head = (
+    <FoldHead
+      k="filters"
+      extra={
+        c.active > 0 && (
           <button type="button" className="map-link-btn" onClick={() => onState({ filter: emptyFilter() })}>
             {t.map.reset}
           </button>
-        )}
-      </div>
+        )
+      }
+    >
+      {t.map.sections.filters}
+      {c.active > 0 && <span className="badge badge--accent map-badge">{c.active}</span>}
+    </FoldHead>
+  );
+  if (fold.closed("filters")) return head;
+  return (
+    <>
+      {head}
       <p className="map-shown">
         {filtered
           ? t.map.shownOf(c.shown.people, c.total.people, c.shown.works, c.total.works)
           : t.map.totals(c.total.people, c.total.works, c.total.links)}
       </p>
-      <Facet title={t.map.facets.time} value={f.from != null || f.to != null ? `${from}–${to}` : undefined}>
+      <Facet {...facet(t.map.facets.time)} value={f.from != null || f.to != null ? `${from}–${to}` : undefined}>
         <div className="map-range">
           <YearInput label={t.map.from} value={from} onCommit={(v) => set({ from: v <= (data.range ?? vis.range)[0] ? undefined : Math.min(v, to - 1) })} />
           <YearInput label={t.map.to} value={to} onCommit={(v) => set({ to: v >= (data.range ?? vis.range)[1] ? undefined : Math.max(v, from + 1) })} />
@@ -636,7 +820,7 @@ function Filters({ data, vis, state, onState }: Props) {
       {listFacet("roles", t.map.facets.role, t.onto.values.person_role, c.roles)}
       {listFacet("kinds", t.map.facets.kind, t.map.kinds, c.kinds)}
       {listFacet("ekinds", t.map.facets.events, t.onto.values.event_kind, c.ekinds)}
-      <Facet title={t.map.facets.links} value={f.verified ? t.map.verifiedShort : undefined}>
+      <Facet {...facet(t.map.facets.links)} value={f.verified ? t.map.verifiedShort : undefined}>
         <Check label={t.map.onlyVerified} count={c.verified} checked={f.verified} onChange={(on) => set({ verified: on })} />
         <p className="map-facet__hint">{t.map.verifiedHint}</p>
       </Facet>
@@ -651,7 +835,6 @@ export function Legend() {
   const L = t.map.legend;
   return (
     <>
-      <h2 className="map-panel__h">{t.map.sections.legend}</h2>
       <div className="map-legend">
         <span>
           <svg viewBox="0 0 34 12" aria-hidden="true">

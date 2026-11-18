@@ -405,7 +405,6 @@ export const en: Catalog = {
   map: {
     desk: {
       notes: "Notes on the desk",
-      reading: "Further reading:",
       quote: (text: string) => `“${text}”`,
       quoteSource: (a: string, b: string) => `${a} and ${b}, from the textbook`,
     },

@@ -551,22 +551,53 @@
 }
 
 /* ---------- панель ---------- */
-/* Высота панели — высота карты (contain: size не даёт панели растить строку сетки);
-   длинное содержимое прокручивается внутри панели, страница не прокручивается. */
+/* Высота панели — высота карты (contain: size не даёт панели растить строку сетки).
+   Прокрутки нет: разделы, которым не хватает места, складываются до заголовка (MapPanel,
+   useFit); окна фильтров выходят за левый край панели поверх карты, поэтому overflow открыт. */
 .map-panel {
+  position: relative;
   align-self: stretch;
   contain: size;
-  overflow-y: auto;
+  overflow: visible;
   padding: 0 0.125rem var(--space-2) 1.125rem;
   border-left: 1px solid var(--m-rule-soft);
   color: var(--m-ink-2);
   font: 400 0.78125rem/1.45 var(--font-ui);
-  scrollbar-width: thin;
 }
 
 .map-panel.is-collapsed {
   overflow: visible;
   padding-left: 0.375rem;
+}
+
+/* Плотный режим (MapPanel, useFit): кнопка сворачивания — в строке поиска, отступы меньше */
+.map-panel.is-tight .map-panel__bar {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  min-height: 0;
+  margin: 0;
+}
+
+.map-panel.is-tight .map-panel__title {
+  display: none;
+}
+
+.map-panel.is-tight .map-search {
+  margin-right: 2.125rem;
+}
+
+.map-panel.is-tight .map-panel__sec {
+  margin-top: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.map-panel.is-tight .map-facet summary {
+  min-height: 1.75rem;
+}
+
+.map-panel.is-tight .map-selected__actions {
+  margin-top: var(--space-2);
 }
 
 .map-panel__bar {
@@ -938,9 +969,62 @@
   font-weight: 600;
 }
 
-.map-facet__body {
-  padding-bottom: var(--space-2);
+.map-facet {
+  position: relative;
 }
+
+/* Окно значений фильтра: слева от панели, поверх карты (MapPanel, Facet). */
+.map-facet__body {
+  position: absolute;
+  top: -0.5rem;
+  right: calc(100% + 1.375rem);
+  z-index: 15;
+  width: 15rem;
+  padding: 0.625rem 0.875rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--m-ink-2) 30%, transparent);
+  border-radius: 0.3125rem;
+  background: var(--m-paper);
+  box-shadow: var(--shadow-pop);
+}
+
+.map-facet__title {
+  margin-bottom: 0.375rem;
+  color: var(--m-ink-3);
+  font: 600 0.625rem/0.875rem var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Заголовок складываемого раздела панели: кнопка дизайн-системы в виде подписи раздела */
+.pg-btn.map-fold {
+  gap: 0.375rem;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  white-space: normal;
+  text-align: left;
+}
+
+.pg-btn.map-fold:hover {
+  background: none;
+  color: var(--m-ink);
+}
+
+.pg-btn.map-fold:active {
+  transform: none;
+}
+
+.pg-btn.map-fold:focus-visible {
+  outline: 2px solid var(--m-focus);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
 
 .map-check {
   display: flex;
