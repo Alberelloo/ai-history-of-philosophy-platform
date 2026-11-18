@@ -54,9 +54,7 @@ def open_map(browser, site, path: str = "/graph", query: str = DENSE, **options)
     options.setdefault("viewport", {"width": 1920, "height": 1080})
     context = reader_context(browser, **options)
     page = context.new_page()
-    # Как в e2e (15 с): без GPU кадр со сценой стола (SVG-фильтры дерева и бумаги)
-    # рисуется секундами, и щелчок по карте на медленной машине CI подходит к 8 с.
-    page.set_default_timeout(15000)
+    page.set_default_timeout(8000)
     page.goto(f"{site.url}{path}{'?' + query if query else ''}")
     page.locator(".map-canvas, .map-empty").first.wait_for()
     settle(page)
@@ -394,6 +392,26 @@ def test_search_groups_hints_and_selects(browser, site):
             "без даты"
         )
         assert page.locator("[data-entity='u-innate']").count() == 0
+    finally:
+        context.close()
+
+
+@req(KG, "Фильтры и поиск карты")
+def test_search_hints_stay_open_after_quick_refocus(browser, site):
+    """Щелчок мимо поля и быстрый возврат к вводу: запоздавшее закрытие после ухода фокуса
+    не прячет новые подсказки (гонка, которую ловил CI)."""
+    context, page = open_map(browser, site)
+    try:
+        field = page.locator(".map-search input")
+        field.fill("крит")
+        expect(page.locator(".map-search__list")).to_be_visible()
+        page.evaluate(
+            """() => { const i = document.querySelector('.map-search input');
+                 i.blur(); i.focus(); i.value = ''; }"""
+        )
+        field.fill("Кант")
+        page.wait_for_timeout(400)  # дольше задержки закрытия (150 мс)
+        expect(page.locator(".map-search__row", has_text="Иммануил Кант")).to_be_visible()
     finally:
         context.close()
 

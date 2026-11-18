@@ -360,7 +360,13 @@ function SearchBox({
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          // Подсказки закрываются после ухода фокуса с запозданием (щелчок по подсказке успевает
+          // сработать). Если за это время читатель вернулся в поле, старый таймер список не трогает.
+          onBlur={() =>
+            setTimeout(() => {
+              if (document.activeElement !== inputRef.current) setOpen(false);
+            }, 150)
+          }
           onKeyDown={onKeyDown}
         />
         <kbd>/</kbd>
