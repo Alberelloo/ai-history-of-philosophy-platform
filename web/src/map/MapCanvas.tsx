@@ -134,7 +134,7 @@ export function MapCanvas(props: Props) {
             <button
               key={k}
               type="button"
-              className={on ? "map-lens" : "map-lens is-off"}
+              className={on ? "pg-btn pg-btn--ghost map-lens" : "pg-btn pg-btn--ghost map-lens is-off"}
               style={{ top: L.bands[k].top }}
               aria-pressed={on}
               aria-disabled={locked || undefined}

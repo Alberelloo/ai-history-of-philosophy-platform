@@ -152,12 +152,16 @@
   pointer-events: none;
 }
 
-.map-lens {
+/* Кнопка дизайн-системы (pg-btn) в виде подписи страты: правила с .pg-btn перекрывают
+   размеры и подсветку pg-btn--ghost, которые на бумаге листа не подходят. */
+.pg-btn.map-lens {
   position: absolute;
   left: 0;
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.4375rem;
+  height: auto;
   min-height: 1.375rem;
   margin-top: 0.1875rem;
   padding: 0.125rem 0.375rem 0.125rem 0.125rem;
@@ -172,22 +176,29 @@
   pointer-events: auto;
 }
 
-.map-lens:hover {
+.pg-btn.map-lens:hover:not([disabled]):not([aria-disabled="true"]) {
   background: color-mix(in srgb, var(--m-ink-2) 8%, transparent);
   color: var(--m-ink);
 }
 
-.map-lens:focus-visible {
+.pg-btn.map-lens:focus-visible {
   outline: 2px solid var(--m-focus);
   outline-offset: 1px;
+  box-shadow: none;
 }
 
-.map-lens.is-off {
+.pg-btn.map-lens.is-off {
   color: var(--m-ink-3);
 }
 
-.map-lens[aria-disabled="true"] {
+/* Последнюю развёрнутую страту свернуть нельзя: подпись остаётся читаемой. */
+.pg-btn.map-lens[aria-disabled="true"] {
+  opacity: 1;
   cursor: default;
+}
+
+.pg-btn.map-lens:active {
+  transform: none;
 }
 
 /* ---------- холст: общее ---------- */

@@ -259,7 +259,8 @@ def test_map_frames_16_9(browser, site, ids, theme):
             visual.settle(page)
             visual.assert_no_horizontal_scroll(page)
             visual.assert_no_overlap(page, [".sidebar", ".map-chart", ".map-panel"])
-            sheet = visual.computed(page, ".map-sheet", "backgroundColor")
+            # Бумагу рисует лист сцены стола (.desk-sheet), сама карта на нём прозрачна.
+            sheet = visual.computed(page, ".desk-sheet", "backgroundColor")
             assert min(sheet[:3]) > 180, sheet  # лист светлый в обеих темах
             snaps(page, f"map-{theme}-{width}x{height}")
         finally:

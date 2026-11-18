@@ -455,7 +455,8 @@ function Selected(props: Props) {
       {noLinks && !build.running && (
         <div className="map-selected__note">
           <p>{t.graph.empty}</p>
-          {!generation && (
+          {/* После попытки достроить ту же кнопку несёт уведомление ниже — одна кнопка, не две. */}
+          {!generation && build.extension !== "disabled" && (
             <button type="button" className="pg-btn pg-btn--secondary pg-btn--sm" onClick={props.onEnableGeneration}>
               {t.graph.enableExtension}
             </button>
