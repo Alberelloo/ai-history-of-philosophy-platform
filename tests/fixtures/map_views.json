@@ -1,0 +1,22 @@
+[
+  {
+    "note": "только служебная пометка: карта целиком",
+    "view": {"sel": null, "from": null, "to": null, "groups": [], "roles": [], "kinds": [], "ekinds": [], "verified": false, "lens": []},
+    "href": "/graph?via=assistant"
+  },
+  {
+    "note": "выбор в пути",
+    "view": {"sel": "kant", "from": null, "to": null, "groups": [], "roles": [], "kinds": [], "ekinds": [], "verified": false, "lens": []},
+    "href": "/graph/kant?via=assistant"
+  },
+  {
+    "note": "школа и годы",
+    "view": {"sel": null, "from": 1690, "to": 1800, "groups": ["g-emp"], "roles": [], "kinds": [], "ekinds": [], "verified": false, "lens": []},
+    "href": "/graph?from=1690&to=1800&groups=g-emp&via=assistant"
+  },
+  {
+    "note": "все поля: списки через запятую, страты в порядке сверху вниз",
+    "view": {"sel": "kant", "from": 1700, "to": 1810, "groups": ["g-emp", "g-rat"], "roles": ["philosopher", "scientist"], "kinds": ["work", "concept"], "ekinds": ["political"], "verified": true, "lens": ["works", "events"]},
+    "href": "/graph/kant?from=1700&to=1810&groups=g-emp,g-rat&roles=philosopher,scientist&kinds=work,concept&ekinds=political&verified=1&lens=events,works&via=assistant"
+  }
+]

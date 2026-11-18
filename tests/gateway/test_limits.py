@@ -59,6 +59,11 @@ class Upstreams:
             self.calls.append(("map", dict(request.query_params)))
             return {"people": []}
 
+        @app.post("/knowledge/v1/map/view")
+        async def map_view(request: Request):
+            self.calls.append(("map_view", await request.json()))
+            return {"href": "/graph?via=assistant"}
+
         @app.get("/library/api/v1/sources")
         def sources():
             return {"items": []}
@@ -84,6 +89,7 @@ def gw(tmp_path, clock):
             "graph": Quota(1, 5),
             "description": Quota(1, 5),
             "map": Quota(2, 5),
+            "map_view": Quota(2, 5),
         },
         trusted_proxy=True,
     )
@@ -179,6 +185,21 @@ def test_map_limited_without_page_token(gw):
     assert limited.json()["kind"] == "rate_limited" and int(limited.headers["Retry-After"]) >= 1
     assert gw.up.calls[0] == ("map", {"textbook": "s1"}) and gw.up.count("map") == 2
     assert script.get("/api/knowledge/v1/entities/e1/card").json() == {"id": "e1"}
+
+
+@req(AP, "Общий лимит частоты")
+def test_map_view_limited_without_page_token(gw):
+    """Проверка вида карты (assistant-map-view) модель не вызывает: без токена страницы,
+    но со своим счётчиком."""
+    script = TestClient(gw.app, headers={**UA, "X-Forwarded-For": "198.51.100.8"})
+    statuses = [
+        script.post("/api/knowledge/v1/map/view", json={"groups": ["e1"]}).status_code
+        for _ in range(3)
+    ]
+    assert statuses == [200, 200, 429]
+    limited = script.post("/api/knowledge/v1/map/view", json={})
+    assert limited.json()["kind"] == "rate_limited" and int(limited.headers["Retry-After"]) >= 1
+    assert gw.up.count("map_view") == 2
 
 
 @req(AP, "Общий лимит частоты")

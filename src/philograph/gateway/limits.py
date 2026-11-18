@@ -44,8 +44,10 @@ PAID: tuple[tuple[str, re.Pattern[str], str], ...] = (
     ("POST", re.compile(r"^/api/knowledge/v1/entities/[^/]+/description$"), "description"),
     # Карта раздела модель не вызывает, но читает всю область: счётчик без токена страницы.
     ("GET", re.compile(r"^/api/knowledge/v1/map$"), "map"),
+    # Проверка вида карты тоже читает всю область (assistant-map-view).
+    ("POST", re.compile(r"^/api/knowledge/v1/map/view$"), "map_view"),
 )
-WITHOUT_PAGE_TOKEN = frozenset({"map"})
+WITHOUT_PAGE_TOKEN = frozenset({"map", "map_view"})
 
 
 @dataclass(frozen=True)
@@ -70,6 +72,7 @@ class LimitSettings:
             "graph": Quota(30, 200),
             "description": Quota(60, 300),
             "map": Quota(300, 2000),
+            "map_view": Quota(300, 2000),
         }
     )
     token_ttl_seconds: int = 12 * 3600

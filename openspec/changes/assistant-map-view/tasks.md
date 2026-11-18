@@ -4,10 +4,10 @@
 
 ## 1. Сервер знаний: проверка вида
 
-- [ ] 1.1 `MapViews.normalize()` в `knowledge/map.py`: правила из `design.md`, порядок ослабления пустого вида, `dropped` с причинами, `shown`
-- [ ] 1.2 Адрес вида: тот же формат, что `writeState` клиента; общий набор пар «вид → адрес» в `tests/fixtures/map_views.json`, проверяется и Python, и браузерным тестом
-- [ ] 1.3 `POST /v1/map/view` в `knowledge/app.py`, лимит шлюза `map_view` (`gateway/limits.py`), события журнала
-- [ ] 1.4 Тесты `tests/knowledge/test_map_view.py` (требование «Проверка вида карты»)
+- [x] 1.1 `MapViews.normalize()` в `knowledge/map.py`: правила из `design.md`, порядок ослабления пустого вида, `dropped` с причинами, `shown`
+- [x] 1.2 Адрес вида: тот же формат, что `writeState` клиента; общий набор пар «вид → адрес» в `tests/fixtures/map_views.json`, проверяется и Python, и браузерным тестом
+- [x] 1.3 `POST /v1/map/view` в `knowledge/app.py`, лимит шлюза `map_view` (`gateway/limits.py`), события журнала
+- [x] 1.4 Тесты `tests/knowledge/test_map_view.py` (требование «Проверка вида карты»)
 
 ## 2. Ассистент: тип и цепочка «карта»
 
