@@ -68,6 +68,11 @@ QUALIFIERS = [
 
 INFLUENCE_ENDS = IDEAS + AGENTS + WORK
 
+# Значения-свойства из списка (названия — в web/src/i18n/ontology.{ru,en}.json, «values»).
+GROUP_KINDS = ["school", "direction", "institution", "circle"]
+PERSON_ROLES = ["philosopher", "scientist", "writer", "theologian", "ruler", "translator"]
+EVENT_KINDS = ["political", "scientific", "religious", "intellectual", "biographical"]
+
 
 def rel(
     code,
@@ -83,8 +88,12 @@ def rel(
     qualifiers=(),
     v0=True,
     value=None,
+    values=None,
+    single=False,
 ):
-    return {
+    """``value`` — вид значения: ``date`` (нечёткий интервал), ``text`` или ``enum`` (значение
+    из списка ``values``); ``single`` — у сущности одно значение, второе уходит на проверку."""
+    spec = {
         "code": code,
         "title": title,
         "inverse_title": inverse,
@@ -98,6 +107,11 @@ def rel(
         "qualifiers": list(qualifiers),
         "v0": v0,
     }
+    if values is not None:
+        spec["values"] = list(values)
+    if single:
+        spec["single"] = True
+    return spec
 
 
 GENESIS = ("genesis", "consequences")
@@ -450,10 +464,42 @@ RELATIONS = [
         "dating",
         "датировка",
         None,
-        WORK + EVENTS + ["idea_event"],
+        WORK + EVENTS + ["idea_event", "epoch"],
         [],
         value="date",
         families=("biography",),
+    ),
+    # значения из списка: фильтры карты раздела (направление, школа, роль, вид события)
+    rel(
+        "group_kind",
+        "вид группы",
+        None,
+        ["group"],
+        [],
+        value="enum",
+        values=GROUP_KINDS,
+        single=True,
+        families=("biography",),
+    ),
+    rel(
+        "person_role",
+        "роль",
+        None,
+        ["person"],
+        [],
+        value="enum",
+        values=PERSON_ROLES,
+        families=("biography",),
+    ),
+    rel(
+        "event_kind",
+        "вид события",
+        None,
+        EVENTS,
+        [],
+        value="enum",
+        values=EVENT_KINDS,
+        families=("context",),
     ),
     rel(
         "definition",

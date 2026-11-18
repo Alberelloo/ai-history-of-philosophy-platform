@@ -34,6 +34,19 @@ class RegistryError(Exception):
     pass
 
 
+def _recipe_spec(row: tuple) -> dict[str, Any]:
+    code, title, starts, families, direction, depth, order = row
+    return {
+        "code": code,
+        "title": title,
+        "start_types": starts,
+        "families": families,
+        "direction": direction,
+        "depth": depth,
+        "order": order,
+    }
+
+
 class OntologyRegistry:
     def __init__(self, engine: Engine, clock: Clock | None = None) -> None:
         self.engine = engine
@@ -48,6 +61,9 @@ class OntologyRegistry:
         with self.engine.begin() as conn:
             advisory_lock(conn, "philograph-ontology-registry")
             if conn.scalar(select(func.count()).select_from(t.entity_types)):
+                added = self._add_missing_defaults(conn)
+                if added:
+                    self._bump(actor, "дозагрузка реестра: " + ", ".join(added), conn)
                 return
             conn.execute(
                 t.entity_types.insert(),
@@ -68,23 +84,58 @@ class OntologyRegistry:
             )
             conn.execute(
                 t.recipes.insert(),
-                [
-                    {
-                        "code": c,
-                        "spec": {
-                            "code": c,
-                            "title": title,
-                            "start_types": starts,
-                            "families": families,
-                            "direction": direction,
-                            "depth": depth,
-                            "order": order,
-                        },
-                    }
-                    for c, title, starts, families, direction, depth, order in data.RECIPES
-                ],
+                [{"code": row[0], "spec": _recipe_spec(row)} for row in data.RECIPES],
             )
             self._bump(actor, "начальный реестр", conn)
+
+    @staticmethod
+    def _add_missing_defaults(conn: Connection) -> list[str]:
+        """Новые коды начального реестра в уже заполненной базе: недостающие типы, уточнители,
+        связи и рецепты дописываются; у существующих связей добавляются только новые типы
+        концов и значения списка (например, датировка эпохи). Изменённое оператором не
+        перезаписывается."""
+        added: list[str] = []
+        types = set(conn.scalars(select(t.entity_types.c.code)))
+        for c, title, parent in data.ENTITY_TYPES:
+            if c not in types:
+                conn.execute(t.entity_types.insert().values(code=c, title=title, parent=parent))
+                added.append(f"тип сущности {c}")
+        quals = set(conn.scalars(select(t.qualifiers.c.code)))
+        for c, title, kind, allowed in data.QUALIFIERS:
+            if c not in quals:
+                conn.execute(
+                    t.qualifiers.insert().values(
+                        code=c, title=title, value_kind=kind, allowed=allowed
+                    )
+                )
+                added.append(f"уточнитель {c}")
+        stored = {r.code: r.spec for r in conn.execute(select(t.relation_types))}
+        for spec in data.RELATIONS:
+            code = spec["code"]
+            if code not in stored:
+                conn.execute(t.relation_types.insert().values(code=code, spec=spec))
+                added.append(f"тип связи {code}")
+                continue
+            current = dict(stored[code])
+            changed = False
+            for key in ("subject_types", "object_types", "values"):
+                missing = [x for x in spec.get(key) or [] if x not in (current.get(key) or [])]
+                if missing:
+                    current[key] = [*(current.get(key) or []), *missing]
+                    changed = True
+            if changed:
+                conn.execute(
+                    update(t.relation_types)
+                    .where(t.relation_types.c.code == code)
+                    .values(spec=current)
+                )
+                added.append(f"концы и значения {code}")
+        recipes = set(conn.scalars(select(t.recipes.c.code)))
+        for row in data.RECIPES:
+            if row[0] not in recipes:
+                conn.execute(t.recipes.insert().values(code=row[0], spec=_recipe_spec(row)))
+                added.append(f"рецепт {row[0]}")
+        return added
 
     def _bump(self, actor: str, change: str, conn: Connection | None = None) -> int:
         if conn is None:

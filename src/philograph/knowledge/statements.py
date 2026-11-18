@@ -163,6 +163,11 @@ class Statements:
                 raise StatementError(f"у {type_} должно быть значение")
             if type_ == "definition" and not attributions:
                 raise StatementError("у определения обязательна атрибуция")
+            allowed = spec.get("values") or []
+            if spec["value_kind"] == "enum" and value not in allowed:
+                raise StatementError(
+                    f"значение {value!r} недопустимо для {type_}; допустимые: {', '.join(allowed)}"
+                )
         else:
             if obj is None:
                 raise StatementError(f"у {type_} должен быть объект")
@@ -262,6 +267,11 @@ class Statements:
         )
         for warning in self._integrity(subject, type_, obj):
             self._warn(statement_id, warning)
+        if self.registry.relation(type_).get("single") and any(
+            other["id"] != statement_id and other["type"] == type_ and other["status"] != "rejected"
+            for other in self._raw(subject, side="subject")
+        ):
+            self._warn(statement_id, "second_value")  # одно значение: какое верно — решит человек
         self._update_primary(subject, type_)
         return statement_id
 

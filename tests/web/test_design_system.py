@@ -156,10 +156,16 @@ def test_ontology_names_in_both_catalogs():
             expected["inverse"] = spec["inverse_title"]
         assert ru["relations"][code] == expected, code
 
+    # Значения из списка (вид группы, роль, вид события): названия каждого кода реестра.
+    enums = {c: spec["values"] for c, spec in relations.items() if spec["value_kind"] == "enum"}
+    assert {c: set(v) for c, v in ru["values"].items()} == {c: set(v) for c, v in enums.items()}
+    assert {c: set(v) for c, v in en["values"].items()} == {c: set(v) for c, v in enums.items()}
+
     cyrillic = re.compile("[а-яё]", re.IGNORECASE)
     for group in ("sections", "recipes", "relations"):
         assert set(en[group]) == set(ru[group]), group
     texts = [*en["sections"].values(), *en["recipes"].values()]
+    texts += [title for values in en["values"].values() for title in values.values()]
     for code, names in en["relations"].items():
         assert set(names) == set(ru["relations"][code]), code  # inverse там же, где в реестре
         texts += names.values()

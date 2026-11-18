@@ -340,3 +340,74 @@ def test_old_lifespan_records_migrated(onto):
     assert stored.key == onto.statements._key(
         kant, "lifespan", None, stored.value, stored.qualifiers
     )
+
+
+@req(OR, "Типы сущностей в реестре")
+def test_epoch_dating(onto):
+    """Датировка эпохи: нечёткий интервал от начала до конца, копия — в карточке эпохи."""
+    enlightenment = onto.thing("epoch", "Просвещение", "1680–1800")
+    dates = onto.entities.get(enlightenment)["primary"]["dates"]
+    assert (dates["earliest_start"], dates["latest_end"]) == (1680, 1800)
+    kinds = {r["value_kind"] for r in onto.registry._load()["relations"].values()}
+    assert {"date", "text", "enum"} <= kinds
+
+
+@req(OR, "Виды групп, роли персон и виды событий")
+def test_enum_values(onto, events):
+    empiricism = onto.thing("group", "Эмпиризм")
+    st = onto.statements.add(
+        empiricism, "group_kind", value="direction", attributions=[Attribution("common")]
+    )
+    assert onto.statements.get(st)["value"] == "direction"
+    encyclopedia = onto.thing("event", "Энциклопедия", "1751")
+    with pytest.raises(StatementError) as refused:
+        onto.statements.add(
+            encyclopedia, "event_kind", value="culinary", attributions=[Attribution("common")]
+        )
+    assert "political" in str(refused.value) and "biographical" in str(refused.value)
+    assert events.where("knowledge.statement.refused", type="event_kind")
+    # Идейное событие — подтип события: вид события допустим и для него.
+    onto.statements.add(
+        onto.thing("idea_event", "Спор о врождённых идеях"),
+        "event_kind",
+        value="intellectual",
+        attributions=[Attribution("common")],
+    )
+    # Ролей у персоны несколько, вид группы — одно значение: второе уходит на проверку.
+    leibniz = onto.person("Лейбниц", "1646", "1716")
+    for role in ("philosopher", "scientist"):
+        onto.statements.add(
+            leibniz, "person_role", value=role, attributions=[Attribution("common")]
+        )
+    roles = {s["value"] for s in onto.statements.about(leibniz, types=["person_role"])}
+    assert roles == {"philosopher", "scientist"}
+    second = onto.statements.add(
+        empiricism, "group_kind", value="school", attributions=[Attribution("common")]
+    )
+    assert onto.statements.get(second)["warnings"] == ["second_value"]
+    with pytest.raises(StatementError):
+        onto.statements.add(leibniz, "group_kind", value="school")  # не тот тип субъекта
+
+
+@req(OR, "Виды групп, роли персон и виды событий")
+def test_new_codes_loaded_into_existing_registry(onto):
+    """База с реестром до карты раздела: при старте дописываются новые коды и датировка эпохи."""
+    from sqlalchemy import select, update
+
+    from philograph.knowledge import schema
+
+    engine = onto.registry.engine
+    rt = schema.relation_types
+    with engine.begin() as conn:
+        conn.execute(rt.delete().where(rt.c.code.in_(["group_kind", "person_role", "event_kind"])))
+        dating = conn.execute(select(rt.c.spec).where(rt.c.code == "dating")).scalar_one()
+        old = {**dating, "subject_types": [x for x in dating["subject_types"] if x != "epoch"]}
+        conn.execute(update(rt).where(rt.c.code == "dating").values(spec=old))
+    onto.registry._cache = None
+    before = onto.registry.version()
+    onto.registry.load_defaults()
+    assert onto.registry.version() == before + 1
+    assert onto.registry.relation("person_role")["values"][0] == "philosopher"
+    assert "epoch" in onto.registry.relation("dating")["subject_types"]
+    onto.registry.load_defaults()
+    assert onto.registry.version() == before + 1  # повторный старт ничего не меняет
