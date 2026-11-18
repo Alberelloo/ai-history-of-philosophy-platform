@@ -68,6 +68,7 @@ type Step = Fold | "tight";
 // Что уступает место первым: плотный режим (заголовок панели в строке поиска, меньше
 // отступы), затем разделы. Раскрываются обратно в обратном порядке.
 const FOLD_ORDER: Step[] = ["tight", "legend", "filters", "selected"];
+const REOPEN_MARGIN = 16; // px свободного места сверх освобождённого, чтобы раскрыть обратно
 
 type FoldApi = { closed: (k: Fold) => boolean; toggle: (k: Fold) => void };
 const FoldContext = createContext<FoldApi>({ closed: () => false, toggle: () => {} });
@@ -120,9 +121,11 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
     const p = panel.current;
     const b = body.current;
     if (!active || !p || !b) return;
+    // Считаем по экранным прямоугольникам: у тела панели точка отсчёта offsetTop — сама панель.
     const style = getComputedStyle(p);
+    const top = p.getBoundingClientRect().top + p.clientTop + parseFloat(style.paddingTop);
     const avail = p.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-    const need = b.offsetTop - p.offsetTop - parseFloat(style.paddingTop) + b.offsetHeight;
+    const need = b.getBoundingClientRect().bottom - top;
     if (pending.current) {
       freed.current.set(pending.current.k, Math.max(1, pending.current.before - need));
       pending.current = null;
@@ -135,8 +138,11 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
       setClosed(new Set([...closed, victim]));
       return;
     }
+    // Раскрываем обратно с запасом (без качелей у границы) и не под открытым списком поиска:
+    // иначе поле и подсказки сдвигаются под рукой читателя.
+    if (b.querySelector(".map-search__list")) return;
     const back = [...FOLD_ORDER].reverse().find((k) => closed.has(k) && freed.current.has(k) && !(k !== "tight" && byUser.current.has(k)));
-    if (back && avail - need >= freed.current.get(back)!) {
+    if (back && avail - need >= freed.current.get(back)! + REOPEN_MARGIN) {
       freed.current.delete(back);
       setClosed(new Set([...closed].filter((x) => x !== back)));
     }
@@ -542,7 +548,8 @@ function Selected(props: Props) {
         <span>{t.map.era(rel.era.label)}</span>
       </li>,
     );
-  if (rel.links.some((x) => x.link.generated))
+  // Подпись пунктира — только при включённой достройке: без неё читатель о модели не спрашивал.
+  if (generation && rel.links.some((x) => x.link.generated))
     items.push(
       <li key="unv">
         <i className="k k-unv" aria-hidden="true" />

@@ -610,6 +610,25 @@ def test_people_ordered_by_time(browser, site):
 
 
 @req(KG, "Пометка достроенного")
+def test_dashed_note_hidden_without_generation(browser, site):
+    """Подпись пунктира в «Выбрано» — только при включённой достройке моделью."""
+    context, page = open_map(browser, site, "/graph/kant")
+    try:
+        selected = page.locator(".map-selected")
+        switch = page.locator(".map-head").get_by_label("Достраивать моделью")
+        if not switch.is_checked():
+            switch.check()
+        expect(selected).to_contain_text("Пунктир")
+        switch.uncheck()
+        expect(selected).not_to_contain_text("Пунктир")
+        expect(selected).to_contain_text("Иммануил Кант")
+        switch.check()
+        expect(selected).to_contain_text("Пунктир")
+    finally:
+        context.close()
+
+
+@req(KG, "Пометка достроенного")
 def test_generated_link_dashed_in_details_legend_and_export(browser, site):
     context, page = open_map(browser, site, "/graph/kant", accept_downloads=True)
     try:
@@ -881,50 +900,21 @@ def test_map_labels_do_not_overlap(browser, site, size, selection):
         context.close()
 
 
-QUOTE_ROWS = [
-    {
-        "type": "influenced_by",
-        "subject": "kant",
-        "object": "hume",
-        "evidence": [{"quote": "Юм пробудил меня от догматического сна", "lost": False}],
-    }
-]
-
-
-@req(VD, "Шрифты")
-def test_desk_notes_in_bad_script_from_same_origin(browser, site):
-    """Записка с цитатой связи выбранного набрана Bad Script с самого сайта; списка
-    «К чтению» на столе нет (снят по правке владельца)."""
-    hume = {
-        "id": "hume",
-        "label": "Дэвид Юм",
-        "short": "Юм",
-        "birth": 1711,
-        "death": 1776,
-        "precision": "year",
-        "roles": ["philosopher"],
-        "weight": 4,
-    }
-    data = kant_alone()
-    data["people"].append(hume)
-    context = reader_context(browser, viewport={"width": 1920, "height": 1080})
-    page = context.new_page()
-    fonts: list[str] = []
+@req(VD, "Сцена карты")
+@pytest.mark.parametrize("width,height", [(1920, 1080), (1366, 768), (1024, 576)])
+def test_no_desk_notes_and_no_page_scroll(browser, site, width, height):
+    """Под листом ничего нет (записки сняты правкой владельца): карта с выбранным Кантом
+    помещается в окно, страница не прокручивается ни вниз, ни вбок."""
+    context, page = open_map(
+        browser, site, "/graph/kant", viewport={"width": width, "height": height}
+    )
     try:
-        page.route(MAP_API, lambda route: route.fulfill(json=data))
-        page.route("**/entities/kant/statements*", lambda route: route.fulfill(json=QUOTE_ROWS))
-        page.on("request", lambda r: fonts.append(r.url) if r.resource_type == "font" else None)
-        page.goto(f"{site.url}/graph/kant")
-        page.locator(".map-canvas").wait_for()
-        note = page.locator(".desk-note-quote")
-        expect(note).to_contain_text("догматического сна")
-        settle(page)
+        assert page.locator(".desk-notes, .desk-note").count() == 0
         assert page.get_by_text("К чтению").count() == 0
-        family = note.evaluate("e => getComputedStyle(e).fontFamily")
-        assert family.split(",")[0].strip("\"' ") == "Bad Script", family
-        assert "Bad Script" in visual.loaded_families(page)
-        assert fonts and all(url.startswith(site.url) for url in fonts), fonts
-        assert not any("fonts.googleapis.com" in url or "gstatic" in url for url in fonts)
+        assert page.evaluate("document.documentElement.scrollHeight") <= height
+        visual.assert_no_horizontal_scroll(page)
+        sheet = page.locator(".desk-sheet").bounding_box()
+        assert sheet["y"] + sheet["height"] <= height
     finally:
         context.close()
 

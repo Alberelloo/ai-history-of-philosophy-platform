@@ -30,15 +30,13 @@ type Props = {
   theme?: "light" | "dark";
   /** Узкий десктоп: без предметов, лист на всю рабочую область. По умолчанию — по ширине окна. */
   compact?: boolean;
-  /** Без анимации света и появления записок. По умолчанию — системная настройка. */
+  /** Без анимации света. По умолчанию — системная настройка. */
   reducedMotion?: boolean;
-  /** Записки на столе под листом (DeskNotes). */
-  notes?: ReactNode;
   /** Лист: шапка, карта и панель. */
   children: ReactNode;
 };
 
-export function DeskScene({ theme, compact, reducedMotion, notes, children }: Props) {
+export function DeskScene({ theme, compact, reducedMotion, children }: Props) {
   const narrow = useMedia(COMPACT_MEDIA);
   const systemReduced = useMedia(REDUCED_MOTION_MEDIA);
   const isCompact = compact ?? narrow;
@@ -54,7 +52,7 @@ export function DeskScene({ theme, compact, reducedMotion, notes, children }: Pr
       <svg className="desk-wood" aria-hidden="true" preserveAspectRatio="none">
         <rect width="100%" height="100%" fill={tok("desk-wood")} filter={url(F.wood)} />
       </svg>
-      {/* свет и виньетка: над столом и предметами, под листом и записками */}
+      {/* свет и виньетка: над столом и предметами, под листом */}
       <div className="desk-light" aria-hidden="true" />
       <div className="desk-stage">
         {/* рамка = прямоугольник листа; предметы привязаны к её краям снаружи */}
@@ -80,7 +78,6 @@ export function DeskScene({ theme, compact, reducedMotion, notes, children }: Pr
             <div className="desk-sheet-body">{children}</div>
           </div>
         </div>
-        {notes && <div className="desk-notes-row">{notes}</div>}
       </div>
     </div>
   );

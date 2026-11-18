@@ -403,11 +403,6 @@ export const en: Catalog = {
     },
   },
   map: {
-    desk: {
-      notes: "Notes on the desk",
-      quote: (text: string) => `“${text}”`,
-      quoteSource: (a: string, b: string) => `${a} and ${b}, from the textbook`,
-    },
     title: "Section map",
     eyebrow: "Synchronological map",
     truncated: (limit: number) =>

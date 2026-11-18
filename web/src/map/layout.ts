@@ -407,7 +407,8 @@ export function layout(input: LayoutInput): MapLayout {
   const LANES = Math.max(1, packed.lanes);
   const laneMin = dense ? 27 : 56;
   const peopleNeed = 30 + LANES * laneMin;
-  const peopleMin = on("people") ? 30 + laneMin * Math.min(LANES, 3) : COLL;
+  // В низком кадре (окно 1024×576) людям хватает двух видимых дорожек — остальные прокручиваются.
+  const peopleMin = on("people") ? 30 + laneMin * Math.min(LANES, body < 320 ? 2 : 3) : COLL;
 
   // доли: события — до 20% высоты, труды — до 38%; если люди свёрнуты, труды берут остаток
   const erasH = on("eras") ? ERA_H : COLL;

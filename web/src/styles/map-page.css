@@ -596,6 +596,27 @@
   min-height: 1.75rem;
 }
 
+/* Фильтры в плотном режиме — названия в две колонки; окно значений привязано к разделу
+   и выходит слева от панели, а не от правой колонки. */
+.map-panel.is-tight [data-section="filters"] {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 1rem;
+}
+
+.map-panel.is-tight [data-section="filters"] > :not(.map-facet) {
+  grid-column: 1 / -1;
+}
+
+.map-panel.is-tight [data-section="filters"] .map-facet {
+  position: static;
+}
+
+.map-panel.is-tight [data-section="filters"] .map-facet__body {
+  top: var(--space-2);
+}
+
 .map-panel.is-tight .map-selected__actions {
   margin-top: var(--space-2);
 }
