@@ -20,40 +20,6 @@ export type GEdge = {
   in_textbook: boolean | null;
 };
 
-type RawAttribution = { who?: string | null; who_kind?: string; stance?: string; place?: string | null; hidden?: boolean };
-type RawEvidence = { paragraph_id?: string; quote?: string; lost?: boolean };
-
-// Утверждение из GET /entities/{id}/statements (сырой вид) → ребро в форме потока /graph/build.
-// Имя атрибуции: персона карты — её имя, иначе код из ответа (сырой маршрут подписей не даёт).
-export function edgeFromStatement(raw: Record<string, unknown>, labelOf: (id: string) => string | undefined): GEdge {
-  const attributions = ((raw.attributions as RawAttribution[] | undefined) ?? [])
-    .filter((a) => !a.hidden)
-    .map((a) => ({
-      who: (a.who && labelOf(a.who)) || a.who || "?",
-      kind: a.who_kind,
-      stance: a.stance ?? "asserts",
-      place: a.place ?? null,
-    }));
-  const evidence = ((raw.evidence as RawEvidence[] | undefined) ?? [])
-    .filter((e) => !e.lost && e.paragraph_id)
-    .map((e) => ({ paragraph_id: e.paragraph_id!, quote: e.quote ?? "", link: `/p/${e.paragraph_id}` }));
-  const status = String(raw.status ?? "sourced");
-  return {
-    id: String(raw.id),
-    subject: String(raw.subject),
-    object: String(raw.object),
-    type: String(raw.type),
-    title: String(raw.type),
-    status,
-    generated: status === "generated",
-    consensus: String(raw.consensus ?? ""),
-    qualifiers: (raw.qualifiers as Record<string, unknown> | null) ?? {},
-    attributions,
-    evidence,
-    in_textbook: (raw.in_textbook as boolean | null | undefined) ?? null,
-  };
-}
-
 export function LinkDetails({
   edge,
   label,

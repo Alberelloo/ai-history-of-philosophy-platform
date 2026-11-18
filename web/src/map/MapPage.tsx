@@ -8,7 +8,7 @@ import { DeskNotes, type DeskQuote, type DeskReading } from "./DeskNotes";
 import { DeskScene } from "./DeskScene";
 import { downloadSvg } from "./exportSvg";
 import { DENSE_MAP } from "./fixture";
-import { edgeFromStatement, type GEdge } from "./LinkDetails";
+import type { GEdge } from "./LinkDetails";
 import { MapCanvas } from "./MapCanvas";
 import { idleBuild, MapPanel, type BuildState, type LinkView } from "./MapPanel";
 import { canvasMeasure, loadMapFonts } from "./measure";
@@ -76,6 +76,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const [fontsVersion, setFontsVersion] = useState(0);
   const chart = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: MIN_HEIGHT });
+  const widths = useRef<number[]>([]);
   const exportRef = useRef<(() => string | null) | null>(null);
 
   // Переход по ссылке /graph/<id> на уже открытой карте (из карточки) — выбор этой сущности.
@@ -188,11 +189,19 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const rect = el.getBoundingClientRect();
     const width = Math.round(rect.width);
     const height = Math.max(MIN_HEIGHT, Math.floor(window.innerHeight - (rect.top + window.scrollY) - OVERVIEW_HEIGHT - BOTTOM_GAP));
-    setSize((s) => (s.width === width && s.height === height ? s : { width, height }));
+    // Защита от качелей: ширина карты меняет высоту страницы, высота — полосу прокрутки,
+    // полоса — снова ширину. Возврат к ширине позапрошлого замера не принимаем.
+    const prev = widths.current;
+    if (prev.length === 2 && width === prev[0] && width !== prev[1]) return;
+    setSize((s) => {
+      if (s.width === width && s.height === height) return s;
+      if (s.width !== width) widths.current = [s.width, width];
+      return { width, height };
+    });
   }, []);
   useLayoutEffect(() => {
     remeasure();
-  });
+  }, [remeasure, load.status, panelCollapsed]);
   useEffect(() => {
     const el = chart.current;
     if (!el) return;
@@ -231,7 +240,6 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
       if (!l) return;
       const known = edges.current.get(id);
       if (known) return setLink({ id, edge: known, status: "ready" });
-      const ix = index(data).people;
       // Без сервиса (набор ?fixture) — то, что есть в ответе карты: тип и статус, без атрибуций.
       const fallback: GEdge = {
         id,
@@ -249,16 +257,17 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
       };
       if (fixture) return setLink({ id, edge: fallback, status: "ready" });
       setLink({ id, edge: null, status: "loading" });
-      fetch(`${KNOWLEDGE_API}/entities/${encodeURIComponent(l.subject)}/statements?family=genesis`)
-        .then((r) => (r.ok ? r.json() : []))
-        .then((rows: Record<string, unknown>[]) => {
-          const raw = rows.find((r) => r.id === id);
-          const edge = raw ? { ...edgeFromStatement(raw, (x) => ix.get(x)?.label), in_textbook: l.in_textbook } : fallback;
+      // Связь в виде ребра графа: подписи атрибуций и закрытые по региону источники — на сервере.
+      const q = textbook ? `?textbook=${encodeURIComponent(textbook)}` : "";
+      fetch(`${KNOWLEDGE_API}/graph/edges/${encodeURIComponent(id)}${q}`)
+        .then((r) => (r.ok ? (r.json() as Promise<GEdge>) : null))
+        .then((got) => {
+          const edge = got ?? fallback;
           setLink((cur) => (cur?.id === id ? { id, edge, status: "ready" } : cur));
         })
         .catch(() => setLink((cur) => (cur?.id === id ? { id, edge: fallback, status: "ready" } : cur)));
     },
-    [data, fixture],
+    [data, fixture, textbook],
   );
 
   // «Достроить связи»: прежний поток /graph/build по рецепту, подходящему типу выбранного.

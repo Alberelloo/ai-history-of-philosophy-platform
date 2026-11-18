@@ -668,6 +668,7 @@
 
 .map-search__field kbd {
   padding: 0 0.3125rem;
+  color: var(--m-ink-2);
   border: 1px solid color-mix(in srgb, var(--m-ink-2) 30%, transparent);
   border-radius: 0.1875rem;
   font: 500 0.6875rem var(--font-ui);
@@ -1024,4 +1025,10 @@
   .map-sheet {
     padding: var(--space-3) var(--space-4) var(--space-2);
   }
+}
+
+/* Полоса прокрутки не появляется и не исчезает при смене высоты карты: иначе ширина
+   карты качается вместе с ней (сворачивание панели). */
+html:has(.map-page) {
+  scrollbar-gutter: stable;
 }
