@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+import sys
+import warnings
 from datetime import timedelta
 from pathlib import Path
 
@@ -187,3 +189,17 @@ def test_every_catalog_event_is_emitted_somewhere():
         name for name in ev.catalog() if not name.startswith("test.") and name not in emitted
     )
     assert unused == [], f"события каталога, которые никто не пишет: {unused}"
+
+    # Отчёт, пока не падение: события, которых не называет ни один тест с проверкой журнала.
+    # Каталог — по исходникам (define), чтобы не зависеть от того, какие модули уже загружены.
+    sys.path.insert(0, str(SRC.parents[1] / "scripts"))
+    import check_traceability as tr
+
+    names = tr.catalog_events() | {n for n in ev.catalog() if not n.startswith("test.")}
+    unchecked = tr.unchecked_events(names)
+    if unchecked:
+        warnings.warn(
+            f"события каталога без проверки в тестах ({len(unchecked)} из {len(names)}): "
+            + ", ".join(unchecked),
+            stacklevel=1,
+        )

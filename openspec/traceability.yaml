@@ -38,3 +38,12 @@ enforce:
   - source-catalog
   - regional-access
   - entity-portraits
+
+# Возможности, где CI требует тест на каждый сценарий (маркер req(..., scenario="<заголовок>")).
+# Пока пусто — режим отчёта: `python scripts/check_traceability.py --report` перечисляет
+# непокрытые сценарии. Возможность добавляется, когда тестировщик расставил маркеры.
+enforce_scenarios: []
+
+# Возможности, где у каждого требования должен быть тест с проверкой журнала (events, wait_logs,
+# caplog) или маркер с nolog="<причина>". Пока пусто — режим отчёта.
+enforce_log: []
