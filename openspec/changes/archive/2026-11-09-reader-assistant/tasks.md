@@ -41,4 +41,4 @@
 ## 5. Тесты и проверка
 
 - [x] 5.1 Тесты критерия (поток A, `tests/web/test_assistant_dialogs.py`): T21, T22, T23, T24 (коды и тайм-аут по часам Playwright), T25, T38, T39, T40, T48 — зелёные. Осталось: T17 полностью (Alt+Q после подключения хука; выделение через два абзаца), T18–T20, T35. Прежняя запись: T17–T27, T35, T38–T40, T44, T48. Есть частично (одним-двумя тестами каждый): T17, T18, T19, T20, T24 (серверная часть), T26, T27, T44, T47 (частично). Нет: T21, T22, T23, T25, T35 для ассистента, T38, T39, T40 в полном виде, T48. Подробно — `docs/process/reader-handoff.md`
-- [ ] 5.2 Итоговый прогон и снимки S6–S10, S12 и стадий в обеих темах и языках: сценарии есть в `tests/e2e/test_reader_snapshots.py` (`test_s7_stages`, `test_answer_states`, `test_s10_s12`, `test_strip`, `test_sessions_panel`), эталоны и просмотр — за интегратором
+- [x] 5.2 Итоговый прогон и снимки S6–S10, S12 и стадий в обеих темах и языках: сценарии есть в `tests/e2e/test_reader_snapshots.py` (`test_s7_stages`, `test_answer_states`, `test_s10_s12`, `test_strip`, `test_sessions_panel`), эталоны и просмотр — за интегратором → перенесено в `quality-followups` п. 1.6

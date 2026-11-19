@@ -406,3 +406,12 @@
   следующей сверки `reconcile`. Теперь событие несёт действующие регионы (как путь синхронизации
   каталога `_share_kind_access`); тест `test_access_changed_carries_effective_regions`,
   кейсы TC-38/EC-33.
+
+## 2026-11-19 — отметка 8.7 (уборка OpenSpec)
+
+Задача 8.7 была сделана, а отметка в `tasks.md` осталась пустой. Доказательства:
+- PR #39 «feat(regional-access): ограничение показа источников по региону» слит 2026-11-13, коммит `f5f0766`;
+- в нём же изменение перенесено в `openspec/changes/archive/2026-11-13-ru-only-sources/`, дельты влиты в `openspec/specs/` (`regional-access`, `source-registry`, `source-library`, `chapter-reading`, `paragraph-search`);
+- проверки CI на PR зелёные: `checks` (ruff check и format, полный `pytest -q`) и `e2e` (`gh pr view 39 --json statusCheckRollup`).
+
+Не выполнено: `openspec validate ru-only-sources`. CLI `openspec` нет ни в сессиях, ни в CI, архив сделан вручную. Аудит 2026-11-19 (раздел 3) сверил заголовки требований архивных дельт с `openspec/specs/` и расхождений не нашёл.

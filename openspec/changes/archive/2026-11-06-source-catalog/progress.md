@@ -49,3 +49,10 @@
 
 - `PYTHONPATH=src ../ai-history-of-philosophy-platform/.venv/Scripts/python -m pytest tests/library/catalog -q`
 - `... -m philograph.library.catalog validate`
+
+## 2026-11-19 — отметка 5.3 (уборка OpenSpec)
+
+Задача 5.3 была сделана, а отметка в `tasks.md` осталась пустой. Доказательства:
+- PR #26 «feat: каталог источников и загрузка по ссылкам» слит 2026-11-06, коммит `5941efa`;
+- в нём же изменение перенесено в `openspec/changes/archive/2026-11-06-source-catalog/`, дельта влита в `openspec/specs/source-catalog/spec.md`;
+- проверки CI на PR зелёные: `checks` (ruff check и format, lint-imports, прослеживаемость, полный `pytest -q` на SQLite и `-m "not e2e"` на PostgreSQL) и `e2e` (`gh pr view 26 --json statusCheckRollup`).
