@@ -13,3 +13,4 @@
 | [process/git-workflow.md](process/git-workflow.md) | Ветки, PR, CI и автослияние |
 | [process/openspec-workflow.md](process/openspec-workflow.md) | Работа по OpenSpec: структура `openspec/`, цикл изменения, формат спецификации |
 | [process/reader-handoff.md](process/reader-handoff.md) | Экран чтения: состояние этапов 1–6, нужное от сервера, тесты T1–T48, запуск, процесс и порядок продолжения |
+| [audit/2026-11-19-system-audit.md](audit/2026-11-19-system-audit.md) | Аудит системы и каркаса работы: техдолг, ADR, статусы, покрытие тестами, скиллы и принципы, открытые изменения, план |
