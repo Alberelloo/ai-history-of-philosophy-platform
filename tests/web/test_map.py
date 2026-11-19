@@ -806,7 +806,7 @@ def _luminance(rgb: list[float]) -> float:
     return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2])
 
 
-@req(VD, "Сцена карты")
+@req(VD, "Сцена карты", scenario="Вечер", nolog="оформление: проверка по DOM, события журнала нет")
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_sheet_stays_light_and_readable(browser, site, theme):
     context, page = open_map(browser, site, "/graph/kant", color_scheme=theme)
@@ -821,7 +821,12 @@ def test_sheet_stays_light_and_readable(browser, site, theme):
         context.close()
 
 
-@req(VD, "Сцена карты")
+@req(
+    VD,
+    "Сцена карты",
+    scenario="Узкий десктоп",
+    nolog="оформление: проверка по DOM, события журнала нет",
+)
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_narrow_desktop_hides_desk_props(browser, site, theme):
     context, page = open_map(
@@ -905,7 +910,12 @@ def label_clashes(page) -> list[str]:
     return clashes
 
 
-@req(VD, "Раскладка без наложений")
+@req(
+    VD,
+    "Раскладка без наложений",
+    scenario="Подписи карты",
+    nolog="оформление: проверка по DOM, события журнала нет",
+)
 @pytest.mark.parametrize("size", [(1280, 720), (1920, 1080)], ids=["1280", "1920"])
 @pytest.mark.parametrize("selection", ["/graph", "/graph/kant"], ids=["none", "kant"])
 def test_map_labels_do_not_overlap(browser, site, size, selection):
@@ -920,7 +930,12 @@ def test_map_labels_do_not_overlap(browser, site, size, selection):
         context.close()
 
 
-@req(VD, "Сцена карты")
+@req(
+    VD,
+    "Сцена карты",
+    scenario="Без прокрутки вниз",
+    nolog="оформление: проверка по DOM, события журнала нет",
+)
 @pytest.mark.parametrize("width,height", [(1920, 1080), (1366, 768), (1024, 576)])
 def test_no_desk_notes_and_no_page_scroll(browser, site, width, height):
     """Под листом ничего нет (записки сняты правкой владельца): карта с выбранным Кантом
@@ -950,7 +965,12 @@ def test_fixture_matches_expectations():
     assert json.dumps("g-emp") in source
 
 
-@req(VD, "Разделы в разработке")
+@req(
+    VD,
+    "Разделы в разработке",
+    invariant="старый адрес заглушки заменяется адресом раздела",
+    nolog="оформление: проверка по DOM, события журнала нет",
+)
 def test_soon_graph_bookmark_leads_to_map(browser, site):
     """Заглушка «Граф» снята: пункт без «скоро» ведёт на /graph, старая закладка — на карту."""
     context, page = open_map(browser, site)

@@ -83,7 +83,12 @@ def published(config: dict) -> dict[str, list[int]]:
     }
 
 
-@req(DP, "Публичный адрес по HTTPS")
+@req(
+    DP,
+    "Публичный адрес по HTTPS",
+    scenario="HTTP",
+    nolog="конфигурация Caddy и compose: событий журнала у неё нет по природе",
+)
 def test_https_only_with_automatic_certificate(prod_config):
     caddy = prod_config["services"]["caddy"]
     assert caddy["environment"]["PHILOGRAPH_DOMAIN"] == "philograph.example.org"
@@ -99,7 +104,12 @@ def test_https_only_with_automatic_certificate(prod_config):
         assert page.status_code == 200 and '<div id="root">' in page.text
 
 
-@req(DP, "Внутренние части не видны снаружи")
+@req(
+    DP,
+    "Внутренние части не видны снаружи",
+    scenario="Порт базы",
+    nolog="конфигурация опубликованных портов: событий журнала у неё нет по природе",
+)
 def test_only_http_and_https_published(prod_config):
     assert published(prod_config) == {"caddy": [80, 443]}
     # Внутренние адреса и метрики не видны и через шлюз.
@@ -175,7 +185,7 @@ def stack_compose() -> list[str] | None:
     return [docker, "compose", *files.split()] if files and docker else None
 
 
-@req(DP, "Автоматический перезапуск")
+@req(DP, "Автоматический перезапуск", scenario="Падение")
 def test_restart_policy_and_restart_event(prod_config, tmp_path, events):
     long_running = {
         n: s for n, s in prod_config["services"].items() if n not in ("migrate", "seed")
@@ -235,7 +245,7 @@ class Recorder:
         return [next(a for a in ("build", "run", "up") if a in c) for c, _ in self.commands]
 
 
-@req(DP, "Обновление с миграциями")
+@req(DP, "Обновление с миграциями", scenario="Неудачная миграция")
 def test_update_applies_migrations_first(tmp_path, database_url, events):
     state = tmp_path / "state.json"
     deploy.write_state({"current": "1.4.0", "previous": "1.3.0"}, state)
@@ -255,7 +265,12 @@ def test_update_applies_migrations_first(tmp_path, database_url, events):
     assert events.of("ops.migrations.applied")
 
 
-@req(DP, "Откат обновления")
+@req(
+    DP,
+    "Откат обновления",
+    scenario="Откат",
+    nolog="сценарий развёртывания событий не пишет: проверяются состояние и команды",
+)
 def test_rollback_one_command_and_additive_migrations(tmp_path):
     state = tmp_path / "state.json"
     deploy.write_state({"current": "1.5.0", "previous": "1.4.0"}, state)
@@ -275,7 +290,7 @@ def test_rollback_one_command_and_additive_migrations(tmp_path):
             )
 
 
-@req(DP, "Версия в журнале")
+@req(DP, "Версия в журнале", scenario="Версия")
 def test_version_at_start_and_in_health(events):
     app = create_app("search", "1.5.0", Health("search", "1.5.0"))
     with TestClient(app) as client:

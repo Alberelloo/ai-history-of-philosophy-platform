@@ -25,6 +25,8 @@ from ..assistant.browser import (
     new_session,
     open_assistant,
     panel,
+    scroll_settled,
+    settle,
     stored,
 )
 from ..helpers import reader_context
@@ -367,7 +369,7 @@ def test_t24_messages_by_code(wide, site):
             assert box.get_by_role("button", name="Спросить").get_attribute("aria-disabled")
             box.get_by_label("Вопрос ассистенту").fill("ещё вопрос")
             box.get_by_label("Вопрос ассистенту").press("Enter")
-            page.wait_for_timeout(200)
+            settle(page)
             assert len(stub.requests) == sent
             # Срок в 2 мин тест не ждёт: после перезагрузки вкладки лимита в памяти нет.
             page.reload()
@@ -447,7 +449,7 @@ def test_t25_citations_same_and_other_chapter_and_back(wide, site):
     page.evaluate(
         "id => document.getElementById('p-' + id).scrollIntoView({block: 'start'})", anchor
     )
-    page.wait_for_timeout(100)
+    scroll_settled(page)
     before = top_of(page, anchor)
     box.locator(".citation").nth(1).click()
     page.wait_for_url(re.compile(rf"/read/{sid}/{ch2}#p-{far}$"))
@@ -568,7 +570,7 @@ def test_t39_link_to_other_book_switches_dialog_and_back(wide, site):
     page.evaluate(
         "id => document.getElementById('p-' + id).scrollIntoView({block: 'start'})", anchor
     )
-    page.wait_for_timeout(100)
+    scroll_settled(page)
     before = top_of(page, anchor)
     box.locator(".citation").first.click()
     page.wait_for_url(re.compile(rf"/read/{b}/{b_ch}#p-"))
@@ -776,7 +778,7 @@ def session_crud(page, box, stub, key_of) -> None:
     sent = len(stub.requests)
     row.get_by_role("button", name="Удалить", exact=True).click()
     stub.release(answer(fragment("Не должен появиться.")))
-    page.wait_for_timeout(300)
+    settle(page)
     assert "Не должен появиться" not in json.dumps(key_of(), ensure_ascii=False)
     assert "Долгий вопрос" not in json.dumps(key_of(), ensure_ascii=False)
     assert len(stub.requests) == sent
@@ -826,16 +828,6 @@ def test_t48_sessions_on_assistant_page(wide, site):
 
 # --- T17: Alt+Q ---------------------------------------------------------------
 
-ROOT = Path(__file__).resolve().parents[2]
-SHORTCUT_WIRED = "useAssistantShortcut" in (ROOT / "web/src/ReaderPage.tsx").read_text(
-    encoding="utf-8"
-)
-
-
-@pytest.mark.skipif(
-    not SHORTCUT_WIRED,
-    reason="хук useAssistantShortcut подключает интегратор в ReaderPage (файл потока B)",
-)
 @req(AD, "Вопрос о выделенном фрагменте")
 def test_t17_alt_q_with_and_without_selection(wide, site):
     """T17: Alt+Q при выделении через два абзаца — фрагмент без служебных вставок; без выделения —

@@ -22,6 +22,7 @@ from ..assistant.browser import (
     fragment,
     ndjson,
     open_assistant,
+    settle,
     panel,
     stored,
 )
@@ -29,6 +30,7 @@ from ..helpers import reader_context
 from .test_assistant_dialogs import chapters, open_book
 
 req = pytest.mark.req
+NOLOG_VD = "оформление: проверка по DOM и снимкам, у неё нет события журнала"
 AD = "assistant-dialog"
 VD = "visual-design"
 QUESTION = "А что думали другие авторы?"
@@ -78,7 +80,7 @@ def test_t41_transfer_sends_once(wide, site):
     link.dblclick()
     page.wait_for_url("**/assistant?q=*")
     page.locator(".assistant-page .copy-answer").wait_for()
-    page.wait_for_timeout(300)
+    settle(page)
     sent = library_requests(stub)
     assert len(sent) == 1
     assert sent[0]["question"] == QUESTION and sent[0]["source_id"] == sid
@@ -91,7 +93,7 @@ def test_t41_transfer_sends_once(wide, site):
     page.go_forward()
     page.wait_for_url("**/assistant?q=*")
     page.locator(".assistant-page .turn").wait_for()
-    page.wait_for_timeout(300)
+    settle(page)
     assert len(library_requests(stub)) == 1
     # В панели книги — «Открыть ответ в разделе «Ассистент»», без новой отправки.
     page.go_back()
@@ -105,7 +107,7 @@ def test_t41_transfer_sends_once(wide, site):
     opened.click()
     page.wait_for_url(re.compile(r"/assistant$"))
     page.locator(".assistant-page .turn").wait_for()
-    page.wait_for_timeout(300)
+    settle(page)
     assert len(library_requests(stub)) == 1 and len(library_turns(page)) == 1
 
 
@@ -127,7 +129,7 @@ def test_t42_reload_and_direct_address_do_not_send(browser, site):
     assert "Этот вопрос уже задан" in page.locator(".assistant__asked").inner_text()
     assert page.get_by_label("Вопрос ассистенту").input_value() == QUESTION
     page.locator(".assistant__asked").get_by_role("button", name="Показать ответ").click()
-    page.wait_for_timeout(300)
+    settle(page)
     assert len(library_requests(stub)) == 1
     # Прямой адрес в новой вкладке: «перенесён и не отправлен»; «Спросить» — ровно один запрос.
     other = context.new_page()
@@ -139,7 +141,7 @@ def test_t42_reload_and_direct_address_do_not_send(browser, site):
         pending.inner_text()
     )
     assert other.get_by_label("Вопрос ассистенту").input_value() == "Новый вопрос"
-    other.wait_for_timeout(300)
+    settle(other)
     assert other_stub.requests == []
     other.get_by_role("button", name="Спросить", exact=True).click()
     other.locator(".turn").nth(1).locator(".copy-answer").wait_for()
@@ -159,7 +161,7 @@ def test_t42_reload_and_direct_address_do_not_send(browser, site):
     tab_stub = AskStub(tab)
     tab.wait_for_load_state()
     tab.locator(".assistant__pending").wait_for()
-    tab.wait_for_timeout(300)
+    settle(tab)
     assert tab_stub.requests == [] and len(stub.requests) == before
     tab.close()
     context.close()
@@ -204,7 +206,7 @@ def test_t42_notice_not_closed_does_not_send(browser, site):
     page.locator(".assistant__pending").wait_for()
     assert page.get_by_label("Вопрос ассистенту").input_value() == QUESTION
     assert "Прочитайте уведомление" in page.locator(".assistant-page").inner_text()
-    page.wait_for_timeout(300)
+    settle(page)
     assert stub.requests == [] and library_turns(page) == []
     context.close()
 
@@ -212,8 +214,8 @@ def test_t42_notice_not_closed_does_not_send(browser, site):
 # --- T43: страница раздела ------------------------------------------------------
 
 
+@req(VD, "Разделы в разработке", scenario="Ассистент без метки", nolog=NOLOG_VD)
 @req(AD, "Раздел «Ассистент»")
-@req(VD, "Разделы в разработке")
 def test_t43_nav_item_current_without_soon(wide, site):
     """T43: пункт «Ассистент» ведёт на /assistant, отмечен текущим, без метки «скоро»."""
     page = wide
@@ -285,7 +287,7 @@ def test_t46_boundary_and_stay_in_book(wide, site, kind):
         assert box.locator(".fragment.ungrounded").count() == 1
     assert block.get_by_role("button", name="Продолжить в рамках этого источника").is_visible()
     assert block.get_by_role("link", name=re.compile("^Перейти")).is_visible()
-    page.wait_for_timeout(300)
+    settle(page)
     assert len(stub.requests) == 1  # до выбора запросов нет
     block.get_by_role("button", name="Продолжить в рамках этого источника").click()
     box.locator(".handoff-declined").wait_for()
@@ -303,7 +305,7 @@ def test_t46_boundary_and_stay_in_book(wide, site, kind):
     if kind == "outside_book":
         assert "У Канта иначе." in box.locator(".turn").first.inner_text()  # прежний ответ виден
     assert library_turns(page) == []
-    page.wait_for_timeout(300)
+    settle(page)
     assert len(stub.requests) == 2
 
 
@@ -330,7 +332,12 @@ CYRILLIC = """root => {
 }"""
 
 
-@req(VD, "Язык интерфейса")
+@req(
+    VD,
+    "Язык интерфейса",
+    invariant="страница ассистента на английском без кириллицы",
+    nolog=NOLOG_VD,
+)
 def test_t36_assistant_page_and_boundary_in_english(browser, site):
     """T36: страница «Ассистент» и граница S7a в EN — без кириллицы в интерфейсе."""
     context = reader_context(browser, locale="en-US", viewport={"width": 1440, "height": 900})

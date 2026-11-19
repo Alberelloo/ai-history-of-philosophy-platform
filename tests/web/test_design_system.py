@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 req = pytest.mark.req
+NOLOG_VD = "проверка файлов и сборки клиента: события журнала у неё нет"
 VD = "visual-design"
 ROOT = Path(__file__).resolve().parents[2]
 WEB = ROOT / "web"
@@ -35,14 +36,19 @@ def _node() -> str | None:
     return str(candidates[-1]) if candidates else None
 
 
-@req(VD, "Токены оформления")
+@req(
+    VD,
+    "Токены оформления",
+    invariant="файл токенов клиента совпадает с docs/design/tokens.json",
+    nolog=NOLOG_VD,
+)
 def test_tokens_css_matches_tokens_json():
     expected = design_tokens.generate(design_tokens.load())
     current = design_tokens.TARGET.read_text(encoding="utf-8").replace("\r\n", "\n")
     assert current == expected, "tokens.css устарел: python scripts/design_tokens.py"
 
 
-@req(VD, "Токены оформления")
+@req(VD, "Токены оформления", scenario="Токены не разошлись", nolog=NOLOG_VD)
 def test_changed_tokens_are_detected(tmp_path, monkeypatch):
     """Изменили tokens.json и не перегенерировали — проверка падает."""
     tokens = design_tokens.load()
@@ -57,7 +63,7 @@ def test_changed_tokens_are_detected(tmp_path, monkeypatch):
     assert design_tokens.main() == 1
 
 
-@req(VD, "Токены оформления")
+@req(VD, "Токены оформления", invariant="токены заданы для светлой и тёмной темы", nolog=NOLOG_VD)
 def test_tokens_layout_by_theme():
     css = design_tokens.TARGET.read_text(encoding="utf-8")
     light = css.split('[data-theme="dark"]')[0]
@@ -74,7 +80,7 @@ def test_tokens_layout_by_theme():
         assert name in css
 
 
-@req(VD, "Токены оформления")
+@req(VD, "Токены оформления", invariant="цвета клиента берутся только из токенов", nolog=NOLOG_VD)
 def test_client_styles_use_only_tokens():
     """Цвета в стилях клиента — только через var(--…), без литералов вроде #fff."""
     for path in (WEB / "src" / "styles.css", WEB / "src" / "styles" / "components.css"):
@@ -90,7 +96,12 @@ def test_client_styles_use_only_tokens():
         assert not re.search(r"[\"']#[0-9a-fA-F]{3,8}[\"']", text), path.name
 
 
-@req(VD, "Шрифты")
+@req(
+    VD,
+    "Шрифты",
+    invariant="запросов к сторонним сервисам шрифтов нет, файлы отдаёт сайт",
+    nolog=NOLOG_VD,
+)
 def test_fonts_bundled_without_external_services():
     main = (WEB / "src" / "main.tsx").read_text(encoding="utf-8")
     assert "@fontsource/onest" in main and "@fontsource-variable/literata" in main
@@ -100,7 +111,7 @@ def test_fonts_bundled_without_external_services():
         assert "fonts.googleapis.com" not in text and "fonts.gstatic.com" not in text, path
 
 
-@req(VD, "Язык интерфейса")
+@req(VD, "Язык интерфейса", scenario="Полнота каталога", nolog=NOLOG_VD)
 def test_catalog_keys_checked_by_typescript(tmp_path):
     """Ключ, которого нет в английском каталоге, ломает проверку типов клиента."""
     node = _node()
@@ -132,7 +143,12 @@ def test_catalog_keys_checked_by_typescript(tmp_path):
     assert broken.returncode != 0 and "library" in broken.stdout, broken.stdout
 
 
-@req(VD, "Язык интерфейса")
+@req(
+    VD,
+    "Язык интерфейса",
+    invariant="названия онтологии есть в обоих каталогах и совпадают с реестром",
+    nolog=NOLOG_VD,
+)
 def test_ontology_names_in_both_catalogs():
     """Названия разделов карточки, связей и рецептов есть на обоих языках и совпадают с реестром."""
     import json
@@ -172,7 +188,7 @@ def test_ontology_names_in_both_catalogs():
     assert all(text.strip() and not cyrillic.search(text) for text in texts), texts
 
 
-@req(VD, "Визуальная проверка")
+@req(VD, "Визуальная проверка", scenario="Расхождение", nolog=NOLOG_VD)
 def test_snapshot_mismatch_keeps_files(tmp_path, monkeypatch):
     """Сдвиг сильнее порога проваливает сравнение и оставляет снимок, эталон и разницу."""
     from PIL import Image, ImageDraw

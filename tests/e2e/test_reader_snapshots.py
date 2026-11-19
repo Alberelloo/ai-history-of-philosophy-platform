@@ -31,12 +31,9 @@ from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 from .test_visual_design import reader_columns
 
 req = pytest.mark.req
+NOLOG_VD = "снимочный тест: проверка по DOM и снимкам, у неё нет события журнала"
 pytestmark = pytest.mark.e2e
 VD = "visual-design"
-AD = "assistant-dialog"
-AG = "answer-grounding"
-CR = "chapter-reading"
-EC = "entity-cards"
 KEY = "philograph:v4"
 LEGACY = "philograph:v3"
 ROOT = Path(__file__).resolve().parents[2]
@@ -267,9 +264,21 @@ def fulfill(status: int, body: dict):
 # --- S0, S5: раскладка ------------------------------------------------------------------
 
 
-@req(VD, "Визуальная проверка")
-@req(VD, "Раскладка экрана чтения")
-@req(VD, "Раскладка без наложений")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
+@req(
+    VD, "Раскладка экрана чтения", invariant="раскладка K1–K4 на снимаемых ширинах", nolog=NOLOG_VD
+)
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="колонки не накладываются перед снимком",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), ALL_PAIRS)
 def test_s0_s5_layout(browser, site, ids, theme, lang):
     """S0 и S5 на 1024–2560, обе темы и оба языка."""
@@ -287,8 +296,18 @@ def test_s0_s5_layout(browser, site, ids, theme, lang):
     snaps.check()
 
 
-@req(VD, "Визуальная проверка")
-@req(VD, "Боковая панель навигации")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
+@req(
+    VD,
+    "Боковая панель навигации",
+    invariant="закреплённая панель не закрывает текст главы",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_s0_s5_pinned(browser, site, ids, theme, lang):
     """S0 и S5 с закреплённой навигацией на 1280, 1440, 1920."""
@@ -310,8 +329,12 @@ def test_s0_s5_pinned(browser, site, ids, theme, lang):
 # --- S1, S4: карточка --------------------------------------------------------------------
 
 
-@req(VD, "Визуальная проверка")
-@req(EC, "Карточка рядом с текстом")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_s1_s4_card(browser, site, ids, theme, lang):
     """S1 (окно у «Юм») и S4 (полная карточка в панели) на 1024–1920."""
@@ -359,8 +382,15 @@ def assert_full_card_head(page) -> None:
 # --- полоска справа на 1024 ---------------------------------------------------------------
 
 
-@req(VD, "Визуальная проверка")
-@req(VD, "Раскладка экрана чтения")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
+@req(
+    VD, "Раскладка экрана чтения", invariant="раскладка K1–K4 на снимаемых ширинах", nolog=NOLOG_VD
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_strip(browser, site, ids, theme, lang):
     """Полоска свёрнута, развёрнута и свёрнута во время ответа (1024)."""
@@ -403,8 +433,12 @@ def test_strip(browser, site, ids, theme, lang):
 # --- S7: стадии ответа ----------------------------------------------------------------------
 
 
-@req(VD, "Визуальная проверка")
-@req(AD, "Ход ответа")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_s7_stages(browser, site, ids, theme, lang):
     """S7 на каждой из четырёх стадий, итог ответа и S7 при prefers-reduced-motion (1440).
@@ -598,8 +632,12 @@ def answer_states(browser, site, ids, snaps, theme, lang) -> None:
         context.close()
 
 
-@req(VD, "Визуальная проверка")
-@req(EC, "Карточка рядом с текстом")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_card_states(browser, site, ids, theme, lang):
     """S2, S3, S3a — 1440."""
@@ -608,11 +646,12 @@ def test_card_states(browser, site, ids, theme, lang):
     snaps.check()
 
 
-@req(VD, "Визуальная проверка")
-@req(AD, "Вопрос о выделенном фрагменте")
-@req(AD, "Граница книги")
-@req(AD, "Недоступность и лимиты")
-@req(AG, "Пофрагментная пометка")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_answer_states(browser, site, ids, theme, lang):
     """S6, S7a (шире книги, вне книги, после «Продолжить»), S8, S9 — 1440."""
@@ -621,9 +660,12 @@ def test_answer_states(browser, site, ids, theme, lang):
     snaps.check()
 
 
-@req(VD, "Визуальная проверка")
-@req(AG, "Режим «только по источникам»")
-@req(AD, "Недоступность и лимиты")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_s10_s12(browser, site, ids, theme, lang):
     """S10 (только по источникам) и S12 (вопрос до согласия) — 1440."""
@@ -682,8 +724,12 @@ def missing_chapter(site, ids) -> tuple[str, str, dict]:
     return chapter, item["title"], data
 
 
-@req(VD, "Визуальная проверка")
-@req(CR, "Необработанные части в тексте")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_s13_missing_chapter(browser, site, ids, theme, lang):
     """S13 — глава не оцифрована (1440): заголовок, одна плашка, переход к соседним главам."""
@@ -715,8 +761,12 @@ def test_s13_missing_chapter(browser, site, ids, theme, lang):
 # --- сноски --------------------------------------------------------------------------------
 
 
-@req(VD, "Визуальная проверка")
-@req(CR, "Сноски")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_notes(browser, site, ids, theme, lang):
     """Поле сносок (1920, 1440) и окно сноски (1280, 1024)."""
@@ -771,8 +821,12 @@ def open_sessions(box) -> None:
     box.locator(".assistant__sessions").wait_for()
 
 
-@req(VD, "Визуальная проверка")
-@req(AD, "Память диалога")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_sessions_panel(browser, site, ids, theme, lang):
     """Список сессий в панели, строка переименования, подтверждение удаления — 1440."""
@@ -804,9 +858,12 @@ def page_regions() -> list[str]:
     return [".sidebar", ".assistant-page"]
 
 
-@req(VD, "Визуальная проверка")
-@req(AD, "Раздел «Ассистент»")
-@req(AD, "Переход с вопросом из панели")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="состояния экрана чтения снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize(("theme", "lang"), PAIRS)
 def test_assistant_page(browser, site, ids, theme, lang):
     """Страница «Ассистент»: пустая, с диалогом, «перенесён и не отправлен», «уже задан»

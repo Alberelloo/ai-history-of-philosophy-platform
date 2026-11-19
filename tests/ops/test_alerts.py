@@ -56,7 +56,12 @@ def ops_engine(engine_for):
     return engine_for(ops_schema.migrations, queue_migrations)
 
 
-@req(OA, "Правила оповещений")
+@req(
+    OA,
+    "Правила оповещений",
+    invariant="правила задаются настройкой; набор правил покрывает перечень из требования",
+    nolog="проверяются правила и порог из настройки; событие пишет Alerts (test_ops_spec)",
+)
 def test_rules_from_settings(ops_engine, clock):
     ready = {"value": True}
     rule = ReadinessRule("search", lambda: (ready["value"], "database"), 5, clock)
@@ -101,7 +106,12 @@ def test_rules_from_settings(ops_engine, clock):
     }
 
 
-@req(OA, "Без персональных данных")
+@req(
+    OA,
+    "Без персональных данных",
+    invariant="в оповещении о регионе нет стран посетителей",
+    nolog="проверяется текст оповещения правила; доставка и событие в test_ops_spec",
+)
 def test_unknown_region_rule():
     """Доля запросов шлюза без определённой страны: порог, минимум запросов, без стран."""
 
@@ -137,7 +147,7 @@ def test_unknown_region_rule():
     assert rule().summary == "мало запросов: 2"
 
 
-@req(OA, "Канал оповещений")
+@req(OA, "Канал оповещений", scenario="Повтор")
 def test_repeats_grouped_and_channels(clock, events):
     state = {"firing": True}
     hook = Hook()
@@ -166,10 +176,12 @@ def test_repeats_grouped_and_channels(clock, events):
     broken = Alerts({"x": ("X", lambda: Check(True, "плохо"))}, Hook(fail=True).channel())
     broken.evaluate()
     assert events.one("ops.alert.delivery_failed")["channel"] == "webhook"
+    assert [e["rule"] for e in events.of("ops.alert.fired")] == ["search", "x"]
+    assert [e["rule"] for e in events.of("ops.alert.resolved")] == ["search"]
 
 
-@req(OA, "Восстановление")
-def test_recovery_message(clock):
+@req(OA, "Восстановление", scenario="Сервис вернулся")
+def test_recovery_message(clock, events):
     hook = Hook()
     up = {"value": False}
     rule = ReadinessRule("search", lambda: (up["value"], "qdrant"), 5, clock)
@@ -182,10 +194,12 @@ def test_recovery_message(clock):
     alerts.evaluate()
     assert len(hook.messages) == 2
     assert hook.messages[1].startswith("✓ Сервис search: восстановлено")
+    assert events.one("ops.alert.fired")["rule"] == "ready:search"
+    assert events.one("ops.alert.resolved")["rule"] == "ready:search"
 
 
-@req(OA, "Без персональных данных")
-def test_error_alert_has_rates_not_questions(monkeypatch):
+@req(OA, "Без персональных данных", scenario="Ошибка ассистента")
+def test_error_alert_has_rates_not_questions(monkeypatch, events):
     snapshots = iter(
         [
             {
@@ -220,6 +234,8 @@ def test_error_alert_has_rates_not_questions(monkeypatch):
     hook = Hook()
     Alerts({"errors": ("Ошибки на сайте", lambda: check)}, hook.channel()).evaluate()
     assert "assistant" not in hook.messages[0] and "?" not in hook.messages[0]
+    fired = events.one("ops.alert.fired")
+    assert fired["rule"] == "errors" and "502: 10" in fired["summary"]
     # Метрики шлюза отдаются только со служебным токеном.
     monkeypatch.setenv("PHILOGRAPH_INTERNAL_TOKEN", "служебный".encode().hex())
     client = TestClient(create_app("gateway", "1.0", Health("gateway", "1.0")))

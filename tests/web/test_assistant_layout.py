@@ -16,6 +16,7 @@ from ..assistant.browser import AskStub, answer, ask, fragment, new_session, pan
 from .test_assistant_dialogs import open_book
 
 req = pytest.mark.req
+NOLOG_VD = "оформление: проверка по DOM и снимкам, у неё нет события журнала"
 AD = "assistant-dialog"
 VD = "visual-design"
 SHOTS = os.environ.get("PHILOGRAPH_LAYOUT_SHOTS")
@@ -72,9 +73,14 @@ def assert_last_message_above_input(page, box, scroller) -> None:
     assert position == "static"
 
 
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="поле ввода ассистента не закрывает сообщения",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("width", WIDTHS)
 @req(AD, "Раздел «Ассистент»")
-@req(VD, "Раскладка без наложений")
 def test_page_fills_area_and_input_never_covers_messages(page, site, width):
     """Страница «Ассистент»: сессии слева, диалог на всю высоту, поле прижато к низу; высокий
     ответ не уходит под поле."""
@@ -112,9 +118,14 @@ def test_page_fills_area_and_input_never_covers_messages(page, site, width):
     assert thread["width"] >= min(main["width"] - 6 * root, 68 * root) - 2, (thread, main)
 
 
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="поле ввода панели ассистента не закрывает сообщения",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("width", WIDTHS)
 @req(AD, "Память диалога")
-@req(VD, "Раскладка без наложений")
 def test_panel_fills_height_and_input_never_covers_messages(page, site, width):
     """Панель при чтении: диалог на всю высоту панели, поле внизу, сообщения над полем."""
     page.set_viewport_size({"width": width, "height": 900})

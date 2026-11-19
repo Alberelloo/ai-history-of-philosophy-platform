@@ -348,7 +348,6 @@ def test_user_text_goes_as_data_block(rig, events):
 @req("llm-gateway", "Потоковый ответ")
 def test_http_stream_is_not_buffered(rig):
     """Регрессия: обработчик собирал весь поток в список до отправки."""
-    import threading
     import time as _time
 
     import httpx
@@ -357,13 +356,14 @@ def test_http_stream_is_not_buffered(rig):
     from philograph.llm.app import build_app
 
     slow = rig.provider
+    release = threading.Event()  # провайдер ждёт, пока читатель не получит первый фрагмент
 
     def stream(request):
         slow.calls.append(request)
         from philograph.llm.providers import StreamChunk, Usage
 
         yield StreamChunk(text="Первый фрагмент. ")
-        _time.sleep(1.0)
+        assert release.wait(10), "читатель не получил первый фрагмент до конца ответа"
         yield StreamChunk(text="Второй.")
         yield StreamChunk(usage=Usage(10, 0, 5))
 
@@ -388,15 +388,17 @@ def test_http_stream_is_not_buffered(rig):
         "data": {"question": "?"},
     }
     try:
-        started = _time.perf_counter()
+        lines: list[str] = []
         with httpx.stream(
-            "POST", f"http://127.0.0.1:{port}/v1/stream", json=body, timeout=10
+            "POST", f"http://127.0.0.1:{port}/v1/stream", json=body, timeout=15
         ) as response:
-            first_at = None
             for line in response.iter_lines():
-                if first_at is None and line.strip():
-                    first_at = _time.perf_counter() - started
-            total = _time.perf_counter() - started
-        assert first_at is not None and first_at < 0.8 < total
+                if not line.strip():
+                    continue
+                lines.append(line)
+                # Первый фрагмент пришёл, пока провайдер ещё не отдал второй.
+                release.set()
+        assert len(lines) >= 3 and "Первый фрагмент" in lines[0]
     finally:
+        release.set()
         server.should_exit = True

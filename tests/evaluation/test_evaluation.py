@@ -66,8 +66,8 @@ def questions(ev, *items):
     return dataset
 
 
-@req(ED, "Виды наборов")
-def test_dataset_kinds(ev):
+@req(ED, "Виды наборов", scenario="Вопрос без ответа")
+def test_dataset_kinds(ev, events):
     for kind in ("questions", "mentions", "statements", "ocr_pages", "ontology_questions"):
         ev.datasets.create(f"набор {kind}", kind)
     with pytest.raises(ValueError):
@@ -77,9 +77,11 @@ def test_dataset_kinds(ev):
     )
     item = ev.datasets.snapshot(dataset)[0]
     assert item["has_answer"] is False and item["relevant"] == []
+    changed = events.where("evaluation.dataset.changed", dataset="вопросы", change="add")
+    assert [e["version"] for e in changed] == [1]
 
 
-@req(ED, "Версии наборов")
+@req(ED, "Версии наборов", scenario="Сравнимость")
 def test_dataset_versions(ev, events):
     dataset = questions(ev, {"question": "a"}, {"question": "b"}, {"question": "c"})
     assert ev.datasets.version(dataset) == 3
@@ -90,7 +92,7 @@ def test_dataset_versions(ev, events):
     assert events.of("evaluation.dataset.changed")[-1]["version"] == 4
 
 
-@req(ED, "Черновая разметка моделью")
+@req(ED, "Черновая разметка моделью", scenario="Черновик не в метриках")
 def test_model_drafts_not_in_metrics(ev, events):
     dataset = ev.datasets.create("черновики", "questions")
     ev.bot.model.routes.append({"type": "knowledge", "relevant": [1], "answer": "Привычка."})
@@ -105,8 +107,8 @@ def test_model_drafts_not_in_metrics(ev, events):
     assert events.one("evaluation.run.finished")["items"] == 0
 
 
-@req(ED, "Разметка человеком")
-def test_human_decisions(ev):
+@req(ED, "Разметка человеком", scenario="Исправление")
+def test_human_decisions(ev, events):
     dataset = ev.datasets.create("разметка", "questions")
     ev.datasets.add(dataset, "q1", {"question": "x", "relevant": ["p1", "p2"]}, status="draft")
     ev.datasets.decide(dataset, "q1", "confirm", "operator", {"question": "x", "relevant": ["p1"]})
@@ -115,9 +117,15 @@ def test_human_decisions(ev):
     ev.datasets.add(dataset, "q2", {"question": "y"}, status="draft")
     ev.datasets.decide(dataset, "q2", "reject", "operator")
     assert [i["item_id"] for i in ev.datasets.snapshot(dataset)] == ["q1"]
+    assert [e["change"] for e in events.of("evaluation.dataset.changed")] == [
+        "add",
+        "confirm",
+        "add",
+        "reject",
+    ]
 
 
-@req(ED, "Ссылки на абзацы в наборах")
+@req(ED, "Ссылки на абзацы в наборах", scenario="Абзац удалён")
 def test_broken_paragraph_references(ev, events):
     rig = ev.bot.rig
     gone = rig.paragraph("ru", "Хьюм")
@@ -133,15 +141,16 @@ def test_broken_paragraph_references(ev, events):
     assert events.one("evaluation.reference.broken")["paragraph_id"] == gone
 
 
-@req(ED, "Отделение от данных продукта")
-def test_reference_answers_not_searchable(ev):
+@req(ED, "Отделение от данных продукта", scenario="Эталон не в поиске")
+def test_reference_answers_not_searchable(ev, events):
     reference = "Эталон: уникальнаяфразаэталона о добродетели."
     questions(ev, {"question": "q", "reference": reference})
     found = ev.search.post("search", json={"query": "уникальнаяфразаэталона"}).json()
     assert all("уникальнаяфразаэталона" not in r["text"] for r in found["results"])
+    assert events.of("search.query.completed")  # запрос дошёл до поиска и выполнен
 
 
-@req(QE, "Прогон оценки")
+@req(QE, "Прогон оценки", scenario="Прогон поиска")
 def test_run_records_everything(ev, events):
     dataset = questions(ev, {"question": "привычка ума", "relevant": []})
     run_id = ev.evaluator.run(
@@ -153,8 +162,8 @@ def test_run_records_everything(ev, events):
     events.one("evaluation.run.finished")
 
 
-@req(QE, "Метрики поиска")
-def test_search_recall_and_mrr(ev):
+@req(QE, "Метрики поиска", scenario="Recall")
+def test_search_recall_and_mrr(ev, events):
     rig = ev.bot.rig
     target = rig.paragraph("ru", "проблема индукции")
     other = rig.paragraph("en", "blank slate")
@@ -164,6 +173,8 @@ def test_search_recall_and_mrr(ev):
     run = ev.evaluator.run("search", dataset, {}, c.search_evaluator(ev.search), search_metrics)
     metrics = ev.evaluator.get(run)["metrics"]
     assert metrics["recall@5"] == 0.5 and metrics["mrr"] == 1.0
+    finished = events.one("evaluation.run.finished")
+    assert finished["component"] == "search" and finished["items"] == 1
     assert (
         search_metrics(
             [({"item_id": "x", "relevant": ["a", "b"]}, {"found": ["c", "a", "d", "e", "f"]})]
@@ -172,8 +183,8 @@ def test_search_recall_and_mrr(ev):
     )
 
 
-@req(QE, "Метрики маршрутизатора")
-def test_router_accuracy_and_confusion(ev):
+@req(QE, "Метрики маршрутизатора", scenario="Матрица")
+def test_router_accuracy_and_confusion(ev, events):
     ev.bot.model.routes.extend(
         [
             {"type": "genesis", "confidence": 0.9, "names": []},
@@ -188,11 +199,16 @@ def test_router_accuracy_and_confusion(ev):
     run = ev.evaluator.run("router", dataset, {}, c.router_evaluator(ev.assistant), router_metrics)
     metrics = ev.evaluator.get(run)["metrics"]
     assert metrics["accuracy"] == 0.5
+    assert events.one("evaluation.run.finished")["component"] == "router"
     assert metrics["confusion"] == {"genesis": {"genesis": 1}, "other_authors": {"knowledge": 1}}
 
 
-@req(QE, "Метрики ассистента")
-def test_assistant_metrics(ev):
+@req(
+    QE,
+    "Метрики ассистента",
+    scenario="Вопрос без ответа в режиме «только по источникам»",
+)
+def test_assistant_metrics(ev, events):
     ev.bot.model.answers.extend([["Юм говорил о привычке [1]. ", "Платон [42]. "]])
     dataset = questions(
         ev,
@@ -206,9 +222,15 @@ def test_assistant_metrics(ev):
     assert metrics["citation_correctness"] == 1.0  # оставшиеся ссылки проверены кодом
     assert metrics["refusal_correctness"] == 1.0  # честный отказ на вопросе без ответа
     assert metrics["total_ms"] is not None and metrics["first_fragment_ms"] is not None
+    assert events.one("evaluation.run.finished")["component"] == "assistant"
 
 
-@req(QE, "Метрики онтологии и распознавания")
+@req(
+    QE,
+    "Метрики онтологии и распознавания",
+    scenario="Покрытие контрольных вопросов",
+    nolog="чистая функция расчёта метрик, события у неё нет по природе",
+)
 def test_ocr_and_ontology_metrics():
     per_page = {0: error_rates("кот пишет", "кот пишет"), 1: error_rates("кит", "кот")}
     ocr = ocr_metrics(per_page)
@@ -225,7 +247,7 @@ def test_ocr_and_ontology_metrics():
     assert onto["duplicate_share"] == round(1 / 3, 4)
 
 
-@req(QE, "Оценщик на сильной модели")
+@req(QE, "Оценщик на сильной модели", scenario="Обоснование")
 def test_judge_on_strong_role(ev):
     ev.bot.model.routes.append(
         {"verdict": False, "reason": "фраза о Платоне не подтверждена", "fragment": "Платон"}
@@ -237,13 +259,18 @@ def test_judge_on_strong_role(ev):
     assert call["template"] == "evaluation.judge.faithfulness" and call["template_version"]
 
 
-@req(QE, "Согласие оценщика с человеком")
+@req(
+    QE,
+    "Согласие оценщика с человеком",
+    scenario="Калибровка",
+    nolog="чистая функция расчёта согласия, события у неё нет по природе",
+)
 def test_judge_human_agreement():
     result = agreement({"a": True, "b": False, "c": True}, {"a": True, "b": True, "c": True})
     assert result == {"items": 3, "agreement": round(2 / 3, 4), "disagreements": ["b"]}
 
 
-@req(QE, "Сравнение прогонов")
+@req(QE, "Сравнение прогонов", scenario="С онтологией и без")
 def test_compare_runs(ev, events):
     dataset = questions(
         ev, {"question": "a", "relevant": ["p1"]}, {"question": "b", "relevant": ["p2"]}
@@ -259,8 +286,8 @@ def test_compare_runs(ev, events):
     events.one("evaluation.compare.version_mismatch")
 
 
-@req(QE, "Повторимость")
-def test_repeatable_search_metrics(ev):
+@req(QE, "Повторимость", scenario="Повтор прогона поиска")
+def test_repeatable_search_metrics(ev, events):
     dataset = questions(
         ev, {"question": "привычка ума", "relevant": [ev.bot.rig.paragraph("ru", "привычка ума")]}
     )
@@ -269,9 +296,11 @@ def test_repeatable_search_metrics(ev):
     b = ev.evaluator.run("search", dataset, {}, evaluate, search_metrics)
     ma, mb = ev.evaluator.get(a)["metrics"], ev.evaluator.get(b)["metrics"]
     assert (ma["recall@5"], ma["mrr"]) == (mb["recall@5"], mb["mrr"])
+    assert ma["recall@5"] == 1.0 and ma["mrr"] == 1.0
+    assert len(events.of("evaluation.run.finished")) == 2
 
 
-@req(QE, "Стоимость прогона")
+@req(QE, "Стоимость прогона", scenario="Оценка стоимости")
 def test_run_cost_estimate(ev, events):
     dataset = questions(ev, *[{"question": f"q{i}"} for i in range(4)])
     assert ev.evaluator.estimate("assistant", dataset, 0.002) == {"items": 4, "estimate_usd": 0.008}

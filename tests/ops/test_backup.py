@@ -69,7 +69,7 @@ def bk(clean_schemas, lib, database_url, tmp_path, clock):
     )
 
 
-@req(BR, "Ежедневные копии")
+@req(BR, "Ежедневные копии", scenario="Ночная копия")
 def test_daily_backup_and_rotation(bk, events):
     bk.clock.set(datetime(2026, 11, 4, 2, 0, tzinfo=UTC))
     scheduler = Scheduler(bk.ops, lambda: None, bk.backups.run, None, bk.clock)
@@ -83,6 +83,11 @@ def test_daily_backup_and_rotation(bk, events):
     assert len(list(bk.dir.glob(f"*{SUFFIX}"))) == 2
     completed = events.of("ops.backup.completed")
     assert completed[-1]["rows"] > 0 and completed[-1]["files"] >= 1
+    assert len(completed) == 2
+    content = bk.backups.open(bk.backups.latest())  # в копии и база, и файлы
+    assert content["data/library.sources.jsonl"] and content["files.tar.gz"]
+    assert completed[-1]["name"] == bk.backups.latest()
+    assert len(events.of("ops.backup.rotated")) == 2
     # Хранение: ежедневные за неделю, недельные за месяц, месячные за год.
     now = datetime(2026, 11, 4, 3, 0, tzinfo=UTC)
     names = [f"{(now - timedelta(days=d)):%Y%m%dT%H%M%SZ}{SUFFIX}" for d in range(400)]
@@ -94,8 +99,8 @@ def test_daily_backup_and_rotation(bk, events):
     assert max(ages) <= 366 and 18 <= len(keep) <= 26
 
 
-@req(BR, "Шифрование копий")
-def test_backup_is_encrypted(bk):
+@req(BR, "Шифрование копий", scenario="Доступ к хранилищу копий")
+def test_backup_is_encrypted(bk, events):
     name = bk.backups.run()
     raw = (bk.dir / name).read_bytes()
     assert "Критика".encode() not in raw and not raw.startswith(b"\x1f\x8b")  # не открытый gzip
@@ -106,9 +111,13 @@ def test_backup_is_encrypted(bk):
     with pytest.raises(BackupError, match="расшифровать"):
         stranger.open(name)
     assert "manifest.json" in bk.backups.open(name)
+    with pytest.raises(BackupError, match="расшифровать"):
+        stranger.verify(bk.verify_url)  # проверка чужим ключом тоже не читает копию
+    failed = events.one("ops.backup.verify_failed")
+    assert failed["name"] == name and "расшифровать" in failed["reason"]
 
 
-@req(BR, "Проверка восстановления")
+@req(BR, "Проверка восстановления", scenario="Плановая проверка")
 def test_restore_verified_in_separate_database(bk, events):
     bk.backups.run()
     result = bk.backups.verify(bk.verify_url)
@@ -126,9 +135,29 @@ def test_restore_verified_in_separate_database(bk, events):
     assert events.one("ops.backup.verify_failed")["name"] == latest
     check = BackupRule(bk.ops, AlertSettings(), bk.clock)()
     assert check.firing and "проверка восстановления не прошла" in check.summary
+    sent = []
+    alerts = Alerts(
+        {"backup": ("Резервные копии", BackupRule(bk.ops, AlertSettings(), bk.clock))},
+        WebhookChannel(
+            "https://alerts.example/hook",
+            httpx.Client(
+                transport=httpx.MockTransport(
+                    lambda r: sent.append(r.read().decode()) or httpx.Response(200)
+                )
+            ),
+        ),
+    )
+    alerts.evaluate()
+    assert len(sent) == 1 and "проверка восстановления не прошла" in sent[0]
+    assert events.one("ops.alert.fired")["rule"] == "backup"
 
 
-@req(BR, "Восстановление производных данных")
+@req(
+    BR,
+    "Восстановление производных данных",
+    invariant="кэш LLM не копируется и не восстанавливается",
+    nolog="чистая выгрузка таблиц: события у неё нет, состав копии проверяется напрямую",
+)
 def test_cache_not_backed_up_and_index_rebuilt(bk):
     tables, _ = dump(
         make_engine(bk.database_url, [m.schema for m in all_migrations()]), all_migrations()
@@ -136,7 +165,7 @@ def test_cache_not_backed_up_and_index_rebuilt(bk):
     assert "data/llm.cache.jsonl" not in tables and "data/llm.calls.jsonl" in tables
 
 
-@req(BR, "Неудачная копия")
+@req(BR, "Неудачная копия", scenario="Хранилище недоступно")
 def test_failed_backup_alerts_operator(bk, events):
     bk.backups.run()
     bk.clock.advance(hours=1)
@@ -158,3 +187,5 @@ def test_failed_backup_alerts_operator(bk, events):
     )
     alerts.evaluate()
     assert len(sent) == 1 and "копия не создана" in sent[0]
+    fired = events.one("ops.alert.fired")
+    assert fired["rule"] == "backup" and "копия не создана" in fired["summary"]

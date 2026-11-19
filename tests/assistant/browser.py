@@ -121,3 +121,34 @@ def go(page, path: str) -> None:
         " dispatchEvent(new PopStateEvent('popstate')); }",
         path,
     )
+
+
+def settle(page) -> None:
+    """Точка синхронизации вместо паузы: отрисовка двух кадров и круг запроса к серверу.
+
+    Запросы и обработчики, начатые до вызова, к этому моменту уже отработали; проверка
+    отсутствия после неё не зависит от скорости машины.
+    """
+    page.evaluate(
+        """async () => {
+        const frame = () => new Promise(r => requestAnimationFrame(() => r()));
+        await frame(); await frame();
+        await fetch(location.origin + '/robots.txt', {cache: 'no-store'}).catch(() => {});
+        await frame();
+    }"""
+    )
+
+
+def scroll_settled(page) -> None:
+    """Ждёт, пока прокрутка не остановится: положение не меняется три кадра подряд."""
+    page.evaluate(
+        """async () => {
+        const frame = () => new Promise(r => requestAnimationFrame(() => r()));
+        let last = -1, same = 0;
+        while (same < 3) {
+            await frame();
+            same = window.scrollY === last ? same + 1 : 0;
+            last = window.scrollY;
+        }
+    }"""
+    )

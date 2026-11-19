@@ -13,6 +13,7 @@ from playwright.sync_api import expect
 from ..helpers import reader_context
 
 req = pytest.mark.req
+NOLOG_VD = "оформление: проверка по DOM и снимкам, у неё нет события журнала"
 VD = "visual-design"
 
 
@@ -41,7 +42,12 @@ def assert_no_horizontal_scroll(page, width: int) -> None:
     assert scroll_w <= width + 1, f"горизонтальная прокрутка: {scroll_w} > {width}"
 
 
-@req(VD, "Раскладка экрана чтения")
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="раскладка K1–K4 выбирается по ширине, колонка 62–68ch, без горизонтальной прокрутки",
+    nolog=NOLOG_VD,
+)
 def test_layout_modes_and_text_measure(browser, site):
     cases = [
         (1920, "K1"),  # оглавление + поле сносок
@@ -65,7 +71,12 @@ def test_layout_modes_and_text_measure(browser, site):
             context.close()
 
 
-@req(VD, "Раскладка экрана чтения")
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="колонка текста не уходит под правую панель",
+    nolog=NOLOG_VD,
+)
 def test_panel_shifts_columns_on_wide_screen(browser, site):
     context = reader_context(browser, viewport={"width": 1440, "height": 900})
     page = context.new_page()
@@ -86,7 +97,12 @@ def test_panel_shifts_columns_on_wide_screen(browser, site):
         context.close()
 
 
-@req(VD, "Раскладка экрана чтения")
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="на узком окне панель живёт в полоске 48px у правого края",
+    nolog=NOLOG_VD,
+)
 def test_panel_strip_on_narrow_screen(browser, site):
     context = reader_context(browser, viewport={"width": 1024, "height": 900})
     page = context.new_page()

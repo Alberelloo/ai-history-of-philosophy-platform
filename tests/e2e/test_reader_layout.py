@@ -23,6 +23,7 @@ from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
 req = pytest.mark.req
+NOLOG_VD = "оформление: проверка по DOM и снимкам, у неё нет события журнала"
 e2e = pytest.mark.e2e
 VD = "visual-design"
 AD = "assistant-dialog"
@@ -183,7 +184,12 @@ def test_px_offenders_parses_declarations():
     assert px_offenders(css) == ["padding: 12px"]
 
 
-@req(VD, "Раскладка экрана чтения")
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="размеры в стилях заданы в rem, чтобы расти с корневым кеглем",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("sheet", STYLESHEETS, ids=lambda p: p.name)
 def test_styles_sizes_in_rem(sheet):
     """T45 (Р9): размеры — в rem; px только у линий, радиусов, теней и 1px."""
@@ -261,9 +267,14 @@ def css_px(page, selector: str, prop: str) -> float:
     return float(match.group(0))
 
 
+@req(VD, "Раскладка экрана чтения", scenario="Плавный масштаб", nolog=NOLOG_VD)
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="на 1280, 1920 и 2560 экраны продукта без наложений и горизонтальной прокрутки",
+    nolog=NOLOG_VD,
+)
 @e2e
-@req(VD, "Раскладка экрана чтения")
-@req(VD, "Раскладка без наложений")
 @pytest.mark.parametrize("screen", list(SCREENS))
 def test_scale_across_product(browser, site, ids, screen):
     """T45 (Р9, 9.7): корневой кегль по ширине окна, размеры растут вместе с ним."""
@@ -304,8 +315,8 @@ def test_scale_across_product(browser, site, ids, screen):
 # --- T5: временное сворачивание закреплённой навигации ----------------------------------
 
 
+@req(VD, "Раскладка экрана чтения", scenario="Временное сворачивание навигации", nolog=NOLOG_VD)
 @e2e
-@req(VD, "Раскладка экрана чтения")
 def test_pinned_sidebar_folds_while_panel_open(browser, site, ids):
     """T5: 1440, навигация закреплена; панель открыта — 56px и «Закрепить» aria-disabled."""
     context, page = open_context(browser, width=1440, pinned=True)
@@ -357,9 +368,14 @@ el => {
 """
 
 
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="колонки пересчитываются одним шагом, без анимации ширины",
+    nolog=NOLOG_VD,
+)
 @e2e
 @req(AD, "Место в тексте не теряется")
-@req(VD, "Раскладка экрана чтения")
 def test_columns_do_not_animate(browser, site, ids):
     """T37 (Р7): ширина колонки при открытии и закрытии панели — только два значения."""
     context, page = open_context(browser, width=1440, motion="no-preference")
@@ -439,9 +455,14 @@ def test_reading_place_kept(browser, site, ids):
         context.close()
 
 
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="смена раскладки K2–K4 не сдвигает текст",
+    nolog=NOLOG_VD,
+)
 @e2e
 @req(AD, "Место в тексте не теряется")
-@req(VD, "Раскладка экрана чтения")
 def test_reading_place_kept_k2_to_k4_at_top(browser, site, ids):
     """T4 на 1280 (раунд 3): глава у верха окна, панель переводит K2 → K4 — заголовок и текст
     не сдвигаются (≤ 4px), хотя прокрутке некуда компенсировать; кнопка «Оглавление» над

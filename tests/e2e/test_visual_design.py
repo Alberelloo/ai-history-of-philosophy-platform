@@ -20,6 +20,7 @@ from . import visual
 from .conftest import NOTICE_VERSION, TEST_RATE_BURST
 
 req = pytest.mark.req
+NOLOG_VD = "оформление: проверка по DOM и снимкам, у неё нет события журнала"
 VD = "visual-design"
 pytestmark = pytest.mark.e2e
 KEY = "philograph:v4"
@@ -182,10 +183,15 @@ def check_screen(page, theme: str) -> None:
 # --- требования -----------------------------------------------------------------------
 
 
-@req(VD, "Токены оформления")
-@req(VD, "Компоненты дизайн-системы")
-@req(VD, "Визуальная проверка")
-@req(VD, "Доступность оформления")
+@req(VD, "Токены оформления", scenario="Цвет фона и текста", nolog=NOLOG_VD)
+@req(VD, "Компоненты дизайн-системы", scenario="Кнопки", nolog=NOLOG_VD)
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="основные экраны снимаются в светлой и тёмной теме",
+    nolog=NOLOG_VD,
+)
+@req(VD, "Доступность оформления", scenario="Контраст", nolog=NOLOG_VD)
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_main_screens_in_both_themes(browser, site, ids, theme):
     """Основные экраны: токены, оформленные кнопки, контраст и снимки при 1280."""
@@ -202,8 +208,19 @@ def test_main_screens_in_both_themes(browser, site, ids, theme):
     snaps.check()
 
 
-@req(VD, "Раскладка без наложений")
-@req(VD, "Визуальная проверка")
+@req(VD, "Раскладка без наложений", scenario="Узкий десктоп", nolog=NOLOG_VD)
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="на 1024, 1280, 1440, 1920 нет горизонтальной прокрутки, наложений и обрезанного текста",
+    nolog=NOLOG_VD,
+)
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="чтение и библиотека снимаются на поддерживаемых ширинах",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("width", visual.WIDTHS)
 def test_layout_at_supported_widths(browser, site, ids, width):
     """Чтение и библиотека: без прокрутки по горизонтали, наложений и обрезанного текста."""
@@ -243,9 +260,14 @@ def test_layout_at_supported_widths(browser, site, ids, width):
 MAP_FRAMES = [(1920, 1080), (1280, 720), (1024, 576)]
 
 
-@req(VD, "Раскладка без наложений")
-@req(VD, "Визуальная проверка")
-@req(VD, "Сцена карты")
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="снимки карты снимаются кадром окна 16:9, карта и панель не накладываются",
+    nolog=NOLOG_VD,
+)
+@req(VD, "Визуальная проверка", invariant="карта снимается в светлой и тёмной теме", nolog=NOLOG_VD)
+@req(VD, "Сцена карты", invariant="лист карты светлый в обеих темах", nolog=NOLOG_VD)
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_map_frames_16_9(browser, site, ids, theme):
     """Карта с выбранным Кантом кадром 16:9: без прокрутки по горизонтали, карта и панель
@@ -268,7 +290,7 @@ def test_map_frames_16_9(browser, site, ids, theme):
     snaps.check()
 
 
-@req(VD, "Шрифты")
+@req(VD, "Шрифты", scenario="Шрифты загружены", nolog=NOLOG_VD)
 def test_fonts_served_by_site(browser, site, ids):
     context, page = open_context(browser)
     hosts: list[str] = []
@@ -290,7 +312,7 @@ def test_fonts_served_by_site(browser, site, ids):
         context.close()
 
 
-@req(VD, "Тема")
+@req(VD, "Тема", scenario="Тёмная тема", nolog=NOLOG_VD)
 def test_dark_theme_chosen_and_kept(browser, site, ids):
     context, page = open_context(browser, theme="system")
     try:
@@ -321,7 +343,7 @@ def test_dark_theme_chosen_and_kept(browser, site, ids):
         context.close()
 
 
-@req(VD, "Тема")
+@req(VD, "Тема", invariant="тема применяется до первой отрисовки, без мигания", nolog=NOLOG_VD)
 def test_theme_applied_before_first_paint(browser, site, ids):
     """Тема ставится скриптом в <head> до загрузки приложения: без мигания светлой темой."""
     html = httpx.get(site.url + "/").text
@@ -340,7 +362,7 @@ def test_theme_applied_before_first_paint(browser, site, ids):
         context.close()
 
 
-@req(VD, "Тема")
+@req(VD, "Тема", scenario="Как в системе", nolog=NOLOG_VD)
 def test_system_theme_follows_os(browser, site, ids):
     context, page = open_context(browser, theme="system", color_scheme="dark")
     try:
@@ -354,7 +376,7 @@ def test_system_theme_follows_os(browser, site, ids):
         context.close()
 
 
-@req(VD, "Язык интерфейса")
+@req(VD, "Язык интерфейса", scenario="Английский", nolog=NOLOG_VD)
 def test_english_interface(browser, site, ids):
     context, page = open_context(browser)
     try:
@@ -387,7 +409,7 @@ def test_english_interface(browser, site, ids):
         context.close()
 
 
-@req(VD, "Язык интерфейса")
+@req(VD, "Язык интерфейса", scenario="Названия онтологии", nolog=NOLOG_VD)
 def test_english_card_and_graph(browser, site, ids):
     """В EN подписи карточки и графа (разделы, связи, рецепты, «кто так считает») английские;
     имена сущностей и описания — контент и не переводятся."""
@@ -443,7 +465,12 @@ def test_english_card_and_graph(browser, site, ids):
         context.close()
 
 
-@req(VD, "Язык интерфейса")
+@req(
+    VD,
+    "Язык интерфейса",
+    invariant="язык по умолчанию определяется по языку браузера",
+    nolog=NOLOG_VD,
+)
 def test_language_follows_browser_by_default(browser, site, ids):
     context, page = open_context(browser, locale="en-US")
     try:
@@ -476,7 +503,9 @@ def content_left(page) -> float:
     )
 
 
-@req(VD, "Боковая панель навигации")
+@req(VD, "Боковая панель навигации", scenario="Навигация читается", nolog=NOLOG_VD)
+@req(VD, "Боковая панель навигации", scenario="Свёрнута по умолчанию", nolog=NOLOG_VD)
+@req(VD, "Боковая панель навигации", scenario="Раскрытие при наведении", nolog=NOLOG_VD)
 def test_sidebar_on_every_screen(browser, site, ids):
     """Свёрнута по умолчанию на каждом экране, содержимое правее неё; при наведении
     раскрывается поверх, ничего не сдвигая; пункты не слипаются и не обрезаны."""
@@ -511,13 +540,13 @@ def test_sidebar_on_every_screen(browser, site, ids):
         visual.collapse_sidebar(page)
         assert visual.sidebar_state(page) == "collapsed"
         page.mouse.wheel(0, 600)
-        page.wait_for_timeout(200)
+        visual.settle(page, network=False)  # два кадра после прокрутки вместо паузы
         assert page.locator(".sidebar").bounding_box()["y"] == 0  # закреплена у края окна
     finally:
         context.close()
 
 
-@req(VD, "Боковая панель навигации")
+@req(VD, "Боковая панель навигации", scenario="Раскрытие с клавиатуры", nolog=NOLOG_VD)
 def test_sidebar_keyboard_and_escape(browser, site, ids):
     context, page = open_context(browser)
     try:
@@ -540,7 +569,8 @@ def test_sidebar_keyboard_and_escape(browser, site, ids):
         context.close()
 
 
-@req(VD, "Боковая панель навигации")
+@req(VD, "Боковая панель навигации", scenario="Закрепление", nolog=NOLOG_VD)
+@req(VD, "Боковая панель навигации", scenario="Узкий экран", nolog=NOLOG_VD)
 def test_sidebar_pin_persists_and_shifts_content(browser, site, ids):
     context, page = open_context(browser, width=1280)
     try:
@@ -573,8 +603,13 @@ def test_sidebar_pin_persists_and_shifts_content(browser, site, ids):
         context.close()
 
 
-@req(VD, "Боковая панель навигации")
-@req(VD, "Раскладка без наложений")
+@req(VD, "Боковая панель навигации", scenario="Текст главы не под панелью", nolog=NOLOG_VD)
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="свёрнутая и закреплённая панель не перекрывают оглавление и текст",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("width", visual.SIDEBAR_WIDTHS)
 def test_sidebar_never_covers_chapter(browser, site, ids, width):
     """Свёрнутая и закреплённая панель не закрывают ни оглавление, ни текст главы."""
@@ -594,7 +629,7 @@ def test_sidebar_never_covers_chapter(browser, site, ids, width):
             context.close()
 
 
-@req(VD, "Тема")
+@req(VD, "Тема", scenario="Тема из свёрнутой панели", nolog=NOLOG_VD)
 def test_theme_cycles_from_collapsed_sidebar(browser, site, ids):
     """Кнопка темы в свёрнутой панели — по кругу: светлая, тёмная, как в системе."""
     context, page = open_context(browser, theme="light")
@@ -614,7 +649,10 @@ def test_theme_cycles_from_collapsed_sidebar(browser, site, ids):
         context.close()
 
 
-@req(VD, "Разделы в разработке")
+@req(VD, "Разделы в разработке", scenario="Пункт-заглушка", nolog=NOLOG_VD)
+@req(VD, "Разделы в разработке", scenario="Страница раздела", nolog=NOLOG_VD)
+@req(VD, "Разделы в разработке", scenario="Граф по сущности", nolog=NOLOG_VD)
+@req(VD, "Разделы в разработке", scenario="Ассистент без метки", nolog=NOLOG_VD)
 def test_future_sections_marked_and_described(browser, site, ids):
     context, page = open_context(browser)
     try:
@@ -667,12 +705,19 @@ def test_future_sections_marked_and_described(browser, site, ids):
         page.get_by_role("option", name="Кант").first.click()
         page.wait_for_function(f"location.pathname === '/graph/{ids['kant']}'")
         page.wait_for_selector("h1:has-text('Кант')")
+        # Кант выбран на карте: подсвечена его карточка-человек.
+        page.locator(f".map-person.map-role-self[data-person='{ids['kant']}']").wait_for()
     finally:
         context.close()
 
 
-@req(VD, "Компоненты дизайн-системы")
-@req(VD, "Доступность оформления")
+@req(VD, "Компоненты дизайн-системы", scenario="Кнопки", nolog=NOLOG_VD)
+@req(
+    VD,
+    "Доступность оформления",
+    invariant="фокус с клавиатуры виден (кольцо focus-ring)",
+    nolog=NOLOG_VD,
+)
 def test_keyboard_focus_ring(browser, site, ids):
     context, page = open_context(browser)
     try:
@@ -693,7 +738,12 @@ def test_keyboard_focus_ring(browser, site, ids):
         context.close()
 
 
-@req(VD, "Доступность оформления")
+@req(
+    VD,
+    "Доступность оформления",
+    invariant="при prefers-reduced-motion анимации сокращаются до смены прозрачности",
+    nolog=NOLOG_VD,
+)
 def test_reduced_motion_keeps_only_fade(browser, site, ids):
     for motion, expected in (("reduce", "pg-fade"), ("no-preference", "pg-pop-in")):
         context, page = open_context(browser, reduced_motion=motion)
@@ -710,7 +760,12 @@ def test_reduced_motion_keeps_only_fade(browser, site, ids):
             context.close()
 
 
-@req(VD, "Визуальная проверка")
+@req(
+    VD,
+    "Визуальная проверка",
+    invariant="уведомление при первом входе снимается и проверяется по DOM",
+    nolog=NOLOG_VD,
+)
 def test_first_run_notice_snapshot(browser, site, ids):
     context, page = open_context(browser, accepted=False)
     try:
@@ -722,7 +777,12 @@ def test_first_run_notice_snapshot(browser, site, ids):
         context.close()
 
 
-@req(VD, "Раскладка без наложений")
+@req(
+    VD,
+    "Раскладка без наложений",
+    invariant="уведомление при первом входе стоит в потоке и ничего не закрывает",
+    nolog=NOLOG_VD,
+)
 @pytest.mark.parametrize("width", [1024, 1280])
 def test_first_run_notice_in_flow(browser, site, ids, width):
     """Уведомление при первом входе стоит в потоке страницы и ничего не закрывает."""
