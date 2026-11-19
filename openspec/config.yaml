@@ -13,26 +13,22 @@ context: |
   RAG over source texts; every answer cites source passages. Relations that the
   LLM generated and nobody verified must be marked as such in the interface.
   Product background: docs/product/vision.md and docs/product/system-design.md.
-  Specs describe observable behavior, not technology: the stack is not chosen yet.
+  Specs describe observable behavior, not technology. The stack is chosen
+  (docs/architecture/adr/0001-stack.md) but stays out of specs.
+  Work process (roles coder/tester/reviewer/judge, tests, decision criteria):
+  docs/process/working-principles.md.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
-
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+rules:
+  proposal:
+    - State what is out of scope.
+    - If the change touches money, external services, source licenses or behavior beyond the request, list the questions for the owner.
+  specs:
+    - Every requirement has at least one WHEN/THEN scenario.
+    - Every THEN is observable in output (API response, stream, UI) and, unless purely visual, in the event log; name the event and its key fields.
+    - State invariants explicitly with SHALL NOT / only / at most / always, so they can become normative tests.
+  design:
+    - Include a section "## Выбор решения" with at least two options (including the simplest) rated on optimality, architectural correctness, and maintainability/scalability; state the choice, its cost, and which workarounds are avoided.
+    - Name new or changed log events and their fields.
+  tasks:
+    - Include tester tasks: scenario tests and normative (invariant) tests per requirement, each checking output and the event log, plus mutation checks of key rules, recorded in verification.md.
+    - Include a final judge task: independent verdict in verification.md before the PR leaves draft.
