@@ -28,4 +28,4 @@
 ## 5. Тесты и проверка
 
 - [x] 5.1 Тесты T28–T30: `tests/web/test_reader_notes.py`, 9 тестов (поле K1, три сноски каскадом на 1920 и 1440, пересчёт при смене ширины, клавиатура K1 и K2, окно K3, страницы на поле и в тексте, невхождение номера в выделение, плашка RU/EN). 4 из них (`test_footnotes_on_field_in_k1`, `test_three_notes_cascade_on_field`, `test_field_notes_follow_width_change`, `test_page_numbers_level_and_not_selected`) проходят только после подключения `MarginCol` из `Footnote.tsx` в `ReaderPage.tsx`; с подключением проверено локально — 9 passed
-- [ ] 5.2 Снимки поля сносок (1920, 1440) и окна сноски (1280, 1024) по 14.3 и их просмотр: сценарии есть в `tests/e2e/test_reader_snapshots.py` (`test_notes`), эталоны и просмотр — за интегратором
+- [x] 5.2 Снимки поля сносок (1920, 1440) и окна сноски (1280, 1024) по 14.3 и их просмотр: сценарии есть в `tests/e2e/test_reader_snapshots.py` (`test_notes`), эталоны и просмотр — за интегратором → перенесено в `quality-followups` п. 1.5
