@@ -5,10 +5,11 @@
 не ниже 4.5:1, у фокуса с клавиатуры есть кольцо.
 
 Снимки сравниваются с эталонами ``tests/e2e/visual/baselines/<sys.platform>/<имя>.png``: шрифты
-и сглаживание различаются между системами, поэтому эталоны свои для каждой платформы. Если
-эталонов текущей платформы нет, сравнение пропускается. Эталоны пишутся только явной командой:
-``PHILOGRAPH_UPDATE_SNAPSHOTS=1``. При расхождении в ``tests/e2e/visual/results/`` остаются
-фактический снимок, эталон и карта различий.
+и сглаживание различаются между системами, поэтому эталоны свои для каждой платформы
+(``linux`` — для CI). Если эталона нет, сравнение пропускается, а с
+``PHILOGRAPH_REQUIRE_SNAPSHOTS=1`` (так в CI) тест падает: иначе снимки молча не сравнивались бы.
+Эталоны пишутся только явной командой: ``PHILOGRAPH_UPDATE_SNAPSHOTS=1``. При расхождении в
+``tests/e2e/visual/results/`` остаются фактический снимок, эталон и карта различий.
 """
 
 from __future__ import annotations
@@ -19,10 +20,17 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent / "visual"
 BASELINES = HERE / "baselines" / sys.platform
 RESULTS = HERE / "results"
 UPDATE = os.environ.get("PHILOGRAPH_UPDATE_SNAPSHOTS") == "1"
+
+
+def required() -> bool:
+    """Нет эталона — ошибка, а не пропуск сравнения (CI). Читается при каждом снимке."""
+    return os.environ.get("PHILOGRAPH_REQUIRE_SNAPSHOTS") == "1"
+
 # Доля отличающихся пикселей, выше которой снимок считается изменившимся.
 MAX_DIFF_RATIO = 0.005
 # Разница канала, которую ещё списываем на сглаживание шрифтов и краёв.
@@ -384,6 +392,10 @@ class SnapshotMismatch(AssertionError):
     pass
 
 
+class SnapshotMissing(SnapshotMismatch):
+    """Эталона нет, а сравнение обязательно (``PHILOGRAPH_REQUIRE_SNAPSHOTS=1``)."""
+
+
 def compare(actual: Path, expected: Path, name: str) -> float:
     """Доля отличающихся пикселей; при превышении порога — файлы для разбора и ошибка."""
     from PIL import Image, ImageChops
@@ -443,7 +455,13 @@ def snap(
         actual.unlink()
         return 0.0
     if not expected.exists():
-        # Эталона нет: остаются проверки по DOM, а снимок — в results/ для просмотра.
+        # Снимок остаётся в results/ для просмотра; без обязательного сравнения остаются
+        # проверки по DOM.
+        if required():
+            raise SnapshotMissing(
+                f"{name}: нет эталона {expected.relative_to(REPO).as_posix()}; снимок в {actual}. "
+                "Эталоны пишет python scripts/visual_check.py --update"
+            )
         return None
     ratio = compare(actual, expected, name)
     actual.unlink()
