@@ -62,8 +62,34 @@ class ComposeStack:
 TEST_RATE_BURST = "2000"
 
 
+# Настройки, с которыми тесты поднимают свой стенд: лимит частоты для сотен страниц и регион
+# по умолчанию для локального адреса без CDN. Значение, уже заданное в окружении, не меняется.
+TEST_STACK_ENV = {
+    "PHILOGRAPH_RATE_BURST": TEST_RATE_BURST,
+    "PHILOGRAPH_REGION_FALLBACK": "RU",
+}
+
+
+def start_dev_stack(data: Path):
+    """Поднимает ``scripts/dev_stack.py`` в каталоге ``data`` с настройками тестов.
+
+    Окружение меняется только на время запуска процессов (они получают копию) и сразу
+    возвращается: остальные тесты прогона не видят настроек стенда.
+    """
+    if not (ROOT / "web" / "dist" / "index.html").exists():
+        pytest.skip("клиент не собран: npm run build в web/")
+    import dev_stack
+
+    with pytest.MonkeyPatch.context() as mp:
+        for name, value in TEST_STACK_ENV.items():
+            if name not in os.environ:
+                mp.setenv(name, value)
+        return dev_stack.start(data)
+
+
 @pytest.fixture(scope="session")
 def stack(tmp_path_factory):
+    """Стенд всего прогона: в CI — ``docker compose``, локально — свой ``dev_stack``."""
     if os.environ.get("PHILOGRAPH_E2E_URL"):
         compose = ComposeStack(os.environ["PHILOGRAPH_E2E_URL"])
         # Поиск индексирует демо-источники из очереди: ждём оба события публикации.
@@ -79,16 +105,19 @@ def stack(tmp_path_factory):
             time.sleep(1)
         yield compose
         return
-    if not (ROOT / "web" / "dist" / "index.html").exists():
-        pytest.skip("клиент не собран: npm run build в web/")
-    import dev_stack
-
-    os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
-    # Стенд поднимается с локального адреса без CDN: регион неизвестен, подставляем РФ.
-    os.environ.setdefault("PHILOGRAPH_REGION_FALLBACK", "RU")
-    running = dev_stack.start(tmp_path_factory.mktemp("stack"))
+    running = start_dev_stack(tmp_path_factory.mktemp("stack"))
     yield running
     running.stop()
+
+
+@pytest.fixture(scope="session")
+def site(stack):
+    """Сайт для проверок оформления и раскладки — тот же стенд прогона, что и ``stack``.
+
+    Раньше каждый модуль поднимал свой стенд, но с ``PHILOGRAPH_E2E_URL`` стенд и так был
+    общим: снимки и проверки раскладки не должны зависеть от того, что сделали тесты до них.
+    """
+    return stack
 
 
 def reader_context(browser, *, accepted: bool = True, **options):

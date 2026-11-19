@@ -13,7 +13,7 @@ import pytest
 import yaml
 
 from ..helpers import reader_context
-from .conftest import ROOT
+from .conftest import ROOT, start_dev_stack
 
 pytestmark = pytest.mark.e2e
 req = pytest.mark.req
@@ -32,19 +32,17 @@ BOOK = (
 
 @pytest.fixture(scope="module")
 def own_stack(tmp_path_factory):
+    """Свой стенд: тест публикует в библиотеку новый источник, общий стенд это изменило бы."""
     if os.environ.get("PHILOGRAPH_E2E_URL"):
         pytest.skip("стенд docker compose: команда каталога запускается только у своего стенда")
-    if not (ROOT / "web" / "dist" / "index.html").exists():
-        pytest.skip("клиент не собран: npm run build в web/")
-    import dev_stack
-
-    running = dev_stack.start(tmp_path_factory.mktemp("catalog-stack"))
+    running = start_dev_stack(tmp_path_factory.mktemp("catalog-stack"))
     yield running
     running.stop()
 
 
 @pytest.fixture(scope="module")
-def site(tmp_path_factory):
+def book_site(tmp_path_factory):
+    """Сайт-источник с текстом книги, откуда каталог её скачивает."""
     root = tmp_path_factory.mktemp("site")
     (root / "book.txt").write_text(BOOK, encoding="utf-8")
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(root))
@@ -76,14 +74,14 @@ def catalog_cli(stack, catalog, *args) -> str:
 
 @req(SC, "Синхронизация каталога с библиотекой")
 @req(SC, "Правило публикации обновлений")
-def test_catalog_sync_publishes_and_reader_shows(browser, own_stack, site, tmp_path):
+def test_catalog_sync_publishes_and_reader_shows(browser, own_stack, book_site, tmp_path):
     folder = tmp_path / "sources"
     folder.mkdir()
     for name in ("catalog.schema.json", "licenses.yaml"):
         (folder / name).write_bytes((ROOT / "sources" / name).read_bytes())
     entry = {
         "id": "e2e-essay-on-experience",
-        "landing_url": f"{site}/book",
+        "landing_url": f"{book_site}/book",
         "adapter": "direct",
         "kind": "primary",
         "section": "epistemology",
@@ -95,7 +93,7 @@ def test_catalog_sync_publishes_and_reader_shows(browser, own_stack, site, tmp_p
                 "language": "en",
                 "year": 1748,
             },
-            "files": [{"name": "book.txt", "url": f"{site}/book.txt", "clean": "gutenberg"}],
+            "files": [{"name": "book.txt", "url": f"{book_site}/book.txt", "clean": "gutenberg"}],
         },
         "license": {"kind": "public-domain", "basis": "public_domain", "evidence": "ум. 1776"},
         "review": {"status": "approved", "by": "e2e", "at": None, "note": None},

@@ -17,7 +17,6 @@ from __future__ import annotations
 import contextlib
 import copy
 import json
-import os
 import re
 from pathlib import Path
 
@@ -27,7 +26,7 @@ import pytest
 from ..assistant.browser import DONE, HOLD, AskStub, answer, cite, fragment, ndjson
 from ..helpers import aside, start_aside
 from . import visual
-from .conftest import NOTICE_VERSION, TEST_RATE_BURST
+from .conftest import NOTICE_VERSION
 from .test_visual_design import reader_columns
 
 req = pytest.mark.req
@@ -48,21 +47,6 @@ WORDS = {
     "ru": {"open_card": "Открыть карточку", "continue": "Продолжить в рамках этого источника"},
     "en": {"open_card": "Open card", "continue": "Continue within this source"},
 }
-
-
-@pytest.fixture(scope="module")
-def site(request, tmp_path_factory):
-    if os.environ.get("PHILOGRAPH_E2E_URL"):
-        yield request.getfixturevalue("stack")
-        return
-    if not (ROOT / "web" / "dist" / "index.html").exists():
-        pytest.skip("клиент не собран: npm run build в web/")
-    import dev_stack
-
-    os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
-    running = dev_stack.start(tmp_path_factory.mktemp("reader-snapshots-stack"))
-    yield running
-    running.stop()
 
 
 @pytest.fixture(scope="module")

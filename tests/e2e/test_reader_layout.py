@@ -11,7 +11,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 from pathlib import Path
 
@@ -20,7 +19,7 @@ import pytest
 
 from ..helpers import aside, start_aside
 from . import visual
-from .conftest import NOTICE_VERSION, TEST_RATE_BURST
+from .conftest import NOTICE_VERSION
 
 req = pytest.mark.req
 e2e = pytest.mark.e2e
@@ -33,21 +32,6 @@ STYLES = ROOT / "web" / "src" / "styles.css"
 CHAPTER_3 = "Глава 3. Ответ Канта"
 CHAPTER_2 = "Глава 2. Юм и проблема индукции"
 SECTION = "Привычка и ожидание"
-
-
-@pytest.fixture(scope="module")
-def site(request, tmp_path_factory):
-    if os.environ.get("PHILOGRAPH_E2E_URL"):
-        yield request.getfixturevalue("stack")
-        return
-    if not (ROOT / "web" / "dist" / "index.html").exists():
-        pytest.skip("клиент не собран: npm run build в web/")
-    import dev_stack
-
-    os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
-    running = dev_stack.start(tmp_path_factory.mktemp("layout-stack"))
-    yield running
-    running.stop()
 
 
 @pytest.fixture(scope="module")

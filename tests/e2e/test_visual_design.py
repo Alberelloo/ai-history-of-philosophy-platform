@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 
 import httpx
@@ -17,7 +16,7 @@ import pytest
 
 from ..helpers import aside, start_aside
 from . import visual
-from .conftest import NOTICE_VERSION, TEST_RATE_BURST
+from .conftest import NOTICE_VERSION
 
 req = pytest.mark.req
 VD = "visual-design"
@@ -25,23 +24,6 @@ pytestmark = pytest.mark.e2e
 KEY = "philograph:v4"
 TEXTBOOK = "Теория познания: демонстрационный учебник"
 LIGHT_PAPER, DARK_PAPER = "#eff1ec", "#13171e"
-
-
-@pytest.fixture(scope="module")
-def site(request, tmp_path_factory):
-    if os.environ.get("PHILOGRAPH_E2E_URL"):
-        yield request.getfixturevalue("stack")
-        return
-    from pathlib import Path
-
-    if not (Path(__file__).resolve().parents[2] / "web" / "dist" / "index.html").exists():
-        pytest.skip("клиент не собран: npm run build в web/")
-    import dev_stack
-
-    os.environ.setdefault("PHILOGRAPH_RATE_BURST", TEST_RATE_BURST)
-    running = dev_stack.start(tmp_path_factory.mktemp("visual-stack"))
-    yield running
-    running.stop()
 
 
 @pytest.fixture(scope="module")
