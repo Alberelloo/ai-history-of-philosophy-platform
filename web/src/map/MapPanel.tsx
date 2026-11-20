@@ -120,6 +120,12 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
     setClosed((c) => (c.has("selected") ? new Set([...c].filter((x) => x !== "selected")) : c));
   }, [focusKey]);
 
+  // Замер после каждой отрисовки, без списка зависимостей: высоту тела меняет любое содержимое
+  // панели (выбор, фильтры, уведомления достройки), и разделы складываются в той же отрисовке,
+  // до показа кадра. Перечень зависимостей перенёс бы подгонку на следующий кадр (через
+  // ResizeObserver) и дал бы мигание. Цикла нет: состояние меняется, только пока содержимое
+  // не помещается или освободилось место, и каждый шаг складывает или раскрывает один раздел.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const p = panel.current;
     const b = body.current;
@@ -672,9 +678,11 @@ function Facet({
     if (!panel) return;
     const r = pop.current.getBoundingClientRect();
     const limit = Math.min(panel.getBoundingClientRect().bottom, window.innerHeight - 8);
-    const over = r.bottom - shift - limit;
-    setShift(over > 0 ? -over : 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // r измерен с текущим сдвигом: вычитаем его, чтобы получить положение без сдвига.
+    setShift((shift) => {
+      const over = r.bottom - shift - limit;
+      return over > 0 ? -over : 0;
+    });
   }, [open]);
   useEffect(() => {
     if (!open) return;

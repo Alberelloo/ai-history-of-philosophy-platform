@@ -21,7 +21,6 @@ type Props = {
   width: number;
   height: number;
   measure: Measure;
-  fontsVersion: number; // после загрузки шрифтов раскладка пересчитывается
   linkSel: string | null;
   onSelect: (id: string | null) => void;
   onLink: (id: string) => void;
@@ -32,12 +31,12 @@ type Props = {
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
 export function MapCanvas(props: Props) {
-  const { data, vis, rel, sel, collapsed, width, height, measure, fontsVersion, linkSel } = props;
+  const { data, vis, rel, sel, collapsed, width, height, measure, linkSel } = props;
   const t = useT();
   const L = useMemo(
+    // measure меняется после загрузки шрифтов (MapPage): раскладка — по настоящим ширинам.
     () => layout({ data, vis, rel, sel, width, height, collapsed, measure }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, vis, rel, sel, width, height, collapsed, measure, fontsVersion],
+    [data, vis, rel, sel, width, height, collapsed, measure],
   );
   const top = L.bands.people.top;
   const peopleH = L.bands.people.bot - top;

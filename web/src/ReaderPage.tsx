@@ -6,6 +6,7 @@ import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { fieldItems, MarginCol } from "./Footnote";
 import { useAssistantShortcut } from "./hooks/useAssistantShortcut";
+import { useEvent } from "./hooks/useEvent";
 import { useReadingAnchor } from "./hooks/useReadingAnchor";
 import { useTocLocation } from "./hooks/useTocLocation";
 import { Toc } from "./ReaderToc";
@@ -320,13 +321,14 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     if (panel) setPanel({ ...panel, stripExpanded: false });
   };
   // Панель остаётся открытой при переходе в другую главу/книгу: диалог следует за книгой.
-  useEffect(() => {
+  // Только при смене книги: смена главы или панели сама по себе панель не трогает.
+  const followBook = useEvent((id: string | undefined) => {
     const top = panel?.stack[panel.stack.length - 1];
-    if (panel && top?.kind === "assistant" && sourceId && panel.sourceId !== sourceId) {
-      setPanel({ ...panel, sourceId, chapterId: chapter?.chapter_id, chapterTitle: chapter?.title });
+    if (panel && top?.kind === "assistant" && id && panel.sourceId !== id) {
+      setPanel({ ...panel, sourceId: id, chapterId: chapter?.chapter_id, chapterTitle: chapter?.title });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceId]);
+  });
+  useEffect(() => followBook(sourceId), [sourceId, followBook]);
 
   // Выделение в тексте главы: панель действий над выделением через 120 мс (раздел 7).
   useEffect(() => {

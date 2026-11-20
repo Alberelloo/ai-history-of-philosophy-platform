@@ -64,8 +64,8 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const [link, setLink] = useState<LinkView | null>(null);
   const [build, setBuild] = useState<BuildState>(idleBuild);
   const panelCollapsed = useStored((s) => s.mapPanelCollapsed === true);
-  const measure = useMemo(() => canvasMeasure(), []);
-  const [fontsVersion, setFontsVersion] = useState(0);
+  // После загрузки шрифтов — новый измеритель с пустым кэшем: раскладка карты пересчитывается.
+  const [measure, setMeasure] = useState(canvasMeasure);
   const chart = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: MIN_HEIGHT });
   const widths = useRef<number[]>([]);
@@ -102,14 +102,12 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   useEffect(() => {
     let live = true;
     loadMapFonts().then(() => {
-      if (!live) return;
-      measure.clear();
-      setFontsVersion((v) => v + 1);
+      if (live) setMeasure(canvasMeasure());
     });
     return () => {
       live = false;
     };
-  }, [measure]);
+  }, []);
 
   const data = useMemo<MapData>(() => {
     const base = load.data ?? EMPTY;
@@ -368,7 +366,6 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                       width={size.width}
                       height={size.height}
                       measure={measure}
-                      fontsVersion={fontsVersion}
                       linkSel={link?.id ?? null}
                       onSelect={select}
                       onLink={openLink}

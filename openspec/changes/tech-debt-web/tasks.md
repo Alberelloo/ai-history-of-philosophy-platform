@@ -1,13 +1,13 @@
 ## 1. Запросы через api.ts
 
-- [ ] 1.1 `api.ts`: базы сервисов в одном месте, `request()` с `ApiError` (`kind`, `status`, тело), `stream()` для NDJSON
-- [ ] 1.2 Перевести 14 прямых `fetch` (карточки, карта, упоминания, проверка оператора, портреты, ассистент) на методы `api.ts`; `ReviewPage` проверяет `ok`
+- [x] 1.1 `api.ts`: базы сервисов в одном месте, `request()` с `ApiError` (`kind`, `status`, тело), `stream()` для NDJSON
+- [x] 1.2 Перевести 14 прямых `fetch` (карточки, карта, упоминания, проверка оператора, портреты, ассистент) на методы `api.ts`; `ReviewPage` проверяет `ok`
 
 ## 2. Линтер и окружение
 
-- [ ] 2.1 ESLint flat config: `typescript-eslint` и `eslint-plugin-react-hooks`, запуск в `npm run build` и `npm run lint`
-- [ ] 2.2 Устранить 8 подавлений `react-hooks/exhaustive-deps` по существу, исправить остальные находки линтера
-- [ ] 2.3 `engines` (node >= 20) в `package.json`, `.nvmrc` (24)
+- [x] 2.1 ESLint flat config: `typescript-eslint` и `eslint-plugin-react-hooks`, запуск в `npm run build` и `npm run lint`
+- [x] 2.2 Устранить 8 подавлений `react-hooks/exhaustive-deps` по существу, исправить остальные находки линтера
+- [x] 2.3 `engines` (node >= 20) в `package.json`, `.nvmrc` (24)
 
 ## 3. Деление крупных компонентов
 

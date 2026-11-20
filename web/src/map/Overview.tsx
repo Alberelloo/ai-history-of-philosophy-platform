@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useEvent } from "../hooks/useEvent";
 import { useT } from "../i18n";
 import { DEFAULT_OPTIONS, timeScale } from "./layout";
 import type { MapPerson } from "./types";
@@ -32,18 +33,19 @@ export function Overview({
   const [A0, A1] = range;
   const s = timeScale(range, DEFAULT_OPTIONS.plotLeft, width - DEFAULT_OPTIONS.plotRightPad);
   const [from, to] = win;
+  const { left, right } = s;
   const oy = 16;
 
-  const commit = (f: number, e: number) => {
+  const commit = useEvent((f: number, e: number) => {
     let a = Math.round(Math.max(A0, Math.min(f, A1 - MIN_SPAN)));
-    let b = Math.round(Math.min(A1, Math.max(e, a + MIN_SPAN)));
+    const b = Math.round(Math.min(A1, Math.max(e, a + MIN_SPAN)));
     if (b - a < MIN_SPAN) a = b - MIN_SPAN;
     onChange(a <= A0 ? undefined : a, b >= A1 ? undefined : b);
-  };
+  });
 
   useEffect(() => {
     if (!drag) return;
-    const k = (s.right - s.left) / Math.max(1, A1 - A0);
+    const k = (right - left) / Math.max(1, A1 - A0);
     const move = (e: globalThis.PointerEvent) => {
       const dy = (e.clientX - drag.x0) / k;
       if (drag.kind === "from") commit(Math.min(drag.from + dy, drag.to - MIN_SPAN), drag.to);
@@ -63,8 +65,7 @@ export function Overview({
       window.removeEventListener("pointerup", up);
       window.removeEventListener("pointercancel", up);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drag, width, A0, A1]);
+  }, [drag, left, right, A0, A1, commit]);
 
   const start = (kind: Drag["kind"]) => (e: PointerEvent) => {
     e.preventDefault();

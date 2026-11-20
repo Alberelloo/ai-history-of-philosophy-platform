@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useEvent } from "./hooks/useEvent";
 
 // Всё, что продукт хранит о читателе, — в одном хранилище браузера с версией формата:
 // настройки, открытые книги, места чтения, закрепление боковой панели, диалоги ассистента,
@@ -479,16 +480,16 @@ export function update(change: (state: State) => State): void {
 
 export function useStored<T>(select: (state: State) => T): T {
   const [value, set] = useState<T>(() => select(read()));
+  // Выборка — обычно стрелка, новая на каждой отрисовке: подписка от неё не зависит.
+  const refresh = useEvent(() => set(select(read())));
   useEffect(() => {
-    const refresh = () => set(select(read()));
     window.addEventListener(EVENT, refresh);
     window.addEventListener("storage", refresh);
     return () => {
       window.removeEventListener(EVENT, refresh);
       window.removeEventListener("storage", refresh);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refresh]);
   return value;
 }
 

@@ -7,6 +7,7 @@ import { pick, recipeTitle, useLang, useT, type Catalog } from "./i18n";
 import { ru } from "./i18n/ru";
 import { requestNotice, useNoticeAccepted } from "./Notice";
 import { ScopeToggle, useScope } from "./scope";
+import { useEvent } from "./hooks/useEvent";
 import { useMedia } from "./SidePanel";
 import { useSources } from "./sources";
 import {
@@ -140,7 +141,7 @@ export function sessionTitle(session: Session, fallback: string): string {
 // Подпись каталога с вставленным названием книги: название — контент со своим языком.
 // Подпись с названием книги и главы: оба названия — текст источника на его языке.
 function withTitles(format: (book: string, chapter: string) => string, source: SourceItem | undefined, chapter: string) {
-  const [before, middle = "", after = ""] = format("\u0001", "\u0002").split(/[\u0001\u0002]/);
+  const [before, middle = "", after = ""] = format("\uE000", "\uE001").split(/[\uE000\uE001]/);
   return (
     <>
       {before}
@@ -598,11 +599,14 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     setDraftState(drafts.get(draftKey) ?? { question: "", fragment: null });
   }, [draftKey]);
 
-  // Внешнее выделение заменяет фрагмент (5.2): новое выделение не добавляет второй.
+  // Внешнее выделение заменяет фрагмент (5.2): новое выделение не добавляет второй. Только при
+  // новом выделении: смена сессии не переносит прежнее выделение в её черновик.
+  const takeSelection = useEvent((text: string, paragraphs: string[]) =>
+    setDraft((d) => ({ ...d, fragment: { text, paragraphs } })),
+  );
   useEffect(() => {
-    if (selection) setDraft((d) => ({ ...d, fragment: { text: selection, paragraphs: selectionParagraphs } }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection, selectionParagraphs]);
+    if (selection) takeSelection(selection, selectionParagraphs);
+  }, [selection, selectionParagraphs, takeSelection]);
 
   // Глава, в которой задан вопрос: по адресу; название — из панели или заголовка главы.
   const chapterNow = (): { id: string; title?: string } | undefined => {
@@ -710,9 +714,9 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
     focusAfter.current = { kind: "delete", id }; // на «Удалить» этой строки (10.4)
   };
 
-  // Поручение перехода из панели (5.10): обмен с handoffId добавляется и отправляется один раз.
-  useEffect(() => {
-    if (!pending) return;
+  // Поручение перехода из панели (5.10): обмен с handoffId добавляется и отправляется один раз —
+  // при появлении поручения, а не при смене настроек или сессии.
+  const takeHandoff = useEvent((pending: PendingHandoff) => {
     const state = window.history.state as HistoryState;
     if (state?.handoff !== pending.id || state?.consumed) return;
     if (inflight.has(pending.id)) return;
@@ -742,8 +746,10 @@ export function AssistantPanel({ sourceId, selection, selectionParagraphs, onClo
       })),
     }));
     window.setTimeout(() => inflight.delete(pending.id), 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pending]);
+  });
+  useEffect(() => {
+    if (pending) takeHandoff(pending);
+  }, [pending, takeHandoff]);
 
   const streamingTurns = active.messages.filter((m) => m.status === "streaming" && live.has(m.id));
   const streamingTurn = streamingTurns[streamingTurns.length - 1];

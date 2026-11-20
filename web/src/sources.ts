@@ -33,9 +33,8 @@ export function useSources(ids: string[]): Record<string, SourceItem | undefined
   useEffect(() => {
     const refresh = () => setVersion((v) => v + 1);
     window.addEventListener(EVENT, refresh);
-    if (ids.length) loadAll(); // полный список один раз: так видно, какие книги сняты с публикации
+    if (key) loadAll(); // полный список один раз: так видно, какие книги сняты с публикации
     return () => window.removeEventListener(EVENT, refresh);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   return Object.fromEntries(ids.map((id) => [id, known.get(id)]));
 }
