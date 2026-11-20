@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ApiError, knowledgeApi } from "./api";
 import { errorText, pick, useT } from "./i18n";
 import { Icon, Portrait } from "./ui";
 
@@ -6,8 +7,6 @@ import { Icon, Portrait } from "./ui";
 // списки подтверждённых и скрытых, действия «Подтвердить», «Скрыть», «Вернуть»,
 // «Сделать главным». Превью черновика сервер не отдаёт (адрес отвечает 404 до
 // подтверждения), поэтому вместо битой картинки показываем монограмму с подписью.
-
-const API = "/api/knowledge/v1";
 
 type PortraitRow = {
   id: number;
@@ -27,6 +26,10 @@ type PortraitRow = {
   created_at: string;
 };
 
+// Ошибка — код и текст сервиса; переводится при показе.
+type Problem = { kind?: string; text?: string };
+const readError = (e: unknown): Problem =>
+  e instanceof ApiError ? { kind: e.details.kind as string | undefined, text: e.details.error as string | undefined } : {};
 type Status = "draft" | "approved" | "hidden";
 const STATUSES: Status[] = ["draft", "approved", "hidden"];
 
@@ -35,41 +38,33 @@ export function PortraitsReview() {
   const [status, setStatus] = useState<Status>("draft");
   const [items, setItems] = useState<PortraitRow[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Problem | null>(null);
 
-  const readError = async (response: Response): Promise<string> => {
-    const body = await response.json().catch(() => ({}));
-    return errorText(t, body.kind, body.error);
-  };
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setError(null);
     setLoaded(false);
-    const response = await fetch(`${API}/review/portraits?status=${status}`);
-    if (!response.ok) {
-      setError(await readError(response));
+    try {
+      setItems(await knowledgeApi.portraits<PortraitRow[]>(status));
+    } catch (e) {
+      setError(readError(e));
       setItems([]);
-      setLoaded(true);
-      return;
     }
-    setItems(await response.json());
     setLoaded(true);
-  };
+  }, [status]);
 
   useEffect(() => {
     load();
-  }, [status]);
+  }, [load]);
 
   const act = async (id: number, action: string) => {
     setError(null);
-    const response = await fetch(`${API}/review/portraits/${id}?action=${action}`, {
-      method: "POST",
-    });
-    if (response.ok) {
-      await load();
-    } else {
-      setError(await readError(response));
+    try {
+      await knowledgeApi.portraitAction(id, action);
+    } catch (e) {
+      setError(readError(e));
+      return;
     }
+    await load();
   };
 
   const empty = status === "hidden" ? t.review.hiddenEmpty : t.review.portraitsEmpty;
@@ -100,7 +95,7 @@ export function PortraitsReview() {
       {error && (
         <div className="pg-notice pg-notice--danger" role="alert">
           <Icon name="warning" />
-          <div>{error}</div>
+          <div>{errorText(t, error.kind, error.text)}</div>
         </div>
       )}
 
@@ -126,7 +121,7 @@ function PortraitRowView({
   const showImage = item.status === "approved" && !item.hidden;
   const authorYear = [item.author, item.year].filter(Boolean).join(", ");
   const preview = showImage
-    ? { url: `${API}/portraits/${item.id}`, width: item.width, height: item.height }
+    ? { url: knowledgeApi.portraitUrl(item.id), width: item.width, height: item.height }
     : null;
 
   return (

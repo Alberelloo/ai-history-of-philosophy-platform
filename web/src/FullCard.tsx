@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ApiError, knowledgeApi } from "./api";
 import { navigate } from "./App";
 import { pick, recipeTitle, relationTitle, sectionTitle, useT, whoLabel } from "./i18n";
 import { ScopeToggle, useScope } from "./scope";
@@ -57,8 +58,6 @@ type Card = {
   }[];
   recipes: { code: string; title: string }[];
 };
-
-const API = "/api/knowledge/v1";
 
 // Переход по связи в полной карточке (4.6): событие ловит экран чтения и кладёт карточку
 // наверх стека панели, поэтому «Назад» подписан «Назад: <прежняя карточка>».
@@ -136,22 +135,14 @@ export function FullCard({
     setProblem(null);
     const params = new URLSearchParams({ generation: String(scope.generation) });
     if (textbook) params.set(onlyTextbook ? "attributed_to" : "textbook", textbook);
-    fetch(`${API}/entities/${entityId}/card?${params}`, { signal: controller.signal })
-      .then(async (r) => {
-        const body = await r.json().catch(() => ({}));
-        if (controller.signal.aborted) return;
-        if (r.status === 404 && body.kind === "entity_not_found") {
-          setProblem("not_found");
-          return;
-        }
-        if (!r.ok) {
-          setProblem("failed");
-          return;
-        }
-        setCard(body as Card);
+    knowledgeApi
+      .card<Card>(entityId, params, controller.signal)
+      .then((body) => {
+        if (!controller.signal.aborted) setCard(body);
       })
-      .catch(() => {
-        if (!controller.signal.aborted) setProblem("failed");
+      .catch((e) => {
+        if (controller.signal.aborted) return;
+        setProblem(e instanceof ApiError && e.status === 404 && e.kind === "entity_not_found" ? "not_found" : "failed");
       });
     return () => controller.abort();
   }, [entityId, onlyTextbook, scope.generation, textbook, attempt]);

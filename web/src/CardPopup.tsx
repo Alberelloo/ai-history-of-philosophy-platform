@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { ApiError, knowledgeApi } from "./api";
 import { navigate } from "./App";
 import { pick, recipeTitle, relationTitle, useT } from "./i18n";
 import { useScope } from "./scope";
@@ -65,7 +66,6 @@ type Props = {
 
 export const CARD_POPUP_ID = "card-popup";
 
-const API = "/api/knowledge/v1";
 const MARGIN = 16;
 const POPOVER_MIN = 320;
 // S2: подпись «Загружаем карточку…» появляется, только если загрузка дольше 300 мс (4.7).
@@ -88,28 +88,12 @@ async function streamDescription(
   signal: AbortSignal,
   onUpdate: (desc: { text: string; generated: boolean }) => void,
 ): Promise<void> {
-  const response = await fetch(`${API}/entities/${entityId}/description?generation=${generation}`, {
-    method: "POST",
-    signal,
-  });
-  if (!response.body) return;
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
   let text = "";
-  for (;;) {
-    const { value: chunk, done } = await reader.read();
-    if (done || signal.aborted) break;
-    buffer += decoder.decode(chunk, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.trim()) continue;
-      const event = JSON.parse(line);
-      if (event.type === "delta") text += event.text;
-      if (event.type === "done") text = event.text;
-      if (event.type === "delta" || event.type === "done") onUpdate({ text, generated: true });
-    }
+  for await (const event of knowledgeApi.description(entityId, generation, signal)) {
+    if (signal.aborted) break;
+    if (event.type === "delta") text += event.text as string;
+    if (event.type === "done") text = event.text as string;
+    if (event.type === "delta" || event.type === "done") onUpdate({ text, generated: true });
   }
 }
 
@@ -263,21 +247,10 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
       window.clearTimeout(timer);
       setLoading(false);
     };
-    fetch(`${API}/entities/${current}/card?${params}`, { signal: controller.signal })
-      .then(async (r) => {
-        const body = await r.json().catch(() => ({}));
+    knowledgeApi
+      .card<Card>(current, params, controller.signal)
+      .then(async (data) => {
         if (controller.signal.aborted) return;
-        if (r.status === 404 && body.kind === "entity_not_found") {
-          setProblem("not_found");
-          finish();
-          return;
-        }
-        if (!r.ok) {
-          setProblem("failed");
-          finish();
-          return;
-        }
-        const data = body as Card;
         finish();
         setCard(data);
         if (data.description) {
@@ -292,11 +265,10 @@ export function CardPopup({ entityId, anchor, line = 0, name, keyboard, x, y, on
         cache.set(key, data);
         trimCache();
       })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setProblem("failed");
-          finish();
-        }
+      .catch((e) => {
+        if (controller.signal.aborted) return;
+        setProblem(e instanceof ApiError && e.status === 404 && e.kind === "entity_not_found" ? "not_found" : "failed");
+        finish();
       });
     return () => {
       window.clearTimeout(timer);

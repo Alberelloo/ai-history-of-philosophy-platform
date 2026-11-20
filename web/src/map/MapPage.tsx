@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ApiError, knowledgeApi } from "../api";
 import { openCardInPanel } from "../FullCard";
 import { useT } from "../i18n";
 import { ScopeToggle, setScope, useScope } from "../scope";
@@ -13,7 +14,6 @@ import { idleBuild, MapPanel, type BuildState, type LinkView } from "./MapPanel"
 import { canvasMeasure, loadMapFonts } from "./measure";
 import { find, index, related, visible } from "./model";
 import { OVERVIEW_HEIGHT, Overview } from "./Overview";
-import { KNOWLEDGE_API, ndjson } from "./stream";
 import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapState } from "./types";
 
 // Страница графа — синхронологическая карта раздела (openspec/changes/archive/2026-11-18-synchro-map).
@@ -86,17 +86,13 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     }
     let live = true;
     setLoad((l) => ({ status: "loading", data: l.data }));
-    const params = new URLSearchParams();
-    if (textbook) params.set("textbook", textbook);
-    if (onlyTextbook) params.set("only_textbook", "true");
-    fetch(`${KNOWLEDGE_API}/map${params.toString() ? `?${params}` : ""}`)
-      .then(async (r) => {
+    knowledgeApi
+      .map<MapData>({ textbook, onlyTextbook })
+      .then((data) => live && setLoad({ status: "ok", data }))
+      .catch((e) => {
         if (!live) return;
-        if (r.status === 404) return setLoad({ status: "missing", data: null });
-        if (!r.ok) return setLoad({ status: "error", data: null });
-        setLoad({ status: "ok", data: (await r.json()) as MapData });
-      })
-      .catch(() => live && setLoad({ status: "error", data: null }));
+        setLoad({ status: e instanceof ApiError && e.status === 404 ? "missing" : "error", data: null });
+      });
     return () => {
       live = false;
     };
@@ -222,13 +218,9 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
       if (fixture) return setLink({ id, edge: fallback, status: "ready" });
       setLink({ id, edge: null, status: "loading" });
       // Связь в виде ребра графа: подписи атрибуций и закрытые по региону источники — на сервере.
-      const q = textbook ? `?textbook=${encodeURIComponent(textbook)}` : "";
-      fetch(`${KNOWLEDGE_API}/graph/edges/${encodeURIComponent(id)}${q}`)
-        .then((r) => (r.ok ? (r.json() as Promise<GEdge>) : null))
-        .then((got) => {
-          const edge = got ?? fallback;
-          setLink((cur) => (cur?.id === id ? { id, edge, status: "ready" } : cur));
-        })
+      knowledgeApi
+        .edge<GEdge>(id, textbook)
+        .then((got) => setLink((cur) => (cur?.id === id ? { id, edge: got ?? fallback, status: "ready" } : cur)))
         .catch(() => setLink((cur) => (cur?.id === id ? { id, edge: fallback, status: "ready" } : cur)));
     },
     [data, fixture, textbook],
@@ -267,28 +259,15 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
       };
       setBuild({ ...idleBuild(), running: true });
       try {
-        const response = await fetch(`${KNOWLEDGE_API}/graph/build`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entity_id: found.obj.id,
-            recipe,
-            depth: null,
-            textbook: textbook ?? null,
-            only_textbook: onlyTextbook,
-            generation: scope.generation,
-          }),
+        const events = knowledgeApi.build({
+          entity_id: found.obj.id,
+          recipe,
+          depth: null,
+          textbook: textbook ?? null,
+          only_textbook: onlyTextbook,
+          generation: scope.generation,
         });
-        if (!response.ok) {
-          const body = await response.json().catch(() => ({}));
-          setBuild((b) => ({
-            ...b,
-            running: false,
-            problem: { kind: body.kind ?? "failed", message: body.error, suggestions: body.suggestions ?? [] },
-          }));
-          return;
-        }
-        for await (const event of ndjson(response)) {
+        for await (const event of events) {
           if (event.type === "graph") {
             add((event.edges as GEdge[]) ?? []);
             const notice = (event.notice as string | null) ?? null;
@@ -302,8 +281,17 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
           }
         }
         setBuild((b) => ({ ...b, running: false }));
-      } catch {
-        setBuild((b) => ({ ...b, running: false, problem: { kind: "service_down", suggestions: [] } }));
+      } catch (e) {
+        // Отказ до начала потока — код и подсказки рецептов от сервера; сбой сети — «недоступен».
+        const problem =
+          e instanceof ApiError
+            ? {
+                kind: (e.details.kind as string | undefined) ?? "failed",
+                message: e.details.error as string | undefined,
+                suggestions: (e.details.suggestions as { code: string; title: string }[] | undefined) ?? [],
+              }
+            : { kind: "service_down", suggestions: [] };
+        setBuild((b) => ({ ...b, running: false, problem }));
       }
     },
     [found, recipeParam, data, textbook, onlyTextbook, scope.generation],

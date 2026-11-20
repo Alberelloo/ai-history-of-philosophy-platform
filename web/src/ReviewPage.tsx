@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ApiError, knowledgeApi } from "./api";
 import { errorText, pick, useT } from "./i18n";
 import { PortraitsReview } from "./PortraitsReview";
 import { Icon, Seg } from "./ui";
@@ -26,16 +27,12 @@ type Context = {
   evidence: { paragraph_text: string; quote: string; highlight: [number, number] | null; link: string }[];
 };
 
-const API = "/api/knowledge/v1";
 const KINDS = ["", "warning", "lost_evidence", "generated", "ambiguous_link", "duplicate", "proposal"];
 type ReviewTab = "statements" | "portraits";
 
-async function post(path: string, body?: unknown) {
-  return fetch(`${API}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+// Ошибка запроса для показа: код сервиса (переводится) и текст; сбой сети — «сервис недоступен».
+function problemOf(e: unknown): { kind?: string; text?: string } {
+  return e instanceof ApiError ? { kind: e.kind, text: e.message } : { kind: "service_down" };
 }
 
 function Highlighted({ text, span }: { text: string; span: [number, number] | null }) {
@@ -61,40 +58,60 @@ export function ReviewPage() {
   const [newType, setNewType] = useState("");
   const [tab, setTab] = useState<ReviewTab>("statements");
 
-  const load = async () => {
-    const response = await fetch(`${API}/review/queue${kind ? `?kind=${kind}` : ""}`);
-    if (response.status === 404) {
-      setAuthorized(false);
-      return;
+  const load = useCallback(async () => {
+    try {
+      const queue = await knowledgeApi.reviewQueue<QueueItem[]>(kind);
+      setAuthorized(true);
+      setItems(queue);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 404) {
+        setAuthorized(false);
+        return;
+      }
+      setAuthorized(true);
+      setItems([]);
+      setError(problemOf(e));
     }
-    setAuthorized(true);
-    setItems(await response.json());
-  };
+  }, [kind]);
   useEffect(() => {
     load();
-  }, [kind]);
+  }, [load]);
 
   const login = async () => {
-    const response = await post("/operator/login", { password });
-    if (response.ok) {
+    try {
+      await knowledgeApi.login(password);
       setError(null);
       load();
-    } else {
-      const body = await response.json().catch(() => ({}));
-      setError({ kind: body.kind, text: body.error });
+    } catch (e) {
+      setError(e instanceof ApiError ? { kind: e.details.kind as string | undefined, text: e.details.error as string | undefined } : {});
     }
   };
 
   const openStatement = async (id: string) => {
-    setOpen(await (await fetch(`${API}/review/statements/${id}`)).json());
+    try {
+      setOpen(await knowledgeApi.reviewStatement<Context>(id));
+      setError(null);
+    } catch (e) {
+      setError(problemOf(e));
+    }
     setNewType("");
+  };
+
+  // Действие оператора и перечитывание очереди; ошибка действия — над очередью.
+  const act = async (run: () => Promise<unknown>) => {
+    try {
+      await run();
+    } catch (e) {
+      setError(problemOf(e));
+    }
+    load();
   };
 
   const decide = async (decision: string, changes?: Record<string, unknown>) => {
     if (!open) return;
-    await post(`/review/statements/${open.statement.id}`, { decision, changes });
+    const id = open.statement.id;
     setOpen(null);
-    load();
+    await act(() => knowledgeApi.decide(id, decision, changes));
   };
 
   if (authorized === false) {
@@ -168,6 +185,12 @@ export function ReviewPage() {
               <Icon name="chevronDown" small className="select__chevron" />
             </div>
           </div>
+          {error && (
+            <div className="pg-notice pg-notice--danger" role="alert">
+              <Icon name="warning" />
+              <div>{errorText(t, error.kind, error.text)}</div>
+            </div>
+          )}
           {authorized && items.length === 0 && <p className="muted">{t.review.empty}</p>}
       <ol className="review-queue">
         {items.map((item, i) => (
@@ -183,13 +206,13 @@ export function ReviewPage() {
                 <code className="review-payload">{JSON.stringify(item.payload)}</code>
                 <button
                   className="pg-btn pg-btn--secondary pg-btn--sm"
-                  onClick={() => post(`/review/items/${item.item_id}/duplicate?merge=true`).then(load)}
+                  onClick={() => act(() => knowledgeApi.duplicate(item.item_id!, true))}
                 >
                   {t.review.merge}
                 </button>
                 <button
                   className="pg-btn pg-btn--ghost pg-btn--sm"
-                  onClick={() => post(`/review/items/${item.item_id}/duplicate?merge=false`).then(load)}
+                  onClick={() => act(() => knowledgeApi.duplicate(item.item_id!, false))}
                 >
                   {t.review.split}
                 </button>
@@ -200,7 +223,7 @@ export function ReviewPage() {
                 <code className="review-payload">{JSON.stringify(item.payload)}</code>
                 <button
                   className="pg-btn pg-btn--ghost pg-btn--sm"
-                  onClick={() => post(`/review/proposals/${item.proposal_id}?accept=false`).then(load)}
+                  onClick={() => act(() => knowledgeApi.proposal(item.proposal_id!, false))}
                 >
                   {t.review.rejectType}
                 </button>

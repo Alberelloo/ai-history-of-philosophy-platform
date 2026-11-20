@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type Dispatch, type MouseEvent as ReactMouseEvent, type ReactNode, type SetStateAction } from "react";
-import { api, ApiError, type Chapter, type ChapterBlock, type TocItem } from "./api";
+import { api, ApiError, knowledgeApi, type Chapter, type ChapterBlock, type TocItem } from "./api";
 import { navigate, pushPanelItem, type PanelState } from "./App";
 import { useFragmentParagraphs } from "./AssistantPanel";
 import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
@@ -472,11 +472,7 @@ export function ReaderPage({ sourceId, chapterId, anchor, panel, setPanel }: Pro
     for (let i = 0; i < targets.length; i += MENTIONS_CHUNK) chunks.push(targets.slice(i, i + MENTIONS_CHUNK));
     Promise.all(
       chunks.map((part) =>
-        fetch(`/api/knowledge/v1/mentions?targets=${part.map(encodeURIComponent).join(",")}`, {
-          signal: controller.signal,
-        })
-          .then((r) => (r.ok ? (r.json() as Promise<Mention[]>) : []))
-          .catch(() => [] as Mention[]),
+        knowledgeApi.mentions<Mention[]>(part, controller.signal).catch(() => [] as Mention[]),
       ),
     ).then((parts) => {
       if (controller.signal.aborted) return;

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
-import type { SourceItem } from "./api";
+import { ApiError, assistantApi, type SourceItem } from "./api";
 import { navigate } from "./App";
 import { openCardInPanel } from "./FullCard";
 import { QUESTION_SELECTOR } from "./hooks/useAssistantShortcut";
@@ -20,6 +20,7 @@ import {
   type Citation,
   type DialogSet,
   type Fragment,
+  type Handoff,
   type Message,
   type MapView,
   type Session,
@@ -309,11 +310,8 @@ async function ask(a: Ask): Promise<void> {
     timer = window.setTimeout(() => controller.abort("timeout"), TIMEOUT_MS);
   };
   try {
-    const response = await fetch("/api/assistant/v1/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: controller.signal,
-      body: JSON.stringify({
+    const events = assistantApi.ask(
+      {
         question: a.question,
         selection: a.selection ?? null,
         selection_paragraphs: a.selection ? a.selectionParagraphs : [],
@@ -325,58 +323,46 @@ async function ask(a: Ask): Promise<void> {
         context: a.context,
         handoff_declined: a.handoff?.declined ?? false,
         handoff_reason: a.handoff?.reason ?? null,
-      }),
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      const message = body.reason ? eventMessage(body) : { code: body.kind ?? "unavailable", text: body.error };
-      finish((t) => ({ ...t, status: "done", notices: pushNotice(t, message) }));
-      return;
-    }
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    for (;;) {
-      const { value, done } = await reader.read();
-      if (done) break;
+      },
+      controller.signal,
+    );
+    for await (const event of events) {
       resetTimer();
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        const event = JSON.parse(line);
-        if (event.type === "stage") {
-          if (event.name === "searching") setStage(turnId, (s) => ({ ...s, step: 1 }));
-          else if (event.name === "composing") setStage(turnId, (s) => ({ ...s, step: 2, found: Number(event.found ?? 0) }));
-        } else if (event.type === "fragment") {
-          setStage(turnId, (s) => ({ ...s, step: 3 }));
-          patch((t) => ({ ...t, fragments: [...t.fragments, event as Fragment] }));
-        } else if (event.type === "suggestion" && event.kind === "map") {
-          if (isMapHref(event.href)) patch((t) => ({ ...t, mapView: normalizeMapView(event) }));
-        } else if (event.type === "suggestion") {
-          patch((t) => ({ ...t, suggestion: event as Suggestion }));
-        } else if (event.type === "handoff") {
-          patch((t) => ({ ...t, handoff: { reason: event.reason } }));
-        } else if (event.type === "done") {
-          finish((t) => ({ ...t, status: "done" }));
-        } else if (event.type === "error") {
-          finish((t) => ({ ...t, status: "error", notices: pushNotice(t, eventMessage(event)) }));
-        } else {
-          const message = eventMessage(event);
-          if (event.reason === "visitor_limit" && Number(event.retry_after_seconds) > 0) {
-            // «Спросить» неактивна до конца срока (5.7).
-            limitedUntil = Date.now() + Number(event.retry_after_seconds) * 1000;
-          }
-          if (event.type === "notice") patch((t) => ({ ...t, notices: pushNotice(t, message) }));
-          else finish((t) => ({ ...t, notices: pushNotice(t, message), status: "done" }));
+      if (event.type === "stage") {
+        if (event.name === "searching") setStage(turnId, (s) => ({ ...s, step: 1 }));
+        else if (event.name === "composing") setStage(turnId, (s) => ({ ...s, step: 2, found: Number(event.found ?? 0) }));
+      } else if (event.type === "fragment") {
+        setStage(turnId, (s) => ({ ...s, step: 3 }));
+        patch((t) => ({ ...t, fragments: [...t.fragments, event as unknown as Fragment] }));
+      } else if (event.type === "suggestion" && event.kind === "map") {
+        if (isMapHref(event.href)) patch((t) => ({ ...t, mapView: normalizeMapView(event) }));
+      } else if (event.type === "suggestion") {
+        patch((t) => ({ ...t, suggestion: event as unknown as Suggestion }));
+      } else if (event.type === "handoff") {
+        patch((t) => ({ ...t, handoff: { reason: event.reason as Handoff["reason"] } }));
+      } else if (event.type === "done") {
+        finish((t) => ({ ...t, status: "done" }));
+      } else if (event.type === "error") {
+        finish((t) => ({ ...t, status: "error", notices: pushNotice(t, eventMessage(event)) }));
+      } else {
+        const message = eventMessage(event);
+        if (event.reason === "visitor_limit" && Number(event.retry_after_seconds) > 0) {
+          // «Спросить» неактивна до конца срока (5.7).
+          limitedUntil = Date.now() + Number(event.retry_after_seconds) * 1000;
         }
+        if (event.type === "notice") patch((t) => ({ ...t, notices: pushNotice(t, message) }));
+        else finish((t) => ({ ...t, notices: pushNotice(t, message), status: "done" }));
       }
     }
     patch((t) => (t.status === "streaming" ? { ...t, status: "done" } : t));
   } catch (e) {
     const reason = controller.signal.reason;
-    if (controller.signal.aborted && reason === "timeout") {
+    if (e instanceof ApiError) {
+      // Отказ до начала потока: пометка по причине (лимит посетителя) или по коду сервиса.
+      const body = e.details;
+      const message = body.reason ? eventMessage(body) : { code: (body.kind as string | undefined) ?? "unavailable", text: body.error as string | undefined };
+      finish((t) => ({ ...t, status: "done", notices: pushNotice(t, message) }));
+    } else if (controller.signal.aborted && reason === "timeout") {
       finish((t) => ({ ...t, status: "error", notices: pushNotice(t, { code: "timeout" }) }));
     } else if (controller.signal.aborted || (e as Error).name === "AbortError") {
       finish((t) => ({ ...t, status: "stopped" }));
