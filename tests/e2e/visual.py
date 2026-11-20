@@ -31,6 +31,7 @@ def required() -> bool:
     """Нет эталона — ошибка, а не пропуск сравнения (CI). Читается при каждом снимке."""
     return os.environ.get("PHILOGRAPH_REQUIRE_SNAPSHOTS") == "1"
 
+
 # Доля отличающихся пикселей, выше которой снимок считается изменившимся.
 MAX_DIFF_RATIO = 0.005
 # Разница канала, которую ещё списываем на сглаживание шрифтов и краёв.
@@ -388,6 +389,11 @@ def reader_name(state: str, theme: str, lang: str, width: int) -> str:
 UNSTABLE = (".assistant__session-meta", ".assistant__elapsed")
 
 
+def _shown(path: Path) -> str:
+    """Путь от корня репозитория, если файл внутри него."""
+    return path.relative_to(REPO).as_posix() if path.is_relative_to(REPO) else str(path)
+
+
 class SnapshotMismatch(AssertionError):
     pass
 
@@ -459,7 +465,7 @@ def snap(
         # проверки по DOM.
         if required():
             raise SnapshotMissing(
-                f"{name}: нет эталона {expected.relative_to(REPO).as_posix()}; снимок в {actual}. "
+                f"{name}: нет эталона {_shown(expected)}; снимок в {_shown(actual)}. "
                 "Эталоны пишет python scripts/visual_check.py --update"
             )
         return None

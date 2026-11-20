@@ -37,3 +37,17 @@
   
   Все падения — `TimeoutError` (goto или wait_for_selector), ни одного «отличается … пикселей», ни одного «нет эталона». `tests/e2e/visual/results/` после прогонов пуст: каждый снятый снимок совпал с эталоном.
 - Находка: эталоны `win32` устарели. В них есть `chapter-light-1600`, которого тесты больше не снимают, и нет шести снимков карты (`map-*`).
+
+## 2026-11-20 — CI, обязательные снимки, документы (1.6, 2.2, 2.3, 4.1, 6.1)
+
+- `tests/e2e/visual.py`: `PHILOGRAPH_REQUIRE_SNAPSHOTS=1` — без эталона `SnapshotMissing` (подкласс `SnapshotMismatch`, поэтому `Snaps` собирает его в общий список), снимок остаётся в `results/`. Юнит-тесты без браузера — `tests/e2e/test_visual_helpers.py`, 3 passed.
+- `.github/workflows/ci.yml` — только новые шаги:
+  - в начале `checks` и `e2e`: `PHILOGRAPH_REQUIRE_SNAPSHOTS=1` и `PYTEST_ADDOPTS=--junitxml=…` через `$GITHUB_ENV`;
+  - переключение файла JUnit перед вторым прогоном (PostgreSQL) и перед проверками развёртывания;
+  - шаг «Спецификации OpenSpec» (`npx -y @fission-ai/openspec@2.1.0 validate --all --no-interactive`);
+  - шаг «Прослеживаемость по прогону pytest» (`--junit-report`, оба XML);
+  - выгрузка отчётов и `tests/e2e/visual/results/` артефактом.
+- `openspec validate`: локально Node 20, поэтому Node 24 поставлен npm-пакетом `node@24` в папку scratchpad, CLI 2.1.0 запущен им. Итог: `Totals: 39 passed, 0 failed (39 items)`, только предупреждения. Требования движка: 1.17.0 — Node ≥ 22.12, 2.1.0 — Node ≥ 22.20 (`npm view`).
+- Сверка JUnit на настоящем отчёте: `pytest tests/platform --junitxml` дал `38 passed`. После этого `check_traceability.py --junit-report --junit …` не назвал ни одного теста из `tests/platform`. Остальные 690 помеченных тестов в этот прогон не входили: соответствие classname и имени верное.
+- `.github/workflows/snapshots.yml` — ручной запуск: `visual_check.py --update --no-build` в образе CI, артефакт `baselines-linux`.
+- AGENTS.md: команда `--report`, правило `nolog`, ловушка «эталоны только Windows» заменена описанием эталонов Linux и `PHILOGRAPH_REQUIRE_SNAPSHOTS`.

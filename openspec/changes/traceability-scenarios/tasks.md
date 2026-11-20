@@ -7,13 +7,13 @@
 - [x] 1.3 Считаются только тесты, которые соберёт pytest (`test_*` модуля, `test_*` классов `Test*`, маркеры класса и `pytestmark`); маркер не на тесте — ошибка
 - [x] 1.4 Статическое определение проверки журнала с обходом помощников; режимы `enforce_scenarios` и `enforce_log` в `traceability.yaml` (пока пустые), флаг `--report`
 - [x] 1.5 `--junit` (несколько отчётов) и `--junit-report`; юнит-тесты скрипта и мутационная проверка
-- [ ] 1.6 Шаги CI: pytest пишет JUnit, скрипт сверяет в режиме отчёта; XML — артефакт
+- [x] 1.6 Шаги CI: pytest пишет JUnit, скрипт сверяет в режиме отчёта; XML — артефакт
 
 ## 2. Снимки экрана в CI
 
 - [x] 2.1 Эталоны `tests/e2e/visual/baselines/linux/` и два прогона сравнения подряд без расхождений
-- [ ] 2.2 `PHILOGRAPH_REQUIRE_SNAPSHOTS=1`: нет эталона — тест падает; переменная в шагах pytest CI (новые шаги не нужны — переменная задания)
-- [ ] 2.3 `.github/workflows/snapshots.yml`: ручной запуск собирает эталоны Linux в образе CI артефактом
+- [x] 2.2 `PHILOGRAPH_REQUIRE_SNAPSHOTS=1`: нет эталона — тест падает; переменная задаётся новым шагом в начале заданий `checks` и `e2e`
+- [x] 2.3 `.github/workflows/snapshots.yml`: ручной запуск собирает эталоны Linux в образе CI артефактом
 - [ ] 2.4 Сверка эталонов с рендером `ubuntu-latest` по прогону CI этого PR; при расхождении — эталоны из артефакта 2.3
 
 ## 3. Одна фикстура стенда e2e
@@ -23,7 +23,7 @@
 
 ## 4. `openspec validate` в CI
 
-- [ ] 4.1 Шаг `npx -y @fission-ai/openspec@2.1.0 validate --all --no-interactive`; проверено локально на Node 24
+- [x] 4.1 Шаг `npx -y @fission-ai/openspec@2.1.0 validate --all --no-interactive`; проверено локально на Node 24
 
 ## 5. События без проверки
 
@@ -31,4 +31,4 @@
 
 ## 6. Документы
 
-- [ ] 6.1 AGENTS.md (ловушки окружения, команды), working-principles / скилл тестировщика — про `--report`, `nolog`, `PHILOGRAPH_REQUIRE_SNAPSHOTS`
+- [x] 6.1 AGENTS.md: команда `--report`, `nolog`, эталоны Linux и `PHILOGRAPH_REQUIRE_SNAPSHOTS`

@@ -35,6 +35,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Снимок без эталона Linux — падение, а не пропуск сравнения (tests/e2e/visual.py).
+      # Отчёт JUnit каждого прогона pytest — для сверки прослеживаемости с выполненными тестами.
+      - name: Снимки обязательны, отчёты pytest
+        run: |
+          echo "PHILOGRAPH_REQUIRE_SNAPSHOTS=1" >> "$GITHUB_ENV"
+          echo "PYTEST_ADDOPTS=--junitxml=reports/junit-sqlite.xml" >> "$GITHUB_ENV"
+
       # Репозиторий публичный, а проект ходит в LLM API: ключ в истории коммитов = утечка.
       - name: Поиск секретов
         run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.18.4 detect --source=/repo --redact --no-banner
@@ -89,6 +96,11 @@ jobs:
           npm ci --no-audit --no-fund
           npm run build
 
+      # Формат спецификаций и изменений OpenSpec; CLI с точной версией (Node >= 22.20).
+      - name: Спецификации OpenSpec
+        if: steps.py.outputs.present == 'true'
+        run: npx -y @fission-ai/openspec@2.1.0 validate --all --no-interactive
+
       - name: Браузер для тестов интерфейса
         if: steps.py.outputs.present == 'true'
         run: python -m playwright install --with-deps chromium
@@ -109,12 +121,34 @@ jobs:
         if: steps.py.outputs.present == 'true'
         run: pytest -q
 
+      - name: Отчёт pytest второго прогона
+        if: steps.py.outputs.present == 'true'
+        run: echo "PYTEST_ADDOPTS=--junitxml=reports/junit-postgres.xml" >> "$GITHUB_ENV"
+
       - name: Pytest (PostgreSQL)
         if: steps.py.outputs.present == 'true'
         env:
           PHILOGRAPH_TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/test
         # Сквозные тесты идут на своём стенде, второй прогон им не нужен.
         run: pytest -q -m "not e2e"
+
+      # Пока отчёт: часть помеченных тестов идёт только в задании e2e (развёртывание).
+      # Как включить обязательность — openspec/changes/traceability-scenarios/design.md, п. 6.
+      - name: Прослеживаемость по прогону pytest
+        if: steps.py.outputs.present == 'true'
+        run: >-
+          python scripts/check_traceability.py --junit-report
+          --junit reports/junit-sqlite.xml --junit reports/junit-postgres.xml
+
+      - name: Отчёты pytest и снимки при расхождении
+        if: always() && steps.py.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-checks
+          path: |
+            reports/
+            tests/e2e/visual/results/
+          if-no-files-found: ignore
 
   e2e:
     name: e2e
@@ -124,6 +158,11 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Снимки обязательны, отчёты pytest
+        run: |
+          echo "PHILOGRAPH_REQUIRE_SNAPSHOTS=1" >> "$GITHUB_ENV"
+          echo "PYTEST_ADDOPTS=--junitxml=reports/junit-e2e.xml" >> "$GITHUB_ENV"
 
       - name: Настройки стенда
         run: |
@@ -157,6 +196,9 @@ jobs:
           PHILOGRAPH_E2E_URL: http://127.0.0.1:8080
         run: pytest -q tests/e2e
 
+      - name: Отчёт pytest проверок развёртывания
+        run: echo "PYTEST_ADDOPTS=--junitxml=reports/junit-deploy.xml" >> "$GITHUB_ENV"
+
       # Публичный сервер: Caddy с HTTPS (для localhost сертификат выпускает его внутренний
       # центр), закрытый порт шлюза, перезапуск упавшего сервиса.
       # Значения региона — как у стенда: Caddy считает локальный адрес CDN, страна — CF-IPCountry.
@@ -175,6 +217,16 @@ jobs:
           PHILOGRAPH_DEPLOY_URL: https://localhost
           PHILOGRAPH_DEPLOY_COMPOSE: -f compose.yaml -f compose.e2e.yaml -f compose.prod.yaml
         run: pytest -q tests/ops/test_deploy.py
+
+      - name: Отчёты pytest и снимки при расхождении
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-e2e
+          path: |
+            reports/
+            tests/e2e/visual/results/
+          if-no-files-found: ignore
 
       - name: Журналы сервисов при падении
         if: failure()
