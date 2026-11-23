@@ -231,13 +231,26 @@ class CatalogService:
 
     def _desired(self, entry: dict[str, Any]) -> dict[str, Any]:
         fields = model.registry_fields(entry)
+        meta = model.metadata(entry)
+        metadata_only = bool(entry.get("metadata_only"))
+        settings: dict[str, Any] = {"languages": [fields["language"]]}
+        if metadata_only:
+            settings.update(
+                {
+                    "metadata_only": True,
+                    "abstract": meta.get("abstract"),
+                    "toc": list(meta.get("toc") or []),
+                    "citations": list(meta.get("citations") or []),
+                }
+            )
         return {
             **fields,
             "license": model.license_of(entry),
-            "files": [
-                {k: v for k, v in f.items() if k in FILE_KEYS and v} for f in model.files(entry)
-            ],
-            "settings": {"languages": [fields["language"]]},
+            "files": []
+            if metadata_only
+            else [{k: v for k, v in f.items() if k in FILE_KEYS and v} for f in model.files(entry)],
+            "settings": settings,
+            "metadata_only": metadata_only,
         }
 
     def _sync_entry(self, entry: dict[str, Any], *, dry_run: bool) -> Outcome:
@@ -275,6 +288,9 @@ class CatalogService:
         blocked = self.registry.blocked_reason(source_id)
         if blocked:
             return Outcome(cid, "blocked", blocked, source_id=source_id)
+        if entry.get("metadata_only"):
+            # Без файлов и версии: источник уже зарегистрирован, метаданные ушли в онтологию.
+            return Outcome(cid, "metadata", source_id=source_id)
         source = self.registry.get(source_id)
         if source.status == "unpublished" and source.published_version:
             # запись снова одобрена после отзыва: возвращаем прежнюю публикацию

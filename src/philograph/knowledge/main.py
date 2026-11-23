@@ -19,6 +19,7 @@ from philograph.knowledge.filling import Filling
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import MapSettings, SectionMap
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.metadata import MetadataIngest
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
@@ -76,7 +77,7 @@ def components(env: dict[str, str]) -> Components:
         )
     queue = Queue(engine)
     mentions = Mentions(statements, library)
-    subscribe(queue, statements, filling, mentions)
+    subscribe(queue, statements, filling, mentions, metadata=MetadataIngest(statements))
     actions = ActionLog(engine)
     review = Review(statements, actions)
     llm = (

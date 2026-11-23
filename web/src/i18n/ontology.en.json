@@ -145,6 +145,10 @@
       "title": "author",
       "inverse": "wrote"
     },
+    "cites": {
+      "title": "cites",
+      "inverse": "cited by"
+    },
     "expresses": {
       "title": "expresses",
       "inverse": "expressed in"

@@ -651,7 +651,158 @@ class Direct:
         return Harvest(metadata={}, files=[{"name": name, "url": url}], slug_hint=[name])
 
 
-ADAPTERS: list[Adapter] = [Gutenberg(), Wikisource(), ArchiveOrg(), Direct()]
+# --- Открытые репозитории современной философии ---------------------------------------
+
+_ATOM = "http://www.w3.org/2005/Atom"
+_OAI_DC = "http://www.openarchives.org/OAI/2.0/oai_dc/"
+_DC = "http://purl.org/dc/elements/1.1/"
+
+
+def _year_of(raw: str | None) -> int | None:
+    """Первый четырёхзначный год в строке даты; ``None``, если его нет."""
+    if not raw:
+        return None
+    match = re.search(r"\d{4}", raw)
+    return int(match.group(0)) if match else None
+
+
+def _person(name: str) -> dict[str, Any]:
+    """Современный автор: имя без дат смерти (годы не подтверждают срок охраны)."""
+    return {"name": " ".join(name.split()), "death_year": None, "wikidata": None}
+
+
+class Arxiv:
+    name = "arxiv"
+    version = 1
+
+    def matches(self, url: str) -> bool:
+        return bool(re.match(r"https?://(www\.)?arxiv\.org/(abs|pdf)/", url))
+
+    def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
+        arxiv_id = re.search(r"/(?:abs|pdf)/([^?#]+)", url).group(1)
+        data = fetcher.get(
+            f"https://export.arxiv.org/api/query?id_list={quote(arxiv_id, safe='')}", api=True
+        ).data
+        root = etree.fromstring(data)
+        entry = root.find(f"{{{_ATOM}}}entry")
+        if entry is None:
+            raise FetchError(f"arXiv: нет записи {arxiv_id}")
+        title = " ".join(entry.findtext(f"{{{_ATOM}}}title", default="").split())
+        summary = " ".join(entry.findtext(f"{{{_ATOM}}}summary", default="").split())
+        authors = [
+            _person(a.findtext(f"{{{_ATOM}}}name", default=""))
+            for a in entry.findall(f"{{{_ATOM}}}author")
+        ]
+        year = _year_of(entry.findtext(f"{{{_ATOM}}}published", default=""))
+        return Harvest(
+            metadata={
+                "title": title,
+                "authors": authors,
+                "language": "en",
+                "year": year,
+                "publisher": "arXiv",
+                "abstract": summary,
+            },
+            files=[{"name": f"{arxiv_id}.pdf", "url": f"https://arxiv.org/pdf/{arxiv_id}"}],
+            license_hint="arXiv.org perpetual, non-exclusive license",
+            slug_hint=[title, arxiv_id],
+        )
+
+
+class PhilArchive:
+    name = "philarchive"
+    version = 1
+
+    def matches(self, url: str) -> bool:
+        return bool(re.match(r"https?://(www\.)?(philarchive|philpapers)\.org/rec/", url))
+
+    def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
+        record_id = re.search(r"/rec/([^/?#]+)", url).group(1)
+        identifier = f"oai:philarchive.org:rec/{record_id}"
+        data = fetcher.get(
+            "https://philarchive.org/oai?verb=GetRecord&metadataPrefix=oai_dc"
+            f"&identifier={quote(identifier, safe='')}",
+            api=True,
+        ).data
+        root = etree.fromstring(data)
+        dc = root.find(f".//{{{_OAI_DC}}}dc")
+        if dc is None:
+            raise FetchError(f"PhilArchive: нет записи {record_id}")
+        title = " ".join(dc.findtext(f"{{{_DC}}}title", default="").split())
+        authors = [_person(t.text or "") for t in dc.findall(f"{{{_DC}}}creator")]
+        year = _year_of(dc.findtext(f"{{{_DC}}}date", default=""))
+        summary = " ".join(dc.findtext(f"{{{_DC}}}description", default="").split())
+        rights = " ".join(dc.findtext(f"{{{_DC}}}rights", default="").split())
+        pdf = next(
+            (i.text for i in dc.findall(f"{{{_DC}}}identifier") if (i.text or "").endswith(".pdf")),
+            None,
+        )
+        files = [{"name": "paper.pdf", "url": pdf}] if pdf else []
+        return Harvest(
+            metadata={
+                "title": title,
+                "authors": authors,
+                "language": "en",
+                "year": year,
+                "publisher": "PhilArchive",
+                "abstract": summary,
+            },
+            files=files,
+            license_hint=rights or "open access",
+            slug_hint=[title, record_id],
+        )
+
+
+class Doaj:
+    name = "doaj"
+    version = 1
+
+    def matches(self, url: str) -> bool:
+        return bool(re.match(r"https?://(www\.)?doaj\.org/article/", url))
+
+    def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
+        article_id = re.search(r"/article/([^/?#]+)", url).group(1)
+        body = fetcher.get(
+            f"https://doaj.org/api/search/articles/{quote(article_id)}", api=True
+        ).json()
+        bib = ((body.get("results") or [{}])[0]).get("bibjson") or {}
+        title = bib.get("title") or ""
+        authors = [_person(a.get("name") or "") for a in (bib.get("author") or [])]
+        summary = " ".join(str(bib.get("abstract") or "").split())
+        license_hint = " ".join(str(lic.get("type") or "") for lic in (bib.get("license") or []))
+        fulltext = next(
+            (
+                link.get("url") or ""
+                for link in (bib.get("link") or [])
+                if link.get("type") == "fulltext"
+            ),
+            "",
+        )
+        files = [{"name": "article.pdf", "url": fulltext}] if fulltext else []
+        return Harvest(
+            metadata={
+                "title": title,
+                "authors": authors,
+                "language": "en",
+                "year": bib.get("year"),
+                "publisher": "DOAJ",
+                "abstract": summary,
+            },
+            files=files,
+            license_hint=license_hint,
+            slug_hint=[title, article_id],
+        )
+
+
+ADAPTERS: list[Adapter] = [
+    Gutenberg(),
+    Wikisource(),
+    ArchiveOrg(),
+    Arxiv(),
+    PhilArchive(),
+    Doaj(),
+    Direct(),
+]
 
 
 def adapter_for(url: str, name: str | None = None) -> Adapter:
@@ -684,6 +835,7 @@ LICENSE_HINTS = (
     (r"creativecommons\.org/licenses/by-nc-sa/4\.0|CC[- ]BY[- ]NC[- ]SA", "cc-by-nc-sa-4.0"),
     (r"creativecommons\.org/licenses/by-nc/4\.0|CC[- ]BY[- ]NC[- ]4", "cc-by-nc-4.0"),
     (r"creativecommons\.org/licenses/by/4\.0|CC[- ]BY[- ]4\.0", "cc-by-4.0"),
+    (r"arxiv.*non-exclusive|arxiv", "arxiv-non-exclusive"),
 )
 
 

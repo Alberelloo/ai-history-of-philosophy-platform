@@ -33,7 +33,10 @@
         "editor": {"type": ["string", "null"]},
         "edition": {"type": ["string", "null"]},
         "publisher": {"type": ["string", "null"]},
-        "isbn": {"type": ["string", "null"]}
+        "isbn": {"type": ["string", "null"]},
+        "abstract": {"type": ["string", "null"], "description": "аннотация; для metadata-only — обязательна"},
+        "toc": {"type": "array", "items": {"type": "string"}, "description": "оглавление (только metadata-only)"},
+        "citations": {"type": "array", "items": {"type": "string"}, "description": "цитируемые/ссылаемые работы (только metadata-only)"}
       }
     },
     "file": {
@@ -77,9 +80,10 @@
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,118}$"},
         "landing_url": {"type": "string", "pattern": "^https?://"},
-        "adapter": {"enum": ["gutenberg", "wikisource", "archive_org", "direct"]},
+        "adapter": {"enum": ["gutenberg", "wikisource", "archive_org", "direct", "arxiv", "philarchive", "doaj"]},
         "kind": {"enum": ["textbook", "primary", "reference"]},
         "section": {"type": ["string", "null"]},
+        "metadata_only": {"type": "boolean", "description": "запись без файлов: только метаданные охраняемого произведения"},
         "harvested": {
           "type": ["object", "null"],
           "additionalProperties": false,
