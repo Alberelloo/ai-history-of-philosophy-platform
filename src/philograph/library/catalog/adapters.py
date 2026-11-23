@@ -681,7 +681,7 @@ class Arxiv:
     def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
         arxiv_id = re.search(r"/(?:abs|pdf)/([^?#]+)", url).group(1)
         data = fetcher.get(
-            f"https://export.arxiv.org/api/query?id_list={quote(arxiv_id)}", api=True
+            f"https://export.arxiv.org/api/query?id_list={quote(arxiv_id, safe='')}", api=True
         ).data
         root = etree.fromstring(data)
         entry = root.find(f"{{{_ATOM}}}entry")
