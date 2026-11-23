@@ -40,7 +40,7 @@ def metadata_entry(env, entry_id: str = "wittgenstein-pi") -> dict:
 def test_metadata_only_registers_without_files(env):
     entry = metadata_entry(env)
     outcome = env.sync(entry["id"])[entry["id"]]
-    assert outcome.code == "metadata"
+    assert outcome.outcome == "metadata"
     source = env.registry.get(outcome.source_id)
     assert source.files == []
     assert env.registry.versions(outcome.source_id) == []

@@ -43,7 +43,7 @@ class MetadataIngest:
         created = 0
         for name in payload.get("authors", []):
             person = self._person(name)
-            self.statements.add(person, "authored", obj=work)
+            self.statements.add(work, "author", obj=person)
             created += 1
         for cited in payload.get("citations", []):
             cited_work = self._work(cited)

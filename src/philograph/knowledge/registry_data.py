@@ -316,15 +316,6 @@ RELATIONS = [
     ),
     rel("founded", "основал", "основатель", ["person"], ["group"], families=("biography",)),
     rel(
-        "authored",
-        "автор работы",
-        "произведения автора",
-        ["person"],
-        ["work"],
-        families=("bibliographic",),
-        qualifiers=("role",),
-    ),
-    rel(
         "cites",
         "ссылается на",
         "цитируется в",

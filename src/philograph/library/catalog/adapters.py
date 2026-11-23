@@ -679,7 +679,7 @@ class Arxiv:
         return bool(re.match(r"https?://(www\.)?arxiv\.org/(abs|pdf)/", url))
 
     def harvest(self, url: str, fetcher: Fetcher) -> Harvest:
-        arxiv_id = re.search(r"/(?:abs|pdf)/([^/?#]+)", url).group(1)
+        arxiv_id = re.search(r"/(?:abs|pdf)/([^?#]+)", url).group(1)
         data = fetcher.get(
             f"https://export.arxiv.org/api/query?id_list={quote(arxiv_id)}", api=True
         ).data
@@ -729,7 +729,7 @@ class PhilArchive:
         if dc is None:
             raise FetchError(f"PhilArchive: нет записи {record_id}")
         title = " ".join(dc.findtext(f"{{{_DC}}}title", default="").split())
-        authors = [_person(t) for t in dc.findall(f"{{{_DC}}}creator")]
+        authors = [_person(t.text or "") for t in dc.findall(f"{{{_DC}}}creator")]
         year = _year_of(dc.findtext(f"{{{_DC}}}date", default=""))
         summary = " ".join(dc.findtext(f"{{{_DC}}}description", default="").split())
         rights = " ".join(dc.findtext(f"{{{_DC}}}rights", default="").split())
