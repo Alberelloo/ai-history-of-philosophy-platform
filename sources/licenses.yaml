@@ -72,3 +72,10 @@
   # Статус не удалось определить: консервативно не показывается и не отправляется внешним
   # сервисам до классификации оператором.
   permissions: {display: false, external_processing: false, quoting: false}
+- code: arxiv-non-exclusive
+  title: arXiv non-exclusive license
+  url: https://arxiv.org/help/license
+  tier: open_license
+  # «arXiv.org perpetual, non-exclusive license»: авторы дают arXiv право размещать и
+  # распространять; для некоммерческого читательского показа и пересказа допустимо.
+  permissions: {display: true, external_processing: true, quoting: true}

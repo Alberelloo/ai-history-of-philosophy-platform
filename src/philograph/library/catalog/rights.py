@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-OPEN_LICENSE_HINT = re.compile(r"creativecommons\.org/licenses|CC[- ]BY|CC0", re.I)
+OPEN_LICENSE_HINT = re.compile(r"creativecommons\.org/licenses|CC[- ]BY|CC0|arxiv", re.I)
 PUBLIC_DOMAIN_HINT = re.compile(r"public domain|PD-|publicdomain|NOT_IN_COPYRIGHT", re.I)
 
 

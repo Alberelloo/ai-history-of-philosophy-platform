@@ -35,7 +35,7 @@ from philograph.platform.health import Health
 from philograph.platform.queue import Job, Queue
 from philograph.platform.web import UserFacingError, create_app
 
-EVENTS = ("source.published", "source.unpublished", "source.deleted")
+EVENTS = ("source.published", "source.unpublished", "source.deleted", "source.metadata_registered")
 REGION_HEADER = "X-Philograph-Region"
 
 
@@ -494,12 +494,19 @@ def _review_routes(router: APIRouter, review: Review, auth: OperatorAuth) -> Non
         return review.export_sample(sample_id)
 
 
-def subscribe(queue: Queue, statements: Statements, filling=None, mentions=None) -> None:
+def subscribe(
+    queue: Queue, statements: Statements, filling=None, mentions=None, metadata=None
+) -> None:
     """Подписка на события библиотеки: подтверждения обновляются всегда, извлечение — если
-    подключено наполнение (публикация запускает его для добавленных и изменённых абзацев)."""
+    подключено наполнение (публикация запускает его для добавленных и изменённых абзацев),
+    метаданные — если подключён ``MetadataIngest``."""
     for kind in EVENTS:
 
         def handle(job: Job, kind: str = kind) -> None:
+            if kind == "source.metadata_registered":
+                if metadata is not None:
+                    metadata.handle(job.payload)
+                return
             statements.handle_library_event(kind, job.payload)
             if filling is not None and kind == "source.published":
                 filling.handle_published(job.payload)

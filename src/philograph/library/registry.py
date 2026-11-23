@@ -406,7 +406,9 @@ class Registry:
         if missing:
             events.emit("library.source.rejected", reason="missing_fields", fields=missing)
             raise RegistryError(f"не хватает полей: {', '.join(missing)}", fields=missing)
-        unknown = set(fields) - set(REQUIRED) - set(OPTIONAL) - {"settings", "files"}
+        unknown = (
+            set(fields) - set(REQUIRED) - set(OPTIONAL) - {"settings", "files", "metadata_only"}
+        )
         if unknown:
             raise RegistryError(f"неизвестные поля: {', '.join(sorted(unknown))}")
         if fields["kind"] not in ("textbook", "primary", "reference"):
@@ -427,6 +429,7 @@ class Registry:
         source_id = f"s_{uuid.uuid4().hex[:12]}"
         settings = dict(fields.get("settings") or {})
         settings.setdefault("languages", [fields["language"]])
+        metadata_only = bool(fields.get("metadata_only") or settings.get("metadata_only"))
         with self.engine.begin() as conn:
             conn.execute(
                 t.sources.insert().values(
@@ -456,6 +459,21 @@ class Registry:
                     new=fields["scope"],
                 )
             )
+            if metadata_only:
+                # Без текста: метаданные уходят сервису знаний как производные факты.
+                self._outbox(
+                    conn,
+                    "source.metadata_registered",
+                    source_id,
+                    {
+                        "title": fields["title"],
+                        "authors": list(fields["authors"]),
+                        "year": fields.get("year"),
+                        "abstract": settings.get("abstract"),
+                        "toc": list(settings.get("toc") or []),
+                        "citations": list(settings.get("citations") or []),
+                    },
+                )
             self.actions.record(actor, "register_source", source_id, conn=conn)
         events.emit("library.source.registered", source_id=source_id, kind=fields["kind"])
         if blocked:

@@ -256,7 +256,24 @@ def validate(catalog: Catalog, *, year: int) -> list[Problem]:
                 problems.append(Problem("error", entry["id"], f"metadata.{name}: не заполнено"))
         if not meta.get("authors"):
             problems.append(Problem("error", entry["id"], "metadata.authors: не заполнено"))
-        if not files(entry):
+        if entry.get("metadata_only"):
+            if not meta.get("abstract"):
+                problems.append(
+                    Problem(
+                        "error",
+                        entry["id"],
+                        "metadata.abstract: у metadata-only нужна аннотация",
+                    )
+                )
+            if tier != "in_copyright":
+                problems.append(
+                    Problem(
+                        "error",
+                        entry["id"],
+                        "metadata_only: правовой статус должен быть in_copyright",
+                    )
+                )
+        elif not files(entry):
             problems.append(Problem("error", entry["id"], "files: нет ссылок на файлы"))
         if lic["basis"] == "public_domain":
             built = license_of(entry)

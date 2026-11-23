@@ -178,6 +178,29 @@ docker compose run --rm -v ./sources:/app/sources:ro worker python -m philograph
 
 Исполнитель очереди (`python -m philograph.worker`) получает файлы тем же загрузчиком. Поэтому задача `library.check_updates` тоже идёт условными запросами, но правило публикации применяет только команда каталога.
 
+## Открытые репозитории современной философии
+
+Для full-text современных работ добавлены три адаптера (`library/catalog/adapters.py`):
+
+| Адаптер | matches | Источник метаданных | Лицензия |
+|---|---|---|---|
+| `arxiv` | `arxiv.org/abs/<id>`, `arxiv.org/pdf/<id>` | arXiv API (Atom) | `arxiv-non-exclusive` → `open_license` |
+| `philarchive` | `philarchive.org/rec/<id>`, `philpapers.org/rec/<id>` | OAI-PMH (`oai_dc`) | `dc:rights` (CC-*) → `open_license` |
+| `doaj` | `doaj.org/article/<id>` | DOAJ API (`bibjson`) | `bibjson.license` (CC-*) → `open_license` |
+
+Каждый собирает title, authors, year, abstract и ссылку на PDF; классификация — существующая `suggest_license` + новый паттерн arXiv. Годы смерти современных авторов не берутся из Wikidata как основание срока: статус таких источников — `open_license`, а не `public_domain`. Сбой сети: `FetchError`, запись не создаётся.
+
+## Записи только с метаданными
+
+Охраняемые произведения (XX–XXI вв.), полный текст которых недоступен, описываются записью `metadata_only: true, files: []` с `rights_tier: in_copyright`. В `override.metadata` — title, authors, year, `abstract`, `toc`, `citations`. Такая запись:
+
+- регистрируется в учёте без файлов и без версии текста;
+- читателю не видна (`display: false`, статус `in_copyright`);
+- эмитит событие `source.metadata_registered`, которое сервис знаний превращает в производные факты: персоны (авторы), произведения и связи `authored`/`cites` (кто на кого ссылается);
+- полный текст нигде не хранится и не загружается.
+
+Сбор полных текстов `in_copyright` остаётся решением и правовым риском владельца (ADR-0004); здесь хранятся только метаданные.
+
 ## Правовой статус источника (rights_tier)
 
 Каждый источник имеет обязательный правовой статус `rights_tier` — одно из `public_domain`,
