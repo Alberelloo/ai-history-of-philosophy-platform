@@ -817,7 +817,10 @@ class LLMGateway:
                 started = time.perf_counter()
                 try:
                     vectors, usage = provider.embed(
-                        role_conf.model, texts, role_conf.timeout_seconds
+                        role_conf.model,
+                        texts,
+                        role_conf.timeout_seconds,
+                        dimensions=role_conf.dimensions,
                     )
                     break
                 except TransientProviderError as exc:

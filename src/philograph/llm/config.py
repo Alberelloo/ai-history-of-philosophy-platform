@@ -46,6 +46,7 @@ class RoleConfig(BaseModel):
     model: str
     max_output_tokens: int = 1024
     timeout_seconds: float = 30.0
+    dimensions: int | None = None  # для эмбеддингов: Matryoshka/сжатие; None — без поля
 
 
 class NightTariff(BaseModel):
