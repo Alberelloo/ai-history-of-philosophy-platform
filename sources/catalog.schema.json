@@ -54,7 +54,10 @@
       "additionalProperties": false,
       "properties": {
         "kind": {"type": "string", "description": "код из sources/licenses.yaml"},
-        "basis": {"enum": ["public_domain", "open_license", "rightsholder_permission"]},
+        "basis": {"enum": ["public_domain", "open_license", "rightsholder_permission", "in_copyright", "unknown"]},
+        "rights_tier": {"enum": ["public_domain", "open_license", "in_copyright", "unknown"], "description": "правовой статус источника; обязателен для одобренной записи"},
+        "rights_evidence": {"type": ["string", "null"], "description": "откуда известен правовой статус"},
+        "rights_jurisdiction": {"type": ["string", "null"], "description": "юрисдикция, по которой определён статус (RU, US, EU…)"},
         "author_death_years": {"type": "array", "items": {"type": "integer"}},
         "translator_death_year": {"type": ["integer", "null"]},
         "document_url": {"type": ["string", "null"]},

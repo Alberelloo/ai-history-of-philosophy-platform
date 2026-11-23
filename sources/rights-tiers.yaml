@@ -1,0 +1,41 @@
+# Правовые статусы источников и критерии классификации.
+# Пороги и соответствие тира разрешениям — данные, а не код: меняются без пересборки,
+# ревьюятся вместе с каталогом. Полные тексты in-copyright хранятся серверно только для
+# производной онтологии и читателям не раздаются.
+version: 1
+
+tiers:
+  public_domain:
+    title: Общественное достояние
+    permissions: {display: true, external_processing: true, quoting: true}
+  open_license:
+    title: Открытая лицензия
+    permissions: {display: true, external_processing: true, quoting: true}
+  in_copyright:
+    title: Под охраной
+    permissions: {display: false, external_processing: true, quoting: false}
+    note: сбор полного текста — решение и правовой риск владельца
+  unknown:
+    title: Статус неизвестен
+    permissions: {display: false, external_processing: false, quoting: false}
+    note: консервативно до классификации оператором
+
+criteria:
+  death_plus_years: 70
+  us:
+    pre_1930: 1929            # издания 1929 и ранее — ОД в США; порог сдвигается ежегодно
+    published_plus_years: 95  # 1930–1977 с уведомлением об охране
+    work_for_hire_years: 120
+  ru:
+    death_plus_years: 70      # ст. 1281 ГК РФ
+    war_plus_years: 74        # работавшие в годы ВОВ
+    anonymous_publication_plus_years: 70  # анонимно/под псевдонимом, если автор не раскрыт
+  open_licenses:
+    - cc0
+    - cc-by-4.0
+    - cc-by-sa-3.0
+    - cc-by-sa-4.0
+    - cc-by-nc-sa-4.0
+    - cc-by-nc-4.0
+    - gfdl-1.3
+    - ogl

@@ -15,6 +15,7 @@ from urllib.parse import quote, unquote, urlsplit
 from lxml import etree
 
 from philograph.library.catalog.fetcher import Fetcher, FetchError
+from philograph.library.catalog.rights import classify_tier
 from philograph.platform import events
 
 LANGS = {
@@ -686,24 +687,36 @@ LICENSE_HINTS = (
 )
 
 
-def suggest_license(harvest: Harvest, year: int) -> dict[str, Any] | None:
-    """Черновик лицензии по подсказке сайта; окончательно решает review записи."""
+def suggest_license(harvest: Harvest, year: int) -> dict[str, Any]:
+    """Черновик лицензии и правового статуса; окончательно решает review записи.
+
+    Всегда возвращает черновик с ``rights_tier``: открытая лицензия, общественное достояние,
+    под охраной или неизвестно — оператор подтверждает или правит в обзоре записи.
+    """
     hint = harvest.license_hint or ""
+    rights = classify_tier(harvest, year)
     for pattern, code in LICENSE_HINTS:
         if re.search(pattern, hint, re.I):
-            return {"kind": code, "basis": "open_license", "evidence": f"сайт: {hint}"}
-    if re.search(r"public domain|PD-|publicdomain|NOT_IN_COPYRIGHT", hint, re.I) or (
-        harvest.metadata.get("publisher") or ""
-    ).endswith("wikisource.org"):
-        people = list(harvest.metadata.get("authors") or [])
-        if harvest.metadata.get("translator"):
-            people.append(harvest.metadata["translator"])
-        deaths = [p.get("death_year") for p in people]
-        if people and all(d is not None for d in deaths) and all(d + 70 < year for d in deaths):
-            detail = "; ".join(f"{p['name']} ум. {p['death_year']}" for p in people)
-            return {
-                "kind": "public-domain",
-                "basis": "public_domain",
-                "evidence": f"сайт: {hint or 'Wikisource'}; {detail}",
-            }
-    return None
+            return {"kind": code, "basis": "open_license", "evidence": f"сайт: {hint}", **rights}
+    if rights["rights_tier"] == "public_domain":
+        people = list((harvest.metadata or {}).get("authors") or [])
+        detail = "; ".join(f"{p['name']} ум. {p['death_year']}" for p in people)
+        return {
+            "kind": "public-domain",
+            "basis": "public_domain",
+            "evidence": f"сайт: {hint or 'Wikisource'}; {detail}",
+            **rights,
+        }
+    if rights["rights_tier"] == "in_copyright":
+        return {
+            "kind": "in-copyright",
+            "basis": "in_copyright",
+            "evidence": rights["rights_evidence"],
+            **rights,
+        }
+    return {
+        "kind": "unknown-rights",
+        "basis": "unknown",
+        "evidence": rights["rights_evidence"],
+        **rights,
+    }

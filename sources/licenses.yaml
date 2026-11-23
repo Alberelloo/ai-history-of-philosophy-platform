@@ -1,37 +1,47 @@
 # Виды лицензий источников. Синхронизация каталога заносит их в учёт источников.
 # Разрешения: display — показывать текст читателю, external_processing — отправлять текст
 # внешним сервисам (эмбеддинги, LLM), quoting — цитировать фрагменты в ответах.
+# tier — правовой статус (sources/rights-tiers.yaml): public_domain | open_license |
+# in_copyright | unknown. Итоговый статус источника берётся из вида и может быть перемаркирован.
 - code: public-domain
   title: Общественное достояние
   url: null
+  tier: public_domain
   permissions: {display: true, external_processing: true, quoting: true}
 - code: cc-by-4.0
   title: CC BY 4.0
   url: https://creativecommons.org/licenses/by/4.0/
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: cc-by-sa-3.0
   title: CC BY-SA 3.0
   url: https://creativecommons.org/licenses/by-sa/3.0/
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: cc-by-sa-4.0
   title: CC BY-SA 4.0
   url: https://creativecommons.org/licenses/by-sa/4.0/
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: cc-by-nc-sa-4.0
   title: CC BY-NC-SA 4.0
   url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: cc-by-nc-4.0
   title: CC BY-NC 4.0
   url: https://creativecommons.org/licenses/by-nc/4.0/
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: gfdl-1.3
   title: GNU FDL 1.3
   url: https://www.gnu.org/licenses/fdl-1.3.html
+  tier: open_license
   permissions: {display: true, external_processing: true, quoting: true}
 - code: pd-site
   title: Общественное достояние по отметке сайта
   url: null
+  tier: public_domain
   # Сайт публикует текст как общественное достояние (например, «Public domain in the USA» у
   # Project Gutenberg или PD-шаблон Wikisource), а годы смерти не подтверждают срок по
   # правилу 70 лет. Только для пробной загрузки: перед публичным запуском пересмотреть.
@@ -39,6 +49,7 @@
 - code: public-domain-ru
   title: Общественное достояние по праву РФ
   url: null
+  tier: public_domain
   # Срок 70 лет после смерти автора и переводчика истёк по ст. 1281 ГК РФ, но издание вышло
   # после 1930 г. (или год неизвестен), и в США текст может быть ещё защищён. Показывать
   # только читателям из РФ: регионы применяет сервис (шлюз определяет страну, библиотека,
@@ -46,3 +57,18 @@
   # ассистент показывает такие абзацы ссылками с пометкой, не пересказывая.
   regions: [RU]
   permissions: {display: true, external_processing: false, quoting: true}
+- code: in-copyright
+  title: Под охраной
+  url: null
+  tier: in_copyright
+  # Свободно доступно в сети, но срок охраны не истёк и открытой лицензии нет. Полный текст
+  # хранится серверно и уходит внешним сервисам только для производной онтологии; читателям
+  # не показывается и не цитируется. Сбор — решение и правовой риск владельца.
+  permissions: {display: false, external_processing: true, quoting: false}
+- code: unknown-rights
+  title: Статус неизвестен
+  url: null
+  tier: unknown
+  # Статус не удалось определить: консервативно не показывается и не отправляется внешним
+  # сервисам до классификации оператором.
+  permissions: {display: false, external_processing: false, quoting: false}

@@ -128,9 +128,15 @@ class CatalogService:
                 or current["permissions"] != kind["permissions"]
                 or current["title"] != kind["title"]
                 or list(current["regions"] or []) != (regions or [])
+                or current.get("tier") != kind.get("tier")
             ):
                 self.registry.add_license_kind(
-                    kind["code"], kind["title"], kind.get("url"), kind["permissions"], regions
+                    kind["code"],
+                    kind["title"],
+                    kind.get("url"),
+                    kind["permissions"],
+                    regions,
+                    tier=kind.get("tier"),
                 )
 
     # --- добавление и сбор метаданных -------------------------------------------------

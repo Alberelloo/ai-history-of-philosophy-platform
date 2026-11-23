@@ -107,7 +107,7 @@ def test_internal_published_keeps_restricted(api):
 def test_internal_access_lists_closed(api):
     _, client, _, restricted_id, _ = api
     closed = client.get("/api/v1/internal/access?region=DE").json()
-    assert closed == {"region": "DE", "closed": [restricted_id]}
+    assert closed == {"region": "DE", "closed": [restricted_id], "hidden": []}
     assert client.get("/api/v1/internal/access?region=RU").json()["closed"] == []
     # прочее значение региона — неизвестный регион
     assert client.get("/api/v1/internal/access?region=T1").json()["closed"] == [restricted_id]
