@@ -27,13 +27,14 @@
 - `python scripts/check_traceability.py` — 348 из 348.
 - `python -m philograph.library.catalog validate` — ошибок 0, предупреждений 6 (предсуществующие дубли названий).
 - Смоук-тест в памяти: регистрация `in_copyright`, `change_rights_tier` + журнал, миграция — OK.
+- Полный прогон `pytest -q -m "not e2e"` (в окружении с полным доступом): **531 passed, 150 skipped, 95 deselected, 1 failed**. 150 skip — окружение (Chromium/Playwright, 1 PostgreSQL), кода не касаются. Единственный сбой — регрессия `tests/library/test_regions_api.py::test_internal_access_lists_closed`: эндпоинт `internal/access` стал отдавать ещё поле `hidden`, а тест сверял весь словарь. Исправлено: ожидание `{"region","closed","hidden"}`.
 
 ## Блокеры и известные вопросы
 
-- **`pytest` не прогнан**: песочница DSH (workspace-write) запрещает удаление файлов, а pytest при очистке временных каталогов (`shutil.rmtree`) падает с PermissionError; диагноз требует `diagnose-windows-sandbox-acl` с разрешением, которое в сессии отключено. Код проверен статикой и смоук-тестом в памяти.
+- **В локальной сессии субагента `pytest` не прогоняется**: песочница DSH (workspace-write) запрещает удаление файлов, и pytest падает на очистке временных каталогов (`shutil.rmtree`/`cleanup_dead_symlinks` → PermissionError). Полный прогон выполнен Lead'ом с полным доступом (см. выше).
 - `docker compose` v2 нет → `tests/ops/test_deploy.py` (3 падения) — предсуществующее, не от этого изменения.
 - e2e/визуальный стенд (Postgres/Docker) при ~1 ГБ памяти не поднимался.
-- `openspec archive` не выполнялся: изменение остаётся активным, дельты вливаются в `openspec/specs/` при архивации в том же PR (после финальной проверки тестов).
+- `openspec archive` не выполнялся: по решению Lead — только после зелёных проверок и слияния `claude/synchro-map` в `main`.
 
 ## Следующий шаг
 
