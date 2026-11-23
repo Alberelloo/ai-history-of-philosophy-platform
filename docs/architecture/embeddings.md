@@ -6,11 +6,22 @@ LiteLLM. Модель, размерность и провайдера перек
 
 ## Наш конфиг (`config/llm.yaml`)
 
+По умолчанию — заглушка без ключей:
+
+```yaml
+providers:
+  embeddings-stub: {kind: fake}
+roles:
+  embeddings: {provider: embeddings-stub, model: stub-embeddings}
+```
+
+Для реальных эмбеддингов переключи роль на LiteLLM-прокси:
+
 ```yaml
 providers:
   litellm:
     kind: openai_compatible
-    base_url: http://localhost:4000      # self-hosted litellm server
+    base_url: ${LITELLM_BASE_URL:-http://localhost:4000}   # docker задаёт http://litellm:4000
     api_key_env: LITELLM_API_KEY
 roles:
   embeddings: {provider: litellm, model: bge-m3, dimensions: 1024, timeout_seconds: 60}
@@ -18,8 +29,10 @@ prices:
   bge-m3: {input_cache_miss: 0.0, input_cache_hit: 0.0}
 ```
 
-`dimensions` не обязателен: без него запрос идёт без поля, векторы — той длины, что вернул
-провайдер. Для Matryoshka (openai/text-embedding-3-large) размерность задаёт сжатие.
+`base_url` берётся из env `LITELLM_BASE_URL` (локально — `http://localhost:4000`, в docker —
+`http://litellm:4000`). `dimensions` не обязателен: без него запрос идёт без поля, векторы —
+той длины, что вернул провайдер. Для Matryoshka (openai/text-embedding-3-large) размерность
+задаёт сжатие.
 
 ## Пресеты моделей (конфиг LiteLLM)
 
@@ -79,3 +92,29 @@ model_list:
 Смена модели: в `config/llm.yaml` поменять `roles.embeddings.model` (+ `dimensions`), а в
 `config.yaml` LiteLLM — соответствующий `model_name`. Ключи и бюджеты — на стороне LiteLLM и
 `.env`, в репозиторий не попадают.
+
+## Поднятие LiteLLM в Docker
+
+LiteLLM — опциональный сервис через оверлей `compose.litellm.yaml` (не трогает дефолтный
+`compose.yaml`). Конфиг прокси — `config/litellm.yaml` (7 пресетов выше).
+
+1. В `.env` задай ключи провайдеров (или `LITELLM_MASTER_KEY`/`LITELLM_API_KEY` для локального
+   self-host без внешних ключей):
+   ```dotenv
+   LITELLM_MASTER_KEY=sk-litellm
+   LITELLM_API_KEY=sk-litellm
+   # для self-host моделей — адреса inference-серверов:
+   BGE_M3_API_BASE=http://bge-m3:80
+   ```
+2. Переключи роль эмбеддингов в `config/llm.yaml`:
+   `embeddings: {provider: litellm, model: bge-m3, dimensions: 1024, timeout_seconds: 60}`.
+3. Подними всё вместе:
+   ```sh
+   docker compose -f compose.yaml -f compose.litellm.yaml up -d --build
+   ```
+
+Оверлей сам: поднимает `litellm` на порту 4000, задаёт `LITELLM_BASE_URL=http://litellm:4000` и
+`LITELLM_API_KEY` сервису `llm`, переключает `search`/`worker` на
+`PHILOGRAPH_EMBEDDING_MODEL=bge-m3` и `PHILOGRAPH_EMBEDDING_DIMENSION=1024` — согласованно с
+llm-ролью. Локально (без docker) то же самое делает переопределение env у `scripts/dev_stack.py`
+(`PHILOGRAPH_EMBEDDING_MODEL`/`PHILOGRAPH_EMBEDDING_DIMENSION`).

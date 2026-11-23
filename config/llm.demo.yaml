@@ -29,6 +29,14 @@ providers:
       graph.extend: '{"statements": [{"subject": "Кант", "relation": "develops", "object": "Лейбниц"}, {"subject": "Юм", "relation": "influenced_by", "object": "Локк"}, {"subject": "Кант", "relation": "lived_in", "object": "Юм"}]}'
   demo-embeddings:
     kind: fake
+  # Локальный прокси эмбеддингов LiteLLM (self-hosted, jina-v3) — опционально, без ключей.
+  # Чтобы включить: поднять LiteLLM (docker compose -f compose.litellm.yaml up litellm),
+  # переключить роль embeddings на litellm/jina-v3/dimensions:1024 и задать у search
+  # PHILOGRAPH_EMBEDDING_MODEL=jina-v3, PHILOGRAPH_EMBEDDING_DIMENSION=1024.
+  litellm:
+    kind: openai_compatible
+    base_url: ${LITELLM_BASE_URL:-http://localhost:4000}
+    api_key_env: LITELLM_API_KEY
 
 roles:
   fast: {provider: demo-router, model: demo-flash, max_output_tokens: 200}
@@ -39,6 +47,7 @@ roles:
 prices:
   demo-flash: {input_cache_miss: 0.0, input_cache_hit: 0.0, output: 0.0}
   demo-embeddings: {input_cache_miss: 0.0, input_cache_hit: 0.0}
+  jina-v3: {input_cache_miss: 0.0, input_cache_hit: 0.0}
 
 budgets:
   site: {daily_limit_usd: 1.7}

@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 import os
+import re
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
@@ -104,10 +106,24 @@ class LLMSettings(ServiceSettings):
     database_url: str = "sqlite://"
 
 
+def _expand_env(text: str, env: Mapping[str, str]) -> str:
+    """Раскрывает ``${VAR}`` и ``${VAR:-default}`` в тексте конфига перед разбором YAML."""
+
+    def repl(match: re.Match[str]) -> str:
+        expr = match.group(1)
+        if ":-" in expr:
+            name, default = expr.split(":-", 1)
+            return env.get(name, default)
+        return env.get(expr, "")
+
+    return re.sub(r"\$\{([^}]+)\}", repl, text)
+
+
 def load_config(path: Path, env: dict[str, str] | None = None) -> GatewayConfig:
     """Читает настройку и проверяет, что ключи всех используемых провайдеров заданы."""
     env = os.environ if env is None else env
-    config = GatewayConfig.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+    raw = _expand_env(path.read_text(encoding="utf-8"), env)
+    config = GatewayConfig.model_validate(yaml.safe_load(raw))
     missing = {}
     used = {role.provider for role in config.roles.values()}
     for name in sorted(used):

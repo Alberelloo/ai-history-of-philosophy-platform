@@ -1,0 +1,37 @@
+# Пресеты моделей эмбеддингов для self-hosted LiteLLM-прокси.
+# См. docs/architecture/embeddings.md. Ключи — из переменных окружения (os.environ/…), не здесь.
+#
+# Self-hosted модели (bge-m3, jina-v3, e5-large) требуют отдельный inference-сервер
+# (vLLM/TEI/TGI) на указанном api_base; подставьте свой адрес.
+model_list:
+  - model_name: bge-m3
+    litellm_params:
+      model: huggingface/BAAI/bge-m3
+      api_base: os.environ/BGE_M3_API_BASE
+      api_key: os.environ/HUGGINGFACE_API_KEY
+  - model_name: jina-v3
+    litellm_params:
+      model: huggingface/jinaai/jina-embeddings-v3
+      api_base: os.environ/JINA_V3_API_BASE
+      api_key: os.environ/HUGGINGFACE_API_KEY
+  - model_name: e5-large
+    litellm_params:
+      model: huggingface/intfloat/multilingual-e5-large
+      api_base: os.environ/E5_API_BASE
+      api_key: os.environ/HUGGINGFACE_API_KEY
+  - model_name: openai-3-large
+    litellm_params:
+      model: openai/text-embedding-3-large
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: voyage-3-large
+    litellm_params:
+      model: voyage/voyage-3-large
+      api_key: os.environ/VOYAGE_API_KEY
+  - model_name: cohere-multilingual
+    litellm_params:
+      model: cohere/embed-multilingual-v3.0
+      api_key: os.environ/COHERE_API_KEY
+  - model_name: gemini-embed
+    litellm_params:
+      model: gemini/text-embedding-004
+      api_key: os.environ/GEMINI_API_KEY
