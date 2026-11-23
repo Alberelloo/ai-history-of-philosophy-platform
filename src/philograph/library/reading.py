@@ -154,6 +154,37 @@ class Reading:
         """Идентификаторы опубликованных источников, закрытых для региона (для индексации)."""
         return [row["id"] for row in self._restricted_rows(Reader(frozenset({PUBLIC}), region))]
 
+    def hidden_source_ids(self) -> list[str]:
+        """Идентификаторы опубликованных источников без права показа (in_copyright/unknown).
+
+        Они обработаны для онтологии, но читателю не видны; сервис знаний скрывает их текст
+        и цитаты так же, как закрытые по региону.
+        """
+        kinds = self.registry.license_kinds()
+        with self.engine.begin() as conn:
+            rows = (
+                conn.execute(
+                    select(t.sources).where(
+                        and_(
+                            t.sources.c.status == "active",
+                            t.sources.c.published_version.is_not(None),
+                        )
+                    )
+                )
+                .mappings()
+                .all()
+            )
+        hidden = []
+        for row in rows:
+            license_json = row["license"] or {}
+            kind = kinds.get(license_json.get("kind")) or {"permissions": {}}
+            permissions = effective_permissions(
+                kind["permissions"], license_json.get("narrowed") or {}, None
+            )
+            if not permissions["display"]:
+                hidden.append(row["id"])
+        return hidden
+
     def _describe(self, row: dict[str, Any]) -> dict[str, Any]:
         kind = self.registry.license_kind(row["license"]["kind"]) or {}
         return {
@@ -500,6 +531,10 @@ class Internal:
         ]
 
     def access(self, region: str | None) -> dict[str, Any]:
-        """Идентификаторы источников, закрытых для региона: их скрывает сервис знаний."""
+        """Идентификаторы источников, закрытых для читателя: по региону и без права показа."""
         code = parse_region(region)
-        return {"region": code, "closed": self.reading.closed_source_ids(code)}
+        return {
+            "region": code,
+            "closed": self.reading.closed_source_ids(code),
+            "hidden": self.reading.hidden_source_ids(),
+        }

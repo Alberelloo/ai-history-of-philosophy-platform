@@ -187,8 +187,12 @@ class Indexer:
         elif kind == "source.deleted":
             counts["removed"] = self._drop_source(source_id)
         elif kind == "source.access_changed":
-            # Регионы показа сменились без повторной публикации: эмбеддинги не пересчитываются.
-            self._set_source_regions(source_id, payload)
+            if not payload.get("permissions", {}).get("display", True):
+                # Источник без права показа: читателю не индексируется.
+                counts["removed"] = self._drop_source(source_id)
+            else:
+                # Регионы показа сменились без повторной публикации: эмбеддинги не пересчитываются.
+                self._set_source_regions(source_id, payload)
         with self.engine.begin() as conn:
             conn.execute(t.processed.insert().values(event_id=event_id))
         events.emit(
@@ -202,6 +206,19 @@ class Indexer:
         collection = collection or self.active_collection
         data = self.library.version_paragraphs(version_id)
         source_id = data["source_id"]
+        # Источник без права показа (in_copyright/unknown) читателю не индексируется:
+        # полный текст остаётся только внутри библиотеки и сервиса знаний.
+        if not data["permissions"].get("display", True):
+            with self.engine.begin() as conn:
+                ids = list(
+                    conn.scalars(
+                        select(t.docs.c.paragraph_id).where(t.docs.c.source_id == source_id)
+                    )
+                )
+            if ids:
+                self._remove(ids, self.active_collection)
+            events.emit("search.index.external_forbidden", source_id=source_id)
+            return {"indexed": 0, "embedded": 0, "removed": len(ids)}
         # Вторая проверка разрешения: событие могло устареть, библиотека знает текущее.
         external = bool(data["permissions"].get("external_processing"))
         if not external:

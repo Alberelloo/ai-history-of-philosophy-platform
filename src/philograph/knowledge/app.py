@@ -40,15 +40,18 @@ REGION_HEADER = "X-Philograph-Region"
 
 
 def closed_sources(client: ServiceClient, region: str | None) -> frozenset[str]:
-    """Идентификаторы источников, закрытых для региона, из ``GET /internal/access``.
+    """Идентификаторы источников, закрытых для читателя, из ``GET /internal/access``.
 
     Регион приходит заголовком ``X-Philograph-Region`` от шлюза или в теле запроса ассистента.
     Библиотека сама нормализует значение; без региона она считает его неизвестным и закрывает
-    все ограниченные источники. Недоступная библиотека поднимает ``ServiceUnavailable``.
+    все ограниченные источники. В ``hidden`` — источники без права показа (in_copyright/unknown):
+    их текст и цитаты читателю не отдаются, но производные факты (сущности, связи) остаются.
+    Недоступная библиотека поднимает ``ServiceUnavailable``.
     """
     params = {"region": region} if region else None
     response = client.get("internal/access", params=params)
-    return frozenset(response.json().get("closed", []))
+    body = response.json()
+    return frozenset(list(body.get("closed", [])) + list(body.get("hidden", [])))
 
 
 def library_paragraphs(client: ServiceClient):

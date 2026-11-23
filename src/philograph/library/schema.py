@@ -30,6 +30,7 @@ license_kinds = Table(
     Column("url", String(500)),
     Column("permissions", JSON, nullable=False),  # display, external_processing, quoting
     Column("regions", JSON),  # регионы показа вида лицензии; NULL — везде
+    Column("tier", String(30)),  # правовой статус по умолчанию (см. rights-tiers.yaml)
     schema=SCHEMA,
 )
 
@@ -50,12 +51,27 @@ sources = Table(
     Column("original_url", String(1000)),
     Column("license", JSON, nullable=False),  # вид, основание, подробности, разрешения
     Column("regions", JSON),  # сужение регионов показа источника; NULL — как у вида
+    Column("rights_tier", String(30)),  # правовой статус источника; NULL — по виду лицензии
     Column("scope", String(100), nullable=False),  # public | user:<id> | group:<id>
     Column("settings", JSON, nullable=False),
     Column("files", JSON, nullable=False),  # [{name, url | path}] по порядку
     Column("status", String(20), nullable=False),  # active | unpublished | deleted
     Column("published_version", String(40)),
     Column("created_at", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+
+rights_log = Table(
+    "rights_log",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("source_id", String(40), nullable=False, index=True),
+    Column("time", DateTime(timezone=True), nullable=False),
+    Column("actor", String(100), nullable=False),
+    Column("old_tier", String(30)),
+    Column("new_tier", String(30), nullable=False),
+    Column("evidence", Text),
+    Column("note", Text),
     schema=SCHEMA,
 )
 
@@ -280,6 +296,22 @@ migrations.add(2, "учебник по умолчанию")(migrations.create_ta
 migrations.add(3, "каталог источников и состояние загрузки")(
     migrations.create_tables("catalog_links", "fetch_state")
 )
+
+
+@migrations.add(6, "правовой статус источника")
+def _add_rights_tier(conn) -> None:
+    """Правовой статус: столбец ``sources.rights_tier``, тир по умолчанию у вида лицензии и
+    журнал перемаркировок. Столбцы добавляются отдельно, чтобы откат старого кода не падал на
+    неизвестном ключе JSON-лицензии."""
+    from sqlalchemy import inspect, text
+
+    kinds = {c["name"] for c in inspect(conn).get_columns("license_kinds", schema=SCHEMA)}
+    if "tier" not in kinds:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.license_kinds ADD COLUMN tier VARCHAR(30)"))
+    sources = {c["name"] for c in inspect(conn).get_columns("sources", schema=SCHEMA)}
+    if "rights_tier" not in sources:
+        conn.execute(text(f"ALTER TABLE {SCHEMA}.sources ADD COLUMN rights_tier VARCHAR(30)"))
+    migrations.create_tables("rights_log")(conn)
 
 
 @migrations.add(4, "код и страница неразобранной части")

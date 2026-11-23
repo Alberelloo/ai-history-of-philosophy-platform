@@ -27,4 +27,4 @@ def test_item_without_license_gives_null_hint(env):
     harvest = ArchiveOrg().harvest(f"https://archive.org/details/{ITEM}", env.service.fetcher)
     assert harvest.license_hint is None
     assert harvest.metadata["publisher"] is None
-    assert suggest_license(harvest, 2026) is None
+    assert suggest_license(harvest, 2026)["rights_tier"] == "unknown"

@@ -150,6 +150,7 @@ def license_of(entry: dict[str, Any]) -> License | None:
         document_url=lic.get("document_url"),
         narrowed=dict(lic.get("narrowed") or {}),
         regions=list(lic["regions"]) if lic.get("regions") else None,
+        rights_tier=lic.get("rights_tier"),
     )
 
 
@@ -244,6 +245,11 @@ def validate(catalog: Catalog, *, year: int) -> list[Problem]:
         if lic["kind"] not in kinds:
             problems.append(
                 Problem("error", entry["id"], f"license.kind: нет в licenses.yaml: {lic['kind']}")
+            )
+        tier = lic.get("rights_tier")
+        if tier and tier not in ("public_domain", "open_license", "in_copyright", "unknown"):
+            problems.append(
+                Problem("error", entry["id"], f"license.rights_tier: неизвестный статус {tier!r}")
             )
         for name in ("title", "language"):
             if not meta.get(name):

@@ -58,7 +58,8 @@ flowchart TD
     metadata: {year: 1690}
   license:
     kind: public-domain         # код из licenses.yaml
-    basis: public_domain        # public_domain | open_license | rightsholder_permission
+    basis: public_domain        # public_domain | open_license | rightsholder_permission | in_copyright | unknown
+    rights_tier: public_domain  # public_domain | open_license | in_copyright | unknown
     evidence: 'сайт: Public domain in the USA.; John Locke ум. 1704'
   review: {status: approved, by: operator, at: '2026-11-06', note: null}
   publish: auto                 # auto | manual
@@ -149,7 +150,7 @@ flowchart TD
 | Сайт недоступен (сеть, 404, 5xx) | публикация остаётся (снимок у нас), неудачи считаются, после трёх подряд — `library.catalog.fetch_failed` |
 | Ссылка переехала (301/308) | файл берётся по новому адресу, конечный адрес сохраняется, `library.catalog.moved` — обновите ссылку в каталоге |
 | Сайт поменял метаданные | `harvest` показывает разницу; `sync` меняет описание без новой версии текста |
-| Изменилась лицензия | учёт перепроверяет её; если показ больше не разрешён, источник не публикуется |
+| Изменилась лицензия | учёт перепроверяет её; если показ больше не разрешён, источник скрыт от читателя, но онтология продолжает его видеть |
 | Запись больше не нужна | `review.status: withdrawn` → источник снят, ссылки на абзацы сообщают, что он недоступен; удалить запись из файла нельзя — `validate` упадёт |
 | Новая версия конвейера | `reprocess --older-pipeline`, как раньше |
 
@@ -176,3 +177,28 @@ docker compose run --rm -v ./sources:/app/sources:ro worker python -m philograph
 ```
 
 Исполнитель очереди (`python -m philograph.worker`) получает файлы тем же загрузчиком. Поэтому задача `library.check_updates` тоже идёт условными запросами, но правило публикации применяет только команда каталога.
+
+## Правовой статус источника (rights_tier)
+
+Каждый источник имеет обязательный правовой статус `rights_tier` — одно из `public_domain`,
+`open_license`, `in_copyright`, `unknown`. Статус определяет, что можно делать с текстом
+(спецификация `source-registry` «Правовой статус источника»; критерии — `sources/rights-tiers.yaml`).
+
+| Статус | Показ читателю | Внешняя обработка (онтология) | Цитаты |
+|---|---|---|---|
+| `public_domain` | да | да | да |
+| `open_license` | да | да | да |
+| `in_copyright` | нет | да | нет |
+| `unknown` | нет | нет | нет |
+
+- **Классификация.** Адаптер (`catalog add`) предлагает статус по подсказке лицензии сайта,
+  годам смерти из Wikidata, году издания и порогам из `rights-tiers.yaml`. Окончательно решает
+  оператор в `review` записи.
+- **Хранение.** Статус — столбец `sources.rights_tier`; по умолчанию берётся из тира вида
+  лицензии (`licenses.yaml` → `tier`), оператор может перемаркировать с доказательством —
+  смена пишется в таблицу `rights_log`.
+- **Гейтинг.** `in_copyright`/`unknown` не попадают в библиотеку читателя, поиск и ответы
+  ассистента; `in_copyright` при этом обрабатывается сервисом знаний как производные данные
+  (сущности, связи, утверждения), полные тексты и цитаты наружу не отдаются.
+- **Сбор `in_copyright`** — решение и правовой риск владельца: полные тексты хранятся
+  серверно только для производной онтологии (см. ADR-0004).

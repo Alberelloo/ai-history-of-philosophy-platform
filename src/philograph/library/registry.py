@@ -20,10 +20,27 @@ from philograph.platform import events
 from philograph.platform.clock import Clock, SystemClock
 
 SourceKind = Literal["textbook", "primary", "reference"]
-Basis = Literal["public_domain", "open_license", "rightsholder_permission"]
+Basis = Literal[
+    "public_domain", "open_license", "rightsholder_permission", "in_copyright", "unknown"
+]
 PUBLIC = "public"
 PERMISSIONS = ("display", "external_processing", "quoting")
-COPYRIGHT_YEARS = 70  # срок охраны после смерти автора, лет
+COPYRIGHT_YEARS = 70  # срок охраны после смерти автора, лет; пороги — rights-tiers.yaml
+TIERS = ("public_domain", "open_license", "in_copyright", "unknown")
+_BASIS_TIER = {
+    "public_domain": "public_domain",
+    "open_license": "open_license",
+    "rightsholder_permission": "open_license",
+    "in_copyright": "in_copyright",
+    "unknown": "unknown",
+}
+
+
+def resolve_tier(kind_tier: str | None, basis: str, explicit: str | None) -> str:
+    """Итоговый правовой статус: явный статус важнее тира вида лицензии, тир — важнее основания."""
+    tier = explicit or kind_tier or _BASIS_TIER.get(basis)
+    return tier if tier in TIERS else "unknown"
+
 
 events.define(
     "library.source.registered", "info", "Источник зарегистрирован", required=("source_id", "kind")
@@ -102,6 +119,12 @@ events.define(
     required=("source_id", "reason"),
 )
 events.define("library.source.deleted", "info", "Источник удалён", required=("source_id",))
+events.define(
+    "library.rights_tier.changed",
+    "info",
+    "Сменён правовой статус источника",
+    required=("source_id", "old", "new"),
+)
 
 
 class RegistryError(Exception):
@@ -128,6 +151,9 @@ class License:
     # Сужение регионов показа. В JSON лицензии не пишется: регионы живут отдельным столбцом,
     # иначе старый код при откате упал бы на неизвестном ключе License(**data).
     regions: list[str] | None = None
+    # Явный правовой статус (перемаркировка оператором). Не пишется в JSON лицензии: статус
+    # живёт отдельным столбцом sources.rights_tier; None — по виду лицензии (tier) или basis.
+    rights_tier: str | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -213,6 +239,7 @@ class Source:
     editor: str | None = None
     isbn: str | None = None
     original_url: str | None = None
+    rights_tier: str | None = None
 
 
 REQUIRED = ("title", "authors", "language", "kind", "license", "scope")
@@ -242,6 +269,7 @@ class Registry:
         url: str | None,
         permissions: dict[str, bool],
         regions: list[str] | None = None,
+        tier: str | None = None,
     ) -> None:
         missing = [p for p in PERMISSIONS if p not in permissions]
         if missing:
@@ -257,7 +285,12 @@ class Registry:
             conn.execute(delete(t.license_kinds).where(t.license_kinds.c.code == code))
             conn.execute(
                 t.license_kinds.insert().values(
-                    code=code, title=title, url=url, permissions=permissions, regions=codes
+                    code=code,
+                    title=title,
+                    url=url,
+                    permissions=permissions,
+                    regions=codes,
+                    tier=tier,
                 )
             )
             if previous is not None and list(previous["regions"] or []) != (codes or []):
@@ -315,6 +348,11 @@ class Registry:
         with self.engine.begin() as conn:
             rows = conn.execute(select(t.license_kinds)).mappings().all()
         return {row["code"]: dict(row) for row in rows}
+
+    def _tier(self, lic: License) -> str:
+        """Итоговый правовой статус: явный статус, тир вида лицензии, иначе основание."""
+        kind = self.license_kind(lic.kind) or {}
+        return resolve_tier(kind.get("tier"), lic.basis, lic.rights_tier)
 
     # --- регистрация ---
 
@@ -399,6 +437,7 @@ class Registry:
                     kind=fields["kind"],
                     license={**lic.to_json(), "blocked": blocked},
                     regions=normalize_regions(lic.regions),
+                    rights_tier=self._tier(lic),
                     scope=fields["scope"],
                     settings=settings,
                     files=list(fields.get("files") or []),
@@ -475,6 +514,7 @@ class Registry:
             editor=row["editor"],
             isbn=row["isbn"],
             original_url=row["original_url"],
+            rights_tier=row["rights_tier"],
         )
 
     def blocked_reason(self, source_id: str) -> str | None:
@@ -524,17 +564,70 @@ class Registry:
             conn.execute(
                 update(t.sources)
                 .where(t.sources.c.id == source_id)
-                .values(license={**lic.to_json(), "blocked": blocked}, regions=regions)
+                .values(
+                    license={**lic.to_json(), "blocked": blocked},
+                    regions=regions,
+                    rights_tier=self._tier(lic),
+                )
             )
             self.actions.record(actor, "change_license", source_id, {"kind": lic.kind}, conn=conn)
             # Регионы и разрешения меняются и без публикации: индексы обновляются по событию.
             self._outbox(conn, "source.access_changed", source_id, access)
-        if (
-            not self.permissions(source_id)["display"]
-            and source.status == "active"
-            and (source.published_version)
-        ):
-            self.unpublish(actor, source_id, reason="license_forbids_display")
+
+    def change_rights_tier(
+        self,
+        actor: str,
+        source_id: str,
+        tier: str,
+        *,
+        evidence: str | None = None,
+        note: str | None = None,
+    ) -> None:
+        """Ручная перемаркировка правового статуса с доказательством; пишется в журнал.
+
+        Статус — классификация, а не разрешения: показ и внешнюю обработку задаёт вид лицензии.
+        Расширение в более открытый статус требует доказательства.
+        """
+        if tier not in TIERS:
+            raise RegistryError(
+                f"правовой статус — одно из {', '.join(TIERS)}", fields=["rights_tier"]
+            )
+        source = self.get(source_id)
+        old = source.rights_tier
+        if old == tier:
+            return
+        if tier in ("public_domain", "open_license") and not evidence:
+            raise RegistryError(
+                "для открытого статуса нужно доказательство", fields=["rights_evidence"]
+            )
+        with self.engine.begin() as conn:
+            conn.execute(
+                update(t.sources).where(t.sources.c.id == source_id).values(rights_tier=tier)
+            )
+            conn.execute(
+                t.rights_log.insert().values(
+                    source_id=source_id,
+                    time=self.clock.now(),
+                    actor=actor,
+                    old_tier=old,
+                    new_tier=tier,
+                    evidence=evidence,
+                    note=note,
+                )
+            )
+            self.actions.record(actor, "change_rights_tier", source_id, {"tier": tier}, conn=conn)
+        events.emit("library.rights_tier.changed", source_id=source_id, old=old, new=tier)
+
+    def rights_history(self, source_id: str) -> list[dict[str, Any]]:
+        with self.engine.begin() as conn:
+            return [
+                dict(r)
+                for r in conn.execute(
+                    select(t.rights_log)
+                    .where(t.rights_log.c.source_id == source_id)
+                    .order_by(t.rights_log.c.id)
+                ).mappings()
+            ]
 
     def change_scope(self, actor: str, source_id: str, new_scope: str) -> None:
         if new_scope != PUBLIC and not self.restricted_scopes:
@@ -797,8 +890,6 @@ class Registry:
             refuse = f"версия в состоянии «{version['state']}», нужна «проверена»"
         elif any(i["level"] == "error" for i in (version["issues"] or [])):
             refuse = "у версии есть ошибки автоматических проверок"
-        elif not self.permissions(source_id)["display"]:
-            refuse = "лицензия не разрешает показывать текст"
         elif self.blocked_reason(source_id):
             refuse = self.blocked_reason(source_id)
         if refuse:
@@ -833,6 +924,7 @@ class Registry:
                     "version_id": version_id,
                     "previous_version_id": previous,
                     "external_processing": self.permissions(source_id)["external_processing"],
+                    "display": self.permissions(source_id)["display"],
                     **changes,
                 },
             )

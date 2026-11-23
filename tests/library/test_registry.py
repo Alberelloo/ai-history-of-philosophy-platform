@@ -75,10 +75,10 @@ def test_permissions_drive_events_and_publication(lib, events):
 
     hidden = lib.register(title="Скрытый", license=License("no-display", "open_license"))
     version_id = lib.pipeline.start("operator", hidden)
-    with pytest.raises(RegistryError) as info:
-        lib.registry.publish("operator", version_id)
-    assert "показывать" in str(info.value)
-    assert events.where("library.publish.refused", version_id=version_id)
+    lib.registry.publish("operator", version_id)  # без показа публикуется для онтологии
+    payload = lib.registry.outbox_pending()[-1]["payload"]
+    assert payload["display"] is False
+    assert lib.registry.get(hidden).published_version == version_id
 
 
 @req(SR, "Виды лицензий как данные")
@@ -198,9 +198,9 @@ def test_metadata_and_license_changes(lib, events):
     assert len(lib.registry.versions(source_id)) == 1 and v1
 
     lib.registry.change_license("operator", source_id, License("no-display", "open_license"))
-    assert lib.registry.get(source_id).status == "unpublished"
-    assert events.where("library.source.unpublished", reason="license_forbids_display")
-    assert lib.registry.outbox_pending()[-1]["kind"] == "source.unpublished"
+    # Без права показа источник скрыт от читателя, но не снят: онтология продолжает видеть его.
+    assert lib.registry.get(source_id).status == "active"
+    assert lib.registry.outbox_pending()[-1]["kind"] == "source.access_changed"
 
 
 @req(SR, "Снятие с публикации")

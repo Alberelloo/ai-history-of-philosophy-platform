@@ -3,14 +3,39 @@
 ## 2026-11-23 — планирование
 
 - Ведёт: субагент `claude` (аналитик/планировщик), по поручению Lead.
-- Собран анализ текущего состояния: правило «70 лет / public domain» зашито в `src/philograph/library/registry.py` (`COPYRIGHT_YEARS = 70`, `Basis` без `in_copyright`/`unknown`), `library/catalog/{model,adapters}.py` (валидация и подсказка лицензии), `sources/{licenses.yaml,catalog.schema.json}` (нет тира/видов под охраной), спеках `source-registry`/`source-catalog`.
-- Написан план: `proposal.md` (Why / What Changes / Capabilities / Impact), `design.md` (модель `rights_tier`, тир→разрешения, критерии, гейтинг), `tasks.md` (P0–P3 + явные договорённости), `progress.md`.
-- Статус задач: все пункты `tasks.md` открыты — это план реализации, код не пишется.
-- CLI `openspec` в окружении не установлен (нужна Node ≥22.12): файлы созданы вручную по образцу архивных изменений, `openspec validate` не прогонялся.
-- Следующий шаг: согласование плана с владельцем (особенно п. 4 design.md — сбор `in_copyright` как решение и правовой риск владельца), затем реализация P0 (задачи 1.1–2.3).
+- Собран анализ текущего состояния (см. design.md): правило «70 лет / public domain» в `registry.py`, `catalog/{model,adapters}.py`, `sources/{licenses.yaml,catalog.schema.json}`, спеках `source-registry`/`source-catalog`.
+- Написан план (`proposal.md`, `design.md`, `tasks.md`), дельты спецификаций, `openspec validate add-source-rights-tiers` — valid.
 
-## Известные вопросы
+## 2026-11-23 — реализация
 
-- Точная форма события для непубликуемых версий (`source.processed`) и его потребители — уточнить при реализации с сервисом знаний.
-- Тир `open_license` с `ND`/`BY-SA`: считать ли разметку/пересказ «производным произведением» — решение владельца (отдельно от гейтинга показа).
-- `unknown` и `in_copyright`: нужно ли хранить полный текст серверно или только производные данные — влияет на объём хранилища и правовой риск.
+- Ведёт: субагент `claude` (разработчик), ветка `claude/add-source-rights-tiers` от `claude/synchro-map`.
+- Реализовано P0–P3 по `tasks.md`:
+  - данные: `sources/rights-tiers.yaml`, `licenses.yaml` (поле `tier`, виды `in-copyright`/`unknown-rights`), `catalog.schema.json`;
+  - схема: миграция `library` № 6 (`sources.rights_tier`, `license_kinds.tier`, `rights_log`);
+  - ядро: `registry.py` (`resolve_tier`, `change_rights_tier`, публикация с `display: false`, событие `library.rights_tier.changed`);
+  - классификация: `catalog/rights.py` (`classify_tier`), `adapters.suggest_license` всегда возвращает черновик с тиром, `model.validate`, `service.ensure_license_kinds`;
+  - гейтинг: `reading.hidden_source_ids` + `Internal.access`, `search.indexing` (пропуск `display: false`), `knowledge.closed_sources` (+ `hidden`);
+  - тесты: `tests/library/test_rights_tiers.py`, `tests/library/catalog/test_rights.py`, правки `test_registry.py`, `test_archive_org.py`;
+  - доки: `source-ingestion.md`, `runbook.md`, ADR-0004.
+- Отклонение от плана (осознанно): вместо отдельного события `source.processed` использована публикация с `display: false` + фильтры на краях (`Internal.published` и так не отдаёт `display: false`, поиск это закрепляет). Это проще и переиспользует существующий механизм разрешений; зафиксировано в ADR-0004 и design.md (см. ниже). Константа `COPYRIGHT_YEARS` оставлена как защитная проверка основания `public_domain`.
+
+## Проверки
+
+- `openspec validate add-source-rights-tiers` — valid.
+- `ruff check .` — All checks passed; `ruff format --check src tests` — 202 files already formatted.
+- `lint-imports` — 3 kept, 0 broken.
+- `python scripts/check_traceability.py` — 348 из 348.
+- `python -m philograph.library.catalog validate` — ошибок 0, предупреждений 6 (предсуществующие дубли названий).
+- Смоук-тест в памяти: регистрация `in_copyright`, `change_rights_tier` + журнал, миграция — OK.
+
+## Блокеры и известные вопросы
+
+- **`pytest` не прогнан**: песочница DSH (workspace-write) запрещает удаление файлов, а pytest при очистке временных каталогов (`shutil.rmtree`) падает с PermissionError; диагноз требует `diagnose-windows-sandbox-acl` с разрешением, которое в сессии отключено. Код проверен статикой и смоук-тестом в памяти.
+- `docker compose` v2 нет → `tests/ops/test_deploy.py` (3 падения) — предсуществующее, не от этого изменения.
+- e2e/визуальный стенд (Postgres/Docker) при ~1 ГБ памяти не поднимался.
+- `openspec archive` не выполнялся: изменение остаётся активным, дельты вливаются в `openspec/specs/` при архивации в том же PR (после финальной проверки тестов).
+
+## Следующий шаг
+
+- Прогнать `pytest -q -m "not e2e"` в окружении с полным доступом (вне песочницы) и при необходимости поправить.
+- После зелёных тестов — `openspec archive add-source-rights-tiers --yes` и PR в `main`.
