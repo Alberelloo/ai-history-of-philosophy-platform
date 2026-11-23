@@ -62,7 +62,7 @@ class Provider(Protocol):
     def stream(self, request: ProviderRequest) -> Iterator[StreamChunk]: ...
 
     def embed(
-        self, model: str, texts: list[str], timeout_seconds: float
+        self, model: str, texts: list[str], timeout_seconds: float, dimensions: int | None = None
     ) -> tuple[list[list[float]], Usage]: ...
 
 
@@ -84,6 +84,7 @@ class FakeProvider:
     rules: list[tuple[str, str, str, str | None]] = field(default_factory=list)
     calls: list[ProviderRequest] = field(default_factory=list)
     embed_calls: list[list[str]] = field(default_factory=list)
+    embed_dimensions: list[int | None] = field(default_factory=list)
     dimension: int = 8
 
     def push(self, *items: Any) -> None:
@@ -140,9 +141,10 @@ class FakeProvider:
         yield StreamChunk(usage=self._usage(request, produced))
 
     def embed(
-        self, model: str, texts: list[str], timeout_seconds: float
+        self, model: str, texts: list[str], timeout_seconds: float, dimensions: int | None = None
     ) -> tuple[list[list[float]], Usage]:
         self.embed_calls.append(list(texts))
+        self.embed_dimensions.append(dimensions)
         item = (
             self.script.popleft() if self.script and isinstance(self.script[0], Exception) else None
         )
@@ -242,12 +244,13 @@ class OpenAICompatibleProvider:
             raise TransientProviderError(f"обрыв: {type(exc).__name__}") from exc
 
     def embed(
-        self, model: str, texts: list[str], timeout_seconds: float
+        self, model: str, texts: list[str], timeout_seconds: float, dimensions: int | None = None
     ) -> tuple[list[list[float]], Usage]:
+        body: dict[str, Any] = {"model": model, "input": texts}
+        if dimensions is not None:
+            body["dimensions"] = dimensions
         try:
-            response = self._http.post(
-                "/embeddings", json={"model": model, "input": texts}, timeout=timeout_seconds
-            )
+            response = self._http.post("/embeddings", json=body, timeout=timeout_seconds)
         except httpx.TimeoutException as exc:
             raise TransientProviderError("таймаут") from exc
         self._raise_for(response)

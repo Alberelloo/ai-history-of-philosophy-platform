@@ -816,8 +816,13 @@ class LLMGateway:
                 attempt += 1
                 started = time.perf_counter()
                 try:
+                    kwargs = (
+                        {"dimensions": role_conf.dimensions}
+                        if role_conf.dimensions is not None
+                        else {}
+                    )
                     vectors, usage = provider.embed(
-                        role_conf.model, texts, role_conf.timeout_seconds
+                        role_conf.model, texts, role_conf.timeout_seconds, **kwargs
                     )
                     break
                 except TransientProviderError as exc:

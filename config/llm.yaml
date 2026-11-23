@@ -5,7 +5,12 @@ providers:
     kind: openai_compatible
     base_url: https://api.deepseek.com
     api_key_env: DEEPSEEK_API_KEY
-  # Провайдер эмбеддингов выбирается при реализации поиска (add-paragraph-search).
+  # Прокси эмбеддингов LiteLLM (self-hosted): наш код ходит в один /v1/embeddings,
+  # а модель/провайдера/ключи/бюджеты переключаешь в конфиге LiteLLM.
+  litellm:
+    kind: openai_compatible
+    base_url: http://localhost:4000
+    api_key_env: LITELLM_API_KEY
   embeddings-stub:
     kind: fake
 
@@ -13,7 +18,8 @@ roles:
   fast: {provider: deepseek, model: deepseek-flash, max_output_tokens: 200, timeout_seconds: 10}
   main: {provider: deepseek, model: deepseek-flash, max_output_tokens: 1500, timeout_seconds: 60}
   strong: {provider: deepseek, model: deepseek-v4-pro, max_output_tokens: 1500, timeout_seconds: 120}
-  embeddings: {provider: embeddings-stub, model: stub-embeddings}
+  # model/dimensions — пример; см. docs/architecture/embeddings.md (пресеты 7 моделей).
+  embeddings: {provider: litellm, model: bge-m3, dimensions: 1024, timeout_seconds: 60}
 
 prices:
   deepseek-flash:
@@ -27,6 +33,9 @@ prices:
     output: 4.00
     night: {start_minute: 990, end_minute: 30, multiplier: 0.5}
   stub-embeddings:
+    input_cache_miss: 0.0
+    input_cache_hit: 0.0
+  bge-m3:
     input_cache_miss: 0.0
     input_cache_hit: 0.0
 
