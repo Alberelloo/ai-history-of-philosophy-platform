@@ -34,7 +34,7 @@ def test_embed_posts_model_and_dimensions_and_maps_vectors():
         return httpx.Response(200, json=data, request=request)
 
     provider = OpenAICompatibleProvider(
-        "http://litellm:4000/v1", "sk-test", transport=httpx.MockTransport(handler)
+        "http://litellm:4000", "sk-test", transport=httpx.MockTransport(handler)
     )
     vectors, usage = provider.embed("bge-m3", ["a", "b"], 60, dimensions=1024)
 
@@ -52,7 +52,7 @@ def test_embed_without_dimensions_omits_field():
         return httpx.Response(200, json={"data": [], "usage": {}}, request=request)
 
     provider = OpenAICompatibleProvider(
-        "http://litellm:4000/v1", "sk-test", transport=httpx.MockTransport(handler)
+        "http://litellm:4000", "sk-test", transport=httpx.MockTransport(handler)
     )
     provider.embed("bge-m3", ["a"], 60)
     assert "dimensions" not in seen["body"]
