@@ -34,7 +34,7 @@
   - `partial` → `knowledge.import.skipped`.
 
   Прежние тесты `test_filling.py` (импорт Wikidata) зелёные без правки ожиданий.
-- [ ] 2.6 Юнит-тесты `life_dates` на фикстурах записей (`tests/knowledge/wd_records.py`, QID — только метки). `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q tests/knowledge/test_wikidata_unit.py tests/knowledge/test_filling.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`.
+- [x] 2.6 Юнит-тесты `life_dates` на фикстурах записей (`tests/knowledge/wd_records.py`, QID — только метки). `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q tests/knowledge/test_wikidata_unit.py tests/knowledge/test_filling.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`.
 
 ## 3. Тестировщик
 
