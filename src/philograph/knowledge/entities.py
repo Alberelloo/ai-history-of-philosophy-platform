@@ -10,7 +10,7 @@ import uuid
 from itertools import combinations
 from typing import Any
 
-from sqlalchemy import Engine, and_, select, update
+from sqlalchemy import Engine, and_, delete, select, update
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.naming import (
@@ -184,12 +184,14 @@ class Entities:
         return {eid: by_id[rid] for eid, rid in resolved.items() if rid in by_id}
 
     def set_primary(self, entity_id: str, key: str, value: Any) -> None:
+        """Копия основного значения; ``None`` — копии больше нет (ключ снимается)."""
         entity = self.get(entity_id)
+        primary = {**entity["primary"], key: value}
+        if value is None:
+            del primary[key]
         with self.engine.begin() as conn:
             conn.execute(
-                update(t.entities)
-                .where(t.entities.c.id == entity["id"])
-                .values(primary={**entity["primary"], key: value})
+                update(t.entities).where(t.entities.c.id == entity["id"]).values(primary=primary)
             )
 
     @staticmethod
@@ -296,6 +298,35 @@ class Entities:
                 t.external_ids.insert().values(entity_id=entity_id, system=system, value=value)
             )
         return True
+
+    def remove_external(self, entity_id: str, system: str, value: str) -> bool:
+        """Снять внешний идентификатор (откат запуска). ``True`` — снят, ``False`` — его не
+        было у этой сущности."""
+        entity_id = self.resolve(entity_id)
+        with self.engine.begin() as conn:
+            return bool(
+                conn.execute(
+                    delete(t.external_ids).where(
+                        and_(
+                            t.external_ids.c.entity_id == entity_id,
+                            t.external_ids.c.system == system,
+                            t.external_ids.c.value == value,
+                        )
+                    )
+                ).rowcount
+            )
+
+    def external_of(self, entity_id: str, system: str) -> str | None:
+        """Внешний идентификатор системы у сущности (после перенаправлений)."""
+        entity_id = self.resolve(entity_id)
+        with self.engine.begin() as conn:
+            return conn.scalar(
+                select(t.external_ids.c.value)
+                .where(
+                    and_(t.external_ids.c.entity_id == entity_id, t.external_ids.c.system == system)
+                )
+                .order_by(t.external_ids.c.value)
+            )
 
     def externals(self, system: str) -> dict[str, str]:
         """Сущность → значение внешнего идентификатора системы (по действующим сущностям)."""

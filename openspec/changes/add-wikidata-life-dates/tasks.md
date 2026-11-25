@@ -20,7 +20,7 @@
   - `HUMAN = "Q5"`.
 
   Юнит-тесты.
-- [ ] 2.3 `knowledge/life_dates.py`:
+- [x] 2.3 `knowledge/life_dates.py`:
   - `LifeDates.suggest` (фильтр класса, `--auto-exact` по правилу design.md);
   - кандидат-держатель (О10): `holder` в кандидате, пункт `duplicate` с `reason="review:qid_candidate"` без повтора;
   - `apply`: QID по правилу 1–4 спецификации (порядок манифеста, `qid_conflict`, `qid_taken`) → даты по таблице точностей (`bad_value`) → роли; `unchanged`/`conflict`; сухой прогон. Пары `qid_taken` с `accepted` идут в `Dedupe.run(confirmed=…)`, с `auto` — в очередь;

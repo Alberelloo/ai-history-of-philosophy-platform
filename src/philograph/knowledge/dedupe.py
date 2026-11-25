@@ -334,13 +334,25 @@ class Dedupe:
         self.review = review
         self.engine = statements.engine
 
-    def plan(self, confirmed: Iterable[tuple[str, str]] = ()) -> Plan:
+    def plan(
+        self, confirmed: Iterable[tuple[str, str]] = (), scope: Iterable[str] | None = None
+    ) -> Plan:
+        """План по всем персонам базы. ``scope`` — только компоненты и пары очереди, где есть
+        хотя бы одна из этих сущностей (команда QID сливает свои подтверждения, а не всё)."""
         persons = load_persons(self.engine)
         resolve = self.statements.entities.resolve
         confirmed = [(resolve(a), resolve(b)) for a, b in confirmed]
         _, distinct = duplicate_items(self.engine)
         counts = link_counts(self.engine, [p.id for p in persons])
-        return plan(persons, confirmed=confirmed, distinct=distinct, counts=counts)
+        result = plan(persons, confirmed=confirmed, distinct=distinct, counts=counts)
+        if scope is None:
+            return result
+        wanted = {resolve(x) for x in scope}
+        return Plan(
+            merges=[m for m in result.merges if wanted & {m[0], *m[1]}],
+            review=[r for r in result.review if wanted & {r[0], r[1]}],
+            apart=result.apart,
+        )
 
     def run(
         self,
@@ -348,8 +360,9 @@ class Dedupe:
         dry_run: bool = False,
         run_id: str | None = None,
         confirmed: Iterable[tuple[str, str]] = (),
+        scope: Iterable[str] | None = None,
     ) -> dict[str, int]:
-        result = self.plan(confirmed)
+        result = self.plan(confirmed, scope)
         merged = sum(len(removed) for _, removed, _ in result.merges)
         if dry_run:
             return {"merged": merged, "proposed": len(result.review), "apart": result.apart}

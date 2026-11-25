@@ -40,6 +40,8 @@ STRENGTH = {"verified": 3, "sourced": 2, "generated": 1, "rejected": 0}
 # эпохи): проверенные, по источникам, сгенерированные; прочее — после.
 STATUS_ORDER = {"verified": 0, "sourced": 1, "generated": 2}
 INFLUENCE = "influenced_by"
+# Типы, чьё основное значение копируется в ``entities.primary`` (ключ копии).
+PRIMARY_TYPES = {"lifespan": "dates", "dating": "dates", "description": "description"}
 
 events.define(
     "knowledge.statement.created",
@@ -561,7 +563,7 @@ class Statements:
 
         Основное — предпочтённое, иначе первое записанное из действующих (не отклонённых и не
         «устаревших»); пересчитывается при записи, смене ранга и смене статуса."""
-        key = {"lifespan": "dates", "dating": "dates", "description": "description"}.get(type_)
+        key = PRIMARY_TYPES.get(type_)
         if key is None:
             return
         rows = [
@@ -1080,6 +1082,7 @@ class Statements:
                 .all()
             )
         removed = 0
+        touched: set[str] = set()
         for s in candidates:
             if s["provenance"].get("run_id") != run_id:
                 continue
@@ -1088,6 +1091,10 @@ class Statements:
                 with self.engine.begin() as conn:
                     conn.execute(delete(t.statements).where(t.statements.c.id == s["id"]))
                 removed += 1
+                if s["type"] in PRIMARY_TYPES:
+                    touched.add(s["subject"])
+        for entity_id in sorted(touched):  # копии основных значений — по оставшимся
+            self._refresh_primary(entity_id)
         events.emit(
             "knowledge.run.rolled_back",
             run_id=run_id,
