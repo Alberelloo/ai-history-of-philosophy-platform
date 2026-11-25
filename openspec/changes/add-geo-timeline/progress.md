@@ -182,3 +182,12 @@
   Правки — только ссылки в design.md этого изменения; пункт «Риски: имена в wikidata.py не зафиксированы» снят.
 - 2.1 — `registry.py`, `_add_missing_defaults`: к дописываемым ключам существующей связи добавлен `qualifiers` (недостающие — в конец, прежние и добавленные оператором остаются). Запись версии — «концы, значения и уточнители <код>». Тесты — `tests/knowledge/test_geo_units.py` (`test_missing_qualifiers_are_appended_operator_changes_kept`, `test_qualifier_added_by_operator_is_not_removed`): реестр прежней версии (`lived_in` с одним `time`, оператор добавил тип конца `group`) → после `load_defaults` `time` и `place_role`, тип конца сохранён, версия +1, повторный старт версию не меняет. Тест зелёный вместе с 2.2 (уточнитель `place_role` появляется там).
 - 2.2 — `registry_data.py`: уточнитель `place_role` (`birth`, `death`, `activity`, `residence`), `lived_in` с `("time", "place_role")`, значение-свойство `coordinates` (`value="geo"`, `requires_attribution=True`, семейство `context`), `rel(..., requires_attribution=False)` — флаг пишется в спецификацию только когда задан. Прогон: `pytest -q tests/knowledge/test_geo_units.py` — 3 passed; `tests/knowledge/test_registry_entities.py` — 33 passed, 1 skipped (гонка только на PostgreSQL, как было).
+- 2.3 — `statements.py`:
+  - `StatementError(message, code=None)`; `knowledge.statement.refused` получил необязательное поле `code` (`optional=("code",)` в каталоге), прежние отказы его не пишут;
+  - пожелание (а) второго круга: `add` перевыбрасывает `StatementError(str(exc), code)` с кодом исходного исключения (у `RegistryError` кода нет — `None`);
+  - пожелание (б): нормализация значения (`NORMALIZE` по виду значения, для `geo` — `normalize_geo`) идёт до `_key` внутри того же `try`, что и `_check`: на каждый отказ ровно одно событие;
+  - `normalize_geo`: dict с `lat`/`lon`, конечные числа не `bool` → `geo_not_number`; пределы включительно на исходном значении → `geo_out_of_range`; `round(float(x), 2)`;
+  - флаг `requires_attribution` проверяется в `_check_value` (код `attribution_required`); прежняя проверка `definition` по имени не тронута;
+  - публичный `check_value(type_, value, qualifiers, attributions)` — те же проверки без сущности, возвращает хранимое значение, событий не пишет;
+  - `find` нормализует значение так же (недопустимое — `None`), иначе повторная проверка с неокруглёнными координатами не нашла бы утверждение.
+  Прогон: `tests/knowledge/test_geo_units.py` — 15 passed; `tests/knowledge/test_statements.py` — 19 passed.

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import uuid
 from collections import deque
@@ -46,6 +47,9 @@ events.define(
     "warning",
     "Утверждение не записано: ошибка",
     required=("type", "reason"),
+    # Код отказа — у проверок, которым он нужен (geo-timeline): geo_not_number,
+    # geo_out_of_range, attribution_required. Прежние отказы его не пишут.
+    optional=("code",),
 )
 events.define(
     "knowledge.statement.warning",
@@ -80,7 +84,33 @@ events.define(
 
 
 class StatementError(Exception):
-    pass
+    """Утверждение не записано. ``code`` — машинный код причины, если он есть."""
+
+    def __init__(self, message: str, code: str | None = None) -> None:
+        super().__init__(message)
+        self.code = code
+
+
+def normalize_geo(value: Any) -> dict[str, float]:
+    """Координаты ``{lat, lon}``: конечные числа (не ``bool``) → пределы −90…90 и −180…180
+    включительно на исходном значении → округление ``round(x, 2)``. Ключ утверждения
+    считается по результату: 54.7104 и 54.71 — одно утверждение."""
+    lat = value.get("lat") if isinstance(value, dict) else None
+    lon = value.get("lon") if isinstance(value, dict) else None
+    for x in (lat, lon):
+        if isinstance(x, bool) or not isinstance(x, int | float) or not math.isfinite(x):
+            raise StatementError(
+                "координаты должны быть конечными числами: широта и долгота", "geo_not_number"
+            )
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        raise StatementError(
+            "координаты вне пределов: широта −90…90, долгота −180…180", "geo_out_of_range"
+        )
+    return {"lat": round(float(lat), 2), "lon": round(float(lon), 2)}
+
+
+# Нормализация значения по виду: значение приводится к хранимому виду до вычисления ключа.
+NORMALIZE: dict[str, Callable[[Any], Any]] = {"geo": normalize_geo}
 
 
 @dataclass
@@ -168,6 +198,10 @@ class Statements:
         добавляет ни утверждений, ни повторных атрибуций (``add`` слил бы и дописал их)."""
         subject = self.entities.resolve(subject)
         obj = self.entities.resolve(obj) if obj else None
+        try:
+            value = self._normalize(type_, value)
+        except StatementError:
+            return None  # недопустимое значение не может быть записано
         key = self._key(subject, type_, obj, value, qualifiers or {})
         with self.engine.begin() as conn:
             return conn.scalar(
@@ -188,22 +222,25 @@ class Statements:
         )
         return hashlib.sha256(payload.encode()).hexdigest()
 
-    def _check(
-        self,
-        subject: str,
-        type_: str,
-        obj: str | None,
-        value: Any,
-        qualifiers: dict[str, Any],
-        attributions: list[Attribution],
-        evidence: list[Evidence],
-    ) -> None:
+    def _normalize(self, type_: str, value: Any) -> Any:
+        """Значение в хранимом виде (координаты — округлённые); недопустимое —
+        ``StatementError`` с кодом. Для прочих видов значение не меняется."""
+        normalize = NORMALIZE.get(self.registry.relation(type_).get("value_kind") or "")
+        return normalize(value) if normalize is not None and value is not None else value
+
+    def _live(self, type_: str) -> dict[str, Any]:
         spec = self.registry.relation(type_)
         if spec.get("deprecated_by"):
             raise StatementError(f"тип {type_} устарел, используйте {spec['deprecated_by']}")
-        subject_type = self.entities.get(subject)["type"]
-        if not self.registry.is_a(subject_type, spec["subject_types"]):
-            raise StatementError(f"тип субъекта {subject_type} недопустим для {type_}")
+        return spec
+
+    def _check_value(
+        self, type_: str, value: Any, qualifiers: dict[str, Any], attributions: list[Attribution]
+    ) -> None:
+        """Проверки, которым не нужна сущность: значение, атрибуция, уточнители."""
+        spec = self.registry.relation(type_)
+        if spec.get("requires_attribution") and not attributions:
+            raise StatementError(f"у {type_} обязательна атрибуция", "attribution_required")
         if spec.get("value_kind"):
             if value is None:
                 raise StatementError(f"у {type_} должно быть значение")
@@ -214,13 +251,47 @@ class Statements:
                 raise StatementError(
                     f"значение {value!r} недопустимо для {type_}; допустимые: {', '.join(allowed)}"
                 )
-        else:
+        self.registry.check_qualifiers(type_, qualifiers)
+
+    def check_value(
+        self,
+        type_: str,
+        value: Any = None,
+        qualifiers: dict[str, Any] | None = None,
+        attributions: list[Attribution] | None = None,
+    ) -> Any:
+        """Сухая проверка без сущности (обогащение до создания места): значение и уточнители
+        так, как их проверит ``add``. Возвращает значение в хранимом виде; отказ —
+        ``StatementError`` с ``code``, если он есть. Событий не пишет и ничего не записывает."""
+        try:
+            self._live(type_)
+            value = self._normalize(type_, value)
+            self._check_value(type_, value, qualifiers or {}, attributions or [])
+        except RegistryError as exc:
+            raise StatementError(str(exc), getattr(exc, "code", None)) from exc
+        return value
+
+    def _check(
+        self,
+        subject: str,
+        type_: str,
+        obj: str | None,
+        value: Any,
+        qualifiers: dict[str, Any],
+        attributions: list[Attribution],
+        evidence: list[Evidence],
+    ) -> None:
+        spec = self._live(type_)
+        subject_type = self.entities.get(subject)["type"]
+        if not self.registry.is_a(subject_type, spec["subject_types"]):
+            raise StatementError(f"тип субъекта {subject_type} недопустим для {type_}")
+        if not spec.get("value_kind"):
             if obj is None:
                 raise StatementError(f"у {type_} должен быть объект")
             object_type = self.entities.get(obj)["type"]
             if not self.registry.is_a(object_type, spec["object_types"]):
                 raise StatementError(f"тип объекта {object_type} недопустим для {type_}")
-        self.registry.check_qualifiers(type_, qualifiers)
+        self._check_value(type_, value, qualifiers, attributions)
         for ev in evidence:
             text = self.paragraph_text(ev.paragraph_id)
             if text is None or _norm_quote(ev.quote) not in _norm_quote(text):
@@ -248,10 +319,14 @@ class Statements:
         subject = self.entities.resolve(subject)
         obj = self.entities.resolve(obj) if obj else None
         try:
+            # Нормализация — до ключа и внутри той же проверки: на любой отказ одно событие.
+            value = self._normalize(type_, value)
             self._check(subject, type_, obj, value, qualifiers, attributions, evidence)
         except (StatementError, RegistryError) as exc:
-            events.emit("knowledge.statement.refused", type=type_, reason=str(exc))
-            raise StatementError(str(exc)) from exc
+            code = getattr(exc, "code", None)
+            fields = {"code": code} if code else {}
+            events.emit("knowledge.statement.refused", type=type_, reason=str(exc), **fields)
+            raise StatementError(str(exc), code) from exc
         key = self._key(subject, type_, obj, value, qualifiers)
         with self.engine.begin() as conn:
             existing = (
