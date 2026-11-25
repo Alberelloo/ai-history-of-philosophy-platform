@@ -18,7 +18,7 @@
 - [x] 2.1 `pyproject.toml`:
   - `hypothesis>=6.100` в `[project.optional-dependencies].dev` (О8);
   - `[tool.setuptools.package-data]` для `philograph/knowledge/*.yaml`.
-- [ ] 2.2 `knowledge/naming_rules.yaml`: стоп-список владельца целиком, пределы по типам (6/80, 12/160), частицы, шаблоны персоны, `exempt: [source]`. `knowledge/naming.py` — определения из спецификации `entity-naming`:
+- [x] 2.2 `knowledge/naming_rules.yaml`: стоп-список владельца целиком, пределы по типам (6/80, 12/160), частицы, шаблоны персоны, `exempt: [source]`. `knowledge/naming.py` — определения из спецификации `entity-naming`:
   - `load_rules` (проверка формы);
   - `script_of`, `lang_for`, `is_russian` (слова из римских цифр не считаются);
   - `check_name` (NFC, знаки, слова, порядок `empty` → `number` (нет букв, есть цифра) → `sentence` → `not_a_name` (частицы с `-`/`'`/`’`, шаблоны по нормализованному названию без учёта регистра, склейка) → `stopword`);

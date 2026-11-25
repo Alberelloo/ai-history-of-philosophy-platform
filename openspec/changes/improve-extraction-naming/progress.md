@@ -111,3 +111,4 @@
 ## Код — 2026-11-25 (разработчик)
 
 - 2.1 `pyproject.toml`: `hypothesis>=6.100` в dev, `package-data` для `philograph.knowledge/*.yaml`. В `.venv` поставлен hypothesis 6.170.17.
+- 2.2 `knowledge/naming_rules.yaml` и `knowledge/naming.py`. Событие `knowledge.entity.rejected` определено в `naming.py` (поля `type`, `label`, `reason`), эмитирует `naming.reject`. Отличие от design: `names_for(type_, item)` — тип нужен для проверки написаний; не прошедшее проверку написание пишет событие отказа там же. `normalize` перенесён в `naming.py` (NFC, `_` → пробел), `entities.normalize` — тот же объект. Частицы — список спецификации плюс `da`, `del`, `della`, `di`, `du`, `der`, `дель`, `делла`, `ди`, `дю`, `дер`, `эль`. Юнит-тесты `tests/knowledge/test_naming_unit.py`: 68 passed.
