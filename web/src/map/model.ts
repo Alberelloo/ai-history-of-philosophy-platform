@@ -247,9 +247,15 @@ export function related(data: MapData, v: Visible, sel: string | null, verified 
     const e = f.obj;
     // что событие стимулировало (из ответа карты) — участники и вне десятилетнего окна
     const stim = new Set((e.stimulated ?? []).filter((s) => !verified || !s.generated).map((s) => s.id));
+    // стимулированные персоны — стимулированные напрямую и авторы стимулированных трудов:
+    // они участники и получают свои цвета раньше прочих
+    const stimPeople = new Set(stim);
+    v.works.forEach((w) => {
+      if (stim.has(w.id) && w.author != null) stimPeople.add(w.author);
+    });
     group(
-      v.people.filter((p) => (p.birth <= e.year && p.death >= e.year) || stim.has(p.id)),
-      stim,
+      v.people.filter((p) => (p.birth <= e.year && p.death >= e.year) || stimPeople.has(p.id)),
+      stimPeople,
     );
     era = eraOf(v.eras, e.year);
     works = new Set(
