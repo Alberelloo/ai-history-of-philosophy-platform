@@ -156,3 +156,29 @@
 - Д2: `naming.reject` пишет `label` после `strip` + NFC, обрезка `event_label` — по нему (`naming.py`, `reject`).
 - Пробел О15: `dating.TYPE = "dating:type"`; `EntityItems.date` до проверок 1–6 сверяет тип сущности с `subject_types` связи `lifespan`/`dating` реестра и отказывает кодом. Дописано в `specs/entity-dating/spec.md` (перед пп. 1–6), design (таблица событий), tasks 3.4 (строка мутации для тестировщика). Юнит-тест `test_date_type_not_allowed_is_code`.
 - Прогоны по одному: `test_entity_naming` 31 passed / 2 failed (Д1, ждут тестировщика), `test_entity_dating_extraction` 13 passed, `test_entity_items_unit` 12 passed, `test_naming_unit` 68 passed.
+
+## Ревьювер — код, 2026-11-25, коммит e843975 (субагент `reviewer`)
+
+Проверки: `ruff check` и `ruff format --check` на 25 файлах обоих изменений чисто; `lint-imports` — 3 kept; `check_traceability.py` — 407/407; `mutation_check.py --coverage` чисто у обоих (8 и 4 требования). Выборочно прогнана мутация `era-unchecked`: упали 3/3 ожидаемых теста.
+
+Файлы Lead'а. В `filling.py` только точки вызова:
+- схема `entities`, `language`;
+- `_resolve` делегирует в `EntityItems`;
+- цикл датировок;
+- `accept_core_report`;
+- `import_wikidata` переведён на `simple_time`/`interval` с `partial`;
+- `WIKIDATA_ROLES` перенесена в `wikidata.py`;
+- определения событий `extraction.dropped`/`ambiguous` перенесены в `entity_items.py`.
+
+В `prompts/__init__.py` — только текст `ontology.extract`, поле `language` и новый шаблон `ontology.translate_names`. Логика правил живёт в `naming.py`, `dating.py` и `entity_items.py`. Язык и проверка названия стоят в `Entities.create`/`add_name`/`set_primary_name`, а внешние пути (`geo_enrich`, `epoch_dates`, `epoch_context`, `metadata`) проверяют название до записи через `invalid_primary`. Оракулы стратегий не импортируют `naming`/`dating`: тесты вызывают их как проверяемое и сравнивают с ожиданием генератора.
+
+Блокирует:
+1. `entity_items.py:127` (закоммиченная версия) — `Skip(str(exc))` пишет в `knowledge.extraction.dropped` текст «название «children» (person) отклонено: not_a_name», то есть название в событии. Это нарушает О17 и spec:123. Правка `entity:{exc.reason}` и spec лежат в рабочем дереве незакоммиченными. Сделать: закоммитить вместе с тестом на точное множество значений `reason` (`entity:*`/`dating:*`) и мутацией.
+
+Желательно:
+1. `filling.py`, цикл датировок — элемент `entities`, который не встречается ни в одном утверждении, но несёт `dating`, создаёт новую сущность только ради даты. Spec говорит о сущностях «названных в утверждениях». Если элемент неоднозначен, второй вызов `resolve` ставит второй такой же пункт `ambiguous_link` и пишет `dropped` с текстовой причиной вместо `dating:*`.
+2. `entity_items.py:122,186` — причины «новая сущность «…» без типа» и «неоднозначное название «…»» по-прежнему несут название в `dropped.reason`. Это прежнее поведение, но под правило О17 стоит перевести и их.
+3. `entity_items.py:72` — обращение к приватному `registry._load()`; `dedupe._pair` используется из другого модуля.
+
+Выбор решения: соответствует design. Подгонка тестов: не найдена.
+Вердикт: можно к судье после коммита правки О17 (п. 1).
