@@ -10,6 +10,7 @@ mutations:
       - tests/knowledge/test_person_quality.py::test_garbage_person
       - tests/knowledge/test_person_quality.py::test_glued
       - tests/knowledge/test_person_quality.py::test_person_quality_invariant
+      - tests/knowledge/test_person_quality.py::test_person_rule_any_input
   - id: prompt-no-person-def
     requirement: Качество персон
     patch: prompt-no-person-def.patch

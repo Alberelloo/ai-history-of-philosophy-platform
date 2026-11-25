@@ -106,3 +106,11 @@
 - «Ответ без `entities` как прежде» — плюс прежние `tests/knowledge/test_filling.py` без правки ожиданий: 30 passed.
 - Сценарий «Язык по письменности на любом пути»: миграция не проверена (её путь — `migrate-ontology-quality`).
 - Полный `pytest` не запускался (1 ГБ RAM), только файлы выше по одному.
+
+### Перепроверка после О15 — 2026-11-25 (тестировщик, коммит разработчика c76007a)
+
+- Д1 закрыт правкой spec: инвариант «латиницы (вне римских чисел) не меньше кириллицы — не `ru`; перевес кириллицы — `ru`». `test_no_latin_name_has_ru` приведён к новой формулировке, параметры с ожиданием: «Locke» → не ru, «Kant-Кант» (4:4) → не ru, «Kantt-Кант» → не ru, «Кантq» → ru, «Иммануил Kant» → ru, «Людовик XIV» → ru, «XIV» → не ru (букв вне римских нет). 7 passed.
+- Д2 закрыт в коде: `test_rejected_label_is_name_after_strip` (4 параметра) passed без правки.
+- `dating:type`: новый тест `test_entity_dating_extraction.py::test_dating_of_type_not_allowed` — датировка понятия «Субстанция» во фрагменте: сущность и связь `opposed_to` записаны, датировки и `primary.dates` нет, ровно одно `knowledge.extraction.dropped` с `reason="dating:type"` и `run_id`, сторожевой токен не утёк. Passed. Мутация `dating-type-unchecked` (проверка типа до пп. 1–6 убрана, отказ — текстом реестра): упал (1 failed, 4.26 s), worktree на 3aa55a9.
+- Стратегия `stopwords_perturbed`: если разделитель « - » вывел стоп-слово за предел типа, ожидание — `sentence` (порядок правил spec); раньше такой вход был бы ложно помечен `stopword`.
+- Прогоны: `test_entity_naming` 35 passed (68.6 s), `test_entity_dating_extraction` 14 passed (57.7 s). Наблюдение про причину текстом реестра у датировки понятия (раздел «Наблюдения» выше) снято: теперь код.

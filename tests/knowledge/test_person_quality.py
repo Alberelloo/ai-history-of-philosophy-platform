@@ -18,7 +18,7 @@ from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as hst
 from sqlalchemy import select
 
-from philograph.knowledge import dedupe
+from philograph.knowledge import dedupe, naming
 from philograph.knowledge import schema as t
 from philograph.knowledge.app import build_app
 from philograph.knowledge.dates import lifespan, span
@@ -35,6 +35,7 @@ from .strategies import (
     PERSON,
     expected_kept,
     expected_label,
+    name_of,
     names_with_reason,
     not_persons,
     persons_with_variants,
@@ -207,6 +208,19 @@ def test_person_quality_invariant(stand, onto, events, case):
         assert fields(rejected) == {"type": PERSON, "label": expected_label(raw), "reason": reason}
         assert events.of(DROPPED)
     no_token(events, token)
+
+
+@req(PQ, QUALITY, invariant="Правило названий персон — чистая функция: ожидаемая причина")
+@settings(parent=PROFILES["pure"])
+@given(_person_cases())
+@example(((PERSON, "your Lordship"), "not_a_name"))
+@example(((PERSON, "Kepler and Des Cartes"), "not_a_name"))
+@example(((PERSON, "Children"), "stopword"))
+@example(((PERSON, "Logicians"), "stopword"))
+@example(((PERSON, "Иоганн Вольфганг фон Гёте"), None))
+def test_person_rule_any_input(case):
+    (_type, raw), reason = case
+    assert naming.check_name(PERSON, name_of(raw)) == reason
 
 
 # =========================== Слияние вариантов персоны ====================================

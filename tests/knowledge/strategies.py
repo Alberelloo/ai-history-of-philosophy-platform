@@ -243,6 +243,10 @@ def stopwords_perturbed(draw) -> tuple[tuple[str, str], str]:
         text = text[:first] + text[first].upper() + text[first + 1 :]
         if search_form(text).startswith(("the author ", "author of ")):
             type_ = draw(st.sampled_from(NON_PERSON))
+    max_words, max_chars = limits(type_)
+    clean = name_of(text)
+    if len(clean.split()) > max_words or len(clean) > max_chars:
+        return (type_, text), "sentence"  # разделитель « - » добавил слова: предел раньше
     return (type_, text), "stopword"
 
 
@@ -669,9 +673,18 @@ def not_persons():
     строчные описания, «the … of …», склейки (``not_a_name``), обращения и группы
     из стоп-списка с заглавной (``stopword``), фразы длиннее предела (``sentence``)."""
     persons_only = st.one_of(not_names(), stopwords_perturbed(), long_phrases())
-    return persons_only.map(lambda case: ((PERSON, case[0][1]), case[1])).filter(
-        lambda case: _person_reason_kept(case)
-    )
+    return persons_only.map(_as_person).filter(_person_reason_kept)
+
+
+def _as_person(case):
+    """Вход другого типа как персона: предел персоны (6 слов, 80 знаков) может быть меньше
+    предела исходного типа — тогда по порядку правил раньше срабатывает ``sentence``."""
+    (_type, raw), reason = case
+    max_words, max_chars = limits(PERSON)
+    clean = name_of(raw)
+    if reason == "stopword" and (len(clean.split()) > max_words or len(clean) > max_chars):
+        reason = "sentence"
+    return (PERSON, raw), reason
 
 
 def _person_reason_kept(case) -> bool:
