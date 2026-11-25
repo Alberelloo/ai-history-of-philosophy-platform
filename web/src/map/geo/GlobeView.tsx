@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { useT } from "../../i18n";
 import { mapFonts, type Measure } from "../layout";
 import type { GeoLayer } from "./api";
-import { LAND } from "./land";
+import { LAND } from "./world";
 import {
   arcPath,
   canvasPath,

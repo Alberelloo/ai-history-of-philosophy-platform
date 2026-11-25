@@ -60,3 +60,4 @@
 ## 2026-11-25 — реализация (разработчик, круг 2, этап Б)
 
 - 1.3 — раздел 12 в `docs/design/features/geo-timeline-options.md`.
+- 2.1–2.3 — `countries.ru.json` (174 кода, 17 обиходных отступлений в `overrides`), `world.ts` вместо `land.ts` (`LAND`, `BORDERS`, `COUNTRIES`, `COUNTRY_COUNT`), `countries.ts` (`countryAt`, `countryOf`, `countryName`). Юнит-тесты модулей клиента — `web/unit/**/*.test.ts`, их собирает esbuild и запускает node из `tests/web/test_geo_units.py` (маркеров `req` нет: это тесты разработчика). Прогон: `pytest -q tests/web/test_geo_units.py` — 1 passed, внутри 17 проверок, 0 провалов; Приштина → «страна не определена» (точка внутри контура Косово без кода), Сиракузы → Италия.
