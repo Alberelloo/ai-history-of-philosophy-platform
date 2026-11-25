@@ -320,7 +320,9 @@ class Entities:
     # --- дубли ---
 
     def duplicate_candidates(self) -> list[tuple[str, str]]:
-        """Кандидаты: одинаковый тип, совпадает последнее слово названия и основные даты."""
+        """Кандидаты в дубли одного типа — по индексу названий, без перебора всех пар:
+        совпадает последнее слово названия и основные даты, или основное название одной
+        совпадает с любым названием другой."""
         with self.engine.begin() as conn:
             rows = (
                 conn.execute(select(t.entities).where(t.entities.c.redirect_to.is_(None)))
@@ -328,20 +330,33 @@ class Entities:
                 .all()
             )
             all_names = conn.execute(select(t.names)).mappings().all()
-        names_of: dict[str, set[str]] = {}
+        position = {r["id"]: i for i, r in enumerate(rows)}
+        by_id = {r["id"]: r for r in rows}
+        last_words: dict[tuple[str, str], set[str]] = {}
+        full: dict[tuple[str, str], set[str]] = {}
+        primaries: dict[str, set[str]] = {}
         for n in all_names:
-            names_of.setdefault(n["entity_id"], set()).add(
-                n["normalized"].split()[-1] if n["normalized"] else ""
-            )
-        pairs = []
-        for a, b in combinations(rows, 2):
-            if a["type"] != b["type"]:
+            entity = by_id.get(n["entity_id"])
+            if entity is None:
                 continue
-            same_name = names_of.get(a["id"], set()) & names_of.get(b["id"], set())
-            dates_a, dates_b = a["primary"].get("dates"), b["primary"].get("dates")
-            if same_name and (dates_a == dates_b):
-                pairs.append((a["id"], b["id"]))
-        return pairs
+            words = n["normalized"].split()
+            last = words[-1] if words else ""
+            last_words.setdefault((entity["type"], last), set()).add(entity["id"])
+            full.setdefault((entity["type"], n["normalized"]), set()).add(entity["id"])
+            if n["kind"] == "primary" and n["normalized"]:
+                primaries.setdefault(entity["id"], set()).add(n["normalized"])
+        pairs: set[tuple[str, str]] = set()
+        for group in last_words.values():
+            for a, b in combinations(sorted(group, key=position.get), 2):
+                if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):
+                    pairs.add((a, b))
+        for entity_id, names in primaries.items():
+            for name in names:
+                for other in full.get((by_id[entity_id]["type"], name), ()):
+                    if other != entity_id:
+                        a, b = sorted((entity_id, other), key=position.get)
+                        pairs.add((a, b))
+        return sorted(pairs, key=lambda p: (position[p[0]], position[p[1]]))
 
     def merge(self, kept: str, removed: str, *, emit: bool = True) -> int:
         """Переносит названия, утверждения, внешние идентификаторы, упоминания, атрибуции-автора

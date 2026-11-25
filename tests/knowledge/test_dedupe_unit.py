@@ -117,3 +117,23 @@ def test_dedupe_run_merges_and_proposes(onto, events):
     proposed = events.one("knowledge.entity.merge_proposed").fields
     assert {proposed["kept"], proposed["removed"]} == {francis, bacon}
     assert dedupe.run()["proposed"] == 0  # пункт по паре уже открыт
+
+
+def test_duplicate_candidates_by_index(onto):
+    a = onto.person("Дж. Локк", "1632", "1704")
+    b = onto.person("Джон Локк", "1632", "1704")
+    berkeley = [onto.person("Berkeley") for _ in range(3)]
+    francis = onto.entities.create(
+        "person", [("ru", "Фрэнсис Бэкон", "primary"), ("ru", "Бэкон", "variant")]
+    )
+    roger = onto.person("Бэкон", "1214", "1292")
+    plato_work = onto.thing("work", "Berkeley")
+    pairs = onto.entities.duplicate_candidates()
+    assert (a, b) in pairs
+    assert {p for p in pairs if set(p) <= set(berkeley)} == {
+        (berkeley[0], berkeley[1]),
+        (berkeley[0], berkeley[2]),
+        (berkeley[1], berkeley[2]),
+    }
+    assert (francis, roger) in pairs  # основное одной — вариант другой
+    assert not any(plato_work in p for p in pairs)  # разные типы — никогда

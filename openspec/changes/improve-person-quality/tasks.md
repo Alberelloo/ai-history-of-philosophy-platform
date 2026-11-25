@@ -29,7 +29,7 @@
   - `get` по свёрнутому id отдаёт `survivor`;
   - `events.define`: `optional` поля `knowledge.entity.merged`, `restored` у `merge_undone`, событие `knowledge.entity.merge_proposed`.
 - [x] 2.4 `snapshot.py`: утверждения-связи с `subject == object` не показываются (петли).
-- [ ] 2.5 `review.py`:
+- [x] 2.5 `review.py`:
   - `resolve_duplicate` вызывает `merge_entities`;
   - `refresh_duplicates` берёт кандидатов по индексу: прежнее правило (последнее слово + даты) и новое (основное одной = любое название другой), без O(n²).
 - [ ] 2.6 `entity_items.py`: несколько кандидатов-персон от разных написаний одного элемента → `Dedupe` с парой от модели → слияние, очередь или прежняя неоднозначность.
