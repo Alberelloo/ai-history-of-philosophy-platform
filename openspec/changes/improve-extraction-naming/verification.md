@@ -180,3 +180,42 @@
     test_entity_naming.py  35 passed in 145.30s
     | Валидность названий сущностей | reject-label-raw | test_entity_naming.py::test_rejection_invariant | да (1 failed) |
     | Валидность названий сущностей | reject-label-raw | test_entity_naming.py::test_rejected_label_is_name_after_strip | да (1 failed) |
+
+## Судья — повторно, 2026-11-25, коммит 446bbf4
+
+Новый субагент, без истории разработки. Тесты — по одному файлу (1 ГБ RAM). Мутации и проба системы — в отдельном `git worktree` на 4649bea (PYTHONPATH на worktree). Worktree удалён, `git diff -- src` пуст. Продуктовый код с 63aabff не менялся, кроме `integrity.py` (это `migrate-ontology-quality`).
+
+**Замечания прежнего судьи:**
+1. RUF043 закрыто (6a29b22): `ruff check` по 27 файлам изменения чисто.
+2. Закрыто: пункты 1.2 и 4.1 отмечены, круг 2 ревью кода О17/О18 записан в progress.md.
+3. Закрыто: в `test_rejection_invariant` вход сырой, есть `@example` с краевыми пробелами. Мутация `reject-label-raw` в моём прогоне валит оба ожидаемых теста.
+
+| Требование | Журнал тестировщика | Мой прогон | Вывод системы (мой фрагмент, настоящий `Filling.extract_version`, фейковая модель) | Итог |
+|---|---|---|---|---|
+| entity-naming «Язык названий сущностей» | 35 passed; lang-given, rename-creates | test_entity_naming 35 passed in 40.7s | «Юм» при существующей «David Hume» (en) → тот же `e_39abcfaf`: основное `ru` «Юм», вариант `en`; `knowledge.entity.renamed {entity_id, lang: ru, previous_lang: en}`; справочник `q=Юм` → тот же id, `label="Юм"`; «Mill» → `en` | **не подтверждено**: своя мутация J1 не поймана |
+| entity-naming «Валидность названий сущностей» | 35 passed; 5 мутаций + reject-label-raw | 35 passed; reject-label-raw 2/2; своя J2 поймана | `rejected {concept, "§ 3.1", number}` + `dropped entity:number`; `rejected {person, "teacher of Plato", not_a_name}` + `dropped entity:not_a_name` | подтверждено |
+| entity-dating «Извлечение дат» | 15 passed; 6 мутаций | test_entity_dating_extraction 15 passed in 28.7s; roman-unchecked 3/3; своя J5 поймана | Локк «1632–1704» → `lifespan`, (1632, 1704) `year`; произведение «1690» → `dating`; Юм «1776–1711» → `dropped dating:unparsed`, персона и утверждение записаны | **не подтверждено**: своя мутация J3 не поймана |
+| ontology-extraction «Структурированный вывод по реестру» | 9 passed | test_extraction_entities 9 passed; своя J4 поймана | — | подтверждено |
+| ontology-extraction «Нормализация сущностей» | 9 passed | 9 passed; spellings-without-en 2/2 | «Юм» привязан к «David Hume» по `en`, новой персоны нет | подтверждено |
+| epochs / epoch-context / geo-timeline (MODIFIED) | 6 passed | test_invalid_name_external 6 passed | — (тестовый стенд) | подтверждено |
+
+Прочие прогоны (все passed): test_entity_items_unit 12, test_filling 30 (ожидания прежние), test_invalid_name_paths_unit 4, test_extraction_codes_unit 10, test_mutation_coverage 3. `mutation_check.py --coverage improve-extraction-naming`: мутации есть у всех 8 требований. `ruff check` и `ruff format --check` по файлам изменения чисто. `lint-imports`: 3 kept, 0 broken. `check_traceability.py`: 410 из 410. Полный pytest не запускался: ограничение машины, не проверено.
+
+Мутации из `mutations.yaml`, повторены: reject-label-raw, roman-unchecked, spellings-without-en. Все ожидаемые тесты упали.
+
+Свои мутации:
+- **J1 (язык).** `naming._script_counts`: `_ROMAN_WORD.match(word.upper())` — слова из букв IVXLCDM в любом регистре считаются римскими. В spec: «только заглавные». Под мутацией `lang_for("Mild") == "und"`, а должно быть `en`; «Mill» тоже теряет язык. Результат: **test_entity_naming 35 passed, мутация не поймана**. Причина: `scripts_mix` строит латинские слова как «заглавная + строчные» из всего алфавита и не делает целенаправленно слова из букв римских цифр не в верхнем регистре («Mill», «Civil», «Lid», «Xiv»). Таких `@example` тоже нет.
+- **J2 (валидность).** `naming.normalize` без `ё` → `е`. Упали `test_check_name_any_input` и `test_rejection_invariant`.
+- **J3 (даты).** `dating._format`: убрана проверка Г1 ≤ Г2 у интервала нашей эры. Под мутацией «1804–1724» записывается как (1724, 1804) `year`, а должно быть `dating:unparsed`: формата нет в таблице. Результат: **test_entity_dating_extraction 15 passed, мутация не поймана**. Причина: `datings` не порождает обратный интервал без эры, `@example` на него нет.
+- **J4 (коды событий).** `EntityItems.index`: тип вне реестра даёт `entity:no_type` вместо `entity:type`. Упали `test_entity_type_outside_registry` и `test_only_registry_types_for_any_items`.
+- **J5 (даты).** `single_year` не применяется к веку у персоны. Упали `test_dating_invariant` и `test_dating_check_any_input`.
+
+Файлы Lead'а: `filling.py` и `prompts/__init__.py` с 63aabff не менялись. В `filling.py` по диффу только точки вызова (`EntityItems`, `language`, цикл `date_item`, `accept_core_report`, перехват `InvalidName`, `entity_types()`) и данные схемы. Логики правил там нет.
+
+Подгонка: не найдена. Оракул стратегий не импортирует `naming`/`dating`/`dates`, ожидания не правились под вывод. J1 и J3 — пробелы в области входов генераторов, а не подгонка. Код на этих входах работает верно, это видно по выводу системы.
+
+Вердикт: **не принято** — вернуть тестировщику:
+- J1: в `scripts_mix` добавить латинские слова из букв IVXLCDM не в верхнем регистре («Mill», «Civil», «Lid», «Xiv»), их буквы идут в счёт латиницы. Добавить `@example` в `test_lang_for_any_text` и `test_language_invariant_create_and_add_name`. Мутацию J1 записать в `mutations.yaml` с ожиданием падения property-тестов языка.
+- J3: в `datings` добавить обратный интервал нашей эры (Г1 > Г2, в том числе «ок.») с ожиданием `dating:unparsed`. Добавить `@example` в `test_dating_check_any_input` и `test_dating_invariant`. Мутацию J3 записать в `mutations.yaml`.
+
+Разработчику, ревьюверу и Lead'у возвратов нет.
