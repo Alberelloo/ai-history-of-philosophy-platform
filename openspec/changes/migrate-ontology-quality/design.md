@@ -33,7 +33,7 @@
 **Что останется после чистки и слияния:**
 - снято мусора ≈ 30;
 - слито дублей ≈ 11: Berkeley×3 → 1, Сократ×3 → 1, Теэтет×3 → 1, по одному лишнему у Hegel, Hume, Newton, Reid, Descartes;
-- Гомер/Омир и Горгий/Горгиас без общего написания и без QID не сливаются и не попадают в очередь: правило их не видит (риск ниже).
+- Гомер/Омир и Горгий/Горгиас без общего написания правило имён не видит. Их путь (О10): `suggest` ставит пару в очередь `duplicate` (`qid_candidate`), человек подтверждает QID в манифесте, шаг `manifest_qids` сливает по `merge:qid_confirmed`. До решения пара открыта в очереди и А4 её считает.
 
 **Знаменатель и пороги:**
 - знаменатель ≈ 1889 − 30 − 11 − S ≈ **1838 при S ≈ 10**. Здесь S — число сущностей-источников, по одной на каждый обработанный источник (`source_entity`). На стенде S не проверено; при S = 100 знаменатель ≈ 1748, допуск ≈ 175, нужная доля принятых переводов ≈ 87,3%. Вывод от S не меняется;
@@ -90,7 +90,7 @@ python -m philograph.knowledge.ontology_migrate rollback <run_id>
 class Action:  step: str; kind: str; payload: dict          # пишется в run_actions
 class View:    # проекция: entities, names, externals, retired — из snapshot-подобной выборки
     def apply(self, action: Action) -> None
-STEPS = ("lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
+STEPS = ("manifest_qids", "lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
 class Migration:
     def __init__(self, statements, review, fetch: Fetch | None, llm: ServiceClient | None)
     def plan(self, *, estimate=False) -> Report          # без записи; translate — подсчёт
@@ -102,6 +102,7 @@ class Migration:
 
 | Шаг | Действие | `payload` для отката |
 |---|---|---|
+| `manifest_qids` | при `--manifest`: `LifeDates.apply` по манифесту в рамках запуска (`run_id` общий); пары `qid_taken` с `accepted` идут в шаг `dedupe` как `confirmed`, без решения — в очередь | `{kind: external}` из `run_actions`, слияния — `{merge_id}` |
 | `lang_fix` | название с `lang ≠ script_lang(text)` (и `script_lang` не `None`) → язык по письменности | `{name_id, old_lang}` |
 | `retire` | действующая сущность (не `source`), у которой `check_name(type, label)` даёт причину → `retired_run = run_id`, `retired_reason = причина`; событие `knowledge.entity.retired` | `{entity_id}` |
 | `wikidata_labels` | сущность с QID и с нерусским основным названием: подпись `ru` записи проходит `is_russian` и `check_name` → `set_primary_name(e, "ru", …)` | `{entity_id, names_before}` |
@@ -203,7 +204,7 @@ python -m philograph.knowledge.quality_report [--save before.json] [--baseline b
 | А1 | `|{e ∈ E, type ≠ source : is_russian(label(e))}| / |{e ∈ E, type ≠ source}|`. `is_russian`: ≥ 1 кириллическая буква, нет латинских букв, кроме слов из римских цифр `[IVXLCDM]+` | ≥ 0,90 |
 | А2 | `|{e ∈ E, type ≠ source : check_name(type, label) ∈ {number}}|` | = 0 |
 | А3 | `|{p ∈ P : check_name("person", label(p)) ≠ None}|` (стоп-список, роли, описания, склейки) | = 0 |
-| А4 | пары `{a, b} ⊂ P`, где `normalize(основное(a))` ∈ нормализованные названия `b` (основные и варианты) или наоборот, плюс открытые пункты `duplicate`, у которых обе сущности в `P`. Общий QID невозможен (PK `external_ids`), поэтому в формуле его нет (О9). Тёзки «Фрэнсис Бэкон»/«Роджер Бэкон» с вариантом «Бэкон» не совпадают: сравнивается основное одной со всеми названиями другой | = 0 |
+| А4 | пары `{a, b} ⊂ P`, где `normalize(основное(a))` ∈ нормализованные названия `b` (основные и варианты) или наоборот, плюс открытые пункты `duplicate` любой причины (`dates`, `variant`, `qid_cluster`, `qid_candidate`, `qid_taken`), у которых обе сущности в `P`. Общий QID невозможен (PK `external_ids`), поэтому в формуле его нет (О9). Тёзки «Фрэнсис Бэкон»/«Роджер Бэкон» с вариантом «Бэкон» не совпадают: сравнивается основное одной со всеми названиями другой | = 0 |
 | А5 | `|{p ∈ P : primary.dates ≠ None}|` | ≥ 20 |
 | А6 | число записей `people` ответа `GET /api/knowledge/v1/map` без учебника с `"philosopher" ∈ roles`. Команда считает его тем же объектом `SectionMap.result(textbook=None)`, что отвечает на этот адрес. Тест сверяет с ответом API | ≥ 10 |
 | А7 | число элементов ответа `GET /api/knowledge/v1/catalog` (все страницы, `lang=ru`, без фильтров), у которых `check_name(type, label) ≠ None`. Считается тем же `Catalog.list`. Тест сверяет с API | = 0 |
@@ -276,5 +277,5 @@ python -m philograph.knowledge.quality_report [--save before.json] [--baseline b
 - Качество перевода не проверено человеком. Меры: английское название остаётся вариантом, отчёт перечисляет переименования, откат по запуску полный. Выборка на проверку — за Lead'ом.
 - Перевод может создать совпадения названий у не-персон («Причинность»/«causality» → два «Причинность»). Они уходят в очередь проверки, автослияния не-персон нет. В отчёте поле `review`.
 - `retire` по правилу названий снимает и законные сущности с длинным названием, если пределы типа малы. Сухой прогон показывает `retired` по причинам до записи. Пределы — данные.
-- Гомер/Омир, Горгий/Горгиас (транслитерации без общего написания и QID) не видны ни правилу, ни А4. Их сводит человек через очередь или QID из манифеста. А4 = 0 не значит, что таких пар нет.
+- Гомер/Омир, Горгий/Горгиас видны А4 только через очередь: если `suggest` не нашёл общего кандидата QID (у обеих нет QID или поиск не дал держателя), пара не попадёт ни в очередь, ни в А4. А4 = 0 не значит, что таких пар нет; на стенде их проверяет ручной список П4 в отчёте.
 - А5/А6 зависят от подтверждения QID (`add-wikidata-life-dates` 5.2) и ролей P106. Без них миграция А5/А6 не поднимет. Это записано в замере.
