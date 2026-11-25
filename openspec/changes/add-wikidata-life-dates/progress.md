@@ -116,3 +116,7 @@
 
 - 3.1–3.7 закрыты: `tests/knowledge/test_life_dates.py`, стратегии `wd_times`, `wd_person_records`, `manifests` в `tests/knowledge/strategies.py`, мутации `tests/mutations/add-wikidata-life-dates/` (10, от HEAD, отдельный worktree): 18 из 18 упали. `entity-dating` в `enforce`, `check_traceability` 410/410.
 - Дефект Д1: откат удаляет атрибуцию `wikidata:<QID>` у проверенного утверждения запуска (`Statements.rollback_run`). Тест `test_rollback_verified_keeps_attribution` красный.
+
+## Ведущий — 2026-11-25
+
+1.2 отмечен ведущим: ревью плана прошло три круга (ревьювер круги 1–3, тестировщик круги 1–2; решения О9–О13 в отчёте PR). После судьи improve-extraction-naming («не принято»: ruff RUF043 в test_entity_items_unit.py:97 — разработчику; property-тест отказа сужен strip — тестировщику; нет ревью О17/О18 — ревьюверу) — роли получили возвраты.

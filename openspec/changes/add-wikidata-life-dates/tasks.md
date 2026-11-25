@@ -9,7 +9,7 @@
 ## 1. План
 
 - [x] 1.1 `proposal.md`, `design.md`, `tasks.md`, `progress.md`, дельты `entity-dating` (ADDED), `ontology-extraction` (MODIFIED «Импорт из Wikidata»)
-- [ ] 1.2 Ревью плана, решения ведущего, правки
+- [x] 1.2 Ревью плана, решения ведущего, правки
 
 ## 2. Разработчик
 

@@ -195,3 +195,7 @@
 - (2) `entity:no_type`, `entity:ambiguous` — коды без названия (`ENTITY_NO_TYPE`, `ENTITY_AMBIGUOUS` в `entity_items.py`); spec `ontology-extraction` (перечень причин), `entity-naming` (сценарий «Написания нашли разные сущности»), `entity-dating` (`dating:unresolved`), design.
 - (3) `OntologyRegistry.entity_types()` вместо `registry._load()` (`entity_items.py`, `filling.py:181`, `filling.py:415` — точки вызова); `dedupe.pair_key` вместо `dedupe._pair`.
 - Юнит-тесты: `tests/knowledge/test_extraction_codes_unit.py` (10).
+
+## Ведущий — 2026-11-25
+
+1.2 отмечен ведущим: ревью плана прошло три круга (ревьювер круги 1–3, тестировщик круги 1–2; решения О9–О13 в отчёте PR). После судьи improve-extraction-naming («не принято»: ruff RUF043 в test_entity_items_unit.py:97 — разработчику; property-тест отказа сужен strip — тестировщику; нет ревью О17/О18 — ревьюверу) — роли получили возвраты.

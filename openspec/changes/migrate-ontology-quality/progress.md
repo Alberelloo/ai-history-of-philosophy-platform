@@ -163,3 +163,7 @@
 - (4) `schema.has_retired` — кэш на движок (`WeakSet`, «нет» не кэшируется: база может пройти миграцию в том же процессе); `integrity._state` вызывает его вместо своего `inspect`. Юнит: `test_integrity_unit.py::test_has_retired_cached_per_engine`.
 - Попутно: новый тест тестировщика `test_life_dates.py::test_rollback_verified_keeps_attribution` падал. Причина: `Statements.rollback_run` удалял атрибуции и подтверждения запуска и у проверенных утверждений. Теперь они удаляются только у непроверенных (`statements.py`, `rollback_run`). `test_life_dates` 31, `test_filling` 30, `test_statements` 19 — passed.
 - Прогоны по одному: `test_quality_report_unit` 5, `test_retired_unit` 4, `test_life_dates_unit` 14, `test_ontology_migrate_unit` 13, `test_integrity_unit` 7, `test_entity_merge` 13, `test_snapshot` 6, `test_wikidata` 52 — passed; ruff, lint-imports (3 kept), traceability 410 из 410.
+
+## Ведущий — 2026-11-25
+
+1.2 отмечен ведущим: ревью плана прошло три круга (ревьювер круги 1–3, тестировщик круги 1–2; решения О9–О13 в отчёте PR). После судьи improve-extraction-naming («не принято»: ruff RUF043 в test_entity_items_unit.py:97 — разработчику; property-тест отказа сужен strip — тестировщику; нет ревью О17/О18 — ревьюверу) — роли получили возвраты.
