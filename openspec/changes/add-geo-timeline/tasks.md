@@ -49,7 +49,7 @@
   - события `knowledge.geo.enriched`, `knowledge.geo.skipped`, `knowledge.geo.rolled_back`;
   - сухой прогон через `check_value`;
   - места после отката остаются
-- [ ] 3.5 CLI `python -m philograph.knowledge.geo_enrich run|rollback` (`--limit`, `--dry-run`, `--from-file`). Сеть — `wikidata.http_fetch`
+- [x] 3.5 CLI `python -m philograph.knowledge.geo_enrich run|rollback` (`--limit`, `--dry-run`, `--from-file`). Сеть — `wikidata.http_fetch`
 - [ ] 3.6 Демо-данные `scripts/seed_demo.py` (только для демо и e2e, тесты ожиданий из них не берут): координаты, `lived_in` с видом и временем, одна персона без места, одно событие с `happened_in`; карточки Канта и Юма не меняются
 - [ ] 3.7 Юнит-тесты модулей 3.1–3.5 (`tests/knowledge/test_geo_units.py`) с синтетическими записями (QID — только метки в фикстурах); `ruff`, `lint-imports`
 
