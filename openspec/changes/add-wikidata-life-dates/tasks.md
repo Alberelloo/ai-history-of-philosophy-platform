@@ -22,7 +22,7 @@
   Юнит-тесты.
 - [ ] 2.3 `knowledge/life_dates.py`:
   - `LifeDates.suggest` (фильтр класса, `--auto-exact` по правилу design.md);
-  - кандидат-держатель (О10): `holder` в кандидате, пункт `duplicate` с `reason="qid_candidate"` без повтора;
+  - кандидат-держатель (О10): `holder` в кандидате, пункт `duplicate` с `reason="review:qid_candidate"` без повтора;
   - `apply`: QID по правилу 1–4 спецификации (порядок манифеста, `qid_conflict`, `qid_taken`) → даты по таблице точностей (`bad_value`) → роли; `unchanged`/`conflict`; сухой прогон. Пары `qid_taken` с `accepted` идут в `Dedupe.run(confirmed=…)`, с `auto` — в очередь;
   - проверка формы манифеста (код 2);
   - `rollback`: утверждения, кроме проверенных; QID из `run_actions`, кроме тех, на которые ссылается проверенное (`kept`); `undo_merge` слияний запуска;
@@ -38,7 +38,7 @@
 
 ## 3. Тестировщик
 
-Wikidata — только фикстуры (`fetch`-словарь, `--from-file`). Сеть запрещена фикстурой (О6). Инфраструктура общая (`improve-extraction-naming` 3.1).
+Wikidata — только фикстуры (`fetch`-словарь, `--from-file`). Сеть запрещена фикстурой (О6). Инфраструктура общая (`improve-extraction-naming` 3.1). Явные `@example` на каждую границу и мутацию и сторожевой токен журнала в каждом тесте с событиями — по общему разделу `improve-extraction-naming/design.md`, «Границы и сторожевые токены» (О11).
 
 - [ ] 3.1 Стратегии «вход + ожидание» (оракул не импортирует `wikidata`, `dates`):
   - `wd_times()` → (значение и точность, ожидаемые границы и `precision` по таблице точностей спецификации);
@@ -68,7 +68,7 @@ Wikidata — только фикстуры (`fetch`-словарь, `--from-file
   | Подтверждение QID | `suggest` не ставит кандидата-держателя в очередь | «Кандидат уже у другой персоны» |
   | Импорт из Wikidata | `import_wikidata` со срезом `[1:5]` | «Дата до нашей эры» |
 
-- [ ] 3.5 `python scripts/mutation_check.py --change add-wikidata-life-dates` — таблица в `verification.md`.
+- [ ] 3.5 `python scripts/mutation_check.py --change add-wikidata-life-dates` — таблица в `verification.md`; `--coverage add-wikidata-life-dates` чисто (О11).
 - [ ] 3.6 `openspec/traceability.yaml`: `entity-dating` в `enforce`. `python scripts/check_traceability.py` чисто.
 - [ ] 3.7 `verification.md`:
   - сырые итоги;

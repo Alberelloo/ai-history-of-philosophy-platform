@@ -72,7 +72,7 @@
 
 - **GIVEN** персона с QID: P569 `+1680-00-00` с точностью 8, P570 `+1801-00-00` с точностью 7
 - **WHEN** запущен `apply --linked`
-- **THEN** границы начала 1680…1689, конца 1701…1800, `precision="century"`
+- **THEN** границы начала 1680…1689, конца 1801…1900 (век ⌈1801/100⌉ = XIX, семантика Wikidata и `wikidata.wikidata_time`), `precision="century"`
 - **AND** в журнале `knowledge.life_dates.run` с `lifespans=1`
 
 #### Scenario: Год 0000 и малая точность
@@ -124,7 +124,7 @@
 
 Команда `suggest` SHALL подбирать кандидатов QID для персон и произведений без QID поиском Wikidata по основному названию и вариантам (ru и en). Кандидат персоны должен быть записью класса «человек» (P31 Q5), кандидат произведения — иметь P577. Кандидаты SHALL записываться в манифест вместе с подписями, описанием и датами. В базу команда MUST NOT писать.
 
-**Кандидат уже у другой персоны.** Если кандидат QID сущности уже записан у другой действующей сущности того же типа, `suggest` SHALL записать держателя в кандидат (`holder`) и поставить пару в очередь проверки `duplicate` с событием `knowledge.entity.merge_proposed` и `reason="qid_candidate"`, без повтора, если такой пункт уже открыт. Так транслитерации без общего написания («Омир» при «Гомер» с Q6691) попадают к человеку.
+**Кандидат уже у другой персоны.** Если кандидат QID сущности уже записан у другой действующей сущности того же типа, `suggest` SHALL записать держателя в кандидат (`holder`) и поставить пару в очередь проверки `duplicate` с событием `knowledge.entity.merge_proposed` и `reason="review:qid_candidate"`, без повтора, если такой пункт уже открыт. Так транслитерации без общего написания («Омир» при «Гомер» с Q6691) попадают к человеку.
 
 **Подтверждение.** QID в манифесте SHALL ставить человек (`decision: accepted`). Автоматическое подтверждение SHALL происходить только по явному флагу `--auto-exact` и отмечаться `decision: auto`. Условия:
 - кандидат ровно один;
@@ -162,7 +162,7 @@
 - **GIVEN** персона «Гомер» с QID Q6691, персона «Омир» без QID; поиск по «Омир» (фикстура) возвращает Q6691
 - **WHEN** запущен `suggest`
 - **THEN** в манифесте у «Омир» кандидат Q6691 с `holder` — id «Гомер», `decision: pending`; в очереди проверки пункт `duplicate` с парой; повторный `suggest` второго пункта не создаёт
-- **AND** в журнале одно `knowledge.entity.merge_proposed` с `reason="qid_candidate"`
+- **AND** в журнале одно `knowledge.entity.merge_proposed` с `reason="review:qid_candidate"`
 
 #### Scenario: Точное совпадение с флагом
 
@@ -182,7 +182,7 @@
 - **GIVEN** персона «Hume» с QID Q41568 и персона «Юм» без QID и без дат; в манифесте у «Юм» `wikidata: Q41568`, `decision: accepted`
 - **WHEN** запущен `apply`
 - **THEN** QID у «Юм» не записан; слияние вариантов получает подтверждение и сливает «Юм» и «Hume» в одну персону с QID Q41568
-- **AND** в журнале `knowledge.life_dates.skipped` с `reason="qid_taken"` и `knowledge.entity.merged` с `reason="qid_confirmed"`
+- **AND** в журнале `knowledge.life_dates.skipped` с `reason="qid_taken"` и `knowledge.entity.merged` с `reason="merge:qid_confirmed"`
 
 #### Scenario: Два подтверждения одного QID
 

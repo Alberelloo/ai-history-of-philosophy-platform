@@ -53,7 +53,7 @@ entities:
   # holder: e_… — если кандидат уже у другой действующей сущности того же типа (О10)
 ```
 
-**Кандидат-держатель (О10).** `suggest` проверяет каждого кандидата по `external_ids`. Если QID уже у другой действующей сущности того же типа, в кандидат пишется `holder`, а пара `(entity, holder)` ставится в очередь `duplicate` (`merge_proposed`, `reason="qid_candidate"`), если открытого пункта по ней нет. Так «Омир» при «Гомер» (Q6691) попадает к человеку; решение `accepted` дальше ведёт к `qid_taken` → `merge:qid_confirmed`. При закрытии пункта решением о слиянии запись манифеста не нужна.
+**Кандидат-держатель (О10).** `suggest` проверяет каждого кандидата по `external_ids`. Если QID уже у другой действующей сущности того же типа, в кандидат пишется `holder`, а пара `(entity, holder)` ставится в очередь `duplicate` (`merge_proposed`, `reason="review:qid_candidate"`), если открытого пункта по ней нет. Так «Омир» при «Гомер» (Q6691) попадает к человеку; решение `accepted` дальше ведёт к `qid_taken` → `merge:qid_confirmed`. При закрытии пункта решением о слиянии запись манифеста не нужна.
 
 Проверка формы — до базы и сети, как в `epoch_dates.check_manifest`:
 - `wikidata` по `^Q\d+$` или `null`;
@@ -78,7 +78,7 @@ entities:
 2. Записи манифеста обходятся по порядку, правило 1–4 требования «Подтверждение QID»:
    - есть тот же QID → ничего;
    - другой QID → `qid_conflict`;
-   - QID у другой сущности, в том числе у записанной раньше в этом запуске → `qid_taken`. Для `accepted` пара `(entity, holder)` копится в `confirmed`, для `auto` — пункт `duplicate` с событием `merge_proposed`;
+   - QID у другой сущности, в том числе у записанной раньше в этом запуске → `qid_taken`. Для `accepted` пара `(entity, holder)` копится в `confirmed`, для `auto` — пункт `duplicate` с событием `merge_proposed` (`reason="review:qid_taken"`);
    - иначе `add_external`, в `run_actions` пишется `{kind: "external", entity, qid}`.
 
    После обхода `Dedupe(...).run(confirmed=confirmed, run_id=…)` (`improve-person-quality`) сливает пары по `merge:qid_confirmed`, если даты не противоречат, иначе ставит их в очередь (ревью, желательное 1). В сухом прогоне ничего не пишется, слияния считаются через `dedupe.plan`.
