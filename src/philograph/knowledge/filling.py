@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import uuid
+from collections import Counter
 from collections.abc import Callable
 from typing import Any
 
@@ -16,6 +17,9 @@ from sqlalchemy import select, update
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate, lifespan, parse
+from philograph.knowledge.entity_items import EntityItems
+from philograph.knowledge.entity_items import Skip as _Skip
+from philograph.knowledge.naming import InvalidName
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.statements import (
     INFLUENCE,
@@ -119,6 +123,7 @@ class Filling:
         self.clock = clock or SystemClock()
         self.fragment_size = fragment_size
         self.created_entities: list[str] = []  # для пересчёта упоминаний новых сущностей
+        self.items = EntityItems(self.entities, statements, self.created_entities)
 
     # --- запуски ---
 
@@ -207,6 +212,7 @@ class Filling:
         item["subject_type"] = {"enum": types}
         item["object_type"] = {"enum": types}
         item["proposed_type"] = {"type": "string"}
+        schema["properties"]["entities"] = _entities_schema(types)  # необязательный массив
         return schema
 
     def fragments(
@@ -265,6 +271,8 @@ class Filling:
         run_id: str,
     ) -> None:
         passages = "\n\n".join(f"[{i + 1}] {p['text']}" for i, p in enumerate(window))
+        langs = Counter(p["lang"] for p in window if p.get("lang")).most_common(1)
+        language = langs[0][0] if langs else "ru"
         try:
             response = self.llm.post(
                 "structured",
@@ -277,6 +285,7 @@ class Filling:
                     "json_schema": schema,
                     "data": {
                         "passages": passages,
+                        "language": language,
                         "section": window[0].get("section_title") or "",
                         "relations": str(schema["x-relations"]),
                         "entity_types": ", ".join(
@@ -297,9 +306,21 @@ class Filling:
             return
         created = dropped = 0
         resolved: dict[str, str] = {}
-        for item in response.json()["value"]["statements"]:
+        value = response.json()["value"]
+        index = self.items.index(value.get("entities"), run_id)
+        for item in value["statements"]:
             try:
-                self._store(item, window, data, source, run_id, resolved)
+                self._store(item, window, data, source, run_id, resolved, index)
+                created += 1
+            except (StatementError, RegistryError, _Skip) as exc:
+                self._drop(run_id, str(exc))
+                dropped += 1
+        for name, entity in index.items():
+            if not entity.get("dating"):
+                continue
+            try:
+                entity_id = self.items.resolve(name, entity["type"], entity, resolved)
+                self.items.date(entity_id, entity, window, data["source_id"], run_id)
                 created += 1
             except (StatementError, RegistryError, _Skip) as exc:
                 self._drop(run_id, str(exc))
@@ -324,13 +345,14 @@ class Filling:
         source: str,
         run_id: str,
         resolved: dict[str, str],
+        index: dict[str, dict[str, Any]] | None = None,
     ) -> str:
         number = item.get("paragraph", 0)
         if not 1 <= number <= len(window):
             raise _Skip("ссылка на абзац вне фрагмента")
         paragraph = window[number - 1]
-        subject = self._resolve(item["subject"], item.get("subject_type"), resolved)
-        obj = self._resolve(item["object"], item.get("object_type"), resolved)
+        subject = self._resolve(item["subject"], item.get("subject_type"), resolved, index)
+        obj = self._resolve(item["object"], item.get("object_type"), resolved, index)
         relation = item["type"]
         if item.get("proposed_type"):
             self.registry.propose(
@@ -340,7 +362,7 @@ class Filling:
         relation = self._fit(relation, subject, obj)
         attributions = [Attribution("source", data["source_id"], stance="asserts")]
         if item.get("attributed_to"):
-            author = self._resolve(item["attributed_to"], "person", resolved)
+            author = self._resolve(item["attributed_to"], "person", resolved, index)
             attributions = [
                 Attribution("entity", author, stance=item.get("stance", "asserts")),
                 Attribution("source", data["source_id"], stance="mentions"),
@@ -380,45 +402,16 @@ class Filling:
             current = spec.get("parent")
         raise _Skip(f"тип {relation} не подходит концам {s_type} → {o_type}")
 
-    def _resolve(self, name: str, type_: str | None, resolved: dict[str, str]) -> str:
-        """Существующая сущность по названию; новая — если нет; неоднозначная — на проверку."""
-        if name in resolved:
-            return resolved[name]
-        candidates = self.entities.find(name)
-        if type_:
-            candidates = [c for c in candidates if self.registry.is_a(c["type"], [type_])]
-        if len(candidates) == 1:
-            resolved[name] = candidates[0]["id"]
-            return resolved[name]
-        if len(candidates) > 1:
-            # Контекст фрагмента: кандидат, уже связанный с найденными здесь сущностями.
-            linked = [
-                c
-                for c in candidates
-                if any(
-                    s["object"] in resolved.values() or s["subject"] in resolved.values()
-                    for s in self.statements.about(c["id"], derived=False)
-                )
-            ]
-            if len(linked) == 1:
-                resolved[name] = linked[0]["id"]
-                return resolved[name]
-            with self.statements.engine.begin() as conn:
-                conn.execute(
-                    t.review_items.insert().values(
-                        kind="ambiguous_link",
-                        status="open",
-                        resolution=None,
-                        payload={"name": name, "candidates": [c["id"] for c in candidates]},
-                    )
-                )
-            events.emit("knowledge.extraction.ambiguous", name=name, candidates=len(candidates))
-            raise _Skip(f"неоднозначное название «{name}»")
-        if not type_:
-            raise _Skip(f"новая сущность «{name}» без типа")
-        resolved[name] = self.entities.create(type_, [("ru", name, "primary")])
-        self.created_entities.append(resolved[name])
-        return resolved[name]
+    def _resolve(
+        self,
+        name: str,
+        type_: str | None,
+        resolved: dict[str, str],
+        index: dict[str, dict[str, Any]] | None = None,
+    ) -> str:
+        """Существующая сущность по названию; новая — если нет; неоднозначная — на проверку.
+        Привязка по всем написаниям элемента ``entities`` — в ``EntityItems.resolve``."""
+        return self.items.resolve(name, type_, (index or {}).get(name), resolved)
 
     def handle_published(self, payload: dict[str, Any]) -> None:
         """По событию публикации: извлечение только из добавленных и изменённых абзацев."""
@@ -485,9 +478,19 @@ class Filling:
 
     def accept_core(self, items: list[dict[str, Any]], actor: str) -> list[str]:
         """Принятое из черновика создаётся как ручное, с отметкой, что был черновик модели."""
-        created = []
+        return self.accept_core_report(items, actor)["created"]
+
+    def accept_core_report(self, items: list[dict[str, Any]], actor: str) -> dict[str, Any]:
+        """То же, с отказами: элемент с названием, не прошедшим проверку, не создаётся и
+        возвращается в ``rejected`` с причиной; остальные создаются."""
+        created: list[str] = []
+        rejected: list[dict[str, str]] = []
         for item in items:
-            entity = self.entities.create(item["type"], [("ru", item["name"], "primary")])
+            try:
+                entity = self.entities.create(item["type"], [("ru", item["name"], "primary")])
+            except InvalidName as exc:
+                rejected.append({"name": item["name"], "type": item["type"], "reason": exc.reason})
+                continue
             if item.get("note"):
                 self.statements.add(
                     entity,
@@ -497,7 +500,7 @@ class Filling:
                     provenance=Provenance("manual", actor=actor, extra={"draft": "model"}),
                 )
             created.append(entity)
-        return created
+        return {"created": created, "rejected": rejected}
 
     # --- Wikidata ---
 
@@ -506,9 +509,12 @@ class Filling:
         record = fetch(qid)
         label = record["labels"].get("ru") or record["labels"].get("en") or qid
         kind = "work" if "P50" in record["claims"] else "person"
-        entity = self.entities.by_external("wikidata", qid) or self.entities.create(
-            kind, [("ru", label, "primary")], external={"wikidata": qid}
-        )
+        try:
+            entity = self.entities.by_external("wikidata", qid) or self.entities.create(
+                kind, [("ru", label, "primary")], external={"wikidata": qid}
+            )
+        except InvalidName:
+            return []  # мусорная подпись записи: событие отказа уже в журнале
         url = f"https://www.wikidata.org/wiki/{qid}"
         attribution = [Attribution("source", f"wikidata:{qid}", place=url)]
         imported = Provenance("imported", extra={"wikidata": qid})
@@ -562,9 +568,14 @@ class Filling:
         ):
             for target in claims.get(prop, []):
                 target_label = fetch(target)["labels"].get("ru") or target
-                other = self.entities.by_external("wikidata", target) or self.entities.create(
-                    target_type, [("ru", target_label, "primary")], external={"wikidata": target}
-                )
+                try:
+                    other = self.entities.by_external("wikidata", target) or self.entities.create(
+                        target_type,
+                        [("ru", target_label, "primary")],
+                        external={"wikidata": target},
+                    )
+                except InvalidName:
+                    continue  # место или учитель с мусорной подписью не создаётся
                 created.append(
                     self.statements.add(
                         entity,
@@ -578,5 +589,25 @@ class Filling:
         return created
 
 
-class _Skip(Exception):
-    pass
+def _entities_schema(types: list[str]) -> dict[str, Any]:
+    """Необязательный массив ``entities``: написания и датировка упомянутых сущностей."""
+    text = {"type": "string"}
+    return {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+                "name": text,
+                "type": {"enum": types},
+                "ru": text,
+                "en": text,
+                "original": {"type": "object", "properties": {"lang": text, "text": text}},
+                "dating": {
+                    "type": "object",
+                    "required": ["text", "paragraph", "quote"],
+                    "properties": {"text": text, "paragraph": {"type": "integer"}, "quote": text},
+                },
+            },
+        },
+    }

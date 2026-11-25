@@ -115,3 +115,16 @@
 - 2.3 `entities.py`: `normalize` из `naming` (NFC); `create`/`add_name` ставят язык `lang_for`, основное проверяется `check_name` (отказ — `InvalidName` и `knowledge.entity.rejected`); `set_primary_name` — все прежние основные становятся вариантами с языком по письменности, совпавший вариант повышается, а не дублируется; событие `knowledge.entity.renamed` (`entity_id`, `lang`, `previous_lang`). Юнит-тесты `tests/knowledge/test_naming_entities_unit.py`: 7 passed; `test_registry_entities.py` 33 passed/1 skipped, `test_entities_external.py` 4 passed, `test_statements.py` 19 passed — без правки ожиданий.
 - 2.4 `knowledge/dating.py`: белый список форматов, затем `dates.parse` (сам `parse` не менялся). Отличие от design: сигнатура `check(text, quote, paragraph, paragraphs, *, is_person) -> FuzzyDate | reason`: номер абзаца и абзацы фрагмента вместо текста абзаца и длины окна, потому что проверка номера идёт первой. Интервал нашей эры с началом позже конца и римское число не в канонической записи — `dating:unparsed`. Юнит-тесты `tests/knowledge/test_dating_unit.py`: 35 passed.
 - 2.5 `knowledge/entity_items.py`: `index` (тип вне реестра → `knowledge.extraction.dropped`, `reason="entity:type"`), `resolve` по всем написаниям (логика контекста и очереди `ambiguous_link` перенесена из `Filling._resolve` без изменений), русское основное у найденной сущности без русского основного через `set_primary_name`, `date` через `dating.check` → `lifespan`/`dating`. Исключение `Skip` живёт здесь, `filling._Skip` — его псевдоним. Отличие от design: «нет русского основного» значит «нет основного с русским текстом» (`is_russian`). Так старые латинские основные с языком `ru` тоже получают русское название. Юнит-тесты `tests/knowledge/test_entity_items_unit.py`: 9 passed.
+- 2.6 **Файлы Lead'а, только точки вызова (О3; согласование — 5.1):**
+  - `src/philograph/knowledge/filling.py`:
+    - :12, :20–22 — импорты `Counter`, `EntityItems`, `Skip as _Skip`, `InvalidName`; класс `_Skip` в конце файла убран, вместо него псевдоним;
+    - :126 — `self.items = EntityItems(...)` в `__init__`;
+    - :215 — `_schema` добавляет `entities` (`_entities_schema`, :592–613);
+    - :274–275, :288 — `language` (преобладающий `lang` абзацев, иначе `ru`) в данных запроса;
+    - :309–323 — `index` элементов и датировки после утверждений; созданные и отброшенные датировки учитываются в `created`/`dropped` фрагмента;
+    - :348, :354–355, :365 — `_store` передаёт `index` в `_resolve`;
+    - :405–414 — `_resolve` делегирует в `EntityItems.resolve`, прежнее тело перенесено;
+    - :481–495, :503 — `accept_core_report`, `accept_core` вызывает его;
+    - :512–517, :571–578 — `import_wikidata` пропускает элемент при `InvalidName`.
+  - `src/philograph/prompts/__init__.py` :57, :66–83 — `ontology.extract`: «с ключом statements» вместо «с единственным ключом», абзац про `entities`, язык, валидность и даты (в том числе «Извлекай годы, если они названы»), слот `language`. Версия шаблона — отпечаток текста, меняется сама. Строку `{"statements": []}` переформатировал ruff, текст тот же.
+  - `tests/knowledge/test_filling.py`: 30 passed, ожидания не правились.

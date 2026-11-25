@@ -36,7 +36,7 @@
   - `resolve`: тип вне реестра → `entity:type`; кандидаты по всем написаниям; разные кандидаты от разных написаний → неоднозначность; перенос логики контекста и очереди из `Filling._resolve` без изменения поведения;
   - русское основное у английской сущности;
   - `date` через `dating.check` → `lifespan` или `dating`.
-- [ ] 2.6 **Файлы Lead'а** (точки вызова, О3; согласование — пункт 5.1):
+- [x] 2.6 **Файлы Lead'а** (точки вызова, О3; согласование — пункт 5.1):
   - `filling.py`: `_schema` с `entities`; `language` и `EntityItems` в `_extract_fragment`; `_resolve` делегирует; `accept_core_report` (отказы в ответе), `accept_core` через него; `import_wikidata` ловит `InvalidName`;
   - `prompts/__init__.py`, `ontology.extract`: правила языка, валидности, дат; поле `language`.
 
