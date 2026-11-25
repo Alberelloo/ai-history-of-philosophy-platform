@@ -51,12 +51,13 @@
   - профили `hypothesis` `ci` (60), `pure` (400), `heavy` (25) в `tests/conftest.py`;
   - автофикстура запрета сети в `tests/knowledge/conftest.py`;
   - `tests/knowledge/dump.py`;
-  - `scripts/mutation_check.py` с форматом `tests/mutations/<изменение>/mutations.yaml`;
+  - `scripts/mutation_check.py` с форматом `tests/mutations/<изменение>/mutations.yaml` и режимом `--coverage <изменение>` (О11);
+  - `tests/test_mutation_coverage.py` — `--coverage` для каждого изменения с отмеченным пунктом мутационной проверки;
   - стратегии «вход + ожидание» в `tests/knowledge/strategies.py` (`numbers`, `blank`, `long_phrases`, `stopwords_perturbed`, `proper_names`, `not_names`, `scripts_mix`, `fragment_items`, `datings`). Оракул не импортирует `naming`, `dating`, `dates.parse`.
 - [ ] 3.2 Сценарные тесты на **каждый** сценарий `entity-naming` (2 требования), `entity-dating` («Извлечение дат») и MODIFIED `ontology-extraction` («Структурированный вывод по реестру», «Нормализация сущностей»). Каждый проверяет:
   - вывод — база, ответ справочника, перехваченный запрос к шлюзу;
   - событие с точным множеством ключей.
-- [ ] 3.3 Property-тест (`invariant=`) на **каждое** требование, с явными `@example` на границы (список в design.md):
+- [ ] 3.3 Property-тест (`invariant=`) на **каждое** требование, с явными `@example` на границы и сторожевым токеном журнала (design.md, «Границы и сторожевые токены»):
   - «Язык названий»: язык = ожидание стратегии `scripts_mix`, один основной на язык, сущностей = событий `created`;
   - «Валидность»: создано ⇔ нет ожидаемой причины, одно событие с ожидаемой причиной, `label` по правилу обрезки;
   - «Извлечение дат»: `span`/`precision` = ожидание по таблице, иначе одно `dropped` с ожидаемой причиной;
@@ -78,7 +79,7 @@
   | Структурированный вывод | тип элемента не проверяется сервером | «Тип вне реестра в сущностях» |
   | Нормализация | кандидаты не ищутся по `en` | «Привязка по английскому написанию» |
 
-- [ ] 3.5 `python scripts/mutation_check.py --change improve-extraction-naming` — таблица в `verification.md`.
+- [ ] 3.5 `python scripts/mutation_check.py --change improve-extraction-naming` — таблица в `verification.md`; `--coverage improve-extraction-naming` чисто.
 - [ ] 3.6 `openspec/traceability.yaml`: `entity-naming` в `enforce` (`entity-dating` — в `add-wikidata-life-dates` 3.6). `python scripts/check_traceability.py` чисто.
 - [ ] 3.7 `verification.md`, раздел «Тестировщик»:
   - сырые итоги pytest;
