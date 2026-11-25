@@ -46,9 +46,9 @@
 ## 5. Завершение
 
 - [x] 5.1 `openspec/traceability.yaml`: `entity-catalog` в `enforce` (`epochs` — в `add-epochs`, решение ведущего Р6; тесты на «Принадлежность к эпохе» пишутся здесь); `python scripts/check_traceability.py` — без пропусков
-- [ ] 5.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/gateway tests/web/test_reference.py`
-- [ ] 5.3 Ревьювер: вычитка диффа против спецификации, выбранных вариантов (API, снимок, лимиты, принадлежность, пагинация), признаков костылей и подгонки тестов; замечания — в `progress.md`
-- [ ] 5.4 Судья (новый субагент): независимый прогон и вердикт в `verification.md`; PR остаётся draft до вердикта «принято»
+- [x] 5.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/gateway tests/web/test_reference.py`
+- [x] 5.3 Ревьювер: вычитка диффа против спецификации, выбранных вариантов (API, снимок, лимиты, принадлежность, пагинация), признаков костылей и подгонки тестов; замечания — в `progress.md`
+- [x] 5.4 Судья (новый субагент): независимый прогон и вердикт в `verification.md`; PR остаётся draft до вердикта «принято»
 - [x] 5.5 Архив: перенос дельт в `openspec/specs/` (вручную, CLI `openspec` нет), `openspec/changes/archive/<дата>-add-reference-catalog/`
 
 ## Вне объёма, отдельной задачей
