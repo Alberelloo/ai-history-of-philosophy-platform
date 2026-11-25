@@ -40,20 +40,20 @@
 
 Wikidata — только фикстуры (`fetch`-словарь, `--from-file`). Сеть запрещена фикстурой (О6). Инфраструктура общая (`improve-extraction-naming` 3.1). Явные `@example` на каждую границу и мутацию и сторожевой токен журнала в каждом тесте с событиями — по общему разделу `improve-extraction-naming/design.md`, «Границы и сторожевые токены» (О11).
 
-- [ ] 3.1 Стратегии «вход + ожидание» (оракул не импортирует `wikidata`, `dates`):
+- [x] 3.1 Стратегии «вход + ожидание» (оракул не импортирует `wikidata`, `dates`):
   - `wd_times()` → (значение и точность, ожидаемые границы и `precision` по таблице точностей спецификации);
   - `wd_person_records()`;
   - `manifests()` — порядок записей, два подтверждения одного QID, QID у другой, свой другой QID.
 
   Явные `@example`: `-0427`/`-0347` (9), `+1724-04-22` (11), точности 8, 7, 6, 5, год `0000`, значение не по формату.
-- [ ] 3.2 Сценарные тесты на **каждый** сценарий обоих требований `entity-dating` этого изменения и MODIFIED «Импорт из Wikidata». Каждый проверяет:
+- [x] 3.2 Сценарные тесты на **каждый** сценарий обоих требований `entity-dating` этого изменения и MODIFIED «Импорт из Wikidata». Каждый проверяет:
   - вывод — база, манифест, JSON отчёта CLI, код выхода;
   - события с точным множеством ключей.
-- [ ] 3.3 Property-тест на **каждое** требование:
+- [x] 3.3 Property-тест на **каждое** требование:
   - «Даты жизни» (`ci`): границы = ожидание, «−» ⇒ ≤ 0, без перезаписи, `dry_run` — `dump` без изменений, повтор без новых утверждений. Два отдельных свойства отката: без проверенных ⇒ `dump` к исходному; с проверенными ⇒ проверенные и их QID на месте;
   - «Подтверждение QID» (`ci`): QID только при `accepted`/`auto`, не перезаписывается, первое из двух по порядку, `auto` только с флагом, нет двух сущностей с одним QID;
   - «Импорт из Wikidata» (`pure`): «−» ⇒ до н. э., одна дата ⇒ `partial`.
-- [ ] 3.4 Мутации — на **каждое** требование, с ожидаемым тестом в `tests/mutations/add-wikidata-life-dates/mutations.yaml`:
+- [x] 3.4 Мутации — на **каждое** требование, с ожидаемым тестом в `tests/mutations/add-wikidata-life-dates/mutations.yaml`:
 
   | Требование | Мутация | Ожидаемый упавший тест |
   |---|---|---|
@@ -68,9 +68,9 @@ Wikidata — только фикстуры (`fetch`-словарь, `--from-file
   | Подтверждение QID | `suggest` не ставит кандидата-держателя в очередь | «Кандидат уже у другой персоны» |
   | Импорт из Wikidata | `import_wikidata` со срезом `[1:5]` | «Дата до нашей эры» |
 
-- [ ] 3.5 `python scripts/mutation_check.py --change add-wikidata-life-dates` — таблица в `verification.md`; `--coverage add-wikidata-life-dates` чисто (О11).
-- [ ] 3.6 `openspec/traceability.yaml`: `entity-dating` в `enforce`. `python scripts/check_traceability.py` чисто.
-- [ ] 3.7 `verification.md`:
+- [x] 3.5 `python scripts/mutation_check.py --change add-wikidata-life-dates` — таблица в `verification.md`; `--coverage add-wikidata-life-dates` чисто (О11).
+- [x] 3.6 `openspec/traceability.yaml`: `entity-dating` в `enforce`. `python scripts/check_traceability.py` чисто.
+- [x] 3.7 `verification.md`:
   - сырые итоги;
   - `--durations`;
   - события;

@@ -111,3 +111,8 @@
 
 Блокирует: нет.
 Вердикт: код можно к тестировщику и судье.
+
+## Тестировщик — 2026-11-25 (субагент `tester`)
+
+- 3.1–3.7 закрыты: `tests/knowledge/test_life_dates.py`, стратегии `wd_times`, `wd_person_records`, `manifests` в `tests/knowledge/strategies.py`, мутации `tests/mutations/add-wikidata-life-dates/` (10, от HEAD, отдельный worktree): 18 из 18 упали. `entity-dating` в `enforce`, `check_traceability` 410/410.
+- Дефект Д1: откат удаляет атрибуцию `wikidata:<QID>` у проверенного утверждения запуска (`Statements.rollback_run`). Тест `test_rollback_verified_keeps_attribution` красный.
