@@ -315,6 +315,17 @@ def test_undo_with_fold_and_qid(onto, events):
     assert undone["restored"] == 1
 
 
+@req(
+    OE, MERGE, invariant="Внешние идентификаторы удалённой переходят к оставшейся (строки таблицы)"
+)
+def test_external_rows_move_to_kept(onto):
+    hume, yum, _locke = _hume_yum(onto)
+    onto.statements.merge_entities(yum, hume)
+    with onto.statements.engine.begin() as conn:
+        rows = conn.execute(select(t.external_ids.c.entity_id, t.external_ids.c.value)).all()
+    assert [(r.entity_id, r.value) for r in rows] == [(yum, "Q41568")]
+
+
 # --- инвариант сохранения ---------------------------------------------------------------
 
 

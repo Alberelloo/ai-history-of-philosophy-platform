@@ -860,3 +860,90 @@ def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
         assert sorted(e["reason"] for e in events.of(MERGED)) == expected_merged
         outcomes.append(_outcome(onto, review, case, ids, events))
     assert outcomes[0] == outcomes[1]
+
+
+# --- аудит пунктов (О21): границы определений и компонент ------------------------------
+
+
+def _bounds(es, ls, ee, le) -> dict:
+    return {
+        "earliest_start": es,
+        "latest_start": ls,
+        "earliest_end": ee,
+        "latest_end": le,
+        "precision": "year",
+        "original": "",
+    }
+
+
+def _berkeley(id_: str, dates: dict | None, qid: str | None = None) -> Entity:
+    return Entity(id_, "person", (("primary", "berkeley"),), dates, qid)
+
+
+@req(PQ, MERGE, invariant="Даты противоречат, если не пересекаются интервалы начала или конца")
+@pytest.mark.parametrize(
+    ("other", "verdict"),
+    [
+        (_bounds(1685, 1685, 1800, 1800), "review:dates"),  # расходится только конец
+        (_bounds(1750, 1750, 1753, 1753), "review:dates"),  # расходится только начало
+        (_bounds(1690, 1690, 1753, 1753), "review:dates"),  # начало: 5 лет > 2 + 2
+        (_bounds(1685, 1685, 1758, 1758), "review:dates"),  # конец: 5 лет > 2 + 2
+        (_bounds(1689, 1689, 1753, 1753), "merge:name"),  # начало: 4 года — допуски касаются
+        (_bounds(1685, 1685, 1757, 1757), "merge:name"),  # конец: 4 года — допуски касаются
+        (_bounds(1680, 1685, 1750, 1753), "merge:name"),  # интервалы неопределённости пересекаются
+        (_bounds(1690, 1692, 1757, 1760), "review:dates"),  # начало врозь при близком конце
+    ],
+)
+def test_dates_conflict_on_start_or_end_interval(other, verdict):
+    base = _bounds(1685, 1685, 1753, 1753)
+    assert dedupe.same_person(_berkeley("a", base), _berkeley("b", other)).reason == verdict
+    assert dedupe.same_person(_berkeley("b", other), _berkeley("a", base)).reason == verdict
+
+
+@req(PQ, MERGE, invariant="Решённая пара не ставится в очередь и после слияния компонент")
+def test_decided_pair_not_requeued_after_merge_mapping():
+    """Y слит в Z (одно основное); пара X–Y — review:single_name, но X и Z решением «разные»:
+    после отображения Y → Z пара совпадает с решённой и в очередь не идёт."""
+    z = Entity("e1", "person", (("primary", "zeta"),), None, None)
+    y = Entity("e2", "person", (("primary", "zeta"),), None, None)
+    x = Entity("e3", "person", (("primary", "xi"), ("variant", "zeta")), None, None)
+    result = plan([z, y, x], distinct=[("e1", "e3")])
+    assert result.merges == [("e1", ["e2"], "merge:name")]
+    assert result.review == []
+
+
+@req(PQ, MERGE, invariant="Причина отказа компоненты: qid_cluster раньше review:dates")
+def test_component_reason_priority_qid_cluster_over_dates():
+    a = Entity("a", "person", (("primary", "same"),), _bounds(1685, 1685, 1753, 1753), "Q1")
+    b = Entity("b", "person", (("primary", "same"),), _bounds(1885, 1885, 1953, 1953), None)
+    c = Entity("c", "person", (("primary", "same"),), None, "Q2")
+    d = Entity("d", "person", (("primary", "same"),), None, None)
+    result = plan([a, b, c, d])
+    assert result.merges == []
+    assert result.review == [
+        ("a", "d", "review:qid_cluster"),
+        ("b", "c", "review:qid_cluster"),
+        ("b", "d", "review:qid_cluster"),
+        ("c", "d", "review:qid_cluster"),
+    ]
+
+
+@req(PQ, MERGE, invariant="В слиянии участвуют только действующие персоны")
+def test_redirected_person_not_loaded(onto):
+    kept = onto.entities.create("person", [("en", "Berkeley", "primary")])
+    removed = onto.entities.create("person", [("en", "Berkeley", "primary")])
+    onto.entities.merge(kept, removed)
+    assert [p.id for p in dedupe.load_persons(onto.statements.engine)] == [kept]
+
+
+@req(PQ, MERGE, invariant="Ссылки на сущность: субъект и объект утверждений плюс атрибуция-автор")
+def test_link_counts_subject_object_author(onto):
+    p1 = onto.entities.create("person", [("en", "Alpha", "primary")])
+    p2 = onto.entities.create("person", [("en", "Beta", "primary")])
+    p3 = onto.entities.create("person", [("en", "Gamma", "primary")])
+    work = onto.thing("work", "Трактат")
+    onto.statements.add(p1, "influenced_by", obj=p2)  # p1 — субъект, p2 — объект
+    onto.statements.add(p3, "influenced_by", obj=p1)  # p1 — объект
+    onto.statements.add(work, "author", obj=p3, attributions=[Attribution("entity", p1)])
+    counts = dedupe.link_counts(onto.statements.engine, [p1, p2, p3])
+    assert counts == {p1: 3, p2: 1, p3: 2}
