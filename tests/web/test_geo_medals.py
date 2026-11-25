@@ -364,6 +364,25 @@ def test_medal_limit(knowledge_context, knowledge_stack, events):
     )
     assert got == expected, (got, expected)
     expect(page.locator("[data-geo-limit='people']")).to_have_text("показаны 600 из 51 150 человек")
+    assert len(events.of(GEO_BUILT)) == 1  # ответы подменены: событие — прямого запроса теста
+
+
+@req(GEO, MED, scenario="Предел медальонов")
+def test_medal_limit_layout_budget(knowledge_context, knowledge_stack, events):
+    """THEN «раскладка в покое укладывается в бюджет задачи 3.8» (≤ 150 мс) — отдельно от
+    остальных THEN сценария: замер в браузере включает отрисовку React."""
+    knowledge_stack.world.person("Опорный", "1720", "1780")
+    context = knowledge_context(1366, 768)
+    places, people = many_places()
+    data, layer = synthetic(knowledge_stack, context, places, people)
+    page = context.new_page()
+    page.set_default_timeout(180000)
+    page.route(MAP_API, lambda r: r.fulfill(json=data))
+    page.route(PLACES_API, lambda r: r.fulfill(json=layer))
+    page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
+    page.locator(".geo-globe[aria-busy='false']").wait_for(timeout=240000)
+    settle(page)
+    sc = scene(page)
     # Бюджет задачи 3.8: раскладка в покое ≤ 150 мс. Замер — от нажатия стрелки до кадра
     # после смены data-center (включает отрисовку React: строже, чем одна раскладка).
     focus_globe(page)
@@ -380,7 +399,7 @@ def test_medal_limit(knowledge_context, knowledge_stack, events):
         sc = scene(page)
     print("раскладка в покое, мс:", [round(s) for s in spent])
     assert sorted(spent)[1] <= 150, spent
-    assert len(events.of(GEO_BUILT)) == 1  # ответы подменены: событие — прямого запроса теста
+    assert len(events.of(GEO_BUILT)) == 1
 
 
 @req(GEO, MED, scenario="Без наложений")
@@ -467,7 +486,7 @@ def test_rim_while_dragging(knowledge_context, knowledge_stack, events, width, h
     )
     center_on(page, w["base"], (-20, 50))
     focus_globe(page)
-    zoom_to(page, 2)
+    zoom_to(page, 0)
     sc0 = scene(page)
     shifted = [
         p
@@ -479,10 +498,10 @@ def test_rim_while_dragging(knowledge_context, knowledge_stack, events, width, h
         > MEDAL / 2
     ]
     assert shifted, "нет медальонов, сдвинутых от точки привязки"
-    # Тянем влево: место у обода уходит к восточному краю круга.
+    # Тянем вправо: центр уходит на запад, место — с 80° к краю видимого полушария (~89°).
     went_hidden = set()
     shots = drag_frames(
-        page, -sc0["R"] * 0.35, 0, frames=5, start=(sc0["cx"] - sc0["R"] * 0.5, sc0["cy"])
+        page, sc0["R"] * 0.16, 0, frames=5, start=(sc0["cx"] - sc0["R"] * 0.5, sc0["cy"])
     )
     assert len(shots) == 5
     for sc in shots:

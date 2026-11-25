@@ -203,16 +203,15 @@ def open_globe(make, stack, path: str, *, width=1920, height=1080, before=None, 
     return page, info.value
 
 
-def open_globe_map(make, stack, path: str, **kw):
+def open_globe_map(make, stack, path: str, *, before_extra=None, **kw):
     """Как ``open_globe``, плюс JSON ответа ``/map``, полученного страницей."""
     holder: dict[str, Any] = {}
 
     def before(page):
         page.on("response", lambda r: holder.setdefault("map", r) if MAP_API.match(r.url) else None)
-        if kw.get("before_extra"):
-            kw["before_extra"](page)
+        if before_extra is not None:
+            before_extra(page)
 
-    kw.pop("before_extra", None)
     page, response = open_globe(make, stack, path, before=before, **kw)
     return page, response, holder["map"].json()
 
