@@ -41,3 +41,4 @@ enforce:
   - entity-catalog
   - epochs
   - epoch-context
+  - geo-timeline
