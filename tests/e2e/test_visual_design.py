@@ -631,8 +631,11 @@ def test_future_sections_marked_and_described(browser, site, ids):
         reference_link = nav.get_by_role("link", name="Справочник")
         assert "скоро" not in reference_link.inner_text()
         assert reference_link.get_attribute("href") == "/reference"
+        # «Эпохи» реализованы (add-epochs): ведут на /epochs, без «скоро».
+        epochs_link = nav.get_by_role("link", name="Эпохи")
+        assert "скоро" not in epochs_link.inner_text()
+        assert epochs_link.get_attribute("href") == "/epochs"
         future = [
-            "Эпохи и контекст",
             "Сравнение трактовок",
             "Маршрут изучения",
             "Мои материалы",

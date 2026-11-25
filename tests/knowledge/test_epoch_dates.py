@@ -21,7 +21,7 @@ from sqlalchemy import func, select
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate
 from philograph.knowledge.epoch_dates import EpochDates, ManifestError, main
-from philograph.knowledge.statements import Attribution
+from philograph.knowledge.statements import Attribution, Provenance
 
 from .wd_records import (  # noqa: F401  (фикстура no_network)
     FILM,
@@ -199,6 +199,27 @@ def test_first_recorded_dating(svc, onto, events):
     bar = epoch(onto, "Барокко")
     dating_of(onto, bar, span(1600, 1750))
     dating_of(onto, bar, span(1580, 1730))
+    data, rid = listed(svc)
+    item = by_label(data["epochs"])["Барокко"]
+    assert (item["from"], item["to"]) == (1600, 1750)
+    assert events.where(LISTED, request_id=rid)[0]["epochs"] == 1
+
+
+@req(EP, DATING, invariant="основная — первая записанная, а не самая сильная по статусу")
+def test_first_recorded_not_strongest(svc, onto, events):
+    bar = epoch(onto, "Барокко")
+    onto.statements.add(
+        bar,
+        "dating",
+        value=span(1600, 1750),
+        attributions=[Attribution("common")],
+        provenance=Provenance("generated"),
+    )
+    onto.statements.add(
+        bar, "dating", value=span(1580, 1730), attributions=[Attribution("source", "s_textbook")]
+    )
+    statuses = [s["status"] for s in datings(onto, bar)]
+    assert statuses[0] == "generated" and statuses[1] != "generated"
     data, rid = listed(svc)
     item = by_label(data["epochs"])["Барокко"]
     assert (item["from"], item["to"]) == (1600, 1750)

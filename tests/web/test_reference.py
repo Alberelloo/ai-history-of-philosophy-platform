@@ -699,6 +699,7 @@ def test_live_items_without_soon(knowledge_context, knowledge_stack, events):
         ("Ассистент", "/assistant"),
         ("Граф", "/graph"),
         ("Справочник", "/reference"),
+        ("Эпохи", "/epochs"),  # add-epochs: раздел реализован
     ):
         link = nav.get_by_role("link", name=name)
         assert "скоро" not in link.inner_text().lower(), name
@@ -713,8 +714,7 @@ def test_live_items_without_soon(knowledge_context, knowledge_stack, events):
 def test_future_items_keep_soon(knowledge_context, knowledge_stack, events):
     page = open_page(knowledge_context, knowledge_stack)
     nav = sidenav(page)
-    for name in (
-        "Эпохи и контекст",
+    for name in (  # «Эпохи» реализованы (add-epochs) — без метки, см. «Ассистент без метки»
         "Сравнение трактовок",
         "Маршрут изучения",
         "Мои материалы",
