@@ -96,3 +96,62 @@ export function spanText(from: number, to: number, bce: string): string {
   const b = yearText(to, bce);
   return a.includes(" ") || b.includes(" ") ? `${a} – ${b}` : `${a}–${b}`;
 }
+
+// Контекст эпохи (epoch-context, «Контекст эпохи»): GET /v1/context?epoch=… — события эпохи
+// с видом, местами и связями «стимулировало». Без модели; цитат в ответе нет.
+export const CONTEXT_KINDS = [
+  "political",
+  "economic",
+  "social",
+  "religious",
+  "scientific",
+  "intellectual",
+  "biographical",
+  "none",
+] as const;
+export type ContextKind = (typeof CONTEXT_KINDS)[number];
+
+export type ContextLink = {
+  statement_id: string;
+  target: { id: string; label: string; type: string };
+  mechanism: string | null;
+  status: string;
+  generated: boolean;
+  in_textbook: boolean | null;
+  attributed_to: string[];
+  evidence: { paragraph_id: string; link: string }[];
+  pending?: boolean; // предложено достройкой, ещё сохраняется (клиент)
+};
+
+export type ContextEvent = {
+  id: string;
+  label: string;
+  type: string;
+  kind: string | null;
+  wikidata?: string | null;
+  dates: { from: number; to: number; precision: string | null; original: string | null } | null;
+  places: { id: string; label: string; wikidata: string | null }[];
+  basis: string | null;
+  stimulated: ContextLink[];
+};
+
+export type ContextData = {
+  mode: "epoch" | "window";
+  events: ContextEvent[];
+  counts: Partial<Record<ContextKind, number>>;
+  truncated: boolean;
+};
+
+export function fetchContext(
+  epochId: string,
+  opts: { kinds: string[]; verified: boolean; textbook: string | null; lang: string },
+  signal: AbortSignal,
+): Promise<ContextData> {
+  const p = new URLSearchParams();
+  p.set("epoch", epochId);
+  if (opts.kinds.length) p.set("kinds", opts.kinds.join(","));
+  if (opts.verified) p.set("verified", "true");
+  if (opts.textbook) p.set("textbook", opts.textbook);
+  p.set("lang", opts.lang);
+  return json<ContextData>(`${API}/context?${p}`, signal);
+}

@@ -318,6 +318,8 @@ class Context:
                     "label": label(record.id),
                     "type": record.type,
                     "kind": record.kind,
+                    # Внешний идентификатор события (ссылка «Wikidata ↗»), только по шаблону.
+                    "wikidata": _qid(snapshot.wikidata.get(record.id)),
                     "dates": _dates(record.dates),
                     "places": [
                         {"id": p, "label": label(p), "wikidata": _qid(snapshot.wikidata.get(p))}

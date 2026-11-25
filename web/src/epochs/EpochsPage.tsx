@@ -17,11 +17,13 @@ import {
   type MemberList,
   type UndatedEpoch,
 } from "./api";
+import { ContextBlock } from "./ContextBlock";
 import { Timeline, TimelinePlaceholder } from "./Timeline";
 
 // Страница эпох (epochs, «Страница эпох»): /epochs и /epochs/<id>. Лента — данные
 // GET /v1/epochs; описание выбранной — счётчики из списка, ведущие персоны, труды и события —
-// справочником (/v1/catalog?epoch=&type=). Выбор — в адресе: /epochs/<id> (запись истории),
+// справочником (/v1/catalog?epoch=&type=), под ними — блок «Контекст эпохи» (ContextBlock,
+// /v1/context). Выбор — в адресе: /epochs/<id> (запись истории),
 // Esc на ленте — /epochs. Названия и id из адреса выводятся текстом React, без разметки.
 
 type Load = { status: "loading" } | { status: "error" } | { status: "ok"; data: EpochsData };
@@ -255,6 +257,7 @@ function Details({
           <MemberColumn key={list} list={list} items={lists[list]} />
         ))}
       </div>
+      <ContextBlock epochId={epoch.id} />
     </section>
   );
 }
