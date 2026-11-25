@@ -173,3 +173,58 @@
     возвращено `git checkout -- web/src/map/model.ts`, пересобрано, `git diff --stat -- src web/src` пусто; тест — 1 passed.
 
 Д1 и Д2 закрыты.
+
+## Тестировщик — повторный прогон после ревью, круг 1, 2026-11-25, от коммита 55b6fb6
+
+Правки разработчика d470065; дельта `epoch-context` дополнена по решению ведущего (поле `events[].wikidata`, `result=duplicate_qid`). Новые тесты:
+
+| Требование | Сценарий / инвариант | Тест | Вывод | Журнал |
+|---|---|---|---|---|
+| Пометка непроверенного контекста | «только проверенные» скрывает и только что достроенное | tests/web/test_epochs.py::test_verified_hides_just_extended | `?verified=1` → «Достроить контекст» (FakeProvider предлагает stimulated) → строки «Два трактата…» 0, `data-unverified="true"` 0; перезапрос verified=true; после снятия фильтра строка видна с `data-unverified="true"` | graph.extended recipe=context proposed=1 по request_id потока; context.served generated_links=0 (request_id первого ответа и перезапроса); model.calls=1 |
+| Контекст эпохи | events[].wikidata — только Q<число>, иначе null | tests/knowledge/test_context.py::test_event_wikidata_field, ::test_event_wikidata_hostile[5] | "Q6534" в обоих режимах, без внешнего id — null; «Q12<script>», «q6534», «Q», «P31», адрес — null и не в теле | context.served |
+| Контекст на странице эпохи | ссылка «Wikidata ↗» из проверенного QID | tests/web/test_epochs.py::test_event_wikidata_link | href https://www.wikidata.org/wiki/Q6534; у испорченного QID (с кавычкой и onmouseover) и без QID ссылки нет | context.served events=3 |
+| Контекстные события из Wikidata | duplicate_qid (QID события у места / QID места у события) | tests/knowledge/test_epoch_context_import.py::test_duplicate_qid_other_type[event, place] | строки всех таблиц схемы равны | checked result=duplicate_qid; run 0/0/0, skipped=2 (duplicate_qid + pending) |
+| Контекст на странице эпохи | вид из адреса без событий | tests/web/test_epochs.py::test_kind_from_address_without_events | `?kinds=social`: кнопка «Общество 0» aria-pressed=true, событий 0, «Событий выбранных видов в этой эпохе нет.»; отжатие — 4 события | context.served events=0, затем events=4 |
+
+Команды и итоги (после `cd web && npm run build` → ✓ built in 5.08s; файлы по одному):
+    tests/knowledge/test_catalog.py:  125 passed, 1 warning in 139.45s (0:02:19)
+    tests/knowledge/test_catalog_route.py:  7 passed, 1 warning in 3.28s
+    tests/knowledge/test_catalog_unit.py:  29 passed in 13.90s
+    tests/knowledge/test_context.py:  84 passed, 1 warning in 100.52s (0:01:40)
+    tests/knowledge/test_context_unit.py:  25 passed, 1 warning in 22.16s
+    tests/knowledge/test_dates_span.py:  9 passed in 0.09s
+    tests/knowledge/test_entities_external.py:  4 passed in 1.36s
+    tests/knowledge/test_epoch_card_unit.py:  1 passed in 0.63s
+    tests/knowledge/test_epoch_context_import.py:  16 passed in 7.76s
+    tests/knowledge/test_epoch_dates.py:  66 passed, 1 warning in 24.77s
+    tests/knowledge/test_epoch_dates_unit.py:  19 passed in 4.55s
+    tests/knowledge/test_epochs_list.py:  11 passed, 1 warning in 31.40s
+    tests/knowledge/test_epochs_list_unit.py:  3 passed, 1 warning in 1.33s
+    tests/knowledge/test_epochs_membership.py:  55 passed, 1 warning in 36.48s
+    tests/knowledge/test_epochs_unit.py:  8 passed in 4.87s
+    tests/knowledge/test_external_processing.py:  2 passed in 1.13s
+    tests/knowledge/test_filling.py:  30 passed, 1 warning in 35.10s
+    tests/knowledge/test_graph.py:  24 passed, 1 warning in 24.18s
+    tests/knowledge/test_map.py:  16 passed, 1 warning in 17.71s
+    tests/knowledge/test_map_snapshot_parity.py:  3 passed, 1 warning in 3.94s
+    tests/knowledge/test_map_view.py:  10 passed, 1 warning in 8.80s
+    tests/knowledge/test_mentions_cards.py:  32 passed, 1 warning in 31.42s
+    tests/knowledge/test_portrait_source.py:  35 passed in 0.55s
+    tests/knowledge/test_portraits.py:  13 passed, 1 warning in 4.59s
+    tests/knowledge/test_reference_groups.py:  1 passed in 0.02s
+    tests/knowledge/test_regions.py:  10 passed, 1 warning in 3.91s
+    tests/knowledge/test_registry_entities.py:  33 passed, 1 skipped in 12.64s
+    tests/knowledge/test_service.py:  3 passed, 1 warning in 2.60s
+    tests/knowledge/test_snapshot.py:  6 passed in 2.25s
+    tests/knowledge/test_statements.py:  19 passed in 7.98s
+    tests/knowledge/test_wikidata.py:  52 passed in 12.65s
+    tests/knowledge/test_wikidata_unit.py:  36 passed in 0.15s
+    tests/web/test_epochs.py:  43 passed, 1 warning in 148.46s (0:02:28)
+    tests/web/test_map.py:  51 passed, 1 warning in 308.61s (0:05:08)
+    check_traceability → Требований с тестами: 387 из 387; ruff check/format tests — чисто
+
+Мутация (блок. 1 ревью): в ContextBlock.tsx `build.added` показывается без `shownLink` (фильтр только у ответа сервера), сборка web →
+    test_verified_hides_just_extended: `expect(...target has_text «Два трактата…»).to_have_count(0)` — AssertionError, 1 failed
+    возвращено `git checkout -- web/src/epochs/ContextBlock.tsx`, пересобрано, `git diff --stat -- src web/src` пусто; тест — 1 passed.
+
+`test_accessible_names` в этом прогоне прошёл (таймаута нет).

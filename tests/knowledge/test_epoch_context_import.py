@@ -326,3 +326,32 @@ def test_import_events_only_codes(onto, importer, events, no_network):
     logged = json.dumps([e.fields for e in ours], ensure_ascii=False, default=str)
     for needle in ("Французская", "Париж", "Просвещение", "Paris"):
         assert needle not in logged, needle
+
+
+# --- после ревью, круг 1: duplicate_qid (таблица result дельты) --------------------------------
+
+
+@req(
+    EC,
+    WD,
+    invariant="duplicate_qid: QID события или места у сущности другого типа — ничего не записано, "
+    "пропущен",
+)
+@pytest.mark.parametrize("taken", ["event", "place"])
+def test_duplicate_qid_other_type(onto, importer, events, no_network, taken):
+    if taken == "event":  # QID события занят местом
+        onto.entities.create(
+            "place", [("ru", "Не событие", "primary")], external={"wikidata": REVOLUTION}
+        )
+    else:  # QID места занят событием
+        onto.entities.create("event", [("ru", "Не место", "primary")], external={"wikidata": PARIS})
+    manifest = decide(harvested(), **{REVOLUTION: "accepted"})
+    before = table_rows(onto)
+    events.clear()
+    importer.apply(manifest, FixtureFetch())
+    assert table_rows(onto) == before
+    results = {e["qid"]: e["result"] for e in events.of("knowledge.context_import.checked")}
+    assert results[REVOLUTION] == "duplicate_qid"
+    run = events.one("knowledge.context_import.run")
+    assert (run["created"], run["statements"], run["places_created"]) == (0, 0, 0)
+    assert run["skipped"] == 2  # duplicate_qid и второй кандидат pending

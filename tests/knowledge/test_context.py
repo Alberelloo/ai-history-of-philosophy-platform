@@ -14,6 +14,7 @@ import json
 
 import pytest
 
+from philograph.knowledge.dates import parse
 from philograph.knowledge.statements import Attribution, Evidence, Provenance, StatementError
 
 from .conftest import TEXTBOOK_N, TEXTBOOK_R, VISITOR_ADDRESS
@@ -674,3 +675,40 @@ def test_region_from_header(svc, w, events):
     served_of(mine)
     access = [c for c in svc.library_calls if c["path"].endswith("/internal/access")]
     assert access and access[-1].get("region") == "RU"
+
+
+# --- после ревью, круг 1: поле events[].wikidata (дельта «Контекст эпохи») ---------------------
+
+
+@req(EC, CTX, invariant="events[].wikidata — только идентификатор Q<число>, иначе null")
+def test_event_wikidata_field(svc, w, events):
+    with_qid = svc.onto.entities.create(
+        "event", [("ru", "Французская революция", "primary")], external={"wikidata": "Q6534"}
+    )
+    svc.world.statements.add(with_qid, "dating", value=parse("1789").to_json(), attributions=COMMON)
+    for params in ({"epoch": w["enl"]}, {"from": "1600", "to": "1800"}):
+        response, mine = ask(svc, events, params)
+        records = {e["id"]: e for e in response.json()["events"]}
+        assert records[with_qid]["wikidata"] == "Q6534"
+        assert records[w["glorious"]]["wikidata"] is None
+        served_of(mine)
+
+
+@req(EC, CTX, invariant="events[].wikidata: испорченный внешний идентификатор не отдаётся")
+@pytest.mark.parametrize("value", ["Q12<script>", "q6534", "Q", "P31", "https://evil.example/Q1"])
+def test_event_wikidata_hostile(svc, w, events, value):
+    from sqlalchemy import insert
+
+    from philograph.knowledge import schema
+
+    event = svc.world.thing("event", "Событие с испорченным QID", "1720")
+    with svc.onto.statements.engine.begin() as conn:  # запись в обход проверок — как старые данные
+        conn.execute(
+            insert(schema.external_ids).values(entity_id=event, system="wikidata", value=value)
+        )
+    response, mine = ask(svc, events, {"epoch": w["enl"]})
+    record = {e["id"]: e for e in response.json()["events"]}[event]
+    assert record["wikidata"] is None
+    if len(value) > 1:  # «Q» как подстрока есть в любом теле
+        assert value not in response.text
+    served_of(mine)

@@ -619,6 +619,18 @@ SERVED = "knowledge.context.served"
 LOCKE_DOCTRINE = "Политическая философия Локка"
 
 
+def _parse(text: str):
+    from philograph.knowledge.dates import parse
+
+    return parse(text)
+
+
+def _common():
+    from philograph.knowledge.statements import Attribution
+
+    return [Attribution("common")]
+
+
 def context_world(stack, *, sourced: bool = True) -> dict[str, str]:
     """Данные «Контекста Просвещения»: две эпохи, четыре события, Лондон, учение Локка;
     связь «Славная революция → Политическая философия Локка» (political, по источникам,
@@ -1180,4 +1192,105 @@ def test_extend_scope_message(knowledge_context, knowledge_stack, events):
     )
     assert knowledge_stack.model.calls == []
     assert events.where("knowledge.graph.built", extension="scope")
+    no_page_errors(page)
+
+
+# --- после ревью, круг 1 -----------------------------------------------------------------------
+
+
+@req(
+    ECX,
+    MARK,
+    invariant="«только проверенные» скрывает и связи, только что добавленные достройкой",
+)
+def test_verified_hides_just_extended(knowledge_context, knowledge_stack, events):
+    w = extend_world(knowledge_stack)
+    push_proposals(
+        knowledge_stack,
+        {"subject": "Славная революция", "relation": "stimulated", "object": TREATISES},
+    )
+    page, first = open_context(knowledge_context, knowledge_stack, w["enl"], "verified=1")
+    expect(block(page).get_by_label("Только проверенные")).to_be_checked()
+    assert event_of(events, first, SERVED)["generated_links"] == 0
+    with page.expect_response(CONTEXT_API) as refetch:
+        stream = extend(page, w["glorious"])
+    assert stream.status == 200
+    expect(block(page)).to_have_attribute("aria-busy", "false")
+    # Достройка прошла: модель вызвана, связь предложена (событие по request_id потока).
+    rid = stream.headers.get("x-request-id")
+    assert rid
+    [extended] = events.where("knowledge.graph.extended", request_id=rid)
+    assert extended["recipe"] == "context" and extended["proposed"] == 1
+    assert len(knowledge_stack.model.calls) == 1
+    # Под отмеченным фильтром сгенерированной строки нет — ни до сохранения, ни после.
+    glorious = context_event(page, w["glorious"])
+    expect(glorious.locator(".epochs-context__target", has_text=TREATISES)).to_have_count(0)
+    assert page.locator(".epochs-context__link[data-unverified='true']").count() == 0
+    assert parse_qs(urlparse(refetch.value.url).query).get("verified") == ["true"]
+    assert event_of(events, refetch.value, SERVED)["generated_links"] == 0
+    # Снятый фильтр показывает добавленную строку с пометкой.
+    with page.expect_response(CONTEXT_API):
+        block(page).get_by_label("Только проверенные").uncheck()
+    row = glorious.locator(
+        ".epochs-context__link", has=page.locator(".epochs-context__target", has_text=TREATISES)
+    )
+    expect(row).to_have_attribute("data-unverified", "true")
+    no_page_errors(page)
+
+
+@req(ECX, BLOCK, invariant="ссылка «Wikidata ↗» события — только из проверенного QID")
+def test_event_wikidata_link(knowledge_context, knowledge_stack, events):
+    from sqlalchemy import insert
+
+    from philograph.knowledge import schema
+
+    world = knowledge_stack.world
+    enl = world.thing("epoch", "Просвещение", "1680–1800")
+    good = world.entities.create(
+        "event", [("ru", "Французская революция", "primary")], external={"wikidata": "Q6534"}
+    )
+    world.statements.add(good, "dating", value=_parse("1789").to_json(), attributions=_common())
+    bad = world.thing("event", "Событие с испорченным QID", "1720")
+    with world.engine.begin() as conn:
+        conn.execute(
+            insert(schema.external_ids).values(
+                entity_id=bad, system="wikidata", value='Q1x" onmouseover="alert(1)'
+            )
+        )
+    plain = world.thing("event", "Южноморский пузырь", "1720")
+    page, response = open_context(knowledge_context, knowledge_stack, enl)
+    link = context_event(page, good).locator(".epochs-context__wikidata")
+    expect(link).to_have_count(1)
+    assert link.get_attribute("href") == "https://www.wikidata.org/wiki/Q6534"
+    assert "Wikidata" in link.inner_text()
+    for entity in (bad, plain):
+        assert context_event(page, entity).locator(".epochs-context__wikidata").count() == 0
+    records = {e["id"]: e for e in response.json()["events"]}
+    assert (records[good]["wikidata"], records[bad]["wikidata"], records[plain]["wikidata"]) == (
+        "Q6534",
+        None,
+        None,
+    )
+    assert event_of(events, response, SERVED)["events"] == 3
+    no_page_errors(page)
+
+
+@req(ECX, BLOCK, invariant="вид из адреса без событий — нажатая кнопка и пустое состояние")
+def test_kind_from_address_without_events(knowledge_context, knowledge_stack, events):
+    w = context_world(knowledge_stack)
+    page, response = open_context(knowledge_context, knowledge_stack, w["enl"], "kinds=social")
+    social = block(page).locator(".epochs-context__kind[data-kind='social']")
+    expect(social).to_have_attribute("aria-pressed", "true")
+    expect(social).to_contain_text("0")
+    assert page.locator(".epochs-context__event").count() == 0
+    expect(block(page).locator(".epochs-context__empty")).to_have_text(
+        "Событий выбранных видов в этой эпохе нет."
+    )
+    served = event_of(events, response, SERVED)
+    assert served["events"] == 0
+    # Отжатая кнопка возвращает все события.
+    with page.expect_response(CONTEXT_API) as again:
+        social.click()
+    expect(page.locator(".epochs-context__event")).to_have_count(4)
+    assert event_of(events, again.value, SERVED)["events"] == 4
     no_page_errors(page)
