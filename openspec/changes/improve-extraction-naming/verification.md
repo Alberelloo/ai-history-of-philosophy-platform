@@ -219,3 +219,14 @@
 - J3: в `datings` добавить обратный интервал нашей эры (Г1 > Г2, в том числе «ок.») с ожиданием `dating:unparsed`. Добавить `@example` в `test_dating_check_any_input` и `test_dating_invariant`. Мутацию J3 записать в `mutations.yaml`.
 
 Разработчику, ревьюверу и Lead'у возвратов нет.
+
+## Тестировщик — возврат повторного судьи (J1, J3), 2026-11-25
+
+- **J1.** В `scripts_mix` новый вид слова `roman_letters`: буквы IVXLCDM не целиком заглавными («Mill», «civil», «Xiv»), их буквы считаются латиницей. Добавлены `@example`: «Mill» и «Civil Xiv» → `en` в `test_lang_for_any_text`; «Mill»/«Lid» в `test_language_invariant_create_and_add_name`.
+- **J3.** В `datings` (класс `unparsed`) добавлен обратный интервал нашей эры Г1 > Г2, с «ок.» и «около» и без них, → `dating:unparsed`. В `EXAMPLES` добавлены «1804–1724» (персона) и «ок. 1690-1689» (произведение), они идут в `test_dating_invariant` и `test_dating_check_any_input`.
+- Базовый прогон: 4 passed in 25.94s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Язык названий сущностей | roman-any-case (J1) | test_lang_for_any_text, test_language_invariant_create_and_add_name | да ×2 |
+| Извлечение дат | reverse-interval-accepted (J3) | test_dating_check_any_input, test_dating_invariant | да ×2 |
