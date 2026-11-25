@@ -17,6 +17,7 @@ from philograph.knowledge.cards import Cards
 from philograph.knowledge.catalog import Catalog, CatalogSettings
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
+from philograph.knowledge.geo import PlaceLayer
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import MapSettings, SectionMap
 from philograph.knowledge.mentions import Mentions
@@ -54,6 +55,7 @@ class Components:
     section_map: SectionMap
     snapshots: Snapshots
     catalog: Catalog
+    place_layer: PlaceLayer
 
 
 def components(env: dict[str, str]) -> Components:
@@ -118,6 +120,7 @@ def components(env: dict[str, str]) -> Components:
             max_stale_seconds=float(env.get("PHILOGRAPH_CATALOG_MAX_STALE_SECONDS", "15"))
         ),
     )
+    place_layer = PlaceLayer(section_map, snapshots)
     return Components(
         statements,
         health,
@@ -134,6 +137,7 @@ def components(env: dict[str, str]) -> Components:
         section_map,
         snapshots,
         catalog,
+        place_layer,
     )
 
 
@@ -158,4 +162,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         library=_c.library,
         section_map=_c.section_map,
         catalog=_c.catalog,
+        place_layer=_c.place_layer,
     )

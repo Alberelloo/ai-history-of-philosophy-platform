@@ -336,3 +336,31 @@ def test_layer_has_no_quotes_or_paragraphs(onto, clock, geo_world):
     text = json.dumps(_layer(onto, clock).build(), ensure_ascii=False)
     for word in ("quote", "paragraph", "evidence", "attributions", "wikidata.org"):
         assert word not in text
+
+
+# --- 3.3: маршрут и шлюз -------------------------------------------------------------------
+
+
+def test_places_route(onto, clock, events, geo_world):
+    from fastapi.testclient import TestClient
+
+    from philograph.knowledge.app import build_app
+    from philograph.knowledge.map import SectionMap
+    from philograph.knowledge.snapshot import Snapshots
+
+    snaps = Snapshots(onto.statements.engine, clock)
+    app = build_app(onto.statements, section_map=SectionMap(onto.statements, snapshots=snaps))
+    events.clear()
+    response = TestClient(app).get("/v1/map/places")
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body) == {"places", "placements", "unplaced", "truncated", "limit"}
+    assert [p["label"] for p in body["places"]] == ["Кёнигсберг"]
+    assert len(events.of("knowledge.geo.built")) == 1 and not events.of("knowledge.map.built")
+
+
+def test_gateway_counts_places_as_map_without_page_token():
+    from philograph.gateway.limits import WITHOUT_PAGE_TOKEN, paid_operation
+
+    assert paid_operation("GET", "/api/knowledge/v1/map/places") == "map"
+    assert "map" in WITHOUT_PAGE_TOKEN

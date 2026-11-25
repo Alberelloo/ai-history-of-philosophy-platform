@@ -41,7 +41,7 @@
   - `unplaced`;
   - LRU-кэш с отпечатком;
   - `knowledge.geo.built` (`events.define`)
-- [ ] 3.3 Маршрут `GET /v1/map/places` в `app.py`, сборка в `main.py` (общий `Snapshots`); шлюз `limits.py` — `/map/places` как операция `map` без токена страницы
+- [x] 3.3 Маршрут `GET /v1/map/places` в `app.py`, сборка в `main.py` (общий `Snapshots`); шлюз `limits.py` — `/map/places` как операция `map` без токена страницы
 - [ ] 3.4 `knowledge/geo_enrich.py`, `PlaceEnrichment.run`, `rollback`:
   - таблица `PROPERTIES`;
   - только через `knowledge/wikidata.py` (`check_qid`, `fetch_entity`, `wikidata_time`, `page_url`). P625 — из `Claim.value` (`latitude`, `longitude`);

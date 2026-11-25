@@ -17,6 +17,7 @@ from philograph.knowledge.catalog import Catalog, CatalogRejected
 from philograph.knowledge.context import Context, ContextRejected
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.epochs import EpochList
+from philograph.knowledge.geo import PlaceLayer
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.map import MapViews, SectionMap
 from philograph.knowledge.mentions import Mentions
@@ -157,6 +158,7 @@ def build_app(
     actions: ActionLog | None = None,
     section_map: SectionMap | None = None,
     catalog: Catalog | None = None,
+    place_layer: PlaceLayer | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -289,6 +291,15 @@ def build_app(
             """Карта раздела из сохранённых утверждений, без модели. Цитат и атрибуций в ней
             нет — подробности связи клиент берёт из ``/entities/{id}/statements``."""
             return section_map.build(textbook=textbook, only_textbook=only_textbook)
+
+        # Слой мест — на той же карте и том же снимке (geo-timeline).
+        places = place_layer or PlaceLayer(section_map, section_map.snapshots)
+
+        @router.get("/map/places")
+        def map_places(textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
+            """Географический слой карты: места с координатами, размещения персон и событий
+            карты, сущности без места. Без модели и внешних запросов; цитат нет."""
+            return places.build(textbook=textbook, only_textbook=only_textbook)
 
         views = MapViews(section_map)
 
