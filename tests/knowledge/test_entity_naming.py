@@ -662,12 +662,11 @@ def test_check_name_any_input(case):
 @DB_SETTINGS
 @given(case=names_with_reason(), path=hs.sampled_from(["create", "set_primary_name", "add_name"]))
 @_with_path_examples
+@example(case=(("concept", " 20.1 "), "number"), path="create")  # M3: label после strip
+@example(case=(("concept", "  EVERY "), "stopword"), path="add_name")
+@example(case=(("term", "\t"), "empty"), path="set_primary_name")
 def test_rejection_invariant(onto, events, case, path):
-    (type_, raw), reason = case
-    # Пробелы по краям входа — отдельный тест ``test_rejected_label_is_name_after_strip``
-    # (дефект: ``label`` — сырой вход, а не название после ``strip()``); здесь вход без них,
-    # чтобы остальные утверждения инварианта проверялись на всех классах входов.
-    raw = raw.strip()
+    (type_, raw), reason = case  # сырой вход: label события — по оракулу strip + NFC (Д2)
     token = sentinel()
     if path == "create" or type_ == "source":
         before = stand_count(onto)

@@ -141,3 +141,10 @@ mutations:
     note: отказ привязки в датировке даёт entity:<код> вместо dating:unresolved (О18)
     expect_fail:
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_unresolved_entity
+  - id: reject-label-raw
+    requirement: Валидность названий сущностей
+    patch: reject-label-raw.patch
+    note: M3 судьи — reject пишет label без strip()/NFC (откат Д2)
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+      - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
