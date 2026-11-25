@@ -1,7 +1,7 @@
 """Места и координаты из Wikidata (geo-timeline, задача 7.2).
 
 Тесты по требованию «Места и координаты из Wikidata» дельты
-``openspec/changes/add-geo-timeline/specs/geo-timeline/spec.md``. Записи Wikidata задаёт сам
+``openspec/specs/geo-timeline/spec.md``. Записи Wikidata задаёт сам
 тест (``wd_records.record`` и свои значения P625/P937), сеть запрещена (``no_network``).
 QID — только метки синтетических записей. Оператор запускает обогащение командой
 ``python -m philograph.knowledge.geo_enrich`` (``main``) с записями из файла.

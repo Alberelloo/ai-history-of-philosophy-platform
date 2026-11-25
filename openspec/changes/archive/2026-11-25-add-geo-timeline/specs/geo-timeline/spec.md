@@ -94,9 +94,9 @@
 
 #### Scenario: Пропуски
 
-- **GIVEN** у Декарта P19 со значением `"<script>"`, у Юма P19 — место с P625 (95, 0), запись места Стокгольм не загружается
+- **GIVEN** у Декарта P19 со значением `"<script>"` и P20 — Стокгольм, запись которого не загружается; у Юма P19 — место с P625 (95, 0)
 - **WHEN** запуск идёт до конца
-- **THEN** в журнале `knowledge.geo.skipped`: Декарт с `reason=bad_qid`, Юм с `reason=refused`, Стокгольм с `reason=fetch_failed`; у итога `skipped=2`, `failed=1`
+- **THEN** в журнале `knowledge.geo.skipped`: Декарт с `reason=bad_qid`, Юм с `reason=refused`, Декарт с `property=P20` и `reason=fetch_failed` (пропуск записывается на обрабатываемую персону); у итога `skipped=2`, `failed=1`
 
 #### Scenario: Откат
 

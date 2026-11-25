@@ -1,7 +1,7 @@
 """Общее для браузерных тестов глобуса (geo-timeline, задачи 7.4–7.6).
 
 Данные задаёт каждый тест сам через ``stack.world`` (настоящий сервис знаний, ``knowledge_stack``).
-Ожидания берутся из спецификации ``openspec/changes/add-geo-timeline/specs/geo-timeline/spec.md``.
+Ожидания берутся из спецификации ``openspec/specs/geo-timeline/spec.md``.
 Клиент событий журнала не пишет: серверный якорь — ``knowledge.geo.built`` по ``request_id``
 ответа ``/map/places``, полученного страницей (``geo_built``).
 """

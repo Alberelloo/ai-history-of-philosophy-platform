@@ -26,7 +26,7 @@ import {
 import type { GlobeRoles } from "./selection";
 import { markRadius, MAX_LABELS, opacity, type Scene, type ScenePlace } from "./timeline";
 
-// Вид «Глобус» карты раздела (openspec/changes/add-geo-timeline): ортографическая проекция
+// Вид «Глобус» карты раздела (openspec/changes/archive/2026-11-25-add-geo-timeline): ортографическая проекция
 // d3-geo. Основа — тень, море, сетка 15°, суша Natural Earth — на canvas 2D (вариант Б по
 // замеру 5.6); поверх — SVG с объёмом, дугами влияний, отметками мест, подписями и латунным
 // ободом. Ленивый фрагмент: грузится только при открытии вида (MapPage).

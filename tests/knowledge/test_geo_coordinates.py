@@ -1,6 +1,6 @@
 """Координаты места и вид места в биографии (geo-timeline, задача 7.1).
 
-Тесты написаны по дельте ``openspec/changes/add-geo-timeline/specs/geo-timeline/spec.md``:
+Тесты написаны по дельте ``openspec/specs/geo-timeline/spec.md``:
 требования «Координаты места» и «Вид места в биографии». Данные задаёт каждый тест сам через
 ``Entities``/``Statements`` (фикстура ``onto``); журнал — фикстура ``events``.
 """

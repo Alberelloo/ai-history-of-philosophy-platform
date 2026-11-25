@@ -1,7 +1,7 @@
 """Географический слой карты ``GET /v1/map/places`` (geo-timeline, задача 7.3).
 
 Тесты по требованию «Географический слой карты» дельты
-``openspec/changes/add-geo-timeline/specs/geo-timeline/spec.md`` и контракту из ``design.md``.
+``openspec/specs/geo-timeline/spec.md`` и контракту из ``design.md``.
 Приложение сервиса знаний — настоящее (``build_app``), библиотека и модель — подменённые
 транспорты, сеть запрещена. Событие ответа находится по ``request_id`` запроса.
 """

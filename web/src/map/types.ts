@@ -103,7 +103,7 @@ export type Selection = string;
 export type Stratum = "events" | "eras" | "people" | "works";
 export const STRATA: readonly Stratum[] = ["events", "eras", "people", "works"];
 
-// Вид карты: хронология (по умолчанию) или глобус (geo-timeline, openspec/changes/add-geo-timeline).
+// Вид карты: хронология (по умолчанию) или глобус (geo-timeline, openspec/changes/archive/2026-11-25-add-geo-timeline).
 export type MapView = "chrono" | "globe";
 
 export type MapState = {
