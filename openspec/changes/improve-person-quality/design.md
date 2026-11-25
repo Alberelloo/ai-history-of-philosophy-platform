@@ -37,7 +37,9 @@ class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, st
 `Entity` — `{id, type, names, primary, externals}`. Правило `same_person` по шагам 1–8 и правило компонент заданы в спецификации `person-quality` и здесь не повторяются. Изменения после ревью (О9):
 - **`merge:qid` убран.** Первичный ключ `external_ids (system, value)` не допускает один QID у двух сущностей. Его место заняло `merge:qid_confirmed`: человек подтвердил в манифесте QID для сущности, у которой его нет, а QID уже у другой (`qid_taken` в `add-wikidata-life-dates`);
 - **компоненты.** `plan` строит граф по рёбрам `merge:*` (индекс по нормализованным основным названиям, плюс пары от модели и подтверждения) и находит связные компоненты объединением множеств. Компонента с ≥ 2 QID или с парой `apart:qid`/`review:dates` целиком уходит в очередь. Это закрывает обход запрета QID по транзитивности: «Hume»(Q1)~«Hume»~«Hume»(Q2). Итог зависит только от множества входа: компоненты, `choose_kept` по компоненте и сортировка вывода по id;
-- **даты у одной стороны** — не противоречие.
+- **даты у одной стороны** — не противоречие;
+- **однословные тёзки** (О12): общее основное из одного слова без QID и дат у обеих сторон даёт `review:single_name`, а не `merge:name`. Ложное слияние хуже дубля: его нужно заметить и отменить, а дубль виден в очереди и в А4. `review:single_name` не блокирует компоненту: если третья сущность с датой или QID связывает обе рёбрами `merge:name`, компонента сливается;
+- **`reason` событий** равен строке вердикта (`merge:name`, `review:dates`): один перечень во всех spec и design (О11).
 
 `choose_kept` выбирает оставшуюся по порядку:
 - сущность с QID;
@@ -53,7 +55,7 @@ class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, st
 `Entities.merge` остаётся низкоуровневым переносом строк. Он дополняется переносом `attributions.who`, `portraits` и правилом основного названия. Свёртка и пересчёт живут в `Statements`, потому что ключ, согласие и `primary` принадлежат ему.
 
 1. `Entities.merge` переносит:
-   - названия: основное удалённой на языке, где у оставшейся уже есть основное, становится `variant`; прежний вид пишется в `moved.kinds`. Точные повторы названий `(lang, normalized)` не дублируются: строка удалённой переносится, но получает вид `variant`;
+   - названия (О12): после переноса у оставшейся ровно одно основное. Выбирается русское основное любой из сторон (при двух русских — оставшейся), иначе основное оставшейся. Все прочие бывшие основные обеих сторон становятся `variant`. Прежний вид каждой изменённой строки обеих сторон пишется в `moved.kinds` (`{name_id: kind}`), отмена возвращает их все. Точные повторы названий `(lang, normalized)` не дублируются: строка удалённой переносится, но получает вид `variant`;
    - `statements.subject` и `statements.object`;
    - `external_ids` — перенесённые пишутся в `moved.externals` (исправление: сейчас `undo_merge` их не возвращает, ревью п. 3);
    - `mentions`;
@@ -98,9 +100,9 @@ class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, st
 
 | Событие | Уровень | Поля | Когда |
 |---|---|---|---|
-| `knowledge.entity.merged` (есть, поля расширены) | info | `kept`, `removed`; новые — `reason` (`qid`, `name`, `model_pair`, `review`, `migration`), `statements` (перенесено), `attributions` (перенесено `who` + атрибуций свёрнутых), `folded` (свёрнуто утверждений) | слияние |
+| `knowledge.entity.merged` (есть, поля расширены) | info | `kept`, `removed`; новые — `reason` (`merge:qid_confirmed`, `merge:name`, `merge:model_pair`, `merge:review`; единый перечень с префиксом, О11), `statements` (перенесено), `attributions` (перенесено `who` + атрибуций свёрнутых), `folded` (свёрнуто утверждений) | слияние |
 | `knowledge.entity.merge_undone` (есть) | info | `kept`, `removed`; новые — `restored` (восстановлено свёрнутых) | отмена |
-| `knowledge.entity.merge_proposed` (новое) | info | `kept`, `removed`, `reason` (`dates`, `variant`) | пара в очередь проверки |
+| `knowledge.entity.merge_proposed` (новое) | info | `kept`, `removed`, `reason` (`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:qid_candidate`, `review:qid_taken`) | пара в очередь проверки |
 | `knowledge.entity.rejected` (из `improve-extraction-naming`) | warning | `type`, `label`, `reason` | мусорная персона |
 
 Новые поля `knowledge.entity.merged` добавляются в `optional`, `required` прежний: старые вызовы `Entities.merge` событие не ломают.
