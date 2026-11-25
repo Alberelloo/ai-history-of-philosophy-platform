@@ -22,9 +22,9 @@
 
 ## 4. Wikidata
 
-- [ ] 4.1 `knowledge/epoch_context.py` поверх общего `knowledge/wikidata.py` из 2.2 (без своего httpx, разбора времени и проверки QID): `harvest` (P793 → кандидаты с датой, видом по `EVENT_CLASSES`, местом; без даты — нет; решения и поля человека не перезаписываются, кандидаты не задваиваются), событие `knowledge.context_import.harvested`
-- [ ] 4.2 `apply` (только `accepted`; событие и место по QID или новые; `dating`, `event_kind`, `belongs_to_epoch`, `happened_in` — `sourced`, атрибуция Wikidata; `stimulated` никогда; `--dry-run`; идемпотентность через формат дат `FuzzyDate.to_json`), события `checked` (`created`/`exists`/`pending`/`rejected`/`no_date`/`fetch_failed`) и `run` (`created`, `statements`, `places_created`, `skipped`)
-- [ ] 4.3 CLI `python -m philograph.knowledge.epoch_context harvest|apply`; `sources/epoch_context.yaml` — пустой манифест со схемой в комментарии; фикстуры Wikidata в `tests/knowledge/fixtures/wikidata/`
+- [x] 4.1 `knowledge/epoch_context.py` поверх общего `knowledge/wikidata.py` из 2.2 (без своего httpx, разбора времени и проверки QID): `harvest` (P793 → кандидаты с датой, видом по `EVENT_CLASSES`, местом; без даты — нет; решения и поля человека не перезаписываются, кандидаты не задваиваются), событие `knowledge.context_import.harvested`
+- [x] 4.2 `apply` (только `accepted`; событие и место по QID или новые; `dating`, `event_kind`, `belongs_to_epoch`, `happened_in` — `sourced`, атрибуция Wikidata; `stimulated` никогда; `--dry-run`; идемпотентность через формат дат `FuzzyDate.to_json`), события `checked` (`created`/`exists`/`pending`/`rejected`/`no_date`/`fetch_failed`) и `run` (`created`, `statements`, `places_created`, `skipped`)
+- [x] 4.3 CLI `python -m philograph.knowledge.epoch_context harvest|apply`; `sources/epoch_context.yaml` — пустой манифест со схемой в комментарии; фикстуры Wikidata в `tests/knowledge/fixtures/wikidata/`
 
 ## 5. Клиент
 

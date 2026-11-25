@@ -14,6 +14,7 @@ from philograph.knowledge.statements import Attribution, Evidence, Provenance
 from ..library.conftest import lib  # noqa: F401
 from .conftest import TEXTBOOK_N
 from .test_filling import _all, fill, st  # noqa: F401
+from .wd_records import no_network  # noqa: F401
 
 COMMON = [Attribution("common")]
 OLD_EVENT_KINDS = ["political", "scientific", "religious", "intellectual", "biographical"]
@@ -370,3 +371,158 @@ def test_demo_seed_context(svc):
     assert gen["generated"] is True and gen["mechanism"] is None
     bubble = by_label["Южноморский пузырь"]
     assert bubble["kind"] == "economic" and bubble["stimulated"] == []
+
+
+# --- 4.1–4.3: события эпох из Wikidata (``knowledge/epoch_context.py``) ----------------
+
+EPOCHS_YAML = {"epochs": [{"ru": "Просвещение", "wikidata": "Q910001", "candidates": []}]}
+
+
+def _rows(onto) -> dict[str, int]:
+    tables = (schema.entities, schema.statements, schema.attributions, schema.external_ids)
+    with onto.registry.engine.begin() as conn:
+        return {tbl.name: conn.scalar(select(func.count()).select_from(tbl)) for tbl in tables}
+
+
+@pytest.fixture
+def importer(onto):
+    from philograph.knowledge.epoch_context import EpochContextImport
+
+    onto.thing("epoch", "Просвещение", "1680–1800")
+    return EpochContextImport(onto.statements)
+
+
+def test_harvest_candidates(onto, importer, events, no_network):
+    from philograph.knowledge.epoch_context import harvest
+
+    from .wikidata_fixtures import FixtureFetch
+
+    before = _rows(onto)
+    manifest = harvest(EPOCHS_YAML, {"epochs": []}, FixtureFetch())
+    [entry] = manifest["epochs"]
+    assert (entry["epoch"], entry["qid"]) == ("Просвещение", "Q910001")
+    revolution, quake = entry["candidates"]
+    assert revolution["qid"] == "Q910011" and revolution["kind"] == "political"
+    assert revolution["place"] == {"qid": "Q910021", "label": {"ru": "Париж", "en": "Paris"}}
+    assert revolution["decision"] == "pending"
+    assert quake["qid"] == "Q910012" and quake["kind"] is None and quake["place"] is None
+    assert _rows(onto) == before
+    [done] = events.of("knowledge.context_import.harvested")
+    assert (done["epochs"], done["candidates"]) == (1, 2)
+
+    revolution["decision"] = "accepted"
+    revolution["kind"] = "social"  # правка человека
+    again = harvest(EPOCHS_YAML, manifest, FixtureFetch())
+    assert [c["qid"] for c in again["epochs"][0]["candidates"]] == ["Q910011", "Q910012"]
+    kept = again["epochs"][0]["candidates"][0]
+    assert (kept["decision"], kept["kind"]) == ("accepted", "social")
+
+
+def _accepted_manifest(**changes):
+    candidate = {
+        "qid": "Q910011",
+        "label": {"ru": "Французская революция"},
+        "kind": "political",
+        "place": {"qid": "Q910021", "label": {"ru": "Париж"}},
+        "decision": "accepted",
+        **changes,
+    }
+    return {"epochs": [{"epoch": "Просвещение", "qid": "Q910001", "candidates": [candidate]}]}
+
+
+def test_apply_accepted_then_exists_and_dry_run(onto, importer, events, no_network):
+    from .wikidata_fixtures import FixtureFetch
+
+    report = importer.apply(_accepted_manifest(), FixtureFetch())
+    assert report.totals() == {"created": 1, "statements": 4, "places_created": 1, "skipped": 0}
+    event = onto.entities.by_external("wikidata", "Q910011")
+    paris = onto.entities.by_external("wikidata", "Q910021")
+    assert onto.entities.label(event) == "Французская революция"
+    assert onto.entities.label(paris) == "Париж"
+    rows = [s for s in onto.statements.about(event, derived=False) if s["direction"] == "out"]
+    assert sorted(s["type"] for s in rows) == [
+        "belongs_to_epoch",
+        "dating",
+        "event_kind",
+        "happened_in",
+    ]
+    assert all(s["status"] == "sourced" for s in rows)
+    assert all(a["who"] == "wikidata:Q910011" for s in rows for a in s["attributions"])
+    belongs = next(s for s in rows if s["type"] == "belongs_to_epoch")
+    assert belongs["qualifiers"] == {"membership_basis": "historians"}
+    assert not [s for s in rows if s["type"] == "stimulated"]
+    assert events.where("knowledge.context_import.checked", qid="Q910011", result="created")
+    [run] = events.of("knowledge.context_import.run")
+    assert run["mode"] == "apply" and run["created"] == 1 and run["places_created"] == 1
+
+    before = _rows(onto)
+    again = importer.apply(_accepted_manifest(), FixtureFetch())
+    assert again.candidates[0]["result"] == "exists"
+    assert again.totals()["created"] == 0 and again.totals()["statements"] == 0
+    assert _rows(onto) == before
+
+    fresh = _accepted_manifest(qid="Q910012", label={"ru": "Лиссабонское землетрясение"})
+    fresh["epochs"][0]["candidates"][0].update(kind=None, place=None)
+    dry = importer.apply(fresh, FixtureFetch(), dry_run=True)
+    assert dry.mode == "dry_run" and dry.totals()["created"] == 1
+    assert dry.totals()["statements"] == 2  # датировка и эпоха: вида и места нет
+    assert _rows(onto) == before
+
+
+def test_apply_skips_pending_rejected_no_date_and_failed(onto, importer, events, no_network):
+    from .wikidata_fixtures import FixtureFetch
+
+    manifest = _accepted_manifest(decision="pending")
+    candidates = manifest["epochs"][0]["candidates"]
+    candidates.append({**candidates[0], "qid": "Q910012", "decision": "rejected"})
+    candidates.append({**candidates[0], "qid": "Q910013", "decision": "accepted"})
+    candidates.append({**candidates[0], "qid": "Q910099", "decision": "accepted"})
+    before = _rows(onto)
+    report = importer.apply(manifest, FixtureFetch())
+    assert [c["result"] for c in report.candidates] == [
+        "pending",
+        "rejected",
+        "no_date",
+        "fetch_failed",
+    ]
+    assert report.totals()["skipped"] == 4 and _rows(onto) == before
+
+
+def test_apply_refuses_unknown_kind_and_missing_epoch(onto, events):
+    from philograph.knowledge.epoch_context import EpochContextImport
+    from philograph.knowledge.epoch_dates import ManifestError
+
+    from .wikidata_fixtures import FixtureFetch
+
+    importer = EpochContextImport(onto.statements)
+    with pytest.raises(ManifestError, match="нет в онтологии"):
+        importer.apply(_accepted_manifest(), FixtureFetch())
+    onto.thing("epoch", "Просвещение", "1680–1800")
+    with pytest.raises(ManifestError, match="culinary"):
+        importer.apply(_accepted_manifest(kind="culinary"), FixtureFetch())
+    assert not events.of("knowledge.context_import.run")
+
+
+def test_cli_harvest_writes_manifest(tmp_path, onto, no_network):
+    import yaml
+
+    from philograph.knowledge.epoch_context import EpochContextImport, main
+
+    from .wikidata_fixtures import FixtureFetch
+
+    epochs = tmp_path / "epochs.yaml"
+    epochs.write_text(yaml.safe_dump(EPOCHS_YAML, allow_unicode=True), encoding="utf-8")
+    manifest = tmp_path / "epoch_context.yaml"
+    manifest.write_text("# шапка\nepochs: []\n", encoding="utf-8")
+    service = lambda: EpochContextImport(onto.statements)  # noqa: E731
+    code = main(
+        ["harvest", "--epochs", str(epochs), "--manifest", str(manifest)],
+        fetch=FixtureFetch(),
+        service=service,
+    )
+    assert code == 0
+    text = manifest.read_text(encoding="utf-8")
+    assert text.startswith("# шапка\n") and "Q910011" in text
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("epochs:\n- epoch: X\n  qid: nope\n", encoding="utf-8")
+    assert main(["apply", "--manifest", str(bad)], fetch=FixtureFetch(), service=service) == 2

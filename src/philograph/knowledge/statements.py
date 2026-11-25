@@ -149,6 +149,30 @@ class Statements:
 
     # --- запись ---
 
+    def find(
+        self,
+        subject: str,
+        type_: str,
+        *,
+        obj: str | None = None,
+        value: Any = None,
+        qualifiers: dict[str, Any] | None = None,
+        scope: str = "public",
+    ) -> str | None:
+        """Утверждение с тем же ключом (концы, тип, значение, уточнители) — в любом статусе.
+
+        Импорт по манифесту проверяет им, есть ли строка, до записи: повторный запуск не
+        добавляет ни утверждений, ни повторных атрибуций (``add`` слил бы и дописал их)."""
+        subject = self.entities.resolve(subject)
+        obj = self.entities.resolve(obj) if obj else None
+        key = self._key(subject, type_, obj, value, qualifiers or {})
+        with self.engine.begin() as conn:
+            return conn.scalar(
+                select(t.statements.c.id).where(
+                    and_(t.statements.c.key == key, t.statements.c.scope == scope)
+                )
+            )
+
     def _key(
         self, subject: str, type_: str, obj: str | None, value: Any, qualifiers: dict[str, Any]
     ) -> str:
