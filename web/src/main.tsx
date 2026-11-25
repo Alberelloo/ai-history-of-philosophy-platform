@@ -11,6 +11,7 @@ import "./styles/tokens.css";
 import "./styles/components.css";
 import "./styles.css";
 import "./styles/map.css";
+import "./styles/reference.css";
 import "./styles/map-page.css";
 import "./styles/notes.css";
 import "./styles/assistant.css";

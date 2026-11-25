@@ -8,7 +8,11 @@ import { useTheme } from "./theme";
 import { Icon, Mark, type IconName } from "./ui";
 
 // Разделы из списка SOON, которые уже работают, и их адреса.
-const LIVE: Partial<Record<SoonCode, string>> = { assistant: "/assistant", graph: "/graph" };
+const LIVE: Partial<Record<SoonCode, string>> = {
+  assistant: "/assistant",
+  graph: "/graph",
+  reference: "/reference",
+};
 
 // Боковая панель навигации (docs/design/system/components/Sidebar.md): свёрнута до значков,
 // раскрывается при наведении или фокусе поверх содержимого, закрепляется и тогда сдвигает его.
@@ -219,7 +223,7 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
               </p>
               {SOON.filter((s) => s.group === group).map((s) => {
                 const text = t.soon.sections[s.code];
-                // Работающие разделы ведут на себя и без метки «скоро»: ассистент и карта графа.
+                // Работающие разделы ведут на себя и без метки «скоро»: ассистент, карта графа, справочник.
                 const live = LIVE[s.code];
                 return (
                   <Item
