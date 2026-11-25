@@ -5,7 +5,7 @@
 ## 1. Задача и документы
 
 - [x] 1.1 Изменение OpenSpec: `proposal.md`, `design.md` (выбор решения, концепт интерфейса, функциональные сценарии), `tasks.md`, дельты `entity-catalog`, `epochs`, `visual-design`, `abuse-protection`, `progress.md`
-- [ ] 1.2 `docs/product/system-design.md` — сервис знаний: справочник и снимок данных; `docs/product/ontology.md` (п. О-8) — ссылка на правило принадлежности к эпохе в `epochs`
+- [x] 1.2 `docs/product/system-design.md` — сервис знаний: справочник и снимок данных; `docs/product/ontology.md` (п. О-8) — ссылка на правило принадлежности к эпохе в `epochs`
 
 ## 2. Сервис знаний
 
