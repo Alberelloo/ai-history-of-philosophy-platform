@@ -425,6 +425,9 @@ def test_reduced_motion(knowledge_context, knowledge_stack, events):
     )
     target = "20.51,54.71"
     assert center(page) != target
+    # После clock.install() время страницы идёт само; останавливаем его, чтобы дальше оно
+    # шло только по run_for (Д6 круга 2 — шаг теста, не продукт).
+    page.clock.pause_at(page.evaluate("Date.now()") + 1000)
     _watch(page, "data-center")
     row = page.locator(f"[data-geo-row='{w['konigsberg']}'] .geo-row__place")
     # При reduce и остановленных часах страницы Playwright не дожидается «стабильности»
@@ -434,7 +437,7 @@ def test_reduced_motion(knowledge_context, knowledge_stack, events):
     expect(row).to_be_enabled()
     row.dispatch_event("click")
     expect(page.locator(".map-selected__name")).to_have_text("Кёнигсберг, Россия, 1760")
-    page.clock.run_for(50)  # один кадр; дальше время страницы стоит
+    page.clock.run_for(50)  # один кадр; время страницы остановлено pause_at
     expect(globe(page)).to_have_attribute("data-center", target)
     assert _seen(page, "data-center") == [target]
     page.clock.run_for(1000)
@@ -602,20 +605,47 @@ def test_three_frames(knowledge_context, knowledge_stack, events, width, height,
         height=height,
         color_scheme=theme,
     )
-    dims = page.evaluate(
-        "() => ({sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth,"
-        " ih: innerHeight, iw: innerWidth})"
-    )
-    assert dims["sh"] <= dims["ih"] and dims["sw"] <= dims["iw"], dims
-    c = _circle(page)
-    assert c["top"] >= 0 and c["left"] >= 0 and c["bottom"] <= height and c["right"] <= width, c
-    scale = page.locator(".map-overview").bounding_box()
-    assert scale["y"] >= c["bottom"] - 1, (scale, c)
-    assert scale["y"] + scale["height"] <= height
-    expect(page.locator(".map-overview")).to_be_visible()
-    expect(page.locator(".geo-yearbar__year")).to_be_in_viewport()
-    panel = page.locator(".map-panel").bounding_box()
-    assert not _rect_hits_circle(panel, c), (panel, c)
+    frames = 0
+    for zoom_out in (False, True):
+        if zoom_out:
+            focus_globe(page)
+            for _ in range(20):  # «−» до приближения 1
+                if float(globe(page).get_attribute("data-zoom")) <= 1:
+                    break
+                press(page, "-")
+            settle(page)
+            expect(globe(page)).to_have_attribute("data-zoom", "1")
+        dims = page.evaluate(
+            "() => ({sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth,"
+            " ih: innerHeight, iw: innerWidth})"
+        )
+        assert dims["sh"] <= dims["ih"] and dims["sw"] <= dims["iw"], (zoom_out, dims)
+        stage = page.locator(".geo-stage").bounding_box()
+        assert stage["x"] >= 0 and stage["y"] >= 0, (zoom_out, stage)
+        assert stage["x"] + stage["width"] <= width and stage["y"] + stage["height"] <= height, (
+            zoom_out,
+            stage,
+        )
+        scale = page.locator(".map-overview").bounding_box()
+        assert scale["y"] >= stage["y"] + stage["height"] - 1, (zoom_out, scale, stage)
+        assert scale["y"] + scale["height"] <= height
+        expect(page.locator(".map-overview")).to_be_visible()
+        expect(page.locator(".geo-yearbar__year")).to_be_in_viewport()
+        panel = page.locator(".map-panel").bounding_box()
+        overlap_x = min(panel["x"] + panel["width"], stage["x"] + stage["width"]) - max(
+            panel["x"], stage["x"]
+        )
+        overlap_y = min(panel["y"] + panel["height"], stage["y"] + stage["height"]) - max(
+            panel["y"], stage["y"]
+        )
+        assert not (overlap_x > 0.5 and overlap_y > 0.5), (zoom_out, panel, stage)
+        if zoom_out:
+            c = _circle(page)
+            assert c["top"] >= stage["y"] - 0.5 and c["left"] >= stage["x"] - 0.5, (c, stage)
+            assert c["bottom"] <= stage["y"] + stage["height"] + 0.5, (c, stage)
+            assert c["right"] <= stage["x"] + stage["width"] + 0.5, (c, stage)
+        frames += 1
+    assert frames == 2
     geo_built(events, response)
 
 

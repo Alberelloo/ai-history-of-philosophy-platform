@@ -95,6 +95,7 @@ def test_demo_globe_medals_labels_arcs(browser, stack, width, height):
         page.locator(".geo-globe").focus()
         frames = 0
         worst = 0.0
+        n0 = None
         for key in [None, "Shift+ArrowRight", "Shift+ArrowRight", "+", "+", "Shift+ArrowLeft"]:
             if key:
                 page.keyboard.press(key)
@@ -111,7 +112,18 @@ def test_demo_globe_medals_labels_arcs(browser, stack, width, height):
             assert arc_faults(sc) == [], (key, arc_faults(sc))
             worst = max(worst, arc_end_error(sc))
             assert all(n["text"] for n in sc["names"])
-            assert sum(1 for p in sc["persons"] if drawn(p)) >= 1 or key
+            if key is None:
+                # «Подписи на исходном виде»: на исходном виде не меньше 5 подписей стран.
+                assert len(sc["countries"]) >= 5, [c["text"] for c in sc["countries"]]
+                assert sum(1 for p in sc["persons"] if drawn(p)) >= 1, (
+                    "на исходном виде нет медальонов"
+                )
+                n0 = len(sc["persons"])
+            # Поворот и приближение сцену года не меняют: медальонов в DOM столько же, и каждый
+            # нарисован, свёрнут в значок или скрыт поворотом.
+            assert len(sc["persons"]) == n0, (key, len(sc["persons"]), n0)
+            for p in sc["persons"]:
+                assert drawn(p) or p["packed"] == "true" or p["hidden"] == "true", (key, p)
             frames += 1
         assert worst <= 1 and frames == 6
         assert page.evaluate("typeof window.__xss") == "undefined"

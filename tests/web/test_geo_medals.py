@@ -15,8 +15,9 @@ from __future__ import annotations
 import math
 import re
 import struct
-import time
+import subprocess
 import zlib
+from pathlib import Path
 
 import pytest
 from playwright.sync_api import expect
@@ -47,6 +48,7 @@ from .geo_helpers import (
     open_globe,
     open_globe_map,
     outside,
+    play_button,
     press,
     project,
     scene,
@@ -56,6 +58,7 @@ from .geo_helpers import (
     where_block,
 )
 
+WEB = Path(__file__).resolve().parents[2] / "web"
 req = pytest.mark.req
 GEO = "geo-timeline"
 MED = "Медальоны философов"
@@ -368,11 +371,37 @@ def test_medal_limit(knowledge_context, knowledge_stack, events):
 
 
 @req(GEO, MED, scenario="Предел медальонов")
-def test_medal_limit_layout_budget(knowledge_context, knowledge_stack, events):
-    """THEN «раскладка в покое укладывается в бюджет задачи 3.8» (≤ 150 мс) — отдельно от
-    остальных THEN сценария: замер в браузере включает отрисовку React."""
+def test_medal_limit_layout_budget(knowledge_context, knowledge_stack, events, tmp_path):
+    """THEN «раскладка в покое укладывается в бюджет задачи 3.8» — в редакции дельты:
+    (1) функции раскладки на этих данных в node — медиана 5 прогонов ≤ 150 мс процессорного
+    времени (юнит-тест ``web/unit/geo/budget.test.ts``, его вывод сверяется здесь);
+    (2) в браузере одно действие читателя в покое даёт ровно одну полную раскладку.
+    Полная раскладка наблюдается снаружи как кадр, в котором меняются подписи (подписи стран
+    и персон ставит только полная раскладка; кадры движения их не трогают)."""
+    out = WEB / "unit" / "geo" / "budget.test.ts"
+    assert out.exists(), "нет юнит-теста бюджета из дельты"
+    bundle = tmp_path / "budget.mjs"
+    subprocess.run(
+        [
+            str(WEB / "node_modules" / ".bin" / "esbuild"),
+            str(out),
+            "--bundle",
+            "--platform=node",
+            "--format=esm",
+            f"--outfile={bundle}",
+            "--log-level=error",
+        ],
+        cwd=WEB,
+        check=True,
+    )
+    run = subprocess.run(
+        ["node", str(bundle)], cwd=WEB, capture_output=True, text=True, timeout=300
+    )
+    print("budget.test.ts:", run.stdout.strip()[-400:])
+    assert run.returncode == 0 and "failed 0" in run.stdout, run.stdout + run.stderr
+
     knowledge_stack.world.person("Опорный", "1720", "1780")
-    context = knowledge_context(1366, 768)
+    context = knowledge_context(1366, 768, reduced_motion="reduce")
     places, people = many_places()
     data, layer = synthetic(knowledge_stack, context, places, people)
     page = context.new_page()
@@ -382,24 +411,44 @@ def test_medal_limit_layout_budget(knowledge_context, knowledge_stack, events):
     page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
     page.locator(".geo-globe[aria-busy='false']").wait_for(timeout=240000)
     settle(page)
-    sc = scene(page)
-    # Бюджет задачи 3.8: раскладка в покое ≤ 150 мс. Замер — от нажатия стрелки до кадра
-    # после смены data-center (включает отрисовку React: строже, чем одна раскладка).
+    page.evaluate(LAYOUT_WATCH_JS)
     focus_globe(page)
-    spent = []
-    for _ in range(3):
-        t0 = time.perf_counter()
-        before = sc["center"]
-        page.keyboard.press("ArrowRight")
+    counts = []
+    for key in ("ArrowRight", "ArrowDown", "PageUp"):
+        page.evaluate("() => { window.__layoutTicks = new Set(); }")
+        before = (globe(page).get_attribute("data-center"), globe(page).get_attribute("data-year"))
+        page.keyboard.press(key)
         page.wait_for_function(
-            "c => document.querySelector('.geo-globe').dataset.center !== c", arg=before
+            "b => { const g = document.querySelector('.geo-globe');"
+            " return g.dataset.center !== b[0] || g.dataset.year !== b[1]; }",
+            arg=list(before),
         )
         settle(page)
-        spent.append((time.perf_counter() - t0) * 1000)
-        sc = scene(page)
-    print("раскладка в покое, мс:", [round(s) for s in spent])
-    assert sorted(spent)[1] <= 150, spent
+        page.wait_for_timeout(300)  # не доказательство отсутствия: число уже снято после покоя
+        counts.append(page.evaluate("() => window.__layoutTicks.size"))
+    print("полных раскладок на действие:", counts)
+    assert counts == [1, 1, 1], counts
     assert len(events.of(GEO_BUILT)) == 1
+
+
+LAYOUT_WATCH_JS = """
+() => {
+  let tick = 0;
+  const loop = () => { tick += 1; requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+  window.__layoutTicks = new Set();
+  const label = n => n && n.nodeType === 1 && n.matches && n.matches('[data-geo-country],[data-geo-name]');
+  const inside = n => { for (let x = n; x; x = x.parentNode) if (label(x)) return true; return false; };
+  new MutationObserver(list => {
+    for (const m of list) {
+      const nodes = [...m.addedNodes, ...m.removedNodes];
+      if (inside(m.target) || nodes.some(n => label(n) || (n.querySelector && n.querySelector('[data-geo-country],[data-geo-name]')))) {
+        window.__layoutTicks.add(tick);
+      }
+    }
+  }).observe(document.querySelector('.geo-globe'), {subtree: true, childList: true, attributes: true, characterData: true});
+}
+"""
 
 
 @req(GEO, MED, scenario="Без наложений")
@@ -1000,3 +1049,54 @@ def test_single_medal_no_anchor(knowledge_context, knowledge_stack, events):
     assert drawn(p) and math.hypot(p["box"]["cx"] - x, p["box"]["cy"] - y) <= 0.6
     assert sc["anchors"] == []
     geo_built(events, response)
+
+
+TIME = "Люди, события и связи во времени"
+
+
+@req(
+    GEO,
+    MED,
+    invariant="сцена сменилась во время перетаскивания (проигрывание) — в каждом кадре медальоны ровно персон года T, медальонов персон вне сцены нет",
+)
+@req(
+    GEO,
+    TIME,
+    invariant="проигрывание + перетаскивание: в каждом кадре число [data-geo-person] равно числу персон года",
+)
+@pytest.mark.parametrize(("width", "height"), SIZES)
+def test_playback_while_dragging(knowledge_context, knowledge_stack, events, width, height):
+    world = knowledge_stack.world
+    g = Geo(world)
+    births = {}
+    # 12 персон, рождение 1702…1790 через 8 лет, смерть +30: в окне 1700–1800 конец видимости
+    # (смерть + 150) за окном, поэтому персона в сцене года T ⇔ рождение ≤ T.
+    for i in range(12):
+        b = 1702 + 8 * i
+        p = world.person(f"Странник {i:02d}", str(b), str(b + 30))
+        g.lived(p, g.place(f"Город {i:02d}", 40 + (i % 4) * 4, -5 + (i // 4) * 10))
+        births[p] = b
+    page, response = open_globe(
+        knowledge_context,
+        knowledge_stack,
+        "/graph?view=globe&from=1700&to=1800&t=1700",
+        width=width,
+        height=height,
+    )
+    play_button(page).click()
+    years = set()
+    frames = 0
+    for dx, dy in ((0.3, 0.0), (-0.3, 0.1), (0.2, -0.2), (-0.2, 0.1)):
+        sc = scene(page)
+        for shot in drag_frames(page, sc["R"] * dx, sc["R"] * dy, frames=5):
+            t = shot["year"]
+            expected = {p for p, b in births.items() if b <= t}
+            got = [p["id"] for p in shot["persons"]]
+            assert len(got) == len(set(got)), (t, got)
+            assert set(got) == expected, (t, sorted(set(got) ^ expected))
+            years.add(t)
+            frames += 1
+    print(f"{width}×{height}: кадров {frames}, годы {sorted(years)}")
+    assert frames == 20 and len(years) >= 2, years
+    geo_built(events, response)
+    errors(page)

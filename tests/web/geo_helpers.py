@@ -58,6 +58,9 @@ TOUCH = 0.5
 PAD = 1.5
 MAX_SHIFT = 3 * (MEDAL + MEDAL_GAP)
 COUNTRY_MIN_AREA = 1500
+COUNTRY_MIN_LABELS = 5
+LABEL_FONT = 10.5  # основной кегль подписи страны
+FILL_FONT = 9.0  # кегль добора
 MAX_COUNTRY_LABELS = 24
 MAX_PERSONS = 600
 MAX_PORTRAITS = 60
@@ -280,6 +283,7 @@ SCENE_JS = """() => {
       html: e.innerHTML, box: rel(e), cls: e.getAttribute('class')})),
     countries: all('[data-geo-country]').map(e => ({id: e.dataset.geoCountry,
       text: e.textContent, area: num(e.dataset.area), span: num(e.dataset.span),
+      fill: e.dataset.fill ?? null, fs: parseFloat(getComputedStyle(e).fontSize),
       ax: num(e.getAttribute('x')), ay: num(e.getAttribute('y')), box: rel(e)})),
     links: all('[data-geo-link]').map(e => ({id: e.dataset.geoLink, from: e.dataset.from,
       to: e.dataset.to, hidden: e.dataset.hidden, status: e.dataset.status,
@@ -574,6 +578,10 @@ def arc_faults(sc: dict) -> list[tuple]:
         if lk["hidden"] == "true":
             if lk["d"] is not None or lk["arrow"] is not None or lk["paths"]:
                 bad.append(("скрытая связь с путём", lk["id"]))
+            # «Рисуется, только если видны оба маркера и это разные маркеры» — и обратно:
+            # оба видимы и различны, а связь скрыта — тоже нарушение.
+            if a is not None and b is not None and a[2] is not b[2]:
+                bad.append(("связь скрыта, хотя оба маркера видимы и различны", lk["id"]))
             continue
         if a is None or b is None:
             bad.append(("мёртвая дуга: маркер конца не виден", lk["id"], a is None, b is None))

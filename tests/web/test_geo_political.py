@@ -20,6 +20,9 @@ import pytest
 from .geo_helpers import (
     CITIES,
     COUNTRY_MIN_AREA,
+    COUNTRY_MIN_LABELS,
+    FILL_FONT,
+    LABEL_FONT,
     MAX_COUNTRY_LABELS,
     PLACES_API,
     RU_JSON,
@@ -91,8 +94,21 @@ def label_faults(sc, o, names, *, with_markers=True) -> list:
         if v is None:
             bad.append(("подпись страны не на видимой стороне", c["id"]))
             continue
-        if c["area"] < COUNTRY_MIN_AREA or v["area"] < COUNTRY_MIN_AREA - 1:
-            bad.append(("площадь меньше 1500", c["id"], c["area"], round(v["area"])))
+        if c["fill"] is None and (c["area"] < COUNTRY_MIN_AREA or v["area"] < COUNTRY_MIN_AREA - 1):
+            bad.append(
+                (
+                    "площадь меньше 1500 у подписи без data-fill",
+                    c["id"],
+                    c["area"],
+                    round(v["area"]),
+                )
+            )
+        if c["fill"] not in (None, "true"):
+            bad.append(("data-fill не «true»", c["id"], c["fill"]))
+        if c["fill"] is None and abs(c["fs"] - LABEL_FONT) > 0.01:
+            bad.append(("кегль основной подписи не 10,5 px", c["id"], c["fs"]))
+        if c["fill"] == "true" and min(abs(c["fs"] - LABEL_FONT), abs(c["fs"] - FILL_FONT)) > 0.01:
+            bad.append(("кегль подписи добора не 10,5 и не 9 px", c["id"], c["fs"]))
         if abs(c["area"] - v["area"]) > max(2.0, 0.01 * v["area"]):
             bad.append(
                 ("data-area не равна видимой площади", c["id"], c["area"], round(v["area"], 1))
@@ -110,6 +126,17 @@ def label_faults(sc, o, names, *, with_markers=True) -> list:
             bad.append(("точка подписи не внутри страны", c["id"], c["box"]["cx"], c["box"]["cy"]))
         if abs(c["box"]["cx"] - c["ax"]) > 1.0:  # ширина текста округляется до целого
             bad.append(("подпись не по центру точки", c["id"], c["box"]["cx"], c["ax"]))
+    main = [c for c in labels if c["fill"] is None]
+    fill = [c for c in labels if c["fill"] == "true"]
+    if fill and len(main) >= COUNTRY_MIN_LABELS:
+        bad.append(("добор при 5 и больше основных подписях", len(main), [c["id"] for c in fill]))
+    if fill and len(labels) > COUNTRY_MIN_LABELS:
+        bad.append(("с добором подписей больше 5", len(labels)))
+    # Добор идёт по убыванию видимой площади. Какая страна «поместилась бы» кеглем добора,
+    # независимо не посчитать (нужна ширина текста), поэтому сверяется порядок внутри добора.
+    areas = [c["area"] for c in fill]
+    if areas != sorted(areas, reverse=True):
+        bad.append(("добор не по убыванию площади", [(c["id"], c["area"]) for c in fill]))
     items = [s for s in shapes(sc) if with_markers or s[0] == "country"]
     for a, b in collisions(items):
         if "country" in (a[0], b[0]):
@@ -295,8 +322,15 @@ def test_only_large_countries(knowledge_context, knowledge_stack, events):
             sc = scene(page)
             assert [p for p in sc["persons"]] == [], "в сцене есть персоны"
             assert sc["countries"], (lonlat, z)
-            for c in sc["countries"]:
+            main = [c for c in sc["countries"] if c["fill"] is None]
+            fill = [c for c in sc["countries"] if c["fill"] == "true"]
+            for c in main:
                 assert c["area"] >= COUNTRY_MIN_AREA, c
+            if fill:
+                assert (
+                    len(main) < COUNTRY_MIN_LABELS and len(sc["countries"]) <= COUNTRY_MIN_LABELS
+                ), (lonlat, z, main, fill)
+            for c in sc["countries"]:
                 assert c["box"]["w"] <= c["span"] + 0.5, c
             assert label_faults(sc, o, names, with_markers=False) == []
             if lonlat == (15, 50) and z == 1:
