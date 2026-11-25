@@ -27,18 +27,18 @@
 ```python
 @dataclass(frozen=True)
 class Verdict:  kind: Literal["merge", "review", "apart"]; reason: str
-def same_person(a: Entity, b: Entity, *, paired_by_model=False, qid_confirmed=False) -> Verdict
+def same_person(a: Entity, b: Entity, *, paired_by_model=False, qid_confirmed=False, decided_apart=False) -> Verdict
 def choose_kept(component: list[Entity], counts: Mapping[str, int]) -> str
-def plan(entities: Iterable[Entity], pairs_by_model=(), confirmed=()) -> Plan   # чистая функция
+def plan(entities: Iterable[Entity], pairs_by_model=(), confirmed=(), distinct=()) -> Plan   # чистая функция; distinct — пары, закрытые «разные»
 @dataclass(frozen=True)
 class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, str, str]]   # (kept, removed[], reason), (a, b, reason)
 ```
 
-`Entity` — `{id, type, names, primary, externals}`. Правило `same_person` по шагам 1–8 и правило компонент заданы в спецификации `person-quality` и здесь не повторяются. Изменения после ревью (О9):
+`Entity` — `{id, type, names, primary, externals}`. Правило `same_person` по шагам 1–9 и правило компонент заданы в спецификации `person-quality` и здесь не повторяются. Изменения после ревью (О9):
 - **`merge:qid` убран.** Первичный ключ `external_ids (system, value)` не допускает один QID у двух сущностей. Его место заняло `merge:qid_confirmed`: человек подтвердил в манифесте QID для сущности, у которой его нет, а QID уже у другой (`qid_taken` в `add-wikidata-life-dates`);
 - **компоненты.** `plan` строит граф по рёбрам `merge:*` (индекс по нормализованным основным названиям, плюс пары от модели и подтверждения) и находит связные компоненты объединением множеств. Компонента с ≥ 2 QID или с парой `apart:qid`/`review:dates` целиком уходит в очередь. Это закрывает обход запрета QID по транзитивности: «Hume»(Q1)~«Hume»~«Hume»(Q2). Итог зависит только от множества входа: компоненты, `choose_kept` по компоненте и сортировка вывода по id;
 - **даты у одной стороны** — не противоречие;
-- **однословные тёзки** (О12): общее основное из одного слова без QID и дат у обеих сторон даёт `review:single_name`, а не `merge:name`. Ложное слияние хуже дубля: его нужно заметить и отменить, а дубль виден в очереди и в А4. `review:single_name` не блокирует компоненту: если третья сущность с датой или QID связывает обе рёбрами `merge:name`, компонента сливается;
+- **однословные дубли** (О13, отменяет «однословные → review» из О12): совпавшее нормализованное основное название сливается `merge:name` и при одном слове, если нет разных QID, даты не противоречат и человек не решил «разные». На стенде почти все дубли однословные без дат (Hume, Newton, Reid, Descartes, Сократ, Теэтет), спека владельца считает их дублями и требует А4 = 0. Ложное слияние тёзок обратимо (`undo_merge`), видно в `plan` до записи и предотвращается решением «разные» (`apart:decided`) или разными QID. Однословное основное, совпавшее лишь с вариантом другой, даёт `review:single_name`;
 - **`reason` событий** равен строке вердикта (`merge:name`, `review:dates`): один перечень во всех spec и design (О11).
 
 `choose_kept` выбирает оставшуюся по порядку:
