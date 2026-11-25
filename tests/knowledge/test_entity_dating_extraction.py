@@ -1,0 +1,433 @@
+"""entity-dating (improve-extraction-naming): «Извлечение дат».
+
+По дельте ``openspec/changes/improve-extraction-naming/specs/entity-dating``. Извлечение —
+настоящий ``Filling.extract_version`` на стенде ``extraction_stand`` (модель — фейк шлюза,
+библиотека — поддельный транспорт, сеть запрещена). Вывод — утверждение ``lifespan``/``dating``
+и ``primary.dates`` сущности, журнал — ``knowledge.statement.created`` и
+``knowledge.extraction.dropped``. Property-тест берёт пары из ``strategies.datings``.
+"""
+
+from __future__ import annotations
+
+import pytest
+from hypothesis import HealthCheck, example, given, settings
+
+from philograph.knowledge.dates import span
+
+from ..conftest import PROFILES
+from .extraction_stand import Stand
+from .strategies import datings, sentinel
+
+req = pytest.mark.req
+ED = "entity-dating"
+EXTRACT = "Извлечение дат"
+CTX = {"request_id", "run_id", "service"}
+DROPPED = "knowledge.extraction.dropped"
+STATEMENT = "knowledge.statement.created"
+
+
+@pytest.fixture
+def stand(onto, engine_for, clock) -> Stand:
+    return Stand(onto, engine_for, clock)
+
+
+def entity_of(stand, name: str) -> str:
+    [found] = stand.onto.entities.find(name)
+    return found["id"] if isinstance(found, dict) else found
+
+
+def datings_of(stand, entity_id: str) -> list[dict]:
+    return [
+        s
+        for s in stand.statements()
+        if s["subject"] == entity_id and s["type"] in ("lifespan", "dating")
+    ]
+
+
+def dropped(events) -> list[dict]:
+    return [dict(e.fields) for e in events.of(DROPPED)]
+
+
+def no_token(events, token: str) -> None:
+    for event in events.items:
+        assert token not in repr(event.fields), event.name
+
+
+def reply(name: str, type_: str, dating: dict, statements=None) -> dict:
+    return {
+        "statements": statements or [],
+        "entities": [{"name": name, "type": type_, "dating": dating}],
+    }
+
+
+# --- сценарии --------------------------------------------------------------------------
+
+
+@req(ED, EXTRACT, scenario="Дата жизни в тексте")
+def test_life_dates_in_text(stand, onto, events):
+    token = sentinel()
+    _vid, [pid] = stand.extract(
+        [f"Иммануил Кант (1724–1804) родился в Кёнигсберге. {token}"],
+        reply("Кант", "person", {"text": "1724–1804", "paragraph": 1, "quote": "Кант (1724–1804)"}),
+    )
+    kant = entity_of(stand, "Кант")
+    dates = onto.entities.get(kant)["primary"]["dates"]
+    assert span(dates) == (1724, 1804)
+    assert dates["precision"] == "year" and dates["original"] == "1724–1804"
+    [lifespan] = datings_of(stand, kant)
+    assert lifespan["type"] == "lifespan"
+    assert [(e["paragraph_id"], e["quote"]) for e in lifespan["evidence"]] == [
+        (pid, "Кант (1724–1804)")
+    ]
+    assert [a["who_kind"] for a in lifespan["attributions"]] == ["source"]
+    assert lifespan["provenance"]["method"] == "extracted"
+    assert len(events.where(STATEMENT, type="lifespan")) == 1
+    events.assert_none(DROPPED)
+    no_token(events, token)
+
+
+@req(ED, EXTRACT, scenario="Дата до нашей эры")
+def test_bc_dates(stand, onto, events):
+    stand.extract(
+        ["Платон (427–347 до н. э.) основал Академию."],
+        reply(
+            "Платон",
+            "person",
+            {"text": "427–347 до н. э.", "paragraph": 1, "quote": "Платон (427–347 до н. э.)"},
+        ),
+    )
+    plato = entity_of(stand, "Платон")
+    dates = onto.entities.get(plato)["primary"]["dates"]
+    assert span(dates) == (-426, -346)
+    assert dates["precision"] == "year"
+    assert len(events.where(STATEMENT, type="lifespan")) == 1
+
+
+@req(ED, EXTRACT, scenario="Год произведения")
+def test_work_year(stand, onto, events):
+    stand.extract(
+        ["„Критика чистого разума“ (1781) вышла в Риге."],
+        reply(
+            "Критика чистого разума",
+            "work",
+            {"text": "1781", "paragraph": 1, "quote": "„Критика чистого разума“ (1781)"},
+        ),
+    )
+    work = entity_of(stand, "Критика чистого разума")
+    [dating] = datings_of(stand, work)
+    assert dating["type"] == "dating"
+    assert span(onto.entities.get(work)["primary"]["dates"]) == (1781, 1781)
+    assert len(events.where(STATEMENT, type="dating")) == 1
+
+
+@req(ED, EXTRACT, scenario="Века у события")
+def test_event_century(stand, onto, events):
+    stand.extract(
+        ["В V в. до н. э. софисты учили за плату."],
+        reply(
+            "Софистическое движение",
+            "event",
+            {"text": "V в. до н. э.", "paragraph": 1, "quote": "В V в. до н. э."},
+        ),
+    )
+    event = entity_of(stand, "Софистическое движение")
+    dates = onto.entities.get(event)["primary"]["dates"]
+    assert span(dates) == (-450, -450)
+    assert dates["precision"] == "century"
+    assert len(events.where(STATEMENT, type="dating")) == 1
+
+
+def _rejected(stand, events, paragraphs, name, type_, dating, reason, statements=None):
+    stand.extract(paragraphs, reply(name, type_, dating, statements))
+    entity = entity_of(stand, name)
+    assert datings_of(stand, entity) == []
+    assert "dates" not in (stand.onto.entities.get(entity)["primary"] or {})
+    [drop] = dropped(events)
+    assert drop["reason"] == reason
+    assert set(drop) - {"request_id", "service"} == {"run_id", "reason"}
+    if not statements:
+        events.assert_none(STATEMENT)
+    return entity
+
+
+@req(ED, EXTRACT, scenario="Века нет в цитате")
+def test_century_not_in_quote(stand, events):
+    _rejected(
+        stand,
+        events,
+        ["В V в. до н. э. софисты учили за плату."],
+        "Софистика",
+        "event",
+        {"text": "V в. до н. э.", "paragraph": 1, "quote": "софисты учили за плату"},
+        "dating:not_in_quote",
+    )
+
+
+@req(ED, EXTRACT, scenario="Эра не совпадает")
+def test_era_mismatch(stand, events):
+    _rejected(
+        stand,
+        events,
+        ["«Государство» (ок. 375 до н. э.) — диалог Платона."],
+        "Государство",
+        "work",
+        {"text": "375", "paragraph": 1, "quote": "(ок. 375 до н. э.)"},
+        "dating:era",
+    )
+
+
+@req(ED, EXTRACT, scenario="Года нет в цитате")
+def test_year_not_in_quote(stand, onto, events):
+    statement = {
+        "subject": "Кант",
+        "subject_type": "person",
+        "type": "holds",
+        "object": "Трансцендентальный идеализм",
+        "object_type": "position",
+        "paragraph": 1,
+        "quote": "Кант родился в Кёнигсберге",
+    }
+    kant = _rejected(
+        stand,
+        events,
+        ["Кант родился в Кёнигсберге и учил трансцендентальному идеализму."],
+        "Кант",
+        "person",
+        {"text": "1724–1804", "paragraph": 1, "quote": "Кант родился в Кёнигсберге"},
+        "dating:not_in_quote",
+        statements=[statement],
+    )
+    holds = [s for s in stand.statements() if s["type"] == "holds"]
+    assert [s["subject"] for s in holds] == [kant]
+    assert len(events.where(STATEMENT, type="holds")) == 1
+    events.assert_none("knowledge.entity.rejected")
+
+
+@req(ED, EXTRACT, scenario="Число внутри другого числа")
+def test_number_inside_number(stand, events):
+    _rejected(
+        stand,
+        events,
+        ["Трактат разошёлся в 17245 экземплярах."],
+        "Трактат о природе",
+        "work",
+        {"text": "1724", "paragraph": 1, "quote": "в 17245 экземплярах"},
+        "dating:not_in_quote",
+    )
+
+
+@req(ED, EXTRACT, scenario="Один год у персоны")
+def test_single_year_person(stand, events):
+    _rejected(
+        stand,
+        events,
+        ["Кант родился в 1724 году в Кёнигсберге."],
+        "Кант",
+        "person",
+        {"text": "1724", "paragraph": 1, "quote": "в 1724 году"},
+        "dating:single_year",
+    )
+
+
+@req(ED, EXTRACT, scenario="Неразборчивая дата")
+def test_unparsed(stand, onto, events):
+    stand.extract(
+        ["Он жил в эпоху Просвещения.", "Сенека (4 до н. э. – 65) писал письма."],
+        {
+            "statements": [],
+            "entities": [
+                {
+                    "name": "Вольтер",
+                    "type": "person",
+                    "dating": {
+                        "text": "в эпоху Просвещения",
+                        "paragraph": 1,
+                        "quote": "Он жил в эпоху Просвещения",
+                    },
+                },
+                {
+                    "name": "Сенека",
+                    "type": "person",
+                    "dating": {
+                        "text": "4 до н. э. – 65",
+                        "paragraph": 2,
+                        "quote": "Сенека (4 до н. э. – 65)",
+                    },
+                },
+            ],
+        },
+    )
+    for name in ("Вольтер", "Сенека"):
+        assert datings_of(stand, entity_of(stand, name)) == []
+    assert [d["reason"] for d in dropped(events)] == ["dating:unparsed"] * 2
+    events.assert_none(STATEMENT)
+
+
+@req(ED, EXTRACT, scenario="Абзац вне фрагмента")
+def test_paragraph_outside_fragment(stand, events):
+    paragraphs = [f"Абзац {i}: Юм (1711–1776) писал." for i in range(1, 5)]
+    stand.extract(
+        paragraphs,
+        {
+            "statements": [],
+            "entities": [
+                {
+                    "name": name,
+                    "type": "person",
+                    "dating": {"text": "1711–1776", "paragraph": p, "quote": "Юм (1711–1776)"},
+                }
+                for name, p in (("Юм", 0), ("Дэвид Юм", 5))
+            ],
+        },
+    )
+    for name in ("Юм", "Дэвид Юм"):
+        assert datings_of(stand, entity_of(stand, name)) == []
+    assert [d["reason"] for d in dropped(events)] == ["dating:paragraph"] * 2
+    events.assert_none(STATEMENT)
+
+
+# --- инвариант ---------------------------------------------------------------------------
+
+
+def _ints(text: str) -> set[int]:
+    """Целые числа по границам цифр — своим проходом, без регулярного выражения модуля."""
+    found, current = set(), ""
+    for ch in text + " ":
+        if ch.isdigit():
+            current += ch
+        elif current:
+            if len(current) <= 4:
+                found.add(int(current))
+            current = ""
+    return found
+
+
+def _case(text, quote, paragraph_text, reason, expect, type_="work", paragraph=1, n=1):
+    paragraphs = [f"Пустой абзац {i}." for i in range(1, n + 1)]
+    paragraphs[min(max(paragraph, 1), n) - 1] = paragraph_text
+    return {
+        "dating": {"text": text, "paragraph": paragraph, "quote": quote},
+        "paragraphs": paragraphs,
+        "type": type_,
+        "person": type_ == "person",
+        "reason": reason,
+        "expect": expect,
+        "statement": "lifespan" if type_ == "person" else "dating",
+        "token": "SENTINELexample",
+    }
+
+
+EXAMPLES = [
+    _case(
+        "V в. до н. э.",
+        "софисты учили",
+        "софисты учили за плату",
+        "dating:not_in_quote",
+        None,
+        "event",
+    ),
+    _case("375", "(ок. 375 до н. э.)", "Диалог (ок. 375 до н. э.).", "dating:era", None),
+    _case("1724", "в 17245 экземплярах", "в 17245 экземплярах", "dating:not_in_quote", None),
+    _case(
+        "1724–1804",
+        "Кант (1724–1804)",
+        "Кант (1724–1804)",
+        "dating:paragraph",
+        None,
+        "person",
+        0,
+        4,
+    ),
+    _case(
+        "1724–1804",
+        "Кант (1724–1804)",
+        "Кант (1724–1804)",
+        "dating:paragraph",
+        None,
+        "person",
+        5,
+        4,
+    ),
+    _case("1724", "в 1724 году", "в 1724 году", "dating:single_year", None, "person"),
+    _case(
+        "4 до н. э. – 65", "(4 до н. э. – 65)", "Сенека (4 до н. э. – 65)", "dating:unparsed", None
+    ),
+    _case(
+        "427–347 до н. э.",
+        "(427–347 до н. э.)",
+        "Платон (427–347 до н. э.)",
+        None,
+        {"edges": (-426, -426, -346, -346), "span": (-426, -346), "precision": "year"},
+        "person",
+    ),
+    _case(
+        "ок. 470 до н. э.",
+        "ок. 470 до нашей эры",
+        "Родился ок. 470 до нашей эры.",
+        None,
+        {"edges": (-479, -459, -479, -459), "span": (-469, -469), "precision": "approx"},
+    ),
+    _case(
+        "XVII в.",
+        "в XVII в.",
+        "в XVII в. наука",
+        None,
+        {"edges": (1601, None, None, 1700), "span": (1650, 1650), "precision": "century"},
+    ),
+    _case("XVII в.", "в XVIII в.", "в XVIII в. наука", "dating:not_in_quote", None),
+    _case(
+        "ок. 1739–1740",
+        "ок. 1739–1740",
+        "Трактат ок. 1739–1740 гг.",
+        None,
+        {"edges": (1734, 1744, 1735, 1745), "span": (1739, 1740), "precision": "approx"},
+    ),
+]
+
+
+def _with_examples(test):
+    for case in EXAMPLES:
+        test = example(case)(test)
+    return test
+
+
+@req(ED, EXTRACT, scenario="Инвариант датировки")
+@req(ED, EXTRACT, invariant="Записана по таблице либо отклонена одной причиной")
+@settings(parent=PROFILES["ci"], suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(datings())
+@_with_examples
+def test_dating_invariant(stand, onto, events, case):
+    stand.reset()
+    events.clear()
+    name = "Иммануил Кант" if case["person"] else "Опорная сущность"
+    stand.extract(case["paragraphs"], reply(name, case["type"], case["dating"]))
+    entity = entity_of(stand, name)
+    rows = datings_of(stand, entity)
+    if case["reason"] is None:
+        expect = case["expect"]
+        [row] = rows
+        assert row["type"] == case["statement"]
+        value = row["value"]
+        edges = (
+            value["earliest_start"],
+            value["latest_start"],
+            value["earliest_end"],
+            value["latest_end"],
+        )
+        assert all(e is None or e == g for e, g in zip(expect["edges"], edges, strict=True)), (
+            expect,
+            value,
+        )
+        dates = onto.entities.get(entity)["primary"]["dates"]
+        assert span(dates) == expect["span"]
+        assert dates["precision"] == expect["precision"]
+        assert _ints(case["dating"]["text"]) <= _ints(case["dating"]["quote"])
+        assert [e["quote"] for e in row["evidence"]] == [case["dating"]["quote"]]
+        assert len(events.where(STATEMENT, type=case["statement"])) == 1
+        events.assert_none(DROPPED)
+    else:
+        assert rows == []
+        [drop] = dropped(events)
+        assert drop["reason"] == case["reason"]
+        events.assert_none(STATEMENT)
+    no_token(events, case["token"])

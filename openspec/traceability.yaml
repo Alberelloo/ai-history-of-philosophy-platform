@@ -42,3 +42,4 @@ enforce:
   - epochs
   - epoch-context
   - geo-timeline
+  - entity-naming
