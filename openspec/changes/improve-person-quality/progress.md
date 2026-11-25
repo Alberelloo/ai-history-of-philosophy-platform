@@ -93,3 +93,4 @@
   - `get` по свёрнутому id отдаёт оставшееся (`folded_into`), иначе прежнее `NoResultFound`.
 
   Описания событий: optional-поля `merged` и `merge_undone` — в `entities.py`, где события уже описаны; `knowledge.entity.merge_proposed` — в `statements.py`. Найден и обойдён побочный эффект: `lifespan` и `dating` пишут один ключ `dates`, поэтому `_refresh_primary` пересчитывает только тип, который есть у сущности. Юнит-тесты 6 passed (в том числе дамп после отмены равен исходному). `test_statements` 19, `test_registry_entities` 33/1, `test_snapshot` 6.
+- 2.4 `snapshot.py`: утверждения-связи с `subject == object` (петли) не попадают в снимок. Карта, справочник и карточки их не видят. Сверх пункта то же сделано в `Statements.about`: из него `/entities/{id}/statements` получает данные (сценарий «Петля» требует скрыть там). Юнит-тест 7 passed; `test_snapshot` 6, `test_map` 16, `test_graph` 24.

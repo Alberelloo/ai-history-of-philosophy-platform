@@ -170,6 +170,8 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             continue  # основано только на снятом источнике
         if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
             continue
+        if s["object"] is not None and s["object"] == s["subject"]:
+            continue  # петля после слияния двух концов: хранится, но не показывается
         statements.append(s)
     return Snapshot(
         entities=entities,

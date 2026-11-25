@@ -933,6 +933,8 @@ class Statements:
         for s in self._raw(entity_id):
             if s["scope"] not in scopes or s["status"] == "rejected":
                 continue
+            if s["object"] is not None and s["object"] == s["subject"]:
+                continue  # петля после слияния: хранится, не показывается
             if s["rank"] == "deprecated" and not include_deprecated:
                 continue
             if allowed_types is not None and s["type"] not in allowed_types:

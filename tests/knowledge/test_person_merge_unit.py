@@ -164,3 +164,22 @@ def test_merge_updates_primary_dates(onto):
     b = onto.person("Berkeley", "1685", "1753")
     onto.statements.merge_entities(a, b)
     assert onto.entities.get(a)["primary"]["dates"]["earliest_start"] == 1685
+
+
+def test_loop_hidden_in_snapshot_and_about(onto):
+    from datetime import UTC
+    from datetime import datetime as dt
+
+    from philograph.knowledge.snapshot import fingerprint, load
+
+    hume = onto.entities.create("person", [("en", "Hume", "primary")])
+    yum = onto.thing("person", "Юм")
+    loop = _influence(onto, hume, yum, "s_a")
+    onto.statements.merge_entities(yum, hume)
+    assert loop not in {s["id"] for s in onto.statements.about(yum, derived=False)}
+    assert loop not in {
+        s["id"]
+        for s in load(
+            onto.entities.engine, fingerprint(onto.entities.engine), dt.now(UTC)
+        ).statements
+    }
