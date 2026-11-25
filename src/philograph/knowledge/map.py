@@ -3,7 +3,9 @@
 Карта строится из сохранённых утверждений одним проходом по базе, без модели и без обхода
 по рецепту: ось времени — годы жизни, датировки трудов, событий и эпох. Идея ставится на год
 самого раннего датированного труда, где она высказана или рассматривается; без такого труда
-она уходит в «без даты». Членство в эпохе клиент считает по датам сам: здесь — только пролёты.
+она уходит в «без даты». Принадлежность к эпохе — общее правило ``knowledge/epochs.py``:
+у персон, трудов, идей и событий — ``epochs`` (id эпох в порядке начала), у эпох — нечёткие
+границы ``fuzzy``; клиент её заново не вычисляет.
 
 Данные берутся из общего снимка онтологии (``knowledge/snapshot.py``) без окна устарелости;
 ответ кэшируется в памяти процесса по области и отпечатку снимка (LRU на ``CACHE_KEYS``
@@ -24,6 +26,7 @@ from sqlalchemy import select
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import span
 from philograph.knowledge.entities import EntityNotFound
+from philograph.knowledge.epochs import fuzzy, membership
 from philograph.knowledge.snapshot import Snapshot, Snapshots
 from philograph.knowledge.statements import INFLUENCE, STRENGTH, Statements
 from philograph.platform import events
@@ -134,6 +137,10 @@ class SectionMap:
         entities, labels, statements = snapshot.entities, snapshot.labels, snapshot.statements
         attributed = self.statements._attributed
         is_a = self.registry.is_a
+        epochs = membership(snapshot, self.registry)
+
+        def epochs_of(entity_id: str) -> list[str]:
+            return [epoch_id for epoch_id, _ in epochs.of(entity_id)]
 
         def category(entity_type: str) -> str | None:
             if entity_type == "person":
@@ -220,6 +227,7 @@ class SectionMap:
                             "year": _start(dates(first)),
                             "author": author(first),
                             "via": first,
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
@@ -237,6 +245,7 @@ class SectionMap:
                             "death": _end(d),
                             "precision": d["precision"],
                             "roles": roles,
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
@@ -250,17 +259,19 @@ class SectionMap:
                             "kind": "work",
                             "year": _start(d),
                             "author": author(entity_id),
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
             elif cat == "event":
-                event = {**base, "year": _start(d)}
+                event = {**base, "year": _start(d), "epochs": epochs_of(entity_id)}
                 kind = value(entity_id, "event_kind")
                 if kind:
                     event["kind"] = kind
                 items.append(("events", event))
             else:  # эпоха
-                items.append(("eras", {**base, "from": _start(d), "to": _end(d)}))
+                era = {**base, "from": _start(d), "to": _end(d), "fuzzy": fuzzy(d)}
+                items.append(("eras", era))
 
         # Предел: остаются самые весомые (вес — число утверждений сущности в области).
         limit = self.settings.max_entities
