@@ -966,3 +966,420 @@ def test_soon_graph_bookmark_leads_to_map(browser, site):
         assert page.locator(".soon").count() == 0
     finally:
         context.close()
+
+
+# --- add-epochs: эпохи на карте с настоящим сервисом знаний (задача 5.5) --------------------
+#
+# Стенд ``knowledge_stack`` (``tests/web/knowledge_stack.py``): шлюз, библиотека и сервис
+# знаний; данные — ``stack.world``. Противоречия эпох (явная связь против дат, перекрытие
+# пролётов) заданы данными. Серверный якорь — ``knowledge.map.built`` с ``request_id``
+# ответа ``/v1/map``, полученного страницей.
+
+EP = "epochs"
+MAP_BUILT = "knowledge.map.built"
+
+
+def epoch_world(world, *, fuzzy_end: bool = False) -> dict[str, str]:
+    """Декарт, Локк (явно — Просвещение), Юм, Кант; «Критика чистого разума» (1781),
+    «Рассуждение о методе» (1637), «Причинность» (на году труда, без явной эпохи); событие
+    «Отмена Нантского эдикта» (1685); «Барокко» без датировки."""
+    from philograph.knowledge.dates import FuzzyDate
+
+    if fuzzy_end:
+        sci = world.dated(
+            "epoch",
+            "Научная революция",
+            FuzzyDate(1543, 1543, 1687, 1700, "approx", "1543 – 1687…1700").to_json(),
+        )
+    else:
+        sci = world.thing("epoch", "Научная революция", "1543–1687")
+    ids = {
+        "sci": sci,
+        "enl": world.thing("epoch", "Просвещение", "1680–1800"),
+        "baroque": world.thing("epoch", "Барокко"),
+        "descartes": world.person("Рене Декарт", "1596", "1650"),
+        "locke": world.person("Джон Локк", "1632", "1704"),
+        "hume": world.person("Дэвид Юм", "1711", "1776"),
+        "kant": world.person("Иммануил Кант", "1724", "1804"),
+        "critique": world.thing("work", "Критика чистого разума", "1781"),
+        "discourse": world.thing("work", "Рассуждение о методе", "1637"),
+        "causality": world.thing("concept", "Причинность"),
+        "nantes": world.thing("event", "Отмена Нантского эдикта", "1685"),
+    }
+    world.relate(ids["critique"], "author", ids["kant"])
+    world.relate(ids["discourse"], "author", ids["descartes"])
+    world.relate(ids["critique"], "discusses", ids["causality"])
+    world.relate(ids["kant"], "influenced_by", ids["hume"])
+    world.relate(ids["hume"], "influenced_by", ids["locke"])
+    world.belongs(ids["locke"], ids["enl"])
+    return ids
+
+
+def open_stack_map(make, stack, path: str, *, width: int = 1920, height: int = 1080):
+    context = make(width, height)
+    page = context.new_page()
+    page.set_default_timeout(8000)
+    with page.expect_response(MAP_API) as info:
+        page.goto(stack.url + path)
+    page.locator(".map-canvas, .map-empty").first.wait_for()
+    settle(page)
+    return page, info.value
+
+
+def map_built(events, response):
+    rid = response.headers.get("x-request-id")
+    assert rid, response.url
+    found = events.where(MAP_BUILT, request_id=rid)
+    assert len(found) == 1, (rid, events.names())
+    return found[0]
+
+
+def era(page, entity: str):
+    return page.locator(f".map-era[data-entity='{entity}']")
+
+
+def shown_people(page) -> set[str]:
+    return set(page.locator(".map-person").evaluate_all("els => els.map(e => e.dataset.person)"))
+
+
+def shown_works(page) -> set[str]:
+    return set(page.locator(".map-work").evaluate_all("els => els.map(e => e.dataset.entity)"))
+
+
+def window_years(page) -> tuple[str, str]:
+    years = facet(page, "Время").locator(".map-year")
+    return years.nth(0).input_value(), years.nth(1).input_value()
+
+
+def checked_epochs(page) -> list[str]:
+    boxes = facet(page, "Эпоха").locator(".map-check")
+    return [
+        boxes.nth(i).inner_text().split("\n")[0].strip()
+        for i in range(boxes.count())
+        if boxes.nth(i).locator("input").is_checked()
+    ]
+
+
+def map_errors(page) -> None:
+    assert page.context.errors == [], page.context.errors
+    assert page.evaluate("window.__consoleErrors") == []
+
+
+@req(KG, "Выбор на карте", scenario="Явная эпоха на карте")
+def test_explicit_epoch_on_map(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{w['enl']}")
+    map_built(events, response)
+    assert re.fullmatch(r"c[1-6]", role_of(page, w["locke"]) or ""), role_of(page, w["locke"])
+    assert not is_dim(page, w["locke"])
+    for member in ("hume", "kant"):
+        assert re.fullmatch(r"c[1-6]", role_of(page, w[member]) or ""), member
+    assert is_dim(page, w["descartes"])
+    # «Научная революция»: Локк по датам (середина 1668) — её, но явная связь важнее.
+    era(page, w["sci"]).click()
+    page.wait_for_url(re.compile(f"/graph/{w['sci']}$"))
+    settle(page)
+    assert is_dim(page, w["locke"])
+    assert re.fullmatch(r"c[1-6]", role_of(page, w["descartes"]) or "")
+    map_errors(page)
+
+
+@req(KG, "Карта раздела", scenario="Эпоха года при перекрытии")
+def test_era_of_year_on_overlap(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{w['nantes']}")
+    map_built(events, response)
+    expect(era(page, w["enl"])).to_have_attribute("data-selected-era", "true")
+    expect(era(page, w["sci"])).to_have_attribute("data-selected-era", "false")
+    map_errors(page)
+
+
+@req(
+    KG, "Карта раздела", invariant="эпоха года — самое позднее начало, при равенстве — по названию"
+)
+def test_era_of_year_tie_by_name(knowledge_context, knowledge_stack, events):
+    world = knowledge_stack.world
+    b = world.thing("epoch", "Барокко", "1600–1750")
+    a = world.thing("epoch", "Абсолютизм", "1600–1789")
+    early = world.thing("epoch", "Научная революция", "1543–1687")
+    event = world.thing("event", "Основание Королевского общества", "1660")
+    world.person("Роберт Бойль", "1627", "1691")
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{event}")
+    map_built(events, response)
+    selected = page.locator(".map-era[data-selected-era='true']").evaluate_all(
+        "els => els.map(e => e.dataset.entity)"
+    )
+    assert selected == [a]  # начало 1600 у обеих, «Абсолютизм» раньше «Барокко» по названию
+    assert era(page, b).get_attribute("data-selected-era") == "false"
+    assert era(page, early).get_attribute("data-selected-era") == "false"
+    map_errors(page)
+
+
+@req(KG, "Карта раздела", scenario="Нечёткая граница эпохи")
+def test_fuzzy_era_edge_on_map(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world, fuzzy_end=True)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, "/graph")
+    map_built(events, response)
+    body = response.json()
+    sci = next(e for e in body["eras"] if e["id"] == w["sci"])
+    assert sci["fuzzy"] == {"from": [1543, 1543], "to": [1687, 1700]}
+    expect(era(page, w["sci"])).to_have_attribute("data-fuzzy-start", "0")
+    expect(era(page, w["sci"])).to_have_attribute("data-fuzzy-end", "13")
+    expect(era(page, w["enl"])).to_have_attribute("data-fuzzy-start", "0")
+    expect(era(page, w["enl"])).to_have_attribute("data-fuzzy-end", "0")
+    # Растушёвка — у нечёткого края, у чётких — резкий край.
+    assert era(page, w["sci"]).locator(".map-era__fade").count() == 1
+    assert era(page, w["enl"]).locator(".map-era__fade").count() == 0
+    fade = era(page, w["sci"]).locator(".map-era__fade").bounding_box()
+    fill = era(page, w["sci"]).locator(".map-era__fill").bounding_box()
+    assert fade["x"] >= fill["x"] + fill["width"] - 1  # растушёвка — справа, у конца
+    map_errors(page)
+
+
+@req(KG, "Фильтры и поиск карты", scenario="Фильтр «Эпоха»")
+def test_epoch_filter(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph?epochs={w['enl']}")
+    map_built(events, response)
+    assert checked_epochs(page) == ["Просвещение"]
+    assert window_years(page) == ("1680", "1800")
+    assert shown_people(page) == {w["locke"], w["hume"], w["kant"]}
+    assert shown_works(page) == {w["critique"]}
+    expect(page.locator(".map-shown")).to_have_text("Показано 3 из 4 философов · 1 из 3 трудов")
+    map_errors(page)
+
+
+@req(KG, "Фильтры и поиск карты", scenario="Окно из адреса важнее")
+def test_window_from_address_wins(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    page, response = open_stack_map(
+        knowledge_context, knowledge_stack, f"/graph?epochs={w['enl']}&from=1750&to=1800"
+    )
+    map_built(events, response)
+    assert window_years(page) == ("1750", "1800")
+    assert checked_epochs(page) == ["Просвещение"]
+    _path, query = address(page)
+    assert (query.get("epochs"), query.get("from"), query.get("to")) == (w["enl"], "1750", "1800")
+    map_errors(page)
+
+
+@req(KG, "Фильтры и поиск карты", scenario="Неизвестная эпоха в адресе")
+def test_unknown_epoch_in_address(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    page, response = open_stack_map(
+        knowledge_context, knowledge_stack, f"/graph?epochs=e_unknown,{w['baroque']}"
+    )
+    map_built(events, response)
+    page.wait_for_function("!new URLSearchParams(location.search).has('epochs')")
+    path, query = address(page)
+    assert path == "/graph" and "epochs" not in query
+    assert checked_epochs(page) == []
+    assert shown_people(page) == {w["descartes"], w["locke"], w["hume"], w["kant"]}
+    # Эпоха без датировки в фильтре не предлагается.
+    labels = facet(page, "Эпоха").locator(".map-check").all_inner_texts()
+    assert [x.split("\n")[0].strip() for x in labels] == ["Научная революция", "Просвещение"]
+    map_errors(page)
+
+
+@req(KG, "Фильтры и поиск карты", invariant="фильтр «Эпоха» — по принадлежности, не по окну")
+def test_epoch_filter_by_membership_not_window(knowledge_context, knowledge_stack, events):
+    w = epoch_world(knowledge_stack.world)
+    # Локк жил в 1543–1687 и по датам — «Научная революция», но явно — «Просвещение».
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph?epochs={w['sci']}")
+    map_built(events, response)
+    assert window_years(page) == ("1543", "1687")
+    assert shown_people(page) == {w["descartes"]}
+    assert shown_works(page) == {w["discourse"]}
+    # Две эпохи — объединение участников, окно — общий пролёт.
+    check(page, "Эпоха", "Просвещение")
+    settle(page)
+    assert sorted(address(page)[1]["epochs"].split(",")) == sorted([w["sci"], w["enl"]])
+    assert window_years(page) == ("1543", "1800")
+    assert shown_people(page) == {w["descartes"], w["locke"], w["hume"], w["kant"]}
+    assert w["causality"] not in shown_works(page)  # идея без явной эпохи скрыта
+    map_errors(page)
+
+
+def _geometry(page) -> dict:
+    return page.evaluate(
+        """() => ({
+            lives: [...document.querySelectorAll('.map-person')].map(e => {
+                const r = e.querySelector('.map-person__life').getBoundingClientRect();
+                return [e.dataset.person, Math.round(r.x), Math.round(r.y), Math.round(r.width)];
+            }).sort(),
+            works: [...document.querySelectorAll('.map-work')].map(e => {
+                const mark = e.querySelector('.map-work__mark') || e;  // значок вида
+                const r = mark.getBoundingClientRect();
+                const label = e.querySelector('.map-work__title');
+                const t = label ? label.getBoundingClientRect() : null;
+                return [e.dataset.entity, Math.round(r.x), Math.round(r.y),
+                        t ? Math.round(t.x) : null, t ? Math.round(t.y) : null];
+            }).sort(),
+            threads: [...document.querySelectorAll('.map-thread')]
+                .map(e => e.getAttribute('d')).sort(),
+        })"""
+    )
+
+
+@req(
+    KG,
+    "Карта раздела",
+    invariant="растушёвка и подпись года не меняют линии жизни, значки, маршруты",
+)
+@pytest.mark.parametrize("selection", ["", "kant"])
+def test_fuzzy_edge_keeps_design_anchors(knowledge_context, knowledge_stack, events, selection):
+    """Одни и те же данные с чёткой и с нечёткой (тот же пролёт) границей эпохи."""
+    from philograph.knowledge.dates import FuzzyDate
+    from philograph.knowledge.statements import Attribution
+
+    w = epoch_world(knowledge_stack.world)
+    path = f"/graph/{w[selection]}" if selection else "/graph"
+    page, response = open_stack_map(knowledge_context, knowledge_stack, path)
+    map_built(events, response)
+    sharp = _geometry(page)
+    assert sharp["lives"] and sharp["works"] and sharp["threads"]
+    assert era(page, w["sci"]).get_attribute("data-fuzzy-end") == "0"
+    # Нечёткий конец 1680…1694 (середина 1687) — тот же пролёт; основной её делает ранг.
+    stmts = knowledge_stack.world.statements
+    sid = stmts.add(
+        w["sci"],
+        "dating",
+        value=FuzzyDate(1543, 1543, 1680, 1694, "approx", "1543 – 1680…1694").to_json(),
+        attributions=[Attribution("common")],
+    )
+    stmts.set_rank(sid, "preferred", "operator")
+    with page.expect_response(MAP_API) as again:
+        page.reload()
+    page.locator(".map-canvas").wait_for()
+    settle(page)
+    map_built(events, again.value)
+    expect(era(page, w["sci"])).to_have_attribute("data-fuzzy-end", "14")
+    assert era(page, w["sci"]).locator(".map-era__fade").count() == 1
+    assert _geometry(page) == sharp
+    map_errors(page)
+
+
+# --- add-epoch-context: событие и то, что оно стимулировало (задача 6.6) ----------------------
+
+
+def revolution_world(world) -> dict[str, str]:
+    """«Французская революция» (1789) стимулировала «Основу общего наукоучения» Фихте (1794)
+    и — сгенерированной связью — Маркса (1818–1883, в 1789 не жил). Семь других современников
+    события значимее Фихте и Маркса (больше трудов), у двоих — влияние между ними."""
+    from philograph.knowledge.statements import Provenance
+
+    ids = {
+        "revolution": world.thing("event", "Французская революция", "1789"),
+        "fichte": world.person("Иоганн Готлиб Фихте", "1762", "1814"),
+        "marx": world.person("Карл Маркс", "1818", "1883"),
+        "basis": world.thing("work", "Основа общего наукоучения", "1794"),
+    }
+    world.relate(ids["basis"], "author", ids["fichte"])
+    others = []
+    for i, (name, birth, death) in enumerate(
+        [
+            ("Иммануил Кант", "1724", "1804"),
+            ("Иоганн Гердер", "1744", "1803"),
+            ("Фридрих Якоби", "1743", "1819"),
+            ("Моисей Мендельсон", "1729", "1786"),
+            ("Карл Рейнгольд", "1757", "1823"),
+            ("Соломон Маймон", "1753", "1800"),
+            ("Георг Гаман", "1730", "1788"),
+        ]
+    ):
+        person = world.person(name, birth, death)
+        others.append(person)
+        for j in range(3):
+            work = world.thing("work", f"Труд {i}-{j}", str(1781 + j))
+            world.relate(work, "author", person)
+    ids["others"] = others
+    ids["influence"] = world.relate(others[1], "influenced_by", others[0])
+    ids["basis_link"] = world.relate(
+        ids["revolution"], "stimulated", ids["basis"], qualifiers={"mechanism": "political"}
+    )
+    ids["marx_link"] = world.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["marx"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+def related(page, selector: str) -> str | None:
+    return page.locator(selector).get_attribute("data-related")
+
+
+@req(KG, "Выбор на карте", scenario="Событие и то, что оно стимулировало")
+def test_event_highlights_what_it_stimulated(knowledge_context, knowledge_stack, events):
+    w = revolution_world(knowledge_stack.world)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{w['revolution']}")
+    map_built(events, response)
+    payload = response.json()
+    event = {e["id"]: e for e in payload["events"]}[w["revolution"]]
+    assert event["stimulated"] == [
+        {"id": w["basis"], "generated": False},
+        {"id": w["marx"], "generated": True},
+    ]
+    assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
+    assert related(page, f".map-person[data-person='{w['marx']}']") == "true"
+    assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
+    colours = {who: role_of(page, w[who]) for who in ("fichte", "marx")}
+    # Линий от события нет: линии — только влияния между людьми из ответа карты.
+    influence_ids = {link["id"] for link in payload["links"]}
+    drawn = set(page.locator(".map-thread-hit").evaluate_all("els => els.map(e => e.dataset.link)"))
+    assert drawn <= influence_ids, drawn - influence_ids
+    assert w["basis_link"] not in drawn and w["marx_link"] not in drawn
+    # У выбранного события нет «влияний выбранного» — линий при выборе события нет вовсе.
+    assert page.locator(".map-thread").count() == 0
+    # «Только проверенные» — сгенерированная связь не выделяет Маркса.
+    check(page, "Связи", "Только проверенные")
+    settle(page)
+    assert address(page)[1].get("verified") == "1"
+    marx_verified = related(page, f".map-person[data-person='{w['marx']}']")
+    assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
+    assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
+    map_errors(page)
+    # Свои цвета (c1…c6) — у Фихте (автор стимулированного труда) и Маркса раньше прочих
+    # участников: семь современников значимее их, а своих цветов шесть — без приоритета Фихте
+    # и Маркс их бы не получили.
+    for who, colour in colours.items():
+        assert re.fullmatch(r"c[1-6]", colour or ""), (who, colours)
+    assert marx_verified == "false", marx_verified
+
+
+@req(KG, "Выбор на карте", invariant="стимулированное выделяется и вне десятилетнего окна")
+def test_event_stimulated_outside_window(knowledge_context, knowledge_stack, events):
+    world = knowledge_stack.world
+    revolution = world.thing("event", "Славная революция", "1688")
+    kant = world.person("Иммануил Кант", "1724", "1804")  # родился после события
+    late = world.thing("work", "Критика чистого разума", "1781")  # вне ±10 лет
+    world.relate(late, "author", kant)
+    world.relate(revolution, "stimulated", late)
+    world.person("Джон Локк", "1632", "1704")
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{revolution}")
+    map_built(events, response)
+    assert related(page, f".map-work[data-entity='{late}']") == "true"
+    map_errors(page)
+
+
+@req(
+    KG,
+    "Выбор на карте",
+    invariant="«только проверенные» снимает выделение по сгенерированной связи «стимулировало»",
+)
+def test_event_generated_stimulated_off_when_verified(knowledge_context, knowledge_stack, events):
+    from philograph.knowledge.statements import Provenance
+
+    world = knowledge_stack.world
+    revolution = world.thing("event", "Славная революция", "1688")
+    world.person("Джон Локк", "1632", "1704")
+    hume = world.person("Дэвид Юм", "1711", "1776")  # родился после события
+    world.statements.add(revolution, "stimulated", obj=hume, provenance=Provenance("generated"))
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{revolution}")
+    map_built(events, response)
+    assert related(page, f".map-person[data-person='{hume}']") == "true"
+    check(page, "Связи", "Только проверенные")
+    settle(page)
+    assert related(page, f".map-person[data-person='{hume}']") == "false"
+    map_errors(page)

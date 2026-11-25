@@ -15,10 +15,13 @@
     "epoch": "Historical context",
     "when": "Date and place",
     "effects": "What it influenced",
+    "dating": "Dating",
+    "members": "Belong to the epoch",
     "parts": "Parts",
     "answers": "Answers and proponents",
     "arguments": "Arguments for and against",
-    "misconceptions": "Commonly believed, but…"
+    "misconceptions": "Commonly believed, but…",
+    "context": "Historical context"
   },
   "relations": {
     "influenced_by": {
@@ -243,7 +246,9 @@
       "scientific": "scientific",
       "religious": "religious",
       "intellectual": "intellectual",
-      "biographical": "biographical"
+      "biographical": "biographical",
+      "economic": "economic",
+      "social": "social"
     }
   },
   "recipes": {
@@ -254,5 +259,15 @@
     "answers": "Answers to the problem",
     "conceptions": "Comparing conceptions",
     "path": "Path between two"
+  },
+  "qualifiers": {
+    "mechanism": {
+      "political": "political",
+      "economic": "economic",
+      "social": "social",
+      "religious": "religious",
+      "scientific": "scientific",
+      "institutional": "institutional"
+    }
   }
 }

@@ -1,0 +1,22 @@
+# Контекстные события эпох из Wikidata (возможность epoch-context, «Контекстные события из Wikidata»).
+# Заполняет команда
+#   python -m philograph.knowledge.epoch_context harvest
+# по эпохам с подтверждённым QID (поле wikidata в sources/epochs.yaml или внешний идентификатор
+# эпохи в базе): «значимые события» эпохи (P793) с датой, видом и местом. Кандидат без даты не
+# предлагается. Человек ставит decision: accepted или rejected (можно поправить label и kind),
+# затем apply --dry-run и apply. Повторный harvest уже записанных кандидатов не трогает.
+# Связей «стимулировало» Wikidata не даёт: их находят извлечение, достройка или оператор.
+# Схема:
+#   epochs:
+#   - epoch: Просвещение          # ru-название эпохи (как в sources/epochs.yaml)
+#     qid: Q…                     # подтверждённый QID эпохи
+#     candidates:
+#     - qid: Q…                   # событие Wikidata
+#       label: {ru: …, en: …}
+#       dates: {start: "+1789-00-00T00:00:00Z", start_precision: 9}   # или start/end (P580/P582)
+#       classes: [Q…]             # P31 записи
+#       kind: political           # вид по таблице EVENT_CLASSES или null; только значение реестра
+#       place: {qid: Q…, label: {ru: …}}   # первое P276 или null
+#       decision: pending         # pending | accepted | rejected — решает человек
+# harvest перезаписывает файл и сохраняет только эти строки комментария в начале.
+epochs: []

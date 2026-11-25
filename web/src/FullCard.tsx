@@ -36,6 +36,7 @@ type Row = {
   in_textbook: boolean | null;
   attributed_to: string[];
   evidence: { paragraph_id: string; link: string }[];
+  qualifiers?: Record<string, unknown>; // механизм «стимулировало» и др. (проверены сервером)
 };
 type Card = {
   id: string;
@@ -256,7 +257,11 @@ export function FullCard({
                     const who = believers(t, row);
                     const against = disputers(t, row);
                     return (
-                      <li key={row.statement_id} className={row.generated ? "card-row ungrounded" : "card-row"}>
+                      <li
+                        key={row.statement_id}
+                        className={row.generated ? "card-row ungrounded" : "card-row"}
+                        data-unverified={row.generated ? "true" : undefined}
+                      >
                         <span className="card-row__relation">
                           {relationTitle(t, row.type, Boolean(row.inverse), row.relation)}:{" "}
                         </span>
@@ -274,6 +279,7 @@ export function FullCard({
                           // Сгенерированная строка — `pg-generated` с ромбом (4.5, П-4).
                           return row.generated ? <Generated className="card-row__value">{shown}</Generated> : shown;
                         })()}
+                        {section.code === "context" && <Mechanism row={row} />}
                         {row.status === "verified" && <StatusMark status="verified" />}
                         {row.status !== "verified" && row.evidence.length > 0 && !row.generated && (
                           <StatusMark status="sourced" />
@@ -350,5 +356,19 @@ export function FullCard({
         )}
       </div>
     </>
+  );
+}
+
+// Механизм в строке раздела «Исторический контекст»: подпись значения из списка реестра или
+// «механизм не указан» (epoch-context, «Механизм влияния»).
+function Mechanism({ row }: { row: Row }) {
+  const t = useT();
+  const code = typeof row.qualifiers?.mechanism === "string" ? row.qualifiers.mechanism : null;
+  const label = code ? (pick(t.onto.qualifiers.mechanism, code) ?? code) : null;
+  return (
+    <span className={label ? "card-row__mechanism" : "card-row__mechanism is-missing"} data-mechanism={code ?? ""}>
+      {" · "}
+      {label ?? t.epochs.context.noMechanism}{" "}
+    </span>
   );
 }

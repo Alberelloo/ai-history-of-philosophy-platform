@@ -1,0 +1,32 @@
+# Эпохи раздела «Теория познания» — ядро эпох (возможность epochs, «Ядро эпох»).
+# ru — название (уникально), en — английское название (вариант), wikidata — только QID,
+# подтверждённый человеком; candidates заполняет команда
+#   python -m philograph.knowledge.epoch_dates suggest
+# человек переносит верный qid кандидата в wikidata, затем apply --dry-run и apply.
+# QID здесь не выдумываются: пока человек не подтвердил — wikidata: null.
+# suggest перезаписывает файл и сохраняет только эти строки комментария в начале.
+epochs:
+- ru: Античность
+  en: Classical antiquity
+  wikidata: null
+  candidates: []
+- ru: Средние века
+  en: Middle Ages
+  wikidata: null
+  candidates: []
+- ru: Возрождение
+  en: Renaissance
+  wikidata: null
+  candidates: []
+- ru: Научная революция
+  en: Scientific Revolution
+  wikidata: null
+  candidates: []
+- ru: Просвещение
+  en: Age of Enlightenment
+  wikidata: null
+  candidates: []
+- ru: Немецкая классическая философия
+  en: German classical philosophy
+  wikidata: null
+  candidates: []

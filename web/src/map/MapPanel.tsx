@@ -5,6 +5,7 @@ import { Icon, type IconName } from "../ui";
 import { LinkDetails, type GEdge } from "./LinkDetails";
 import {
   counts as countsOf,
+  epochWindow,
   find,
   index,
   isFiltered,
@@ -792,8 +793,28 @@ function Filters({ data, vis, state, onState }: Props) {
       </Facet>
     );
   };
+  // Фасет «Эпоха»: только датированные эпохи карты (в data.eras эпох без датировки нет).
+  const epochFacet = () => {
+    if (!data.eras.length) return null;
+    const n = data.eras.filter((e) => f.epochs.includes(e.id)).length;
+    return (
+      <Facet {...facet(t.map.facets.epoch)} value={n ? String(n) : undefined}>
+        {data.eras.map((e) => (
+          <Check
+            key={e.id}
+            label={e.label}
+            count={c.epochs[e.id] ?? 0}
+            checked={f.epochs.includes(e.id)}
+            onChange={(on) => set({ epochs: toggle(f.epochs, e.id, on) })}
+          />
+        ))}
+      </Facet>
+    );
+  };
   const filtered = isFiltered(f);
   const [from, to] = vis.range;
+  // Окно задано читателем или выбранными эпохами (если читатель своё не задал).
+  const windowSet = f.from != null || f.to != null || epochWindow(data, f) != null;
   const fold = useContext(FoldContext);
   const [openFacet, setOpenFacet] = useState<string | null>(null);
   const facet = (title: string) => ({
@@ -825,13 +846,14 @@ function Filters({ data, vis, state, onState }: Props) {
           ? t.map.shownOf(c.shown.people, c.total.people, c.shown.works, c.total.works)
           : t.map.totals(c.total.people, c.total.works, c.total.links)}
       </p>
-      <Facet {...facet(t.map.facets.time)} value={f.from != null || f.to != null ? `${from}–${to}` : undefined}>
+      <Facet {...facet(t.map.facets.time)} value={windowSet ? `${from}–${to}` : undefined}>
         <div className="map-range">
           <YearInput label={t.map.from} value={from} onCommit={(v) => set({ from: v <= (data.range ?? vis.range)[0] ? undefined : Math.min(v, to - 1) })} />
           <YearInput label={t.map.to} value={to} onCommit={(v) => set({ to: v >= (data.range ?? vis.range)[1] ? undefined : Math.max(v, from + 1) })} />
         </div>
         <p className="map-facet__hint">{t.map.timeHint}</p>
       </Facet>
+      {epochFacet()}
       {groupFacet("direction", t.map.facets.direction)}
       {groupFacet("school", t.map.facets.school)}
       {listFacet("roles", t.map.facets.role, t.onto.values.person_role, c.roles)}

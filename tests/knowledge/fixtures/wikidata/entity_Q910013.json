@@ -1,0 +1,39 @@
+{
+ "entities": {
+  "Q910013": {
+   "type": "item",
+   "id": "Q910013",
+   "labels": {
+    "ru": {
+     "language": "ru",
+     "value": "Событие без даты"
+    },
+    "en": {
+     "language": "en",
+     "value": "Undated event"
+    }
+   },
+   "descriptions": {},
+   "claims": {
+    "P31": [
+     {
+      "mainsnak": {
+       "snaktype": "value",
+       "property": "P31",
+       "datavalue": {
+        "type": "wikibase-entityid",
+        "value": {
+         "entity-type": "item",
+         "numeric-id": 10931,
+         "id": "Q10931"
+        }
+       }
+      },
+      "type": "statement",
+      "rank": "normal"
+     }
+    ]
+   }
+  }
+ }
+}

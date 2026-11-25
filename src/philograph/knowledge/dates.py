@@ -7,7 +7,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
+from typing import Any
 
 _ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
@@ -106,3 +108,60 @@ def lifespan(birth: str, death: str) -> FuzzyDate:
         "year" if b.precision == d.precision == "year" else "approx",
         f"{birth}{LIFESPAN_DASH}{death}",
     )
+
+
+# «Худшая» точность интервала при равной ширине неопределённости: век, десятилетие, прочее.
+_PRECISION_RANK = {"century": 3, "decade": 2, "approx": 1, "year": 0}
+
+
+def join_original(start: str, end: str) -> str:
+    """Исходная запись интервала: «1685–1815»; если в частях есть пробелы — тире с пробелами:
+    «VIII в. до н. э. – V в.»."""
+    dash = " – " if " " in start or " " in end else LIFESPAN_DASH
+    return f"{start}{dash}{end}"
+
+
+def interval(start: FuzzyDate, end: FuzzyDate, original: str | None = None) -> FuzzyDate:
+    """Интервал из двух нечётких дат: начала — из ``start``, концы — из ``end``.
+
+    Точность — ``year``, если обе даты с точностью до года; иначе точность той, у которой
+    неопределённость шире (при равной — ``century`` > ``decade`` > ``approx``). Исходная
+    запись — ``original`` или части через тире (``join_original``)."""
+
+    def width(d: FuzzyDate) -> int:
+        return max(d.latest_start - d.earliest_start, d.latest_end - d.earliest_end)
+
+    if start.precision == end.precision == "year":
+        precision = "year"
+    else:
+        rough = [d for d in (start, end) if d.precision != "year"]
+        precision = max(rough, key=lambda d: (width(d), _PRECISION_RANK.get(d.precision, 1)))
+        precision = precision.precision
+    return FuzzyDate(
+        start.earliest_start,
+        start.latest_start,
+        end.earliest_end,
+        end.latest_end,
+        precision,
+        original if original is not None else join_original(start.original, end.original),
+    )
+
+
+def span(d: Mapping[str, Any] | FuzzyDate) -> tuple[int, int]:
+    """Начало и конец датировки: середина каждой нечёткой границы, округлённая до года.
+
+    Одно правило для пролётов карты, принадлежности к эпохе и списков: «1679 или 1680» —
+    1680 (``round`` — банковское округление, как было на карте: 1679,5 → 1680, 1680,5 → 1680).
+    Годы до н. э. — в астрономическом счёте, округление то же."""
+    if isinstance(d, FuzzyDate):
+        d = d.to_json()
+    return (
+        round((d["earliest_start"] + d["latest_start"]) / 2),
+        round((d["earliest_end"] + d["latest_end"]) / 2),
+    )
+
+
+def middle(d: Mapping[str, Any] | FuzzyDate) -> float:
+    """Середина датировки (или жизни) — полусумма начала и конца ``span`` без округления."""
+    start, end = span(d)
+    return (start + end) / 2

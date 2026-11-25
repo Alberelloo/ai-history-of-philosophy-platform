@@ -68,10 +68,20 @@ QUALIFIERS = [
 
 INFLUENCE_ENDS = IDEAS + AGENTS + WORK
 
-# Значения-свойства из списка (названия — в web/src/i18n/ontology.{ru,en}.json, «values»).
+# Значения-свойства из списка (названия — в web/src/i18n/ontology.{ru,en}.json, «values»;
+# названия значений уточнителей — там же, «qualifiers»). Новые значения дописываются в конец:
+# в заполненную базу они дозагружаются тем же порядком.
 GROUP_KINDS = ["school", "direction", "institution", "circle"]
 PERSON_ROLES = ["philosopher", "scientist", "writer", "theologian", "ruler", "translator"]
-EVENT_KINDS = ["political", "scientific", "religious", "intellectual", "biographical"]
+EVENT_KINDS = [
+    "political",
+    "scientific",
+    "religious",
+    "intellectual",
+    "biographical",
+    "economic",
+    "social",
+]
 
 
 def rel(

@@ -121,8 +121,21 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const known = new Set(base.links.map((l) => l.id));
     return { ...base, links: [...base.links, ...extra.filter((l) => !known.has(l.id))] };
   }, [load.data, extra]);
+  // Эпохи фильтра, которых нет на карте (неизвестные и без датировки), отбрасываются —
+  // адрес заменяется без них.
+  useEffect(() => {
+    if (load.status !== "ok" || !load.data) return;
+    const eras = new Set(load.data.eras.map((e) => e.id));
+    setState((s) => {
+      const kept = s.filter.epochs.filter((id) => eras.has(id));
+      return kept.length === s.filter.epochs.length ? s : { ...s, filter: { ...s.filter, epochs: kept } };
+    });
+  }, [load]);
   const vis = useMemo(() => visible(data, state.filter), [data, state.filter]);
-  const rel = useMemo(() => related(data, vis, state.sel), [data, vis, state.sel]);
+  const rel = useMemo(
+    () => related(data, vis, state.sel, state.filter.verified),
+    [data, vis, state.sel, state.filter.verified],
+  );
   const found = state.sel ? find(data, state.sel) : null;
 
   // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.
@@ -182,7 +195,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     setLink(null);
     setBuild(idleBuild());
     if (resetFilter) setFromAssistant(false);
-    setState((s) => ({ ...s, sel: id, ...(resetFilter ? { filter: { ...s.filter, from: undefined, to: undefined, groups: [], roles: [], kinds: [], ekinds: [] } } : {}) }));
+    setState((s) => ({ ...s, sel: id, ...(resetFilter ? { filter: { ...s.filter, from: undefined, to: undefined, groups: [], roles: [], kinds: [], ekinds: [], epochs: [] } } : {}) }));
   }, []);
 
   // Esc снимает выбор связи, затем выбор сущности.

@@ -19,31 +19,55 @@ export type Visible = {
   links: MapLink[];
 };
 
+// Выбранные в фильтре эпохи, которые есть на карте (датированные); прочие id не действуют.
+export function filterEras(data: MapData, filter: Filter): MapEra[] {
+  const ix = index(data).eras;
+  return filter.epochs.flatMap((id) => ix.get(id) ?? []);
+}
+
+// Окно фильтра «Эпоха»: общий пролёт выбранных эпох; null — фильтр не задан.
+export function epochWindow(data: MapData, filter: Filter): [number, number] | null {
+  const eras = filterEras(data, filter);
+  if (!eras.length) return null;
+  return [Math.min(...eras.map((e) => e.from)), Math.max(...eras.map((e) => e.to))];
+}
+
 export function visible(data: MapData, filter: Filter): Visible {
   const range = data.range ?? [0, 1];
-  const from = filter.from ?? range[0];
-  const to = filter.to ?? range[1];
+  // Окно, заданное читателем, важнее окна выбранных эпох.
+  const window = epochWindow(data, filter) ?? range;
+  const from = filter.from ?? window[0];
+  const to = filter.to ?? window[1];
   const gs = data.groups.filter((g) => filter.groups.includes(g.id));
+  const eps = new Set(filterEras(data, filter).map((e) => e.id));
+  // Фильтр «Эпоха»: по эпохам из ответа сервера; без эпох (идеи без явной) — скрыты.
+  const inEpochs = (x: { epochs?: string[] }) => !eps.size || (x.epochs ?? []).some((e) => eps.has(e));
   const people = data.people.filter(
     (p) =>
       (!gs.length || gs.some((g) => g.members.includes(p.id))) &&
       (!filter.roles.length || p.roles.some((r) => filter.roles.includes(r))) &&
+      inEpochs(p) &&
       p.death >= from &&
       p.birth <= to,
   );
   const ids = new Set(people.map((p) => p.id));
   const known = index(data).people;
   // труд без автора на карте (автора нет или он вне области) виден, пока не фильтруют людей
+  // При фильтре «Эпоха» труд эпохи остаётся и при скрытом авторе (труд относится к эпохе сам),
+  // пока не фильтруют людей по группе или роли.
+  const peopleFiltered = gs.length > 0 || filter.roles.length > 0;
   const authorShown = (w: MapWork) =>
-    w.author != null && known.has(w.author) ? ids.has(w.author) : !gs.length && !filter.roles.length;
+    w.author != null && known.has(w.author) ? ids.has(w.author) || (eps.size > 0 && !peopleFiltered) : !peopleFiltered;
   return {
     range: [from, to],
     people,
     works: data.works.filter(
-      (w) => authorShown(w) && (!filter.kinds.length || filter.kinds.includes(w.kind)) && w.year >= from && w.year <= to,
+      (w) =>
+        authorShown(w) && inEpochs(w) && (!filter.kinds.length || filter.kinds.includes(w.kind)) && w.year >= from && w.year <= to,
     ),
     events: data.events.filter(
-      (e) => (!filter.ekinds.length || (e.kind != null && filter.ekinds.includes(e.kind))) && e.year >= from && e.year <= to,
+      (e) =>
+        (!filter.ekinds.length || (e.kind != null && filter.ekinds.includes(e.kind))) && inEpochs(e) && e.year >= from && e.year <= to,
     ),
     eras: data.eras.filter((e) => e.to > from && e.from < to),
     groups: data.groups.filter((g) => g.members.some((m) => ids.has(m))),
@@ -59,7 +83,8 @@ export const isFiltered = (f: Filter): boolean =>
   f.groups.length > 0 ||
   f.roles.length > 0 ||
   f.kinds.length > 0 ||
-  f.ekinds.length > 0;
+  f.ekinds.length > 0 ||
+  f.epochs.length > 0;
 
 /* ---------- поиск сущности по id ---------- */
 
@@ -131,12 +156,22 @@ export type Related = Found & {
 
 export const midLife = (p: MapPerson): number => (p.birth + p.death) / 2;
 
-// Эпоха года: [from, to). Членство персоны в эпохе — по середине жизни.
-export const eraOf = (eras: MapEra[], y: number): MapEra | null => eras.find((e) => y >= e.from && y < e.to) ?? null;
+// Эпоха года (подпись года, подсветка эпохи выбранного): пролёт [from, to); если таких
+// несколько — с самым поздним началом, при равенстве — по названию. Принадлежность сущности
+// к эпохе здесь не считается: она приходит с сервера (поле epochs).
+export function eraOf(eras: MapEra[], y: number): MapEra | null {
+  let best: MapEra | null = null;
+  for (const e of eras) {
+    if (y < e.from || y >= e.to) continue;
+    if (!best || e.from > best.from || (e.from === best.from && e.label.localeCompare(best.label, "ru") < 0)) best = e;
+  }
+  return best;
+}
 
 export const WORKS_AROUND_EVENT = 10; // труды «в пределах десяти лет» от события
 
-export function related(data: MapData, v: Visible, sel: string | null): Related | null {
+// verified — фильтр «только проверенные»: сгенерированные связи «стимулировало» не выделяют.
+export function related(data: MapData, v: Visible, sel: string | null, verified = false): Related | null {
   const f = sel ? find(data, sel) : null;
   if (!f) return null;
   const people = new Map<string, ColorRole>();
@@ -151,10 +186,12 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
     return [...ids].sort((a, b) => (ix.get(a)?.birth ?? 0) - (ix.get(b)?.birth ?? 0));
   };
 
-  // группа участников: шесть самых весомых — свои цвета (по году рождения), прочие — other
-  const group = (members: MapPerson[]) => {
+  // группа участников: шесть самых весомых — свои цвета (по году рождения), прочие — other;
+  // first — кто получает свои цвета раньше прочих (стимулированные событием персоны)
+  const group = (members: MapPerson[], first: Set<string> = new Set()) => {
+    const rank = (p: MapPerson) => (first.has(p.id) ? 0 : 1);
     const top = [...members]
-      .sort((a, b) => b.weight - a.weight || a.birth - b.birth)
+      .sort((a, b) => rank(a) - rank(b) || b.weight - a.weight || a.birth - b.birth)
       .slice(0, PALETTE.length)
       .sort((a, b) => a.birth - b.birth);
     members.forEach((p) => people.set(p.id, "other"));
@@ -200,16 +237,33 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
     events = new Set(v.events.filter((e) => Math.abs(e.year - w.year) <= WORKS_AROUND_EVENT).map((e) => e.id));
   } else if (f.type === "era") {
     const e = f.obj;
-    group(v.people.filter((p) => midLife(p) >= e.from && midLife(p) < e.to));
+    // участники — по эпохам из ответа карты (правило сервера: явные связи важнее дат)
+    const of = (x: { epochs?: string[] }) => (x.epochs ?? []).includes(e.id);
+    group(v.people.filter(of));
     era = e;
-    works = new Set(v.works.filter((w) => w.author != null && people.has(w.author) && w.year >= e.from && w.year < e.to).map((w) => w.id));
-    events = new Set(v.events.filter((x) => x.year >= e.from && x.year < e.to).map((x) => x.id));
+    works = new Set(v.works.filter(of).map((w) => w.id));
+    events = new Set(v.events.filter(of).map((x) => x.id));
   } else if (f.type === "event") {
     const e = f.obj;
-    group(v.people.filter((p) => p.birth <= e.year && p.death >= e.year));
+    // что событие стимулировало (из ответа карты) — участники и вне десятилетнего окна
+    const stim = new Set((e.stimulated ?? []).filter((s) => !verified || !s.generated).map((s) => s.id));
+    // стимулированные персоны — стимулированные напрямую и авторы стимулированных трудов:
+    // они участники и получают свои цвета раньше прочих
+    const stimPeople = new Set(stim);
+    v.works.forEach((w) => {
+      if (stim.has(w.id) && w.author != null) stimPeople.add(w.author);
+    });
+    group(
+      v.people.filter((p) => (p.birth <= e.year && p.death >= e.year) || stimPeople.has(p.id)),
+      stimPeople,
+    );
     era = eraOf(v.eras, e.year);
     works = new Set(
-      v.works.filter((w) => w.author != null && people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT).map((w) => w.id),
+      v.works
+        .filter(
+          (w) => stim.has(w.id) || (w.author != null && people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT),
+        )
+        .map((w) => w.id),
     );
     events = new Set([e.id]);
   } else {
@@ -316,6 +370,7 @@ export type Counts = {
   roles: Record<string, number>; // персон с ролью
   kinds: Record<string, number>; // трудов и идей вида
   ekinds: Record<string, number>; // событий вида
+  epochs: Record<string, number>; // персон эпохи (по эпохам из ответа карты)
   verified: number; // связей, не достроенных моделью
   active: number; // активных фасетов (значок у «Фильтры»)
 };
@@ -344,10 +399,17 @@ export function counts(data: MapData, v: Visible, f: Filter): Counts {
     roles: tally(data.people.flatMap((p) => p.roles)),
     kinds: tally(data.works.map((w) => w.kind)),
     ekinds: tally(data.events.flatMap((e) => (e.kind ? [e.kind] : []))),
+    epochs: tally(data.people.flatMap((p) => p.epochs ?? [])),
     verified: data.links.filter((l) => !l.generated).length,
     // время, каждый вид групп (направление, школа…), роль, вид, вид события, проверенность
     active:
-      [f.from != null || f.to != null, f.roles.length > 0, f.kinds.length > 0, f.ekinds.length > 0, f.verified].filter(Boolean)
-        .length + gkinds.size,
+      [
+        f.from != null || f.to != null,
+        filterEras(data, f).length > 0,
+        f.roles.length > 0,
+        f.kinds.length > 0,
+        f.ekinds.length > 0,
+        f.verified,
+      ].filter(Boolean).length + gkinds.size,
   };
 }
