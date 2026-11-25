@@ -632,7 +632,9 @@ def datings(draw) -> dict[str, Any]:
     return {
         "dating": {"text": text, "paragraph": paragraph, "quote": quote},
         "paragraphs": paragraphs,
-        "type": PERSON if person else draw(st.sampled_from(["work", "event", "concept", "epoch"])),
+        "type": PERSON
+        if person
+        else draw(st.sampled_from(["work", "event", "phenomenon", "idea_event", "epoch"])),
         "person": person,
         "reason": reason,
         "expect": None if reason else d["expect"],

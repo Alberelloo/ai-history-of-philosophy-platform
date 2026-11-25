@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -196,7 +196,7 @@
+             reject(entity["type"], ru, reason)
+             return
+         if is_russian(ru):
+-            self.entities.set_primary_name(entity["id"], "ru", ru)
++            self.entities.create(entity["type"], [("ru", ru, "primary")])
+ 
+     # --- датировка ---
+ 

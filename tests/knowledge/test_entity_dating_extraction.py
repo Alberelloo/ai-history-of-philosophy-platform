@@ -431,3 +431,34 @@ def test_dating_invariant(stand, onto, events, case):
         assert drop["reason"] == case["reason"]
         events.assert_none(STATEMENT)
     no_token(events, case["token"])
+
+
+@req(ED, EXTRACT, invariant="Проверка датировки по порядку причин, чистая функция")
+@settings(parent=PROFILES["pure"])
+@given(datings())
+@_with_examples
+def test_dating_check_any_input(case):
+    from philograph.knowledge import dating
+
+    d = case["dating"]
+    result = dating.check(
+        d["text"], d["quote"], d["paragraph"], case["paragraphs"], is_person=case["person"]
+    )
+    if case["reason"] is not None:
+        assert result == case["reason"]
+        return
+    assert not isinstance(result, str), result
+    expect = case["expect"]
+    value = result.to_json()
+    edges = (
+        value["earliest_start"],
+        value["latest_start"],
+        value["earliest_end"],
+        value["latest_end"],
+    )
+    assert all(e is None or e == g for e, g in zip(expect["edges"], edges, strict=True)), (
+        expect,
+        value,
+    )
+    assert span(value) == expect["span"]
+    assert value["precision"] == expect["precision"]

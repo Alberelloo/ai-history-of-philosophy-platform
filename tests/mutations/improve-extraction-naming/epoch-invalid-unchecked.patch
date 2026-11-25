@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -333,7 +333,7 @@
+         new_id = None
+         names = [("ru", ru, "primary")] + ([("en", en, "variant")] if en else [])
+         bad = invalid_primary(EPOCH, names)
+-        if bad is not None:  # название из манифеста не прошло правило названий
++        if False and bad is not None:  # название из манифеста не прошло правило названий
+             reject(EPOCH, *bad)
+             return {"epoch_id": None, "label": ru, "qid": qid, "result": "invalid_name"}
+         if not dry_run:

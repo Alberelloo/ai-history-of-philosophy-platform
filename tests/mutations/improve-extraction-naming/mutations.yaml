@@ -1,0 +1,109 @@
+# Мутации improve-extraction-naming (tasks.md 3.4): на каждое требование дельт — одна и больше.
+# expect_fail — тесты, каждый из которых должен упасть под мутацией: сценарный и property.
+mutations:
+  - id: lang-given
+    requirement: Язык названий сущностей
+    patch: lang-given.patch
+    note: lang_for всегда возвращает переданный язык
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: rename-creates
+    requirement: Язык названий сущностей
+    patch: rename-creates.patch
+    note: set_primary_name заменён созданием новой сущности
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary
+      - tests/knowledge/test_extraction_entities.py::test_normalization_and_language_for_any_items
+  - id: number-regex
+    requirement: Валидность названий сущностей
+    patch: number-regex.patch
+    note: number по ^[\d.\s]+$ вместо «нет букв, есть цифра»
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_numbers_with_marks
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: patterns-case
+    requirement: Валидность названий сущностей
+    patch: patterns-case.patch
+    note: шаблоны персоны с учётом регистра (по названию, а не нормализованному)
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_description_with_capital
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: stopword-before-person
+    requirement: Валидность названий сущностей
+    patch: stopword-before-person.patch
+    note: not_a_name и stopword поменяны местами
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_role_instead_of_name
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: label-no-trim
+    requirement: Валидность названий сущностей
+    patch: label-no-trim.patch
+    note: event_label без обрезки
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: numbers-substring
+    requirement: Извлечение дат
+    patch: numbers-substring.patch
+    note: числа текста даты ищутся в цитате подстрокой
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_number_inside_number
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+  - id: era-unchecked
+    requirement: Извлечение дат
+    patch: era-unchecked.patch
+    note: эра текста и цитаты не сверяется
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_era_mismatch
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+  - id: roman-unchecked
+    requirement: Извлечение дат
+    patch: roman-unchecked.patch
+    note: римский век не ищется в цитате
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_century_not_in_quote
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+  - id: entity-type-unchecked
+    requirement: Структурированный вывод по реестру
+    patch: entity-type-unchecked.patch
+    note: тип элемента entities не проверяется сервером
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_entity_type_outside_registry
+      - tests/knowledge/test_extraction_entities.py::test_only_registry_types_for_any_items
+  - id: spellings-without-en
+    requirement: Нормализация сущностей
+    patch: spellings-without-en.patch
+    note: кандидаты не ищутся по en
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_binding_by_english_spelling
+      - tests/knowledge/test_extraction_entities.py::test_normalization_and_language_for_any_items
+  - id: epoch-invalid-unchecked
+    requirement: Даты эпох из Wikidata
+    patch: epoch-invalid-unchecked.patch
+    note: invalid_name не проверяется (создание эпохи падает)
+    expect_fail:
+      - tests/knowledge/test_invalid_name_external.py::test_epoch_name_rejected
+      - tests/knowledge/test_invalid_name_external.py::test_epoch_created_iff_name_valid
+  - id: context-place-before-event
+    requirement: Контекстные события из Wikidata
+    patch: context-place-before-event.patch
+    note: место создаётся до проверки названия события
+    expect_fail:
+      - tests/knowledge/test_invalid_name_external.py::test_context_event_name_rejected
+      - tests/knowledge/test_invalid_name_external.py::test_context_candidate_written_iff_name_valid
+  - id: geo-label-unchecked
+    requirement: Места и координаты из Wikidata
+    patch: geo-label-unchecked.patch
+    note: подпись нового места не проверяется
+    expect_fail:
+      - tests/knowledge/test_invalid_name_external.py::test_place_label_rejected
+      - tests/knowledge/test_invalid_name_external.py::test_place_created_iff_label_valid

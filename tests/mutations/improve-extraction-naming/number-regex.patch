@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -248,7 +248,7 @@
+     has_digit = any(ch.isdigit() for ch in label)
+     if not has_letter and not has_digit:
+         return "empty"
+-    if not has_letter:
++    if re.fullmatch(r"[\d.\s]+", label):
+         return "number"
+     limits = rules.limits_for(type_)
+     if len(label.split()) > limits.max_words or len(label) > limits.max_chars:
