@@ -15,6 +15,7 @@ from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.catalog import Catalog, CatalogRejected
 from philograph.knowledge.entities import EntityNotFound
+from philograph.knowledge.epochs import EpochList
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.map import MapViews, SectionMap
 from philograph.knowledge.mentions import Mentions
@@ -241,6 +242,14 @@ def build_app(
                 )
             except CatalogRejected as exc:
                 raise UserFacingError(str(exc), status=400, kind=exc.kind) from exc
+
+        epoch_list = EpochList(catalog)
+
+        @router.get("/epochs")
+        def epochs_list() -> dict[str, Any]:
+            """Эпохи по времени с нечёткими границами, источником датировки и счётчиками по
+            видам; без датировки — в ``undated``. Снимок справочника, без модели."""
+            return epoch_list.list()
 
     if section_map is not None:
 
