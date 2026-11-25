@@ -712,6 +712,7 @@ FACE_KINDS = (
     "decided3",
     "variant_single",
     "variant_multi",
+    "date_chain",
 )
 _TAGS = "бвгджзклмн"
 _LTAGS = "bcdfghklmn"
@@ -776,6 +777,16 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
             rec(0, [(lang, word, "primary")], None, DATE_BASE)
             rec(1, [(lang, word, "primary")], None, (DATE_BASE[0] + gap, DATE_BASE[1] + gap))
             face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:dates"}
+        elif kind == "date_chain":
+            # Компонента «даты A — без дат — противоречащие даты C»: рёбра merge:name через
+            # среднюю, у крайних review:dates → слияний нет, все пары в очередь review:dates.
+            gap = draw(st.integers(5, 200))
+            rec(0, [(lang, word, "primary")], None, DATE_BASE)
+            rec(1, [(lang, word, "primary")])
+            rec(2, [(lang, word, "primary")], None, (DATE_BASE[0] + gap, DATE_BASE[1] + gap))
+            face["queue"] = {
+                frozenset({(f, a), (f, b)}): "review:dates" for a, b in ((0, 1), (1, 2), (0, 2))
+            }
         elif kind == "qids_distinct":
             rec(0, [(lang, word, "primary")], f"Q{next(qid_counter)}")
             rec(1, [(lang, word, "primary")], f"Q{next(qid_counter)}")

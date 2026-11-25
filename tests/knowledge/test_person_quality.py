@@ -465,6 +465,34 @@ def test_conflicting_dates(stand, onto, review, events):
     events.assert_none(MERGED)
 
 
+@req(PQ, MERGE, invariant="Компонента с review:dates через запись без дат не сливается")
+def test_date_chain_component(onto, review, events):
+    """«Berkeley» 1685–1753, «Berkeley» без дат, «Berkeley» 1885–1953: рёбра merge:name идут
+    через среднюю, у крайних даты противоречат — компонента не сливается, все пары в очереди
+    с причиной review:dates."""
+    ids = []
+    for dates in (("1685", "1753"), None, ("1885", "1953")):
+        e = onto.entities.create("person", [("en", "Berkeley", "primary")])
+        if dates:
+            onto.statements.add(
+                e,
+                "lifespan",
+                value=lifespan(*dates).to_json(),
+                attributions=[Attribution("common")],
+            )
+        ids.append(e)
+    events.clear()
+    Dedupe(onto.statements, review).run()
+    assert sorted(persons(onto)) == sorted(ids)
+    events.assert_none(MERGED)
+    assert set(queue_pairs(review)) == {
+        frozenset(p) for p in ((ids[0], ids[1]), (ids[1], ids[2]), (ids[0], ids[2]))
+    }
+    proposed = events.of(PROPOSED)
+    assert {frozenset((e["kept"], e["removed"])) for e in proposed} == set(queue_pairs(review))
+    assert {e["reason"] for e in proposed} == {"review:dates"}
+
+
 @req(PQ, MERGE, scenario="Даты у одной стороны")
 def test_dates_on_one_side(onto, review, events):
     dated = onto.entities.create("person", [("en", "Berkeley", "primary")])
@@ -553,6 +581,41 @@ TRANSITIVE = {
     "confirmed": [],
     "decided": [],
 }
+DATE_CHAIN = {  # J1 судьи: review:dates через запись без дат запрещает всю компоненту
+    "faces": [
+        {
+            "kind": "date_chain",
+            "records": [
+                {
+                    "key": (0, 0),
+                    "names": [("en", "Berkeley", "primary")],
+                    "qid": None,
+                    "dates": (1685, 1753),
+                },
+                {
+                    "key": (0, 1),
+                    "names": [("en", "Berkeley", "primary")],
+                    "qid": None,
+                    "dates": None,
+                },
+                {
+                    "key": (0, 2),
+                    "names": [("en", "Berkeley", "primary")],
+                    "qid": None,
+                    "dates": (1885, 1953),
+                },
+            ],
+            "merge": [],
+            "queue": {
+                frozenset({(0, 0), (0, 1)}): "review:dates",
+                frozenset({(0, 1), (0, 2)}): "review:dates",
+                frozenset({(0, 0), (0, 2)}): "review:dates",
+            },
+        }
+    ],
+    "confirmed": [],
+    "decided": [],
+}
 BOUNDARY_DATES = {
     "faces": [
         {
@@ -605,6 +668,7 @@ BOUNDARY_DATES = {
 @given(persons_with_variants(max_faces=5), hst.randoms())
 @example(TRANSITIVE, random.Random(1))
 @example(BOUNDARY_DATES, random.Random(2))
+@example(DATE_CHAIN, random.Random(5))
 def test_plan_partition_any_order(case, rnd):
     entities, ids = _pure_entities(case)
     confirmed = [(ids[a], ids[b]) for a, b in case["confirmed"]]
@@ -660,6 +724,7 @@ def _outcome(onto, review, case, ids, events) -> tuple:
 @given(persons_with_variants(), hst.randoms())
 @example(TRANSITIVE, random.Random(3))
 @example(BOUNDARY_DATES, random.Random(4))
+@example(DATE_CHAIN, random.Random(6))
 def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
     outcomes = []
     for _ in range(2):

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -198,7 +198,7 @@
+         inner = {p: verdicts.get(p) or verdict(p) for p in combinations(sorted(members), 2)}
+         qids = {by_id[x].qid for x in members if by_id[x].qid}
+         kinds = {v.reason for v in inner.values()}
+-        if len(qids) >= 2 or kinds & {"apart:qid", "apart:decided", "review:dates"}:
++        if len(qids) >= 2 or kinds & {"apart:qid", "apart:decided"}:
+             if len(qids) >= 2 or "apart:qid" in kinds:
+                 reason = "review:qid_cluster"
+             elif "review:dates" in kinds:
