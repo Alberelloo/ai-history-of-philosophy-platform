@@ -21,7 +21,7 @@
 
 - [x] 3.1 `web/src/reference/types.ts` (`TYPE_GROUPS`, типы ответа), `reference/api.ts` (запрос с отменой, разбор ошибок `kind`)
 - [x] 3.2 `web/src/reference/ReferencePage.tsx`: поиск с задержкой 250 мс, переключатели групп со счётчиками, эпоха, раздел, сортировка, список, «Показать ещё» без повторов, состояние в адресе (`q`, `group`, `epoch`, `textbook`, `sort`; `replaceState` при вводе, `pushState` при смене фильтра), устаревший ответ отбрасывается; таймеры — `setTimeout`/`performance.now`, не `Date`, карточка в правой панели, «На карте»
-- [ ] 3.3 Вывод только текстом (без `dangerouslySetInnerHTML`), ошибки загрузки без `pageerror`/`console.error`. Состояния: загрузка, пусто, ничего не найдено, ошибка с «Повторить», учебник закрыт; клавиатура («/», ↑/↓, Enter, Esc), `aria-pressed`, `aria-live`
+- [x] 3.3 Вывод только текстом (без `dangerouslySetInnerHTML`), ошибки загрузки без `pageerror`/`console.error`. Состояния: загрузка, пусто, ничего не найдено, ошибка с «Повторить», учебник закрыт; клавиатура («/», ↑/↓, Enter, Esc), `aria-pressed`, `aria-live`
 - [ ] 3.4 `App.tsx` (маршрут, замена `/soon/reference`), `Sidebar.tsx` (`LIVE.reference`), `activeItem`; стили `styles/reference.css` на токенах, раскладка 1024×576 и 1920×1080
 - [ ] 3.5 Строки RU/EN в `i18n/ru.ts`, `i18n/en.ts`; тест-сверка `TYPE_GROUPS` с реестром
 - [ ] 3.6 `cd web && npm run build` (tsc + vite) без ошибок
