@@ -18,56 +18,74 @@
 - [ ] 2.1 `pyproject.toml`:
   - `hypothesis>=6.100` в `[project.optional-dependencies].dev` (О8);
   - `[tool.setuptools.package-data]` для `philograph/knowledge/*.yaml`.
-- [ ] 2.2 `knowledge/naming_rules.yaml`: стоп-список владельца целиком, пределы по типам, частицы, шаблоны персоны, `exempt: [source]`. `knowledge/naming.py`:
-  - `load_rules` с проверкой формы;
-  - `script_lang`, `is_russian`;
-  - `check_name` — порядок причин по design.md;
-  - `InvalidName`;
-  - `names_for`.
+- [ ] 2.2 `knowledge/naming_rules.yaml`: стоп-список владельца целиком, пределы по типам (6/80, 12/160), частицы, шаблоны персоны, `exempt: [source]`. `knowledge/naming.py` — определения из спецификации `entity-naming`:
+  - `load_rules` (проверка формы);
+  - `script_of`, `lang_for`, `is_russian` (слова из римских цифр не считаются);
+  - `check_name` (NFC, знаки, слова, порядок `empty` → `number` (нет букв, есть цифра) → `sentence` → `not_a_name` (частицы с `-`/`'`/`’`, шаблоны по нормализованному названию без учёта регистра, склейка) → `stopword`);
+  - `event_label`, `InvalidName`, `names_for`.
 
   Юнит-тесты модуля.
 - [ ] 2.3 `entities.py`:
-  - `create` и `add_name(kind="primary")` вызывают `check_name`, событие `knowledge.entity.rejected` (`events.define`, `label` ≤ 80);
-  - `set_primary_name(entity_id, lang, text)` — прежнее основное становится вариантом с языком по письменности, событие `knowledge.entity.renamed`.
-- [ ] 2.4 `knowledge/entity_items.py`:
-  - `EntityItems.index`, `resolve` (кандидаты по всем написаниям; перенос логики контекста и очереди из `Filling._resolve` без изменения поведения);
+  - `normalize` с NFC;
+  - `create` и `add_name` ставят язык `lang_for` для любого пути;
+  - `create` и `add_name(kind="primary")` вызывают `check_name`, событие `knowledge.entity.rejected` ровно с `type`, `label` (`event_label`), `reason`;
+  - `set_primary_name(entity_id, lang, text)` — прежнее основное становится вариантом, событие `knowledge.entity.renamed` ровно с `entity_id`, `lang`, `previous_lang`.
+- [ ] 2.4 `knowledge/dating.py`: белый список форматов по таблице `entity-dating`, порядок причин `paragraph` → `quote` → `unparsed` → `not_in_quote` (целые числа по границам цифр, римский век словом) → `era` → `single_year`. `dates.parse` не меняется. Юнит-тесты.
+- [ ] 2.5 `knowledge/entity_items.py`:
+  - `EntityItems.index`;
+  - `resolve`: тип вне реестра → `entity:type`; кандидаты по всем написаниям; разные кандидаты от разных написаний → неоднозначность; перенос логики контекста и очереди из `Filling._resolve` без изменения поведения;
   - русское основное у английской сущности;
-  - `date` — проверки абзаца, цитаты, разбора, годов в цитате, `single_year`; `lifespan` или `dating`.
-- [ ] 2.5 **Файлы Lead'а** (точки вызова, О3; пункт 5.1 — согласование):
-  - `filling.py`: `_schema` с `entities`; `language` и `EntityItems` в `_extract_fragment`; `_resolve` делегирует; `accept_core` и `import_wikidata` ловят `InvalidName`;
+  - `date` через `dating.check` → `lifespan` или `dating`.
+- [ ] 2.6 **Файлы Lead'а** (точки вызова, О3; согласование — пункт 5.1):
+  - `filling.py`: `_schema` с `entities`; `language` и `EntityItems` в `_extract_fragment`; `_resolve` делегирует; `accept_core_report` (отказы в ответе), `accept_core` через него; `import_wikidata` ловит `InvalidName`;
   - `prompts/__init__.py`, `ontology.extract`: правила языка, валидности, дат; поле `language`.
 
   Прогон `tests/knowledge/test_filling.py` — прежние тесты зелёные без правки ожиданий.
-- [ ] 2.6 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py`, `pytest -q tests/knowledge/test_filling.py tests/knowledge/test_registry_entities.py tests/llm` (затронутые пакеты)
+- [ ] 2.7 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py`; `pytest -q tests/knowledge/test_filling.py tests/knowledge/test_registry_entities.py tests/knowledge/test_snapshot.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`. Язык по письменности в `create` затрагивает все пути создания.
 
 ## 3. Тестировщик
 
-Модель — фейковый провайдер шлюза (`FakeProvider`, ответы по шаблону `ontology.extract`), сеть запрещена (О6).
+Модель — фейковый провайдер шлюза с записью запросов, сеть запрещена фикстурой (О6). Инфраструктура — раздел «Тестовая инфраструктура» design.md. Её создаёт это изменение, остальные три переиспользуют.
 
-- [ ] 3.1 Профиль `hypothesis` `ci` в `tests/conftest.py`: `derandomize=True`, `max_examples=60`, `deadline=None`, `database=None`. Генераторы в `tests/knowledge/strategies.py` по таблице design.md: `numbers`, `blank`, `long_phrases`, `stopwords_perturbed`, `proper_names`, `not_names`, `labels`, `fragment_items`, `datings`.
-- [ ] 3.2 Сценарные тесты `@pytest.mark.req("entity-naming", …, scenario=…)` на каждый сценарий «Язык названий сущностей» и «Валидность названий сущностей». Каждый проверяет вывод (сущности и названия в базе, ответ справочника) и событие с полями.
-- [ ] 3.3 Сценарные тесты `entity-dating` «Извлечение дат» и изменённых требований `ontology-extraction`:
-  - «Схема с сущностями и датировкой»: запрос к шлюзу перехватывается фейком;
-  - «Ответ без сущностей»;
-  - «Привязка по английскому написанию».
-- [ ] 3.4 Property-тест (`invariant=`) на **каждое** требование:
-  - «Язык названий»: один основной на язык, язык = письменность, сущностей = событий `created`;
-  - «Валидность»: создано ⇔ нет причины, отказ ⇔ одно событие с той же причиной, `label` ≤ 80;
-  - «Извлечение дат»: записанное ⇒ годы в цитате и `span` равен разбору, отказ ⇒ одно `dropped` `dating:*`;
-  - «Структурированный вывод»: в базе только типы реестра;
+- [ ] 3.1 **Инфраструктура:**
+  - профили `hypothesis` `ci` (60), `pure` (400), `heavy` (25) в `tests/conftest.py`;
+  - автофикстура запрета сети в `tests/knowledge/conftest.py`;
+  - `tests/knowledge/dump.py`;
+  - `scripts/mutation_check.py` с форматом `tests/mutations/<изменение>/mutations.yaml`;
+  - стратегии «вход + ожидание» в `tests/knowledge/strategies.py` (`numbers`, `blank`, `long_phrases`, `stopwords_perturbed`, `proper_names`, `not_names`, `scripts_mix`, `fragment_items`, `datings`). Оракул не импортирует `naming`, `dating`, `dates.parse`.
+- [ ] 3.2 Сценарные тесты на **каждый** сценарий `entity-naming` (2 требования), `entity-dating` («Извлечение дат») и MODIFIED `ontology-extraction` («Структурированный вывод по реестру», «Нормализация сущностей»). Каждый проверяет:
+  - вывод — база, ответ справочника, перехваченный запрос к шлюзу;
+  - событие с точным множеством ключей.
+- [ ] 3.3 Property-тест (`invariant=`) на **каждое** требование, с явными `@example` на границы (список в design.md):
+  - «Язык названий»: язык = ожидание стратегии `scripts_mix`, один основной на язык, сущностей = событий `created`;
+  - «Валидность»: создано ⇔ нет ожидаемой причины, одно событие с ожидаемой причиной, `label` по правилу обрезки;
+  - «Извлечение дат»: `span`/`precision` = ожидание по таблице, иначе одно `dropped` с ожидаемой причиной;
+  - «Структурированный вывод»: в базе только типы реестра для любых типов элементов;
   - «Нормализация»: найденная по любому написанию сущность не дублируется.
-- [ ] 3.5 Мутации, на каждое требование хотя бы одна, результат — в `verification.md`:
-  - убрать проверку `number`;
-  - поменять местами `not_a_name` и `stopword`;
-  - записывать язык `ru` всегда;
-  - не проверять год в цитате;
-  - создавать новую сущность вместо `set_primary_name`;
-  - не искать кандидатов по `en`.
+- [ ] 3.4 Мутации — по одной и больше на **каждое** требование. В `tests/mutations/improve-extraction-naming/mutations.yaml` указан ожидаемый упавший тест:
+
+  | Требование | Мутация | Ожидаемый упавший тест |
+  |---|---|---|
+  | Язык названий | `lang_for` всегда возвращает переданный язык | сценарий «Язык по письменности на любом пути» + property языка |
+  | Язык названий | `set_primary_name` заменён созданием новой сущности | «Существующая английская сущность» |
+  | Валидность | `number` по `^[\d.\s]+$` | «Номер со знаками» |
+  | Валидность | шаблоны с учётом регистра | «Описание с заглавной» |
+  | Валидность | `not_a_name` и `stopword` поменяны местами | «Роль вместо имени» |
+  | Валидность | `event_label` без обрезки | «Границы предела» (label 80) |
+  | Извлечение дат | числа ищутся подстрокой | «Число внутри другого числа» |
+  | Извлечение дат | эра не проверяется | «Эра не совпадает» |
+  | Извлечение дат | римский век не ищется в цитате | «Века нет в цитате» |
+  | Структурированный вывод | тип элемента не проверяется сервером | «Тип вне реестра в сущностях» |
+  | Нормализация | кандидаты не ищутся по `en` | «Привязка по английскому написанию» |
+
+- [ ] 3.5 `python scripts/mutation_check.py --change improve-extraction-naming` — таблица в `verification.md`.
 - [ ] 3.6 `openspec/traceability.yaml`: `entity-naming` в `enforce` (`entity-dating` — в `add-wikidata-life-dates` 3.6). `python scripts/check_traceability.py` чисто.
 - [ ] 3.7 `verification.md`, раздел «Тестировщик»:
   - сырые итоги pytest;
+  - `--durations` property-слоя (бюджет ≤ 3 мин на все четыре изменения);
   - выдержки событий;
-  - таблица «требование → доказывающий тест (сценарный, property) → мутация → упал ли».
+  - таблица «требование → сценарный тест → property-тест → мутация → упал»;
+  - непроверяемое и его проверяемая часть (design.md).
 
 ## 4. Ревьювер
 
@@ -83,6 +101,13 @@
 - [ ] 5.1 Согласовать факт правки `prompts/__init__.py` (`ontology.extract`) и `filling.py` (точки вызова 2.5). Пункт «Согласовать с Lead'ом» — в описании PR.
 - [ ] 5.2 Оплачиваемая проба нового промпта на стенде — `Filling.estimate` на 2 фрагментах одного русского и одного английского источника. Решение о полном проходе — за Lead'ом.
 - [ ] 5.3 Замер А1–А8 на стенде после всех четырёх изменений — пункт `migrate-ontology-quality` 5.x.
+- [ ] 5.4 В описание PR — расхождения со спекой владельца на подтверждение (О9):
+  - пятая причина `empty`;
+  - пределы 12/160 для произведений и событий;
+  - `number` — «нет букв, есть цифра»;
+  - `dating:single_year`;
+  - астрономический счёт (Платон −426/−346 вместо −427/−347);
+  - русское основное и для английских источников.
 
 ## 6. Судья
 

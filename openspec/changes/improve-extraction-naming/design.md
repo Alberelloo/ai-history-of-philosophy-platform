@@ -36,25 +36,18 @@
 
 ```python
 RULES = load_rules()                         # knowledge/naming_rules.yaml, кэш на процесс
-def script_lang(text: str) -> str | None     # "ru" | "en" | "el" | None (нет букв / смешано)
-def is_russian(text: str) -> bool            # ≥1 кириллическая буква, нет латинских, кроме
-                                             # слов-римских чисел (XIV) — формула А1
+def script_of(text: str) -> str | None       # "cyrillic" | "latin" | "greek" | "other" | None
+def lang_for(text: str, given: str | None) -> str   # пп. 1–5 требования «Язык названий»
+def is_russian(text: str) -> bool            # кириллица есть, латиницы нет (вне римских чисел)
 def check_name(type_: str, label: str) -> str | None   # None | empty | number | sentence | not_a_name | stopword
+def event_label(label: str) -> str           # ≤ 80 знаков: 79 + «…»
 class InvalidName(Exception): type_, label, reason
-def names_for(item, source_lang) -> list[tuple[lang, text, kind]]   # основное + варианты
+def names_for(item) -> list[tuple[lang, text, kind]]   # основное + варианты, без отклонённых
 ```
 
-Правило `check_name` — по порядку, первое сработавшее:
+Определения (нормализация, знаки, слова, слово из римских цифр, письменность, порядок причин, частицы с `-`/`'`/`’`, шаблоны по нормализованному названию без учёта регистра, обрезка `label`) записаны в спецификации `entity-naming` и здесь не повторяются. Код — одна реализация в `naming.py`. Нормализация — существующая `entities.normalize`, к ней добавляется NFC; поиск сущностей использует её же.
 
-1. `empty` — после `strip()` нет ни одной буквы и ни одной цифры.
-2. `number` — `^[\d.\s]+$`: номер раздела.
-3. `sentence` — слов (разбиение по пробелам) больше `max_words` или знаков больше `max_chars`. Пределы берутся из `limits[type]`, иначе `limits.default`.
-4. `not_a_name` — только для типов из `person.types` (`person`):
-   - первая буква строчная и первое слово не из `person.particles` (`de`, `d'`, `van`, `von`, `ibn`, `де`, `фон`, `ван`, `ибн`, `аль`…);
-   - или название совпадает с одним из `person.patterns` (регулярные выражения: `^(the )?author of\b`, `^the \w+( \w+)* of\b`, `\b(and|и)\b` между двумя словами с заглавной — склейка «Kepler and Des Cartes»).
-5. `stopword` — `normalize(label)` входит в `normalize`-множество `stopwords`.
-
-Типы из `exempt` (`source`) не проверяются.
+Типы из `exempt` (`source`) не проверяются правилом названий, но язык им ставится по письменности.
 
 ### Данные `knowledge/naming_rules.yaml` (новый, в package-data)
 
@@ -72,9 +65,13 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 
 Загрузка проверяет форму: пределы — положительные целые, шаблоны компилируются. Ошибка формы — отказ запуска сервиса, а не молчаливая подстановка. Пополнение стоп-списка — правка данных без кода.
 
-### Где проверка: `Entities.create` и `Entities.add_name(kind="primary")`
+### Где проверка и язык: `Entities.create` и `Entities.add_name`
 
-`create(type_, names, …)` вызывает `check_name(type_, основное название)` до вставки. При отказе поднимается `InvalidName` и пишется событие `knowledge.entity.rejected`. Проверяется основное название, а вариант — нет: варианты служат поиску, а у стоп-слова варианта не бывает. `add_name(..., kind="primary")` проверяет так же.
+`create(type_, names, …)` и `add_name(...)` для каждого названия делают две вещи:
+- ставят язык `lang_for(text, given)`. Это единственное место, где выбирается язык, поэтому `accept_core`, `import_wikidata`, `source_entity`, `geo_enrich`, `epoch_dates` и миграция получают его без своих правок (ревью, блок. 2);
+- проверяют основное название через `check_name`. Варианты не проверяются: они служат поиску.
+
+Отказ поднимает `InvalidName` и пишет событие `knowledge.entity.rejected`.
 
 ### Привязка с несколькими написаниями: `knowledge/entity_items.py` (новый)
 
@@ -83,10 +80,11 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 - `index(items) -> dict[name, item]` — элементы `entities` ответа по `name`.
 - `resolve(name, type_, item | None, resolved) -> entity_id`:
   1. Кандидаты — объединение `Entities.find(n)` по всем написаниям элемента (`name`, `ru`, `en`, `original.text`), отфильтрованное по типу (`registry.is_a`).
-  2. Один кандидат — привязка (п. «рус. основное» ниже). Несколько — существующая логика контекста фрагмента и очереди проверки. Её переносят из `_resolve` без изменения поведения.
+  2. Один кандидат — привязка (п. «рус. основное» ниже). Несколько — существующая логика контекста фрагмента и очереди проверки. Её переносят из `_resolve` без изменения поведения. Сюда же попадает случай, когда разные написания нашли разные сущности: новая не создаётся. Для персон до этого шага срабатывает правило `person-quality`.
+  0. Элемент с типом вне реестра не используется, событие `knowledge.extraction.dropped` с `reason="entity:type"`. Сервер проверяет сам и не полагается на схему шлюза.
   3. Кандидатов нет — создание через `create(type_, names_for(item, lang))`. `InvalidName` превращается в `_Skip`: утверждение отбрасывается, `knowledge.extraction.dropped` пишется как сейчас.
 - **Русское основное у английской сущности:** у кандидата нет основного `ru`, у элемента есть `ru`, и оно прошло `check_name`. Тогда `Entities.set_primary_name(entity, "ru", text)`:
-  - прежнее основное с латинским текстом становится вариантом с языком `script_lang` (`en`);
+  - прежнее основное с латинским текстом становится вариантом с языком `lang_for` (`en`);
   - пишется `knowledge.entity.renamed` (`entity_id`, `lang`, `previous_lang`).
   
   Идентификатор сущности не меняется, поэтому утверждения, упоминания и внешние id остаются при ней.
@@ -94,17 +92,17 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 
 ### Датировка
 
-- `item.dating.paragraph` должен лежать в пределах фрагмента, иначе отказ `dating:paragraph`.
-- Цитата проверяется тем же правилом, что у утверждений (`Statements` сверяет цитату с абзацем), иначе `dating:quote`.
-- `dates.parse(text)`; `ValueError` даёт `dating:unparsed`.
-- Каждое число из `re.findall(r"\d{1,4}", text)` должно встречаться в цитате, иначе `dating:not_in_quote`. Модель предлагает, код проверяет: годы, которых нет в тексте, не записываются.
-- Персона: `lifespan`, если в тексте интервал (две границы). Если год один, ставится `dating:single_year`: рождение и смерть по одному году не угадываются. Для прочих типов — `dating`.
-- Запись: `Statements.add(entity, "lifespan" | "dating", value=fd.to_json(), evidence=[Evidence(paragraph, quote)], attributions=[Attribution("source", source_id)], provenance=Provenance("extracted", run_id=…))`. Статус — как у прочих извлечённых. `primary.dates` обновляет существующий `_update_primary`.
-- Отказ даёт `knowledge.extraction.dropped` с `reason="dating:<код>"`. Сущность и утверждения элемента при этом остаются.
+Порядок проверок, таблица форматов и правило «число есть в цитате целым» — в спецификации `entity-dating`. Реализация:
+- `dating.check(text, quote, paragraph_text, window_len, is_person) -> FuzzyDate | reason`, новый модуль `knowledge/dating.py`;
+- **формат** — белый список регулярных выражений по строкам таблицы. Только после совпадения вызывается `dates.parse`. Сам `parse` не меняется: он шире таблицы (смешанная эра и интервал веков разбираются им неверно — проверено пробой: «470 до н. э. – 399» → (−469, −398), «XVIII в. – XIX в.» → только XVIII). Белый список закрывает это без правки общего разбора;
+- **числа** — `(?<!\d)\d{1,4}(?!\d)` по тексту и цитате, сравнение множеств целых;
+- **римское число** века — отдельным словом в цитате;
+- **эра** — маркер в тексте ⇔ маркер в цитате (`до н. э.`, `до н.э.`, `до нашей эры`);
+- **запись** — `Statements.add(entity, "lifespan" | "dating", value=fd.to_json(), evidence=[Evidence(paragraph_id, quote)], attributions=[Attribution("source", source_id)], provenance=Provenance("extracted", run_id=…))`. `primary.dates` обновляет существующий `_update_primary`.
 
 ### Язык фрагмента
 
-`language = most_common(p["lang"] for p in window)`, если пусто — `ru`. Передаётся в промпт полем данных `language` и в `names_for`. Если у элемента нет `ru`, основным становится `name` с языком `script_lang(name)`, а не `language`. Язык фрагмента нужен только промпту, чтобы модель знала, на каком языке писать `name`.
+`language = most_common(p["lang"] for p in window)`, если пусто — `ru`. Передаётся в промпт полем данных `language`. Если у элемента нет `ru`, основным становится `name` с языком `lang_for(name, None)`, а не `language`. Язык фрагмента нужен только промпту, чтобы модель знала, на каком языке писать `name`.
 
 ### Точки вызова в файлах Lead'а (минимальные, О3)
 
@@ -116,7 +114,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
   - `_schema()` добавляет `entities` (одна вставка);
   - `_extract_fragment` передаёт `language` и строит `items = EntityItems.index(...)`, после утверждений вызывает `EntityItems.date(...)` по элементам с `dating`;
   - `_resolve` делегирует в `EntityItems.resolve`. Его тело переносится в новый модуль, поведение для старых ответов прежнее, кроме языка названия по письменности.
-  - `accept_core` ловит `InvalidName` по элементу. Отклонённые складываются в `self.rejected_core: list[{name, reason}]`, а возвращаемый список созданных остаётся прежним (`list[str]`). Так единственный вызов в `tests/knowledge/test_filling.py` не меняется.
+  - новый `accept_core_report(items, actor) -> {"created": [id], "rejected": [{name, type, reason}]}`: ловит `InvalidName` по элементу, отказы возвращает в ответе, а не в состоянии объекта (ревью, желательное 3). `accept_core` = `accept_core_report(...)["created"]`, поэтому единственный вызов в `tests/knowledge/test_filling.py` не меняется.
   - `import_wikidata` создаёт сущности через `create`. `InvalidName` там пропускает элемент: место или учитель с мусорной подписью не создаётся.
 
 ## События журнала
@@ -125,7 +123,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 |---|---|---|---|
 | `knowledge.entity.rejected` (новое) | warning | `type`, `label` (≤ 80 знаков, длиннее — обрезка с «…»), `reason` (`empty`, `number`, `sentence`, `not_a_name`, `stopword`) | отказ `check_name` при создании или смене основного названия |
 | `knowledge.entity.renamed` (новое) | info | `entity_id`, `lang`, `previous_lang` | русское основное название у сущности с латинским основным |
-| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` | отказ датировки |
+| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` или `"entity:type"` | отказ датировки или элемента |
 | `knowledge.statement.created` (есть) | info | `type="lifespan"\|"dating"` | датировка записана |
 
 **Утечка текста.** `label` — название сущности, которое модель взяла из учебника, либо ввод оператора. Это не текст вопроса и не личные данные читателя: названия философов и терминов публичны. Длина ограничена 80 знаками, поэтому предложение из учебника целиком в журнал не попадает. Цитаты и абзацы в событие не пишутся. Без `label` оператор не поймёт, что отклонено, а тестировщику нечего будет проверить.
@@ -164,21 +162,55 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 | А. Утверждение `lifespan`/`dating` в массиве `statements` | Схема почти та же | Сейчас значения-свойства (`value_kind`) из схемы исключены намеренно (`output_schema` их отбрасывает); пришлось бы ломать это правило | Модель путает субъект и объект у значения |
 | Б. Поле `dating` у элемента `entities` (выбрано) | Одно поле | Дата при сущности, проверка цитаты та же; разбор — код (`dates.parse`) | Новое поле не трогает утверждения; удаляется одной правкой |
 
-## Генераторы для property-тестов (О7, О8)
+## Тестовая инфраструктура (общая для четырёх изменений; создаётся здесь)
 
-`hypothesis` (dev-зависимость), профиль `ci`: `derandomize=True`, `max_examples=60`, `deadline=None`, `database=None`. Генераторы лежат в `tests/knowledge/strategies.py` и общие для четырёх изменений.
+Это решения О7, О8 и О9 с ревью тестировщика Б1–Б11.
 
-| Генератор | Что даёт |
-|---|---|
-| `numbers()` | `\d{1,3}(\.\d{1,3}){0,3}` с пробелами по краям — правило `number` |
-| `blank()` | пустые строки, пробелы, только знаки препинания — `empty` |
-| `long_phrases()` | 7–15 слов или 81–200 знаков из кириллицы и латиницы; граница ровно 6 слов / 80 знаков отдельно |
-| `stopwords_perturbed()` | элементы стоп-списка в разном регистре, с пробелами, точкой, `ё`/`е` |
-| `proper_names()` | 1–4 слова с заглавной (кириллица, латиница, смешанные), с частицами `de`/`фон`/`ибн`, римские числа |
-| `not_names()` | строчная первая буква, `the X of Y`, `author of …`, `A and B`, `А и Б` |
-| `labels()` | смесь всех выше — для инварианта «отказ ⇔ событие» |
-| `fragment_items()` | элементы `entities` с `ru`/`en`/`original`, с существующей английской сущностью и без неё |
-| `datings()` | годы −3000…2100, интервалы, «до н. э.», «ок.», века; цитата с годами и без них |
+- **`hypothesis`** — только dev-зависимость. Профили регистрируются в `tests/conftest.py` и выбираются переменной `HYPOTHESIS_PROFILE`, по умолчанию `ci`. Везде `derandomize=True`, `deadline=None`, `database=None`, `print_blob=True`.
+
+  | Профиль | `max_examples` | Для чего |
+  |---|---|---|
+  | `ci` | 60 | тесты с базой SQLite, через сервис |
+  | `pure` | 400 | чистые функции (`naming`, `dating`, `dedupe.same_person`, разбор времени Wikidata) — декоратором `@settings(parent=…)` |
+  | `heavy` | 25 | миграция, откат, слияние на онтологиях из генератора |
+
+  **Бюджет:** весь слой property-тестов четырёх изменений — не дольше 3 минут на CI (`pytest --durations` в `verification.md`).
+- **Стратегии «вход + ожидание»** (`tests/knowledge/strategies.py`). Стратегия собирает вход из частей с известным ответом и возвращает пару `(вход, ожидание)`. Например, `numbers()` → `("§ 20.1", "number")`, `datings()` → `({"text": "427–347 до н. э.", "quote": …}, ((−426, −346), "year"))`. Оракул **не импортирует** проверяемые функции (`check_name`, `lang_for`, `dates.parse`, `claim_date`, `same_person`). Ожидание выводится из того, как стратегия построила вход.
+
+  | Стратегия | Что даёт |
+  |---|---|
+  | `numbers()` | цифры со знаками и точками → `number` |
+  | `blank()` | пустые, пробелы, знаки → `empty` |
+  | `long_phrases()` | 7–15 слов, 81–200 знаков → `sentence` |
+  | `stopwords_perturbed()` | регистр, пробелы, `ё` → `stopword` |
+  | `proper_names()` | с частицами и дефисами, римские числа → `None` |
+  | `not_names()` | строчные, «the … of …» в любом регистре, склейки → `not_a_name` |
+  | `scripts_mix()` | буквы известных письменностей с заданным перевесом → язык |
+  | `fragment_items()` | элементы `entities` и состояние онтологии → ожидаемые сущности и названия |
+  | `datings()` | по строкам таблицы `entity-dating` → `span`/`precision` или причина |
+
+- **Явные `@example` на каждую границу и на каждую мутацию:** 6/7 слов, 80/81 знак, «your Lordship», «The author of …», «аль-Фараби», «Людовик XIV», «Kant-Кант», «§ 20.1», «V в. до н. э.» без века в цитате, «375» при «до н. э.» в цитате, «17245», абзацы 0 и n+1.
+- **Общий дамп** `tests/knowledge/dump.py`: `dump(engine, tables=DATA_TABLES) -> dict[table, list[row]]`.
+  - Строки нормализованы: JSON-поля — канонический `json.dumps(sort_keys=True)`, сортировка по всем столбцам.
+  - `DATA_TABLES` — `entities`, `names`, `external_ids`, `statements`, `attributions`, `evidence`, `mentions`, `portraits`.
+  - Журнальные таблицы (`merges`, `run_actions`, `journal`, `filling_runs`, `review_items`, `graph_extensions`) в дамп не входят и проверяются отдельно.
+
+  Используется в инвариантах «до/после», отката и сухого прогона всех четырёх изменений.
+- **Мутации** — `tests/mutations/<изменение>/<id>.patch` и `tests/mutations/<изменение>/mutations.yaml` вида `{id, requirement, patch, expect_fail: [test node ids]}`. Скрипт `scripts/mutation_check.py [--change C] [--id M]`:
+  1. проверяет чистоту рабочего дерева;
+  2. применяет патч (`git apply`);
+  3. запускает `pytest -q` на тестах из `expect_fail` и требует, чтобы каждый упал;
+  4. откатывает патч (`git apply -R`), в том числе при ошибке;
+  5. печатает таблицу Markdown «требование | мутация | ожидаемый тест | упал».
+
+  Таблица вставляется в `verification.md`, судья запускает тот же скрипт. На **каждое** требование — минимум одна мутация.
+- **Наблюдаемость:**
+  - запрет сети — автофикстура в `tests/knowledge/conftest.py` подменяет `socket.socket.connect` на исключение;
+  - перехват шлюза — фейковый провайдер записывает запросы: шаблон, данные, `json_schema`;
+  - события сверяются **точным множеством ключей** (`set(event) - {служебные} == ожидаемые`), а не подмножеством.
+- **Непроверяемое тестом** и его проверяемая часть, записывается в `verification.md`:
+  - «модель пишет по-русски», А1 на новых данных — контракт промпта (литералы правил в тексте шаблона), схема (`json_schema`, `required`) и поведение сервера на ответах фейка. Фактический А1 замеряет Lead;
+  - «ответ без `entities` как прежде» — старые `tests/knowledge/test_filling.py` без правки ожиданий.
 
 ## Риски
 
