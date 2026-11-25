@@ -14,6 +14,7 @@ import "./styles/map.css";
 import "./styles/reference.css";
 import "./styles/epochs.css";
 import "./styles/map-page.css";
+import "./styles/map-geo.css";
 import "./styles/notes.css";
 import "./styles/assistant.css";
 import "./styles/card.css";

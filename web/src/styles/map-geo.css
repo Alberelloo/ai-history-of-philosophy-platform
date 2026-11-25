@@ -1,0 +1,506 @@
+/* Вид «Глобус» карты раздела (openspec/changes/add-geo-timeline). Глобус — гравюра на том же
+   листе, что и хронология: море и суша — оттенки бумаги, берег тушью, сетка через 15°
+   точками, латунный обод. Цвета — только токены (globe-*, sel-*, лист); одинаковы в обеих
+   темах, как лист. Без SVG-фильтров, без анимаций и переходов: глобус движется только по
+   действию читателя (кадры — в GlobeView). */
+
+/* ---------- переключатель вида ---------- */
+/* Рядом с заголовком, а не среди инструментов: шапка хронологии не получает лишней строки. */
+.map-head__titlerow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.map-view-switch .pg-seg__item {
+  min-height: 1.75rem;
+}
+
+/* ---------- сцена ---------- */
+.geo-stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.geo-globe {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.geo-globe:active {
+  cursor: grabbing;
+}
+
+/* Кольцо фокуса — по ободу глобуса и по рамке сцены: видно и на краю листа. */
+.geo-globe:focus-visible {
+  outline: 2px solid var(--m-focus);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.geo-globe:focus-visible .geo-rim__inner {
+  stroke: var(--m-focus);
+  stroke-width: 2;
+}
+
+.geo-sea {
+  fill: var(--globe-sea);
+}
+
+.geo-graticule {
+  fill: none;
+  stroke: var(--globe-graticule);
+  stroke-width: 0.8;
+  stroke-dasharray: 0.6 3.2;
+  stroke-linecap: round;
+}
+
+.geo-land {
+  fill: var(--globe-land);
+  stroke: var(--globe-coast);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+}
+
+/* Объём — статический радиальный градиент поверх моря и суши. */
+.geo-shade {
+  fill: url(#geo-shade);
+  pointer-events: none;
+}
+
+.geo-shade__light {
+  stop-color: var(--globe-land);
+  stop-opacity: 0.4;
+}
+
+.geo-shade__mid {
+  stop-color: var(--globe-land);
+  stop-opacity: 0;
+}
+
+.geo-shade__dark {
+  stop-color: var(--globe-coast);
+  stop-opacity: 0.2;
+}
+
+.geo-shadow {
+  fill: url(#geo-shadow);
+  pointer-events: none;
+}
+
+.geo-shadow__in {
+  stop-color: var(--globe-coast);
+  stop-opacity: 0.22;
+}
+
+.geo-shadow__out {
+  stop-color: var(--globe-coast);
+  stop-opacity: 0;
+}
+
+/* ---------- латунный обод ---------- */
+.geo-rim {
+  fill: none;
+  stroke: var(--globe-brass);
+  stroke-width: 5;
+  pointer-events: none;
+}
+
+.geo-rim__inner {
+  fill: none;
+  stroke: var(--globe-coast);
+  stroke-width: 0.9;
+  pointer-events: none;
+}
+
+.geo-rim__ticks {
+  fill: none;
+  stroke: var(--globe-brass);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+/* ---------- дуги влияний ---------- */
+.geo-links {
+  pointer-events: none;
+}
+
+.geo-link__arc {
+  fill: none;
+  stroke: var(--role, var(--globe-coast));
+  stroke-width: 1.2;
+  stroke-opacity: 0.75;
+  stroke-linecap: round;
+}
+
+.geo-link.is-generated .geo-link__arc {
+  stroke-dasharray: 4 3;
+}
+
+.geo-link__arrow {
+  fill: var(--role, var(--globe-coast));
+  fill-opacity: 0.85;
+}
+
+.geo-link.is-on .geo-link__arc {
+  stroke-width: 2;
+  stroke-opacity: 1;
+}
+
+.geo-link[data-dim="true"] .geo-link__arc,
+.geo-link[data-dim="true"] .geo-link__arrow {
+  stroke-opacity: 0.22;
+  fill-opacity: 0.22;
+}
+
+/* Путь жизни выбранного: места по порядку лет. */
+.geo-trail {
+  fill: none;
+  stroke: var(--role, var(--globe-coast));
+  stroke-width: 1.6;
+  stroke-dasharray: 0.5 4;
+  stroke-linecap: round;
+}
+
+/* ---------- отметки мест ---------- */
+.geo-place {
+  cursor: pointer;
+}
+
+.geo-place[data-hidden="true"] {
+  visibility: hidden;
+}
+
+.geo-place__hit {
+  fill: transparent;
+}
+
+.geo-place__dot {
+  fill: var(--role, var(--globe-coast));
+  fill-opacity: 0.9;
+  stroke: var(--globe-land);
+  stroke-width: 1.2;
+}
+
+/* Все размещения достроены моделью — полое кольцо (не только цвет). */
+.geo-place.is-unverified .geo-place__dot {
+  fill: var(--globe-land);
+  fill-opacity: 1;
+  stroke: var(--role, var(--globe-coast));
+  stroke-width: 1.8;
+  stroke-dasharray: 2.4 1.6;
+}
+
+/* Только события — кольцо. */
+.geo-place.is-event .geo-place__dot {
+  fill: var(--globe-land);
+  stroke: var(--role, var(--globe-coast));
+  stroke-width: 1.6;
+}
+
+.geo-place.is-on .geo-place__dot {
+  stroke-width: 2;
+}
+
+.geo-place[data-dim="true"] .geo-place__dot {
+  fill-opacity: 0.3;
+  stroke-opacity: 0.45;
+}
+
+.geo-place__count {
+  fill: var(--globe-land);
+  font: 700 0.5625rem var(--font-ui);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.geo-place.is-unverified .geo-place__count,
+.geo-place.is-event .geo-place__count {
+  fill: var(--role, var(--globe-coast));
+}
+
+/* ---------- подписи ---------- */
+.geo-labels {
+  pointer-events: none;
+}
+
+.geo-label {
+  fill: var(--m-ink);
+  paint-order: stroke;
+  stroke: var(--globe-land);
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+}
+
+.geo-label.is-on {
+  fill: var(--role, var(--sel-self));
+  font-weight: 600;
+}
+
+.geo-label.is-dim {
+  fill: var(--m-ink-2);
+}
+
+/* ---------- подписи сцены и состояния ---------- */
+.geo-coast {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  margin: 0;
+  color: var(--m-ink-2);
+  font: italic 400 0.6875rem var(--font-read);
+  pointer-events: none;
+}
+
+.geo-keys {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  max-width: 17rem;
+}
+
+.geo-keys__hint {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--m-rule-soft);
+  border-radius: 4px;
+  background: var(--m-paper);
+  color: var(--m-ink-2);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.geo-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 20rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--m-rule-soft);
+  border-radius: 6px;
+  background: var(--m-paper);
+  color: var(--m-ink);
+  text-align: center;
+}
+
+.geo-state p {
+  margin: 0;
+  color: var(--m-ink-2);
+  font-size: 0.8125rem;
+}
+
+.geo-state--loading {
+  top: auto;
+  bottom: 1.75rem;
+  transform: translateX(-50%);
+  color: var(--m-ink-2);
+  font: italic 400 0.8125rem var(--font-read);
+}
+
+.geo-state.pg-notice {
+  flex-direction: row;
+  text-align: left;
+}
+
+/* Живая область — для экранных читалок, не видна. */
+.geo-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- год под шкалой ---------- */
+.map-overview__year-stem {
+  stroke: var(--sel-self);
+  stroke-width: 1.2;
+}
+
+.map-overview__year-dot {
+  fill: var(--sel-self);
+  stroke: var(--m-paper);
+  stroke-width: 1.5;
+  cursor: ew-resize;
+  outline: none;
+}
+
+.map-overview__year-dot:focus-visible {
+  stroke: var(--m-focus);
+  stroke-width: 3;
+}
+
+.geo-yearbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-left: 0.25rem;
+}
+
+.geo-yearbar__year {
+  min-width: 11rem;
+  color: var(--m-ink);
+  font: 500 1.0625rem var(--font-read);
+  font-variant-numeric: oldstyle-nums;
+}
+
+.geo-yearbar__speed {
+  margin-left: auto;
+}
+
+/* ---------- панель: места в году ---------- */
+.geo-list__rows {
+  max-height: 16rem; /* до замера: остаток панели — GeoList, useRest */
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-color: var(--m-rule) transparent;
+  scrollbar-width: thin;
+}
+
+.geo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.125rem 0.5rem;
+  padding: 0.3125rem 0;
+  border-bottom: 1px solid var(--m-rule-soft);
+}
+
+.geo-row__place {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--m-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.geo-row__place:focus-visible,
+.geo-list .map-link-btn:focus-visible {
+  outline: 2px solid var(--m-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.geo-row__place[aria-pressed="true"] .geo-row__name {
+  color: var(--sel-self);
+}
+
+.geo-row__name {
+  font: 600 0.8125rem var(--font-read);
+}
+
+.geo-row__count {
+  color: var(--m-ink-2);
+  font-size: 0.6875rem;
+}
+
+.geo-row__unverified {
+  color: var(--m-ink-2);
+  font-size: 0.6875rem;
+  font-style: italic;
+}
+
+.geo-row__who {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+}
+
+.geo-list__limit {
+  margin: 0 0 0.25rem;
+  color: var(--m-ink-2);
+  font-size: 0.6875rem;
+}
+
+.geo-list__unplaced {
+  margin-top: 0.375rem;
+}
+
+.geo-list__unplaced summary {
+  color: var(--m-ink-2);
+  cursor: pointer;
+}
+
+.geo-list__unplaced ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.geo-selected__who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.geo-selected__noplace {
+  font-style: italic;
+}
+
+/* ---------- легенда глобуса ---------- */
+.geo-legend__dot {
+  fill: var(--globe-coast);
+  stroke: var(--globe-land);
+  stroke-width: 1;
+}
+
+.geo-legend__ring {
+  fill: var(--globe-land);
+  stroke: var(--globe-coast);
+  stroke-width: 1.5;
+  stroke-dasharray: 2.4 1.6;
+}
+
+.geo-legend__arc {
+  fill: none;
+  stroke: var(--globe-coast);
+  stroke-width: 1.3;
+}
+
+.geo-legend__arrow {
+  fill: var(--globe-coast);
+}
+
+.geo-legend__trail {
+  fill: none;
+  stroke: var(--sel-self);
+  stroke-width: 1.6;
+  stroke-dasharray: 0.5 3.5;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geo-globe,
+  .geo-globe * {
+    transition: none;
+    animation: none;
+  }
+}
