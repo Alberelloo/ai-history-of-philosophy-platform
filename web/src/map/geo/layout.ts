@@ -26,8 +26,10 @@ export { MAX_PERSONS }; // предел медальонов в DOM живёт �
 export const MAX_PORTRAITS = 60;
 export const LABEL_PAD = 1.5;
 export const NAME_GAP = 4;
+export const TEXT_GAP = 2; // px: запас раскладки у текста сверх геометрии пересечений
 export const COUNTRY_MIN_AREA = 1500;
 export const MAX_COUNTRY_LABELS = 24;
+export const COUNTRY_MIN_LABELS = 5; // меньше — добор (layoutCountries)
 
 export type Circle = { kind: "circle"; x: number; y: number; r: number };
 export type Rect = { kind: "rect"; x0: number; y0: number; x1: number; y1: number };
@@ -56,31 +58,42 @@ export function overlaps(a: Shape, b: Shape): boolean {
   return Math.min(ra.x1, rb.x1) - Math.max(ra.x0, rb.x0) > TOUCH && Math.min(ra.y1, rb.y1) - Math.max(ra.y0, rb.y0) > TOUCH;
 }
 
+const grow = (r: Rect, d: number): Rect => ({ kind: "rect", x0: r.x0 - d, y0: r.y0 - d, x1: r.x1 + d, y1: r.y1 + d });
+
 const box = (s: Shape): [number, number, number, number] =>
   s.kind === "circle" ? [s.x - s.r, s.y - s.r, s.x + s.r, s.y + s.r] : [s.x0, s.y0, s.x1, s.y1];
 
 // Сетка-индекс положенных фигур: проверка пересечения — только с соседями по ячейкам.
+// Ключ ячейки — число (без строк: раскладка зовёт hits десятки тысяч раз).
+const cellKey = (i: number, j: number): number => (i + 32768) * 65536 + (j + 32768);
 export class Grid {
-  private cells = new Map<string, Shape[]>();
+  private cells = new Map<number, Shape[]>();
   readonly shapes: Shape[] = [];
   constructor(private size = 40) {}
-  private keys(s: Shape): string[] {
-    const [x0, y0, x1, y1] = box(s);
-    const out: string[] = [];
-    for (let i = Math.floor(x0 / this.size); i <= Math.floor(x1 / this.size); i++)
-      for (let j = Math.floor(y0 / this.size); j <= Math.floor(y1 / this.size); j++) out.push(`${i},${j}`);
-    return out;
-  }
   add(s: Shape): void {
     this.shapes.push(s);
-    for (const k of this.keys(s)) {
-      const list = this.cells.get(k);
-      if (list) list.push(s);
-      else this.cells.set(k, [s]);
-    }
+    const [x0, y0, x1, y1] = box(s);
+    const z = this.size;
+    for (let i = Math.floor(x0 / z); i <= Math.floor(x1 / z); i++)
+      for (let j = Math.floor(y0 / z); j <= Math.floor(y1 / z); j++) {
+        const k = cellKey(i, j);
+        const list = this.cells.get(k);
+        if (list) list.push(s);
+        else this.cells.set(k, [s]);
+      }
   }
+  // Проверка с запасом TEXT_GAP у текста: ширина, измеренная раскладкой, может расходиться
+  // с отрисованной на доли пикселя (округление, кернинг) — ноль наложений держится и тогда.
   hits(s: Shape): boolean {
-    for (const k of this.keys(s)) for (const o of this.cells.get(k) ?? []) if (overlaps(s, o)) return true;
+    const [x0, y0, x1, y1] = box(s);
+    const z = this.size;
+    const q = s.kind === "rect" ? grow(s, TEXT_GAP) : s;
+    for (let i = Math.floor((x0 - TEXT_GAP) / z); i <= Math.floor((x1 + TEXT_GAP) / z); i++)
+      for (let j = Math.floor((y0 - TEXT_GAP) / z); j <= Math.floor((y1 + TEXT_GAP) / z); j++) {
+        const list = this.cells.get(cellKey(i, j));
+        if (list)
+          for (const o of list) if (overlaps(q, s.kind === "rect" || o.kind !== "rect" ? o : grow(o, TEXT_GAP))) return true;
+      }
     return false;
   }
 }
@@ -109,7 +122,7 @@ export type Metrics = { ascent: number; descent: number };
 export type Measure = (text: string) => number;
 
 export type LPlace = { id: string; x: number; y: number; visible: boolean };
-export type LPerson = { id: string; place: string; name: string };
+export type LPerson = { id: string; place: string; name: string | null }; // null — без подписи
 export type LEvent = { id: string; place: string };
 
 export type NameLabel = { x: number; y: number; anchor: "start" | "end" | "middle"; rect: Rect };
@@ -195,7 +208,7 @@ export function layoutMarkers(inp: LayoutInput): Layout {
       slot.packed = true;
       continue;
     }
-    const got = search(grid, f, at, R, { tw: inp.measure(p.name), m: inp.metrics });
+    const got = search(grid, f, at, R, p.name ? { tw: inp.measure(p.name), m: inp.metrics } : null);
     if (!got) {
       fails.set(p.place, (fails.get(p.place) ?? 0) + 1);
       slot.packed = true;
@@ -204,7 +217,7 @@ export function layoutMarkers(inp: LayoutInput): Layout {
     fails.set(p.place, 0);
     Object.assign(slot, { x: got.x, y: got.y, dx: got.x - at.x, dy: got.y - at.y, label: got.label });
     grid.add({ kind: "circle", x: got.x, y: got.y, r: R });
-    grid.add(got.label!.rect);
+    if (got.label) grid.add(got.label.rect);
     drawnOrder.push(slot);
   }
 
@@ -224,7 +237,10 @@ export function layoutMarkers(inp: LayoutInput): Layout {
   const packedBy = new Map<string, PersonSlot[]>();
   for (const s of persons) if (s.packed) (packedBy.get(s.place) ?? packedBy.set(s.place, []).get(s.place)!).push(s);
   const overBy = new Map<string, number>();
-  for (const p of inp.persons.slice(limit)) if (places.get(p.place)?.visible) overBy.set(p.place, (overBy.get(p.place) ?? 0) + 1);
+  for (let i = limit; i < inp.persons.length; i++) {
+    const place = inp.persons[i].place;
+    if (places.get(place)?.visible) overBy.set(place, (overBy.get(place) ?? 0) + 1);
+  }
 
   const badges: Badge[] = [];
   const pending: LPlace[] = [];
@@ -265,10 +281,10 @@ export function layoutMarkers(inp: LayoutInput): Layout {
     // Значков нет: значком становится последний положенный медальон ближайшего места.
     const drawn = drawnOrder.filter((s) => !s.packed);
     if (!drawn.length) {
-      for (const s of packedBy.get(q.id) ?? []) {
-        s.packed = false;
-        s.hidden = true;
-      }
+      // Ни медальонов, ни значков: значок в точке привязки — персона не пропадает из счёта.
+      badges.push({ places: [], x: round2(q.x), y: round2(q.y), dx: 0, dy: 0, hidden: false, count: 0, persons: [] });
+      grid.add({ kind: "circle", x: q.x, y: q.y, r: R });
+      join(badges.length - 1, q.id);
       continue;
     }
     let nearest = drawn[0];
@@ -330,6 +346,24 @@ export function shiftLayout(prev: Layout, places: LPlace[], f: Frame): Layout {
   return { persons, events, badges, grid: new Grid() };
 }
 
+// Раскладка кадра. В покое — полная (full). Во время движения — сдвиги последней раскладки
+// покоя (shiftLayout), но только если она построена для той же сцены (key): сменился год
+// или слой во время перетаскивания — полная раскладка, кадр — её сдвиги без подписей.
+export type RestLayout = { key: unknown; layout: Layout };
+export function frameLayout(
+  rest: RestLayout | null,
+  key: unknown,
+  moving: boolean,
+  places: LPlace[],
+  f: Frame,
+  full: () => Layout,
+): { layout: Layout; rest: RestLayout } {
+  if (moving && rest && rest.key === key) return { layout: shiftLayout(rest.layout, places, f), rest };
+  const layout = full();
+  const next = { key, layout };
+  return { layout: moving ? shiftLayout(layout, places, f) : layout, rest: next };
+}
+
 // Маркер персоны на экране: её медальон или значок, куда она свёрнута; null — не виден.
 export function markerOf(l: Layout, index: Map<string, PersonSlot>, id: string): Circle | null {
   const s = index.get(id);
@@ -344,7 +378,7 @@ export function markerOf(l: Layout, index: Map<string, PersonSlot>, id: string):
 // --- подписи стран ---
 
 export type CountryInput = { id: string; name: string; feature: Feature<Polygon | MultiPolygon> };
-export type CountryLabel = { id: string; text: string; x: number; y: number; area: number; span: number; rect: Rect };
+export type CountryLabel = { id: string; text: string; x: number; y: number; area: number; span: number; rect: Rect; font: number; fill: boolean };
 
 // Геометрия страны для отсева (один раз на страну): многоугольники, сферический центр и
 // угловой радиус (наибольшее расстояние от центра до вершины).
@@ -363,25 +397,40 @@ function geoOf(c: CountryInput): CountryGeo {
   return g;
 }
 
-// Подписи стран: кандидаты по видимой площади (path — проекция с обрезкой по полушарию и
-// кадру), точка — центр крупнейшего видимого многоугольника, если он внутри страны; ширина
-// подписи не больше видимой части; без пересечений с уже положенным (grid); не больше
-// MAX_COUNTRY_LABELS. Положенные подписи добавляются в grid.
+type CountryCand = { c: CountryInput; area: number; span: number; x: number; y: number };
+type CandCache = { key: string; done: boolean; main: CountryCand[]; rest: CountryCand[] | null; later: CountryInput[] };
+const candCache = new WeakMap<object, CandCache>();
+
+// Шрифт подписи страны: начертание (для отрисовки), ширина текста и вертикальные метрики.
+export type CountryFont = { font: string; measure: Measure; metrics: Metrics };
+
+// Подписи стран. Основной проход: кандидаты с видимой площадью не меньше COUNTRY_MIN_AREA
+// (path — проекция с обрезкой по полушарию и кадру) по убыванию площади; точка — центр
+// крупнейшего видимого многоугольника, если он внутри страны; ширина подписи не больше
+// видимой части; без пересечений с уже положенным (grid); не больше MAX_COUNTRY_LABELS.
+// Добор: если подписей меньше COUNTRY_MIN_LABELS — остальные страны видимой стороны по
+// убыванию площади по тем же правилам, основным кеглем, а не поместившиеся по ширине —
+// кеглем добора (fonts[1]), пока подписей не COUNTRY_MIN_LABELS. Положенные — в grid.
 export function layoutCountries(
   countries: CountryInput[],
   path: GeoPath,
   projection: GeoProjection,
   f: Frame,
   grid: Grid,
-  measure: Measure,
-  m: Metrics,
+  fonts: CountryFont[],
 ): CountryLabel[] {
-  type Cand = { c: CountryInput; area: number; span: number; x: number; y: number };
-  const cands: Cand[] = [];
   const rot = projection.rotate();
   const center: [number, number] = [-rot[0], -rot[1]];
   const scale = projection.scale();
-  for (const c of countries) {
+  // Кандидаты зависят только от вида и кадра: при смене года (проигрывание) — из кэша.
+  const key = JSON.stringify([rot, scale, projection.translate(), projection.clipExtent(), f.w, f.h]);
+  let cache = candCache.get(countries);
+  if (!cache || cache.key !== key) candCache.set(countries, (cache = { key, done: false, main: [], rest: null, later: [] }));
+  const { main, later } = cache;
+  const rest: CountryCand[] = cache.rest ?? [];
+  const fresh = !cache.done;
+  cache.done = true;
+  for (const c of fresh ? countries : []) {
     // Отсев без обрезки путей: страна целиком за полушарием или далеко за кадром.
     const g = geoOf(c);
     const dist = geoDistance(g.center, center);
@@ -391,8 +440,15 @@ export function layoutCountries(
       const reach = 2 * Math.sin(Math.min(g.radius, Math.PI) / 2) * scale; // хорда: проекция не дальше
       if (xy && (xy[0] < -reach || xy[1] < -reach || xy[0] > f.w + reach || xy[1] > f.h + reach)) continue;
     }
+    // Верхняя оценка: проекция шапки радиуса r лежит в круге радиуса scale·sin r.
+    const bound = g.radius < Math.PI / 2 ? Math.PI * (scale * Math.sin(g.radius)) ** 2 : Infinity;
+    if (bound < COUNTRY_MIN_AREA) later.push(c);
+    else measureCand(c);
+  }
+  function measureCand(c: CountryInput): void {
+    const g = geoOf(c);
     const area = path.area(c.feature);
-    if (!(area >= COUNTRY_MIN_AREA)) continue;
+    if (!(area > 0)) return;
     let best: Polygon | null = g.polys.length === 1 ? g.polys[0] : null;
     let bestA = 0;
     if (!best)
@@ -403,25 +459,41 @@ export function layoutCountries(
           best = p;
         }
       }
-    if (!best) continue;
+    if (!best) return;
     const [[x0], [x1]] = path.bounds(c.feature);
     const [x, y] = path.centroid(best);
-    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     const ll = projection.invert?.([x, y]);
-    if (!ll || !geoContains(c.feature, ll)) continue;
-    cands.push({ c, area, span: x1 - x0, x, y });
+    if (!ll || !geoContains(c.feature, ll)) return;
+    (area >= COUNTRY_MIN_AREA ? main : rest).push({ c, area, span: x1 - x0, x, y });
   }
-  cands.sort((a, b) => b.area - a.area || (a.c.id < b.c.id ? -1 : 1));
+  const order = (a: CountryCand, b: CountryCand) => b.area - a.area || (a.c.id < b.c.id ? -1 : 1);
+  if (fresh) main.sort(order);
   const out: CountryLabel[] = [];
-  for (const k of cands) {
-    if (out.length >= MAX_COUNTRY_LABELS) break;
+  const place = (k: CountryCand, fi: number, fill: boolean): boolean => {
+    const { measure, metrics: m } = fonts[fi];
     const tw = measure(k.c.name);
-    if (tw + 2 * LABEL_PAD > k.span) continue; // прямоугольник подписи не шире видимой части
+    if (tw + 2 * LABEL_PAD > k.span) return false; // прямоугольник подписи не шире видимой части
     const base = k.y + (m.ascent - m.descent) / 2;
     const rect: Rect = { kind: "rect", x0: k.x - tw / 2 - LABEL_PAD, y0: base - m.ascent - LABEL_PAD, x1: k.x + tw / 2 + LABEL_PAD, y1: base + m.descent + LABEL_PAD };
-    if (!inFrame(f, rect) || grid.hits(rect)) continue;
+    if (!inFrame(f, rect) || grid.hits(rect)) return false;
     grid.add(rect);
-    out.push({ id: k.c.id, text: k.c.name, x: round2(k.x), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect });
+    out.push({ id: k.c.id, text: k.c.name, x: round2(k.x), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect, font: fi, fill });
+    return true;
+  };
+  for (const k of main) {
+    if (out.length >= MAX_COUNTRY_LABELS) break;
+    place(k, 0, false);
   }
+  if (out.length < COUNTRY_MIN_LABELS && !cache.rest) {
+    for (const c of later) measureCand(c);
+    rest.sort(order);
+    cache.rest = rest;
+  }
+  if (out.length < COUNTRY_MIN_LABELS)
+    for (const k of [...main.filter((k) => !out.some((o) => o.id === k.c.id)), ...rest]) {
+      if (out.length >= COUNTRY_MIN_LABELS) break;
+      for (let fi = 0; fi < fonts.length; fi++) if (place(k, fi, fi > 0 || k.area < COUNTRY_MIN_AREA)) break;
+    }
   return out;
 }

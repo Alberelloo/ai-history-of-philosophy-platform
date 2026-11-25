@@ -11,6 +11,7 @@ import type { GEdge } from "./LinkDetails";
 import { MapCanvas } from "./MapCanvas";
 import { idleBuild, MapPanel, type BuildState, type LinkView } from "./MapPanel";
 import { canvasMeasure, loadMapFonts } from "./measure";
+import { loadGlobeFonts } from "./geo/fonts";
 import { eraOf, find, index, related, visible } from "./model";
 import { OVERVIEW_HEIGHT, Overview, YEAR_BAR_HEIGHT } from "./Overview";
 import { KNOWLEDGE_API, ndjson } from "./stream";
@@ -154,7 +155,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   // Шрифты карты: до загрузки ширина подписей меряется по запасному — потом раскладка заново.
   useEffect(() => {
     let live = true;
-    loadMapFonts().then(() => {
+    Promise.all([loadMapFonts(), loadGlobeFonts()]).then(() => {
       if (!live) return;
       measure.clear();
       setFontsVersion((v) => v + 1);
@@ -230,12 +231,12 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const g = sp ? model.places.get(sp.place) : null;
     if (sp && stay && g) {
       const role: GeoRole = stay.row.role == null ? "none" : stay.row.role;
-      where = { year, place: g.label, country: country(g.id), role, from: stay.from, to: stay.to, after: stay.after };
+      where = { year, place: g.label, country: countryOf ? country(g.id) : undefined, role, from: stay.from, to: stay.to, after: stay.after };
     }
   } else if (model && scene && found?.type === "event") {
     const se = scene.events.find((e) => e.id === found.obj.id);
     const g = se ? model.places.get(se.place) : null;
-    if (se && g) where = { year, place: g.label, country: country(g.id), role: "event", from: found.obj.year, to: found.obj.year, after: false };
+    if (se && g) where = { year, place: g.label, country: countryOf ? country(g.id) : undefined, role: "event", from: found.obj.year, to: found.obj.year, after: false };
   }
   const geoPanel: GeoPanel | undefined = globe
     ? {

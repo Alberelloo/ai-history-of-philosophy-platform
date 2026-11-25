@@ -1,4 +1,4 @@
-import { EVENT_MARK, inCircle, inFrame, layoutMarkers, MAX_SHIFT, MEDAL, overlaps, shiftLayout, type Frame, type LPlace, type Shape } from "../../src/map/geo/layout";
+import { EVENT_MARK, frameLayout, inCircle, inFrame, layoutMarkers, MAX_SHIFT, MEDAL, overlaps, shiftLayout, type Frame, type LPlace, type Shape } from "../../src/map/geo/layout";
 import { done, eq, ok, test } from "../harness";
 
 const measure = (t: string) => t.length * 7;
@@ -86,6 +86,43 @@ test("перетаскивание: вышедшие за круг скрыты"
   for (const s of moved.persons) if (!s.hidden) ok(inCircle(f, s.x, s.y) && inFrame(f, { kind: "circle", x: s.x, y: s.y, r: 13 }), "видимый внутри");
   ok(moved.persons.some((s) => s.hidden), "хотя бы один скрыт");
   ok(moved.persons.every((s) => s.label === null), "подписей нет");
+});
+
+test("кадр движения: раскладка покоя только своей сцены", () => {
+  const f: Frame = { w: 400, h: 400, cx: 200, cy: 200, R: 180 };
+  const places = [{ id: "a", x: 200, y: 200, visible: true }];
+  const sceneA = { year: 1700 };
+  const sceneB = { year: 1801 };
+  const mk = (ids: string[]) => () => layoutMarkers({ places, persons: ids.map((id) => ({ id, place: "a", name: "Кант" })), events: [], frame: f, measure, metrics });
+  let calls = 0;
+  const count = (fn: () => ReturnType<typeof layoutMarkers>) => () => (calls++, fn());
+  const rest0 = frameLayout(null, sceneA, false, places, f, count(mk(["descartes"]))).rest;
+  eq(calls, 1, "покой — полная раскладка");
+  const same = frameLayout(rest0, sceneA, true, places, f, count(mk(["descartes"])));
+  eq(calls, 1, "та же сцена в движении — без полной раскладки");
+  eq(same.rest, rest0, "раскладка покоя та же");
+  const other = frameLayout(rest0, sceneB, true, places, f, count(mk(["hume", "kant"])));
+  eq(calls, 2, "сцена сменилась в движении — полная раскладка");
+  eq(other.layout.persons.map((s) => s.id), ["hume", "kant"], "медальоны новой сцены, прошлой нет");
+  ok(other.layout.persons.every((s) => s.label === null), "в движении без подписей");
+  eq(other.rest.key, sceneB, "ключ раскладки покоя — новая сцена");
+});
+
+test("ни медальонов, ни значков: значок в точке привязки, персоны в счёте", () => {
+  // Медальон не помещается в кадр 20×20 ни в одной позиции; значок — в точке привязки.
+  const f: Frame = { w: 20, h: 20, cx: 10, cy: 10, R: 9 };
+  const places = [{ id: "a", x: 10, y: 10, visible: true }];
+  const persons = Array.from({ length: 3 }, (_, i) => ({ id: `p${i}`, place: "a", name: "Кант" }));
+  const l = layoutMarkers({ places, persons, events: [], frame: f, measure, metrics, maxPersons: 2 });
+  eq(l.badges.length, 1, "один значок");
+  eq([l.badges[0].x, l.badges[0].y, l.badges[0].count], [10, 10, 3], "в точке привязки, все три персоны (одна сверх предела)");
+  ok(l.persons.every((s) => s.packed && !s.hidden && s.badge === 0), "каждая — ровно в одном значке");
+});
+
+test("персона без имени — медальон без подписи", () => {
+  const f: Frame = { w: 400, h: 400, cx: 200, cy: 200, R: 180 };
+  const l = layoutMarkers({ places: [{ id: "a", x: 200, y: 200, visible: true }], persons: [{ id: "x", place: "a", name: null }], events: [], frame: f, measure, metrics });
+  eq([l.persons[0].hidden, l.persons[0].packed, l.persons[0].label], [false, false, null], "медальон без подписи");
 });
 
 done();

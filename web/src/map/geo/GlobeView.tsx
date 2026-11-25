@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { useT } from "../../i18n";
 import { monogram } from "../../ui";
-import { mapFonts, type Measure } from "../layout";
+import type { Measure } from "../layout";
+import { COUNTRY_FILL_FONT, COUNTRY_FONT, NAME_FONT } from "./fonts";
 import type { GeoLayer } from "./api";
 import { arcBetween } from "./arcs";
 import { countryName, countryOf } from "./countries";
@@ -12,10 +13,10 @@ import {
   MAX_PORTRAITS,
   MEDAL,
   EVENT_MARK,
-  shiftLayout,
+  frameLayout,
   type CountryLabel,
   type Frame as LFrame,
-  type Layout,
+  type RestLayout,
   type LPlace,
   type Metrics,
   type PersonSlot,
@@ -63,8 +64,7 @@ const INERTIA_MS = 700;
 const DRAG_THRESHOLD = 4; // px: меньше — щелчок
 const WHEEL_STEP = 100; // px колеса на шаг приближения
 const RIM = 16; // поле под обод и деления вокруг круга глобуса
-const NAME_FONT = mapFonts(false).workTitle;
-const COUNTRY_FONT = "500 10.5px Onest, Arial, sans-serif";
+const COUNTRY_PRECISION = 2; // px: площадь и центр видимой части стран (расхождение с точной < 0,01 %)
 const DRAG_PRECISION = 2.5; // px: точность передискретизации путей во время перетаскивания
 
 export type GlobeInfo = { name: string; full: string; portrait?: string | null };
@@ -95,9 +95,10 @@ type Props = {
 // Вертикальные метрики шрифта — те же, что у прямоугольника текста в браузере
 // (fontBoundingBox*); без canvas — с запасом от кегля.
 let metricsCanvas: CanvasRenderingContext2D | null | undefined;
-const metricsCache = new Map<string, Metrics>();
-function fontMetrics(font: string): Metrics {
-  const hit = metricsCache.get(font);
+const metricsCache = new Map<string, Metrics>(); // ключ — начертание и версия шрифтов
+function fontMetrics(font: string, version: number): Metrics {
+  const key = `${version}\u0000${font}`;
+  const hit = metricsCache.get(key);
   if (hit) return hit;
   if (metricsCanvas === undefined) metricsCanvas = typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : null;
   const c = metricsCanvas;
@@ -107,10 +108,11 @@ function fontMetrics(font: string): Metrics {
     const t = c.measureText("Ag");
     if (t.fontBoundingBoxAscent) m = { ascent: t.fontBoundingBoxAscent, descent: t.fontBoundingBoxDescent };
   }
-  metricsCache.set(font, m);
+  metricsCache.set(key, m);
   return m;
 }
 
+const COUNTRY_FONTS = [COUNTRY_FONT, COUNTRY_FILL_FONT];
 const COUNTRY_INPUT = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
 
 export default function GlobeView(props: Props) {
@@ -169,11 +171,13 @@ export default function GlobeView(props: Props) {
     cancel();
     const lerp = interpolateCenter(viewRef.current, target);
     const t0 = performance.now();
+    setMoving(true); // кадры поворота — сдвиги раскладки, полная — в покое
     const tick = () => {
       const k = Math.min(1, (performance.now() - t0) / FOCUS_MS);
       const e = k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
       setView(k >= 1 ? target : lerp(e));
       anim.current = k >= 1 ? 0 : requestAnimationFrame(tick);
+      if (!anim.current) setMoving(false);
     };
     anim.current = requestAnimationFrame(tick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,7 +284,7 @@ export default function GlobeView(props: Props) {
     else if (e.key === "ArrowDown") next = rotateBy(v, 0, -step);
     else if (e.key === "+" || e.key === "=") next = zoomBy(v, 1);
     else if (e.key === "-" || e.key === "_" || e.key === "−") next = zoomBy(v, -1);
-    else if (e.key === "0") next = home.current ?? initialView([]);
+    else if (e.key === "0") next = scene ? homeView(scene.places, frame, width, height, MEDAL) : initialView([]); // по местам года T и размеру сейчас
     else if (e.key === "PageUp") props.onYearStep(10);
     else if (e.key === "PageDown") props.onYearStep(-10);
     else if (e.key === "]") props.onYearStep(1);
@@ -298,9 +302,9 @@ export default function GlobeView(props: Props) {
   const R = pr.scale;
   const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R };
   const places = useMemo(() => scene?.places ?? [], [scene]);
-  const rest = useRef<Layout | null>(null);
+  const rest = useRef<RestLayout | null>(null);
   const info = props.info;
-  const nameOf = useCallback((id: string) => info(id)?.name ?? id, [info]);
+  const nameOf = useCallback((id: string) => info(id)?.name || null, [info]); // без имени — без подписи, не id
   const { anchors, lay, countries } = useMemo(() => {
     const anchors: LPlace[] = places.map((p) => {
       const xy = pr.projection([p.lon, p.lat]);
@@ -309,22 +313,33 @@ export default function GlobeView(props: Props) {
       return { id: p.id, x, y, visible: !!xy && isNear(view, p) && x >= 0 && y >= 0 && x <= width && y <= height };
     });
     const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
-    if (moving && rest.current) return { anchors, lay: shiftLayout(rest.current, anchors, lf), countries: [] as CountryLabel[] };
-    const lay = layoutMarkers({
-      places: anchors,
-      persons: (scene?.persons ?? []).map((p) => ({ id: p.id, place: p.place, name: nameOf(p.id) })),
-      events: (scene?.events ?? []).map((e) => ({ id: e.id, place: e.place })),
-      frame: lf,
-      measure: (text) => measure(text, NAME_FONT),
-      metrics: fontMetrics(NAME_FONT),
-    });
-    const cp = projector(view, frame);
+    const fv = props.fontsVersion;
+    const got = frameLayout(rest.current, scene, moving, anchors, lf, () =>
+      layoutMarkers({
+        places: anchors,
+        persons: (scene?.persons ?? []).map((p) => ({ id: p.id, place: p.place, name: nameOf(p.id) })),
+        events: (scene?.events ?? []).map((e) => ({ id: e.id, place: e.place })),
+        frame: lf,
+        measure: (text) => measure(text, NAME_FONT),
+        metrics: fontMetrics(NAME_FONT, fv),
+      }),
+    );
+    rest.current = got.rest;
+    const lay = got.layout;
+    if (moving) return { anchors, lay, countries: [] as CountryLabel[] };
+    const cp = projector(view, frame, COUNTRY_PRECISION);
     cp.projection.clipExtent([
       [0, 0],
       [width, height],
     ]);
-    const countries = layoutCountries(COUNTRY_INPUT, cp.path, cp.projection, lf, lay.grid, (text) => measure(text, COUNTRY_FONT), fontMetrics(COUNTRY_FONT));
-    rest.current = lay;
+    const countries = layoutCountries(
+      COUNTRY_INPUT,
+      cp.path,
+      cp.projection,
+      lf,
+      lay.grid,
+      COUNTRY_FONTS.map((font) => ({ font, measure: (text: string) => measure(text, font), metrics: fontMetrics(font, fv) })),
+    );
     return { anchors, lay, countries };
     // fontsVersion: шрифты загрузились — ширины подписей меряются заново.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -346,8 +361,7 @@ export default function GlobeView(props: Props) {
   const where = (placeId: string) => {
     const p = placeOf.get(placeId);
     if (!p) return "";
-    const c = countryOf(p);
-    return c ? `${p.label}, ${c.name}` : p.label;
+    return t.geo.placeWithCountry(p.label, countryOf(p)?.name ?? null);
   };
   const showTip = (target: Element, x: number, y: number) => {
     const el = target.closest?.("[data-geo-person],[data-geo-name],[data-geo-event]");
@@ -355,7 +369,9 @@ export default function GlobeView(props: Props) {
     const id = el.getAttribute("data-geo-person") ?? el.getAttribute("data-geo-name") ?? el.getAttribute("data-geo-event")!;
     const place = personOf.get(id)?.place ?? eventOf.get(id)?.place;
     if (!place) return setTip(null);
-    const text = `${props.info(id)?.name ?? id} — ${where(place)}`;
+    const name = props.info(id)?.name;
+    if (!name) return setTip(null);
+    const text = `${name} — ${where(place)}`;
     setTip((old) => (old && old.text === text ? old : { text, x, y }));
   };
 
@@ -453,6 +469,7 @@ export default function GlobeView(props: Props) {
       : null;
   const dim = roles.active;
   const busy = status === "loading";
+  const ready = !busy && (status !== "ok" || props.fontsVersion > 0); // слой разложен по загруженным шрифтам
   const empty = status === "ok" && (layer?.places.length ?? 0) === 0;
   const nobody = status === "ok" && !empty && places.length === 0;
 
@@ -499,7 +516,7 @@ export default function GlobeView(props: Props) {
         aria-roledescription={t.geo.roledescription}
         aria-label={props.summary}
         aria-describedby="geo-keys-hint"
-        aria-busy={busy}
+        aria-busy={!ready}
         tabIndex={0}
         data-year={props.year}
         data-center={centerAttr(view)}
@@ -524,7 +541,7 @@ export default function GlobeView(props: Props) {
         <path className="geo-shade" d={sphere} aria-hidden="true" />
         <g className="geo-countries" aria-hidden="true">
           {countries.map((c) => (
-            <text key={c.id} className={dim ? "geo-country is-dim" : "geo-country"} data-geo-country={c.id} data-area={c.area} data-span={c.span} x={c.x} y={c.y} textAnchor="middle" style={{ font: COUNTRY_FONT }}>
+            <text key={c.id} className={dim ? "geo-country is-dim" : "geo-country"} data-geo-country={c.id} data-area={c.area} data-span={c.span} x={c.x} y={c.y} textAnchor="middle" data-fill={c.fill ? "true" : undefined} style={{ font: COUNTRY_FONTS[c.font] }}>
               {c.text}
             </text>
           ))}
@@ -639,7 +656,7 @@ export default function GlobeView(props: Props) {
                       </>
                     ) : (
                       <text className="geo-medal__mono" y={3.5}>
-                        {monogram(info?.full ?? info?.name ?? s.id)}
+                        {monogram(info?.full || info?.name || "")}
                       </text>
                     )}
                     <circle className="geo-medal__ring" r={r} />

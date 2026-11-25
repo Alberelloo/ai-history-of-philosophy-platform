@@ -1,21 +1,25 @@
 import { geoOrthographic, geoPath } from "d3-geo";
 import { countryName } from "../../src/map/geo/countries";
-import { COUNTRY_MIN_AREA, Grid, inFrame, layoutCountries, MAX_COUNTRY_LABELS, overlaps, type Frame } from "../../src/map/geo/layout";
+import { COUNTRY_MIN_AREA, COUNTRY_MIN_LABELS, Grid, inFrame, layoutCountries, MAX_COUNTRY_LABELS, overlaps, type Frame } from "../../src/map/geo/layout";
 import { COUNTRIES } from "../../src/map/geo/world";
 import { done, eq, ok, test } from "../harness";
 
-const measure = (t: string) => t.length * 6.5;
-const metrics = { ascent: 9, descent: 3 };
+// Шрифты как у глобуса: основной кегль и мельче для добора (ширина — по числу знаков).
+const fonts = [
+  { font: "10.5px", measure: (t: string) => t.length * 6.5, metrics: { ascent: 9, descent: 3 } },
+  { font: "9px", measure: (t: string) => t.length * 5.6, metrics: { ascent: 8, descent: 2.5 } },
+];
 const input = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
 
 function run(w: number, h: number, lon: number, lat: number, zoom: number) {
   const R = (Math.min(w, h) / 2 - 16) * zoom;
   const projection = geoOrthographic().rotate([-lon, -lat]).scale(R).translate([w / 2, h / 2]).clipAngle(90).clipExtent([[0, 0], [w, h]]);
   const f: Frame = { w, h, cx: w / 2, cy: h / 2, R };
-  return layoutCountries(input, geoPath(projection), projection, f, new Grid(), measure, metrics);
+  return layoutCountries(input, geoPath(projection), projection, f, new Grid(), fonts);
 }
 
-for (const [w, h] of [[1024, 576], [1366, 768], [1920, 1080]])
+// 564×322 — svg глобуса в окне 1024×576 (панель справа, шкала снизу).
+for (const [w, h] of [[564, 322], [1024, 576], [1366, 768], [1920, 1080]])
   for (const [lon, lat] of [[15, 50], [100, 40], [-60, -10], [20, 0], [40, 50]])
     for (const z of [1, 2]) {
       test(`подписи стран ${w}×${h} (${lon}, ${lat}) ×${z}`, () => {
@@ -24,7 +28,8 @@ for (const [w, h] of [[1024, 576], [1366, 768], [1920, 1080]])
         ok(out.length <= MAX_COUNTRY_LABELS, "не больше предела");
         for (let i = 0; i < out.length; i++) {
           const a = out[i];
-          ok(a.area >= COUNTRY_MIN_AREA, "площадь");
+          if (!a.fill) ok(a.area >= COUNTRY_MIN_AREA, "площадь основной подписи");
+          if (a.fill) ok(out.filter((o) => !o.fill).length < COUNTRY_MIN_LABELS, "добор — только когда основных меньше 5");
           ok(a.rect.x1 - a.rect.x0 <= a.span + 0.5, `ширина ${a.text}`);
           ok(inFrame({ w, h, cx: 0, cy: 0, R: 0 }, a.rect), "в кадре");
           eq(a.text, countryName(a.id));
