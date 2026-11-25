@@ -23,6 +23,7 @@ from philograph.knowledge.metadata import MetadataIngest
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
+from philograph.knowledge.snapshot import Snapshots
 from philograph.knowledge.statements import Statements
 from philograph.operator.access import ActionLog, OperatorAuth
 from philograph.operator.access import migrations as operator_migrations
@@ -50,6 +51,7 @@ class Components:
     assistant: AssistantKnowledge
     library: ServiceClient
     section_map: SectionMap
+    snapshots: Snapshots
 
 
 def components(env: dict[str, str]) -> Components:
@@ -99,9 +101,12 @@ def components(env: dict[str, str]) -> Components:
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
+    # Один снимок онтологии на процесс: карта (без окна устарелости) и справочник.
+    snapshots = Snapshots(engine)
     section_map = SectionMap(
         statements,
         MapSettings(max_entities=int(env.get("PHILOGRAPH_MAP_MAX_ENTITIES", "400"))),
+        snapshots,
     )
     return Components(
         statements,
@@ -117,6 +122,7 @@ def components(env: dict[str, str]) -> Components:
         assistant,
         library,
         section_map,
+        snapshots,
     )
 
 

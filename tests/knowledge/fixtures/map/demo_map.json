@@ -1,0 +1,688 @@
+{
+ "all": {
+  "eras": [
+   {
+    "from": 1543,
+    "id": "<Научная революция>",
+    "label": "Научная революция",
+    "to": 1687
+   },
+   {
+    "from": 1680,
+    "id": "<Просвещение>",
+    "label": "Просвещение",
+    "to": 1800
+   }
+  ],
+  "events": [
+   {
+    "id": "<Смерть Декарта в Стокгольме>",
+    "kind": "biographical",
+    "label": "Смерть Декарта в Стокгольме",
+    "year": 1650
+   },
+   {
+    "id": "<Отлучение Спинозы>",
+    "kind": "religious",
+    "label": "Отлучение Спинозы",
+    "year": 1656
+   },
+   {
+    "id": "<Основание Лондонского королевского общества>",
+    "kind": "scientific",
+    "label": "Основание Лондонского королевского общества",
+    "year": 1660
+   },
+   {
+    "id": "<Славная революция>",
+    "kind": "political",
+    "label": "Славная революция",
+    "year": 1688
+   },
+   {
+    "id": "<Выход первого тома «Энциклопедии»>",
+    "kind": "intellectual",
+    "label": "Выход первого тома «Энциклопедии»",
+    "year": 1751
+   }
+  ],
+  "groups": [
+   {
+    "id": "<Немецкий идеализм>",
+    "kind": "direction",
+    "label": "Немецкий идеализм",
+    "members": [
+     "<Фихте>"
+    ]
+   },
+   {
+    "id": "<Рационализм>",
+    "kind": "direction",
+    "label": "Рационализм",
+    "members": [
+     "<Декарт>",
+     "<Вольф>"
+    ]
+   },
+   {
+    "id": "<Школа Вольфа>",
+    "kind": "school",
+    "label": "Школа Вольфа",
+    "members": [
+     "<Вольф>"
+    ]
+   },
+   {
+    "id": "<Эмпиризм>",
+    "kind": "direction",
+    "label": "Эмпиризм",
+    "members": [
+     "<Беркли>"
+    ]
+   }
+  ],
+  "limit": 400,
+  "links": [
+   {
+    "generated": false,
+    "id": "<<Кант>:influenced_by:<Юм>>",
+    "in_textbook": null,
+    "object": "<Юм>",
+    "status": "sourced",
+    "subject": "<Кант>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": false,
+    "id": "<<Вольф>:influenced_by:<Лейбниц>>",
+    "in_textbook": null,
+    "object": "<Лейбниц>",
+    "status": "verified",
+    "subject": "<Вольф>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": false,
+    "id": "<<Беркли>:influenced_by:<Локк>>",
+    "in_textbook": null,
+    "object": "<Локк>",
+    "status": "verified",
+    "subject": "<Беркли>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": true,
+    "id": "<<Беркли>:criticizes:<Декарт>>",
+    "in_textbook": null,
+    "object": "<Декарт>",
+    "status": "generated",
+    "subject": "<Беркли>",
+    "type": "criticizes"
+   }
+  ],
+  "people": [
+   {
+    "birth": 1596,
+    "death": 1650,
+    "id": "<Декарт>",
+    "label": "Декарт",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Декарт",
+    "weight": 6
+   },
+   {
+    "birth": 1632,
+    "death": 1704,
+    "id": "<Локк>",
+    "label": "Локк",
+    "precision": "year",
+    "roles": [
+     "philosopher"
+    ],
+    "short": "Локк",
+    "weight": 4
+   },
+   {
+    "birth": 1646,
+    "death": 1716,
+    "id": "<Лейбниц>",
+    "label": "Лейбниц",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Лейбниц",
+    "weight": 5
+   },
+   {
+    "birth": 1679,
+    "death": 1754,
+    "id": "<Вольф>",
+    "label": "Вольф",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Вольф",
+    "weight": 7
+   },
+   {
+    "birth": 1685,
+    "death": 1753,
+    "id": "<Беркли>",
+    "label": "Беркли",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "theologian"
+    ],
+    "short": "Беркли",
+    "weight": 7
+   },
+   {
+    "birth": 1711,
+    "death": 1776,
+    "id": "<Юм>",
+    "label": "Юм",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "writer"
+    ],
+    "short": "Юм",
+    "weight": 4
+   },
+   {
+    "birth": 1724,
+    "death": 1804,
+    "id": "<Кант>",
+    "label": "Кант",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Кант",
+    "weight": 4
+   },
+   {
+    "birth": 1762,
+    "death": 1814,
+    "id": "<Фихте>",
+    "label": "Фихте",
+    "precision": "year",
+    "roles": [
+     "philosopher"
+    ],
+    "short": "Фихте",
+    "weight": 4
+   }
+  ],
+  "range": [
+   1543,
+   1814
+  ],
+  "truncated": false,
+  "undated": [
+   {
+    "id": "<Причинность>",
+    "label": "Причинность",
+    "type": "concept"
+   },
+   {
+    "id": "<Субстанция>",
+    "label": "Субстанция",
+    "type": "concept"
+   }
+  ],
+  "works": [
+   {
+    "author": "<Декарт>",
+    "id": "<Методическое сомнение>",
+    "kind": "position",
+    "label": "Методическое сомнение",
+    "type": "position",
+    "weight": 1,
+    "year": 1637
+   },
+   {
+    "author": "<Декарт>",
+    "id": "<Рассуждение о методе>",
+    "kind": "work",
+    "label": "Рассуждение о методе",
+    "type": "work",
+    "weight": 3,
+    "year": 1637
+   },
+   {
+    "author": "<Беркли>",
+    "id": "<Имматериализм>",
+    "kind": "concept",
+    "label": "Имматериализм",
+    "type": "doctrine",
+    "weight": 1,
+    "year": 1710
+   },
+   {
+    "author": "<Беркли>",
+    "id": "<Трактат о принципах человеческого знания>",
+    "kind": "work",
+    "label": "Трактат о принципах человеческого знания",
+    "type": "work",
+    "weight": 3,
+    "year": 1710
+   },
+   {
+    "author": "<Вольф>",
+    "id": "<Разумные мысли о Боге, мире и душе человека>",
+    "kind": "work",
+    "label": "Разумные мысли о Боге, мире и душе человека",
+    "type": "work",
+    "weight": 2,
+    "year": 1720
+   },
+   {
+    "author": "<Лейбниц>",
+    "id": "<Новые опыты о человеческом разумении>",
+    "kind": "work",
+    "label": "Новые опыты о человеческом разумении",
+    "type": "work",
+    "weight": 3,
+    "year": 1765
+   },
+   {
+    "author": "<Фихте>",
+    "id": "<Основа общего наукоучения>",
+    "kind": "work",
+    "label": "Основа общего наукоучения",
+    "type": "work",
+    "weight": 2,
+    "year": 1794
+   }
+  ]
+ },
+ "only_textbook": {
+  "eras": [],
+  "events": [],
+  "groups": [],
+  "limit": 400,
+  "links": [
+   {
+    "generated": false,
+    "id": "<<Кант>:influenced_by:<Юм>>",
+    "in_textbook": true,
+    "object": "<Юм>",
+    "status": "sourced",
+    "subject": "<Кант>",
+    "type": "influenced_by"
+   }
+  ],
+  "people": [
+   {
+    "birth": 1632,
+    "death": 1704,
+    "id": "<Локк>",
+    "label": "Локк",
+    "precision": "year",
+    "roles": [
+     "philosopher"
+    ],
+    "short": "Локк",
+    "weight": 0
+   },
+   {
+    "birth": 1711,
+    "death": 1776,
+    "id": "<Юм>",
+    "label": "Юм",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "writer"
+    ],
+    "short": "Юм",
+    "weight": 1
+   },
+   {
+    "birth": 1724,
+    "death": 1804,
+    "id": "<Кант>",
+    "label": "Кант",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Кант",
+    "weight": 1
+   }
+  ],
+  "range": [
+   1632,
+   1804
+  ],
+  "truncated": false,
+  "undated": [
+   {
+    "id": "<Причинность>",
+    "label": "Причинность",
+    "type": "concept"
+   }
+  ],
+  "works": []
+ },
+ "textbook": {
+  "eras": [
+   {
+    "from": 1543,
+    "id": "<Научная революция>",
+    "label": "Научная революция",
+    "to": 1687
+   },
+   {
+    "from": 1680,
+    "id": "<Просвещение>",
+    "label": "Просвещение",
+    "to": 1800
+   }
+  ],
+  "events": [
+   {
+    "id": "<Смерть Декарта в Стокгольме>",
+    "kind": "biographical",
+    "label": "Смерть Декарта в Стокгольме",
+    "year": 1650
+   },
+   {
+    "id": "<Отлучение Спинозы>",
+    "kind": "religious",
+    "label": "Отлучение Спинозы",
+    "year": 1656
+   },
+   {
+    "id": "<Основание Лондонского королевского общества>",
+    "kind": "scientific",
+    "label": "Основание Лондонского королевского общества",
+    "year": 1660
+   },
+   {
+    "id": "<Славная революция>",
+    "kind": "political",
+    "label": "Славная революция",
+    "year": 1688
+   },
+   {
+    "id": "<Выход первого тома «Энциклопедии»>",
+    "kind": "intellectual",
+    "label": "Выход первого тома «Энциклопедии»",
+    "year": 1751
+   }
+  ],
+  "groups": [
+   {
+    "id": "<Немецкий идеализм>",
+    "kind": "direction",
+    "label": "Немецкий идеализм",
+    "members": [
+     "<Фихте>"
+    ]
+   },
+   {
+    "id": "<Рационализм>",
+    "kind": "direction",
+    "label": "Рационализм",
+    "members": [
+     "<Декарт>",
+     "<Вольф>"
+    ]
+   },
+   {
+    "id": "<Школа Вольфа>",
+    "kind": "school",
+    "label": "Школа Вольфа",
+    "members": [
+     "<Вольф>"
+    ]
+   },
+   {
+    "id": "<Эмпиризм>",
+    "kind": "direction",
+    "label": "Эмпиризм",
+    "members": [
+     "<Беркли>"
+    ]
+   }
+  ],
+  "limit": 400,
+  "links": [
+   {
+    "generated": false,
+    "id": "<<Кант>:influenced_by:<Юм>>",
+    "in_textbook": true,
+    "object": "<Юм>",
+    "status": "sourced",
+    "subject": "<Кант>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": false,
+    "id": "<<Вольф>:influenced_by:<Лейбниц>>",
+    "in_textbook": false,
+    "object": "<Лейбниц>",
+    "status": "verified",
+    "subject": "<Вольф>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": false,
+    "id": "<<Беркли>:influenced_by:<Локк>>",
+    "in_textbook": false,
+    "object": "<Локк>",
+    "status": "verified",
+    "subject": "<Беркли>",
+    "type": "influenced_by"
+   },
+   {
+    "generated": true,
+    "id": "<<Беркли>:criticizes:<Декарт>>",
+    "in_textbook": false,
+    "object": "<Декарт>",
+    "status": "generated",
+    "subject": "<Беркли>",
+    "type": "criticizes"
+   }
+  ],
+  "people": [
+   {
+    "birth": 1596,
+    "death": 1650,
+    "id": "<Декарт>",
+    "label": "Декарт",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Декарт",
+    "weight": 6
+   },
+   {
+    "birth": 1632,
+    "death": 1704,
+    "id": "<Локк>",
+    "label": "Локк",
+    "precision": "year",
+    "roles": [
+     "philosopher"
+    ],
+    "short": "Локк",
+    "weight": 4
+   },
+   {
+    "birth": 1646,
+    "death": 1716,
+    "id": "<Лейбниц>",
+    "label": "Лейбниц",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Лейбниц",
+    "weight": 5
+   },
+   {
+    "birth": 1679,
+    "death": 1754,
+    "id": "<Вольф>",
+    "label": "Вольф",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Вольф",
+    "weight": 7
+   },
+   {
+    "birth": 1685,
+    "death": 1753,
+    "id": "<Беркли>",
+    "label": "Беркли",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "theologian"
+    ],
+    "short": "Беркли",
+    "weight": 7
+   },
+   {
+    "birth": 1711,
+    "death": 1776,
+    "id": "<Юм>",
+    "label": "Юм",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "writer"
+    ],
+    "short": "Юм",
+    "weight": 4
+   },
+   {
+    "birth": 1724,
+    "death": 1804,
+    "id": "<Кант>",
+    "label": "Кант",
+    "precision": "year",
+    "roles": [
+     "philosopher",
+     "scientist"
+    ],
+    "short": "Кант",
+    "weight": 4
+   },
+   {
+    "birth": 1762,
+    "death": 1814,
+    "id": "<Фихте>",
+    "label": "Фихте",
+    "precision": "year",
+    "roles": [
+     "philosopher"
+    ],
+    "short": "Фихте",
+    "weight": 4
+   }
+  ],
+  "range": [
+   1543,
+   1814
+  ],
+  "truncated": false,
+  "undated": [
+   {
+    "id": "<Причинность>",
+    "label": "Причинность",
+    "type": "concept"
+   },
+   {
+    "id": "<Субстанция>",
+    "label": "Субстанция",
+    "type": "concept"
+   }
+  ],
+  "works": [
+   {
+    "author": "<Декарт>",
+    "id": "<Методическое сомнение>",
+    "kind": "position",
+    "label": "Методическое сомнение",
+    "type": "position",
+    "weight": 1,
+    "year": 1637
+   },
+   {
+    "author": "<Декарт>",
+    "id": "<Рассуждение о методе>",
+    "kind": "work",
+    "label": "Рассуждение о методе",
+    "type": "work",
+    "weight": 3,
+    "year": 1637
+   },
+   {
+    "author": "<Беркли>",
+    "id": "<Имматериализм>",
+    "kind": "concept",
+    "label": "Имматериализм",
+    "type": "doctrine",
+    "weight": 1,
+    "year": 1710
+   },
+   {
+    "author": "<Беркли>",
+    "id": "<Трактат о принципах человеческого знания>",
+    "kind": "work",
+    "label": "Трактат о принципах человеческого знания",
+    "type": "work",
+    "weight": 3,
+    "year": 1710
+   },
+   {
+    "author": "<Вольф>",
+    "id": "<Разумные мысли о Боге, мире и душе человека>",
+    "kind": "work",
+    "label": "Разумные мысли о Боге, мире и душе человека",
+    "type": "work",
+    "weight": 2,
+    "year": 1720
+   },
+   {
+    "author": "<Лейбниц>",
+    "id": "<Новые опыты о человеческом разумении>",
+    "kind": "work",
+    "label": "Новые опыты о человеческом разумении",
+    "type": "work",
+    "weight": 3,
+    "year": 1765
+   },
+   {
+    "author": "<Фихте>",
+    "id": "<Основа общего наукоучения>",
+    "kind": "work",
+    "label": "Основа общего наукоучения",
+    "type": "work",
+    "weight": 2,
+    "year": 1794
+   }
+  ]
+ }
+}
