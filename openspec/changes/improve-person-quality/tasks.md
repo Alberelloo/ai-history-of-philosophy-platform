@@ -9,7 +9,7 @@
 
 ## 2. Разработчик
 
-- [ ] 2.1 `knowledge/dedupe.py`:
+- [x] 2.1 `knowledge/dedupe.py`:
   - `Verdict`, `same_person` (шаги 1–9 спецификации, `apart:decided` по закрытым «разные», без `merge:qid`, с `qid_confirmed`);
   - `choose_kept` по компоненте;
   - `plan` — чистая функция: индекс, объединение множеств, отказ компоненты с ≥ 2 QID или `apart:qid`/`review:dates`, детерминированный вывод;

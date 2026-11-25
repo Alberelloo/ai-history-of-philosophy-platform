@@ -94,3 +94,10 @@
 
   Описания событий: optional-поля `merged` и `merge_undone` — в `entities.py`, где события уже описаны; `knowledge.entity.merge_proposed` — в `statements.py`. Найден и обойдён побочный эффект: `lifespan` и `dating` пишут один ключ `dates`, поэтому `_refresh_primary` пересчитывает только тип, который есть у сущности. Юнит-тесты 6 passed (в том числе дамп после отмены равен исходному). `test_statements` 19, `test_registry_entities` 33/1, `test_snapshot` 6.
 - 2.4 `snapshot.py`: утверждения-связи с `subject == object` (петли) не попадают в снимок. Карта, справочник и карточки их не видят. Сверх пункта то же сделано в `Statements.about`: из него `/entities/{id}/statements` получает данные (сценарий «Петля» требует скрыть там). Юнит-тест 7 passed; `test_snapshot` 6, `test_map` 16, `test_graph` 24.
+- 2.1 `knowledge/dedupe.py`:
+  - `Verdict`, `Entity`, `same_person` по шагам 1–9 (О13: совпавшие основные, в том числе однословные, — `merge:name`; однословное основное, совпавшее с вариантом, — `review:single_name`; решение «разные» — `apart:decided`);
+  - `choose_kept`; `candidate_pairs` по индексу названий; `plan` — объединение множеств, компонента с ≥ 2 QID, `apart:qid`, `apart:decided` или `review:dates` уходит в очередь, вывод отсортирован;
+  - `load_persons`, `link_counts`, `duplicate_items`, `propose` (пункт `duplicate` с `payload.reason`, событие `merge_proposed`, без повтора открытого);
+  - `Dedupe.plan/run(dry_run, run_id, confirmed)`.
+
+  Отличие от spec: в компоненте, заблокированной только решением «разные», рёбра уходят в очередь с `review:qid_cluster` — в перечне причин нет отдельной, а «разные» в очередь не возвращаются. Юнит-тесты `tests/knowledge/test_dedupe_unit.py`: 17 passed, в том числе 5040 перестановок входа с одним итогом.
