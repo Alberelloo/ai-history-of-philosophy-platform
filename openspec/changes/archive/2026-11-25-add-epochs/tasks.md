@@ -48,9 +48,9 @@
 ## 6. Завершение
 
 - [x] 6.1 `openspec/traceability.yaml`: `epochs` в `enforce` (решение ведущего Р6); `python scripts/check_traceability.py` без пропусков
-- [ ] 6.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/web/test_map.py tests/web/test_epochs.py`
-- [ ] 6.3 Ревьювер: дифф против спецификации и «Выбора решения» (модуль-команда, политика конфликтов, правило на сервере, фильтр, страница), костыли, подгонка тестов
-- [ ] 6.4 Судья (новый субагент): вердикт в `verification.md`; PR в draft до «принято»
+- [x] 6.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/web/test_map.py tests/web/test_epochs.py`
+- [x] 6.3 Ревьювер: дифф против спецификации и «Выбора решения» (модуль-команда, политика конфликтов, правило на сервере, фильтр, страница), костыли, подгонка тестов
+- [x] 6.4 Судья (новый субагент): вердикт в `verification.md`; PR в draft до «принято»
 - [x] 6.5 Архив вручную, перенос дельт в `openspec/specs/`
 
 ## Требует согласования Lead'а
