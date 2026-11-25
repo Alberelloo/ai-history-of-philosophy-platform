@@ -137,3 +137,7 @@
   - Все вызовы `create`/`add_name`/`set_primary_name` (grep) обрабатывают отказ названия: `geo_enrich` — пропуск `refused`, `epoch_dates` — `result=invalid_name`, `epoch_context` — `result=invalid_name` с проверкой названий события и места до записи (`naming.invalid_primary`). Принятое поведение меняется (раньше сущность создавалась с мусорным названием), поэтому добавлены дельты MODIFIED `epochs`, `epoch-context`, `geo-timeline` со сценариями, плюс раздел design «Пути из внешних данных».
   - Описания `knowledge.extraction.dropped`/`ambiguous` перенесены из `filling.py` (файл Lead'а, удалены 12 строк описаний) в `entity_items.py`. Не дублируются.
   - Прогоны: `test_invalid_name_paths_unit` 4 passed (в том числе проверка в отдельном процессе, что события описаны без импорта `filling`); `test_geo_enrich` 37, `test_epoch_dates` 66, `test_epoch_dates_unit` 19, `test_epoch_context_import` 16, `test_filling` 30, `test_entity_items_unit` 9 — passed; `lint-imports` 3 kept; traceability 403 из 403.
+
+## Ведущий — к тестировщику (2026-11-25)
+
+План одобрен ревьювером (круг 2) и тестировщиком (круг 2); решения ведущего О1–О13 — в разделах выше и в отчёте PR. Разработчик: пункты 2.1–2.8, риски «пути из внешних данных» и регистрация событий закрыты (5b65a40). Тестировщик запускается на **opus** (исключение CLAUDE.md): он строит новую тестовую инфраструктуру — профили hypothesis, `tests/knowledge/dump.py`, `scripts/mutation_check.py` с `--coverage`, общие для четырёх изменений. Передаются только спецификации и tasks, не код.
