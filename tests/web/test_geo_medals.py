@@ -808,6 +808,13 @@ def test_click_more_badge(knowledge_context, knowledge_stack, events):
     assert badge["places"] == [paris]
     page.mouse.click(sc["left"] + badge["box"]["cx"], sc["top"] + badge["box"]["cy"])
     settle(page)
+    expect(page).to_have_url(re.compile(rf"/graph/{paris}\?"))
+    # На 1024×576 панель складывает разделы до заголовков («Панель карты») — читатель
+    # раскрывает «Выбрано».
+    fold = page.locator(".map-fold", has_text="Выбрано")
+    if fold.get_attribute("aria-expanded") == "false":
+        fold.click()
+        expect(fold).to_have_attribute("aria-expanded", "true")
     expect(page.locator(".map-selected__name")).to_contain_text("Париж")
     who = page.locator(".geo-selected__who button")
     expect(who).to_have_count(19)
