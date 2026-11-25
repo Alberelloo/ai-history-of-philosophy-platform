@@ -169,16 +169,27 @@
 
 | Ветвь | Вид генератора |
 |---|---|
-| 1 `apart:type` | не порождается: генератор строит только персоны. Проверяется сценарием «Разные типы» в ontology-entities, а не этим инвариантом |
+| 1 `apart:type` | `mixed_type`: пара модели «персона — понятие с тем же названием» → понятие не сливается, две персоны сливаются `merge:name`. Мутация type-rule-dropped |
 | 2 `apart:qid` | `qids_distinct`; в компоненте — `two_qids` (пара 0–2) |
 | 3 `apart:decided` | `decided`, `decided3` |
 | 4 `review:dates` | `dates` (пара); в компоненте — `date_chain` (новый) |
 | 5 `merge:qid_confirmed` | `confirmed` |
 | 6 `merge:name` | `plain` (1–4 записи, регистр, даты в допуске и с одной стороны) |
-| 7 `merge:model_pair` | не порождается: нужен элемент ответа модели. Покрыто сценарием «Слияние вариантов» (стенд извлечения) |
+| 7 `merge:model_pair` | `model_pair`: пары модели в `case["model"]` → `plan(pairs_by_model=…)` сливает. В `Dedupe.run` пар модели нет — ожидание: ни слияния, ни очереди. Мутация model-pair-ignored |
 | 8 `review:single_name` / `review:variant` | `variant_single` / `variant_multi` |
 | 9 `apart:none` | разные лица (уникальный хвост названия) |
 | компонента: два QID → `review:qid_cluster` | `two_qids` |
 | компонента: решение «разные» — единственная преграда → `review:decided_conflict` | `decided3` |
 | пара без других рёбер, кроме решённой, — не в очередь | `decided` |
-| пара `review:*` внутри сливаемой компоненты — не в очередь | не порождается: нужно сочетание `plain` и `confirmed` с вариантом. Остаётся пробелом, задача на следующий круг |
+| пара `review:*` внутри сливаемой компоненты — не в очередь | `review_inside`: B и C подтверждены для QID A; основное B = вариант C (`review:single_name`) → слита вся тройка, очереди нет. Мутация review-inside-queued |
+
+Явные `@example`: `MODEL_PAIR` (Hume/Хьюм по модели; Substance — две персоны и понятие) и `REVIEW_INSIDE` (Homer Q6691, Омир, «Гомерос» с вариантом «Омир») — в обоих property-тестах. Прогон `-k "date_chain or plan_partition or merge_invariant_two_orders"` — 3 passed in 37.90s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | type-rule-dropped | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | model-pair-ignored | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | review-inside-queued | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | review-inside-queued | test_merge_invariant_two_orders | да |
+
+`apart:type` и `merge:model_pair` проверяются только чистым `plan`: `Dedupe.run` по базе берёт одни персоны и не принимает пар модели. Это видно из сигнатуры `run(confirmed, scope)`.
