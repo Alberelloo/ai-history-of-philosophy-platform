@@ -181,3 +181,4 @@
 - **Желательно 5** — `externals()` читается один раз в `apply` и передаётся в `_entry` и режим `--linked`.
 - **Желательно 6** — в design («`dating.source`») записано: атрибуция персоне и подтверждающий абзац — `source`; спецификация не менялась.
 - Прогоны: test_statements 19 passed; test_wikidata_unit, test_wikidata, test_epoch_dates_unit, test_epoch_dates — 171 passed; test_mentions_cards, test_map, test_map_snapshot_parity, test_graph, test_epochs_list — 62 passed; `ruff check src tests` чисто, `lint-imports` 3 kept.
+- Тестировщик, повторный прогон после 3fefd87/05bc4f5: все файлы изменения зелёные (knowledge по файлам, web: epochs 23, reference 31, map 48); Д1 и Д2 закрыты. Добавлен инвариант `test_manifest_qid_differs_from_epoch_qid` (QID манифеста ≠ QID эпохи → `duplicate_qid`, без записи); пробел спецификации — строка `duplicate_qid` таблицы `result` этот случай не называет (решение ведущего).

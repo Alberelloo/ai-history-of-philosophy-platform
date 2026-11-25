@@ -944,3 +944,38 @@ def test_not_created_without_dating(op, onto, events, failure):
     assert rows(onto) == before
     assert results(events) == [failure]
     events.assert_none("knowledge.entity.created")
+
+
+@req(EP, FROM_WD, invariant="только подтверждённый QID; второй QID эпохе не записывается")
+@pytest.mark.parametrize("dry", [False, True], ids=["apply", "dry_run"])
+def test_manifest_qid_differs_from_epoch_qid(op, onto, events, dry):
+    """У эпохи уже внешний QID, в манифесте — другой: ни датировки, ни второго QID;
+    код результата — ``duplicate_qid`` (таблица ``result``: запись «нет»)."""
+    enl = epoch(onto, "Просвещение")
+    onto.entities.add_external(enl, "wikidata", "Q12539")
+    fetch = RecordFetch(
+        {
+            "Q12539": dated("Q12539", year(1685), year(1815)),
+            "Q999": dated("Q999", year(1700), year(1790)),
+        }
+    )
+    op.manifest(entry("Просвещение", wikidata="Q999"))
+    before = rows(onto)
+    events.clear()
+    code, report, _ = op.run(fetch, "apply", *(["--dry-run"] if dry else []))
+    assert code == 0
+    assert rows(onto) == before
+    assert datings(onto, enl) == []
+    assert onto.entities.externals("wikidata") == {enl: "Q12539"}
+    assert onto.entities.by_external("wikidata", "Q999") is None
+    [item] = report["epochs"]
+    assert (item["epoch_id"], item["result"]) == (enl, "duplicate_qid")
+    checked = events.one(CHECKED)
+    assert (checked["epoch_id"], checked["qid"], checked["result"]) == (
+        enl,
+        "Q999",
+        "duplicate_qid",
+    )
+    run = run_event(events)
+    assert (run["checked"], run["added"], run["skipped"]) == (1, 0, 1)
+    events.assert_none("knowledge.statement.created")

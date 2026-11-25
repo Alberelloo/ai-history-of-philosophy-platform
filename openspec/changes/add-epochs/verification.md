@@ -147,3 +147,42 @@
 - «Повторный подбор»: «комментарий» проверен как поле `comment` манифеста; YAML-комментарии внутри записей `save_manifest` не сохраняет (сохраняется только шапка файла) — спецификация неоднозначна, дефектом не считаю.
 - `dating.wikidata` проверяется во вложенном объекте `dating` (форма из design.md); в спецификации поле названо `wikidata` без места.
 - Порядок «первая записанная» опирается на порядок строк `Statements._raw` без `ORDER BY`; на SQLite это порядок вставки, на PostgreSQL не гарантирован — риск для ревьювера, тестом на SQLite не ловится.
+
+## Тестировщик — повторный прогон после исправлений (2026-11-25, после 3fefd87 и 05bc4f5)
+
+`git pull --ff-only` → HEAD 05bc4f5; `cd web && npm run build` → `✓ built in 5.15s` (до pytest, не параллельно). Свои тесты не переписывались; добавлен один инвариант (ниже).
+
+Команды и итоги (по файлам):
+
+    tests/knowledge/test_wikidata.py            →  52 passed in 12.42s
+    tests/knowledge/test_epoch_dates.py         →  66 passed in 23.34s   (было 1 failed — Д1)
+    tests/knowledge/test_epochs_list.py         →  11 passed in 29.02s
+    tests/knowledge/test_map.py                 →  12 passed in 10.54s
+    tests/knowledge/test_map_snapshot_parity.py →  3 passed in 3.46s
+    tests/knowledge/test_mentions_cards.py      →  23 passed in 25.43s   (было 1 failed — Д2)
+    tests/knowledge/test_epochs_membership.py   →  55 passed in 33.33s
+    tests/knowledge/test_catalog.py             →  125 passed in 133.85s
+    tests/knowledge/test_statements.py          →  19 passed in 7.60s
+    tests/knowledge/test_epoch_dates_unit.py    →  19 passed in 4.73s
+    tests/knowledge/test_wikidata_unit.py       →  36 passed in 0.15s
+    tests/knowledge/test_epochs_list_unit.py    →  3 passed in 1.55s
+    tests/knowledge/test_epoch_card_unit.py     →  1 passed in 0.57s
+    tests/knowledge/test_entities_external.py   →  4 passed in 1.12s
+    tests/web/test_epochs.py                    →  23 passed in 63.38s
+    tests/web/test_reference.py                 →  31 passed in 75.97s
+    tests/web/test_map.py                       →  48 passed in 265.90s (дизайн-якоря карты зелёные)
+    python scripts/check_traceability.py        →  Требований с тестами: 378 из 378
+    ruff check tests                            →  All checks passed!
+
+Дефекты:
+
+- **Д1 — закрыт.** `test_epoch_dates.py::test_main_dating_only_from_active[reject]` проходит: после отклонения первой датировки `/v1/epochs` отдаёт 1580–1730. Мутация (м) и прочие ожидания «Датировки эпохи» по-прежнему зелёные.
+- **Д2 — закрыт.** `test_mentions_cards.py::test_epoch_card` проходит: атрибуция строки `dating` — «Wikidata», `knowledge.card.served` type=epoch sections=2 rows=2.
+
+Новое поведение из ревью — QID манифеста ≠ QID эпохи:
+
+| Требование | Инвариант | Тест | Вывод | Журнал |
+|---|---|---|---|---|
+| Даты эпох из Wikidata | только подтверждённый QID; второй QID эпохе не записывается | tests/knowledge/test_epoch_dates.py::test_manifest_qid_differs_from_epoch_qid[apply,dry_run] | у «Просвещения» (QID Q12539) манифест Q999: строки всех таблиц равны, датировки нет, внешний id только Q12539, Q999 ни у кого; отчёт duplicate_qid | checked epoch_id=<Просв.> qid=Q999 result=duplicate_qid; run checked=1 added=0 skipped=1; statement.created нет |
+
+Сверка с таблицей `result` дельты `epochs`: строка `duplicate_qid` описана как «идентификатор уже у другой сущности», а здесь у **той же** эпохи уже другой идентификатор. Нормативные фразы требования («только подтверждённый человеком идентификатор», «MUST NOT записывать новую» датировку при действующей; запись — «нет») поведением соблюдены, противоречия MUST нет; но случай в колонке «Когда» не назван — **пробел спецификации**: предлагается дописать в строку `duplicate_qid` «… или у эпохи уже другой идентификатор» (решение ведущего; сценария в дельте нет, покрыто инвариантом).
