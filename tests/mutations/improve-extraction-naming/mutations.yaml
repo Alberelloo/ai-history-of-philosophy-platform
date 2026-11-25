@@ -148,3 +148,17 @@ mutations:
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_rejection_invariant
       - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
+  - id: roman-any-case
+    requirement: Язык названий сущностей
+    patch: roman-any-case.patch
+    note: J1 судьи — слова из букв IVXLCDM в любом регистре считаются римскими
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: reverse-interval-accepted
+    requirement: Извлечение дат
+    patch: reverse-interval-accepted.patch
+    note: J3 судьи — нет проверки «начало ≤ конец» у интервала нашей эры
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant

@@ -295,6 +295,8 @@ def test_spellings_found_different_entities(stand, onto, engine_for, clock, even
 @example((("Ἀριστοτέλης", "ru"), "el", None))
 @example((("Königsberg", "en"), "en", None))
 @example((("Locke", "ru"), "en", None))
+@example((("Mill", "ru"), "en", None))  # J1: буквы IVXLCDM не заглавными — латиница
+@example((("Civil Xiv", None), "en", None))
 @example((("Empiricism: a demonstration reader", "ru"), "en", None))
 @example((("Ding an sich", "de"), "de", None))
 @example((("XIV", "ru"), "und", None))
@@ -321,6 +323,7 @@ def _primaries_per_lang(onto, entity_id: str) -> dict[str, int]:
 @given(main=scripts_mix(), extra=scripts_mix())
 @example(main=(("Kant-Кант", "ru"), "und", None), extra=(("Locke", "ru"), "en", None))
 @example(main=(("Людовик XIV", "en"), "ru", None), extra=(("Ἀριστοτέλης", "ru"), "el", None))
+@example(main=(("Mill", "ru"), "en", None), extra=(("Lid", None), "en", None))  # J1
 def test_language_invariant_create_and_add_name(onto, events, main, extra):
     (text, given_lang), expected, _ = main
     (vtext, vgiven), vexpected, _ = extra

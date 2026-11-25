@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -79,8 +79,6 @@
+         values = [int(first)] + ([int(second)] if second else [])
+         if any(not 1 <= v <= MAX_YEAR for v in values):
+             return None
+-        if second and not years.group("era") and values[0] > values[1]:
+-            return None  # интервал нашей эры — начало не позже конца
+         return _Format(frozenset(values), None, single=second is None)
+     century = _CENTURY_FORMAT.match(s)
+     if century and _roman_value(century.group(1)) is not None:

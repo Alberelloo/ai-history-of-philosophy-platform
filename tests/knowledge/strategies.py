@@ -345,9 +345,19 @@ def scripts_mix(
     counts = {s: 0 for s in _ALPHABETS}
     words: list[str] = []
     for _ in range(draw(st.integers(1, max_words))):
-        kind = draw(st.sampled_from(["cyrillic", "latin", "greek", "other", "mixed", "roman"]))
+        kind = draw(
+            st.sampled_from(
+                ["cyrillic", "latin", "greek", "other", "mixed", "roman", "roman_letters"]
+            )
+        )
         if kind == "roman":
             word = draw(st.sampled_from(ROMAN))
+        elif kind == "roman_letters":
+            # Слово из букв IVXLCDM не целиком заглавными («Mill», «Civil», «Xiv») — латиница,
+            # не римское число: римские — только заглавные (entity-naming).
+            body = draw(st.text("ivxlcdm", min_size=2, max_size=6))
+            word = draw(st.sampled_from([body.capitalize(), body]))
+            counts["latin"] += len(body)
         elif kind == "mixed":
             a, b = (
                 draw(st.sampled_from(["cyrillic", "latin", "greek"])),
@@ -596,7 +606,14 @@ def datings(draw) -> dict[str, Any]:
         quote = quote + " " + sentinel()  # такого текста в абзаце нет
         reason = "dating:quote"
     elif target == "unparsed":
-        text = draw(st.sampled_from(UNPARSED))
+        if draw(st.booleans()):
+            text = draw(st.sampled_from(UNPARSED))
+        else:
+            # Обратный интервал нашей эры (Г1 > Г2), в том числе с «ок.»: формата нет в таблице.
+            end = draw(st.integers(1, 2099))
+            start = draw(st.integers(end + 1, 2100))
+            approx = draw(st.sampled_from(["", "ок. ", "около "]))
+            text = f"{approx}{start}{draw(st.sampled_from(DASHES))}{end}"
         quote = f"{draw(st.sampled_from(CONTEXT_WORDS))} {text}"
         reason = "dating:unparsed"
     elif target == "not_in_quote":

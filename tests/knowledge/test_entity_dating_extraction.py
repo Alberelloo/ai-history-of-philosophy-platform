@@ -318,6 +318,11 @@ def _case(text, quote, paragraph_text, reason, expect, type_="work", paragraph=1
 
 
 EXAMPLES = [
+    # J3: обратный интервал нашей эры — формата нет в таблице
+    _case(
+        "1804–1724", "жил 1804–1724", "Кант жил 1804–1724 годы.", "dating:unparsed", None, "person"
+    ),
+    _case("ок. 1690-1689", "ок. 1690-1689", "Трактат (ок. 1690-1689).", "dating:unparsed", None),
     _case(
         "V в. до н. э.",
         "софисты учили",
