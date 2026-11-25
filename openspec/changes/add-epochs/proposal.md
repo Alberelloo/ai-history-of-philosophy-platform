@@ -12,6 +12,7 @@
 
 ## What Changes
 
+- **Общий модуль Wikidata** `knowledge/wikidata.py`: загрузка (одна функция с сетью, `User-Agent` без личных данных, таймаут, `Retry-After`), проверка QID `^Q\d+$`, разбор записи и рангов, время Wikidata → нечёткая дата, формат дат в утверждениях. 2.3 и 2.4 переиспользуют его.
 - **Даты эпох из Wikidata — новый модуль** `knowledge/epoch_dates.py` с внедряемой функцией загрузки (`fetch`, как у `import_wikidata(qid, fetch)` и `portraits_source`), без сети в тестах. Запуск — командой оператора `python -m philograph.knowledge.epoch_dates <suggest|apply>` на данных Lead'а. Время начала и конца (P580/P582, запасные P571/P576) с точностью Wikidata переводится в нечёткий интервал; записывается как `dating` со статусом «по источникам», атрибуцией «Wikidata» со ссылкой и внешним идентификатором. Существующая датировка не перезаписывается — расхождения попадают в отчёт.
 - **Ядро эпох раздела:** манифест `sources/epochs.yaml` (названия RU/EN, Wikidata QID после подтверждения человеком); `apply` заводит недостающие эпохи из манифеста, `suggest` только подбирает кандидатов QID, ничего не применяя.
 - **`GET /api/knowledge/v1/epochs`**: эпохи по времени с нечёткими границами, источником датировки и числом относящихся сущностей по видам; эпохи без датировки — отдельно. Контракт для страницы эпох и для 2.4.
@@ -28,17 +29,18 @@
 
 ### Modified Capabilities
 
-- `epochs`: добавлены «Датировка эпохи», «Даты эпох из Wikidata», «Подбор записи Wikidata», «Ядро эпох», «Список эпох», «Страница эпох», «Клавиатура и доступность страницы эпох».
+- `epochs`: добавлены «Датировка эпохи», «Доступ к Wikidata», «Даты эпох из Wikidata», «Подбор записи Wikidata», «Ядро эпох», «Список эпох», «Страница эпох», «Клавиатура и доступность страницы эпох».
 - `knowledge-graph`: изменены «Карта раздела» (нечёткие границы пролёта), «Выбор на карте» (участники эпохи — по общему правилу, с явными связями), «Фильтры и поиск карты» (фильтр «Эпоха»).
 - `entity-cards`: изменено «Разделы карточки по типу» — разделы эпохи.
 - `visual-design`: изменено «Разделы в разработке» — «Эпохи» без метки «скоро», `/soon/epochs` → `/epochs`.
 
 ## Impact
 
-- Сервис знаний: новые `knowledge/epoch_dates.py` (CLI и функции с `fetch`), список эпох в `knowledge/epochs.py`; `knowledge/map.py` — поле `epochs` у персон, трудов и событий и `fuzzy` у эпох; `knowledge/cards.py` — разделы эпохи; `knowledge/entities.py` — `add_external` (внешний идентификатор существующей сущности); `knowledge/dates.py` — интервал из двух нечётких дат; маршрут `GET /v1/epochs` в `app.py`.
+- Сервис знаний: новые `knowledge/wikidata.py`, `knowledge/epoch_dates.py` (CLI и функции с `fetch`), список эпох в `knowledge/epochs.py`; `knowledge/map.py` — поле `epochs` у персон, трудов и событий и `fuzzy` у эпох; `knowledge/cards.py` — разделы эпохи; `knowledge/entities.py` — `add_external` (внешний идентификатор существующей сущности); `knowledge/dates.py` — интервал из двух нечётких дат; маршрут `GET /v1/epochs` в `app.py`.
 - Данные: `sources/epochs.yaml` (новый манифест; `sources/catalog.yaml` не трогается); `scripts/seed_demo.py` — третья эпоха без датировки и явная принадлежность.
 - Клиент: `web/src/epochs/EpochsPage.tsx`, `epochs/Timeline.tsx`, `epochs/api.ts`; `web/src/map/{types,model,MapPanel,MapCanvas,layout}.ts(x)` — `epochs`, фильтр, растушёвка; `App.tsx`, `Sidebar.tsx`, `i18n/{ru,en}.ts`; стили `styles/epochs.css`.
 - Тесты: `tests/knowledge/test_epoch_dates.py` (фикстуры ответов Wikidata в `tests/knowledge/fixtures/wikidata/`), `tests/knowledge/test_epochs_list.py`, дополнения `tests/knowledge/test_map.py` (новые сценарии, прежние без правок), `tests/knowledge/test_mentions_cards.py` (карточка эпохи), `tests/web/test_epochs.py`, `tests/web/test_map.py` (фильтр «Эпоха»).
+- `openspec/traceability.yaml`: возможность `epochs` входит в `enforce` на этой ступени.
 - Зависимость: опирается на `add-reference-catalog` (`snapshot.py`, `epochs.py`, `/v1/catalog?epoch=`). Начинается после его слияния или поверх его ветки.
 - Файлы Lead'а не меняются (`filling.py` и `import_wikidata` не трогаются; новый модуль — отдельный).
 

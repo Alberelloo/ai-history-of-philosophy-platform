@@ -5,7 +5,7 @@
 ## Контекст
 
 - Реестр: тип `epoch`; `dating` разрешена для `epoch` (synchro-map); `belongs_to_epoch` (любая → `epoch`, уточнитель `membership_basis`: self | institutional | historians). Аналога «relates_to_epoch» не нужно.
-- `Statements._update_primary` копирует основную датировку в `entities.primary.dates` (предпочтённая, иначе первая); `SectionMap` берёт пролёт эпохи из `primary.dates` по серединам.
+- `Statements._update_primary` копирует основную датировку в `entities.primary.dates` (предпочтённая, иначе первая); `SectionMap` берёт пролёт эпохи из `primary.dates` по серединам. Это правило не меняется: спецификация «Датировка эпохи» описывает его как есть; «самая сильная по статусу» — вне объёма (отдельное изменение `Statements`).
 - `filling.import_wikidata(qid, fetch)` (файл Lead'а, не трогаем) — персоны и труды; год берёт срезом `claims[...][0][1:5]`, то есть теряет знак эры и точность. Для эпох не подходит.
 - `knowledge/portraits_source.py` — образец сетевого модуля: CLI `python -m …`, `fetch`/`download` внедряются, сеть только в нём, манифест в `sources/portraits.yaml` проверяет человек.
 - Клиент карты: `web/src/map/model.ts` считает участников эпохи по `midLife` и подсветку эпохи по `eraOf` — без явных связей; это вторая копия правила, которую 2.1 вынесла на сервер.
@@ -22,12 +22,54 @@ python -m philograph.knowledge.epoch_dates apply   [--manifest sources/epochs.ya
                                                    (база — PHILOGRAPH_DATABASE_URL, как у сервиса знаний)
 ```
 
-- Функции с внедряемой загрузкой: `fetch_entity(qid, fetch) -> WikidataRecord`, `search(label, lang, fetch) -> list[Candidate]`, `epoch_dating(record) -> FuzzyDate | None`, `EpochDates(statements).apply(manifest, fetch, dry_run=False, linked=False) -> Report`, `suggest(manifest, fetch) -> Manifest`. `fetch: Callable[[str], dict]` — URL → JSON. Настоящая загрузка (`httpx`, `User-Agent` как у `portraits_source`, таймаут, повтор при 429 по `Retry-After`) — одна функция `http_fetch`, только в CLI.
-- Время Wikidata → нечёткая дата (`wikidata_time(value: str, precision: int) -> FuzzyDate`):
-  - знак `+`/`-`: год Wikidata `-0800` — 800 до н. э., астрономический −799 (`dates._astro`);
-  - точность 9 и выше — год (месяц и день отбрасываются); 8 — десятилетие (`decade`, ±0…9); 7 — век (`century`, границы как у `dates.parse("N в.")`); 6 — тысячелетие (`approx`); ниже 6 — дата не берётся (`no_dates`).
-  - век по году: N = ⌈|год| / 100⌉ (Wikidata пишет XVIII век как `+1800` или `+1701` — оба дают 18).
-- Интервал: `dates.interval(start: FuzzyDate, end: FuzzyDate, original: str) -> FuzzyDate` — новая функция в `dates.py` (рядом с `lifespan`): ранние и поздние начала — из `start`, концы — из `end`; точность — `year`, если обе год, иначе худшая; `original` — «1685–1815», «VIII в. до н. э. – 476».
+- Команда опирается на общий модуль `knowledge/wikidata.py` (ниже); своего httpx и разбора времени у неё нет. Свои функции: `epoch_dating(record: WikidataRecord) -> tuple[FuzzyDate, list[str]] | None` (датировка и использованные свойства), `EpochDates(statements, entities).apply(manifest, fetch, *, dry_run=False, linked=False) -> Report`, `suggest(manifest, fetch) -> Manifest`.
+- Интервал: `dates.interval(start: FuzzyDate, end: FuzzyDate) -> FuzzyDate` — новая функция в `dates.py` (рядом с `lifespan`): ранние и поздние начала — из `start`, концы — из `end`; точность — `year`, если обе год, иначе худшая (`century` > `decade` > `approx` по ширине); `original` строится детерминированно `wikidata.format_original(start, end)` — «1685–1815», «VIII в. до н. э. – 476».
+
+### Общий модуль `knowledge/wikidata.py` (создаётся здесь; 2.3 и 2.4 переиспользуют)
+
+```python
+QID = re.compile(r"^Q\d+$")
+USER_AGENT = "PhiloGraph/1.0 (+https://github.com/<репозиторий проекта>)"   # без сведений об операторе
+ENTITY_URL = "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
+SEARCH_URL = "https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&type=item&limit=10&language={lang}&search={label}"
+PAGE_URL = "https://www.wikidata.org/wiki/{qid}"
+
+Fetch = Callable[[str], dict[str, Any]]            # URL → JSON; в тестах — фикстура
+
+class WikidataError(Exception): ...                # неверный QID, сбой загрузки, ответ не по форме
+def check_qid(qid: str) -> str                     # ^Q\d+$, иначе WikidataError; запросов не делает
+def page_url(qid: str) -> str                      # ссылка «Wikidata ↗» и place атрибуции — только отсюда
+def http_fetch(url: str, *, wait: Callable[[float], None] = time.sleep,
+               transport: httpx.BaseTransport | None = None,
+               timeout: float = 10.0, retries: int = 3, max_wait: float = 30.0) -> dict  # 429/503 → Retry-After
+def fetch_entity(qid: str, fetch: Fetch) -> WikidataRecord
+def search(label: str, lang: str, fetch: Fetch) -> list[dict]          # id, label, description
+
+@dataclass(frozen=True)
+class WikidataRecord:
+    qid: str
+    labels: dict[str, str]                         # язык → метка
+    descriptions: dict[str, str]
+    claims: dict[str, list[Claim]]                 # свойство → значения (как в ответе, с рангом)
+    def best(self, prop: str) -> Claim | None      # preferred, иначе первый normal; deprecated — никогда
+    def items(self, prop: str) -> list[str]        # QID-значения свойства (P31, P793, P276…), с проверкой check_qid
+
+@dataclass(frozen=True)
+class Claim:
+    value: Any                                     # {"time","precision"} | {"id"} | {"latitude","longitude"} | str
+    rank: str                                      # preferred | normal | deprecated
+    qualifiers: dict[str, list[Any]]
+
+def wikidata_time(value: str, precision: int) -> FuzzyDate | None   # эра, точность (11…6), +0000/мусор → None
+def claim_date(claim: Claim | None) -> FuzzyDate | None             # обёртка над wikidata_time
+def format_original(start: FuzzyDate, end: FuzzyDate | None = None) -> str
+```
+
+- **Формат уточнителя `time` и значений-дат.** Любая дата из Wikidata пишется в утверждение (значение `dating` или уточнитель `time`, как у `lived_in` в 2.4) ровно как `FuzzyDate.to_json()`: `{"earliest_start", "latest_start", "earliest_end", "latest_end", "precision", "original"}`, где `original` — из `format_original`, а интервал — из `dates.interval`. Одинаковые данные Wikidata дают одинаковый JSON, а значит одинаковый ключ утверждения (`Statements._key`) — повторный запуск сливается с прежним утверждением (идемпотентность).
+- Сеть — только `http_fetch`; команды получают `fetch = partial(http_fetch, clock=SystemClock())`, тесты — словарь фикстур или `httpx.MockTransport`. Ожидание повторов — через внедряемую функцию `wait` (у `Clock` проекта нет `sleep`; в тестах `wait` записывает запрошенные секунды и сдвигает `ManualClock`, реального ожидания нет).
+- Правило времени — в спецификации «Доступ к Wikidata»: знак — эра (`dates._astro`), точность 9+ — год, 8 — десятилетие, 7 — век ⌈|год|/100⌉ (обе записи XVIII века — `+1800` и `+1701`), 6 — тысячелетие (`approx`), ниже 6, `+0000` и не по формату — `None`.
+- Ошибки ловятся по типу (`WikidataError`, `httpx.HTTPError`), не `except Exception`.
+
 - Свойства: P580/P582; если нет обоих — P571/P576; если есть только начало или только конец — `no_dates`.
 - Запись: `Statements.add(epoch, "dating", value=…, attributions=[Attribution("source", f"wikidata:{qid}", place=url)], provenance=Provenance("imported", extra={"wikidata": qid, "properties": ["P580","P582"]}), status="sourced")` — та же форма, что у `import_wikidata`; внешний идентификатор — новый `Entities.add_external(entity_id, "wikidata", qid)` (с `DuplicateEntity`, если QID уже у другой сущности → `result=duplicate_qid`, без записи).
 - Существующая действующая датировка: сравнение четырёх границ; совпадает — `unchanged`; иначе `conflict` (обе датировки в отчёте, запись не делается).
@@ -93,7 +135,7 @@ epochs:
 ### Карта
 
 - `SectionMap._build`: у `people[]`, `works[]` (и идей), `events[]` — `epochs: [id]` (порядок — по началу эпохи); у `eras[]` — `fuzzy: {from: [earliest_start, latest_start], to: [earliest_end, latest_end]}`. Поля только дописываются; прежние клиенты их игнорируют.
-- Клиент: `types.ts` — новые поля и `Filter.epochs: string[]`, `parseState`/`writeState` — параметр `epochs`; `model.ts` — `visible` фильтрует по `epochs`, `related` для эпохи берёт `x.epochs.includes(id)` вместо `midLife`, `eraOf` заменяется «первая эпоха из `epochs`»; `MapPanel.tsx` — раздел фильтра «Эпоха» со счётчиками (как прочие фасеты), только датированные эпохи; при выборе эпохи без явного окна — окно на общий пролёт; `MapCanvas.tsx`/`layout.ts` — растушёвка краёв пролёта (`linearGradient` на токенах `scene`, ширина — от `fuzzy`).
+- Клиент: `types.ts` — новые поля и `Filter.epochs: string[]`, `parseState`/`writeState` — параметр `epochs`; `model.ts` — `visible` фильтрует по `epochs`, `related` для эпохи берёт `x.epochs.includes(id)` вместо `midLife`, `eraOf(eras, year)` остаётся для эпохи года (подпись года, подсветка эпохи выбранного) с правилом перекрытия «самое позднее начало, затем название»; удаляется только клиентская привязка сущности к эпохе (`midLife` в `related` для эпохи); `MapPanel.tsx` — раздел фильтра «Эпоха» со счётчиками (как прочие фасеты), только датированные эпохи; при выборе эпохи без явного окна — окно на общий пролёт; `MapCanvas.tsx`/`layout.ts` — растушёвка краёв пролёта (`linearGradient` на токенах `scene`, ширина — от `fuzzy`).
 - `MapViews` (вид от ассистента) параметр `epochs` не принимает (вне объёма); `visible_counts` не меняется — ассистент фильтр не задаёт.
 
 ### Страница эпох
@@ -105,13 +147,13 @@ epochs:
 
 ### Карточка эпохи
 
-`cards.py:SECTIONS["epoch"] = [("when", "Датировка", ["dating"], "out"), ("members", "Относятся к эпохе", ["belongs_to_epoch"], "in")]` — только утверждения; вывод по датам в карточку не попадает (О-8).
+`cards.py:SECTIONS["epoch"] = [("dating", "Датировка", ["dating"], "out"), ("members", "Относятся к эпохе", ["belongs_to_epoch"], "in")]` — код `dating`, а не `when`: `when` уже занят разделом события «Дата и место», а тест каталогов сверяет «код → заголовок» однозначно — только утверждения; вывод по датам в карточку не попадает (О-8).
 
 ## События журнала
 
 | Событие | Уровень | Поля | Когда |
 |---|---|---|---|
-| `knowledge.epochs.listed` | info | `epochs`, `undated`, `snapshot` | ответ `GET /v1/epochs` |
+| `knowledge.epochs.listed` | info | `epochs`, `undated`, `truncated`, `snapshot` | ответ `GET /v1/epochs` |
 | `knowledge.epoch_dates.checked` | info | `epoch_id`, `qid` (может быть `null`), `result` (`added`\|`unchanged`\|`conflict`\|`no_dates`\|`no_qid`\|`fetch_failed`\|`ambiguous`\|`duplicate_qid`\|`created`) | каждая эпоха в `apply` |
 | `knowledge.epoch_dates.run` | info | `mode` (`apply`\|`dry_run`), `checked`, `added`, `created`, `conflicts`, `skipped` | конец `apply` |
 | `knowledge.epoch_dates.suggested` | info | `epochs`, `candidates` | конец `suggest` |
@@ -126,10 +168,10 @@ epochs:
 | Вариант | Оптимальность | Архитектура | Поддержка и масштаб |
 |---|---|---|---|
 | А. Дописать эпохи в `filling.import_wikidata` | Меньше кода | Файл Lead'а (запрещено без согласования); тип сущности угадывается по P50 («work» иначе «person»); год без знака эры | Одна функция на все типы растёт ветвлениями |
-| Б. Новый модуль-команда `knowledge/epoch_dates.py` с `fetch`, манифест в `sources/` | Сеть только при запуске оператором; ни одного вызова на пути читателя | Как `portraits_source`: правило времени Wikidata — в одном месте; запись — через `Statements` с проверками реестра | Тесты офлайн на фикстурах; 10× эпох — линейно, десятки запросов к Wikidata |
+| Б. Новый модуль-команда `knowledge/epoch_dates.py` поверх общего `knowledge/wikidata.py` (загрузка, время, QID), манифест в `sources/` | Сеть только при запуске оператором; ни одного вызова на пути читателя | Как `portraits_source`: правило времени Wikidata — в одном месте; запись — через `Statements` с проверками реестра | Тесты офлайн на фикстурах; 10× эпох — линейно, десятки запросов к Wikidata |
 | В. Операторский HTTP-эндпоинт в сервисе знаний | Запуск из интерфейса оператора | Сервис ходит в сеть во время работы, держит долгий запрос; нужен фоновой запуск и права | Сложнее отладка и повторы; для разовой операции избыточно |
 
-Выбрано: **Б**. Чем платим: запуск — командой в окружении сервиса (Lead делает это у себя); команда пишет в базу сервиса знаний своим же кодом (`Statements`), как `seed_demo` и `portraits_source sync`. Костыли, которых избегаем: правка файла Lead'а, сеть на пути читателя, угадывание типа по свойству.
+Выбрано: **Б**. Чем платим: запуск — командой в окружении сервиса (Lead делает это у себя); команда пишет в базу сервиса знаний своим же кодом (`Statements`), как `seed_demo` и `portraits_source sync`. Костыли, которых избегаем: правка файла Lead'а, сеть на пути читателя, угадывание типа по свойству, копия разбора Wikidata в 2.3 и 2.4 (после обсуждения ролями загрузка и разбор вынесены в `wikidata.py`; в первой версии плана они были внутри `epoch_dates.py`).
 
 ### 2. Что делать с уже существующей датировкой
 
@@ -267,13 +309,22 @@ epochs:
 ## Риски
 
 - **Неверный QID.** Защита — только подтверждённые человеком QID, фильтр кандидатов по классу и датам, `--dry-run` и отчёт.
-- **Wikidata отвечает 429/таймаутом.** `http_fetch` соблюдает `Retry-After` с пределом попыток; эпоха получает `fetch_failed`, запуск идёт дальше.
+- **Wikidata отвечает 429/таймаутом.** `http_fetch` соблюдает `Retry-After` (не дольше 30 с, не больше 3 повторов); эпоха получает `fetch_failed`, запуск идёт дальше.
 - **Точность «век» в Wikidata неоднородна** (`+1800` и `+1701` для XVIII века) — правило ⌈|год|/100⌉ и тест на обе записи.
 - **Конкурентная запись** во время фонового извлечения у Lead'а: команда пишет короткими транзакциями через `Statements`; блокировок очереди не берёт; `queue.py` не трогается.
 - **Регрессия карты** (дизайн-якоря линий жизни, узлов, `anchorOn`): изменение выбора эпохи и растушёвка — проверка `tests/web/test_map.py` и визуальная по DOM; эталоны снимков — только Windows, их обновляет владелец; на машине агента e2e и `visual_check.py` не прогоняются — CI и Lead.
+
+## Тестируемость
+
+- Сервер: ожидание внедряется в `http_fetch` (`wait`), часы — в `Snapshots` (`ManualClock`); сеть в тестах запрещена ловушкой, загрузка — фикстуры `tests/knowledge/fixtures/wikidata/`.
+- Клиент: таймеры ленты и карты — `setTimeout`/`requestAnimationFrame`/`performance.now`, тесты — `page.clock`.
+- Браузерные тесты — на фикстуре `tests/web` с настоящим приложением знаний из `add-reference-catalog` (данные задаёт тест); `page.route` — только для 503 и задержки.
+- Интерфейсные результаты (адрес, выбор, фокус) без клиентского журнала перечисляются в `verification.md` с серверным якорем.
 
 ## Безопасность
 
 - Сеть — только в CLI оператора; домен один (`www.wikidata.org`), адреса строит код из QID по шаблону (`^Q\d+$`), а не из ответа.
 - Ответы Wikidata — данные: из них берутся только время и точность; названия кандидатов в базу не пишутся, пока человек не перенёс QID.
-- Ни секретов, ни личных данных: Wikidata без ключа, `User-Agent` проекта.
+- Ни секретов, ни личных данных: Wikidata без ключа, `User-Agent` проекта без сведений об операторе.
+- Ссылка «Wikidata ↗» на странице эпох строится из `wikidata` ответа только после проверки `^Q\d+$` (сервер — `page_url`, клиент — та же проверка перед выводом).
+- Названия и id из адреса выводятся текстом (React, без `dangerouslySetInnerHTML`); события `knowledge.epoch*` — только id, коды и числа.
