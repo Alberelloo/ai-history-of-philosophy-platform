@@ -391,7 +391,7 @@ def _revolution_world(svc):
     ids = {
         "revolution": w.thing("event", "Французская революция", "1789"),
         "fichte": w.person("Иоганн Готлиб Фихте", "1762", "1814"),
-        "schelling": w.person("Фридрих Шеллинг", "1775", "1854"),
+        "marx": w.person("Карл Маркс", "1818", "1883"),
         "basis": w.thing("work", "Основа общего наукоучения", "1794"),
         "freedom": w.thing("concept", "Свобода"),  # без даты — не на карте
     }
@@ -403,10 +403,10 @@ def _revolution_world(svc):
         qualifiers={"mechanism": "political"},
         attributions=[Attribution("common")],
     )
-    ids["schelling_link"] = w.statements.add(
+    ids["marx_link"] = w.statements.add(
         ids["revolution"],
         "stimulated",
-        obj=ids["schelling"],
+        obj=ids["marx"],
         provenance=Provenance("generated", actor="graph"),
     )
     return ids
@@ -425,7 +425,7 @@ def test_map_event_stimulated_api(svc, events):
     event, _ = _map_event(svc, events, ids["revolution"])
     assert event["stimulated"] == [
         {"id": ids["basis"], "generated": False},
-        {"id": ids["schelling"], "generated": True},
+        {"id": ids["marx"], "generated": True},
     ]
 
 
@@ -473,6 +473,6 @@ def test_map_stimulated_limit_and_order(svc, events):
 @req(KG, CHOICE, invariant="отклонённая связь «стимулировало» на карту не попадает")
 def test_map_stimulated_rejected(svc, events):
     ids = _revolution_world(svc)
-    svc.onto.statements.reject(ids["schelling_link"], "operator")
+    svc.onto.statements.reject(ids["marx_link"], "operator")
     event, _ = _map_event(svc, events, ids["revolution"])
     assert event["stimulated"] == [{"id": ids["basis"], "generated": False}]

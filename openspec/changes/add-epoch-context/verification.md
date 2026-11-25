@@ -156,3 +156,20 @@
 - e2e (`tests/e2e`), Docker, визуальные эталоны снимков (эталоны только Windows) — CI/Lead; полный `pytest` — не по силам машине (1 ГБ, 1 CPU).
 - Инвариант «Сгенерированная связь MUST NOT показываться без пометки … карта»: на карте связи «стимулировало» линиями не рисуются; пометка «не проверено» на карте для подсветки по сгенерированной связи спецификацией не задана — проверено только снятие подсветки при «только проверенные».
 - Лимиты `limit`/`visitor_limit`/`unavailable` в блоке: тексты — `NOTICES` графа (существующее поведение, `tests/knowledge/test_graph.py::test_no_extension_when_disabled_or_limit`); в браузере для блока контекста не проверены — стенд без лимитов шлюза.
+
+## Тестировщик — повторный прогон после исправлений, 2026-11-25, от коммита 519b1e5
+
+Решения ведущего (progress.md): Д1 — дефект кода, исправлен (519b1e5), требование уточнено («стимулированные напрямую и авторы стимулированных трудов»); Д2 — сценарий изменён: адресат сгенерированной связи — Маркс (1818–1883), GIVEN — не меньше семи более значимых современников.
+
+Тесты обновлены строго по новой формулировке, проверки не ослаблены: `tests/web/test_map.py::test_event_highlights_what_it_stimulated` (Шеллинг → Маркс; свои цвета c1…c6 у Фихте и Маркса при семи более значимых современниках; линий 0; `stimulated` в `/v1/map`; «только проверенные» → у Маркса `data-related="false"`; `knowledge.map.built` по request_id), `tests/knowledge/test_map.py::_revolution_world` (то же для API).
+
+    cd web && npm run build                                        →  ✓ built in 5.49s
+    pytest -q tests/knowledge/test_map.py tests/knowledge/test_map_snapshot_parity.py  →  19 passed in 21.80s
+    pytest -q tests/web/test_map.py                                →  51 passed in 313.33s
+    pytest -q tests/web/test_epochs.py                             →  40 passed in 137.83s (test_accessible_names прошёл, таймаута нет)
+
+Мутация: в `web/src/map/model.ts` приоритет цветов только по id из `stimulated` (`group(..., stim)` вместо `stimPeople`), сборка web →
+    test_event_highlights_what_it_stimulated: AssertionError: ('fichte', {'fichte': 'other', 'marx': 'c6'})  — 1 failed
+    возвращено `git checkout -- web/src/map/model.ts`, пересобрано, `git diff --stat -- src web/src` пусто; тест — 1 passed.
+
+Д1 и Д2 закрыты.

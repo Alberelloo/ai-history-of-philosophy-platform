@@ -1264,14 +1264,14 @@ def test_fuzzy_edge_keeps_design_anchors(knowledge_context, knowledge_stack, eve
 
 def revolution_world(world) -> dict[str, str]:
     """«Французская революция» (1789) стимулировала «Основу общего наукоучения» Фихте (1794)
-    и — сгенерированной связью — Шеллинга. Шесть других современников значимее Фихте и
-    Шеллинга (больше трудов), у двоих — влияние между ними."""
+    и — сгенерированной связью — Маркса (1818–1883, в 1789 не жил). Семь других современников
+    события значимее Фихте и Маркса (больше трудов), у двоих — влияние между ними."""
     from philograph.knowledge.statements import Provenance
 
     ids = {
         "revolution": world.thing("event", "Французская революция", "1789"),
         "fichte": world.person("Иоганн Готлиб Фихте", "1762", "1814"),
-        "schelling": world.person("Фридрих Шеллинг", "1775", "1854"),
+        "marx": world.person("Карл Маркс", "1818", "1883"),
         "basis": world.thing("work", "Основа общего наукоучения", "1794"),
     }
     world.relate(ids["basis"], "author", ids["fichte"])
@@ -1297,10 +1297,10 @@ def revolution_world(world) -> dict[str, str]:
     ids["basis_link"] = world.relate(
         ids["revolution"], "stimulated", ids["basis"], qualifiers={"mechanism": "political"}
     )
-    ids["schelling_link"] = world.statements.add(
+    ids["marx_link"] = world.statements.add(
         ids["revolution"],
         "stimulated",
-        obj=ids["schelling"],
+        obj=ids["marx"],
         provenance=Provenance("generated", actor="graph"),
     )
     return ids
@@ -1319,34 +1319,33 @@ def test_event_highlights_what_it_stimulated(knowledge_context, knowledge_stack,
     event = {e["id"]: e for e in payload["events"]}[w["revolution"]]
     assert event["stimulated"] == [
         {"id": w["basis"], "generated": False},
-        {"id": w["schelling"], "generated": True},
+        {"id": w["marx"], "generated": True},
     ]
     assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
-    assert related(page, f".map-person[data-person='{w['schelling']}']") == "true"
+    assert related(page, f".map-person[data-person='{w['marx']}']") == "true"
     assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
-    colours = {who: role_of(page, w[who]) for who in ("fichte", "schelling")}
+    colours = {who: role_of(page, w[who]) for who in ("fichte", "marx")}
     # Линий от события нет: линии — только влияния между людьми из ответа карты.
     influence_ids = {link["id"] for link in payload["links"]}
     drawn = set(page.locator(".map-thread-hit").evaluate_all("els => els.map(e => e.dataset.link)"))
     assert drawn <= influence_ids, drawn - influence_ids
-    assert w["basis_link"] not in drawn and w["schelling_link"] not in drawn
+    assert w["basis_link"] not in drawn and w["marx_link"] not in drawn
     # У выбранного события нет «влияний выбранного» — линий при выборе события нет вовсе.
     assert page.locator(".map-thread").count() == 0
-    # «Только проверенные» — сгенерированная связь не выделяет Шеллинга.
+    # «Только проверенные» — сгенерированная связь не выделяет Маркса.
     check(page, "Связи", "Только проверенные")
     settle(page)
     assert address(page)[1].get("verified") == "1"
-    schelling_verified = related(page, f".map-person[data-person='{w['schelling']}']")
+    marx_verified = related(page, f".map-person[data-person='{w['marx']}']")
     assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
     assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
     map_errors(page)
-    # Последними — утверждения, на которых найдены расхождения (verification.md), чтобы
-    # остальные утверждения THEN были проверены и при отказе здесь.
-    # Свои цвета (c1…c6) — у Фихте и Шеллинга раньше прочих участников: семь современников
-    # значимее их, а своих цветов шесть — без приоритета Фихте и Шеллинг их бы не получили.
+    # Свои цвета (c1…c6) — у Фихте (автор стимулированного труда) и Маркса раньше прочих
+    # участников: семь современников значимее их, а своих цветов шесть — без приоритета Фихте
+    # и Маркс их бы не получили.
     for who, colour in colours.items():
         assert re.fullmatch(r"c[1-6]", colour or ""), (who, colours)
-    assert schelling_verified == "false", schelling_verified
+    assert marx_verified == "false", marx_verified
 
 
 @req(KG, "Выбор на карте", invariant="стимулированное выделяется и вне десятилетнего окна")
