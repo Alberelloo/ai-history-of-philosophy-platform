@@ -75,3 +75,10 @@
 - `fetch_failed` от настоящей сети, `Retry-After` — общий `http_fetch` (`wikidata.py`), не эта дельта; сеть запрещена.
 - `--limit` — не нормативное в дельте, не проверялось.
 - Полный `pytest` не запускался (1 ГБ RAM).
+
+### Перепроверка Д1 после 27ea2fd (разработчик: `rollback_run` не трогает проверенные)
+
+    test_life_dates.py -k rollback: 5 passed, 26 deselected in 66.46s
+    (test_rollback_verified_keeps_attribution — зелёный: атрибуция [("source", "wikidata:Q859")] сохранена)
+
+Д1 закрыт. Мутация `rollback-removes-verified` по-прежнему ловится этими тестами (см. таблицу выше).
