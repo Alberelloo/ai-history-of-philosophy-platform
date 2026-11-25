@@ -94,7 +94,7 @@ def test_date_type_not_allowed_is_code(onto, items):
     """Датировка у типа, которому реестр её не разрешает (понятие), — код ``dating:type`` (О15)."""
     idea = onto.entities.create("concept", [("ru", "Идея", "primary")])
     item = {"dating": {"text": "1781", "paragraph": 1, "quote": "в 1781 году"}}
-    with pytest.raises(Skip, match="^dating:type$"):
+    with pytest.raises(Skip, match=r"^dating:type$"):
         items.date(idea, item, [{"id": "px", "text": "в 1781 году"}], "s_textbook", "run1")
 
 
