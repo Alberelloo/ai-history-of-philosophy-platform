@@ -6,7 +6,7 @@
 3. `add-wikidata-life-dates`;
 4. `migrate-ontology-quality`.
 
-Новые возможности `entity-naming` и `entity-dating` входят в `enforce` в 3.6. Изменённые требования `ontology-extraction` уже под `enforce`, их тесты продолжают действовать.
+Новая возможность `entity-naming` входит в `enforce` в 3.6. `entity-dating` описывают два изменения (здесь «Извлечение дат», в `add-wikidata-life-dates` — даты из Wikidata), поэтому она входит в `enforce` в `add-wikidata-life-dates` 3.6, когда тесты есть у всех её требований. Изменённые требования `ontology-extraction` уже под `enforce`, их тесты продолжают действовать.
 
 ## 1. План
 
@@ -63,7 +63,7 @@
   - не проверять год в цитате;
   - создавать новую сущность вместо `set_primary_name`;
   - не искать кандидатов по `en`.
-- [ ] 3.6 `openspec/traceability.yaml`: `entity-naming`, `entity-dating` в `enforce`. `python scripts/check_traceability.py` чисто.
+- [ ] 3.6 `openspec/traceability.yaml`: `entity-naming` в `enforce` (`entity-dating` — в `add-wikidata-life-dates` 3.6). `python scripts/check_traceability.py` чисто.
 - [ ] 3.7 `verification.md`, раздел «Тестировщик»:
   - сырые итоги pytest;
   - выдержки событий;
