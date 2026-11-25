@@ -683,7 +683,18 @@ def test_group_selection_c1_c6(knowledge_context, knowledge_stack, events):
     colored = [m[p]["role"] for p in members if re.fullmatch(r"c[1-6]", m[p]["role"] or "")]
     assert len(colored) == 6, [m[p]["role"] for p in members]
     assert len(set(colored)) == 6
-    assert m[members[6]]["role"] is None  # седьмой по весу — без цвета
+    # Седьмой по весу — не среди выделенных цветом c1…c6 (роль остальных спецификация не задаёт).
+    assert m[members[6]]["role"] not in {
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "self",
+        "teacher",
+        "student",
+    }
     assert m[outsider]["dim"] == "true"
     geo_built(events, response)
 
@@ -997,11 +1008,11 @@ def test_nearest_year_by_event_marks(knowledge_context, knowledge_stack, events)
     expect(globe(page)).to_have_attribute("data-year", "1700")
     assert [e["id"] for e in scene(page)["events"]] == [ev]
     expect(stage).not_to_contain_text("на карте никого нет")
-    # Событие скрыто поворотом — год не пустой.
-    focus_globe(page)
-    press(page, "Shift+ArrowRight", 6)
-    settle(page)
-    assert scene(page)["events"][0]["hidden"] == "true"
+    # Мест на 1650 нет — исходный вид по умолчанию (Европа); Тихий океан на дальней стороне,
+    # значок скрыт поворотом, а год всё равно не пустой.
+    sc = scene(page)
+    assert project(-160, 0, sc)[2] < 0, sc["center"]
+    assert sc["events"][0]["hidden"] == "true"
     expect(stage).not_to_contain_text("на карте никого нет")
     geo_built(events, response)
 

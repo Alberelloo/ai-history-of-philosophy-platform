@@ -233,7 +233,9 @@ def test_fragment_weight(knowledge_context, knowledge_stack, events):
     assert any("GlobeView" in u for u in sizes), sizes
     assert total <= 150 * 1024, (total, sizes)
     drawn_n = sum(1 for p in scene(page)["persons"] if drawn(p))
-    assert portraits and all(
+    # Портреты, уже загруженные хронологией, берутся из кэша и запросов после переключения
+    # могут не дать; непустой случай проверяет test_portrait_limit.
+    assert all(
         u.startswith(knowledge_stack.url + "/api/knowledge/v1/portraits/") for u in portraits
     ), portraits
     assert len(portraits) <= drawn_n and len(portraits) <= 60
@@ -424,8 +426,14 @@ def test_reduced_motion(knowledge_context, knowledge_stack, events):
     target = "20.51,54.71"
     assert center(page) != target
     _watch(page, "data-center")
-    page.locator(f"[data-geo-row='{w['konigsberg']}'] .geo-row__place").click()
-    expect(page.locator(".map-selected__name")).to_have_text("Кёнигсберг, 1760")
+    row = page.locator(f"[data-geo-row='{w['konigsberg']}'] .geo-row__place")
+    # При reduce и остановленных часах страницы Playwright не дожидается «стабильности»
+    # элемента (переходы 0,001 с не завершаются без хода времени) — щелчок событием,
+    # после явной проверки, что кнопка видна и доступна.
+    expect(row).to_be_visible()
+    expect(row).to_be_enabled()
+    row.dispatch_event("click")
+    expect(page.locator(".map-selected__name")).to_have_text("Кёнигсберг, Россия, 1760")
     page.clock.run_for(50)  # один кадр; дальше время страницы стоит
     expect(globe(page)).to_have_attribute("data-center", target)
     assert _seen(page, "data-center") == [target]

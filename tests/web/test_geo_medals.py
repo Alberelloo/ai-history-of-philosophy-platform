@@ -498,10 +498,10 @@ def test_rim_while_dragging(knowledge_context, knowledge_stack, events, width, h
         > MEDAL / 2
     ]
     assert shifted, "нет медальонов, сдвинутых от точки привязки"
-    # Тянем вправо: центр уходит на запад, место — с 80° к краю видимого полушария (~89°).
+    # Тянем вправо на ~26°: центр уходит на запад, место (80° от центра) — за край полушария.
     went_hidden = set()
     shots = drag_frames(
-        page, sc0["R"] * 0.16, 0, frames=5, start=(sc0["cx"] - sc0["R"] * 0.5, sc0["cy"])
+        page, sc0["R"] * 0.45, 0, frames=5, start=(sc0["cx"] - sc0["R"] * 0.5, sc0["cy"])
     )
     assert len(shots) == 5
     for sc in shots:
