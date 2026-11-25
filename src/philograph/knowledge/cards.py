@@ -59,6 +59,12 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
         ("when", "Дата и место", ["dating", "happened_in"], "out"),
         ("effects", "На что повлияло", ["stimulated"], "out"),
     ],
+    # Эпоха: только явные утверждения; принадлежность по датам — вывод (О-8), её показывают
+    # страница эпох и справочник. Код ``dating``, а не ``when``: ``when`` — «Дата и место».
+    "epoch": [
+        ("dating", "Датировка", ["dating"], "out"),
+        ("members", "Относятся к эпохе", ["belongs_to_epoch"], "in"),
+    ],
     "doctrine": [
         ("parts", "Состав", ["part_of"], "in"),
         ("answers", "Ответы и сторонники", ["answers", "holds"], "both"),
