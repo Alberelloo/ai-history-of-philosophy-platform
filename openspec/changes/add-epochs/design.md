@@ -1,6 +1,6 @@
 # Design
 
-Второе изменение стека (ТЗ, п. 2.2). Опирается на `add-reference-catalog`: общий снимок `knowledge/snapshot.py`, правило `knowledge/epochs.py:EpochMembership`, справочник `GET /v1/catalog?epoch=`. Его использует `add-epoch-context` (2.3) и, через HTTP, `add-geo-timeline` (2.4).
+Второе изменение стека (ТЗ, п. 2.2). Опирается на `add-reference-catalog`: общий снимок `knowledge/snapshot.py`, правило `knowledge/epochs.py:EpochMembership`, справочник `GET /v1/catalog?epoch=`. Его использует `add-epoch-context` (2.3) и `add-geo-timeline` (2.4) — импортом `knowledge/wikidata.py`, `dates.span/middle` и клиентской `eraOf`.
 
 ## Контекст
 
@@ -66,7 +66,7 @@ def format_original(start: FuzzyDate, end: FuzzyDate | None = None) -> str
 ```
 
 - **Формат уточнителя `time` и значений-дат.** Любая дата из Wikidata пишется в утверждение (значение `dating` или уточнитель `time`, как у `lived_in` в 2.4) ровно как `FuzzyDate.to_json()`: `{"earliest_start", "latest_start", "earliest_end", "latest_end", "precision", "original"}`, где `original` — из `format_original`, а интервал — из `dates.interval`. Одинаковые данные Wikidata дают одинаковый JSON, а значит одинаковый ключ утверждения (`Statements._key`) — повторный запуск сливается с прежним утверждением (идемпотентность).
-- Сеть — только `http_fetch`; команды получают `fetch = partial(http_fetch, clock=SystemClock())`, тесты — словарь фикстур или `httpx.MockTransport`. Ожидание повторов — через внедряемую функцию `wait` (у `Clock` проекта нет `sleep`; в тестах `wait` записывает запрошенные секунды и сдвигает `ManualClock`, реального ожидания нет).
+- Сеть — только `http_fetch`; команды получают `fetch = partial(http_fetch, wait=time.sleep)`, тесты — словарь фикстур или `httpx.MockTransport`. Ожидание повторов — через внедряемую функцию `wait` (у `Clock` проекта нет `sleep`; в тестах `wait` записывает запрошенные секунды и сдвигает `ManualClock`, реального ожидания нет).
 - Правило времени — в спецификации «Доступ к Wikidata»: знак — эра (`dates._astro`), точность 9+ — год, 8 — десятилетие, 7 — век ⌈|год|/100⌉ (обе записи XVIII века — `+1800` и `+1701`), 6 — тысячелетие (`approx`), ниже 6, `+0000` и не по формату — `None`.
 - Ошибки ловятся по типу (`WikidataError`, `httpx.HTTPError`), не `except Exception`.
 
