@@ -71,12 +71,13 @@ entities:
 1. Цели:
    - записи манифеста с `wikidata` и `decision ∈ {accepted, auto}`;
    - с `--linked` — ещё и все персоны и произведения базы с внешним `wikidata`.
-2. Для записи манифеста вызывается `Entities.add_external(entity, "wikidata", qid)`:
-   - `True` — записан, в `run_actions` пишется `{kind: "external", entity, qid}`;
-   - `False` — уже был;
-   - `DuplicateEntity` — QID у другой сущности. Тогда пропуск `qid_taken`, пункт очереди `duplicate` с `reason="qid"` и событие `knowledge.entity.merge_proposed`. Само слияние выполняет `Dedupe` или человек.
+2. Записи манифеста обходятся по порядку, правило 1–4 требования «Подтверждение QID»:
+   - есть тот же QID → ничего;
+   - другой QID → `qid_conflict`;
+   - QID у другой сущности, в том числе у записанной раньше в этом запуске → `qid_taken`. Для `accepted` пара `(entity, holder)` копится в `confirmed`, для `auto` — пункт `duplicate` с событием `merge_proposed`;
+   - иначе `add_external`, в `run_actions` пишется `{kind: "external", entity, qid}`.
 
-   В сухом прогоне ничего не пишется.
+   После обхода `Dedupe(...).run(confirmed=confirmed, run_id=…)` (`improve-person-quality`) сливает пары по `merge:qid_confirmed`, если даты не противоречат, иначе ставит их в очередь (ревью, желательное 1). В сухом прогоне ничего не пишется, слияния считаются через `dedupe.plan`.
 3. Запись Wikidata загружается (`fetch_entity`, кэш на запуск). Сбой — `fetch_failed`.
 4. Персона:
    - `b = claim_date(best("P569"))`, `d = claim_date(best("P570"))`;
@@ -94,6 +95,7 @@ entities:
 ### `rollback(run_id)`
 
 - `Statements.rollback_run(run_id)`: утверждения запуска, кроме проверенных человеком.
+- Слияния запуска (`merges.moved.run_id`) отменяются `Statements.undo_merge` в обратном порядке.
 - По `run_actions` запуска удаляются записанные им внешние QID. QID не удаляется, если его сущность с тех пор получила утверждения с атрибуцией этой записи от другого запуска: тогда `kept`.
 - Событие `knowledge.life_dates.rolled_back`.
 
@@ -105,7 +107,7 @@ entities:
 
 `filling.py`:
 - `WIKIDATA_ROLES` импортируется из `wikidata.py`;
-- в `import_wikidata` блок дат заменяется вызовами `wikidata.simple_time(value)` (это `wikidata_time(value, 9)` для упрощённой записи) и `interval(...)`. Персона с одной датой не получает `lifespan`, для неё пишется событие `knowledge.import.skipped` с `property`, `reason="partial"`.
+- в `import_wikidata` оба блока дат — P569/P570 (`lifespan`) и P577 (`dating`, сейчас тоже срез `[1:5]`, `filling.py:535`) — заменяются вызовами `wikidata.simple_time(value)` (это `wikidata_time(value, 9)` для упрощённой записи) и `interval(...)`. Персона с одной датой не получает `lifespan`, для неё пишется событие `knowledge.import.skipped` с `property`, `reason="partial"`.
 
 ## События журнала
 
@@ -113,7 +115,7 @@ entities:
 |---|---|---|
 | `knowledge.life_dates.suggested` | info | `entities` (без QID обработано), `candidates`, `auto` |
 | `knowledge.life_dates.run` | info | `run_id`, `entities`, `externals`, `lifespans`, `datings`, `roles`, `unchanged`, `conflicts`, `skipped`, `failed`, `dry_run` |
-| `knowledge.life_dates.skipped` | warning | `entity`, `property`, `reason` (`bad_qid`, `fetch_failed`, `partial`, `no_dates`, `conflict`, `refused`, `qid_taken`) |
+| `knowledge.life_dates.skipped` | warning | `entity`, `property`, `reason` (`bad_qid`, `fetch_failed`, `bad_value`, `partial`, `no_dates`, `conflict`, `refused`, `qid_taken`, `qid_conflict`) |
 | `knowledge.life_dates.rolled_back` | info | `run_id`, `statements`, `externals`, `kept` |
 | `knowledge.import.skipped` (есть) | debug | `property`, `reason="partial"` — `import_wikidata`, одна дата |
 
