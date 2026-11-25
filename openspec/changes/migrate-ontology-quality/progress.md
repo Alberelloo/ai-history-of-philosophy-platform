@@ -130,3 +130,27 @@
   - Смоук на локальном `.stack` (только чтение, `md5` файла `.stack/stack.knowledge.db` до и после совпал; база локальная, не стенд владельца: 30 сущностей, 8 персон, схема без `knowledge:9`): А1 = 1, А2 = 0, А3 = 0, А4 = 0, А5 = 8, А6 = 8, А7 = 0, А8 — не измерено; итог «не выполнен», код 1. База сравнения сохранена в scratchpad (не в репозитории).
 - 2.7 Юнит-тесты 2.2–2.5 — выше. Прогоны по одному (фильтр действующих не ломает прежнее): `test_snapshot` 6, `test_catalog` 125, `test_catalog_route` 7, `test_catalog_unit` 29, `test_map` 16, `test_map_snapshot_parity` 3, `test_map_view` 10, `test_mentions_cards` 32, `test_statements` 19, `test_registry_entities` 33 + 1 skipped, `test_graph` 24, `test_retired_unit` 4, `test_integrity_unit` 5, `test_ontology_migrate_unit` 10, `test_life_dates_unit` 14, `test_quality_report_unit` 5 — все passed. `ruff check src/` чисто, `ruff format --check src/philograph/knowledge/` чисто, `lint-imports` 3 kept, `check_traceability.py` 407 из 407.
 - О16 (решение ведущего, 2026-11-25): п. 1 (ожидания версии схемы 9) принят по О14. П. 2–3 перенесены в spec, не только design: `review:same_name` для не-персон (вне А4, в `P` не входят), поле `error_kind="integrity_lost"` у `knowledge.migration.aborted`, сравнение действий `plan`/`run` «кроме служебных полей отката (`names_before`)» — в требовании, сценарии «Сухой прогон» и инварианте, `--limit N` — предел числа названий к переводу. Код и тесты не менялись.
+
+## Ревьювер — код, 2026-11-25, коммит 2cc4f44 (субагент `reviewer`)
+
+Проверено:
+- **Сухой прогон.** `plan` пишет только при `not dry_run` (`_record`, `retire`, `_rename`, `merge_entities`, `propose`), шаг QID идёт через `LifeDates.apply(dry_run)`. Модель вызывается только при `--estimate` (одна проба), перевод — только при `translate == "model"` и не в сухом прогоне.
+- **Аварийный откат.** Срабатывает при `lost` или `lost_attributions` > 0: `rollback`, затем `Aborted`, событие `error_kind="integrity_lost"`.
+- **Откат.** Отменяет слияния запуска, переименования (`names_before`, с пропуском `kept`), снятия, языки и шаг QID, закрывает пункты очереди со статусом `rolled_back`. Юнит-тест `test_run_full_then_rollback` сверяет дамп до и после. `test_ontology_migrate_unit.py`: 10 passed.
+- **`quality_report`.**
+  - SQLite открывается как `mode=ro` для основной и присоединённой базы, Postgres — `default_transaction_read_only` плюс `SET SESSION … READ ONLY`, миграции схемы не запускаются;
+  - `active_in`/`retired_ids`/`has_retired` работают на схеме до `knowledge:9`;
+  - А1–А8 считаются по формулам spec, А4 = объединение пар минус `distinct`, А6/А7 — через `SectionMap`/`Catalog`.
+- **События.** В событиях миграции только id, коды и числа. Названия есть только в JSON оператора (`retired_list`, `renamed_list`).
+- **Снятые.** Скрыты в снимке (утверждения и атрибуции со снятым концом), `Statements.about`, упоминаниях, `find`, `externals`, `duplicate_candidates`; карточка снятой отвечает 404.
+
+Блокирует:
+1. `ontology_migrate.py:883-885`. Откат шага `manifest_qids` снимает все QID запуска без условий, а `LifeDates.rollback` (`life_dates.py:600-611`) оставляет QID, на который ссылается проверенное утверждение. Получились два правила отката одного шага. Вход: манифест с `accepted` Q859 → `run` → человек проверил `lifespan` → `rollback`. `rollback_run` сохраняет утверждение с атрибуцией `wikidata:Q859`, а QID снят, и это противоречит `entity-dating` («QID остаётся и попадает в `kept`»). Сделать: вызывать логику `LifeDates.rollback` (или `_referenced`) и учесть `kept` в отчёте.
+2. `tests/knowledge/test_quality_report_unit.py` — `ruff format --check` не проходит (А9, CI `checks`). Отформатировать только этот файл.
+
+Желательно:
+1. `integrity.compare` считает утверждение сохранённым, если строка-цель существует и действует, но не сверяет её содержание (концы после перенаправлений, тип). Ошибочный перенос конца при слиянии потерей не будет.
+2. `schema.has_retired` на схеме до `knowledge:9` вызывает `inspect` на каждый запрос, кэшируется только «есть». Для замера на старой базе это лишняя работа, но не ошибка.
+
+Выбор решения: соответствует гибриду из design. Подгонка тестов: юнит-тесты сверяют дамп и вызовы модели; тесты тестировщика — следующим кругом.
+Вердикт: доработать (пп. 1–2), затем к тестировщику и судье.

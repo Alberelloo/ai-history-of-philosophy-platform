@@ -97,3 +97,17 @@
 - 2.6 Юнит-тесты `tests/knowledge/test_life_dates_unit.py` на `wd_records.RecordFetch`/`record` (14: форма манифеста, Платон до н. э. и роли, повтор, `partial`/`bad_value`, точности 8 и 7, `unchanged`/`conflict`, `qid_conflict`/`qid_taken`/два подтверждения, слияние `merge:qid_confirmed`, сухой прогон = отчёт и дамп, откат к дампу, откат с проверенным `kept=1`, `suggest` с `holder` без повтора и `--auto-exact`, произведение P577, CLI код 2 и `--from-file`). Прогоны по одному: `test_life_dates_unit` 14, `test_run_actions_unit` 1, `test_wikidata_simple_unit` 13, `test_wikidata_unit` 36, `test_filling` 30, `test_geo_enrich` 37, `test_epoch_dates` 66, `test_statements` 19, `test_registry_entities` 33 + 1 skipped, `test_dedupe_unit` 19, `test_person_merge_unit` 7 — все passed. `ruff check src/` чисто, `ruff format --check` чисто, `lint-imports` 3 kept, `check_traceability.py` 405 из 405.
   - Падают из-за `knowledge:8` (см. 2.1): `test_portraits.py::test_migration_7_adds_portraits_and_keeps_old_data`, `test_mentions_cards.py::test_migration_6_adds_mention_position` — закреплено `latest() == 7`.
 - Решение ведущего О14 (разрешённое исключение из «существующие тесты не правишь», прецедент #40 — переход 6→7): миграция `knowledge:8` остаётся; ожидания обновлены только в строках `tests/knowledge/test_portraits.py:97` (`applied == [7, 8]`: миграция 7 применилась, порядок сохранён), `:124` и `tests/knowledge/test_mentions_cards.py:308` (`latest() == 8`). Прогоны по одному: `test_portraits` 13 passed, `test_mentions_cards` 32 passed.
+
+## Ревьювер — код, 2026-11-25, коммит 2cc4f44 (субагент `reviewer`)
+
+Проверено:
+- `LifeDates.apply`: порядок правил 1–4 «Подтверждение QID» (`qid_conflict`, `qid_taken` с победой первой записи в запуске, `accepted` → `confirmed`, `auto` → очередь); `run_actions.record` только при записи; в сухом прогоне записи нет;
+- `rollback`: сначала отменяются слияния запуска, затем `rollback_run`; QID, на который ссылается проверенное утверждение или утверждение другого запуска, остаётся (`_referenced`, `kept`);
+- `rollback_run` пересчитывает `primary` (`_refresh_primary`);
+- в `filling.import_wikidata` даты идут через `simple_time`/`interval`, при одной дате — `partial`;
+- `WIKIDATA_ROLES` — в `wikidata.py`.
+
+`ruff check` и `ruff format --check` по файлам изменения чисто, `lint-imports` — 3 kept. Тесты тестировщика смотрю следующим кругом.
+
+Блокирует: нет.
+Вердикт: код можно к тестировщику и судье.
