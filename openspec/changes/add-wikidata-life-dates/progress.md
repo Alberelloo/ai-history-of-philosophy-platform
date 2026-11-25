@@ -83,3 +83,4 @@
 
 - 2.1 `schema.py`: таблица `run_actions` (`id, run_id, seq, kind, payload, created_at`, индекс по `run_id`), миграция `knowledge:8`. Юнит-тест `tests/knowledge/test_run_actions_unit.py` (1 passed).
   - **Конфликт с прежними тестами (решение Lead'а / тестировщика):** `tests/knowledge/test_portraits.py:97,124` (`applied == [7]`, `latest() == 7`) и `tests/knowledge/test_mentions_cards.py:308` (`latest() == 7`) закрепляют последнюю версию схемы и падают при любой новой миграции. Ожидания не правлю (чужие тесты). Варианты: ожидание `>= 7` / накат только до 7 в этих тестах, либо отказ от `knowledge:8` (тогда `run_actions` негде хранить).
+- 2.2 `wikidata.py`: `HUMAN = "Q5"`, `INSTANCE_OF = "P31"`, `WIKIDATA_ROLES` (перенос таблицы из `filling.py`, сама замена импорта — 2.5), `simple_time(value)` — `"+ГГГГ-ММ-ДД"` или полное значение → `wikidata_time(…, 9)`. Юнит-тесты `tests/knowledge/test_wikidata_simple_unit.py` (13 passed).
