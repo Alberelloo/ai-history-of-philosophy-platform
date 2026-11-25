@@ -1,20 +1,39 @@
 # Design
 
-Варианты, оценки и референс разобраны в [geo-timeline-options.md](../../../docs/design/features/geo-timeline-options.md). Здесь — решения, контракт, события, концепт интерфейса и сценарии.
+Варианты, оценки и референс разобраны в [geo-timeline-options.md](../../../docs/design/features/geo-timeline-options.md). Здесь — решения, контракт, события, концепт интерфейса и сценарии. Правки по обсуждению ролей 2026-11-25 описаны в `progress.md`.
 
-## Контекст
+## Контекст и зависимости стека
 
-- Карта раздела: `GET /v1/map` (`knowledge/map.py`, `SectionMap`). Отдаёт людей (рождение, смерть, вес), события (год), эпохи, группы и влияния между людьми со статусом. Предел — 400 сущностей, кэш — по отпечатку базы, событие `knowledge.map.built`.
-- Изменение `add-reference-catalog` выносит чтение действующих сущностей и утверждений и отпечаток в `knowledge/snapshot.py`. Слой мест читает из того же снимка (изменения идут стеком, это изменение — последнее).
-- Онтология:
-  - тип `place`;
-  - `lived_in` (персона → место, уточнитель `time`), `happened_in` (событие → место);
-  - `Filling.import_wikidata` пишет P19 как `lived_in` без уточнителя и создаёт `place` с внешним id Wikidata.
+Изменение последнее в стеке. Чужие файлы не правит, опирается на их интерфейсы:
 
-  Координат нет. `output_schema` уже исключает значения-связи (`value_kind`) из схемы для модели.
-- Клиент:
-  - `web/src/map/` — `MapPage` (адрес через `parseState`/`writeState`), `MapPanel` (поиск, «Выбрано», фильтры), `Overview` (шкала с окном времени), `DeskScene` (стол, лист);
-  - `?fixture=dense` — набор без сервиса.
+| От кого | Что берём | Статус на 2026-11-25 |
+|---|---|---|
+| `add-reference-catalog` (2.1) | `knowledge/snapshot.py`: `Snapshots` (действующие сущности и утверждения, отпечаток, внедряемые часы); `SectionMap(statements, snapshots=None)` | описано в его design.md |
+| `add-epochs` (2.2) | `knowledge/wikidata.py` — общий модуль Wikidata (решение ведущего Р7); общая функция середины интервала (Р8); клиентская `eraOf(eras, year)` для подписи года | модуль решён ведущим, имена в design.md 2.2 **ещё не обновлены** (там пока `epoch_dates.http_fetch`, `wikidata_time`). Ожидаемый интерфейс — ниже. Если 2.2 назовёт иначе, правим ссылки здесь, а не дублируем |
+| `add-epoch-context` (2.3) | ничего в первой версии: события берём из `/map`, `/v1/context` — для страницы эпохи | — |
+
+Что уже есть в коде:
+- карта раздела `GET /v1/map` (`knowledge/map.py`, `SectionMap`): люди с годами жизни, события с годом, эпохи, группы, влияния между людьми со статусом; предел 400 сущностей; событие `knowledge.map.built`;
+- тип `place`; `lived_in` (персона → место, уточнитель `time`); `happened_in` (событие → место);
+- `Filling.import_wikidata` пишет P19 как `lived_in` без уточнителя; координат нет;
+- `output_schema` исключает значения-связи из схемы для модели;
+- `_add_missing_defaults` (`registry.py`) дописывает в существующую связь только `subject_types`, `object_types`, `values`, но **не `qualifiers`**. Без правки `place_role` не дошёл бы до заполненного реестра Lead'а (блокирующее 2 ревьювера, проверено пробой).
+
+### Интерфейс `knowledge/wikidata.py` (создаёт 2.2)
+
+Сверено с `openspec/changes/add-epochs/design.md` на 2026-11-25. Берём оттуда, своего не пишем:
+- `check_qid(qid) -> str` — `^Q\d+$`, иначе `WikidataError`;
+- `page_url(qid)` — ссылка атрибуции;
+- `http_fetch(url, …)` — httpx, User-Agent без личных данных, таймаут, `Retry-After`, только CLI;
+- `Fetch = Callable[[str], dict]`;
+- `fetch_entity(qid, fetch) -> WikidataRecord`, а у записи `best(prop)` (preferred, иначе первый normal, deprecated никогда) и `items(prop)` (QID-значения с `check_qid`);
+- `Claim(value, rank, qualifiers)` — у P625 `value = {"latitude", "longitude"}`;
+- `claim_date(claim) -> FuzzyDate | None` и `wikidata_time(value, precision)`;
+- `format_original`.
+
+Формат уточнителя `time` — `FuzzyDate.to_json()` (интервал из `dates.interval`, `original` из `format_original`), как у `dating` в 2.2. От этого зависит ключ утверждения и идемпотентность. Функция середины — `dates.span(d)` и `dates.middle(d)` из 2.1 (бывшие `map._start`/`_end`). Клиентская `eraOf(eras, year)` из 2.2: при перекрытии — самое позднее начало, затем название.
+
+Если итоговые имена в 2.2 поменяются, правятся ссылки здесь (задача 1.5), а не пишется копия.
 
 ## Онтология
 
@@ -27,55 +46,62 @@ rel("coordinates", "координаты", None, ["place"], [], value="geo",
     requires_attribution=True, families=("context",))
 ```
 
-- `rel()` получает необязательный `requires_attribution`. `Statements._check` отклоняет утверждение без атрибуции, если у типа стоит этот флаг. Прежняя проверка `type_ == "definition"` не трогается: перевод её на флаг — вне объёма, записано в «Риски».
-- Вид значения `geo` в `Statements._check`:
-  - `value` — объект `{lat, lon}` из чисел (не `bool`);
-  - `−90 ≤ lat ≤ 90`, `−180 ≤ lon ≤ 180`;
-  - сохраняется `{lat: round(lat, 2), lon: round(lon, 2)}`.
-
-  Округление — до вычисления ключа, чтобы 54.7104 и 54.71 давали одно утверждение.
-- `load_defaults` дописывает новые коды в существующий реестр (механизм уже есть с synchro-map).
+- `registry.py`, `_add_missing_defaults`: к ключам, которые дописываются в существующую связь, добавляется `qualifiers` — недостающие коды в конец, изменённое оператором сохраняется. Тест — на реестре, заранее заполненном прежней версией (сценарий «Заполненный реестр»).
+- `rel()` получает необязательный `requires_attribution`. `Statements._check` отклоняет утверждение без атрибуции, если флаг стоит. Прежняя проверка `type_ == "definition"` не трогается (см. «Риски»).
+- Вид значения `geo` в `Statements`:
+  1. `add` нормализует значение до вычисления ключа: проверка «конечные числа, не `bool`» → `geo_not_number`; пределы ±90/±180 включительно на исходном значении → `geo_out_of_range`; затем `{lat: round(lat, 2), lon: round(lon, 2)}`;
+  2. `_key` считается по нормализованному значению.
+- `StatementError` получает необязательный `code`. Событие `knowledge.statement.refused` пишет поле `code`, если оно есть: `geo_not_number`, `geo_out_of_range`, `attribution_required`. Поле добавочное, прежние отказы его не пишут.
+- Публичный `Statements.check_value(type_, value, qualifiers)` — проверки значения и уточнителей без сущности (для сухого прогона, где места ещё нет).
+- Подписи `place_role` — отдельной группой `qualifiers.place_role` в `ontology.{ru,en}.json`, не в `values`: ключи `values` сверяются тестом с enum-связями (замечание ревьювера к 2.3).
 - `docs/product/ontology.md` — строки о координатах и виде места.
 
 ## Обогащение: `knowledge/geo_enrich.py`
 
 ```python
 class PlaceEnrichment:
-    def __init__(self, statements: Statements, fetch: Callable[[str], dict], *, clock=None): ...
+    def __init__(self, statements: Statements, fetch: Callable[[str], dict]): ...
     def run(self, *, limit: int | None = None, dry_run: bool = False) -> dict  # итог = поля события
-    def rollback(self, run_id: str) -> dict  # Statements.rollback_run
+    def rollback(self, run_id: str) -> dict  # Statements.rollback_run + knowledge.geo.rolled_back
 # python -m philograph.knowledge.geo_enrich run [--limit N] [--dry-run] [--from-file F]
 # python -m philograph.knowledge.geo_enrich rollback <run_id>
 ```
 
-- Обходит сущности `person`, `event` (и подтипы), `place` с внешним id `wikidata`.
-- `fetch(qid)` возвращает `{labels, claims}` в той же форме, что у `import_wikidata`, плюс значения с уточнителями:
-  - `P625` — `{lat, lon}`;
-  - `P937` — `[{id, P580?, P582?}]`.
+- Загрузка, проверка QID, разбор записи и времени — только через `knowledge/wikidata.py`. Своего httpx и разбора времени здесь нет. Значения свойств — `record.best(prop)` / `record.items(prop)`, P625 переводится из `{latitude, longitude}` в `{lat, lon}` (переименование полей, не разбор). Файловый `fetch` — словарь «URL → JSON» из файла в формате `Special:EntityData`, разбираемый тем же `fetch_entity`.
+- Обходит `person`, `event` (и подтипы), `place` с внешним id `wikidata`, прошедшим `check_qid`.
+- Свойства — таблица данных модуля `PROPERTIES`:
 
-  Боевой `fetch` — httpx к `Special:EntityData/<Q>.json` с User-Agent проекта (как `portraits_source.py`) и разбором в эту форму. Файловый `fetch` — словарь `{qid: record}` из JSON.
-- Пишет через `Statements.add`:
-  - `Attribution("source", f"wikidata:{qid}", place=url)`;
-  - `Provenance("imported", run_id=run_id, extra={"wikidata": qid})`;
-  - `status="sourced"`.
+  | Свойство | Связь | Вид места | Время |
+  |---|---|---|---|
+  | P19 | `lived_in` | `birth` | `claim_date(best("P569"))` |
+  | P20 | `lived_in` | `death` | `claim_date(best("P570"))` |
+  | P937 | `lived_in` | `activity` | `claim_date` уточнителей P580–P582 |
+  | P276 | `happened_in` | — | — |
+  | P625 | `coordinates` | — | — |
 
-  `run_id = "geo_<hex12>"`.
-- Время для `birth` и `death` — год из `lifespan` персоны, если он есть, иначе из P569/P570 записи.
-- `StatementError` у одной записи даёт `knowledge.geo.skipped` (`reason` — текст ошибки) и `skipped += 1`. Исключение `fetch` даёт `knowledge.geo.skipped` (`reason="fetch_failed"`) и `failed += 1`. Запуск продолжается.
-- Сухой прогон проверяет каждую запись тем же `Statements._check` (через публичный `Statements.check(...)`, тонкую обёртку над `_check`) и считает, но не пишет.
+  Прочее не читается.
+- Запись — через `Statements.add`:
+  - `Attribution("source", f"wikidata:{qid}", place=page_url(qid))`;
+  - `Provenance("imported", run_id=run_id, extra={"wikidata": qid, "property": P})`;
+  - `status="sourced"`;
+  - `run_id = "geo_<hex12>"`.
+- Пропуски: `bad_qid` (значение не QID, `WikidataError` от `check_qid`), `bad_value` (нет или неразборчивое значение), `refused` (`StatementError` у сервера) → `skipped += 1`; `fetch_failed` (`WikidataError` загрузки или `httpx.HTTPError`) → `failed += 1`. Каждый пропуск — `knowledge.geo.skipped`, запуск идёт дальше. `except` ловит только `StatementError` и ошибки загрузки из `wikidata.py`, не `Exception`.
+- Сухой прогон: `check_value` для значений и уточнителей, счёт мест, которые были бы созданы. Ничего не пишет.
+- Откат — `Statements.rollback_run(run_id)`. Места, созданные запуском, остаются: удаления сущностей в API нет, место без утверждений на глобус не попадает. Событие `knowledge.geo.rolled_back` (`run_id`, `statements`, `places_kept`).
 
 ## Слой мест: `knowledge/geo.py`
 
 ```python
 class PlaceLayer:
-    def __init__(self, section_map: SectionMap, snapshot: Snapshot): ...
+    def __init__(self, section_map: SectionMap, snapshots: Snapshots, *, cache_size: int = 32): ...
     def build(self, textbook: str | None = None, only_textbook: bool = False) -> dict
 ```
 
-- Сущности слоя — `people` и `events` ответа `SectionMap.build(textbook, only_textbook)`. Одна область и один предел, правило не дублируется.
-- Утверждения `lived_in`, `happened_in`, `coordinates` — из снимка. Отклонённые снимок не отдаёт (общее правило «действующее утверждение»).
-- Сведение: для пары (сущность, место) запись с `place_role` важнее записи без него. Из нескольких `coordinates` у места — лучшая по `_best` (предпочтённая, затем по статусу).
-- Кэш — по `(textbook, only_textbook)` и отпечатку снимка, как у карты.
+- Сущности слоя — `people` и `events` из `SectionMap.result(textbook, only_textbook)`. Это новый публичный метод: тот же кэшированный результат, что у `build`, но без события `knowledge.map.built`. `build` = `result` + событие. Одна область и один предел, правило не дублируется.
+- Утверждения `lived_in`, `happened_in`, `coordinates` — из `Snapshots` (общее правило «действующее утверждение»). Запасного пути «читать как `_load`» нет: без 2.1 изменение не начинается.
+- Сведение: для пары (сущность, место) записи с `place_role` вытесняют записи без него. Из нескольких `coordinates` места — предпочтённая, затем по статусу, затем раньше записанная.
+- Годы `from`/`to` — `dates.span` от нечёткой даты уточнителя (Р8, та же функция, что у карты).
+- Кэш — LRU по `(textbook, only_textbook)` на `cache_size` ключей, значение — с отпечатком снимка (Р10). Охват закрытого учебника через `only_textbook` — существующая проблема `/map`, вне объёма (задача regional-access, см. «Риски»).
 
 ### Контракт `GET /api/knowledge/v1/map/places?textbook=<id>&only_textbook=<bool>`
 
@@ -86,21 +112,18 @@ class PlaceLayer:
   "placements": [{
     "entity": "e_kant", "place": "e_konigsberg",
     "role": "birth",              // birth | death | activity | residence | event | null (без вида)
-    "from": 1724, "to": 1724,      // годы (середина нечёткой границы) или null
+    "from": 1724, "to": 1724,      // годы или null
     "status": "sourced",           // verified | sourced | generated
-    "generated": false,            // достроено моделью
+    "generated": false,
     "statement": "s_…"
   }],
-  "unplaced": ["e_hume"],          // люди и события карты без размещения с координатами
-  "truncated": false, "limit": 400 // как у /map той же области
+  "unplaced": ["e_hume"],
+  "truncated": false, "limit": 400
 }
 ```
 
-- `from`/`to`:
-  - у `birth` и `death` — год из `time`, иначе из годов жизни;
-  - у `activity` и `residence` — из `time` или `null`;
-  - у события (`role: "event"`) — год события.
-- Место попадает в `places`, только если на него ссылается размещение и у него есть координаты. Размещение без координат места не отдаётся, его сущность уходит в `unplaced`, если других размещений нет.
+- `from`/`to` — из уточнителя `time`, иначе `null`. У события (`role: "event"`) — год события. Сервер не подставляет годы жизни: правило «где в год T» — в клиенте, в одном месте.
+- Место попадает в `places`, только если на него ссылается размещение и у него есть координаты. Размещение без координат места не отдаётся. Сущность без единого размещения с координатами — в `unplaced`.
 - Маршрут — в `app.py` рядом с `/map` (`if section_map is not None`). Шлюз: шаблон `GET ^/api/knowledge/v1/map/places$` → операция `map` (`limits.py`), без токена страницы.
 
 ## События журнала
@@ -109,43 +132,51 @@ class PlaceLayer:
 |---|---|---|---|
 | `knowledge.geo.built` | info | `entities`, `places`, `placements`, `unplaced`, `truncated`, `cached` | каждый ответ `/map/places` |
 | `knowledge.geo.enriched` | info | `run_id`, `entities`, `coordinates`, `placements`, `places_created`, `skipped`, `failed`, `dry_run` | конец запуска обогащения |
-| `knowledge.geo.skipped` | warning | `entity`, `property`, `reason` | пропущенная запись обогащения |
-| `knowledge.statement.refused` (есть) | — | `type`, `reason` | недопустимые координаты, вид места, нет атрибуции |
+| `knowledge.geo.skipped` | warning | `entity`, `property`, `reason` (`bad_qid` \| `bad_value` \| `refused` \| `fetch_failed`) | пропущенная запись |
+| `knowledge.geo.rolled_back` | info | `run_id`, `statements`, `places_kept` | откат запуска |
+| `knowledge.statement.refused` (есть) | — | `type`, `reason`, **новое** `code` | недопустимые координаты, вид места, нет атрибуции |
 
-Личных данных в событиях нет: id сущностей онтологии, коды и числа.
-
-Интерфейс глобуса событий клиента не пишет, как и хронология: в продукте нет клиентского журнала. Сценарии взаимодействия наблюдаются в DOM (якоря ниже), загрузка данных — событием `knowledge.geo.built`. Сценарии, где THEN чисто визуальный (поворот, год, приглушение), подтверждаются по DOM. Это записано в «Функциональных сценариях».
+- В новых событиях только id сущностей, коды и числа: ни названий, ни текста записей Wikidata, ни запроса (Р2). Нормативный тест сверяет поля с этим перечнем.
+- `request_id` добавляет контекст платформы.
+- Интерфейс глобуса событий клиента не пишет: клиентского журнала в продукте нет. Это исключение записано одной фразой в каждом интерфейсном требовании спецификации (Р4). Серверный якорь — `knowledge.geo.built` по `request_id` запроса `/map/places`. Тестировщик перечисляет исключения в `verification.md`.
 
 ## Клиент
 
 ```
 web/src/map/geo/
-  timeline.ts     чистые функции: whereAt(person, placements, T), mainPlace, linkYear,
-                  visibleAt(T) → {places:[{id, people[], events[], opacity, unverified}], links:[…]},
-                  defaultYear, константы ADULT_AGE=20, TRAIL=150, MAX_PLACES=300,
+  timeline.ts     чистые функции: whereAt(person, placements, T), mainPlace, linkYear (= рождение
+                  ученика + ADULT_AGE), visibleAt(T) → {places:[{id, people[], events[], age,
+                  unverified}], links:[{…, age}]}, opacity(age), defaultYear, nearestYear;
+                  константы ADULT_AGE=20, TRAIL=150 (границы включительно), MAX_PLACES=300,
                   MAX_LINKS=200, MAX_LABELS=12
-  projection.ts   чистые функции поверх d3-geo: initialView(places, size) → {rotate, scale},
-                  rotateBy, zoomBy, centerOn(place), isNear(lonlat, rotate), arcPath
+  projection.ts   поверх d3-geo: initialView(places, size) → {center, zoom: 1}, rotateBy (зажим
+                  широты ±80), zoomBy (×1.25, 1–8), centerOn(place), isNear (≤ 90°), arcPath
   land.ts         суша world-atlas land-110m → GeoJSON (topojson-client), один раз
   api.ts          загрузка /map/places, отмена при смене области
-  GlobeView.tsx   SVG: море, сетка, суша, дуги, отметки, подписи; перетаскивание (pointer events),
-                  колесо, клавиши; requestAnimationFrame; ResizeObserver
+  GlobeView.tsx   SVG: море, сетка, суша, дуги, отметки, подписи; pointer events, колесо, клавиши;
+                  requestAnimationFrame; ResizeObserver
   GeoList.tsx     «Места в <год> году» для панели
-  geoFixture.ts   места и размещения для ?fixture=dense
+  geoFixture.ts   места для ?fixture=dense (только ручной просмотр, тесты его не используют)
 ```
 
-- `MapPage.tsx`:
+- **Правило «где в год T»** — `whereAt`: интервал `activity`/`residence` (включительно) → последнее начавшееся место (начала: `birth` — рождение, `activity` без времени — рождение + `ADULT_AGE`, `death` — смерть) → записи без вида и без времени, если записей с видом нет: проживание на всю жизнь.
+- **Середина жизни** для года по умолчанию — `(birth + death) / 2` с тем же округлением, что `dates.middle` на сервере (Р8). Если 2.1 или 2.2 кладут клиентскую копию, берём её. Если нет — одна функция в `map/geo/timeline.ts` и тест на те же примеры, что у `dates.middle`.
+- **Эпоха подписи** — `eraOf(eras, year)` из 2.2: при перекрытии — самое позднее начало, затем название.
+- **Время (Р3).** Таймеры — только `requestAnimationFrame`, `setTimeout` и `performance.now()`, без `Date.now()`. Тесты управляют временем через `page.clock`. Проигрывание считает год по прошедшему времени, а не по числу кадров: результат не зависит от частоты кадров.
+- **`MapPage.tsx`:**
   - переключатель вида — сегментированная кнопка (`role="radiogroup"`);
-  - `const GlobeView = lazy(() => import("./geo/GlobeView"))` — отдельный фрагмент vite, туда же попадают `d3-geo`, `topojson-client` и данные суши;
-  - в виде «Глобус» линзы скрыты, `MapCanvas` не монтируется.
-- `types.ts`: `MapState.view: "chrono" | "globe"`, `MapState.t?: number`. В адрес `view` пишется только `globe`, `t` — только в виде глобуса. `parseState` принимает `t` только как целое.
-- `Overview.tsx`: в виде глобуса поверх рамки окна точка года (`role="slider"`, `aria-valuenow`), кнопка «Играть/Пауза» и скорость. Клавиши шкалы прежние, плюс `[`, `]`.
-- `MapPanel.tsx`: в виде глобуса после «Выбрано» идёт раздел «Места в году» (`GeoList`), счётчик «N без места» (раскрывается перечнем) и пометка «показаны N из M связей».
-- Подписи мест — жадная раскладка по `measure.ts` (как «булавки»): кандидаты справа, слева, сверху, снизу, приоритет — у кого больше людей.
-- DOM-якоря:
-  - `.geo-globe[data-year][data-rotate="λ,φ"][data-scale]`;
-  - `[data-geo-place][data-people][data-unverified]`;
-  - `[data-geo-link][data-status][data-generated]`;
+  - `const GlobeView = lazy(() => import("./geo/GlobeView"))` — отдельный фрагмент vite с `d3-geo`, `topojson-client` и сушей;
+  - в виде «Глобус» линзы скрыты, `MapCanvas` не монтируется;
+  - ошибки загрузки ловятся в компоненте (`console.error` нет).
+- **`types.ts`:** `MapState.view: "chrono" | "globe"`, `MapState.t?: number`. В адрес `view` пишется только `globe`, `t` — только в виде глобуса. `parseState` принимает `t` только целым, зажим в окно — в модели.
+- **`Overview.tsx`:** в виде глобуса — точка года (`role="slider"`, `aria-valuenow`), «Играть/Пауза», скорость; клавиши шкалы прежние плюс `[`, `]`.
+- **`MapPanel.tsx`:** раздел «Места в году» (`GeoList`), «N без места», «показаны N из M мест/связей».
+- **Подписи мест** — жадная раскладка по `measure.ts`. Названия — только текстовыми узлами React, без `dangerouslySetInnerHTML`.
+- **Доступность:** глобус — `role="application"`, `aria-roledescription="глобус"` (EN «globe»), `aria-label` — сводка, `aria-describedby` — подсказка клавиш. Отметки — `aria-hidden`.
+- **DOM-якоря** (они же названы в спецификации):
+  - `.geo-globe[data-year][data-center][data-zoom][aria-busy]`;
+  - `[data-geo-place][data-people][data-age][data-unverified][data-hidden][data-role][data-dim]`;
+  - `[data-geo-link][data-status][data-generated][data-age][data-role][data-dim]`;
   - `[data-geo-label]`, `[data-geo-row]`, `[data-geo-unplaced]`.
 
 ## Выбор решения
@@ -169,7 +200,9 @@ web/src/map/geo/
 | Координаты | К1: значение-связь `coordinates` (`geo`) | поле сущности (обход реестра), своя таблица (второй источник правды), справочник в клиенте (без проверки и атрибуции) |
 | Вид места | Р1: уточнитель `place_role` | подтипы `born_in`/`died_in`/`worked_in` (шире, чем нужно), вывод по датам (угадывание) |
 | Встраивание | И1: `/graph?view=globe` | отдельная страница `/atlas` (копия панели и адреса), окно поверх хронологии (тесно на 1024×576) |
-| Данные слоя | `GET /v1/map/places` поверх `SectionMap` | поле `places` в `/map` (лишние данные каждому читателю хронологии, меняется контракт `/map`) |
+| Данные слоя | `GET /v1/map/places` поверх `SectionMap.result` и `Snapshots` | поле `places` в `/map` (лишние данные каждому читателю хронологии, меняется контракт `/map`) |
+| Разбор Wikidata | общий `knowledge/wikidata.py` (2.2) | свой httpx и разбор времени в `geo_enrich.py` (копия логики в трёх изменениях — отвергнуто ревьювером) |
+| Откат мест | утверждения откатываются, места остаются (`places_kept`) | удалять созданные места (в API нет удаления сущностей; новая операция ради пустых мест) |
 
 **Выбрано: А + К1 + Р1 + И1 + отдельный эндпоинт слоя.**
 - Это минимально достаточно для объёма раздела (≤ 400 сущностей) и единственное, что работает без WebGL и даёт DOM-якоря.
@@ -178,7 +211,10 @@ web/src/map/geo/
 **Чем платим:**
 - три новые зависимости клиента (ISC) и около 60 КБ gzip в ленивом фрагменте;
 - лишнее утверждение P19 на персону (запись `filling.py` без вида рядом с записью обогащения): слой сводит пары, устранение — пункт «требует согласования Lead'а»;
-- условности времени (`ADULT_AGE`, «год связи = рождение ученика», `TRAIL=150`): константы в одном модуле, объяснены в легенде;
+- условности времени (`ADULT_AGE`, «год связи = рождение ученика + `ADULT_AGE`», `TRAIL=150` включительно): константы в одном модуле, объяснены в легенде;
+- правка чужого общего кода: `_add_missing_defaults` в `registry.py` начинает дописывать `qualifiers` (с тестом на заполненном реестре), `StatementError` и `knowledge.statement.refused` получают необязательный `code`;
+- зависимость от 2.1 (`Snapshots`) и 2.2 (`wikidata.py`, `eraOf`, функция середины): без них 3.x не начинается;
+- пустые места после отката остаются в базе;
 - SVG-путь суши пересчитывается на каждый кадр перетаскивания: замер в 5.6, переход на Б по его итогу.
 
 **Костыли, которых избегаем:**
@@ -187,7 +223,9 @@ web/src/map/geo/
 - нет копии панели и разбора адреса;
 - нет флага «для тестов»: детерминизм — свойство исходного вида, а не режим;
 - нет `sleep` в проигрывании: `requestAnimationFrame` и время кадра;
-- в обогащении нет `except Exception` без события: каждая ошибка даёт `knowledge.geo.skipped`.
+- в обогащении нет `except Exception` без события: каждая ошибка даёт `knowledge.geo.skipped`;
+- нет второго разбора Wikidata и второго правила середины интервала;
+- нет лишнего `knowledge.map.built` от слоя мест (`SectionMap.result` вместо `build`).
 
 ## Концепт интерфейса
 
@@ -266,8 +304,8 @@ web/src/map/geo/
 
 | Где | Клавиша | Действие |
 |---|---|---|
-| Глобус | ← → ↑ ↓ | поворот на 10° (Shift — 30°) |
-| Глобус | `+` / `−`, колесо | масштаб 1–8× |
+| Глобус | ← → ↑ ↓ | центр вида на 10° к западу, востоку, северу, югу (Shift — 30°), широта центра в пределах ±80° |
+| Глобус | `+` / `−`, колесо | приближение ×1,25 за шаг, 1–8 |
 | Глобус | `0` | исходный вид |
 | Глобус, шкала | `PageUp` / `PageDown` | год ±10 |
 | Глобус, шкала | `[` / `]` | год ±1 |
@@ -302,7 +340,9 @@ web/src/map/geo/
 | `geo.nobody(y)` | В {y} году на карте никого нет | Nobody on the map in {y} |
 | `geo.nearest` | К ближайшему году | Go to nearest year |
 | `geo.coast` | Береговая линия — современная, Natural Earth | Modern coastline, Natural Earth |
-| `geo.legendLink` | Связь отмечена годом рождения ученика и видна 150 лет | A link appears in the student's birth year and stays for 150 years |
+| `geo.legendLink` | Связь появляется через 20 лет после рождения ученика и видна 150 лет | A link appears 20 years after the student's birth and stays for 150 years |
+| `geo.placesShown(n,m)` | показаны {n} из {m} мест | showing {n} of {m} places |
+| `geo.roledescription` | глобус | globe |
 | `geo.keys` | Клавиши | Keys |
 
 Числительные («1 место», «2 места», «5 мест») — через существующий помощник множественного числа в `i18n` (если его нет — добавить в 6.4).
@@ -311,7 +351,7 @@ web/src/map/geo/
 
 Как читатель пользуется глобусом. Каждый сценарий ссылается на требования `geo-timeline`.
 
-1. **«Где это было?»** Читатель на хронологии выбрал Канта и нажал «Глобус». Глобус повёрнут к Европе, год — середина жизни Канта (1764), Кёнигсберг выделен. От Юма (Эдинбург) идёт дуга цвета учителей. Вольфа без места нет на глобусе, но он в перечне «1 без места» и в «Выбрано» как учитель. *Требования: Вид «Глобус», Выбор на глобусе, Год и проигрывание.*
+1. **«Где это было?»** Читатель на хронологии выбрал Канта и нажал «Глобус». Глобус повёрнут к Европе, год — середина жизни Канта (1764, общей функцией середины), Кёнигсберг выделен. От Юма (Эдинбург) идёт дуга цвета учителей. Вольфа без места нет на глобусе, но он в перечне «1 без места» и в «Выбрано» как учитель. *Требования: Вид «Глобус», Выбор на глобусе, Год и проигрывание.*
 2. **«Как двигалась мысль».** Окно 1600–1800, «Играть». Год идёт, отметки загораются в Ла-Э, Париже и Амстердаме, дуги из Британии тянутся на континент и бледнеют. Пробел — пауза, живая область объявляет «1690 год: …». *Год и проигрывание; Люди, события и связи; Текстовая альтернатива.*
 3. **«Кто жил в Париже в 1750».** Щелчок по отметке Парижа: в «Выбрано» — «Париж, 1750» и список людей. Выбор д'Аламбера возвращает обычный выбор персоны. *Выбор на глобусе.*
 4. **Читатель без мыши и с экранной читалкой.** Tab до глобуса, слышит сводку. `PageDown`, `PageDown` — год меняется, объявление после шага. Tab в список мест, Enter на «Кёнигсберг» — глобус поворачивается. *Текстовая альтернатива и клавиатура.*
@@ -323,6 +363,16 @@ web/src/map/geo/
 - сценарии 1–5 подтверждаются по DOM-якорям (раздел «Клиент»), загрузка данных — событием `knowledge.geo.built`;
 - сценарии 6–7 — выводом команды и событиями `knowledge.geo.enriched` и `knowledge.geo.skipped`.
 
+## Тестируемость
+
+- **Инфраструктура (Р1).** `tests/web` поднимает настоящее приложение знаний в процессе (SQLite, данные задаёт сам тест) — фикстура из `add-reference-catalog`, здесь переиспользуется. Так серверное событие `knowledge.geo.built` наблюдаемо по `request_id`.
+- **Данные.** Ожидания не берутся из `?fixture=dense`, `geoFixture.ts` и `seed_demo.py`. `page.route` — только для крайних случаев: 320 мест, 260 связей, задержка, 500.
+- **Время.** Клиент — `page.clock` (проигрывание, поворот 600 мс, живая область). Сервер — внедряемые часы `Snapshots`.
+- **Сеть и модель.** Ловушка транспорта: 0 внешних запросов и 0 вызовов модели при построении слоя. `fetch` обогащения внедрён: 0 вызовов из пути читателя.
+- **Без WebGL.** Тест защищает от регрессии при смене рендера. В `verification.md` он не засчитывается подтверждением других сценариев.
+- **Вес фрагмента** — детерминированный тест: сумма тел ответов после переключения на глобус, gzip -9, ≤ 150 КБ.
+- **Кадр перетаскивания 16 мс** — замер (5.6) с сырыми числами в `progress.md`/`verification.md`, не утверждение теста.
+
 ## Риски
 
 - **Данные Lead'а.** Неизвестно, у скольких персон `.stack` есть Wikidata-id. Если мало, глобус будет бедным. Слой честно показывает «N без места». Сопоставление сущностей с Wikidata по имени — вне объёма (это задача наполнения).
@@ -330,3 +380,5 @@ web/src/map/geo/
 - **Машина агента** (1 ГБ RAM, 1 CPU): `vite build` и `tests/web` идут медленно, e2e и Docker здесь не прогнать — e2e подтверждает Lead или CI.
 - **`definition`** проверяется по имени типа. Перевод на флаг `requires_attribution` — отдельной задачей, чтобы не менять поведение определения в этом изменении.
 - **Две записи P19** на персону до согласования правки `filling.py`.
+- **Имена в `wikidata.py`** ещё не зафиксированы в design.md 2.2. Расхождение правится ссылками здесь.
+- **Существующие проблемы вне объёма (Р10):** `/map?only_textbook` раскрывает охват закрытого учебника, кэш `/map` растёт по произвольному `textbook`. Записываются отдельной задачей (regional-access), здесь не чинятся. Новый кэш `/map/places` — сразу LRU.
