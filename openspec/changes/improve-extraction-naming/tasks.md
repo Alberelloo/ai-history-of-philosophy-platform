@@ -30,7 +30,7 @@
   - `create` и `add_name` ставят язык `lang_for` для любого пути;
   - `create` и `add_name(kind="primary")` вызывают `check_name`, событие `knowledge.entity.rejected` ровно с `type`, `label` (`event_label`), `reason`;
   - `set_primary_name(entity_id, lang, text)` — прежнее основное становится вариантом, событие `knowledge.entity.renamed` ровно с `entity_id`, `lang`, `previous_lang`.
-- [ ] 2.4 `knowledge/dating.py`: белый список форматов по таблице `entity-dating`, порядок причин `paragraph` → `quote` → `unparsed` → `not_in_quote` (целые числа по границам цифр, римский век словом) → `era` → `single_year`. `dates.parse` не меняется. Юнит-тесты.
+- [x] 2.4 `knowledge/dating.py`: белый список форматов по таблице `entity-dating`, порядок причин `paragraph` → `quote` → `unparsed` → `not_in_quote` (целые числа по границам цифр, римский век словом) → `era` → `single_year`. `dates.parse` не меняется. Юнит-тесты.
 - [ ] 2.5 `knowledge/entity_items.py`:
   - `EntityItems.index`;
   - `resolve`: тип вне реестра → `entity:type`; кандидаты по всем написаниям; разные кандидаты от разных написаний → неоднозначность; перенос логики контекста и очереди из `Filling._resolve` без изменения поведения;
