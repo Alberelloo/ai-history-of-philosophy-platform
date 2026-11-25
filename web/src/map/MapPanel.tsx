@@ -75,6 +75,8 @@ type Step = Fold | "tight";
 // Что уступает место первым: плотный режим (заголовок панели в строке поиска, меньше
 // отступы), затем разделы. Раскрываются обратно в обратном порядке.
 const FOLD_ORDER: Step[] = ["tight", "legend", "filters", "selected"];
+const GEO_ROWS_MIN = 72; // px: минимум списка мест глобуса (GeoList, MIN_ROWS)
+const SQUEEZE_MIN = 48; // px: меньше список «Выбрано» не сжимается — тогда раздел складывается
 const REOPEN_MARGIN = 16; // px свободного места сверх освобождённого, чтобы раскрыть обратно
 
 type FoldApi = { closed: (k: Fold) => boolean; toggle: (k: Fold) => void };
@@ -97,6 +99,18 @@ function FoldHead({ k, children, extra }: { k: Fold; children: ReactNode; extra?
   );
 }
 
+// Снять сжатие «Выбрано» и списка мест (новый выбор или «Выбрано» сложено).
+function unsqueeze(root: HTMLElement | null) {
+  root?.querySelectorAll<HTMLElement>("#map-sec-selected .map-selected__list, #map-sec-selected .geo-selected__who").forEach((el) => {
+    el.style.maxHeight = "";
+    el.style.overflowY = "";
+  });
+  root?.querySelectorAll<HTMLElement>(".geo-list__rows[data-squeezed]").forEach((el) => {
+    delete el.dataset.squeezed;
+    el.style.maxHeight = "";
+  });
+}
+
 // Подгонка разделов под высоту панели: складывает по FOLD_ORDER, пока содержимое выше
 // панели, и раскрывает сложенные подгонкой, когда освобождённого места снова хватает.
 function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, active: boolean, focusKey: string) {
@@ -117,6 +131,8 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
 
   // Новый выбор или связь — «Выбрано» раскрывается: читатель хочет его видеть.
   useEffect(() => {
+    // Новый выбор — сжатие списков «Выбрано» от прошлого снимается.
+    unsqueeze(panel.current);
     if (!focusKey) return;
     byUser.current.delete("selected");
     freed.current.delete("selected");
@@ -138,6 +154,37 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
       pending.current = null;
     }
     if (need > avail + 0.5) {
+      // Раскрытое читателем или выбором «Выбрано» не складывается обратно, пока его списки
+      // (связи, люди места) можно сжать до SQUEEZE_MIN со своей прокруткой: главное — имя
+      // и «Где в <год> году» над ними остаются видны.
+      // Сначала уступает список мест глобуса (до своего минимума), как уступает при подгонке.
+      let over = need - avail;
+      for (const el of b.querySelectorAll<HTMLElement>(".geo-list__rows")) {
+        const h = el.clientHeight;
+        const target = Math.max(GEO_ROWS_MIN, Math.floor(h - over));
+        if (target >= h) continue;
+        el.style.maxHeight = `${target}px`;
+        over -= h - target;
+      }
+      if (over <= 0.5) return;
+      if (pin === "selected" && !closed.has("selected") && !FOLD_ORDER.some((k) => !closed.has(k) && k !== pin)) {
+        const shrink = (sel: string, min: number, mark: boolean) => {
+          for (const el of b.querySelectorAll<HTMLElement>(sel)) {
+            const h = el.clientHeight;
+            const target = Math.max(min, Math.floor(h - over));
+            if (target >= h) continue;
+            el.style.maxHeight = `${target}px`;
+            el.style.overflowY = "auto";
+            if (mark) el.dataset.squeezed = "true"; // useRest (GeoList) не растягивает его обратно
+            over -= h - target;
+          }
+        };
+        const lists = "#map-sec-selected .map-selected__list, #map-sec-selected .geo-selected__who";
+        shrink(lists, SQUEEZE_MIN, false); // списки «Выбрано» — до SQUEEZE_MIN
+        shrink(".geo-list__rows", 0, true); // строки списка мест — целиком, заголовок остаётся
+        shrink(lists, 0, false); // списки «Выбрано» — целиком: имя, «Где» и действия остаются
+        if (over <= 0.5) return;
+      }
       // Последнее средство — сложить и раскрытый читателем раздел: прокрутки не бывает.
       const victim = FOLD_ORDER.find((k) => !closed.has(k) && k !== pin) ?? (pin && !closed.has(pin) ? pin : undefined);
       if (!victim) return;
@@ -164,6 +211,7 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
         setPin(k);
         setClosed(new Set([...closed].filter((x) => x !== k)));
       } else {
+        if (k === "selected") unsqueeze(panel.current);
         byUser.current.add(k);
         if (pin === k) setPin(null);
         setClosed(new Set([...closed, k]));
@@ -249,10 +297,14 @@ export function MapPanel(props: Props) {
           {props.onResetView && <ViaNotice data={props.data} state={props.state} onReset={props.onResetView} />}
           <section className="map-panel__sec map-selected" data-section="selected" id="map-sec-selected" aria-live="polite">
             {fold.closed("selected") ? (
-              <FoldHead k="selected">
-                {t.map.sections.selected}
-                {props.rel ? ` · ${props.rel.obj.label}` : ""}
-              </FoldHead>
+              <>
+                <FoldHead k="selected">
+                  {t.map.sections.selected}
+                  {props.rel ? ` · ${props.rel.obj.label}` : ""}
+                </FoldHead>
+                {/* Город и страна выбранного видны и в сложенном разделе (тесная панель). */}
+                {props.geo?.where && props.rel && <GeoWhere where={props.geo.where} />}
+              </>
             ) : (
               <Selected {...props} />
             )}

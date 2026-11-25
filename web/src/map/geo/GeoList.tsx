@@ -38,7 +38,7 @@ function useRest(list: RefObject<HTMLUListElement | null>) {
     const ul = list.current;
     const panel = ul?.closest<HTMLElement>(".map-panel");
     const body = ul?.closest<HTMLElement>(".map-panel__body");
-    if (!ul || !panel || !body) return;
+    if (!ul || !panel || !body || ul.dataset.squeezed) return; // сжат подгонкой панели ради «Выбрано»
     const style = getComputedStyle(panel);
     const bottom = panel.getBoundingClientRect().top + panel.clientTop + panel.clientHeight - parseFloat(style.paddingBottom);
     const box = ul.getBoundingClientRect();
