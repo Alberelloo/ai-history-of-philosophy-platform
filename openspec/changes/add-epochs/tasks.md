@@ -14,7 +14,7 @@
 - [x] 2.3 `knowledge/epoch_dates.py` поверх `wikidata.py`: `epoch_dating` (P580/P582, запасные P571/P576), `EpochDates.apply` (манифест + `--linked`, сопоставление и заведение эпох, `added`/`created`/`unchanged`/`conflict`/`no_dates`/`no_qid`/`fetch_failed`/`ambiguous`/`duplicate_qid`, `skipped` и равенство `checked = added + created + conflicts + skipped`, `--dry-run` без записи, идемпотентность повторного запуска), отчёт JSON, события `knowledge.epoch_dates.checked`/`run`
 - [x] 2.4 `suggest`: поиск кандидатов, отбор по `PERIOD_CLASSES` и датам, объединение кандидатов по `qid` при повторе, поля человека не трогаются, запись в манифест без `wikidata`, событие `knowledge.epoch_dates.suggested`
 - [x] 2.5 CLI `python -m philograph.knowledge.epoch_dates suggest|apply [--linked] [--dry-run]`; сеть — только `wikidata.http_fetch`
-- [ ] 2.6 `sources/epochs.yaml` — эпохи раздела RU/EN с `wikidata: null` (QID не выдумываются); проверка манифеста (повтор `ru`, шаблон QID) до обращения к базе и сети
+- [x] 2.6 `sources/epochs.yaml` — эпохи раздела RU/EN с `wikidata: null` (QID не выдумываются); проверка манифеста (повтор `ru`, шаблон QID) до обращения к базе и сети
 - [ ] 2.7 Фикстуры ответов Wikidata `tests/knowledge/fixtures/wikidata/*.json` (`wbgetentities`, `wbsearchentities`) — офлайн
 
 ## 3. Сервис знаний
