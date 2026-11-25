@@ -8,6 +8,7 @@ import { LibraryPage } from "./LibraryPage";
 import { FirstRunNotice } from "./Notice";
 import { ParagraphLink } from "./ParagraphLink";
 import { ReaderPage } from "./ReaderPage";
+import { ReferencePage } from "./reference/ReferencePage";
 import { ReviewPage } from "./ReviewPage";
 import { SettingsPage } from "./SettingsPage";
 import { Sidebar } from "./Sidebar";
@@ -21,6 +22,7 @@ import { Icon } from "./ui";
 //         /read/:source[/:chapter][#p-<абзац> | #s-<раздел>] — чтение
 //         /p/:paragraph       — постоянная ссылка на абзац
 //         /graph[/:entity]?sel,q,from,to,…,recipe — карта раздела (synchro-map)
+//         /reference?q,group,epoch,textbook,sort — справочник
 //         /settings[#раздел]  — настройки читателя
 //         /soon/:раздел       — раздел в разработке
 export function navigate(path: string, state?: unknown): void {
@@ -49,6 +51,7 @@ function activeItem(parts: string[]): string {
   if (parts[0] === "read" || parts[0] === "p") return "reading";
   if (parts[0] === "soon") return parts[1] ?? "other";
   if (parts[0] === "assistant") return "assistant";
+  if (parts[0] === "reference") return "reference";
   if (parts[0] === "settings" || parts[0] === "graph") return parts[0];
   return "other";
 }
@@ -195,9 +198,15 @@ function Page({
       window.history.replaceState(null, "", "/graph");
       return <MapPage query={new URLSearchParams()} />;
     }
+    if (parts[1] === "reference") {
+      // Заглушка справочника снята: старая закладка — на справочник без записи в историю.
+      window.history.replaceState(null, "", "/reference");
+      return <ReferencePage search="" />;
+    }
     return <SoonPage key={parts[1]} code={parts[1]} />;
   }
   if (parts[0] === "assistant") return <AssistantPage search={search} />;
+  if (parts[0] === "reference") return <ReferencePage search={search} />;
   if (parts[0] === "graph") {
     // Карта не пересоздаётся при смене выбранной сущности: /graph/<id> только меняет выбор.
     return <MapPage entityId={parts[1] ? decodeURIComponent(parts[1]) : undefined} query={new URLSearchParams(search)} />;

@@ -83,3 +83,89 @@ def onto(engine_for, clock) -> Onto:
     paragraphs = dict(PARAGRAPHS)
     statements = Statements(engine, registry, entities, paragraphs.get, clock)
     return Onto(registry, entities, statements, paragraphs)
+
+
+# --- справочник через HTTP-маршрут сервиса (add-reference-catalog) ---------------------
+
+TEXTBOOK_N = "s_textbook_n"  # открыт везде
+TEXTBOOK_R = "s_textbook_r"  # доступен только в РФ
+VISITOR_ADDRESS = "203.0.113.77"
+
+
+class CatalogService:
+    """Приложение сервиса знаний со справочником и картой на одном снимке.
+
+    Библиотека и шлюз моделей — поддельные транспорты: библиотека закрывает «Учебник R» для
+    любого региона, кроме ``RU``; любой вызов модели записывается и получает 503 (модель
+    недоступна). Время снимка — ``ManualClock`` теста.
+    """
+
+    def __init__(self, onto: Onto, clock, max_stale: float = 15.0) -> None:
+        import uuid
+
+        import httpx
+        from fastapi.testclient import TestClient
+
+        from philograph.knowledge.app import build_app
+        from philograph.knowledge.cards import Cards
+        from philograph.knowledge.catalog import Catalog, CatalogSettings
+        from philograph.knowledge.map import SectionMap
+        from philograph.knowledge.snapshot import Snapshots
+        from philograph.platform.client import ServiceClient
+
+        from .world import World
+
+        self._uuid = uuid
+        self.onto = onto
+        self.clock = clock
+        self.world = World(onto.entities, onto.statements, onto.paragraphs)
+        self.library_calls: list[dict] = []
+        self.llm_calls: list[str] = []
+
+        def library(request: httpx.Request) -> httpx.Response:
+            self.library_calls.append({"path": request.url.path, **dict(request.url.params)})
+            if request.url.path.endswith("/internal/access"):
+                region = request.url.params.get("region")
+                closed = [] if region == "RU" else [TEXTBOOK_R]
+                return httpx.Response(200, json={"closed": closed, "hidden": []})
+            return httpx.Response(404, json={"detail": "Not Found"})
+
+        def llm(request: httpx.Request) -> httpx.Response:
+            self.llm_calls.append(str(request.url))
+            return httpx.Response(503, json={"error": "модель недоступна"})
+
+        self.snapshots = Snapshots(onto.statements.engine, clock)
+        self.catalog = Catalog(
+            self.snapshots, onto.registry, onto.entities, CatalogSettings(max_stale)
+        )
+        self.section_map = SectionMap(onto.statements, snapshots=self.snapshots)
+        llm_client = ServiceClient("llm", "http://llm", transport=httpx.MockTransport(llm))
+        app = build_app(
+            onto.statements,
+            catalog=self.catalog,
+            section_map=self.section_map,
+            cards=Cards(onto.statements, None, llm_client),
+            library=ServiceClient(
+                "library", "http://library/api", transport=httpx.MockTransport(library)
+            ),
+        )
+        self.client = TestClient(app, raise_server_exceptions=False)
+
+    def get(self, path: str = "/v1/catalog", params=None, region: str | None = None):
+        """Ответ и ``request_id`` запроса; адрес посетителя передаётся, как это делает шлюз."""
+        rid = f"rid-{self._uuid.uuid4().hex[:10]}"
+        headers = {"X-Request-Id": rid, "X-Forwarded-For": VISITOR_ADDRESS}
+        if region is not None:
+            headers["X-Philograph-Region"] = region
+        response = self.client.get(path, params=params, headers=headers)
+        return response, rid
+
+    def catalog_ok(self, params=None, region: str | None = None) -> tuple[dict, str]:
+        response, rid = self.get(params=params, region=region)
+        assert response.status_code == 200, response.text
+        return response.json(), rid
+
+
+@pytest.fixture
+def svc(onto, clock) -> CatalogService:
+    return CatalogService(onto, clock)

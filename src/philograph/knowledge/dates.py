@@ -7,7 +7,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
+from typing import Any
 
 _ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
@@ -106,3 +108,23 @@ def lifespan(birth: str, death: str) -> FuzzyDate:
         "year" if b.precision == d.precision == "year" else "approx",
         f"{birth}{LIFESPAN_DASH}{death}",
     )
+
+
+def span(d: Mapping[str, Any] | FuzzyDate) -> tuple[int, int]:
+    """Начало и конец датировки: середина каждой нечёткой границы, округлённая до года.
+
+    Одно правило для пролётов карты, принадлежности к эпохе и списков: «1679 или 1680» —
+    1680 (``round`` — банковское округление, как было на карте: 1679,5 → 1680, 1680,5 → 1680).
+    Годы до н. э. — в астрономическом счёте, округление то же."""
+    if isinstance(d, FuzzyDate):
+        d = d.to_json()
+    return (
+        round((d["earliest_start"] + d["latest_start"]) / 2),
+        round((d["earliest_end"] + d["latest_end"]) / 2),
+    )
+
+
+def middle(d: Mapping[str, Any] | FuzzyDate) -> float:
+    """Середина датировки (или жизни) — полусумма начала и конца ``span`` без округления."""
+    start, end = span(d)
+    return (start + end) / 2

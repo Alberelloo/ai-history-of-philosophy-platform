@@ -1,0 +1,321 @@
+/* Справочник (/reference): обычная страница продукта на токенах дизайн-системы.
+   Раскладки 1920×1080 и 1024×576 — design.md «Концепт интерфейса». */
+
+.reference {
+  max-width: 72rem;
+}
+
+.reference__header {
+  margin-bottom: var(--space-6);
+}
+
+.reference__found {
+  color: var(--ink-2);
+  font: var(--type-ui-label);
+  white-space: nowrap;
+}
+
+.reference__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.reference__search {
+  flex: 1 1 22rem;
+}
+
+.reference__search .pg-input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.reference__selects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.reference__select {
+  display: grid;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.reference__select .pg-input {
+  width: auto;
+  min-width: 10rem;
+  max-width: 16rem;
+}
+
+/* Переключатели групп: один ряд; на узком окне ряд прокручивается сам, страница — нет. */
+.reference__types {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  margin-bottom: var(--space-4);
+}
+
+.reference__types-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.reference__scroll {
+  display: none;
+  flex: none;
+}
+
+.reference__type {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 2rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--type-ui-label);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-quick) var(--ease-out), border-color var(--dur-quick) var(--ease-out);
+}
+
+.reference__type:hover {
+  border-color: var(--ink-3);
+}
+
+.reference__type:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.reference__type[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.reference__type[data-empty="true"] {
+  color: var(--ink-3);
+}
+
+.reference__count {
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+}
+
+.reference__type[aria-pressed="true"] .reference__count {
+  color: var(--accent);
+}
+
+.reference__notice {
+  margin-bottom: var(--space-4);
+  align-items: center;
+}
+
+.reference__empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+  color: var(--ink-2);
+  font: var(--type-ui-body);
+}
+
+/* ---------- Список ---------- */
+.reference__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.reference-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.reference-item[data-selected="true"] {
+  background: var(--accent-soft);
+}
+
+.reference-item__open {
+  --fg: var(--people);
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.reference-item__open:hover .reference-item__name {
+  color: var(--accent);
+}
+
+.reference-item__open:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+.reference-item__open[data-family="ideas"] { --fg: var(--ideas); }
+.reference-item__open[data-family="teachings"] { --fg: var(--teachings); }
+.reference-item__open[data-family="texts"] { --fg: var(--texts); }
+.reference-item__open[data-family="history"] { --fg: var(--history); }
+
+.reference-item__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  min-width: 0;
+}
+
+/* Значок вида — те же формы, что у меток семей (pg-chip). */
+.reference-item__mark {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--fg);
+  transform: translateY(-0.0625rem);
+}
+.reference-item__open[data-family="ideas"] .reference-item__mark { border-radius: 1px; }
+.reference-item__open[data-family="teachings"] .reference-item__mark {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.reference-item__open[data-family="texts"] .reference-item__mark { width: 0.375rem; height: 0.5625rem; border-radius: 1px; }
+.reference-item__open[data-family="history"] .reference-item__mark {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--fg);
+}
+
+.reference-item__name {
+  font: var(--type-name-md);
+  overflow-wrap: anywhere;
+}
+
+.reference-item__also {
+  color: var(--ink-3);
+  font: var(--type-ui-body-sm);
+}
+
+.reference-item__meta {
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+}
+
+.reference-item__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  color: var(--ink-2);
+  font: var(--type-ui-body);
+}
+
+.reference-item__text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.reference-item__map {
+  flex: none;
+  margin-top: var(--space-3);
+}
+
+.reference-item--placeholder {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+}
+
+.reference-item__bar {
+  display: block;
+  width: 40%;
+  height: 0.875rem;
+  border-radius: var(--radius-xs);
+  background: var(--sunken);
+  animation: reference-pulse 1.4s var(--ease-out) infinite alternate;
+}
+
+.reference-item__bar--short {
+  width: 70%;
+  height: 0.75rem;
+}
+
+@keyframes reference-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-item__bar { animation: none; }
+}
+
+.reference__more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+.reference__all {
+  color: var(--ink-3);
+  font: var(--type-ui-body-sm);
+}
+
+/* ---------- Узкое окно (1024×576 и меньше) ---------- */
+@media (max-width: 1279px) {
+  .reference {
+    padding-top: var(--space-6);
+  }
+
+  .reference__lead {
+    display: none;
+  }
+
+  .reference__header {
+    margin-bottom: var(--space-4);
+  }
+
+  .reference__types-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .reference__types-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reference__scroll {
+    display: inline-flex;
+  }
+
+  .reference-item__text {
+    -webkit-line-clamp: 1;
+  }
+
+  .reference-item__map-text {
+    display: none;
+  }
+}
