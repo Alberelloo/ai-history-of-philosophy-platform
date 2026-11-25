@@ -62,7 +62,8 @@ class Snapshot:
     fingerprint: tuple
     built_at: datetime
     _derived: dict[str, Any] = field(default_factory=dict, repr=False)
-    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+    # Повторно входимая: производное может опираться на другое (справочник — на эпохи).
+    _lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     def derived(self, key: str, build: Callable[[Snapshot], T]) -> T:
         """Производное снимка (индекс, принадлежность): строится один раз на снимок."""
