@@ -8,9 +8,9 @@
 
 | От кого | Что берём | Статус на 2026-11-25 |
 |---|---|---|
-| `add-reference-catalog` (2.1) | `knowledge/snapshot.py`: `Snapshots` (действующие сущности и утверждения, отпечаток, внедряемые часы); `SectionMap(statements, snapshots=None)` | описано в его design.md |
-| `add-epochs` (2.2) | `knowledge/wikidata.py` — общий модуль Wikidata (решение ведущего Р7); общая функция середины интервала (Р8); клиентская `eraOf(eras, year)` для подписи года | модуль решён ведущим, имена сверены с design.md 2.2 (второй круг ревью). Интерфейс — ниже. Если 2.2 назовёт иначе, правим ссылки здесь, а не дублируем |
-| `add-epoch-context` (2.3) | ничего в первой версии: события берём из `/map`, `/v1/context` — для страницы эпохи | — |
+| `add-reference-catalog` (2.1) | `knowledge/snapshot.py`: `Snapshots` (действующие сущности и утверждения, отпечаток, внедряемые часы); `SectionMap(statements, settings=None, snapshots=None)`; `Snapshot.wikidata` (сущность → QID) | в коде, принято |
+| `add-epochs` (2.2) | `knowledge/wikidata.py` — общий модуль Wikidata (решение ведущего Р7); общая функция середины интервала (Р8); клиентская `eraOf(eras, year)` для подписи года | в коде, принято; имена сверены с кодом (задача 1.5). Интерфейс — ниже |
+| `add-epoch-context` (2.3) | события берём из `/map`; места, созданные `epoch_context apply` (тип `place`, внешний id `wikidata`), обогащение находит по QID и не создаёт второй раз | в коде, принято |
 
 Что уже есть в коде:
 - карта раздела `GET /v1/map` (`knowledge/map.py`, `SectionMap`): люди с годами жизни, события с годом, эпохи, группы, влияния между людьми со статусом; предел 400 сущностей; событие `knowledge.map.built`;
@@ -21,17 +21,17 @@
 
 ### Интерфейс `knowledge/wikidata.py` (создаёт 2.2)
 
-Сверено с `openspec/changes/add-epochs/design.md` на 2026-11-25. Берём оттуда, своего не пишем:
-- `check_qid(qid) -> str` — `^Q\d+$`, иначе `WikidataError`;
+Сверено с кодом `src/philograph/knowledge/wikidata.py` (2.2 принято и в архиве) на 2026-11-25 (задача 1.5). Берём оттуда, своего не пишем:
+- `check_qid(qid) -> str` — `^Q\d+$`, иначе `WikidataError`; `WikidataError` — и сбой загрузки, и ответ не по форме;
 - `page_url(qid)` — ссылка атрибуции;
-- `http_fetch(url, …)` — httpx, User-Agent без личных данных, таймаут, `Retry-After`, только CLI;
+- `http_fetch(url, *, wait=time.sleep, transport=None, timeout=10.0, retries=3, max_wait=30.0)` — httpx, User-Agent без личных данных, таймаут, `Retry-After`, только CLI (`partial(http_fetch, wait=time.sleep)`, как у `epoch_context`);
 - `Fetch = Callable[[str], dict]`;
 - `fetch_entity(qid, fetch) -> WikidataRecord`, а у записи `best(prop)` (preferred, иначе первый normal, deprecated никогда) и `items(prop)` (QID-значения с `check_qid`);
 - `Claim(value, rank, qualifiers)` — у P625 `value = {"latitude", "longitude"}`;
 - `claim_date(claim) -> FuzzyDate | None` и `wikidata_time(value, precision)`;
 - `format_original`.
 
-Формат уточнителя `time` — `FuzzyDate.to_json()` (интервал из `dates.interval`, `original` из `format_original`), как у `dating` в 2.2. От этого зависит ключ утверждения и идемпотентность. Функция середины — `dates.span(d)` и `dates.middle(d)` из 2.1 (бывшие `map._start`/`_end`). Клиентская `eraOf(eras, year)` из 2.2: при перекрытии — самое позднее начало, затем название.
+Формат уточнителя `time` — `FuzzyDate.to_json()` (интервал из `dates.interval`, `original` из `format_original`), как у `dating` в 2.2. От этого зависит ключ утверждения и идемпотентность. Функция середины — `dates.span(d) -> (start, end)` и `dates.middle(d) -> float` из 2.1 (`knowledge/dates.py`; `map._start`/`_end` теперь обёртки над `span`). Клиентские `eraOf(eras, year)` и `midLife(person)` — в `web/src/map/model.ts` (2.2): у `eraOf` пролёт `[from, to)`, при перекрытии — самое позднее начало, затем название; `midLife` = `(birth + death) / 2`, как `dates.middle` без округления. Год глобуса — целое: `Math.floor(midLife(p))` (Кант 1724–1804 → 1764).
 
 Если итоговые имена в 2.2 поменяются, правятся ссылки здесь (задача 1.5), а не пишется копия.
 
@@ -160,7 +160,7 @@ web/src/map/geo/
 ```
 
 - **Правило «где в год T»** — `whereAt`: интервал `activity`/`residence` (включительно) → последнее начавшееся место (начала: `birth` — рождение, `activity` без времени — рождение + `ADULT_AGE`, `death` — смерть) → записи без вида и без времени, если записей с видом нет: проживание на всю жизнь.
-- **Середина жизни** для года по умолчанию — `(birth + death) / 2` с тем же округлением, что `dates.middle` на сервере (Р8). Если 2.1 или 2.2 кладут клиентскую копию, берём её. Если нет — одна функция в `map/geo/timeline.ts` и тест на те же примеры, что у `dates.middle`.
+- **Середина жизни** для года по умолчанию — клиентская `midLife` из `map/model.ts` (та же формула, что `dates.middle` на сервере, Р8), год — `Math.floor` от неё: в `timeline.ts` своей копии нет.
 - **Эпоха подписи** — `eraOf(eras, year)` из 2.2: при перекрытии — самое позднее начало, затем название.
 - **Время (Р3).** Таймеры — только `requestAnimationFrame`, `setTimeout` и `performance.now()`, без `Date.now()`. Тесты управляют временем через `page.clock`. Проигрывание считает год по прошедшему времени, а не по числу кадров: результат не зависит от частоты кадров.
 - **`MapPage.tsx`:**
@@ -380,5 +380,4 @@ web/src/map/geo/
 - **Машина агента** (1 ГБ RAM, 1 CPU): `vite build` и `tests/web` идут медленно, e2e и Docker здесь не прогнать — e2e подтверждает Lead или CI.
 - **`definition`** проверяется по имени типа. Перевод на флаг `requires_attribution` — отдельной задачей, чтобы не менять поведение определения в этом изменении.
 - **Две записи P19** на персону до согласования правки `filling.py`.
-- **Имена в `wikidata.py`** ещё не зафиксированы в design.md 2.2. Расхождение правится ссылками здесь.
 - **Существующие проблемы вне объёма (Р10):** `/map?only_textbook` раскрывает охват закрытого учебника, кэш `/map` растёт по произвольному `textbook`. Записываются отдельной задачей (regional-access), здесь не чинятся. Новый кэш `/map/places` — сразу LRU.

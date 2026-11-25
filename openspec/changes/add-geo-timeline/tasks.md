@@ -15,7 +15,7 @@
 - [x] 1.2 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, `progress.md`, дельта `geo-timeline`
 - [x] 1.3 Ревью плана (ревьювер, тестировщик), решения ведущего, правки артефактов (progress.md, «обсуждение плана ролями»)
 - [x] 1.4 `docs/product/ontology.md`: координаты места (`coordinates`, вид `geo`), уточнитель `place_role` у «жил в»
-- [ ] 1.5 Сверить имена `knowledge/wikidata.py` (2.2) и `dates.span`/`dates.middle` (2.1) с итоговыми design.md. Расхождения — правкой ссылок в design.md этого изменения
+- [x] 1.5 Сверить имена `knowledge/wikidata.py` (2.2) и `dates.span`/`dates.middle` (2.1) с итоговыми design.md. Расхождения — правкой ссылок в design.md этого изменения
 
 ## 2. Онтология (разработчик)
 

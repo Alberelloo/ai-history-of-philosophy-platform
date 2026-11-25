@@ -173,3 +173,10 @@
 Ветка `claude/geo-timeline`, база — принятые и заархивированные 2.1–2.3 (`ed3adbf`). Коммитит разработчик после каждого пункта.
 
 - 1.4 — `docs/product/ontology.md`: у «жил в» уточнитель «вид места» (`place_role`: `birth`, `death`, `activity`, `residence`, запись без вида допустима); в таблице значений — `coordinates` (вид `geo`, пределы, округление до 0,01°, обязательная атрибуция флагом, не для модели, заполнение командой `geo_enrich`).
+- 1.5 — сверка с кодом нижних ступеней (они приняты и в архиве, сверял с кодом, а не с design.md):
+  - `knowledge/wikidata.py`: `check_qid`, `page_url`, `http_fetch(url, *, wait, transport, timeout, retries, max_wait)`, `Fetch`, `fetch_entity(qid, fetch)`, `WikidataRecord.best/items`, `Claim(value, rank, qualifiers)` (P625 — `{latitude, longitude}`), `claim_date`, `wikidata_time`, `format_original`, `WikidataError` — совпадают с design.md 2.4;
+  - `dates.span` / `dates.middle` — в `knowledge/dates.py`, совпадают;
+  - `SectionMap(statements, settings=None, snapshots=None)` — у design было `SectionMap(statements, snapshots=None)`, поправлена ссылка;
+  - клиентская середина жизни уже есть — `midLife` в `web/src/map/model.ts` (рядом с `eraOf`). Своей копии в `timeline.ts` не будет; год — `Math.floor(midLife(p))` (design.md, «Клиент»: условная ветка «если копии нет» заменена);
+  - места из `epoch_context apply` (2.3) создаются с внешним id `wikidata` — записано в таблице зависимостей; обогащение ищет место по QID до создания (пожелание (в) второго круга).
+  Правки — только ссылки в design.md этого изменения; пункт «Риски: имена в wikidata.py не зафиксированы» снят.
