@@ -14,6 +14,7 @@ from philograph.knowledge import schema
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
 from philograph.knowledge.assist import AssistantKnowledge
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.catalog import Catalog, CatalogSettings
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
 from philograph.knowledge.graph import Graphs, GraphSettings
@@ -52,6 +53,7 @@ class Components:
     library: ServiceClient
     section_map: SectionMap
     snapshots: Snapshots
+    catalog: Catalog
 
 
 def components(env: dict[str, str]) -> Components:
@@ -108,6 +110,14 @@ def components(env: dict[str, str]) -> Components:
         MapSettings(max_entities=int(env.get("PHILOGRAPH_MAP_MAX_ENTITIES", "400"))),
         snapshots,
     )
+    catalog = Catalog(
+        snapshots,
+        registry,
+        statements.entities,
+        CatalogSettings(
+            max_stale_seconds=float(env.get("PHILOGRAPH_CATALOG_MAX_STALE_SECONDS", "15"))
+        ),
+    )
     return Components(
         statements,
         health,
@@ -123,6 +133,7 @@ def components(env: dict[str, str]) -> Components:
         library,
         section_map,
         snapshots,
+        catalog,
     )
 
 
@@ -146,4 +157,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         assistant=_c.assistant,
         library=_c.library,
         section_map=_c.section_map,
+        catalog=_c.catalog,
     )

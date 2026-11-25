@@ -113,7 +113,7 @@ docker compose -f compose.yaml -f compose.prod.yaml exec ops python -m philograp
 
 ## Лимиты
 
-Лимиты платных операций на посетителя задаются переменными `PHILOGRAPH_LIMIT_ASK`, `PHILOGRAPH_LIMIT_GRAPH`, `PHILOGRAPH_LIMIT_DESCRIPTION`, `PHILOGRAPH_LIMIT_MAP` и `PHILOGRAPH_LIMIT_MAP_VIEW` в формате «в час/в сутки», по умолчанию `20/100`, `30/200`, `60/300`, `300/2000` и `300/2000` (карта раздела и проверка вида карты модель не вызывают и токена страницы не требуют, но читают всю область). Предел числа сущностей на карте — `PHILOGRAPH_MAP_MAX_ENTITIES` (по умолчанию 400). Общая частота задаётся `PHILOGRAPH_RATE_PER_SECOND` и `PHILOGRAPH_RATE_BURST`. Срабатывания видны в журнале шлюза как `gateway.limit.triggered`.
+Лимиты платных операций на посетителя задаются переменными `PHILOGRAPH_LIMIT_ASK`, `PHILOGRAPH_LIMIT_GRAPH`, `PHILOGRAPH_LIMIT_DESCRIPTION`, `PHILOGRAPH_LIMIT_MAP` и `PHILOGRAPH_LIMIT_MAP_VIEW` в формате «в час/в сутки», по умолчанию `20/100`, `30/200`, `60/300`, `300/2000` и `300/2000` (карта раздела и проверка вида карты модель не вызывают и токена страницы не требуют, но читают всю область). Предел числа сущностей на карте — `PHILOGRAPH_MAP_MAX_ENTITIES` (по умолчанию 400). Справочник (`/api/knowledge/v1/catalog`) квот платных операций не тратит, ограничен только общей частотой; окно устарелости его снимка — `PHILOGRAPH_CATALOG_MAX_STALE_SECONDS` (по умолчанию 15 с, карта — без окна). Общая частота задаётся `PHILOGRAPH_RATE_PER_SECOND` и `PHILOGRAPH_RATE_BURST`. Срабатывания видны в журнале шлюза как `gateway.limit.triggered`.
 
 ## Правовой статус источника
 
