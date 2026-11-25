@@ -305,3 +305,36 @@ def test_card_context_section(svc, ctx, events):
     assert (served["sections"], served["rows"]) == (1, 2)
     for type_ in ("concept", "person", "work", "doctrine", "problem", "position", "argument"):
         assert "context" in [code for code, *_ in SECTIONS[type_]], type_
+
+
+# --- 3.4: ``stimulated`` у событий карты ----------------------------------------------
+
+
+def test_map_event_stimulated(svc, events):
+    from philograph.knowledge.map import SectionMap
+
+    w = svc.world
+    revolution = w.thing("event", "Французская революция", "1789")
+    fichte = w.person("Фихте", "1762", "1814")
+    schelling = w.person("Шеллинг", "1775", "1854")
+    basis = w.thing("work", "Основа общего наукоучения", "1794")
+    undated = w.thing("concept", "Свобода")
+    w.relate(basis, "author", fichte)
+    w.relate(revolution, "stimulated", basis, qualifiers={"mechanism": "political"})
+    w.statements.add(
+        revolution,
+        "stimulated",
+        obj=schelling,
+        attributions=COMMON,
+        provenance=Provenance("generated"),
+    )
+    w.relate(revolution, "stimulated", undated)
+    lonely = w.thing("event", "Южноморский пузырь", "1720")
+    data = SectionMap(svc.onto.statements, snapshots=svc.snapshots).build()
+    by_id = {e["id"]: e for e in data["events"]}
+    assert by_id[revolution]["stimulated"] == [
+        {"id": basis, "generated": False},
+        {"id": schelling, "generated": True},
+    ]
+    assert "stimulated" not in by_id[lonely]
+    assert events.of("knowledge.map.built")

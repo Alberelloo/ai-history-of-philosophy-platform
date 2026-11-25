@@ -421,6 +421,8 @@ function People({ L, vis, sel }: { L: MapLayout; vis: Visible; sel: string | nul
             className={cls}
             data-entity={p.id}
             data-person={p.id}
+            // Участник выбора или нет (при выборе); без выбора атрибута нет.
+            data-related={p.role != null ? "true" : p.dim ? "false" : undefined}
             role="button"
             tabIndex={0}
             aria-pressed={sel === p.id}
@@ -538,6 +540,8 @@ function Works({ L, data }: { L: MapLayout; data: MapData }) {
             key={it.id}
             className={cls}
             data-entity={it.id}
+            // При выборе на карте остаются только связанные с ним труды.
+            data-related={it.role != null ? "true" : undefined}
             role="button"
             tabIndex={0}
             aria-pressed={it.primary}

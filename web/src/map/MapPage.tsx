@@ -132,7 +132,10 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     });
   }, [load]);
   const vis = useMemo(() => visible(data, state.filter), [data, state.filter]);
-  const rel = useMemo(() => related(data, vis, state.sel), [data, vis, state.sel]);
+  const rel = useMemo(
+    () => related(data, vis, state.sel, state.filter.verified),
+    [data, vis, state.sel, state.filter.verified],
+  );
   const found = state.sel ? find(data, state.sel) : null;
 
   // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.

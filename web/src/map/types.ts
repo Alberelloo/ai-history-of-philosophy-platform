@@ -41,7 +41,17 @@ export type MapWork = {
   epochs?: string[]; // у идеи — только явные
 };
 
-export type MapEvent = { id: string; label: string; year: number; kind?: string | null; epochs?: string[] };
+// Что событие стимулировало (связи «стимулировало» к персонам, трудам и идеям на карте):
+// до 30, проверенные и по источникам раньше сгенерированных; нет таких — поля нет.
+export type MapStimulated = { id: string; generated: boolean };
+export type MapEvent = {
+  id: string;
+  label: string;
+  year: number;
+  kind?: string | null;
+  epochs?: string[];
+  stimulated?: MapStimulated[];
+};
 // Нечёткие границы пролёта: пары «самое раннее, самое позднее»; у чёткой границы равны.
 export type Fuzzy = { from: [number, number]; to: [number, number] };
 export type MapEra = { id: string; label: string; from: number; to: number; fuzzy?: Fuzzy };

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import threading
 from collections import OrderedDict, defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote, urlencode
@@ -50,6 +51,7 @@ IDEA_KIND = {
 VALUE_TYPES = ("lifespan", "dating", "person_role", "group_kind", "event_kind", "description")
 
 
+MAX_STIMULATED = 30  # связей «стимулировало» у события на карте
 CACHE_KEYS = 32  # ответов карты в памяти: LRU по (учебник, «только учебник»)
 
 
@@ -287,6 +289,8 @@ class SectionMap:
                 item["weight"] = weight[item["id"]]
             sections[section].append(item)
         people = {p["id"] for p in sections["people"]}
+        on_map = people | {w["id"] for w in sections["works"]}
+        self._stimulated(sections["events"], in_scope, on_map, labels)
         for work in sections["works"]:
             work.pop("via", None)
         for group in sections["groups"]:
@@ -329,6 +333,38 @@ class SectionMap:
             **sections,
             "links": sorted(links, key=lambda link: link["id"]),
         }
+
+    def _stimulated(
+        self,
+        events_: list[dict[str, Any]],
+        statements: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+        on_map: set[str],
+        labels: Mapping[str, str],
+    ) -> None:
+        """Что стимулировало событие (``stimulated: [{id, generated}]``): действующие связи
+        только к персонам, трудам и идеям, которые есть на карте после предела, не больше
+        ``MAX_STIMULATED``; проверенные и по источникам — раньше сгенерированных. Нет таких
+        связей — поля нет (как ``kind``). Линий от события нет: клиент выделяет эти сущности
+        при выборе события."""
+        kinds = self.registry.relation_subtypes("stimulated")
+        found: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+        ids = {e["id"] for e in events_}
+        for s in statements:
+            if s["type"] not in kinds or s["subject"] not in ids or s["object"] not in on_map:
+                continue
+            seen = found[s["subject"]].get(s["object"])
+            if seen is None or STRENGTH[s["status"]] > STRENGTH[seen["status"]]:
+                found[s["subject"]][s["object"]] = s
+        for event in events_:
+            rows = sorted(
+                found.get(event["id"], {}).values(),
+                key=lambda s: (-STRENGTH[s["status"]], labels.get(s["object"], ""), s["object"]),
+            )
+            if rows:  # как ``kind``: пустое поле не пишется
+                event["stimulated"] = [
+                    {"id": s["object"], "generated": s["status"] == "generated"}
+                    for s in rows[:MAX_STIMULATED]
+                ]
 
     def _with_portraits(self, result: dict[str, Any]) -> dict[str, Any]:
         """Главный подтверждённый и нескрытый портрет персоны — ссылкой, как в карточке."""

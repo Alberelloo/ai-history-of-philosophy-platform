@@ -170,7 +170,8 @@ export function eraOf(eras: MapEra[], y: number): MapEra | null {
 
 export const WORKS_AROUND_EVENT = 10; // труды «в пределах десяти лет» от события
 
-export function related(data: MapData, v: Visible, sel: string | null): Related | null {
+// verified — фильтр «только проверенные»: сгенерированные связи «стимулировало» не выделяют.
+export function related(data: MapData, v: Visible, sel: string | null, verified = false): Related | null {
   const f = sel ? find(data, sel) : null;
   if (!f) return null;
   const people = new Map<string, ColorRole>();
@@ -185,10 +186,12 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
     return [...ids].sort((a, b) => (ix.get(a)?.birth ?? 0) - (ix.get(b)?.birth ?? 0));
   };
 
-  // группа участников: шесть самых весомых — свои цвета (по году рождения), прочие — other
-  const group = (members: MapPerson[]) => {
+  // группа участников: шесть самых весомых — свои цвета (по году рождения), прочие — other;
+  // first — кто получает свои цвета раньше прочих (стимулированные событием персоны)
+  const group = (members: MapPerson[], first: Set<string> = new Set()) => {
+    const rank = (p: MapPerson) => (first.has(p.id) ? 0 : 1);
     const top = [...members]
-      .sort((a, b) => b.weight - a.weight || a.birth - b.birth)
+      .sort((a, b) => rank(a) - rank(b) || b.weight - a.weight || a.birth - b.birth)
       .slice(0, PALETTE.length)
       .sort((a, b) => a.birth - b.birth);
     members.forEach((p) => people.set(p.id, "other"));
@@ -242,10 +245,19 @@ export function related(data: MapData, v: Visible, sel: string | null): Related 
     events = new Set(v.events.filter(of).map((x) => x.id));
   } else if (f.type === "event") {
     const e = f.obj;
-    group(v.people.filter((p) => p.birth <= e.year && p.death >= e.year));
+    // что событие стимулировало (из ответа карты) — участники и вне десятилетнего окна
+    const stim = new Set((e.stimulated ?? []).filter((s) => !verified || !s.generated).map((s) => s.id));
+    group(
+      v.people.filter((p) => (p.birth <= e.year && p.death >= e.year) || stim.has(p.id)),
+      stim,
+    );
     era = eraOf(v.eras, e.year);
     works = new Set(
-      v.works.filter((w) => w.author != null && people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT).map((w) => w.id),
+      v.works
+        .filter(
+          (w) => stim.has(w.id) || (w.author != null && people.has(w.author) && Math.abs(w.year - e.year) <= WORKS_AROUND_EVENT),
+        )
+        .map((w) => w.id),
     );
     events = new Set([e.id]);
   } else {
