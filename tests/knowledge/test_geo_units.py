@@ -581,3 +581,25 @@ def test_reader_path_does_not_fetch(onto, clock, events, geo_world):
     _, fetch = _enrichment(onto, KANT_RECORDS)
     _layer(onto, clock).build()
     assert fetch.calls == []
+
+
+# --- 3.6: демо-данные записываются (ожидания из них не берутся) -----------------------------
+
+
+def test_seed_places_runs_and_keeps_kant_and_hume(onto, clock):
+    from tests.knowledge.test_map_snapshot_parity import _seed_demo, demo_ontology
+
+    demo_ontology(onto)
+    seed = _seed_demo()
+    seed.seed_reference(onto.entities, onto.statements)
+    seed.seed_epochs(onto.entities, onto.statements)
+    seed.seed_context(onto.entities, onto.statements)
+    kant = onto.entities.find("Кант")[0]["id"]
+    hume = onto.entities.find("Юм")[0]["id"]
+    before = [onto.statements.about(e) for e in (kant, hume)]
+    seed.seed_places(onto.entities, onto.statements)
+    assert [onto.statements.about(e) for e in (kant, hume)] == before
+    out = _layer(onto, clock).build()
+    assert out["places"] and kant in out["unplaced"]
+    assert any(p["role"] == "event" for p in out["placements"])
+    assert any(p["generated"] for p in out["placements"])

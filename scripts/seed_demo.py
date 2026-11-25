@@ -114,6 +114,8 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         seed_epochs(entities, statements)
     if not entities.find("Южноморский пузырь"):
         seed_context(entities, statements)
+    if not entities.find("Амстердам"):
+        seed_places(entities, statements)
 
 
 def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
@@ -377,6 +379,98 @@ def seed_context(entities, statements) -> None:
     )
     statements.add(bubble, "dating", value=parse("1720").to_json(), attributions=common)
     statements.add(bubble, "event_kind", value="economic", attributions=common)
+
+
+# Места и координаты (geo-timeline): название, широта, долгота. Только для демо и e2e.
+PLACES = {
+    "Кёнигсберг": (54.71, 20.51),
+    "Лондон": (51.51, -0.13),
+    "Ла-Э": (46.97, 0.7),
+    "Амстердам": (52.37, 4.9),
+    "Стокгольм": (59.33, 18.07),
+    "Лейпциг": (51.34, 12.37),
+    "Ганновер": (52.37, 9.74),
+    "Дублин": (53.35, -6.26),
+    "Бреслау": (51.11, 17.03),
+    "Галле": (51.48, 11.97),
+    "Рамменау": (51.16, 14.13),
+    "Йена": (50.93, 11.59),
+    "Берлин": (52.52, 13.4),
+}
+# Персона: (место, вид места, время или None). Время — как у импорта: нечёткая дата.
+LIVED = {
+    "Декарт": [
+        ("Ла-Э", "birth", "1596"),
+        ("Амстердам", "activity", "1628–1649"),
+        ("Стокгольм", "death", "1650"),
+    ],
+    "Лейбниц": [
+        ("Лейпциг", "birth", "1646"),
+        ("Ганновер", "activity", "1676–1716"),
+        ("Ганновер", "death", "1716"),
+    ],
+    "Беркли": [("Дублин", "activity", "1700–1734")],
+    "Вольф": [("Бреслау", "birth", "1679"), ("Галле", "activity", "1706–1723")],
+    "Фихте": [
+        ("Рамменау", "birth", "1762"),
+        ("Йена", "activity", "1794–1799"),
+        ("Берлин", "death", "1814"),
+    ],
+}
+
+
+def seed_places(entities, statements) -> None:
+    """Глобус (add-geo-timeline): координаты мест, «жил в» с видом и временем, событие с
+    местом. Локк живёт в Лондоне по записи, достроенной моделью (полое кольцо «не
+    проверено»). У Канта и Юма новых утверждений нет — их карточки и эталоны чтения не
+    меняются, на глобусе они в «без места». Координаты Кёнигсберга меняют только карточку
+    места. Названия мест не встречаются в текстах демо-источников."""
+    from philograph.knowledge.dates import parse
+    from philograph.knowledge.statements import Attribution, Provenance
+
+    common = [Attribution("common")]
+    imported = Provenance("imported", actor="seed")
+
+    def place(name: str) -> str:
+        found = entities.find(name)
+        return found[0]["id"] if found else entities.create("place", [("ru", name, "primary")])
+
+    places = {name: place(name) for name in PLACES}
+    for name, (lat, lon) in PLACES.items():
+        statements.add(
+            places[name],
+            "coordinates",
+            value={"lat": lat, "lon": lon},
+            attributions=common,
+            provenance=imported,
+            status="sourced",
+        )
+    for person, rows in LIVED.items():
+        person_id = entities.find(person)[0]["id"]
+        for name, role, time in rows:
+            statements.add(
+                person_id,
+                "lived_in",
+                obj=places[name],
+                qualifiers={"place_role": role, "time": parse(time).to_json()},
+                attributions=common,
+                provenance=imported,
+                status="sourced",
+            )
+    statements.add(
+        entities.find("Локк")[0]["id"],
+        "lived_in",
+        obj=places["Лондон"],
+        qualifiers={"place_role": "residence", "time": parse("1689–1704").to_json()},
+        attributions=common,
+        provenance=Provenance("generated"),
+    )
+    statements.add(
+        entities.find("Смерть Декарта в Стокгольме")[0]["id"],
+        "happened_in",
+        obj=places["Стокгольм"],
+        attributions=common,
+    )
 
 
 if __name__ == "__main__":
