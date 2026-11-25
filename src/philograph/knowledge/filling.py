@@ -16,7 +16,7 @@ from typing import Any
 from sqlalchemy import select, update
 
 from philograph.knowledge import schema as t
-from philograph.knowledge.dates import FuzzyDate, lifespan, parse
+from philograph.knowledge.dates import interval
 from philograph.knowledge.entity_items import EntityItems
 from philograph.knowledge.entity_items import Skip as _Skip
 from philograph.knowledge.naming import InvalidName
@@ -29,6 +29,7 @@ from philograph.knowledge.statements import (
     StatementError,
     Statements,
 )
+from philograph.knowledge.wikidata import WIKIDATA_ROLES, format_original, simple_time
 from philograph.platform import context, events
 from philograph.platform.client import ServiceClient, ServiceUnavailable
 from philograph.platform.clock import Clock, SystemClock
@@ -72,25 +73,6 @@ WIKIDATA_SIMPLE = {
     "P577": "published",
 }
 WIKIDATA_SKIPPED = {"P737": "связи влияния только из библиотеки или достройкой"}
-
-# Род занятий (P106) → роль персоны. Чего нет в таблице, не записывается.
-WIKIDATA_ROLES = {
-    "Q4964182": "philosopher",  # философ
-    "Q170790": "scientist",  # математик
-    "Q169470": "scientist",  # физик
-    "Q11063": "scientist",  # астроном
-    "Q18805": "scientist",  # естествоиспытатель
-    "Q901": "scientist",  # учёный
-    "Q36180": "writer",  # писатель
-    "Q49757": "writer",  # поэт
-    "Q11774202": "writer",  # эссеист
-    "Q1234713": "theologian",  # богослов
-    "Q42603": "theologian",  # священник
-    "Q250867": "theologian",  # католический священник
-    "Q116": "ruler",  # монарх
-    "Q82955": "ruler",  # политик
-    "Q333634": "translator",  # переводчик
-}
 
 
 class Filling:
@@ -513,8 +495,17 @@ class Filling:
                     "knowledge.import.skipped", property=prop, reason=WIKIDATA_SKIPPED[prop]
                 )
         claims = record["claims"]
-        if "P569" in claims and "P570" in claims:
-            span = lifespan(claims["P569"][0][1:5], claims["P570"][0][1:5])
+        # Время — общим правилом ``wikidata.simple_time`` (знак — эра), годы жизни — только
+        # при обеих датах; одна — событие ``partial``.
+        born, died = (simple_time((claims.get(p) or [None])[0]) for p in ("P569", "P570"))
+        if (born is None) != (died is None):
+            events.emit(
+                "knowledge.import.skipped",
+                property="P570" if died is None else "P569",
+                reason="partial",
+            )
+        if born is not None and died is not None:
+            span = interval(born, died, format_original(born, died))
             created.append(
                 self.statements.add(
                     entity,
@@ -525,8 +516,8 @@ class Filling:
                     status="sourced",
                 )
             )
-        if "P577" in claims:
-            dating: FuzzyDate = parse(claims["P577"][0][1:5])
+        dating = simple_time((claims.get("P577") or [None])[0])
+        if dating is not None:
             created.append(
                 self.statements.add(
                     entity,
