@@ -10,6 +10,7 @@ import pytest
 from sqlalchemy import select, update
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.dates import parse
 from philograph.knowledge.statements import Attribution, Provenance, StatementError
 
 # --- 2.1: дозагрузка уточнителей существующей связи ------------------------------------
@@ -174,3 +175,164 @@ def test_output_schema_has_no_coordinates(onto):
         )
         assert "coordinates" not in schema["x-relations"]
     assert "lived_in" in reg.output_schema(["biography"])["x-relations"]
+
+
+# --- 3.2: слой мест ------------------------------------------------------------------------
+
+
+def _layer(onto, clock, max_entities=400, cache_size=32):
+    from philograph.knowledge.geo import PlaceLayer
+    from philograph.knowledge.map import MapSettings, SectionMap
+    from philograph.knowledge.snapshot import Snapshots
+
+    snaps = Snapshots(onto.statements.engine, clock)
+    section_map = SectionMap(onto.statements, MapSettings(max_entities=max_entities), snaps)
+    return PlaceLayer(section_map, snaps, cache_size=cache_size)
+
+
+def lived(onto, person, place, role=None, time=None, status="sourced", run_id=None):
+    qualifiers = {}
+    if role:
+        qualifiers["place_role"] = role
+    if time:
+        qualifiers["time"] = parse(time).to_json()
+    return onto.statements.add(
+        person,
+        "lived_in",
+        obj=place,
+        qualifiers=qualifiers,
+        attributions=WD,
+        provenance=Provenance("generated" if status == "generated" else "imported", run_id),
+        status=status,
+    )
+
+
+@pytest.fixture
+def geo_world(onto):
+    w = {
+        "kant": onto.person("Кант", "1724", "1804"),
+        "hume": onto.person("Юм", "1711", "1776"),
+        "konigsberg": onto.thing("place", "Кёнигсберг"),
+        "edinburgh": onto.thing("place", "Эдинбург"),
+    }
+    coords(onto, w["konigsberg"], 54.7104, 20.5101)
+    lived(onto, w["kant"], w["konigsberg"], "birth", "1724")
+    lived(onto, w["kant"], w["konigsberg"], "activity")
+    lived(onto, w["kant"], w["konigsberg"], "death", "1804")
+    lived(onto, w["hume"], w["edinburgh"])
+    return w
+
+
+def test_layer_kant_and_hume(onto, clock, events, geo_world):
+    w = geo_world
+    layer = _layer(onto, clock)
+    events.clear()
+    out = layer.build()
+    assert out["places"] == [
+        {
+            "id": w["konigsberg"],
+            "label": "Кёнигсберг",
+            "lat": 54.71,
+            "lon": 20.51,
+            "status": "sourced",
+        }
+    ]
+    assert [(p["role"], p["from"], p["to"]) for p in out["placements"]] == [
+        ("activity", None, None),
+        ("birth", 1724, 1724),
+        ("death", 1804, 1804),
+    ]
+    assert out["unplaced"] == [w["hume"]]
+    assert (out["truncated"], out["limit"]) == (False, 400)
+    [built] = events.of("knowledge.geo.built")
+    assert built.fields == {
+        "entities": 2,
+        "places": 1,
+        "placements": 3,
+        "unplaced": 1,
+        "truncated": False,
+        "cached": False,
+    }
+    assert not events.of("knowledge.map.built")
+
+
+def test_layer_cache_and_reset(onto, clock, events, geo_world):
+    layer = _layer(onto, clock)
+    first = layer.build()
+    events.clear()
+    assert layer.build() == first
+    assert events.of("knowledge.geo.built")[0]["cached"] is True
+    coords(onto, geo_world["edinburgh"], 55.95, -3.19)
+    events.clear()
+    third = layer.build()
+    built = events.of("knowledge.geo.built")[0]
+    assert (built["cached"], built["places"], built["unplaced"]) == (False, 2, 0)
+    assert third["unplaced"] == []
+
+
+def test_layer_role_beats_no_role_and_lone_no_role(onto, clock, geo_world):
+    w = geo_world
+    lived(onto, w["kant"], w["konigsberg"])  # без вида рядом с видом
+    coords(onto, w["edinburgh"], 55.95, -3.19)
+    out = _layer(onto, clock).build()
+    kant = [p for p in out["placements"] if p["entity"] == w["kant"]]
+    assert None not in {p["role"] for p in kant} and len(kant) == 3
+    [hume] = [p for p in out["placements"] if p["entity"] == w["hume"]]
+    assert (hume["place"], hume["role"], hume["from"], hume["to"]) == (
+        w["edinburgh"],
+        None,
+        None,
+        None,
+    )
+
+
+def test_layer_only_map_entities(onto, clock, geo_world):
+    w = geo_world
+    x = onto.person("Икс", "1700", "1750")
+    lived(onto, x, w["konigsberg"], "birth")
+    for _ in range(3):  # вес Канта и Юма больше, чем у X
+        other = onto.thing("work", "Труд", "1781")
+        onto.statements.add(other, "author", obj=w["kant"], attributions=WD)
+        other = onto.thing("work", "Трактат", "1739")
+        onto.statements.add(other, "author", obj=w["hume"], attributions=WD)
+    data = _layer(onto, clock, max_entities=2).build()
+    ids = {p["entity"] for p in data["placements"]} | set(data["unplaced"])
+    assert x not in ids and data["truncated"] is True and data["limit"] == 2
+
+
+def test_layer_event_and_rejected(onto, clock, geo_world):
+    w = geo_world
+    event = onto.thing("event", "Выход «Критики»", "1781")
+    onto.statements.add(event, "happened_in", obj=w["konigsberg"], attributions=WD)
+    rejected = lived(onto, w["hume"], w["konigsberg"], "residence", "1750")
+    onto.statements.reject(rejected, "operator")
+    out = _layer(onto, clock).build()
+    [ev] = [p for p in out["placements"] if p["entity"] == event]
+    assert (ev["role"], ev["from"], ev["to"]) == ("event", 1781, 1781)
+    assert rejected not in {p["statement"] for p in out["placements"]}
+
+
+def test_layer_one_coordinate_per_place(onto, clock, geo_world):
+    w = geo_world
+    later = coords(onto, w["konigsberg"], 54.0, 20.0)
+    out = _layer(onto, clock).build()
+    assert (out["places"][0]["lat"], out["places"][0]["lon"]) == (54.71, 20.51)  # раньше записанная
+    onto.statements.set_rank(later, "preferred", "operator")
+    out = _layer(onto, clock).build()
+    assert (out["places"][0]["lat"], out["places"][0]["lon"]) == (54.0, 20.0)
+
+
+def test_layer_cache_bounded(onto, clock, geo_world):
+    layer = _layer(onto, clock, cache_size=4)
+    for i in range(20):
+        out = layer.build(textbook=f"s_none_{i}", only_textbook=True)
+        assert out["places"] == [] and out["placements"] == [] and out["unplaced"] == []
+    assert layer.cached_scopes() == 4
+
+
+def test_layer_has_no_quotes_or_paragraphs(onto, clock, geo_world):
+    import json
+
+    text = json.dumps(_layer(onto, clock).build(), ensure_ascii=False)
+    for word in ("quote", "paragraph", "evidence", "attributions", "wikidata.org"):
+        assert word not in text
