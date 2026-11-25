@@ -23,7 +23,7 @@
   - карточка снятой — 404.
 
   Юнит-тесты миграции схемы и фильтра, в том числе `context.py` без `KeyError` на утверждении со снятым концом.
-- [ ] 2.2 `knowledge/integrity.py`: `Baseline`, `baseline`, `compare` — определения потерь из спецификации: свёртка через `merges.moved.folded`, мусор через `retired_run`, петли через `moved.loops`, атрибуции со снятым автором. `save`/`load`. Юнит-тесты.
+- [x] 2.2 `knowledge/integrity.py`: `Baseline`, `baseline`, `compare` — определения потерь из спецификации: свёртка через `merges.moved.folded`, мусор через `retired_run`, петли через `moved.loops`, атрибуции со снятым автором. `save`/`load`. Юнит-тесты.
 - [ ] 2.3 `knowledge/ontology_migrate.py`:
   - `Action`, `View`, `STEPS`;
   - шаги `manifest_qids` (через `LifeDates.apply`, `confirmed` → `dedupe`, `pending` с `holder` → очередь `review:qid_candidate`), `lang_fix`, `retire`, `wikidata_labels`, `translate` (пакеты, проверка ответа по порядку design.md, причины отказов), `dedupe`, `verify` (аварийный откат);
