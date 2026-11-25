@@ -297,7 +297,11 @@ class PlaceEnrichment:
     ) -> bool:
         """Новое утверждение (``True``) или уже было (``False``); отказ — ``Skip``."""
         try:
-            stored = self.statements.check_value(type_, value, qualifiers, source["attributions"])
+            # Отказ проверки — одно событие knowledge.statement.refused (и в сухом прогоне);
+            # прошедшее проверку значение add уже не отклонит по значению.
+            stored = self.statements.check_value(
+                type_, value, qualifiers, source["attributions"], emit=True
+            )
             if entity_id is not None and self.statements.find(
                 entity_id, type_, obj=obj, value=stored, qualifiers=qualifiers
             ):
@@ -397,8 +401,13 @@ class PlaceEnrichment:
     def rollback(self, run_id: str) -> dict[str, Any]:
         """Утверждения запуска удаляются (кроме проверенных человеком); созданные им места
         остаются: удаления сущностей в API нет, место без утверждений на глобус не попадает."""
+        provenance = t.statements.c.provenance
         with self.statements.engine.begin() as conn:
-            rows = conn.execute(select(t.statements.c.provenance)).scalars().all()
+            rows = (
+                conn.execute(select(provenance).where(provenance["run_id"].as_string() == run_id))
+                .scalars()
+                .all()
+            )
         kept = {
             p["extra"]["created_place"]
             for p in rows

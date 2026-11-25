@@ -91,6 +91,14 @@ class StatementError(Exception):
         self.code = code
 
 
+def _finite(x: float) -> bool:
+    """Конечное число; целое, не помещающееся во float (``10**400``), — не число."""
+    try:
+        return math.isfinite(x)
+    except OverflowError:
+        return False
+
+
 def normalize_geo(value: Any) -> dict[str, float]:
     """Координаты ``{lat, lon}``: конечные числа (не ``bool``) → пределы −90…90 и −180…180
     включительно на исходном значении → округление ``round(x, 2)``. Ключ утверждения
@@ -98,7 +106,7 @@ def normalize_geo(value: Any) -> dict[str, float]:
     lat = value.get("lat") if isinstance(value, dict) else None
     lon = value.get("lon") if isinstance(value, dict) else None
     for x in (lat, lon):
-        if isinstance(x, bool) or not isinstance(x, int | float) or not math.isfinite(x):
+        if isinstance(x, bool) or not isinstance(x, int | float) or not _finite(x):
             raise StatementError(
                 "координаты должны быть конечными числами: широта и долгота", "geo_not_number"
             )
@@ -259,17 +267,31 @@ class Statements:
         value: Any = None,
         qualifiers: dict[str, Any] | None = None,
         attributions: list[Attribution] | None = None,
+        *,
+        emit: bool = False,
     ) -> Any:
         """Сухая проверка без сущности (обогащение до создания места): значение и уточнители
         так, как их проверит ``add``. Возвращает значение в хранимом виде; отказ —
-        ``StatementError`` с ``code``, если он есть. Событий не пишет и ничего не записывает."""
+        ``StatementError`` с ``code``, если он есть. Ничего не записывает; с ``emit=True``
+        отказ пишет ``knowledge.statement.refused`` — то же одно событие, что у ``add``."""
         try:
             self._live(type_)
             value = self._normalize(type_, value)
             self._check_value(type_, value, qualifiers or {}, attributions or [])
-        except RegistryError as exc:
+        except (StatementError, RegistryError) as exc:
+            if emit:
+                raise self._refused(type_, exc) from exc
             raise StatementError(str(exc), getattr(exc, "code", None)) from exc
         return value
+
+    @staticmethod
+    def _refused(type_: str, exc: Exception) -> StatementError:
+        """Отказ: событие ``knowledge.statement.refused`` (с ``code``, если есть) и ошибка
+        с тем же кодом для повторного броска. Одно место для ``add`` и ``check_value``."""
+        code = getattr(exc, "code", None)
+        fields = {"code": code} if code else {}
+        events.emit("knowledge.statement.refused", type=type_, reason=str(exc), **fields)
+        return StatementError(str(exc), code)
 
     def _check(
         self,
@@ -323,10 +345,7 @@ class Statements:
             value = self._normalize(type_, value)
             self._check(subject, type_, obj, value, qualifiers, attributions, evidence)
         except (StatementError, RegistryError) as exc:
-            code = getattr(exc, "code", None)
-            fields = {"code": code} if code else {}
-            events.emit("knowledge.statement.refused", type=type_, reason=str(exc), **fields)
-            raise StatementError(str(exc), code) from exc
+            raise self._refused(type_, exc) from exc
         key = self._key(subject, type_, obj, value, qualifiers)
         with self.engine.begin() as conn:
             existing = (

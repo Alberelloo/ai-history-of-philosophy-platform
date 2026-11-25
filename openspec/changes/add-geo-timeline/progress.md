@@ -283,3 +283,8 @@
 - Ж6 (OverflowError на `10**400`) — разработчику: отказ `geo_not_number`.
 - Ж7 (откат сужает выборку по `run_id`) — разработчику.
 - Ж8 — тестировщику: вернуть проверку предела кэша без `only_textbook`.
+- Исправления по ревью (разработчик, 2026-11-25):
+  - design.md — блок python отформатирован `ruff format` (как в CI); таблица вариантов, «Выбрано: Б», «Чем платим», «Без WebGL», концепт переключателя (значки с доступным именем), «Риски» (цифры 5.6, следующий шаг — замер с GPU, затем упрощение дуг и отметок при перетаскивании) согласованы с canvas; `geo-timeline-options.md` — итог замера; шапка `GlobeView.tsx`.
+  - `statements.py`: `normalize_geo` — `10**400` → `geo_not_number` (`OverflowError` у `math.isfinite`); общий `_refused` для `add` и `check_value(…, emit=True)` — одно `knowledge.statement.refused` на отказ.
+  - `geo_enrich.py`: `_write` проверяет через `check_value(emit=True)` — отказ пишет событие и в сухом прогоне, `add` после прошедшей проверки по значению не отклоняет; откат выбирает provenance с `run_id` в запросе (`provenance["run_id"].as_string() == run_id`).
+  - Прогон: `test_geo_coordinates` 62, `test_geo_enrich` 30, `test_geo_layer` 34, `test_geo_units` 35, `test_statements` 19 — passed; ruff check чисто, `ruff format --check .` — только файлы Lead'а (`dev_stack.py`, `queue.py`, `prompts/__init__.py`); lint-imports 3 kept; traceability 403/403.
