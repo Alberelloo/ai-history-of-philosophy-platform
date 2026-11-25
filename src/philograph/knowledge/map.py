@@ -105,6 +105,22 @@ class SectionMap:
     def build(self, textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
         """``textbook`` — выбранный учебник: пометка ``in_textbook`` у связей; с
         ``only_textbook`` область — только сущности, упомянутые или атрибутированные в нём."""
+        result, hit = self.result(textbook, only_textbook)
+        events.emit(
+            "knowledge.map.built",
+            entities=len(result["people"]) + len(result["works"]) + len(result["events"]),
+            links=len(result["links"]),
+            truncated=result["truncated"],
+            cached=hit,
+        )
+        return self._with_portraits(result)
+
+    def result(
+        self, textbook: str | None = None, only_textbook: bool = False
+    ) -> tuple[dict[str, Any], bool]:
+        """Карта области из кэша (``True`` — попадание) или собранная заново — без события
+        и без портретов. Ею пользуются производные слои карты (места, geo-timeline): та же
+        область и тот же предел, что у ``/map``. Результат не изменяют."""
         only_textbook = bool(only_textbook and textbook)
         key = (textbook, only_textbook)
         # Без окна устарелости: изменение базы видно на карте сразу, как прежде.
@@ -123,14 +139,7 @@ class SectionMap:
                 self._cache.move_to_end(key)
                 while len(self._cache) > CACHE_KEYS:
                     self._cache.popitem(last=False)
-        events.emit(
-            "knowledge.map.built",
-            entities=len(result["people"]) + len(result["works"]) + len(result["events"]),
-            links=len(result["links"]),
-            truncated=result["truncated"],
-            cached=hit,
-        )
-        return self._with_portraits(result)
+        return result, hit
 
     # --- сборка ---
 

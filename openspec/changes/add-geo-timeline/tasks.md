@@ -32,7 +32,7 @@
 
 ## 3. Сервис знаний: слой мест и обогащение (разработчик)
 
-- [ ] 3.1 `SectionMap.result(textbook, only_textbook)` — кэшированный результат без события; `build` = `result` + `knowledge.map.built`. Поведение `/map` и поля события не меняются (прогон `tests/knowledge/test_map.py`)
+- [x] 3.1 `SectionMap.result(textbook, only_textbook)` — кэшированный результат без события; `build` = `result` + `knowledge.map.built`. Поведение `/map` и поля события не меняются (прогон `tests/knowledge/test_map.py`)
 - [ ] 3.2 `knowledge/geo.py`, `PlaceLayer(section_map, snapshots, cache_size=32)`:
   - сущности из `SectionMap.result`, утверждения из `Snapshots`;
   - сведение «с видом вытесняет без вида»;
