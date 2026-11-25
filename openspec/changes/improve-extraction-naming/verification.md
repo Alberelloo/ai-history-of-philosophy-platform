@@ -133,3 +133,39 @@
 | Извлечение дат | unresolved-inner-reason | test_entity_dating_extraction::test_dating_of_unresolved_entity | да |
 
 Дефектов нет.
+
+## Судья — 2026-11-25, коммит 63aabff
+
+Новый субагент, без истории разработки. Прогоны — по одному файлу (1 ГБ RAM), мутации — в отдельном `git worktree` на 63aabff (PYTHONPATH на worktree), worktree удалён, `git diff` по продуктовому коду пуст.
+
+| Требование | Сценарии / инвариант | Журнал тестировщика | Мой прогон | Вывод системы (мой проход, настоящий `Filling.extract_version`, фейковый провайдер) | Итог |
+|---|---|---|---|---|---|
+| entity-naming «Язык названий сущностей» | 7 сценариев + инвариант; маркеры есть у всех | 35 passed; мутации lang-given, rename-creates упали | test_entity_naming 35 passed; своя мутация M1 поймана | «Plato» (en) → тот же `e_…`, основное `ru` «Платон», вариант `en`; `knowledge.entity.renamed {entity_id, lang: ru, previous_lang: en}`; справочник `q=Платон` → тот же id, `label="Платон"` | подтверждено |
+| entity-naming «Валидность названий сущностей» | 12 сценариев + инвариант | мутации number-regex, patterns-case, stopword-before-person, label-no-trim, dropped-reason-text упали | 35 passed; повторил stopword-before-person — 3/3 упали; своя мутация M3 поймана только параметризованным тестом (см. ниже) | `rejected {type: concept, label: "20.1", reason: number}` + `dropped {reason: entity:number}`; `rejected {person, "blind mathematician", not_a_name}` + `dropped entity:not_a_name` | подтверждено сценариями; property — с замечанием 3 |
+| entity-dating «Извлечение дат» | 11 сценариев + инвариант + `dating:type`, `dating:unresolved` | 15 passed; мутации упали | test_entity_dating_extraction 15 passed; повторил numbers-substring — 3/3; своя M2 поймана | Платон «427–347 до н. э.» → `lifespan`, `span=(−426, −346)`; Кант с цитатой без годов → `dropped dating:not_in_quote`, персона создана | подтверждено |
+| ontology-extraction «Структурированный вывод по реестру» | 4 сценария + инвариант | 9 passed | test_extraction_entities 9 passed | элемент `deity` без `passed_gateway` отсекается уже шлюзом (502) — серверная проверка доказана тестом через `passed_gateway` | подтверждено |
+| ontology-extraction «Нормализация сущностей» | 3 сценария + инвариант | 9 passed | 9 passed | привязка «Платон» к «Plato» без новой персоны | подтверждено |
+| epochs / epoch-context / geo-timeline (MODIFIED) | по 1 новому сценарию + инвариант | 6 passed | test_invalid_name_external 6 passed; повторил geo-label-unchecked — 2/2 | — (только тестовый стенд) | подтверждено |
+
+Прочие прогоны: test_filling 30, test_wikidata 52, test_geo_enrich 37, test_epoch_dates 66, test_invalid_name_paths_unit 4, test_naming_unit 68, test_entity_items_unit 12, test_extraction_codes_unit 10, test_naming_entities_unit 7, test_epoch_context_import 16, test_mutation_coverage 3 — все passed. `mutation_check.py --coverage improve-extraction-naming` — мутации у всех 8 требований. `lint-imports` — 3 kept. `check_traceability.py` — 410 из 410. `ruff format --check` по 27 файлам изменения — чисто. **`ruff check` по файлам изменения — 1 ошибка** (замечание 1). Полный pytest не запускался (ограничение машины) — не проверено.
+
+Свои мутации (нет в списке):
+- M1 `naming.py:160` — греческий дополнительный блок U+1F00–1FFF не считается греческим → упали `test_lang_for_any_text`, `test_language_invariant_create_and_add_name`.
+- M2 `dating.py:39` — «до нашей эры» в цитате не распознаётся как эра → упали `test_dating_invariant`, `test_dating_check_any_input`.
+- M3 `naming.py:272` — `reject` пишет `label` без `strip()`/NFC (откат Д2) → упали 4 параметра `test_rejected_label_is_name_after_strip`; **property `test_rejection_invariant` и `test_check_name_any_input` прошли**.
+
+Файлы Lead'а: в `filling.py` — точки вызова (`EntityItems`, `language`, цикл датировок, `accept_core_report`, перехват `InvalidName`, `entity_types()`), плюс схема `_entities_schema` (данные схемы) и переход `import_wikidata` на `simple_time` (относится к `add-wikidata-life-dates`); в `prompts/__init__.py` — текст `ontology.extract` и поле `language` (`ontology.translate_names` — `migrate-ontology-quality`). Логики правил в них нет.
+
+Подгонка: оракул `strategies.py` не импортирует `naming`/`dating`/`dates`; ожидания строятся генератором; `@example` на границы есть. Найдено сужение (замечание 3), признаков правки ожиданий под вывод нет.
+
+Замечания:
+1. **`ruff check`** падает на файле изменения: `tests/knowledge/test_entity_items_unit.py:97:36 RUF043` (`match="^dating:type$"` без raw-строки; файл из c76007a). CI `checks` (`ruff check .`) будет красным.
+2. **tasks.md неполон** (вне «Требует Lead'а»): 1.2 и 4.1 не отмечены. По progress.md ревью плана пройдено (круг 2), а ревью кода (e843975) дало «к судье после коммита О17»; повторной вычитки О17/О18 (ea6321d) ревьювером нет.
+3. **Сужение property-теста**: `test_rejection_invariant` по-прежнему делает `raw = raw.strip()` с комментарием про дефект Д2, хотя Д2 закрыт. Из-за этого инвариант «`label` по правилу обрезки» на пути записи не проверяется для любых входов: мутация M3 проходит property-тесты.
+
+Непроверяемо здесь: поведение настоящей модели (язык названий, датировки), оплачиваемая проба 5.2, А1–А8 на стенде — за Lead'ом.
+
+Вердикт: **не принято** — вернуть:
+- разработчику: замечание 1 (raw-строка в `match=`; `ruff check` по файлам изменения чисто);
+- тестировщику: замечание 3 (убрать `strip()` входа в `test_rejection_invariant`, чтобы инвариант проверял `label` после `strip()`/NFC на любых входах; добавить мутацию M3 в `mutations.yaml` с ожиданием падения property-теста);
+- ревьюверу: замечание 2 (вычитка О17/О18, отметить 4.1; ведущему — отметить 1.2).
