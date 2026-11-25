@@ -41,7 +41,7 @@
   - `prompts/__init__.py`, `ontology.extract`: правила языка, валидности, дат; поле `language`.
 
   Прогон `tests/knowledge/test_filling.py` — прежние тесты зелёные без правки ожиданий.
-- [ ] 2.7 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py`; `pytest -q tests/knowledge/test_filling.py tests/knowledge/test_registry_entities.py tests/knowledge/test_snapshot.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`. Язык по письменности в `create` затрагивает все пути создания.
+- [x] 2.7 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py`; `pytest -q tests/knowledge/test_filling.py tests/knowledge/test_registry_entities.py tests/knowledge/test_snapshot.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`. Язык по письменности в `create` затрагивает все пути создания.
 
 ## 3. Тестировщик
 
