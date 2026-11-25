@@ -92,6 +92,7 @@
 Изменения OpenSpec:
 - `add-onboarding-and-settings`: первое включение и настройки.
 - `add-production-readiness`: лимиты, копии, оповещения, развёртывание.
+- `fix-map-regional-scope` (требование regional-access, найдено в add-geo-timeline, Р10): `GET /v1/map?only_textbook=true&textbook=<закрытый>` отдаёт охват учебника, закрытого по региону, — нужна та же проверка доступа, что у глав; кэш `SectionMap` по `(textbook, only_textbook)` растёт по произвольному `textbook` без предела — сделать LRU, как у `/map/places`.
 
 ### 7. Исследование
 
