@@ -48,10 +48,10 @@
 ## 7. Завершение
 
 - [x] 7.1 `openspec/traceability.yaml`: `epoch-context` в `enforce`; `python scripts/check_traceability.py` без пропусков
-- [ ] 7.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/web/test_epochs.py tests/web/test_map.py`
-- [ ] 7.3 Ревьювер: дифф против спецификации и «Выбора решения» (один эндпоинт, манифест Wikidata, достройка через граф, подсветка вместо линий, виды событий), признаки костылей и подгонки
-- [ ] 7.4 Судья (новый субагент): вердикт в `verification.md`; PR в draft до «принято»
-- [ ] 7.5 Архив вручную, перенос дельт
+- [x] 7.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/web/test_epochs.py tests/web/test_map.py` — прогоны тестировщика и судьи (verification.md)
+- [x] 7.3 Ревьювер: дифф против спецификации и «Выбора решения» (один эндпоинт, манифест Wikidata, достройка через граф, подсветка вместо линий, виды событий), признаки костылей и подгонки — ревью круги 1–2
+- [x] 7.4 Судья (новый субагент): вердикт в `verification.md`; PR в draft до «принято» — вердикт «принято»
+- [x] 7.5 Архив вручную, перенос дельт
 
 ## Требует согласования Lead'а
 
