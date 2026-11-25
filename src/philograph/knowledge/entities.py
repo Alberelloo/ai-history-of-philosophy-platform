@@ -363,11 +363,7 @@ class Entities:
         совпадает последнее слово названия и основные даты, или основное название одной
         совпадает с любым названием другой."""
         with self.engine.begin() as conn:
-            rows = (
-                conn.execute(select(t.entities).where(t.active()))
-                .mappings()
-                .all()
-            )
+            rows = conn.execute(select(t.entities).where(t.active())).mappings().all()
             all_names = conn.execute(select(t.names)).mappings().all()
         position = {r["id"]: i for i, r in enumerate(rows)}
         by_id = {r["id"]: r for r in rows}

@@ -36,7 +36,7 @@
   - таблица, `--json`, `--save`, `--baseline`, коды 0/1/2;
   - событие `knowledge.quality.measured`.
 - [x] 2.6 **Файл Lead'а** `prompts/__init__.py`: шаблон `ontology.translate_names` (поле `items`). Согласование — 5.1.
-- [ ] 2.7 Юнит-тесты модулей 2.2–2.5. `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q` на `tests/knowledge/test_snapshot.py`, `test_catalog*.py`, `test_map*.py`, `test_mentions_cards.py`, `test_statements.py` (фильтр действующих не ломает прежнее).
+- [x] 2.7 Юнит-тесты модулей 2.2–2.5. `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q` на `tests/knowledge/test_snapshot.py`, `test_catalog*.py`, `test_map*.py`, `test_mentions_cards.py`, `test_statements.py` (фильтр действующих не ломает прежнее).
 
 ## 3. Тестировщик
 
