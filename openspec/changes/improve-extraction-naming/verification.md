@@ -114,3 +114,22 @@
 - `dating:type`: новый тест `test_entity_dating_extraction.py::test_dating_of_type_not_allowed` — датировка понятия «Субстанция» во фрагменте: сущность и связь `opposed_to` записаны, датировки и `primary.dates` нет, ровно одно `knowledge.extraction.dropped` с `reason="dating:type"` и `run_id`, сторожевой токен не утёк. Passed. Мутация `dating-type-unchecked` (проверка типа до пп. 1–6 убрана, отказ — текстом реестра): упал (1 failed, 4.26 s), worktree на 3aa55a9.
 - Стратегия `stopwords_perturbed`: если разделитель « - » вывел стоп-слово за предел типа, ожидание — `sentence` (порядок правил spec); раньше такой вход был бы ложно помечен `stopword`.
 - Прогоны: `test_entity_naming` 35 passed (68.6 s), `test_entity_dating_extraction` 14 passed (57.7 s). Наблюдение про причину текстом реестра у датировки понятия (раздел «Наблюдения» выше) снято: теперь код.
+
+## Тестировщик — перепроверка после О17/О18 (2026-11-25, тесты на ea6321d)
+
+- Точное множество кодов `knowledge.extraction.dropped.reason` (`strategies.DROPPED_CODES`: `dating:{paragraph,quote,unparsed,not_in_quote,era,single_year,type,unresolved}`, `entity:{type,no_type,ambiguous,empty,number,sentence,not_a_name,stopword}`) — `assert_dropped_codes` в property `test_only_registry_types_for_any_items`, `test_normalization_and_language_for_any_items`, `test_dating_invariant`, `test_person_quality_invariant`, `test_person_rule_any_input`.
+- Точные значения в сценариях: «Номер раздела» → `["entity:number"]`, «Роль вместо имени» → `["entity:not_a_name"]`, «Написания нашли разные сущности» и `test_ambiguous_goes_to_review` → `["entity:ambiguous"]`.
+- Новый `test_dating_of_unresolved_entity` (инвариант entity-dating «Извлечение дат», О18): неоднозначный «Бэкон» в утверждении и датировке + отклонённый «children» с датировкой → один `ambiguous_link`, причины `{entity:ambiguous, dating:unresolved ×2}`, новых утверждений нет, сторожевой токен в журнале не встречается.
+
+Сырые прогоны (по одному файлу): test_entity_naming 35 passed in 28.02s · test_extraction_entities 9 passed in 23.62s · test_entity_dating_extraction 15 passed in 34.87s · test_person_quality 22 passed in 159.27s · test_entity_merge 13 passed in 89.64s · test_mutation_coverage 3 passed · check_traceability 410/410.
+
+Мутации (отдельный worktree на ea6321d):
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Валидность названий сущностей | dropped-reason-text | test_entity_naming::test_section_number, ::test_role_instead_of_name, test_person_quality::test_person_quality_invariant | да ×3 (на 2cc4f44) |
+| Язык названий сущностей | ambiguous-reason-text | test_entity_naming::test_spellings_found_different_entities, test_extraction_entities::test_ambiguous_goes_to_review, test_entity_dating_extraction::test_dating_of_unresolved_entity | да ×3 |
+| Извлечение дат | unresolved-reresolved | test_entity_dating_extraction::test_dating_of_unresolved_entity | да |
+| Извлечение дат | unresolved-inner-reason | test_entity_dating_extraction::test_dating_of_unresolved_entity | да |
+
+Дефектов нет.

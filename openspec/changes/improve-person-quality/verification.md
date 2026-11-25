@@ -112,3 +112,21 @@
 - «Персоны, созданные до этого изменения, приводит миграция» — путь `migrate-ontology-quality`, не здесь.
 - `merge:review` (человек «слить» в очереди) — только через `resolve_duplicate` в юнит-тестах разработчика; сценария в дельте нет.
 - Полный `pytest` не запускался (1 ГБ RAM), только файлы выше по одному.
+
+## Тестировщик — перепроверка после О17/О18 (2026-11-25, тесты на ea6321d)
+
+- «Слияние по решению человека» (О17): `test_merge_by_human_decision` — `resolve_duplicate(merge=True)`: одна персона, названия `{primary «Бэкон», variant «Фрэнсис Бэкон»}`, утверждение второй при первой, `/v1/entities/<вторая>` отдаёт первую, очередь пуста, `knowledge.entity.merged` `(kept, removed, "merge:review")`, `knowledge.review.decided` `decision="merge"`.
+- `dropped.reason` кодом: `test_garbage_not_a_person` / `test_glued_...` / инвариант качества — `["entity:<причина>"]`.
+- Пустое название персоны: из `_person_cases` убран фильтр `empty`; `@example` `(person, "")`, `(person, "   ")` → `empty` (зонд: `""`, `"   "`, `"\t"` → `knowledge.entity.rejected {type: person, label: "", reason: empty}` и `dropped entity:empty`).
+- Предел группы дублей (О18, ontology-entities «Поиск дублей»): `test_last_word_group_cap[200|201]` — 200 сущностей «… Локк» (из них две «Джон Локк»): пара по последнему слову есть, события нет; 201: пары по последнему слову нет, `duplicate_group_capped` ровно `{type, size, limit}` = `(person, 201, 200)`, без названий; совпадение полного названия найдено в обоих случаях.
+
+Сырые прогоны: test_person_quality 22 passed in 159.27s · test_entity_merge 13 passed in 89.64s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | merge-review-reason | test_person_quality::test_merge_by_human_decision | да (на 2cc4f44) |
+| Поиск дублей | group-cap-silent | test_entity_merge::test_last_word_group_cap[201] | да |
+| Поиск дублей | group-cap-off | test_entity_merge::test_last_word_group_cap[201] | да |
+| Качество персон | person-empty-as-number | test_person_quality::test_person_quality_invariant | да |
+
+Дефектов нет.
