@@ -1,0 +1,218 @@
+"""Настоящий сервис знаний за настоящим шлюзом — для браузерных тестов (задача 4.0).
+
+Стенд ``KnowledgeStack`` поднимает в потоке этого процесса шлюз (раздаёт собранный клиент
+``web/dist``), библиотеку с двумя учебниками (``Учебник N`` открыт везде, ``Учебник R`` —
+только в РФ) и приложение сервиса знаний на SQLite. Данные онтологии задаёт тест через
+``stack.world`` (``tests/knowledge/world.py``: ``Entities``/``Statements``) до открытия страницы.
+События сервисов идут в журнал теста (фикстура ``events``); событие запроса страницы находится
+по ``request_id`` из заголовка ответа ``X-Request-Id`` (``stack.responses``).
+
+Ловушки:
+
+- запрос шлюза к хосту без приложения (сеть наружу) записывается в ``router.unexpected``;
+- вызов модели (``http://llm``) записывается в ``llm_calls`` и получает 503;
+- запрос браузера не к стенду обрывается и записывается в ``outside``.
+
+Фикстура ``knowledge_stack`` (``conftest.py``) в конце теста требует, чтобы все три списка
+были пусты. ``page.route`` в тестах — только для 503, задержки и гонки ответов.
+"""
+
+from __future__ import annotations
+
+import socket
+import threading
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+import httpx
+
+from philograph.gateway.app import build_app as gateway_app
+from philograph.knowledge import schema as knowledge_schema
+from philograph.knowledge.app import build_app as knowledge_app
+from philograph.knowledge.app import library_paragraphs
+from philograph.knowledge.cards import Cards
+from philograph.knowledge.catalog import Catalog, CatalogSettings
+from philograph.knowledge.entities import Entities
+from philograph.knowledge.map import SectionMap
+from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.registry import OntologyRegistry
+from philograph.knowledge.snapshot import Snapshots
+from philograph.knowledge.statements import Statements
+from philograph.library import schema as library_schema
+from philograph.library.app import build_app as library_app
+from philograph.library.processing import Pipeline
+from philograph.library.reading import Reading
+from philograph.library.registry import License, Registry
+from philograph.operator.access import migrations as operator_migrations
+from philograph.platform.client import ServiceClient
+from philograph.platform.db import make_engine
+from philograph.platform.files import FileStore
+
+from ..helpers import HostRouter, asgi_transport
+from ..knowledge.world import World
+from ..library.builders import epub
+
+RU_KIND = "public-domain-ru"
+BOOK = epub([("Глава 1. Опыт", "<p>Кант пишет об опыте.</p><p>Юм пишет о причинности.</p>")])
+
+
+def _free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+@dataclass
+class Seen:
+    """Ответ сервиса знаний, полученный страницей: адрес, статус и ``request_id``."""
+
+    url: str
+    status: int
+    request_id: str | None
+
+
+@dataclass
+class KnowledgeStack:
+    url: str
+    world: World
+    textbooks: dict[str, str]  # "N" | "R" → id источника библиотеки
+    router: HostRouter
+    llm_calls: list[str] = field(default_factory=list)
+    outside: list[str] = field(default_factory=list)
+    responses: list[Seen] = field(default_factory=list)
+    _server: Any = None
+    _thread: Any = None
+
+    # --- браузер ---
+
+    def watch(self, context) -> None:
+        """Ловушка сети наружу и запись ответов ``/api/knowledge`` для страницы контекста."""
+
+        def route(r):
+            if r.request.url.startswith(self.url):
+                r.continue_()
+            else:
+                self.outside.append(r.request.url)
+                r.abort()
+
+        context.route("**/*", route)
+
+        def on_response(response) -> None:
+            if "/api/knowledge/" in response.url:
+                self.responses.append(
+                    Seen(response.url, response.status, response.headers.get("x-request-id"))
+                )
+
+        context.on("response", on_response)
+
+    def catalog_responses(self) -> list[Seen]:
+        return [r for r in self.responses if "/api/knowledge/v1/catalog" in r.url]
+
+    def stop(self) -> None:
+        self._server.should_exit = True
+        self._thread.join(5)
+
+
+def start(tmp: Path, dist: Path) -> KnowledgeStack:
+    # --- библиотека: два учебника ---
+    lib_engine = make_engine(
+        f"sqlite:///{(tmp / 'library.db').as_posix()}",
+        [library_schema.SCHEMA, operator_migrations.schema],
+    )
+    library_schema.migrations.upgrade(lib_engine)
+    operator_migrations.upgrade(lib_engine)
+    registry = Registry(lib_engine)
+    registry.add_license_kind(
+        "public-domain",
+        "Общественное достояние",
+        "https://example.org/public-domain",
+        {"display": True, "external_processing": True, "quoting": True},
+    )
+    registry.add_license_kind(
+        RU_KIND,
+        "Общественное достояние по праву РФ",
+        None,
+        {"display": True, "external_processing": True, "quoting": True},
+        regions=["RU"],
+    )
+    pipeline = Pipeline(registry, FileStore(tmp / "files"), lambda spec: BOOK)
+    textbooks = {}
+    for key, title, kind in (("N", "Учебник N", "public-domain"), ("R", "Учебник R", RU_KIND)):
+        source_id = registry.register(
+            "operator",
+            title=title,
+            authors=["Автор учебника"],
+            year=1950,
+            language="ru",
+            kind="textbook",
+            license=License(kind, "public_domain", author_death_years=[1900]),
+            scope="public",
+            files=[{"name": key, "path": f"{key}.epub"}],
+        )
+        registry.publish("operator", pipeline.start("operator", source_id))
+        textbooks[key] = source_id
+    reading = Reading(registry, lib_engine)
+    reading.set_default("operator", textbooks["N"])
+    library = library_app(reading)
+
+    # --- сервис знаний ---
+    engine = make_engine(
+        f"sqlite:///{(tmp / 'knowledge.db').as_posix()}",
+        [knowledge_schema.migrations.schema, operator_migrations.schema],
+    )
+    knowledge_schema.migrations.upgrade(engine)
+    operator_migrations.upgrade(engine)
+    onto = OntologyRegistry(engine)
+    onto.load_defaults()
+    entities = Entities(engine, onto)
+    library_client = ServiceClient(
+        "library", "http://library/api", transport=asgi_transport(library)
+    )
+    statements = Statements(engine, onto, entities, library_paragraphs(library_client))
+    llm_calls: list[str] = []
+
+    def llm(request: httpx.Request) -> httpx.Response:
+        llm_calls.append(str(request.url))
+        return httpx.Response(503, json={"error": "модель недоступна в тесте"})
+
+    llm_client = ServiceClient("llm", "http://llm", transport=httpx.MockTransport(llm))
+    snapshots = Snapshots(engine)
+    mentions = Mentions(statements, library_client)
+    knowledge = knowledge_app(
+        statements,
+        library=library_client,
+        mentions=mentions,
+        cards=Cards(statements, mentions, llm_client),
+        section_map=SectionMap(statements, snapshots=snapshots),
+        catalog=Catalog(snapshots, onto, entities, CatalogSettings()),
+    )
+    world = World(entities, statements)
+    for key, source_id in textbooks.items():
+        world.source(source_id, f"Учебник {key}")
+
+    # --- шлюз ---
+    import uvicorn
+
+    router = HostRouter({"library": library, "knowledge": knowledge})
+    gateway = gateway_app(
+        {
+            "library": "http://library",
+            "knowledge": "http://knowledge",
+            "assistant": "http://assistant",
+        },
+        dist,
+        transport=router,
+    )
+    port = _free_port()
+    server = uvicorn.Server(
+        uvicorn.Config(gateway, host="127.0.0.1", port=port, log_level="warning")
+    )
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    while not server.started:
+        time.sleep(0.02)  # запуск сервера, не проверка поведения
+    stack = KnowledgeStack(f"http://127.0.0.1:{port}", world, textbooks, router, llm_calls)
+    stack._server, stack._thread = server, thread
+    return stack

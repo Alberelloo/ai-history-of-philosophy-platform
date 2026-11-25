@@ -627,8 +627,11 @@ def test_future_sections_marked_and_described(browser, site, ids):
         graph_link = nav.get_by_role("link", name="Граф")
         assert "скоро" not in graph_link.inner_text()
         assert graph_link.get_attribute("href") == "/graph"
+        # «Справочник» реализован (add-reference-catalog): ведёт на /reference, без «скоро».
+        reference_link = nav.get_by_role("link", name="Справочник")
+        assert "скоро" not in reference_link.inner_text()
+        assert reference_link.get_attribute("href") == "/reference"
         future = [
-            "Справочник",
             "Эпохи и контекст",
             "Сравнение трактовок",
             "Маршрут изучения",
