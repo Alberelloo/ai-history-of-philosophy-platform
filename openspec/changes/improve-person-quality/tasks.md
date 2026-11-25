@@ -33,7 +33,7 @@
   - `resolve_duplicate` вызывает `merge_entities`;
   - `refresh_duplicates` берёт кандидатов по индексу: прежнее правило (последнее слово + даты) и новое (основное одной = любое название другой), без O(n²).
 - [x] 2.6 `entity_items.py`: несколько кандидатов-персон от разных написаний одного элемента → `Dedupe` с парой от модели → слияние, очередь или прежняя неоднозначность.
-- [ ] 2.7 **Файл Lead'а** `prompts/__init__.py`: определение персоны с отрицательными примерами в `ontology.extract`. Согласование — 5.1.
+- [x] 2.7 **Файл Lead'а** `prompts/__init__.py`: определение персоны с отрицательными примерами в `ontology.extract`. Согласование — 5.1.
 - [ ] 2.8 `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q` на `tests/knowledge/test_filling.py`, `test_registry_entities.py`, `test_statements.py`, `test_snapshot.py`, `test_map.py`, тесты очереди проверки. Прежние тесты слияния (`undo_merge`) зелёные без правки ожиданий.
 
 ## 3. Тестировщик
