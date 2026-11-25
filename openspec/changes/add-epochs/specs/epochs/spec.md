@@ -68,7 +68,7 @@
 | `no_qid` | у эпохи нет подтверждённого идентификатора | нет, загрузка не вызывается |
 | `fetch_failed` | загрузка сообщила сбой | нет |
 | `ambiguous` | в онтологии несколько эпох с этим названием | нет |
-| `duplicate_qid` | идентификатор уже у другой сущности | нет |
+| `duplicate_qid` | идентификатор уже у другой сущности или у эпохи уже другой идентификатор Wikidata | нет |
 
 Запуск SHALL записываться событием `knowledge.epoch_dates.run` с полями `mode` (`apply` | `dry_run`), `checked` (число эпох), `added`, `created`, `conflicts`, `skipped` (число эпох с любым другим `result`); `checked = added + created + conflicts + skipped`. В режиме проверки `result` — тот, что был бы записан.
 
