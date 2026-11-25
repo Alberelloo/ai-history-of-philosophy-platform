@@ -138,3 +138,4 @@
 
 - 5.0 `tests/knowledge/test_wikidata.py` (+ построитель записей и ловушка сети `tests/knowledge/wd_records.py`): 52 прохода. Прежние тесты карты (`tests/knowledge/test_map.py` — три теста) и эталон `demo_map.json` обновлены по дельте `knowledge-graph` «Карта раздела» (только `epochs` и `fuzzy`; сверка диффа эталона — в verification.md).
 - 5.1–5.2 `tests/knowledge/test_epoch_dates.py`: 63 теста, 62 прохода, 1 падение — дефект Д1 (отклонённая основная датировка эпохи остаётся основной в `/v1/epochs`, «Датировка эпохи»). 5.3 `tests/knowledge/test_epochs_list.py`: 11 проходов.
+- 5.4 `tests/knowledge/test_map.py` (+3 теста эпох), `tests/knowledge/test_mentions_cards.py` (+2 теста карточки эпохи): карта — 12 проходов; карточка — дефект Д2 (атрибуция строки датировки «wikidata:Q12539» вместо «Wikidata»).
