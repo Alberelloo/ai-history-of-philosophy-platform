@@ -26,7 +26,7 @@
 - [ ] 2.2 `knowledge/integrity.py`: `Baseline`, `baseline`, `compare` — определения потерь из спецификации: свёртка через `merges.moved.folded`, мусор через `retired_run`, петли через `moved.loops`, атрибуции со снятым автором. `save`/`load`. Юнит-тесты.
 - [ ] 2.3 `knowledge/ontology_migrate.py`:
   - `Action`, `View`, `STEPS`;
-  - шаги `manifest_qids` (через `LifeDates.apply`, `confirmed` → `dedupe`, `pending` с `holder` → очередь `qid_candidate`), `lang_fix`, `retire`, `wikidata_labels`, `translate` (пакеты, проверка ответа по порядку design.md, причины отказов), `dedupe`, `verify` (аварийный откат);
+  - шаги `manifest_qids` (через `LifeDates.apply`, `confirmed` → `dedupe`, `pending` с `holder` → очередь `review:qid_candidate`), `lang_fix`, `retire`, `wikidata_labels`, `translate` (пакеты, проверка ответа по порядку design.md, причины отказов), `dedupe`, `verify` (аварийный откат);
   - `Migration.plan/run/rollback`, `Report`;
   - события `knowledge.migration.*`, `knowledge.entity.retired/restored`.
 - [ ] 2.4 CLI `plan|run|rollback` (`--manifest` — шаг `manifest_qids`, `--translate off|model`, `--batch`, `--from-file`, `--estimate`, `--limit`). Шлюз LLM — `ServiceClient` из настроек сервиса знаний, как в `main.py`. Wikidata — `wikidata.http_fetch` или файл.
@@ -40,7 +40,7 @@
 
 ## 3. Тестировщик
 
-Модель — фейковый провайдер с записью запросов (ответы по шаблону `ontology.translate_names`). Wikidata — фикстуры. Сеть запрещена фикстурой (О6). Стенда Lead'а на машине нет (О4б), поэтому используется синтетическая онтология с симптомами П1–П4. Инфраструктура общая (`improve-extraction-naming` 3.1): профили, `dump.py`, `mutation_check.py`, точные множества ключей событий.
+Модель — фейковый провайдер с записью запросов (ответы по шаблону `ontology.translate_names`). Wikidata — фикстуры. Сеть запрещена фикстурой (О6). Стенда Lead'а на машине нет (О4б), поэтому используется синтетическая онтология с симптомами П1–П4. Инфраструктура общая (`improve-extraction-naming` 3.1): профили, `dump.py`, `mutation_check.py`, точные множества ключей событий. Явные `@example` на каждую границу и мутацию и сторожевой токен журнала в каждом тесте с событиями — по общему разделу `improve-extraction-naming/design.md`, «Границы и сторожевые токены» (О11).
 
 - [ ] 3.1 Фикстура «синтетическая онтология стенда» по сценарию спецификации:
   - «Hume» с QID, «Юм» без;
@@ -72,13 +72,16 @@
   | Миграция | шаг `manifest_qids` не передаёт `confirmed` в `dedupe` | «Синтетическая онтология стенда» (Гомер/Омир) |
   | Замер | А4 без открытых `duplicate` | «Транслитерация без решения человека» |
   | Откат | откат без `undo_merge` | «Полный откат» |
+  | Откат | откат не отменяет `manifest_qids` (QID и `rollback_run`) | «Полный откат» + property отката с манифестом |
+  | Замер | А4 — сумма, а не объединение | «А4 — объединение и решение «разные»» |
+  | Замер | А4 считает пары с решением «разные» | «А4 — объединение и решение «разные»» |
   | Откат | откат перезаписывает последующее переименование | «Последующее изменение сохраняется» |
   | Замер | соединение не только на чтение | «Только чтение» |
   | Замер | А1 без исключения `source` | property замера |
   | Замер | А4 только по основным с обеих сторон | «Синтетическая онтология до и после» (А4 = 3) / property |
   | Замер | А6 без фильтра `philosopher` | «А6 и А7 совпадают с API» |
 
-- [ ] 3.5 `python scripts/mutation_check.py --change migrate-ontology-quality` — таблица в `verification.md`.
+- [ ] 3.5 `python scripts/mutation_check.py --change migrate-ontology-quality` — таблица в `verification.md`; `--coverage migrate-ontology-quality` чисто (О11).
 - [ ] 3.6 Прежние тесты `entity-catalog`, `knowledge-graph`, `entity-cards`, `entity-mentions`, `geo-timeline`, `ontology-retrieval` проходят без правки ожиданий.
 - [ ] 3.7 `ontology-migration` в `enforce`, `check_traceability.py` чисто.
 - [ ] 3.8 `verification.md`:
@@ -108,7 +111,7 @@
 - [ ] 5.3 **Оплачиваемо:** `ontology_migrate plan --estimate` (одна проба), решение о `run --translate model`. Ожидаемая стоимость ≈ $0,06 по ценам `config/llm.yaml`.
 - [ ] 5.4 `ontology_migrate run --translate model`, отчёт JSON — к PR. Выборочная проверка переводов человеком (не меньше 50 из `renamed.model`).
 - [ ] 5.5 `quality_report --baseline before.json` — таблица А1–А8 к PR. Цель: А1 ≥ 0,90, А2 = А3 = А4 = А7 = 0, А5 ≥ 20, А6 ≥ 10, А8 = 0. Если А5/А6 не достигнуты — какие персоны без QID и без дат (справочная часть замера), решение по манифесту QID.
-- [ ] 5.6 Очередь проверки `duplicate` после миграции — решение человека (входит в А4). Транслитерации без общего написания (Гомер/Омир, Горгий/Горгиас) правило имён не видит: путь — очередь `qid_candidate` от `suggest` и решение человека в манифесте, шаг `manifest_qids` (О10).
+- [ ] 5.6 Очередь проверки `duplicate` после миграции — решение человека (входит в А4). Транслитерации без общего написания (Гомер/Омир, Горгий/Горгиас) правило имён не видит: путь — очередь `review:qid_candidate` от `suggest` и решение человека в манифесте, шаг `manifest_qids` (О10).
 - [ ] 5.7 Проверить на стенде `retired_list` из `plan` до `run`: законные сущности с длинными названиями (`position`, `argument`, `problem`) снимутся по `sentence` — при необходимости поднять пределы типов в `naming_rules.yaml`.
 - [ ] 5.8 В описание PR — расхождения со спекой владельца на подтверждение (О9): формула А4 (основное одной ∈ названия другой + открытая очередь), снятие вместо удаления, А1 без источников библиотеки.
 
