@@ -29,6 +29,8 @@ export const NAME_GAP = 4;
 export const TEXT_GAP = 2; // px: запас раскладки у текста сверх геометрии пересечений
 export const COUNTRY_MIN_AREA = 1500;
 export const MAX_COUNTRY_LABELS = 24;
+export const COUNTRY_STEP = 12; // px: шаг сетки запасных точек подписи страны
+export const COUNTRY_TRIES = 64; // запасных точек на страну, не больше
 export const COUNTRY_MIN_LABELS = 5; // меньше — добор (layoutCountries)
 
 export type Circle = { kind: "circle"; x: number; y: number; r: number };
@@ -397,7 +399,9 @@ function geoOf(c: CountryInput): CountryGeo {
   return g;
 }
 
-type CountryCand = { c: CountryInput; area: number; span: number; x: number; y: number };
+// x, y — центр крупнейшего видимого многоугольника; box — рамка видимой части; pts — точки
+// подписи по порядку попыток (лениво, один раз на вид).
+type CountryCand = { c: CountryInput; area: number; span: number; x: number; y: number; box: [number, number, number, number]; pts: [number, number][] | null };
 // main и rest заполняются при первом вызове для вида; later (заведомо меньше порога) —
 // измеряются один раз, когда добор впервые нужен (laterDone), и дописываются в rest.
 type CandCache = { key: string; done: boolean; laterDone: boolean; main: CountryCand[]; rest: CountryCand[]; later: CountryInput[] };
@@ -461,12 +465,10 @@ export function layoutCountries(
         }
       }
     if (!best) return;
-    const [[x0], [x1]] = path.bounds(c.feature);
+    const [[x0, y0], [x1, y1]] = path.bounds(c.feature);
     const [x, y] = path.centroid(best);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-    const ll = projection.invert?.([x, y]);
-    if (!ll || !geoContains(c.feature, ll)) return;
-    (area >= COUNTRY_MIN_AREA ? main : rest).push({ c, area, span: x1 - x0, x, y });
+    (area >= COUNTRY_MIN_AREA ? main : rest).push({ c, area, span: x1 - x0, x, y, box: [x0, y0, x1, y1], pts: null });
   }
   const order = (a: CountryCand, b: CountryCand) => b.area - a.area || (a.c.id < b.c.id ? -1 : 1);
   if (fresh) {
@@ -474,16 +476,41 @@ export function layoutCountries(
     rest.sort(order);
   }
   const out: CountryLabel[] = [];
+  // Точки подписи: центр, затем узлы сетки COUNTRY_STEP в рамке видимой части по
+  // возрастанию расстояния от центра (при равенстве — сверху вниз, слева направо), не больше
+  // COUNTRY_TRIES. Точка годится, только если она внутри страны.
+  const inside = new Map<string, boolean>();
+  const within = (k: CountryCand, x: number, y: number): boolean => {
+    const key = `${k.c.id}:${x}:${y}`;
+    let v = inside.get(key);
+    if (v === undefined) {
+      const ll = projection.invert?.([x, y]);
+      inside.set(key, (v = !!ll && geoContains(k.c.feature, ll)));
+    }
+    return v;
+  };
+  const pointsOf = (k: CountryCand): [number, number][] => {
+    if (k.pts) return k.pts;
+    const [x0, y0, x1, y1] = k.box;
+    const grid: [number, number, number][] = [];
+    for (let gx = Math.ceil(x0 / COUNTRY_STEP) * COUNTRY_STEP; gx <= x1; gx += COUNTRY_STEP)
+      for (let gy = Math.ceil(y0 / COUNTRY_STEP) * COUNTRY_STEP; gy <= y1; gy += COUNTRY_STEP) grid.push([gx, gy, Math.hypot(gx - k.x, gy - k.y)]);
+    grid.sort((a, b) => a[2] - b[2] || a[1] - b[1] || a[0] - b[0]);
+    return (k.pts = [[k.x, k.y], ...grid.slice(0, COUNTRY_TRIES).map(([gx, gy]) => [gx, gy] as [number, number])]);
+  };
   const place = (k: CountryCand, fi: number, fill: boolean): boolean => {
     const { measure, metrics: m } = fonts[fi];
     const tw = measure(k.c.name);
     if (tw + 2 * LABEL_PAD > k.span) return false; // прямоугольник подписи не шире видимой части
-    const base = k.y + (m.ascent - m.descent) / 2;
-    const rect: Rect = { kind: "rect", x0: k.x - tw / 2 - LABEL_PAD, y0: base - m.ascent - LABEL_PAD, x1: k.x + tw / 2 + LABEL_PAD, y1: base + m.descent + LABEL_PAD };
-    if (!inFrame(f, rect) || grid.hits(rect)) return false;
-    grid.add(rect);
-    out.push({ id: k.c.id, text: k.c.name, x: round2(k.x), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect, font: fi, fill });
-    return true;
+    for (const [px, py] of pointsOf(k)) {
+      const base = py + (m.ascent - m.descent) / 2;
+      const rect: Rect = { kind: "rect", x0: px - tw / 2 - LABEL_PAD, y0: base - m.ascent - LABEL_PAD, x1: px + tw / 2 + LABEL_PAD, y1: base + m.descent + LABEL_PAD };
+      if (!inFrame(f, rect) || grid.hits(rect) || !within(k, px, py)) continue;
+      grid.add(rect);
+      out.push({ id: k.c.id, text: k.c.name, x: round2(px), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect, font: fi, fill });
+      return true;
+    }
+    return false;
   };
   for (const k of main) {
     if (out.length >= MAX_COUNTRY_LABELS) break;

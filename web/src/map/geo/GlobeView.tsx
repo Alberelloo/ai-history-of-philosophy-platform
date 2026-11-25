@@ -14,7 +14,9 @@ import {
   MEDAL,
   EVENT_MARK,
   frameLayout,
+  COUNTRY_MIN_LABELS,
   type CountryLabel,
+  type Layout,
   type Frame as LFrame,
   type RestLayout,
   type LPlace,
@@ -38,11 +40,12 @@ import {
   STEP,
   STEP_SHIFT,
   zoomBy,
+  ZOOM_STEP,
   type Frame,
   type View,
 } from "./projection";
 import type { GlobeRoles } from "./selection";
-import { opacity, type Scene } from "./timeline";
+import { opacity, type Scene, type ScenePlace } from "./timeline";
 import { BORDERS, COUNTRIES, COUNTRY_COUNT, LAND } from "./world";
 
 // Вид «Глобус» карты раздела (openspec/changes/rework-globe-political-map): ортографическая
@@ -115,6 +118,59 @@ function fontMetrics(font: string, version: number): Metrics {
 const COUNTRY_FONTS = [COUNTRY_FONT, COUNTRY_FILL_FONT];
 const COUNTRY_INPUT = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
 
+// --- раскладка покоя: чистые шаги (кадр, исходный вид) ---
+type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number };
+
+function anchorsAt(projection: (p: [number, number]) => [number, number] | null, view: View, places: ScenePlace[], width: number, height: number): LPlace[] {
+  return places.map((p) => {
+    const xy = projection([p.lon, p.lat]);
+    const x = xy ? xy[0] : 0;
+    const y = xy ? xy[1] : 0;
+    return { id: p.id, x, y, visible: !!xy && isNear(view, p) && x >= 0 && y >= 0 && x <= width && y <= height };
+  });
+}
+
+function markersAt(anchors: LPlace[], lf: LFrame, r: RestInput): Layout {
+  return layoutMarkers({
+    places: anchors,
+    persons: (r.scene?.persons ?? []).map((p) => ({ id: p.id, place: p.place, name: r.nameOf(p.id) })),
+    events: (r.scene?.events ?? []).map((e) => ({ id: e.id, place: e.place })),
+    frame: lf,
+    measure: (text) => r.measure(text, NAME_FONT),
+    metrics: fontMetrics(NAME_FONT, r.fv),
+  });
+}
+
+function countriesAt(view: View, lf: LFrame, grid: Layout["grid"], r: RestInput): CountryLabel[] {
+  const cp = projector(view, r.frame, COUNTRY_PRECISION);
+  cp.projection.clipExtent([
+    [0, 0],
+    [r.width, r.height],
+  ]);
+  return layoutCountries(
+    COUNTRY_INPUT,
+    cp.path,
+    cp.projection,
+    lf,
+    grid,
+    COUNTRY_FONTS.map((font) => ({ font, measure: (text: string) => r.measure(text, font), metrics: fontMetrics(font, r.fv) })),
+  );
+}
+
+// Исходный вид: homeView (все точки привязки в кадре), затем, пока подписей стран меньше
+// COUNTRY_MIN_LABELS, — на шаг ряда дальше, до приближения 1 (правило «Исходное приближение»).
+function homeFor(places: ScenePlace[], r: RestInput): View {
+  let v = homeView(places, r.frame, r.width, r.height, MEDAL);
+  while (v.zoom > 1 + 1e-9) {
+    const p = projector(v, r.frame);
+    const lf: LFrame = { w: r.width, h: r.height, cx: r.frame.cx, cy: r.frame.cy, R: p.scale };
+    const lay = markersAt(anchorsAt(p.projection, v, places, r.width, r.height), lf, r);
+    if (countriesAt(v, lf, lay.grid, r).length >= COUNTRY_MIN_LABELS) break;
+    v = { ...v, zoom: Math.max(1, Math.round((v.zoom / ZOOM_STEP) * 1e6) / 1e6) };
+  }
+  return v;
+}
+
 export default function GlobeView(props: Props) {
   const { width, height, layer, status, scene, roles, measure, reduced } = props;
   const t = useT();
@@ -124,12 +180,17 @@ export default function GlobeView(props: Props) {
     return { cx: width / 2, cy: height / 2, radius };
   }, [width, height]);
 
-  // Исходный вид — из мест первого показа слоя; «0» возвращает к нему.
+  const info = props.info;
+  const nameOf = useCallback((id: string) => info(id)?.name || null, [info]); // без имени — без подписи, не id
+  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height };
+
+  // Исходный вид — из мест первого показа слоя (после загрузки шрифтов: от них зависят
+  // подписи стран, а значит и приближение); «0» возвращает к нему для года T и размера сейчас.
   const home = useRef<View | null>(null);
   const homeLayer = useRef<GeoLayer | null>(null);
-  if (scene && layer && homeLayer.current !== layer) {
+  if (scene && layer && props.fontsVersion > 0 && homeLayer.current !== layer) {
     homeLayer.current = layer;
-    home.current = homeView(scene.places, frame, width, height, MEDAL);
+    home.current = homeFor(scene.places, restIn);
   }
   const [view, setView] = useState<View>(() => home.current ?? initialView([]));
   const viewRef = useRef(view);
@@ -284,7 +345,7 @@ export default function GlobeView(props: Props) {
     else if (e.key === "ArrowDown") next = rotateBy(v, 0, -step);
     else if (e.key === "+" || e.key === "=") next = zoomBy(v, 1);
     else if (e.key === "-" || e.key === "_" || e.key === "−") next = zoomBy(v, -1);
-    else if (e.key === "0") next = scene ? homeView(scene.places, frame, width, height, MEDAL) : initialView([]); // по местам года T и размеру сейчас
+    else if (e.key === "0") next = scene ? homeFor(scene.places, restIn) : initialView([]); // по местам года T и размеру сейчас
     else if (e.key === "PageUp") props.onYearStep(10);
     else if (e.key === "PageDown") props.onYearStep(-10);
     else if (e.key === "]") props.onYearStep(1);
@@ -303,44 +364,15 @@ export default function GlobeView(props: Props) {
   const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R };
   const places = useMemo(() => scene?.places ?? [], [scene]);
   const rest = useRef<RestLayout | null>(null);
-  const info = props.info;
-  const nameOf = useCallback((id: string) => info(id)?.name || null, [info]); // без имени — без подписи, не id
   const { anchors, lay, countries } = useMemo(() => {
-    const anchors: LPlace[] = places.map((p) => {
-      const xy = pr.projection([p.lon, p.lat]);
-      const x = xy ? xy[0] : 0;
-      const y = xy ? xy[1] : 0;
-      return { id: p.id, x, y, visible: !!xy && isNear(view, p) && x >= 0 && y >= 0 && x <= width && y <= height };
-    });
+    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height };
+    const anchors = anchorsAt(pr.projection, view, places, width, height);
     const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
-    const fv = props.fontsVersion;
-    const got = frameLayout(rest.current, scene, moving, anchors, lf, () =>
-      layoutMarkers({
-        places: anchors,
-        persons: (scene?.persons ?? []).map((p) => ({ id: p.id, place: p.place, name: nameOf(p.id) })),
-        events: (scene?.events ?? []).map((e) => ({ id: e.id, place: e.place })),
-        frame: lf,
-        measure: (text) => measure(text, NAME_FONT),
-        metrics: fontMetrics(NAME_FONT, fv),
-      }),
-    );
+    const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r));
     rest.current = got.rest;
     const lay = got.layout;
     if (moving) return { anchors, lay, countries: [] as CountryLabel[] };
-    const cp = projector(view, frame, COUNTRY_PRECISION);
-    cp.projection.clipExtent([
-      [0, 0],
-      [width, height],
-    ]);
-    const countries = layoutCountries(
-      COUNTRY_INPUT,
-      cp.path,
-      cp.projection,
-      lf,
-      lay.grid,
-      COUNTRY_FONTS.map((font) => ({ font, measure: (text: string) => measure(text, font), metrics: fontMetrics(font, fv) })),
-    );
-    return { anchors, lay, countries };
+    return { anchors, lay, countries: countriesAt(view, lf, lay.grid, r) };
     // fontsVersion: шрифты загрузились — ширины подписей меряются заново.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion]);

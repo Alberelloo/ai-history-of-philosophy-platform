@@ -1,4 +1,4 @@
-import { geoOrthographic, geoPath } from "d3-geo";
+import { geoContains, geoOrthographic, geoPath } from "d3-geo";
 import { countryName } from "../../src/map/geo/countries";
 import { COUNTRY_MIN_AREA, COUNTRY_MIN_LABELS, Grid, inFrame, layoutCountries, MAX_COUNTRY_LABELS, overlaps, type Frame } from "../../src/map/geo/layout";
 import { COUNTRIES } from "../../src/map/geo/world";
@@ -10,6 +10,13 @@ const fonts = [
   { font: "9px", measure: (t: string) => t.length * 5.6, metrics: { ascent: 8, descent: 2.5 } },
 ];
 const input = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
+
+const projOf = (w: number, h: number, lon: number, lat: number, zoom: number) =>
+  geoOrthographic()
+    .rotate([-lon, -lat])
+    .scale((Math.min(w, h) / 2 - 16) * zoom)
+    .translate([w / 2, h / 2])
+    .clipAngle(90);
 
 function run(w: number, h: number, lon: number, lat: number, zoom: number, grid = new Grid(), countries = input) {
   const R = (Math.min(w, h) / 2 - 16) * zoom;
@@ -33,6 +40,10 @@ for (const [w, h] of [[564, 322], [1024, 576], [1366, 768], [1920, 1080]])
           ok(a.rect.x1 - a.rect.x0 <= a.span + 0.5, `ширина ${a.text}`);
           ok(inFrame({ w, h, cx: 0, cy: 0, R: 0 }, a.rect), "в кадре");
           eq(a.text, countryName(a.id));
+          const m = fonts[a.font].metrics;
+          const ll = projOf(w, h, lon, lat, z).invert!([a.x, a.y - (m.ascent - m.descent) / 2]);
+          const feature = input.find((c) => c.id === a.id)!.feature;
+          ok(ll && geoContains(feature, ll), `точка подписи ${a.text} внутри страны`);
           for (let j = i + 1; j < out.length; j++) ok(!overlaps(a.rect, out[j].rect), `пересечение ${a.text}/${out[j].text}`);
         }
       });
@@ -80,10 +91,15 @@ test("кэш: сначала без добора, потом с добором (
   const shared = [...input];
   const first = run(1024, 576, 15, 50, 2, new Grid(), shared);
   ok(!first.some((l) => l.fill), "первый вызов без добора");
-  const g = () => busy(1024, 576, 800, 7);
+  const g = () => {
+    const grid = busy(1024, 576, 200, 7);
+    grid.add({ kind: "rect", x0: 0, y0: 0, x1: 1024, y1: 470 }); // занято всё, кроме угла справа снизу
+    grid.add({ kind: "rect", x0: 0, y0: 470, x1: 600, y1: 576 });
+    return grid;
+  };
   const after = run(1024, 576, 15, 50, 2, g(), shared);
   const fresh = run(1024, 576, 15, 50, 2, g(), [...input]);
-  ok(fresh.some((l) => l.fill), "сетка требует добора");
+  ok(fresh.some((l) => l.fill), "сетка требует добора: " + JSON.stringify(sig(fresh)));
   eq(sig(after), sig(fresh), "как со свежим кэшем");
 });
 
