@@ -364,3 +364,220 @@ def test_gateway_counts_places_as_map_without_page_token():
 
     assert paid_operation("GET", "/api/knowledge/v1/map/places") == "map"
     assert "map" in WITHOUT_PAGE_TOKEN
+
+
+# --- 3.4–3.5: обогащение из Wikidata ---------------------------------------------------------
+
+
+def _snak(prop, datavalue):
+    return {"snaktype": "value", "property": prop, "datavalue": datavalue}
+
+
+def _time(year):
+    return {"type": "time", "value": {"time": f"+{year}-00-00T00:00:00Z", "precision": 9}}
+
+
+def _item(qid):
+    return {"type": "wikibase-entityid", "value": {"id": qid}}
+
+
+def _geo(lat, lon):
+    return {"type": "globecoordinate", "value": {"latitude": lat, "longitude": lon}}
+
+
+def wd(qid, ru=None, **claims):
+    """Ответ ``Special:EntityData``: ``claims`` — свойство → [(datavalue, qualifiers)]."""
+    out = {}
+    for prop, values in claims.items():
+        out[prop] = [
+            {
+                "mainsnak": _snak(prop, dv),
+                "rank": "normal",
+                "qualifiers": {q: [_snak(q, v) for v in vs] for q, vs in (quals or {}).items()},
+            }
+            for dv, quals in values
+        ]
+    labels = {"ru": {"language": "ru", "value": ru}} if ru else {}
+    return {"entities": {qid: {"id": qid, "labels": labels, "claims": out}}}
+
+
+class Fixture:
+    """``fetch`` из словаря QID → ответ; считает вызовы, нет записи — ``WikidataError``."""
+
+    def __init__(self, records):
+        self.records = records
+        self.calls = []
+
+    def __call__(self, url):
+        from philograph.knowledge.wikidata import WikidataError
+
+        self.calls.append(url)
+        qid = url.rsplit("/", 1)[-1].removesuffix(".json")
+        if qid not in self.records:
+            raise WikidataError("нет записи")
+        return self.records[qid]
+
+
+KANT_RECORDS = {
+    "Q9312": wd(
+        "Q9312",
+        P569=[(_time(1724), None)],
+        P570=[(_time(1804), None)],
+        P19=[(_item("Q4120832"), None)],
+        P20=[(_item("Q4120832"), None)],
+        P737=[(_item("Q37160"), None)],
+        P27=[(_item("Q27306"), None)],
+    ),
+    "Q4120832": wd("Q4120832", ru="Кёнигсберг", P625=[(_geo(54.7104, 20.5101), None)]),
+}
+
+
+def _enrichment(onto, records):
+    from philograph.knowledge.geo_enrich import PlaceEnrichment
+
+    fetch = Fixture(records)
+    return PlaceEnrichment(onto.statements, fetch), fetch
+
+
+def _count(onto, table):
+    from sqlalchemy import func
+
+    with onto.statements.engine.begin() as conn:
+        return conn.scalar(select(func.count()).select_from(table))
+
+
+def test_enrich_kant(onto, events):
+    kant = onto.person("Кант", "1724", "1804", wikidata="Q9312")
+    enrichment, _ = _enrichment(onto, KANT_RECORDS)
+    events.clear()
+    summary = enrichment.run()
+    assert {k: summary[k] for k in ("coordinates", "placements", "places_created")} == {
+        "coordinates": 1,
+        "placements": 2,
+        "places_created": 1,
+    }
+    assert (summary["skipped"], summary["failed"], summary["dry_run"]) == (0, 0, False)
+    place = onto.entities.by_external("wikidata", "Q4120832")
+    rows = onto.statements.about(kant, types=["lived_in"])
+    got = sorted((r["qualifiers"]["place_role"], r["qualifiers"]["time"]["original"]) for r in rows)
+    assert got == [("birth", "1724"), ("death", "1804")]
+    assert all(r["object"] == place for r in rows)
+    [geo] = onto.statements.about(place, types=["coordinates"])
+    assert geo["value"] == {"lat": 54.71, "lon": 20.51} and geo["status"] == "sourced"
+    for r in [*rows, geo]:
+        [a] = r["attributions"]
+        assert a["who"].startswith("wikidata:Q") and a["place"].startswith(
+            "https://www.wikidata.org/wiki/Q"
+        )
+        assert r["provenance"]["run_id"] == summary["run_id"]
+    assert not onto.statements.about(kant, types=["influenced_by"])
+    assert not events.of("knowledge.geo.skipped")
+    [done] = events.of("knowledge.geo.enriched")
+    assert done.fields == summary
+
+
+def test_enrich_repeat_adds_nothing(onto, events):
+    onto.person("Кант", "1724", "1804", wikidata="Q9312")
+    enrichment, _ = _enrichment(onto, KANT_RECORDS)
+    enrichment.run()
+    before = (_count(onto, t.statements), _count(onto, t.attributions), _count(onto, t.entities))
+    again = enrichment.run()
+    assert (again["coordinates"], again["placements"], again["places_created"]) == (0, 0, 0)
+    after = (_count(onto, t.statements), _count(onto, t.attributions), _count(onto, t.entities))
+    assert after == before
+
+
+def test_enrich_dry_run(onto, events):
+    onto.person("Кант", "1724", "1804", wikidata="Q9312")
+    enrichment, _ = _enrichment(onto, KANT_RECORDS)
+    before = (_count(onto, t.statements), _count(onto, t.entities))
+    summary = enrichment.run(dry_run=True)
+    assert (summary["coordinates"], summary["placements"], summary["places_created"]) == (1, 2, 1)
+    assert summary["dry_run"] is True
+    assert (_count(onto, t.statements), _count(onto, t.entities)) == before
+
+
+def test_enrich_skips(onto, events):
+    onto.person("Декарт", "1596", "1650", wikidata="Q9191")
+    onto.person("Юм", "1711", "1776", wikidata="Q37160")
+    stockholm = onto.entities.create(
+        "place", [("ru", "Стокгольм", "primary")], external={"wikidata": "Q1754"}
+    )
+    records = {
+        "Q9191": wd("Q9191", P19=[(_item("<script>"), None)]),
+        "Q37160": wd("Q37160", P19=[(_item("Q23436"), None)]),
+        "Q23436": wd("Q23436", ru="Эдинбург", P625=[(_geo(95, 0), None)]),
+    }
+    enrichment, _ = _enrichment(onto, records)
+    events.clear()
+    summary = enrichment.run()
+    skipped = {(e["entity"], e["reason"]) for e in events.of("knowledge.geo.skipped")}
+    descartes = onto.entities.by_external("wikidata", "Q9191")
+    hume = onto.entities.by_external("wikidata", "Q37160")
+    assert skipped == {(descartes, "bad_qid"), (hume, "refused"), (stockholm, "fetch_failed")}
+    assert (summary["skipped"], summary["failed"]) == (2, 1)
+    for e in events.of("knowledge.geo.skipped"):
+        assert set(e.fields) == {"entity", "property", "reason"}
+
+
+def test_enrich_activity_with_interval_and_place_from_epoch_context(onto, events):
+    descartes = onto.person("Декарт", "1596", "1650", wikidata="Q9191")
+    amsterdam = onto.entities.create(
+        "place", [("ru", "Амстердам", "primary")], external={"wikidata": "Q727"}
+    )
+    records = {
+        "Q9191": wd(
+            "Q9191",
+            P937=[(_item("Q727"), {"P580": [_time(1628)], "P582": [_time(1649)]})],
+        ),
+        "Q727": wd("Q727", ru="Амстердам", P625=[(_geo(52.37, 4.89), None)]),
+    }
+    enrichment, _ = _enrichment(onto, records)
+    summary = enrichment.run()
+    assert summary["places_created"] == 0  # место уже было (найдено по QID)
+    [row] = onto.statements.about(descartes, types=["lived_in"])
+    assert row["object"] == amsterdam and row["qualifiers"]["place_role"] == "activity"
+    assert (
+        row["qualifiers"]["time"]["earliest_start"],
+        row["qualifiers"]["time"]["latest_end"],
+    ) == (
+        1628,
+        1649,
+    )
+    assert summary["coordinates"] == 1
+
+
+def test_enrich_rollback_keeps_places_and_verified(onto, events):
+    onto.person("Кант", "1724", "1804", wikidata="Q9312")
+    enrichment, _ = _enrichment(onto, KANT_RECORDS)
+    run_id = enrichment.run()["run_id"]
+    place = onto.entities.by_external("wikidata", "Q4120832")
+    [geo] = onto.statements.about(place, types=["coordinates"])
+    onto.statements.confirm(geo["id"], "operator")
+    events.clear()
+    summary = enrichment.rollback(run_id)
+    assert summary == {"run_id": run_id, "statements": 2, "places_kept": 1}
+    assert onto.entities.get(place)["id"] == place
+    assert [e.fields for e in events.of("knowledge.geo.rolled_back")] == [summary]
+
+
+def test_enrich_cli_from_file(onto, tmp_path, capsys, events):
+    import json
+
+    from philograph.knowledge.geo_enrich import PlaceEnrichment, main
+
+    onto.person("Кант", "1724", "1804", wikidata="Q9312")
+    path = tmp_path / "records.json"
+    path.write_text(json.dumps(KANT_RECORDS), encoding="utf-8")
+    code = main(
+        ["run", "--from-file", str(path)], service=lambda f: PlaceEnrichment(onto.statements, f)
+    )
+    assert code == 0
+    out = json.loads(capsys.readouterr().out)
+    assert (out["coordinates"], out["placements"]) == (1, 2)
+
+
+def test_reader_path_does_not_fetch(onto, clock, events, geo_world):
+    _, fetch = _enrichment(onto, KANT_RECORDS)
+    _layer(onto, clock).build()
+    assert fetch.calls == []

@@ -132,7 +132,7 @@ class PlaceLayer:
 |---|---|---|---|
 | `knowledge.geo.built` | info | `entities`, `places`, `placements`, `unplaced`, `truncated`, `cached` | каждый ответ `/map/places` |
 | `knowledge.geo.enriched` | info | `run_id`, `entities`, `coordinates`, `placements`, `places_created`, `skipped`, `failed`, `dry_run` | конец запуска обогащения |
-| `knowledge.geo.skipped` | warning | `entity`, `property`, `reason` (`bad_qid` \| `bad_value` \| `refused` \| `fetch_failed`) | пропущенная запись |
+| `knowledge.geo.skipped` | warning | `entity`, `property`, `reason` (`bad_qid` \| `bad_value` \| `refused` \| `fetch_failed`) | пропущенная запись. `entity` — сущность, которую обрабатывает запуск (у нового места, найденного через персону, — эта персона); `property` — код свойства, `item` — не загрузилась запись самой сущности |
 | `knowledge.geo.rolled_back` | info | `run_id`, `statements`, `places_kept` | откат запуска |
 | `knowledge.statement.refused` (есть) | — | `type`, `reason`, **новое** `code` | недопустимые координаты, вид места, нет атрибуции |
 
