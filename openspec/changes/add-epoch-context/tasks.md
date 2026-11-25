@@ -5,7 +5,7 @@
 ## 1. Задача и документы
 
 - [x] 1.1 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, дельты `epoch-context`, `ontology-registry`, `entity-cards`, `knowledge-graph`, `visual-design`, `progress.md`
-- [ ] 1.2 `docs/product/ontology.md` — виды событий (+ экономическое, социальное), источники контекста; `docs/product/system-design.md` — `GET /v1/context`, команда `epoch_context`
+- [x] 1.2 `docs/product/ontology.md` — виды событий (+ экономическое, социальное), источники контекста; `docs/product/system-design.md` — `GET /v1/context`, команда `epoch_context`
 
 ## 2. Реестр и извлечение
 
