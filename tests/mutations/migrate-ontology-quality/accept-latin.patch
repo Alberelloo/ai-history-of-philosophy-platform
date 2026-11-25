@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -702,7 +702,7 @@
+                 type_ = view.entities[pack[n - 1]]["type"]
+                 if counts[n] > 1:
+                     reason = "duplicate_item"
+-                elif not isinstance(ru, str) or not is_russian(ru):
++                elif not isinstance(ru, str):
+                     reason = "not_russian"
+                 elif (bad := check_name(type_, ru)) is not None:
+                     reason = f"invalid:{bad}"

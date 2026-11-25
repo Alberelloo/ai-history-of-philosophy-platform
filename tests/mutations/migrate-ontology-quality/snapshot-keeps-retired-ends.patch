@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/snapshot.py
++++ b/src/philograph/knowledge/snapshot.py
+@@ -185,8 +185,6 @@
+         s = {**dict(r), "attributions": shown, "evidence": evs.get(r["id"], [])}
+         if own and all(a["hidden"] for a in shown):
+             continue  # основано только на снятом источнике или снятом авторе
+-        if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
+-            continue
+         if s["object"] is not None and s["object"] == s["subject"]:
+             continue  # петля после слияния двух концов: хранится, но не показывается
+         statements.append(s)

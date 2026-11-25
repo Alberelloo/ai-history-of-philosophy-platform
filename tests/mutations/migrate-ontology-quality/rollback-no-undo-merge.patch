@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -853,7 +853,6 @@
+         merges_undone = 0
+         for merge_id, moved in merges:
+             if (moved or {}).get("run_id") == run_id:
+-                self.statements.undo_merge(merge_id)
+                 merges_undone += 1
+         restored = kept = 0
+         externals: list[dict[str, Any]] = []
