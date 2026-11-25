@@ -19,6 +19,7 @@ from sqlalchemy import select
 from philograph.knowledge import schema as t
 from philograph.knowledge.registry import OntologyRegistry, RegistryError
 from philograph.knowledge.statements import Provenance, StatementError, Statements
+from philograph.knowledge.wikidata import QID, page_url
 from philograph.platform import events
 from philograph.platform.client import ServiceClient, ServiceUnavailable
 from philograph.platform.queue import Job, Queue
@@ -66,12 +67,33 @@ class GraphSettings:
     max_nodes: int = 60
 
 
+WIKIDATA_LABEL = "Wikidata"
+WIKIDATA_PREFIX = "wikidata:"  # источник атрибуции импорта из Wikidata: «wikidata:Q…»
+
+
+def wikidata_qid(a: dict[str, Any]) -> str | None:
+    """QID атрибуции импорта из Wikidata — только по шаблону ``^Q\\d+$``, иначе ``None``."""
+    who = a.get("who") or ""
+    if a.get("who_kind") != "source" or not who.startswith(WIKIDATA_PREFIX):
+        return None
+    qid = who[len(WIKIDATA_PREFIX) :]
+    return qid if QID.fullmatch(qid) else None
+
+
+def attribution_link(a: dict[str, Any]) -> str | None:
+    """Ссылка атрибуции: у Wikidata — страница записи, построенная из проверенного QID."""
+    qid = wikidata_qid(a)
+    return page_url(qid) if qid else None
+
+
 def attribution_label(statements: Statements, a: dict[str, Any]) -> str:
     """Кто так считает, по-человечески: персона, источник библиотеки или общее мнение."""
     if a["who_kind"] == "common":
         return "распространённое мнение"
     if a["who_kind"] == "entity" and a["who"]:
         return statements.entities.label(a["who"])
+    if a["who_kind"] == "source" and wikidata_qid(a):
+        return WIKIDATA_LABEL
     if a["who_kind"] == "source" and a["who"]:
         entity = statements.entities.by_external("library", a["who"])
         return statements.entities.label(entity) if entity else a["who"]

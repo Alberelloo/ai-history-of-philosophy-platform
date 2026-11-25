@@ -223,27 +223,52 @@ export function MapCanvas(props: Props) {
 
 /* ---------- эпохи ---------- */
 
+const ERA_FADE_IN = "map-era-fade-in";
+const ERA_FADE_OUT = "map-era-fade-out";
+
 function Eras({ L, data }: { L: MapLayout; data: MapData }) {
   const t = useT();
   const b = L.bands.eras;
   if (b.collapsed) return null;
   const anyActive = L.eras.some((e) => e.active);
+  const top = b.top + 1;
+  const height = b.bot - b.top - 2;
   return (
     <g>
+      {/* Растушёвка нечёткой границы — только в страте эпох; ленты, значки и линии не трогает. */}
+      <defs>
+        <linearGradient id={ERA_FADE_IN} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" className="map-era__stop" stopOpacity="0" />
+          <stop offset="1" className="map-era__stop" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id={ERA_FADE_OUT} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" className="map-era__stop" stopOpacity="1" />
+          <stop offset="1" className="map-era__stop" stopOpacity="0" />
+        </linearGradient>
+      </defs>
       {L.eras.map((e) => {
         const label = data.eras.find((x) => x.id === e.id);
+        const { s0, s1, e0, e1 } = e.fuzzy;
+        // Сплошная часть — между самым поздним началом и самым ранним концом.
+        const core0 = Math.min(s1, e0);
+        const core1 = Math.max(core0, e0);
         return (
           <g
             key={e.id}
             className={["map-entity", "map-era", e.active ? "is-active" : anyActive ? "is-dim" : ""].join(" ")}
             data-entity={e.id}
+            data-fuzzy-start={e.fuzzyYears.start}
+            data-fuzzy-end={e.fuzzyYears.end}
+            data-selected-era={e.active ? "true" : "false"}
             role="button"
             tabIndex={0}
             aria-pressed={e.active}
             aria-label={t.map.aria.era(label?.label ?? "", label?.from ?? 0, label?.to ?? 0)}
           >
             <title>{label ? `${label.label}, ${label.from}–${label.to}` : ""}</title>
-            <rect className="map-era__fill" x={e.x1} y={b.top + 1} width={Math.max(0, e.x2 - e.x1 - 1)} height={b.bot - b.top - 2} />
+            {s1 > s0 && <rect className="map-era__fade" fill={`url(#${ERA_FADE_IN})`} x={s0} y={top} width={s1 - s0} height={height} />}
+            <rect className="map-era__fill" x={core0} y={top} width={Math.max(0, core1 - core0 - 1)} height={height} />
+            {e1 > e0 && <rect className="map-era__fade" fill={`url(#${ERA_FADE_OUT})`} x={e0} y={top} width={e1 - e0} height={height} />}
             {e.labelFits && label && (
               <text className="map-era__text" x={(e.x1 + e.x2) / 2} y={(b.top + b.bot) / 2 + 5} style={{ font: L.fonts.eraText }}>
                 {label.label}

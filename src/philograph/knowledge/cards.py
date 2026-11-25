@@ -12,7 +12,12 @@ import json
 from collections.abc import Iterator
 from typing import Any
 
-from philograph.knowledge.graph import attribution_label, hidden_by_region, recipes_for
+from philograph.knowledge.graph import (
+    attribution_label,
+    attribution_link,
+    hidden_by_region,
+    recipes_for,
+)
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.statements import Attribution, Provenance, Statements
@@ -58,6 +63,12 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
     "event": [
         ("when", "Дата и место", ["dating", "happened_in"], "out"),
         ("effects", "На что повлияло", ["stimulated"], "out"),
+    ],
+    # Эпоха: только явные утверждения; принадлежность по датам — вывод (О-8), её показывают
+    # страница эпох и справочник. Код ``dating``, а не ``when``: ``when`` — «Дата и место».
+    "epoch": [
+        ("dating", "Датировка", ["dating"], "out"),
+        ("members", "Относятся к эпохе", ["belongs_to_epoch"], "in"),
     ],
     "doctrine": [
         ("parts", "Состав", ["part_of"], "in"),
@@ -133,6 +144,8 @@ class Cards:
                     "who": attribution_label(self.statements, a),
                     "kind": a["who_kind"],
                     "stance": a["stance"],
+                    # Ссылка — только у Wikidata и только из проверенного QID.
+                    **({"link": link} if (link := attribution_link(a)) else {}),
                 }
                 for a in visible
             ],

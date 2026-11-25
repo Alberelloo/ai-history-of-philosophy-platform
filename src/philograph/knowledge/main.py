@@ -14,6 +14,7 @@ from philograph.knowledge import schema
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
 from philograph.knowledge.assist import AssistantKnowledge
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.catalog import Catalog, CatalogSettings
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
 from philograph.knowledge.graph import Graphs, GraphSettings
@@ -23,6 +24,7 @@ from philograph.knowledge.metadata import MetadataIngest
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
+from philograph.knowledge.snapshot import Snapshots
 from philograph.knowledge.statements import Statements
 from philograph.operator.access import ActionLog, OperatorAuth
 from philograph.operator.access import migrations as operator_migrations
@@ -50,6 +52,8 @@ class Components:
     assistant: AssistantKnowledge
     library: ServiceClient
     section_map: SectionMap
+    snapshots: Snapshots
+    catalog: Catalog
 
 
 def components(env: dict[str, str]) -> Components:
@@ -99,9 +103,20 @@ def components(env: dict[str, str]) -> Components:
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
+    # Один снимок онтологии на процесс: карта (без окна устарелости) и справочник.
+    snapshots = Snapshots(engine)
     section_map = SectionMap(
         statements,
         MapSettings(max_entities=int(env.get("PHILOGRAPH_MAP_MAX_ENTITIES", "400"))),
+        snapshots,
+    )
+    catalog = Catalog(
+        snapshots,
+        registry,
+        statements.entities,
+        CatalogSettings(
+            max_stale_seconds=float(env.get("PHILOGRAPH_CATALOG_MAX_STALE_SECONDS", "15"))
+        ),
     )
     return Components(
         statements,
@@ -117,6 +132,8 @@ def components(env: dict[str, str]) -> Components:
         assistant,
         library,
         section_map,
+        snapshots,
+        catalog,
     )
 
 
@@ -140,4 +157,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         assistant=_c.assistant,
         library=_c.library,
         section_map=_c.section_map,
+        catalog=_c.catalog,
     )

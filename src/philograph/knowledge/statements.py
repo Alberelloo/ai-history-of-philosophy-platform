@@ -16,7 +16,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-from sqlalchemy import Engine, and_, delete, or_, select, update
+from sqlalchemy import Engine, and_, delete, func, or_, select, update
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate
@@ -111,6 +111,25 @@ ParagraphText = Callable[[str], str | None]
 
 def _norm_quote(text: str) -> str:
     return re.sub(r"\s+", " ", text.replace("ё", "е")).strip().lower()
+
+
+def attributed_sources(s: dict[str, Any], who_kinds: tuple[str, ...] | None = None) -> set[str]:
+    """Кому атрибутировано утверждение и чьи абзацы его подтверждают — одно правило для
+    «в учебнике» (карточка, граф, карта, ассистент) и раздела справочника.
+
+    В множестве — ``who`` нескрытых атрибуций и ``source_id`` непотерянных подтверждений.
+    ``who_kinds`` ограничивает атрибуции видом: справочнику для перечня «известных онтологии
+    учебников» нужны только атрибуции источникам (``("source",)``), иначе учебником
+    считался бы и id персоны из атрибуции ``entity``. Без ограничения — как всегда было
+    у ``Statements._attributed``: сравнивается с id учебника, а id сущностей и источников
+    не пересекаются."""
+    found = {
+        a["who"]
+        for a in s["attributions"]
+        if a["who"] and not a["hidden"] and (who_kinds is None or a["who_kind"] in who_kinds)
+    }
+    found |= {e["source_id"] for e in s["evidence"] if e["source_id"] and not e["lost"]}
+    return found
 
 
 class Statements:
@@ -356,6 +375,8 @@ class Statements:
         events.emit(
             "knowledge.statement.status", statement_id=statement_id, old=old, new=new, reason=reason
         )
+        s = self.get(statement_id)
+        self._update_primary(s["subject"], s["type"])  # отклонённое — уже не действующее
 
     def _journal(self, statement_id: str, actor: str, change: dict[str, Any]) -> None:
         with self.engine.begin() as conn:
@@ -407,7 +428,10 @@ class Statements:
         return warnings
 
     def _update_primary(self, entity_id: str, type_: str) -> None:
-        """Копия основного значения у сущности: годы жизни, датировка, описание."""
+        """Копия основного значения у сущности: годы жизни, датировка, описание.
+
+        Основное — предпочтённое, иначе первое записанное из действующих (не отклонённых и не
+        «устаревших»); пересчитывается при записи, смене ранга и смене статуса."""
         key = {"lifespan": "dates", "dating": "dates", "description": "description"}.get(type_)
         if key is None:
             return
@@ -416,9 +440,11 @@ class Statements:
             for s in self._raw(entity_id, side="subject")
             if s["type"] == type_ and s["status"] != "rejected" and s["rank"] != "deprecated"
         ]
-        if rows:
-            best = sorted(rows, key=lambda s: s["rank"] != "preferred")[0]
-            self.entities.set_primary(entity_id, key, best["value"])
+        # Действующих не осталось — копии основного значения больше нет.
+        current = self.entities.get(entity_id)["primary"].get(key)
+        best = sorted(rows, key=lambda s: s["rank"] != "preferred")[0]["value"] if rows else None
+        if best != current:
+            self.entities.set_primary(entity_id, key, best)
 
     # --- согласие, ранг, решения ---
 
@@ -514,8 +540,21 @@ class Statements:
             "object": t.statements.c.object == entity_id,
             "both": or_(t.statements.c.subject == entity_id, t.statements.c.object == entity_id),
         }[side]
+        # Порядок записи — по первой записи журнала (``add`` пишет её при создании); от него
+        # зависит «первое записанное» основное значение, поэтому порядок задаётся явно.
+        # Подзапрос коррелированный — по индексу journal.statement_id, без агрегата журнала.
+        first = (
+            select(func.min(t.journal.c.id))
+            .where(t.journal.c.statement_id == t.statements.c.id)
+            .scalar_subquery()
+        )
+        query = (
+            select(t.statements.c.id)
+            .where(cond)
+            .order_by(func.coalesce(first, 2**31 - 1), t.statements.c.id)
+        )
         with self.engine.begin() as conn:
-            ids = list(conn.scalars(select(t.statements.c.id).where(cond)))
+            ids = list(conn.scalars(query))
         return [self.get(i) for i in ids]
 
     def about(
@@ -561,9 +600,7 @@ class Statements:
 
     @staticmethod
     def _attributed(s: dict[str, Any], source_id: str) -> bool:
-        return any(a["who"] == source_id and not a["hidden"] for a in s["attributions"]) or any(
-            e["source_id"] == source_id and not e["lost"] for e in s["evidence"]
-        )
+        return source_id in attributed_sources(s)
 
     def _derived_influences(self, person: str, scopes: tuple[str, ...]) -> list[dict[str, Any]]:
         """Участник идейного события испытал влияние его исходного материала."""

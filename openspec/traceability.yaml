@@ -38,3 +38,5 @@ enforce:
   - source-catalog
   - regional-access
   - entity-portraits
+  - entity-catalog
+  - epochs

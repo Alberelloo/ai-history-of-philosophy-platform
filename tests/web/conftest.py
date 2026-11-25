@@ -175,3 +175,53 @@ def page(browser, site):
     page.set_default_timeout(5000)
     yield page
     context.close()
+
+
+# --- настоящий сервис знаний за шлюзом (add-reference-catalog, задача 4.0) ----------------
+
+
+@pytest.fixture
+def knowledge_stack(request, tmp_path, events):
+    """Шлюз, библиотека и сервис знаний этого теста; данные — через ``stack.world``.
+
+    Зависит от ``events``: журнал теста настроен до запуска сервера, события сервисов из его
+    потока попадают в тот же журнал. В конце — ловушки: ни сети наружу, ни вызовов модели.
+    """
+    if not (DIST / "index.html").exists():
+        pytest.skip("клиент не собран: npm run build в web/")
+    from .knowledge_stack import start
+
+    # Параметры стенда — косвенной параметризацией: {"max_stale": 0} и т. п.
+    stack = start(tmp_path, DIST, **getattr(request, "param", {}))
+    yield stack
+    stack.stop()
+    assert stack.router.unexpected == [], f"запросы шлюза наружу: {stack.router.unexpected}"
+    assert stack.llm_calls == [], f"вызовы модели: {stack.llm_calls}"
+    assert stack.outside == [], f"запросы браузера не к стенду: {stack.outside}"
+
+
+@pytest.fixture
+def knowledge_context(browser, knowledge_stack):
+    """Фабрика контекстов браузера читателя для стенда: ловушка сети и запись ответов."""
+    contexts = []
+
+    def make(width: int = 1920, height: int = 1080, **options):
+        context = reader_context(browser, viewport={"width": width, "height": height}, **options)
+        knowledge_stack.watch(context)
+        errors: list[str] = []
+        context.errors = errors  # pageerror всех страниц контекста
+        # console.error — вызовы из кода страницы (сообщения браузера о статусе ответа вроде
+        # «Failed to load resource: 503» не вызов console.error и сюда не попадают).
+        context.add_init_script(
+            "window.__consoleErrors = [];"
+            "const __err = console.error.bind(console);"
+            "console.error = (...a) => { window.__consoleErrors.push(a.map(String).join(' '));"
+            " __err(...a); };"
+        )
+        context.on("page", lambda p: p.on("pageerror", lambda exc: errors.append(str(exc))))
+        contexts.append(context)
+        return context
+
+    yield make
+    for context in contexts:
+        context.close()

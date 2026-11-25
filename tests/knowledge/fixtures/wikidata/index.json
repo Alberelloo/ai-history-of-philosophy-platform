@@ -1,0 +1,7 @@
+{
+  "_": "Поиск wbsearchentities: «название|язык» → файл ответа; нет в списке — пустой ответ. Записи — entity_<QID>.json. QID здесь — только метки синтетических записей.",
+  "search": {
+    "Барокко|ru": "search_baroque_ru.json",
+    "Baroque|en": "search_baroque_ru.json"
+  }
+}
