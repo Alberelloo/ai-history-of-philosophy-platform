@@ -111,3 +111,10 @@
 
 - `docs/product/ontology.md`: виды событий + экономическое, социальное; абзац «Исторический контекст эпохи» (источники: текст, Wikidata через манифест, достройка); разделы карточек — «исторический контекст».
 - `docs/product/system-design.md`: команда `epoch_context` в конвейере наполнения; раздел «Исторический контекст» (`GET /v1/context`, `stimulated` в карте).
+
+### 2.1 — реестр и названия
+
+- `registry_data.EVENT_KINDS` + `economic`, `social` (в конец списка: тем же порядком они дозагружаются в заполненную базу существующим `_add_missing_defaults`).
+- `ontology.{ru,en}.json`: `values.event_kind.economic/social`, новая группа `qualifiers.mechanism` (вне `values`), `sections.context`. `web/src/map/types.ts` — `EventKind`.
+- Юнит-тест `tests/knowledge/test_context_unit.py::test_new_event_kinds_loaded_into_old_registry` (реестр с прежними пятью видами → `load_defaults` → версия +1, `knowledge.registry.changed` с «дозагрузка реестра» и «event_kind», запись `economic`). Прогон: `pytest tests/knowledge/test_context_unit.py tests/knowledge/test_registry_entities.py` — 22 passed, 1 skipped (PostgreSQL-гонка).
+- `tests/web/test_design_system.py::test_ontology_names_in_both_catalogs` сверяет `sections` с `cards.SECTIONS` — до пункта 3.3 (раздел `context` в карточках) он расходится; проверяется после 3.3.

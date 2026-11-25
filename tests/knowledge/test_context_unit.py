@@ -22,9 +22,8 @@ def test_new_event_kinds_loaded_into_old_registry(onto, events):
     onto.statements.add(revolution, "event_kind", value="political", attributions=COMMON)
     with engine.begin() as conn:
         spec = conn.execute(select(rt.c.spec).where(rt.c.code == "event_kind")).scalar_one()
-        conn.execute(
-            update(rt).where(rt.c.code == "event_kind").values(spec={**spec, "values": OLD_EVENT_KINDS})
-        )
+        old = {**spec, "values": OLD_EVENT_KINDS}
+        conn.execute(update(rt).where(rt.c.code == "event_kind").values(spec=old))
     onto.registry._cache = None
     assert "economic" not in onto.registry.relation("event_kind")["values"]
     with engine.begin() as conn:
