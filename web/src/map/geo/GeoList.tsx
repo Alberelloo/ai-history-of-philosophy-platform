@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type RefObject } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { useT } from "../../i18n";
 import { find } from "../model";
 import type { MapData } from "../types";
@@ -25,7 +25,8 @@ export type GeoPanel = {
 };
 
 export type GeoRole = "birth" | "death" | "activity" | "residence" | "none" | "event";
-export type GeoWhereData = { year: number; place: string; country: string | null; role: GeoRole; from: number; to: number; after: boolean };
+// country: undefined — модуль стран ещё не загружен (только город), null — страна не определена.
+export type GeoWhereData = { year: number; place: string; country: string | null | undefined; role: GeoRole; from: number; to: number; after: boolean };
 
 const label = (data: MapData, id: string) => find(data, id)?.obj.label ?? id;
 const MIN_ROWS = 72; // px: меньше — панель складывает разделы (MapPanel, useFit)
@@ -133,7 +134,9 @@ export function GeoPlaceSelected({
   here,
   year,
   onSelect,
+  head,
 }: {
+  head?: ReactNode; // заголовок раздела (складывающий «Выбрано»), иначе — простой
   data: MapData;
   place: GeoPlace;
   country: string | null;
@@ -145,9 +148,11 @@ export function GeoPlaceSelected({
   const who = here ? [...here.people, ...here.events] : [];
   return (
     <>
-      <h2 className="map-panel__h">
-        {t.map.selected} · {t.geo.placeKicker}
-      </h2>
+      {head ?? (
+        <h2 className="map-panel__h">
+          {t.map.selected} · {t.geo.placeKicker}
+        </h2>
+      )}
       <div className="map-selected__name">{t.geo.placeTitle(t.geo.placeWithCountry(place.label, country), year)}</div>
       {who.length ? (
         <div className="geo-selected__who">
@@ -171,7 +176,12 @@ export function GeoWhere({ where }: { where: GeoWhereData }) {
     <div className="geo-where" data-geo-where="">
       <h3 className="geo-where__h">{t.geo.whereIn(where.year)}</h3>
       <p className="geo-where__place">
-        <span data-geo-where-place="">{where.place}</span>, <span data-geo-where-country="">{where.country ?? t.geo.noCountry}</span>
+        <span data-geo-where-place="">{where.place}</span>
+        {where.country !== undefined && (
+          <>
+            , <span data-geo-where-country="">{where.country ?? t.geo.noCountry}</span>
+          </>
+        )}
       </p>
       <p className="geo-where__meta">
         <span data-geo-where-role="">{t.geo.roles[where.role]}</span> · <span data-geo-where-years="">{t.geo.years(where.from, where.to)}</span>

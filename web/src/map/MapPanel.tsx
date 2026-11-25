@@ -180,7 +180,7 @@ export function MapPanel(props: Props) {
   const searchInput = useRef<HTMLInputElement>(null);
   const [focus, setFocus] = useState<Section | null>(null);
   const aside = useRef<HTMLElement>(null);
-  const focusKey = props.link?.id ?? props.rel?.obj.id ?? "";
+  const focusKey = props.link?.id ?? props.rel?.obj.id ?? props.state.sel ?? ""; // и место глобуса: оно не сущность графа
   const { api: fold, tight } = useFit(aside, body, !collapsed, focusKey);
 
   // После разворачивания — к разделу, с которого его открыли.
@@ -465,6 +465,11 @@ function Selected(props: Props) {
         here={geo.scene?.places.find((p) => p.id === geo.place!.id) ?? null}
         year={geo.year}
         onSelect={(id) => props.onSelect(id)}
+        head={
+          <FoldHead k="selected">
+            {t.map.selected} · {t.geo.placeKicker}
+          </FoldHead>
+        }
       />
     );
   if (!rel) {
@@ -589,9 +594,9 @@ function Selected(props: Props) {
   const notice = build.notice ? (pick(t.graph.notices, build.extension) ?? build.notice) : null;
   return (
     <>
-      <h2 className="map-panel__h">
+      <FoldHead k="selected">
         {t.map.selected} · {kicker}
-      </h2>
+      </FoldHead>
       <div className="map-selected__name">
         {title} {sub && <span>{sub}</span>}
       </div>
