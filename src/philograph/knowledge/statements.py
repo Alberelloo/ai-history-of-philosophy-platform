@@ -27,6 +27,9 @@ from philograph.platform.clock import Clock, SystemClock
 
 Status = Literal["verified", "sourced", "generated", "rejected"]
 STRENGTH = {"verified": 3, "sourced": 2, "generated": 1, "rejected": 0}
+# Порядок показа строк по статусу (раздел карточки «Исторический контекст», связи контекста
+# эпохи): проверенные, по источникам, сгенерированные; прочее — после.
+STATUS_ORDER = {"verified": 0, "sourced": 1, "generated": 2}
 INFLUENCE = "influenced_by"
 
 events.define(

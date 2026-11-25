@@ -36,7 +36,7 @@ from philograph.knowledge.graph import hidden_by_region, who_label
 from philograph.knowledge.map import best_of
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.snapshot import Snapshot
-from philograph.knowledge.statements import attributed_sources
+from philograph.knowledge.statements import STATUS_ORDER, attributed_sources
 from philograph.knowledge.wikidata import QID
 from philograph.platform import events
 
@@ -62,8 +62,6 @@ MECHANISM = "mechanism"
 NO_KIND = "none"
 MAX_EVENTS = 200
 MAX_LINKS = 30
-# Порядок связей по статусу: проверенные, по источникам, сгенерированные.
-STATUS_ORDER = {"verified": 0, "sourced": 1, "generated": 2}
 
 MESSAGES = {  # текст ответа 400 по ``kind``
     "bad_query": "Недопустимые параметры контекста",
@@ -299,7 +297,7 @@ class Context:
 
         truncated = len(records) > self.max_events
         if truncated:
-            records = sorted(records, key=lambda rb: (-rb[0].weight, _start_key(rb[0])))
+            records = sorted(records, key=lambda rb: (-rb[0].weight, *_start_key(rb[0]), rb[0].id))
             records = records[: self.max_events]
         records.sort(key=lambda rb: (*_start_key(rb[0]), label(rb[0].id), rb[0].id))
 

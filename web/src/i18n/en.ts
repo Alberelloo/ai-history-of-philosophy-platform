@@ -592,6 +592,7 @@ export const en: Catalog = {
       noLinks: "no links yet",
       loading: "Loading the context",
       empty: "No context has been collected for this epoch yet.",
+      noneOfKinds: "This epoch has no events of the selected kinds.",
       error: "Context is temporarily unavailable.",
       retry: "Retry",
       partial: (n: number, total: number) => `Showing the ${n} most significant of ${total} events.`,

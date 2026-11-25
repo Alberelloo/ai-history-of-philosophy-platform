@@ -63,6 +63,7 @@
 - `epoch` — только в режиме эпохи; `window: {"from", "to"}` — только в режиме окна.
 - `basis` — `explicit` | `dates` (режим эпохи); в режиме окна — `null`.
 - `places[].wikidata` — внешний идентификатор места, если есть (для 2.4: по нему 2.4 берёт координаты).
+- `events[].wikidata` — внешний идентификатор события (только `^Q\d+$`, иначе `null`); страница показывает ссылку «Wikidata ↗», построенную кодом из QID (дописано по ревью кода, решение ведущего).
 - Подтверждения — без цитат (цитата показывается в карточке, здесь только ссылка на абзац); подтверждения и атрибуции источников, закрытых для региона, снимаются (`closed_sources`, как `without_closed`).
 - Порядок, пределы (200 событий по значимости, 30 связей на событие), `truncated` — как в требовании.
 - Код: `knowledge/context.py:Context(snapshots, registry, membership)` — сборка из снимка, без обращений к базе на событие; маршрут в `app.py`; не платная операция.
@@ -119,7 +120,7 @@ epochs:
 | `knowledge.context.served` | info | `mode`, `events`, `links`, `generated_links`, `truncated`, `snapshot` | ответ `GET /v1/context` |
 | `knowledge.context.rejected` | info | `reason` (`mode`\|`window`\|`unknown_epoch`\|`unknown_kind`) | отклонённый запрос (таблица — в требовании «Проверка параметров контекста») |
 | `knowledge.context_import.harvested` | info | `epochs`, `candidates` | конец `harvest` |
-| `knowledge.context_import.checked` | info | `qid`, `result` (`created`\|`exists`\|`pending`\|`rejected`\|`no_date`\|`fetch_failed`) | каждый кандидат в `apply`/`harvest` |
+| `knowledge.context_import.checked` | info | `qid`, `result` (`created`\|`exists`\|`pending`\|`rejected`\|`no_date`\|`fetch_failed`\|`duplicate_qid`) | каждый кандидат в `apply` |
 | `knowledge.context_import.run` | info | `mode` (`apply`\|`dry_run`), `created`, `statements`, `places_created`, `skipped` | конец `apply` |
 | существующие | | `knowledge.statement.created`/`refused`, `knowledge.extraction.dropped`/`fragment`, `knowledge.graph.extended`/`proposal_dropped`/`saved`, `knowledge.card.served`, `knowledge.map.built` | без изменений полей |
 
@@ -270,6 +271,7 @@ epochs:
 - **Совпадение названий при достройке:** `_proposal` отбрасывает неоднозначные названия (`ambiguous_entity`) — часть предложений модели пропадёт; это осознанная строгость.
 - **Таблица классов P31** неполна — события без вида попадают в «Прочее»; таблица — данные, пополняется без кода.
 - **Регрессия карты:** выбор события меняет подсветку — проверки `tests/web/test_map.py`; эталоны снимков — Lead/CI.
+- **Отпечаток снимка и внешние идентификаторы:** `external_ids` входит в отпечаток счётчиком строк. Удаление и вставка строки между двумя проверками отпечатка счётчик не меняют — снимок останется прежним до другой записи. Сейчас таких путей нет (только вставка и перенос при слиянии, слияние учитывается отдельно); новый путь удаления внешних идентификаторов должен менять отпечаток иначе (например, максимум id или журнал).
 - Машина агента не тянет e2e и Docker — их прогоняют CI и Lead.
 
 ## Тестируемость

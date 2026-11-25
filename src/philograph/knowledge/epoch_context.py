@@ -20,7 +20,8 @@
   «по источникам», атрибуция ``wikidata:<QID события>`` со ссылкой, происхождение «импорт».
   Связей «стимулировало», механизма и влияния Wikidata не даёт и команда их не пишет.
   Есть ли строка, проверяется до записи (``Statements.find``): повторный запуск ничего
-  не добавляет. ``--dry-run`` считает то же без записи.
+  не добавляет. QID события или места, занятый сущностью другого типа, — ``duplicate_qid``
+  (ничего не пишется, решает человек). ``--dry-run`` считает то же без записи.
 
 Сеть — только ``wikidata.http_fetch``; функции модуля получают загрузку ``fetch`` извне.
 Своего разбора времени и проверки QID здесь нет — общий модуль ``knowledge/wikidata.py``.
@@ -90,7 +91,15 @@ INSTANCE_OF = "P31"
 LOCATION = "P276"
 EPOCH, EVENT, PLACE = "epoch", "event", "place"
 DECISIONS = ("pending", "accepted", "rejected")
-RESULTS = ("created", "exists", "pending", "rejected", "no_date", "fetch_failed")
+RESULTS = (
+    "created",
+    "exists",
+    "pending",
+    "rejected",
+    "no_date",
+    "fetch_failed",
+    "duplicate_qid",
+)
 # Класс записи Wikidata (P31) → вид события реестра (``event_kind``). Данные модуля, как
 # ``PERIOD_CLASSES`` в ``epoch_dates``: дополняются здесь и проверяются тестом на фикстурах.
 # Класс не из таблицы — вид не записывается (событие попадёт в «Прочее»). QID классов
@@ -279,15 +288,13 @@ def harvest(
         try:
             epoch = fetch_entity(epoch_qid, fetch)
         except FETCH_ERRORS:
-            events.emit("knowledge.context_import.checked", qid=epoch_qid, result="fetch_failed")
-            continue
+            continue  # эпоха без записи — кандидатов нет; ``checked`` пишет только ``apply``
         for qid in epoch.items(SIGNIFICANT_EVENT):
             if qid in known:
                 continue  # решение и поля человека не трогаются
             try:
                 record = fetch_entity(qid, fetch)
             except FETCH_ERRORS:
-                events.emit("knowledge.context_import.checked", qid=qid, result="fetch_failed")
                 continue
             candidate = _candidate(record, fetch)
             if candidate is None:
@@ -406,13 +413,13 @@ class EpochContextImport:
             return {"result": "no_date"}
         event_id = self.entities.by_external(SYSTEM, qid)
         if event_id is not None and not self._of_type(event_id, EVENT):
-            return {"result": "exists", "note": "QID у сущности другого типа"}
+            return {"result": "duplicate_qid"}  # QID занят сущностью другого типа
         names = _names(candidate.get("label") or {}, _labels(record), qid)
         place = candidate.get("place")
         place_id = self.entities.by_external(SYSTEM, place["qid"]) if place else None
         new_place = place is not None and place_id is None
         if place_id is not None and not self._of_type(place_id, PLACE):
-            place_id, new_place, place = None, False, None  # QID места занят не местом
+            return {"result": "duplicate_qid"}  # QID места занят не местом: решает человек
         attribution = [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))]
         provenance = Provenance(
             "imported", extra={"wikidata": qid, "from": SIGNIFICANT_EVENT, "epoch": entry["qid"]}

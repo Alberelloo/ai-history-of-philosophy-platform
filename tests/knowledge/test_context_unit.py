@@ -526,3 +526,35 @@ def test_cli_harvest_writes_manifest(tmp_path, onto, no_network):
     bad = tmp_path / "bad.yaml"
     bad.write_text("epochs:\n- epoch: X\n  qid: nope\n", encoding="utf-8")
     assert main(["apply", "--manifest", str(bad)], fetch=FixtureFetch(), service=service) == 2
+
+
+def test_apply_qid_of_other_type_is_duplicate_qid(onto, importer, events, no_network):
+    from .wikidata_fixtures import FixtureFetch
+
+    onto.entities.create(
+        "person", [("ru", "Не событие", "primary")], external={"wikidata": "Q910011"}
+    )
+    before = _rows(onto)
+    report = importer.apply(_accepted_manifest(), FixtureFetch())
+    assert report.candidates[0]["result"] == "duplicate_qid"
+    assert report.totals()["created"] == 0 and report.totals()["skipped"] == 1
+    assert events.where("knowledge.context_import.checked", qid="Q910011", result="duplicate_qid")
+    assert _rows(onto) == before
+
+    onto.entities.create(
+        "person", [("ru", "Не место", "primary")], external={"wikidata": "Q910021"}
+    )
+    fresh = _accepted_manifest(qid="Q910012", label={"ru": "Лиссабонское землетрясение"})
+    fresh["epochs"][0]["candidates"][0]["place"] = {"qid": "Q910021", "label": {"ru": "Париж"}}
+    before = _rows(onto)
+    assert importer.apply(fresh, FixtureFetch()).candidates[0]["result"] == "duplicate_qid"
+    assert _rows(onto) == before
+
+
+def test_harvest_fetch_failure_writes_no_checked(onto, events, no_network):
+    from philograph.knowledge.epoch_context import harvest
+
+    from .wikidata_fixtures import FixtureFetch
+
+    harvest(EPOCHS_YAML, {"epochs": []}, FixtureFetch(failing={"Q910011"}))
+    assert not events.of("knowledge.context_import.checked")

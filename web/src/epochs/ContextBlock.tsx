@@ -55,6 +55,10 @@ function follow(path: string) {
   };
 }
 
+// «Только проверенные» — одно правило для связей из ответа сервера и из потока достройки:
+// сгенерированное (и ещё сохраняемое) не показывается.
+const shownLink = (l: ContextLink, verified: boolean): boolean => !verified || !(l.generated || l.pending === true);
+
 const kindOf = (e: ContextEvent): ContextKind =>
   (CONTEXT_KINDS as readonly string[]).includes(e.kind ?? "") ? (e.kind as ContextKind) : "none";
 
@@ -170,7 +174,8 @@ export function ContextBlock({ epochId }: { epochId: string }) {
     }
     return CONTEXT_KINDS.filter((k) => by.has(k)).map((k) => ({ kind: k, events: by.get(k)! }));
   }, [data]);
-  const kindsWithEvents = CONTEXT_KINDS.filter((k) => (counts[k] ?? 0) > 0);
+  // Кнопки — виды с событиями и выбранные в адресе (даже с нулём: их можно отжать).
+  const kindsWithEvents = CONTEXT_KINDS.filter((k) => (counts[k] ?? 0) > 0 || filter.kinds.includes(k));
 
   return (
     <section className="epochs-context" aria-labelledby="epochs-context-title" aria-busy={load.status === "loading"}>
@@ -206,7 +211,7 @@ export function ContextBlock({ epochId }: { epochId: string }) {
               aria-pressed={filter.kinds.includes(k)}
               onClick={() => toggleKind(k)}
             >
-              {c.kinds[k]} {counts[k]}
+              {c.kinds[k]} {counts[k] ?? 0}
             </button>
           ))}
         </div>
@@ -232,6 +237,11 @@ export function ContextBlock({ epochId }: { epochId: string }) {
           {c.empty}
         </p>
       )}
+      {data && totalAll > 0 && data.events.length === 0 && (
+        <p className="epochs-context__state epochs-context__empty" role="status">
+          {c.noneOfKinds}
+        </p>
+      )}
       {data?.truncated && (
         <p className="epochs-context__state epochs-context__partial" role="status">
           {c.partial(data.events.length, totalShown)}
@@ -245,6 +255,7 @@ export function ContextBlock({ epochId }: { epochId: string }) {
               key={e.id}
               event={e}
               build={builds[e.id]}
+              verified={filter.verified}
               canExtend={scope.generation}
               onExtend={() => extend(e)}
             />
@@ -261,11 +272,13 @@ export function ContextBlock({ epochId }: { epochId: string }) {
 function ContextEventItem({
   event,
   build,
+  verified,
   canExtend,
   onExtend,
 }: {
   event: ContextEvent;
   build: Build | undefined;
+  verified: boolean;
   canExtend: boolean;
   onExtend: () => void;
 }) {
@@ -274,7 +287,9 @@ function ContextEventItem({
   const year = event.dates ? yearText(event.dates.from, t.epochs.bce) : null;
   const wikidata = wikidataUrl(event.wikidata);
   const saved = new Set(event.stimulated.map((l) => l.target.id));
-  const links = [...event.stimulated, ...(build?.added ?? []).filter((l) => !saved.has(l.target.id))];
+  const links = [...event.stimulated, ...(build?.added ?? []).filter((l) => !saved.has(l.target.id))].filter((l) =>
+    shownLink(l, verified),
+  );
   return (
     <article className="epochs-context__event" data-event={event.id}>
       <div className="epochs-context__event-head">
