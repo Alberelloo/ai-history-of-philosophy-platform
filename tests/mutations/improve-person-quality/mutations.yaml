@@ -134,3 +134,9 @@ mutations:
     expect_fail:
       - tests/knowledge/test_entity_merge.py::test_loop
       - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-review-reason
+    requirement: Слияние вариантов персоны
+    patch: merge-review-reason.patch
+    note: решение человека «слить» пишет reason=merge:name вместо merge:review (О17)
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_merge_by_human_decision

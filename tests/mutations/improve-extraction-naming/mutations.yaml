@@ -113,3 +113,11 @@ mutations:
     note: тип без датировки в реестре не проверяется до проверок 1–6 (отказ текстом реестра, О15)
     expect_fail:
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_type_not_allowed
+  - id: dropped-reason-text
+    requirement: Валидность названий сущностей
+    patch: dropped-reason-text.patch
+    note: knowledge.extraction.dropped.reason — текст исключения с названием, а не код entity:<причина> (О17)
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_section_number
+      - tests/knowledge/test_entity_naming.py::test_role_instead_of_name
+      - tests/knowledge/test_person_quality.py::test_person_quality_invariant

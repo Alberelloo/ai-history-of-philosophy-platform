@@ -137,7 +137,7 @@ def test_garbage_person(stand, onto, events):
     assert [fields(e) for e in events.of(REJECTED)] == [
         {"type": "person", "label": "children", "reason": "not_a_name"}
     ]
-    assert events.of(DROPPED)
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:not_a_name"]  # О17: код
     assert stand.statements() == []
     no_token(events, token)
 
@@ -151,6 +151,7 @@ def test_glued(stand, onto, events):
     assert persons(onto) == []
     [rejected] = events.of(REJECTED)
     assert (rejected["type"], rejected["reason"]) == ("person", "not_a_name")
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:not_a_name"]
 
 
 @req(PQ, QUALITY, scenario="Определение персоны в промпте")
@@ -206,7 +207,7 @@ def test_person_quality_invariant(stand, onto, events, case):
         assert created == []
         [rejected] = events.of(REJECTED)
         assert fields(rejected) == {"type": PERSON, "label": expected_label(raw), "reason": reason}
-        assert events.of(DROPPED)
+        assert [d["reason"] for d in events.of(DROPPED)] == [f"entity:{reason}"]  # О17
     no_token(events, token)
 
 
@@ -279,6 +280,34 @@ def test_common_primary_name(onto, review, events):
     assert {onto.statements.get(s)["subject"] for s in opinions} == {kept}
     assert [n for n in names(onto, kept) if n[2] == "primary"] == [("en", "Berkeley", "primary")]
     assert [e["reason"] for e in events.of(MERGED)] == ["merge:name"] * 2
+
+
+@req(PQ, MERGE, scenario="Слияние по решению человека")
+def test_merge_by_human_decision(onto, review, events):
+    first = onto.person("Бэкон")
+    second = onto.person("Фрэнсис Бэкон")
+    held = onto.statements.add(
+        second,
+        "holds",
+        obj=onto.thing("position", "Знание — сила"),
+        attributions=[Attribution("common")],
+    )
+    dedupe.propose(onto.statements.engine, first, second, "review:single_name", set())
+    [item] = review.queue(kind="duplicate")
+    a, b = item["payload"]["pair"]
+    label = {first: "Бэкон", second: "Фрэнсис Бэкон"}
+    events.clear()
+    review.resolve_duplicate(item["item_id"], True, "operator")
+    assert persons(onto) == [a]
+    assert onto.entities.resolve(b) == a
+    assert names(onto, a) == {("ru", label[a], "primary"), ("ru", label[b], "variant")}
+    assert onto.statements.get(held)["subject"] == a
+    assert api(onto).get(f"/v1/entities/{b}").json()["id"] == a
+    assert review.queue(kind="duplicate") == []
+    [merged] = events.of(MERGED)
+    assert (merged["kept"], merged["removed"], merged["reason"]) == (a, b, "merge:review")
+    decided = events.one("knowledge.review.decided")
+    assert decided["decision"] == "merge"
 
 
 @req(PQ, MERGE, scenario="QID подтверждён человеком для другой")

@@ -395,7 +395,7 @@ def test_section_number(stand, onto, events):
     assert by_text(onto, "20.1") == []
     assert [s for s in stand.statements() if s["type"] == "opposed_to"] == []
     assert _rejected_fields(events) == [{"type": "concept", "label": "20.1", "reason": "number"}]
-    assert events.of(DROPPED)
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:number"]  # О17: код без названия
     no_token(events, token)
 
 
@@ -454,7 +454,7 @@ def test_role_instead_of_name(stand, onto, events):
     assert _rejected_fields(events) == [
         {"type": "person", "label": "blind mathematician", "reason": "not_a_name"}
     ]
-    assert events.of(DROPPED)
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:not_a_name"]  # О17
 
 
 @req(NM, VALID, scenario="Стоп-слово у понятия")
