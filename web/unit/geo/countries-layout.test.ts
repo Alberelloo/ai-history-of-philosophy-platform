@@ -11,11 +11,11 @@ const fonts = [
 ];
 const input = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
 
-function run(w: number, h: number, lon: number, lat: number, zoom: number) {
+function run(w: number, h: number, lon: number, lat: number, zoom: number, grid = new Grid(), countries = input) {
   const R = (Math.min(w, h) / 2 - 16) * zoom;
   const projection = geoOrthographic().rotate([-lon, -lat]).scale(R).translate([w / 2, h / 2]).clipAngle(90).clipExtent([[0, 0], [w, h]]);
   const f: Frame = { w, h, cx: w / 2, cy: h / 2, R };
-  return layoutCountries(input, geoPath(projection), projection, f, new Grid(), fonts);
+  return layoutCountries(countries, geoPath(projection), projection, f, grid, fonts);
 }
 
 // 564×322 — svg глобуса в окне 1024×576 (панель справа, шкала снизу).
@@ -42,6 +42,49 @@ test("Россия есть, Бельгии нет при (15, 50) ×1", () => {
   const ids = run(1920, 1080, 15, 50, 1).map((l) => l.id);
   ok(ids.includes("643"), "Россия");
   ok(!ids.includes("056"), "Бельгия");
+});
+
+// Детерминированный генератор.
+function rng(seed: number) {
+  let v = seed >>> 0;
+  return () => ((v = (v * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+}
+
+// Сетка с занятыми местами (медальоны раскладки): n кругов MEDAL в случайных точках кадра.
+function busy(w: number, h: number, n: number, seed: number): Grid {
+  const r = rng(seed);
+  const g = new Grid();
+  for (let i = 0; i < n; i++) g.add({ kind: "circle", x: r() * w, y: r() * h, r: 13 });
+  return g;
+}
+
+// Свойство кэша кандидатов: результат вызова не зависит от истории вызовов с тем же видом —
+// после любой последовательности сеток (в том числе сначала без добора, потом с добором)
+// он равен результату со свежим кэшем.
+const sig = (out: ReturnType<typeof run>) => out.map((l) => [l.id, l.x, l.y, l.font, l.fill]);
+for (const [w, h] of [[564, 322], [1024, 576], [1366, 768]])
+  for (const [lon, lat] of [[15, 50], [100, 40], [-60, -10], [20, 0]])
+    for (const z of [1, 2]) {
+      test(`кэш подписей без истории ${w}×${h} (${lon}, ${lat}) ×${z}`, () => {
+        const shared = [...input];
+        const seq = [0, 400, 0, 150, 800, 40];
+        seq.forEach((n, i) => {
+          const got = run(w, h, lon, lat, z, busy(w, h, n, i + 1), shared);
+          const fresh = run(w, h, lon, lat, z, busy(w, h, n, i + 1), [...input]);
+          eq(sig(got), sig(fresh), `вызов ${i + 1} (${n} кругов)`);
+        });
+      });
+    }
+
+test("кэш: сначала без добора, потом с добором (1024×576, (15, 50), ×2)", () => {
+  const shared = [...input];
+  const first = run(1024, 576, 15, 50, 2, new Grid(), shared);
+  ok(!first.some((l) => l.fill), "первый вызов без добора");
+  const g = () => busy(1024, 576, 800, 7);
+  const after = run(1024, 576, 15, 50, 2, g(), shared);
+  const fresh = run(1024, 576, 15, 50, 2, g(), [...input]);
+  ok(fresh.some((l) => l.fill), "сетка требует добора");
+  eq(sig(after), sig(fresh), "как со свежим кэшем");
 });
 
 done();

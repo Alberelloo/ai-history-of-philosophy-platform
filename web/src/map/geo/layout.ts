@@ -398,7 +398,9 @@ function geoOf(c: CountryInput): CountryGeo {
 }
 
 type CountryCand = { c: CountryInput; area: number; span: number; x: number; y: number };
-type CandCache = { key: string; done: boolean; main: CountryCand[]; rest: CountryCand[] | null; later: CountryInput[] };
+// main и rest заполняются при первом вызове для вида; later (заведомо меньше порога) —
+// измеряются один раз, когда добор впервые нужен (laterDone), и дописываются в rest.
+type CandCache = { key: string; done: boolean; laterDone: boolean; main: CountryCand[]; rest: CountryCand[]; later: CountryInput[] };
 const candCache = new WeakMap<object, CandCache>();
 
 // Шрифт подписи страны: начертание (для отрисовки), ширина текста и вертикальные метрики.
@@ -425,9 +427,8 @@ export function layoutCountries(
   // Кандидаты зависят только от вида и кадра: при смене года (проигрывание) — из кэша.
   const key = JSON.stringify([rot, scale, projection.translate(), projection.clipExtent(), f.w, f.h]);
   let cache = candCache.get(countries);
-  if (!cache || cache.key !== key) candCache.set(countries, (cache = { key, done: false, main: [], rest: null, later: [] }));
-  const { main, later } = cache;
-  const rest: CountryCand[] = cache.rest ?? [];
+  if (!cache || cache.key !== key) candCache.set(countries, (cache = { key, done: false, laterDone: false, main: [], rest: [], later: [] }));
+  const { main, rest, later } = cache;
   const fresh = !cache.done;
   cache.done = true;
   for (const c of fresh ? countries : []) {
@@ -468,7 +469,10 @@ export function layoutCountries(
     (area >= COUNTRY_MIN_AREA ? main : rest).push({ c, area, span: x1 - x0, x, y });
   }
   const order = (a: CountryCand, b: CountryCand) => b.area - a.area || (a.c.id < b.c.id ? -1 : 1);
-  if (fresh) main.sort(order);
+  if (fresh) {
+    main.sort(order);
+    rest.sort(order);
+  }
   const out: CountryLabel[] = [];
   const place = (k: CountryCand, fi: number, fill: boolean): boolean => {
     const { measure, metrics: m } = fonts[fi];
@@ -485,10 +489,10 @@ export function layoutCountries(
     if (out.length >= MAX_COUNTRY_LABELS) break;
     place(k, 0, false);
   }
-  if (out.length < COUNTRY_MIN_LABELS && !cache.rest) {
+  if (out.length < COUNTRY_MIN_LABELS && !cache.laterDone) {
+    cache.laterDone = true;
     for (const c of later) measureCand(c);
     rest.sort(order);
-    cache.rest = rest;
   }
   if (out.length < COUNTRY_MIN_LABELS)
     for (const k of [...main.filter((k) => !out.some((o) => o.id === k.c.id)), ...rest]) {
