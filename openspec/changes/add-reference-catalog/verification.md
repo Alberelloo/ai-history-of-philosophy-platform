@@ -232,3 +232,86 @@
     Первая попытка без `0 * nextPage(...)` не собралась (TS6133, неиспользуемый импорт): dist не изменился, тест прошёл. Эта попытка не засчитана.
 
 Не прогонялось: e2e (в том числе обновлённый тест навигации tests/e2e/test_visual_design.py), визуальные снимки win32, полный pytest.
+
+## Судья — 2026-11-25, коммит f384b02
+
+Код продукта на f384b02 совпадает с тем, на котором тестировщик делал повторный прогон (24b4147): после него менялись только `tests/web` (66e7796, тест тестировщика) и `progress.md`. Мои прогоны — последовательно на машине 1 ГБ RAM, 1 CPU, без Docker.
+
+### Полнота
+
+- `tasks.md`: 1.1–5.1 отмечены и сделаны (проверено по диффу: `dates.span/middle`, `snapshot.py`, `epochs.py`, `catalog.py`, маршрут и сборка в `app.py`/`main.py`, `seed_demo.seed_reference`, `web/src/reference/*`, `App.tsx`, `Sidebar.tsx`, строки RU/EN, `traceability.yaml`). 5.2 выполнен этим прогоном; 5.3 — круги ревью в `progress.md`; 5.4 — этот раздел; 5.5 (архив) — после вердикта.
+- Каждое требование и сценарий дельт `entity-catalog`, `epochs`, `abuse-protection`, `visual-design` есть в таблицах тестировщика, кроме неизменённых сценариев MODIFIED-требований: «Лимит исчерпан» — прежний `tests/gateway/test_limits.py` (прошёл), «Граф по сущности» — `tests/web/test_map.py::test_soon_graph_bookmark_leads_to_map` (прошёл), «Страница раздела» — `tests/e2e/test_visual_design.py` (e2e, здесь не запускался).
+- Тела тестов прочитаны выборочно (`test_list_without_filters`, `test_merged_duplicate_hidden`, `test_generated_summary_marked`, `test_catalog_without_model`, `test_input_debounce`, `test_old_reference_bookmark`): проверяют каждое утверждение THEN и событие по `request_id`.
+
+### Мой прогон
+
+    git log -1                                → f384b02, рабочее дерево чистое
+    cd web && npm run build                   → ✓ built in 4.87s
+    ruff check .                              → 1 ошибка: scripts/dev_stack.py:100 E501
+    ruff format --check .                     → 3 files would be reformatted: scripts/dev_stack.py, src/philograph/platform/queue.py, src/philograph/prompts/__init__.py
+        все три файла в ветке не менялись; в базе origin/claude/embedding-docker проверены отдельно (git show … | ruff format --check -) — так же не проходят, E501 тоже есть в базе
+    lint-imports                              → Contracts: 3 kept, 0 broken.
+    python scripts/check_traceability.py      → Требований с тестами: 369 из 369
+    pytest -q tests/knowledge                 → 415 passed, 1 skipped in 277.99s (skip — test_registry_entities.py:281, только PostgreSQL, файл вне диффа)
+    pytest -q tests/gateway                   → 41 passed in 15.98s
+    pytest -q tests/assistant tests/evaluation → 68 passed in 124.21s (используют statements/карту)
+    pytest -q tests/web                       → 215 passed in 523.73s (весь пакет, включая test_reference.py, test_reference_paging.py и прежние тесты чтения, карты, навигации)
+
+Расхождение с журналом тестировщика: в `tests/knowledge` у него 413 + 1 skip (первый прогон), у меня 415 + 1 skip. Объяснено: после первого прогона разработчик добавил два юнит-теста (24b4147: `test_label_cache_bounded_by_interface_languages`, сверка `attributed_sources`); 4 падения Д1 исправлены в f1812e7, тест тестировщика `test_ties_broken_by_id` не менялся.
+
+Не запускались: `tests/library`, `tests/llm`, `tests/operator`, `tests/ops`, `tests/platform`, `tests/search` — дифф их кода не трогает, ни один из них не импортирует `philograph.knowledge` и `seed_demo` (grep пуст); `tests/e2e` и визуальные снимки win32 — нет Docker и памяти. Это остаётся за CI (`checks`).
+
+### Итоговый вывод системы
+
+Вместо `dev_stack.py` (файл базы, на машине не помещается) поднят стенд `tests/web/knowledge_stack.start`: настоящий шлюз (uvicorn), библиотека с учебниками N (открыт) и R (только РФ), сервис знаний на SQLite; данные — `World`: Кант (вариант «Kant», упомянут в N), Юм (упомянут в R), Кантор, Локк (явно «Просвещение»), «Научная революция», «Просвещение», «Причинность» (сгенерированное описание), 30 понятий. Скрипт — в scratchpad судьи, не в репозитории. Запросы через шлюз `/api/knowledge/v1/catalog` с `X-Request-Id`, события собраны по `request_id`:
+
+| Запрос | Ответ | События по request_id |
+|---|---|---|
+| без фильтров | 200, total=38, 24 записи, нет «Учебника N/R», facets.types сумма 38 | snapshot.built reason=first entities=40; listed total=38 returned=24 page=1 filters=[] q_len=0 sort=label snapshot=fresh textbook_closed=False |
+| `q=кан` | [Георг Кантор, Иммануил Кант] | listed filters=["q"] q_len=3 sort=relevance snapshot=cached |
+| `q=kant` | Иммануил Кант, matched_name="Kant" | listed q_len=4 |
+| `type=person&epoch=<Просвещение>` | Локк (explicit), Юм, Кант (dates); Локк не в «Научной революции», хотя середина жизни 1668 в ней | listed filters=["epoch","type"] |
+| `textbook=<N>` | только Кант | `/v1/internal/access` с тем же request_id; listed filters=["textbook"] |
+| `type=concept&page=2` | total=31, 7 записей «Понятие 24…29», «Причинность» | listed page=2 returned=7 |
+| `sort=date&limit=5` | НР 1543, Локк, Просвещение 1680, Юм, Кант | listed sort=date |
+| `limit=61` / `q` из 201 знака / `type=dragon` | 400 bad_query / bad_query / unknown_type | одно rejected reason=limit / query_too_long / unknown_type, listed нет |
+| сервис знаний, `textbook=<R>`, регион DE / RU | items=[], facets пусты, textbook_closed=true / Юм | listed textbook_closed=True total=0 / False total=1 |
+| `/v1/entities?name=Кант` | [] (точный поиск, «Иммануил Кант» не совпадает — прежний контракт) | только http.request.completed, listed нет |
+| `/reference`, `/soon/reference` | 200, клиент | — |
+
+Ни в одном событии нет текста запроса, названий или региона. Вызовов модели — 0, запросов наружу — 0. Страницу в браузере сам не проходил: браузерные сценарии подтверждены прогоном `tests/web` целиком (215 passed).
+
+### Сверка по требованиям
+
+| Требование | Сценарии / инварианты | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Список справочника | 5 сценариев, 3 инварианта | test_list_without_filters … test_catalog_never_calls_model; listed total=5 filters=[] | passed (tests/knowledge) | список без источников, поля события те же, llm 0 | подтверждено |
+| Поиск по названию | 4 сценария, пустая строка | test_search_part_of_name … test_blank_query_means_no_search | passed | `кан` → Кантор, Кант; `kant` → matched_name | подтверждено |
+| Фильтры справочника | 5 сценариев, регион только для раздела | test_type_includes_subtypes … test_region_only_for_textbook | passed | epoch+type, textbook; access только при textbook | подтверждено |
+| Проверка параметров | Границы параметров, эпоха после перенаправления | test_parameter_bounds[16], test_epoch_after_redirect | passed | 400 и одно rejected с reason по таблице | подтверждено |
+| Счётчики | 3 сценария, 3 инварианта | test_facets_* , test_epoch_facets* | passed | сумма types = total без фильтра типа | подтверждено |
+| Постраничная выдача | 2 сценария, 3 инварианта (Д1 исправлен) | test_second_page … test_ties_broken_by_id | passed | page=2 без пересечения, date по началу | подтверждено |
+| Прежний поиск по названию | Точный поиск не изменился | test_exact_name_lookup_unchanged | passed | точный поиск, listed нет | подтверждено |
+| Закрытые источники | 3 сценария, пусто при любых фильтрах | test_closed_textbook … [24] | passed | DE пусто, textbook_closed=True; RU — Юм | подтверждено |
+| Свежесть справочника | 3 сценария, 3 инварианта | test_snapshot_* , test_stale_window (ManualClock) | passed | built first, затем cached | подтверждено |
+| Страница справочника | 7 сценариев + «Показать ещё» при смене снимка, адрес | tests/web/test_reference.py | passed (tests/web 215) | `/reference` отдаётся шлюзом | подтверждено |
+| Состояния / Безопасный вывод / Клавиатура | все сценарии и инварианты, 1024×576 и 1920×1080 | tests/web/test_reference.py | passed | — (браузер — только тестами) | подтверждено тестами; визуальные снимки — CI/Lead |
+| epochs: Принадлежность к эпохе | 8 сценариев, 6 инвариантов | test_epochs_membership.py | passed | Локк explicit важнее дат | подтверждено |
+| abuse-protection: Бесплатное без ограничений платных | 3 сценария, 2 инварианта | test_reference_limits.py, test_limits.py | passed (tests/gateway 41) | — | подтверждено |
+| visual-design: Разделы в разработке | Пункт-заглушка, Ассистент без метки, Старая закладка, Граф по сущности | test_reference.py, test_map.py, test_assistant_page.py | passed | `/soon/reference` 200 | подтверждено; «Страница раздела» и обновлённый e2e-тест навигации — только CI |
+
+### Мутации (свои)
+
+    epochs.py:71  start <= mid < end → start <= mid <= end
+        → 10 failed: test_epoch_end_excluded, test_half_open_span[*-1687|1800] (8), test_person_middle_of_life_unrounded[1660-1714]  (как в журнале — 10)
+    catalog.py:465  is_closed = False
+        → 25 failed в test_catalog.py -k closed (как в журнале — 25)
+    код возвращён git checkout; git status пуст
+
+### Подгонка
+
+Не найдена. `git diff origin/claude/embedding-docker...HEAD -- tests openspec`: новых `skip`/`xfail` нет, кроме пропуска при несобранном клиенте и отсутствии node (условия окружения, тесты у меня выполнились); один `time.sleep(0.02)` — ожидание запуска сервера стенда, не проверка отсутствия. Тесты тестировщика после передачи не менял никто, кроме самого тестировщика (66e7796); разработчик правил только свой юнит-тест (f1812e7) в сторону спецификации. Дельты `specs/` не менялись после d35bd66/8348210 (до кода). Числа мутаций совпадают с журналом.
+
+Полный pytest: не запускался целиком (ограничение машины); запущены все пакеты, которые дифф затрагивает или которые импортируют изменённый код, — зелёные. e2e и визуальные снимки — за CI.
+Прослеживаемость: 369 из 369.
+Вердикт: **принято** — при условии зелёного `checks` в CI (полный набор и e2e, включая обновлённый `tests/e2e/test_visual_design.py::test_future_sections_marked_and_described`); падение там — вернуть тестировщику и разработчику для разбора.
