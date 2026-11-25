@@ -17,12 +17,12 @@ providers:
 
 roles:
   fast: {provider: deepseek, model: deepseek-flash, max_output_tokens: 200, timeout_seconds: 10}
-  main: {provider: deepseek, model: deepseek-flash, max_output_tokens: 1500, timeout_seconds: 60}
-  strong: {provider: deepseek, model: deepseek-v4-pro, max_output_tokens: 1500, timeout_seconds: 120}
+  main: {provider: deepseek, model: deepseek-flash, max_output_tokens: 8000, timeout_seconds: 60}
+  strong: {provider: deepseek, model: deepseek-v4-pro, max_output_tokens: 8000, timeout_seconds: 120}
   # По умолчанию — заглушка без ключей. Для реальных эмбеддингов переключи на:
-  #   embeddings: {provider: litellm, model: bge-m3, dimensions: 1024, timeout_seconds: 60}
+  #   embeddings: {provider: litellm, model: jina-v3, dimensions: 1024, timeout_seconds: 60}
   # (см. docs/architecture/embeddings.md; модель и размерность — из конфига LiteLLM).
-  embeddings: {provider: embeddings-stub, model: stub-embeddings}
+  embeddings: {provider: litellm, model: jina-v3, dimensions: 1024, timeout_seconds: 60}
 
 prices:
   deepseek-flash:
@@ -38,11 +38,11 @@ prices:
   stub-embeddings:
     input_cache_miss: 0.0
     input_cache_hit: 0.0
-  bge-m3:
+  jina-v3:
     input_cache_miss: 0.0
     input_cache_hit: 0.0
 
 budgets:
   site: {daily_limit_usd: 1.7, monthly_limit_usd: 50, alert_ratio: 0.8}
   # Наполнение онтологии из загруженных книг: без лимита загрузка каталога тратила бы сколько угодно.
-  filling: {daily_limit_usd: 2.0, monthly_limit_usd: 20, alert_ratio: 0.8}
+  filling: {daily_limit_usd: 50.0, monthly_limit_usd: 200, alert_ratio: 0.8}

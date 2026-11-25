@@ -269,7 +269,7 @@ class Filling:
             response = self.llm.post(
                 "structured",
                 json={
-                    "role": "main",
+                    "role": "strong",
                     "template": "ontology.extract",
                     "caller": "knowledge",
                     "operation": "extract",

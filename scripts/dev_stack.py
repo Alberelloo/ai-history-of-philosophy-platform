@@ -89,7 +89,9 @@ def start(data: Path, port: int | None = None, *, demo: bool = True) -> Stack:
         "PYTHONUTF8": "1",
         "PHILOGRAPH_DATABASE_URL": db,
         "PHILOGRAPH_FILES_ROOT": str(data / "files"),
-        "PHILOGRAPH_LLM_CONFIG": str(ROOT / "config" / "llm.demo.yaml"),
+        "PHILOGRAPH_LLM_CONFIG": os.environ.get(
+            "PHILOGRAPH_LLM_CONFIG", str(ROOT / "config" / "llm.demo.yaml")
+        ),
         "PHILOGRAPH_LLM_URL": f"http://127.0.0.1:{ports['llm']}",
         "PHILOGRAPH_LIBRARY_URL": f"http://127.0.0.1:{ports['library']}",
         "PHILOGRAPH_SEARCH_URL": f"http://127.0.0.1:{ports['search']}",
