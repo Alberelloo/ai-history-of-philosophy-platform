@@ -177,3 +177,12 @@
 Выбор решения: соответствует (варианты Б/Б/А/Б/А реализованы как выбраны; не учтена цена отпечатка — желательно 3).
 Подгонка тестов: не найдена.
 Итог: к судье после исправления блокирующих 1–2.
+
+## Ответ на ревью, круг 1 (разработчик)
+
+- **Блок. 1.** `catalog.interface_lang`: `lang` приводится к `ru|en` до обращения к кэшу подписей — в `Catalog._parse` и в `CatalogIndex.labels`. Неизвестное значение — как `ru`. В кэше не больше двух ключей. Юнит-тест `test_label_cache_bounded_by_interface_languages`: после 100 разных `lang` ключи ⊆ {ru, en}. В design (строка `lang`) записано.
+- **Блок. 2.** Новый модуль `web/src/reference/paging.ts` с чистыми функциями `hasMore`, `nextPage`, `appendPage`. Страница хранит `paging` последней загруженной страницы (`page`, `limit`, `total`, `returned`); первая страница его сбрасывает. «Показать ещё» запрашивает `page+1` и исчезает, когда `page*limit >= total` или пришла пустая страница. Юнит-проверка без браузера — `tests/web/test_reference_paging.py`: node + `typescript.transpileModule`, случай ревью (30 → 31 записей, повтор на стыке). Сценарий со сменой снимка в браузере — за тестировщиком.
+- **Желат. 1.** У записи `aria-keyshortcuts="Shift+Enter"` для типов, которые есть на карте. У кнопки «На карте» `title` «На карте — Shift+Enter на записи» (новые строки `reference.onMapHint` RU/EN).
+- **Желат. 2.** Одно правило — `statements.attributed_sources(s, who_kinds=None)`. `Statements._attributed` выражен через него, поведение не изменилось: юнит-тест сверяет оба на скрытых и потерянных, `entity` и `common`. Справочник берёт тот же вызов для принадлежности к разделу. `who_kinds=("source",)` нужен только для перечня известных учебников — так id персоны из атрибуции `entity` не станет учебником. Записано в design («Индекс справочника»).
+- **Желат. 3, 4.** В design: цена отпечатка на каждый запрос — «Выбор решения» 2, «Чем платим»; перечень «известный онтологии учебник» — таблица параметров, строка `textbook`.
+- Проверки. `pytest -q` (test_catalog_unit, test_catalog, test_catalog_route, test_map, test_map_snapshot_parity, test_statements, test_mentions_cards, test_graph): 223 passed. `tests/web/test_reference_paging.py`: 1 passed. `npm run build`: ✓. `ruff check src tests`: чисто. `lint-imports`: 3 kept, 0 broken.

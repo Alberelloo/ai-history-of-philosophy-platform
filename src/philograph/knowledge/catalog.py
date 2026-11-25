@@ -30,7 +30,7 @@ from philograph.knowledge.entities import Entities, normalize
 from philograph.knowledge.epochs import EpochMembership, membership
 from philograph.knowledge.registry import OntologyRegistry, RegistryError
 from philograph.knowledge.snapshot import Snapshot, Snapshots, Status
-from philograph.knowledge.statements import STRENGTH
+from philograph.knowledge.statements import STRENGTH, attributed_sources
 from philograph.platform import events
 
 events.define(
@@ -61,6 +61,13 @@ MAX_LIMIT = 60
 DEFAULT_LIMIT = 24
 SUMMARY_CHARS = 200
 SOURCE = "source"  # источники библиотеки в справочник не попадают
+# Языки интерфейса: прочее значение ``lang`` — как ``ru``, без своей записи в кэше подписей
+# (иначе каждое новое значение из запроса копировало бы все подписи снимка).
+LANGS = ("ru", "en")
+
+
+def interface_lang(lang: str | None) -> str:
+    return lang if lang in LANGS else "ru"
 
 
 @dataclass(frozen=True)
@@ -166,13 +173,10 @@ class CatalogIndex:
             ends = [s["subject"]] + ([s["object"]] if s["object"] else [])
             for end in ends:
                 weight[end] += 1
-            # Как ``Statements._attributed``: атрибуция учебнику или его подтверждающий абзац.
-            cited = {
-                a["who"]
-                for a in s["attributions"]
-                if a["who_kind"] == "source" and a["who"] and not a["hidden"]
-            } | {e["source_id"] for e in s["evidence"] if e["source_id"] and not e["lost"]}
-            known_sources |= cited
+            # Раздел — то же правило, что «в учебнике» карты и карточки (``attributed_sources``);
+            # «известный учебник» — только атрибуции источникам и подтверждения.
+            cited = attributed_sources(s)
+            known_sources |= attributed_sources(s, who_kinds=("source",))
             for end in ends:
                 sources[end] |= cited
             if s["type"] == "description" and isinstance(s["value"], str):
@@ -229,6 +233,7 @@ class CatalogIndex:
     def labels(self, lang: str) -> tuple[dict[str, str], dict[str, str]]:
         """Основное название на языке ``lang`` (нет — русское, затем любое, как в снимке)
         и его нормализованная форма — ключ сортировки по названию."""
+        lang = interface_lang(lang)
         if lang not in self._labels:
             labels = dict(self.snapshot.labels)
             if lang != "ru":
@@ -422,7 +427,7 @@ class Catalog:
             sort=sort,
             page=page_n,
             limit=limit_n,
-            lang=lang or "ru",
+            lang=interface_lang(lang),
         )
 
     def list(

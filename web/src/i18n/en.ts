@@ -573,6 +573,7 @@ export const en: Catalog = {
     undated: "undated",
     alsoKnown: (name: string) => `also: ${name}`,
     onMap: "On the map",
+    onMapHint: "On the map — Shift+Enter on the entry",
     onMapOf: (name: string) => `${name} on the map`,
     more: (shown: number, total: number) => `Show more (${shown} of ${total})`,
     allShown: (n: number) => `All ${n} shown`,

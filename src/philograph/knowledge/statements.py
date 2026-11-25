@@ -113,6 +113,25 @@ def _norm_quote(text: str) -> str:
     return re.sub(r"\s+", " ", text.replace("ё", "е")).strip().lower()
 
 
+def attributed_sources(s: dict[str, Any], who_kinds: tuple[str, ...] | None = None) -> set[str]:
+    """Кому атрибутировано утверждение и чьи абзацы его подтверждают — одно правило для
+    «в учебнике» (карточка, граф, карта, ассистент) и раздела справочника.
+
+    В множестве — ``who`` нескрытых атрибуций и ``source_id`` непотерянных подтверждений.
+    ``who_kinds`` ограничивает атрибуции видом: справочнику для перечня «известных онтологии
+    учебников» нужны только атрибуции источникам (``("source",)``), иначе учебником
+    считался бы и id персоны из атрибуции ``entity``. Без ограничения — как всегда было
+    у ``Statements._attributed``: сравнивается с id учебника, а id сущностей и источников
+    не пересекаются."""
+    found = {
+        a["who"]
+        for a in s["attributions"]
+        if a["who"] and not a["hidden"] and (who_kinds is None or a["who_kind"] in who_kinds)
+    }
+    found |= {e["source_id"] for e in s["evidence"] if e["source_id"] and not e["lost"]}
+    return found
+
+
 class Statements:
     def __init__(
         self,
@@ -561,9 +580,7 @@ class Statements:
 
     @staticmethod
     def _attributed(s: dict[str, Any], source_id: str) -> bool:
-        return any(a["who"] == source_id and not a["hidden"] for a in s["attributions"]) or any(
-            e["source_id"] == source_id and not e["lost"] for e in s["evidence"]
-        )
+        return source_id in attributed_sources(s)
 
     def _derived_influences(self, person: str, scopes: tuple[str, ...]) -> list[dict[str, Any]]:
         """Участник идейного события испытал влияние его исходного материала."""

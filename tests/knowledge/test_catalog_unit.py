@@ -268,3 +268,35 @@ def test_lang_label_falls_back_to_russian(onto, cat):
     onto.person("Юм")
     items = cat.list(lang="en")["items"]
     assert [(i["id"] == kant, i["label"]) for i in items] == [(True, "Kant"), (False, "Юм")]
+
+
+def test_label_cache_bounded_by_interface_languages(onto, cat, clock):
+    onto.person("Кант")
+    for n in range(100):
+        cat.list(lang=f"x{n}")
+    cat.list(lang="en")
+    cat.list(lang="ru")
+    snap, _ = cat.snapshots.get(max_stale=15)
+    assert set(cat.index(snap)._labels) <= {"ru", "en"}
+    assert cat.list(lang="zz")["items"][0]["label"] == "Кант"
+
+
+def test_attribution_rule_shared_with_statements():
+    from philograph.knowledge.statements import Statements, attributed_sources
+
+    s = {
+        "attributions": [
+            {"who_kind": "source", "who": "s_a", "hidden": False},
+            {"who_kind": "source", "who": "s_hidden", "hidden": True},
+            {"who_kind": "entity", "who": "e_kant", "hidden": False},
+            {"who_kind": "common", "who": None, "hidden": False},
+        ],
+        "evidence": [
+            {"source_id": "s_b", "lost": False},
+            {"source_id": "s_lost", "lost": True},
+        ],
+    }
+    assert attributed_sources(s) == {"s_a", "e_kant", "s_b"}
+    assert attributed_sources(s, who_kinds=("source",)) == {"s_a", "s_b"}
+    for source in ("s_a", "s_b", "s_hidden", "s_lost", "e_kant", "s_none"):
+        assert Statements._attributed(s, source) == (source in attributed_sources(s))

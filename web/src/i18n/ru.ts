@@ -587,6 +587,7 @@ export const ru = {
     undated: "без даты",
     alsoKnown: (name: string) => `также: ${name}`,
     onMap: "На карте",
+    onMapHint: "На карте — Shift+Enter на записи",
     onMapOf: (name: string) => `${name} на карте`,
     more: (shown: number, total: number) => `Показать ещё (${shown} из ${total})`,
     allShown: (n: number) => `Показаны все ${n}`,

@@ -5,6 +5,7 @@ import { openCardInPanel } from "../FullCard";
 import { pick, useLang, useT } from "../i18n";
 import { Icon, StatusMark, familyOf } from "../ui";
 import { CatalogError, fetchCatalog, isAbort } from "./api";
+import { appendPage, hasMore, nextPage, type Paging } from "./paging";
 import {
   GROUP_CODES,
   SORTS,
@@ -48,6 +49,7 @@ export function ReferencePage({ search }: { search: string }) {
   const [input, setInput] = useState(state.q);
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [data, setData] = useState<CatalogPage | null>(null);
+  const [paging, setPaging] = useState<Paging | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
@@ -144,12 +146,13 @@ export function ReferencePage({ search }: { search: string }) {
             for (const item of result.items) for (const e of item.epochs) next[e.id] = e.label;
             return next;
           });
+          setPaging({ page: result.page, limit: result.limit, total: result.total, returned: result.items.length });
           if (page === 1) setItems(result.items);
           else {
             setItems((shown) => {
-              const seen = new Set(shown.map((i) => i.id));
-              focusIndex.current = shown.length;
-              return [...shown, ...result.items.filter((i) => !seen.has(i.id))];
+              const merged = appendPage(shown, result.items);
+              focusIndex.current = merged.firstNew;
+              return merged.items;
             });
           }
         })
@@ -473,6 +476,7 @@ export function ReferencePage({ search }: { search: string }) {
                     data-family={familyOf(item.type)}
                     tabIndex={index === 0 ? 0 : -1}
                     aria-label={t.reference.itemName(item.label, type, dates)}
+                    aria-keyshortcuts={onMap(item.type) ? "Shift+Enter" : undefined}
                     onClick={() => open(item)}
                     onKeyDown={(e) => onItemKey(e, item, index)}
                     onFocus={(e) => {
@@ -505,6 +509,7 @@ export function ReferencePage({ search }: { search: string }) {
                       type="button"
                       className="pg-btn pg-btn--ghost pg-btn--sm reference-item__map"
                       aria-label={t.reference.onMapOf(item.label)}
+                      title={t.reference.onMapHint}
                       tabIndex={-1}
                       onClick={() => navigate(`/graph/${encodeURIComponent(item.id)}`)}
                     >
@@ -519,12 +524,12 @@ export function ReferencePage({ search }: { search: string }) {
 
       {data !== null && items.length > 0 && (
         <div className="reference__more">
-          {items.length < data.total ? (
+          {paging !== null && hasMore(paging) ? (
             <button
               type="button"
               className="pg-btn pg-btn--secondary"
               disabled={loading}
-              onClick={() => load(Math.floor(items.length / data.limit) + 1)}
+              onClick={() => load(nextPage(paging))}
             >
               {t.reference.more(items.length, data.total)}
             </button>
