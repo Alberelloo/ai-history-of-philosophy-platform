@@ -43,3 +43,4 @@ enforce:
   - epoch-context
   - geo-timeline
   - entity-naming
+  - person-quality

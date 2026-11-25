@@ -1,0 +1,135 @@
+# Мутации improve-person-quality (tasks.md 3.4): на каждое требование дельт — одна и больше.
+# expect_fail — тесты, каждый из которых должен упасть под мутацией: сценарный и property.
+# Патчи сняты от HEAD ветки (рабочее дерево параллельно меняет разработчик).
+mutations:
+  - id: person-not-a-name
+    requirement: Качество персон
+    patch: person-not-a-name.patch
+    note: not_a_name не применяется к person
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_garbage_person
+      - tests/knowledge/test_person_quality.py::test_glued
+      - tests/knowledge/test_person_quality.py::test_person_quality_invariant
+  - id: prompt-no-person-def
+    requirement: Качество персон
+    patch: prompt-no-person-def.patch
+    note: определение персоны убрано из промпта ontology.extract
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_person_definition_in_prompt
+  - id: component-qids-unchecked
+    requirement: Слияние вариантов персоны
+    patch: component-qids-unchecked.patch
+    note: компонента сливается без проверки числа QID и apart:qid
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_transitive_component_two_qids
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: dates-unchecked
+    requirement: Слияние вариантов персоны
+    patch: dates-unchecked.patch
+    note: проверка противоречия дат убрана
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_conflicting_dates
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: variant-merges
+    requirement: Слияние вариантов персоны
+    patch: variant-merges.patch
+    note: review:variant заменён слиянием
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_only_variant_matched
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: kept-input-order
+    requirement: Слияние вариантов персоны
+    patch: kept-input-order.patch
+    note: оставшаяся — первая по порядку входа, а не по правилу (итог зависит от перестановки)
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: qid-confirmed-ignored
+    requirement: Слияние вариантов персоны
+    patch: qid-confirmed-ignored.patch
+    note: подтверждение qid_confirmed игнорируется
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_transliteration_with_decision
+      - tests/knowledge/test_person_quality.py::test_qid_confirmed_for_other
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: single-word-primary-review
+    requirement: Слияние вариантов персоны
+    patch: single-word-primary-review.patch
+    note: однословное общее основное не сливается
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_common_primary_name
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: decided-ignored
+    requirement: Слияние вариантов персоны
+    patch: decided-ignored.patch
+    note: решение «разные» не учитывается
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_namesakes
+      - tests/knowledge/test_person_quality.py::test_decided_apart_and_third
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: decided-as-qid-cluster
+    requirement: Слияние вариантов персоны
+    patch: decided-as-qid-cluster.patch
+    note: рёбра компоненты с решением «разные» уходят с причиной review:qid_cluster
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_decided_apart_and_third
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: single-word-variant
+    requirement: Слияние вариантов персоны
+    patch: single-word-variant.patch
+    note: однословный вариант даёт review:variant вместо review:single_name
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_only_variant_matched
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: kept-primary-stays
+    requirement: Слияние с перенаправлением
+    patch: kept-primary-stays.patch
+    note: прежнее основное не становится вариантом при русском основном другой стороны
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: candidates-primary-only
+    requirement: Поиск дублей
+    patch: candidates-primary-only.patch
+    note: кандидаты только по общему основному (без последнего слова и вариантов)
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_candidates
+      - tests/knowledge/test_entity_merge.py::test_candidates_invariant
+  - id: candidates-no-type
+    requirement: Поиск дублей
+    patch: candidates-no-type.patch
+    note: кандидаты без проверки типа
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_different_types
+      - tests/knowledge/test_entity_merge.py::test_candidates_invariant
+  - id: author-attribution-stays
+    requirement: Слияние с перенаправлением
+    patch: author-attribution-stays.patch
+    note: attributions.who не переносится на оставшуюся
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_author_attribution_moves
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: key-not-recomputed
+    requirement: Слияние с перенаправлением
+    patch: key-not-recomputed.patch
+    note: ключ перенесённых утверждений не пересчитывается, повтор не сворачивается
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-without-externals
+    requirement: Слияние с перенаправлением
+    patch: undo-without-externals.patch
+    note: undo_merge не возвращает moved.externals
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: loop-shown
+    requirement: Слияние с перенаправлением
+    patch: loop-shown.patch
+    note: петля показывается в about и на снимке
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_loop
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo

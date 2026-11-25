@@ -391,6 +391,45 @@ def _with_examples(test):
     return test
 
 
+@req(ED, EXTRACT, invariant="Тип без датировки в реестре — отказ dating:type (О15)")
+def test_dating_of_type_not_allowed(stand, onto, events):
+    """О15: датировка понятия — реестр не разрешает ``dating`` для ``concept``; причина — код."""
+    token = sentinel()
+    text = f"Учение о субстанции сложилось в 1641 году. {token}"
+    stand.extract(
+        [text],
+        {
+            "statements": [
+                {
+                    "subject": "Субстанция",
+                    "subject_type": "concept",
+                    "type": "opposed_to",
+                    "object": "Акциденция",
+                    "object_type": "concept",
+                    "paragraph": 1,
+                    "quote": "Учение о субстанции",
+                }
+            ],
+            "entities": [
+                {
+                    "name": "Субстанция",
+                    "type": "concept",
+                    "dating": {"text": "1641", "paragraph": 1, "quote": "в 1641 году"},
+                }
+            ],
+        },
+    )
+    concept = entity_of(stand, "Субстанция")
+    assert onto.entities.get(concept)["type"] == "concept"  # сущность и связь не отменены
+    assert datings_of(stand, concept) == []
+    assert "dates" not in onto.entities.get(concept)["primary"]
+    assert [s["type"] for s in stand.statements() if s["subject"] == concept] == ["opposed_to"]
+    [drop] = dropped(events)
+    assert drop["reason"] == "dating:type"
+    assert drop["run_id"]
+    no_token(events, token)
+
+
 @req(ED, EXTRACT, scenario="Инвариант датировки")
 @req(ED, EXTRACT, invariant="Записана по таблице либо отклонена одной причиной")
 @settings(parent=PROFILES["ci"], suppress_health_check=[HealthCheck.function_scoped_fixture])

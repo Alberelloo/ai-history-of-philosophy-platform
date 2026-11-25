@@ -1,0 +1,22 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -380,8 +380,8 @@
+                 continue
+             words = n["normalized"].split()
+             last = words[-1] if words else ""
+-            last_words.setdefault((entity["type"], last), set()).add(entity["id"])
+-            full.setdefault((entity["type"], n["normalized"]), set()).add(entity["id"])
++            last_words.setdefault(("", last), set()).add(entity["id"])
++            full.setdefault(("", n["normalized"]), set()).add(entity["id"])
+             if n["kind"] == "primary" and n["normalized"]:
+                 primaries.setdefault(entity["id"], set()).add(n["normalized"])
+         pairs: set[tuple[str, str]] = set()
+@@ -391,7 +391,7 @@
+                     pairs.add((a, b))
+         for entity_id, names in primaries.items():
+             for name in names:
+-                for other in full.get((by_id[entity_id]["type"], name), ()):
++                for other in full.get(("", name), ()):
+                     if other != entity_id:
+                         a, b = sorted((entity_id, other), key=position.get)
+                         pairs.add((a, b))

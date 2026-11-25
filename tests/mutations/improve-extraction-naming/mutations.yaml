@@ -107,3 +107,9 @@ mutations:
     expect_fail:
       - tests/knowledge/test_invalid_name_external.py::test_place_label_rejected
       - tests/knowledge/test_invalid_name_external.py::test_place_created_iff_label_valid
+  - id: dating-type-unchecked
+    requirement: Извлечение дат
+    patch: dating-type-unchecked.patch
+    note: тип без датировки в реестре не проверяется до проверок 1–6 (отказ текстом реестра, О15)
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_type_not_allowed

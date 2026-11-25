@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-import unicodedata
 from pathlib import Path
 
 import pytest
@@ -316,18 +315,6 @@ def _primaries_per_lang(onto, entity_id: str) -> dict[str, int]:
     return counts
 
 
-def _has_latin(text: str) -> bool:
-    """Латинская буква вне слов из римских цифр (определение п. 2, своё у оракула)."""
-    for raw in text.split():
-        word = raw.strip(".,;:!?()[]«»\"'„“”")
-        if word and all(ch in "IVXLCDM" for ch in word):
-            continue
-        for ch in word:
-            if ch.isalpha() and unicodedata.name(ch, "").startswith("LATIN"):
-                return True
-    return False
-
-
 @req(NM, LANG, scenario="Инвариант языка и основного названия")
 @req(NM, LANG, invariant="Язык каждого названия по письменности для create и add_name")
 @DB_SETTINGS
@@ -349,24 +336,28 @@ def test_language_invariant_create_and_add_name(onto, events, main, extra):
     assert stand_count(onto) - before == len(events.of(CREATED)) - created_before == 1
 
 
-@req(NM, LANG, invariant="Ни одно название с латинскими буквами вне римских чисел не имеет ru")
+@req(
+    NM,
+    LANG,
+    invariant="Латиницы вне римских чисел не меньше кириллицы — не ru; перевес кириллицы — ru",
+)
 @pytest.mark.parametrize(
-    "text",
+    ("text", "is_ru"),
     [
-        "Locke",  # язык передан ru
-        "Kant-Кант",  # равенство
-        "Кантq",  # кириллица в большинстве, одна латинская буква
-        "Иммануил Kant",  # кириллицы 8, латиницы 4
-        "Людовик XIV",  # римское число — не латиница: здесь ru допустим
+        ("Locke", False),  # язык передан ru, кириллицы нет
+        ("Kant-Кант", False),  # равенство: 4 и 4
+        ("Kantt-Кант", False),  # латиницы больше
+        ("Кантq", True),  # перевес кириллицы: 4 против 1
+        ("Иммануил Kant", True),  # кириллицы 8, латиницы 4
+        ("Людовик XIV", True),  # римское число — не латиница
+        ("XIV", False),  # одни римские цифры: кириллицы нет
     ],
 )
-def test_no_latin_name_has_ru(onto, events, text):
+def test_no_latin_name_has_ru(onto, events, text, is_ru):
+    """О15: формулировка инварианта после правки спецификации (Д1)."""
     entity = onto.entities.create("concept", [("ru", text, "primary")])
     [name] = onto.entities.get(entity)["names"]
-    if _has_latin(text):
-        assert name["lang"] != "ru", (text, name["lang"])
-    else:
-        assert name["lang"] == "ru"
+    assert (name["lang"] == "ru") == is_ru, (text, name["lang"])
     assert events.where(CREATED, entity_id=entity)
 
 

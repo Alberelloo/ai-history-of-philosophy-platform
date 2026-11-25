@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -568,8 +568,6 @@
+     kinds: dict[int, str] = {}
+     for n in names:
+         new = n["kind"]
+-        if n["kind"] == "primary" and n is not chosen:
+-            new = "variant"
+         if n["entity_id"] == removed and n is not chosen and (n["lang"], n["normalized"]) in seen:
+             new = "variant"
+         if new != n["kind"]:

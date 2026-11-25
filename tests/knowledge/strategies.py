@@ -659,3 +659,298 @@ def _replace_number(quote: str, number: int, replacement: str) -> str:
             out.append(quote[i])
             i += 1
     return "".join(out)
+
+
+# --- персоны: качество и слияние вариантов (improve-person-quality) ------------------------
+
+
+def not_persons():
+    """Предложения персон, которые правило названий отклоняет, с ожидаемой причиной:
+    строчные описания, «the … of …», склейки (``not_a_name``), обращения и группы
+    из стоп-списка с заглавной (``stopword``), фразы длиннее предела (``sentence``)."""
+    persons_only = st.one_of(not_names(), stopwords_perturbed(), long_phrases())
+    return persons_only.map(lambda case: ((PERSON, case[0][1]), case[1])).filter(
+        lambda case: _person_reason_kept(case)
+    )
+
+
+def _person_reason_kept(case) -> bool:
+    """Стоп-слово, сгенерированное для другого типа, у персоны может дать ``not_a_name``
+    (строчная первая буква, шаблон) — такие входы отбрасываются, а не переобъясняются."""
+    (_type, raw), reason = case
+    if reason != "stopword":
+        return True
+    text = raw.strip()
+    first = next((ch for ch in text if ch.isalpha()), "")
+    form = search_form(text)
+    return first.isupper() and not form.startswith(("the author ", "author of "))
+
+
+DATE_BASE = (1685, 1753)
+FACE_KINDS = (
+    "plain",
+    "plain",
+    "plain",
+    "two_qids",
+    "dates",
+    "qids_distinct",
+    "confirmed",
+    "decided",
+    "decided3",
+    "variant_single",
+    "variant_multi",
+)
+_TAGS = "бвгджзклмн"
+_LTAGS = "bcdfghklmn"
+
+
+def _face_word(draw, index: int, cyrillic: bool) -> str:
+    base = draw(_word(CYR_LOWER if cyrillic else LATIN_LOWER, 3, 6))
+    tag = (_TAGS if cyrillic else _LTAGS)[index % 10] * (index // 10 + 2)
+    return base + tag
+
+
+@st.composite
+def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
+    """Персоны по «лицам» и ожидаемый итог слияния вариантов по правилу ``person-quality``.
+
+    Запись: ``{"key": (лицо, номер), "names": [(lang, text, kind)], "qid", "dates"}``.
+    Лицо: вид, записи, ожидаемые блоки слияния (``merge``: [ключи], ``reason``) и пары
+    очереди (``queue``: {frozenset(ключ1, ключ2): причина}). Названия разных лиц не
+    пересекаются (уникальный хвост на лицо)."""
+    faces = []
+    confirmed, decided = [], []
+    qid_counter = iter(range(900100, 999999))
+    for f in range(draw(st.integers(1, max_faces))):
+        kind = draw(st.sampled_from(FACE_KINDS))
+        cyr = draw(st.booleans())
+        lang = "ru" if cyr else "en"
+        word = _face_word(draw, f, cyr)
+        records: list[dict[str, Any]] = []
+        face: dict[str, Any] = {"kind": kind, "records": records, "merge": [], "queue": {}}
+
+        def rec(i, names, qid=None, dates=None, f=f, records=records):
+            records.append({"key": (f, i), "names": names, "qid": qid, "dates": dates})
+
+        if kind == "plain":
+            n = draw(st.integers(1, 4))
+            with_qid = draw(st.sampled_from([None, *range(n)]))
+            dated = draw(st.sampled_from(["none", "equal", "within", "one_side"]))
+            for i in range(n):
+                text = word if draw(st.booleans()) else word.upper() if i else word
+                if dated == "none" or (dated == "one_side" and i > 0):
+                    dates = None
+                elif dated == "equal" or dated == "one_side":
+                    dates = DATE_BASE
+                else:
+                    s = draw(st.integers(0, 4))
+                    dates = (DATE_BASE[0] + s, DATE_BASE[1] + s)
+                qid = f"Q{next(qid_counter)}" if with_qid == i else None
+                rec(i, [(lang, text, "primary")], qid, dates)
+            if n > 1:
+                face["merge"] = [[(f, i) for i in range(n)]]
+                face["reason"] = "merge:name"
+        elif kind == "two_qids":
+            rec(0, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+            rec(1, [(lang, word, "primary")])
+            rec(2, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+            face["queue"] = {
+                frozenset({(f, 0), (f, 1)}): "review:qid_cluster",
+                frozenset({(f, 1), (f, 2)}): "review:qid_cluster",
+            }
+        elif kind == "dates":
+            gap = draw(st.integers(5, 200))
+            rec(0, [(lang, word, "primary")], None, DATE_BASE)
+            rec(1, [(lang, word, "primary")], None, (DATE_BASE[0] + gap, DATE_BASE[1] + gap))
+            face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:dates"}
+        elif kind == "qids_distinct":
+            rec(0, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+            rec(1, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+        elif kind == "confirmed":
+            other = _face_word(draw, f, not cyr)
+            rec(0, [("en" if cyr else "ru", other, "primary")], f"Q{next(qid_counter)}")
+            rec(1, [(lang, word, "primary")])
+            confirmed.append(((f, 1), (f, 0)))
+            face["merge"] = [[(f, 0), (f, 1)]]
+            face["reason"] = "merge:qid_confirmed"
+        elif kind == "decided":
+            rec(0, [(lang, word, "primary")])
+            rec(1, [(lang, word, "primary")])
+            decided.append(((f, 0), (f, 1)))
+        elif kind == "decided3":
+            for i in range(3):
+                rec(i, [(lang, word, "primary")])
+            decided.append(((f, 0), (f, 1)))
+            face["queue"] = {
+                frozenset({(f, 0), (f, 2)}): "review:decided_conflict",
+                frozenset({(f, 1), (f, 2)}): "review:decided_conflict",
+            }
+        elif kind == "variant_single":
+            first = _face_word(draw, f + 50, cyr)
+            rec(0, [(lang, f"{first.capitalize()} {word}", "primary"), (lang, word, "variant")])
+            rec(1, [(lang, word, "primary")])
+            face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:single_name"}
+        else:  # variant_multi
+            first = _face_word(draw, f + 50, cyr)
+            two = f"{first.capitalize()} {word}"
+            alien = _face_word(draw, f + 70, not cyr)
+            rec(0, [("en" if cyr else "ru", alien, "primary"), (lang, two, "variant")])
+            rec(1, [(lang, two, "primary")])
+            face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:variant"}
+        faces.append(face)
+    return {"faces": faces, "confirmed": confirmed, "decided": decided}
+
+
+def expected_kept(face_records: list[dict[str, Any]], ids: dict, links: dict | None = None):
+    """Оставшаяся по правилу: с QID; иначе больше ссылок; иначе меньший идентификатор."""
+    with_qid = [r for r in face_records if r["qid"]]
+    if with_qid:
+        return ids[with_qid[0]["key"]]
+    links = links or {}
+    return min((ids[r["key"]] for r in face_records), key=lambda i: (-links.get(i, 0), i))
+
+
+# --- онтология с дублями: слияние с перенаправлением (ontology-entities, MODIFIED) ---------
+
+REL_TYPES = ("influenced_by", "criticizes")  # персона → персона, несимметричные
+SOURCES = ("s_a", "s_b", "s_c")
+
+
+@st.composite
+def ontology_with_duplicates(draw) -> dict[str, Any]:
+    """5–30 сущностей и пара персон ``K`` (оставшаяся, индекс 0) и ``R`` (удалённая, 1).
+
+    Утверждения задаются индексами концов; генератор нарочно строит повторы, которые
+    совпадут после слияния (одно и то же у K и у R), петли R → K, атрибуции на R,
+    точные повторы атрибуции, подтверждения, упоминания и портреты с общим признаком.
+    Ожидание считается в тесте из этих данных: отображение R → K и множества."""
+    n_persons = draw(st.integers(3, 12))
+    n_positions = draw(st.integers(max(0, 5 - n_persons), 30 - n_persons))
+    kept_lang, removed_lang = draw(
+        st.sampled_from([("en", "ru"), ("ru", "en"), ("en", "en"), ("ru", "ru")])
+    )
+    entities = [
+        {
+            "type": "person",
+            "names": [(kept_lang, "Hume" if kept_lang == "en" else "Юм", "primary")],
+        },
+        {
+            "type": "person",
+            "names": [(removed_lang, "Юм" if removed_lang == "ru" else "Hume", "primary")],
+        },
+    ]
+    if draw(st.booleans()):
+        entities[0]["names"].append(("en", "David Hume", "variant"))
+    if draw(st.booleans()):
+        entities[1]["names"].append(("ru", "Давид Юм", "variant"))
+    entities += [
+        {"type": "person", "names": [("ru", f"Персона {i}", "primary")]}
+        for i in range(2, n_persons)
+    ]
+    entities += [
+        {"type": "position", "names": [("ru", f"Позиция {i}", "primary")]}
+        for i in range(n_positions)
+    ]
+    qid_side = draw(st.sampled_from([None, 0, 1]))
+    persons_ix = list(range(n_persons))
+    positions_ix = list(range(n_persons, n_persons + n_positions))
+
+    attribution = st.one_of(
+        st.tuples(
+            st.just("source"), st.sampled_from(SOURCES), st.sampled_from(["asserts", "supports"])
+        ),
+        st.tuples(
+            st.just("entity"), st.sampled_from(persons_ix), st.sampled_from(["asserts", "supports"])
+        ),
+    )
+    evidence = st.tuples(st.sampled_from(["p1", "p2", "p3"]), st.sampled_from(SOURCES))
+
+    def statement(subject, type_, obj=None, value=None):
+        return {
+            "subject": subject,
+            "type": type_,
+            "object": obj,
+            "value": value,
+            "attributions": draw(st.lists(attribution, min_size=1, max_size=3, unique=True)),
+            "evidence": draw(st.lists(evidence, max_size=2, unique=True)),
+        }
+
+    statements = []
+    for _ in range(draw(st.integers(0, 12))):
+        kind = draw(st.sampled_from(["rel", "holds", "description"]))
+        subject = draw(st.sampled_from(persons_ix))
+        if kind == "rel":
+            obj = draw(st.sampled_from([i for i in persons_ix if i != subject]))
+            statements.append(statement(subject, draw(st.sampled_from(REL_TYPES)), obj))
+        elif kind == "holds" and positions_ix:
+            statements.append(statement(subject, "holds", draw(st.sampled_from(positions_ix))))
+        else:
+            statements.append(
+                statement(subject, "description", value=draw(st.sampled_from(["один", "два"])))
+            )
+    # повторы: то же у K и у R (совпадут после слияния), иногда с той же атрибуцией
+    for _ in range(draw(st.integers(0, 3))):
+        type_ = draw(st.sampled_from(REL_TYPES))
+        other = draw(st.sampled_from(persons_ix[2:]))
+        first = statement(0, type_, other)
+        second = statement(1, type_, other)
+        if draw(st.booleans()):
+            second["attributions"] = list(first["attributions"])  # точный повтор
+        statements += [first, second]
+    # петли R → K
+    for type_ in draw(st.lists(st.sampled_from(REL_TYPES), max_size=2, unique=True)):
+        statements.append(statement(1, type_, 0))
+    mentions = draw(st.lists(st.sampled_from([0, 1]), max_size=4))
+    portraits = draw(
+        st.lists(
+            st.tuples(st.sampled_from([0, 1]), st.sampled_from(["aaaa", "bbbb", "cccc"])),
+            max_size=4,
+            unique=True,  # признак изображения уникален в пределах сущности
+        )
+    )
+    return {
+        "entities": entities,
+        "qid_side": qid_side,
+        "statements": statements,
+        "mentions": mentions,
+        "portraits": portraits,
+    }
+
+
+NAME_POOL = (
+    "Berkeley",
+    "Беркли",
+    "Локк",
+    "Джон Локк",
+    "Бэкон",
+    "Фрэнсис Бэкон",
+    "Платон",
+)
+
+
+@st.composite
+def ontology_names(draw) -> list[dict[str, Any]]:
+    """Сущности разных типов с названиями из малого пула (много совпадений по форме поиска)."""
+    out = []
+    for _ in range(draw(st.integers(2, 10))):
+        type_ = draw(st.sampled_from(["person", "person", "work", "concept"]))
+        primary = draw(st.sampled_from(NAME_POOL))
+        if type_ != "person" and draw(st.booleans()):
+            primary = primary.lower()  # регистр; строчное имя персоны отклонит правило названий
+        variants = draw(st.lists(st.sampled_from(NAME_POOL), max_size=2, unique=True))
+        variants = [v for v in variants if search_form(v) != search_form(primary)]
+        out.append({"type": type_, "primary": primary, "variants": variants})
+    return out
+
+
+def expected_candidates(entities: list[dict[str, Any]]) -> set[frozenset[int]]:
+    """Пары одного типа: основное одной совпало (по форме поиска) с любым названием другой."""
+    out = set()
+    for i, a in enumerate(entities):
+        for j, b in enumerate(entities):
+            if i == j or a["type"] != b["type"]:
+                continue
+            names_b = {search_form(x) for x in [b["primary"], *b["variants"]]}
+            if search_form(a["primary"]) in names_b:
+                out.add(frozenset({i, j}))
+    return out
