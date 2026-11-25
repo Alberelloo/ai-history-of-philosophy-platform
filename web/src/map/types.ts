@@ -4,7 +4,14 @@
 
 // Роли персоны и виды событий — значения из списка реестра (person_role, event_kind).
 export type PersonRole = "philosopher" | "scientist" | "writer" | "theologian" | "ruler" | "translator";
-export type EventKind = "political" | "scientific" | "religious" | "intellectual" | "biographical";
+export type EventKind =
+  | "political"
+  | "economic"
+  | "social"
+  | "scientific"
+  | "religious"
+  | "intellectual"
+  | "biographical";
 // Вид значка на страте трудов: произведение или идея (понятие, позиция, аргумент).
 export type WorkKind = "work" | "concept" | "position" | "argument";
 export type GroupKind = "school" | "direction" | "institution" | "circle";

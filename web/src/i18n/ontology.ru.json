@@ -20,7 +20,8 @@
     "parts": "Состав",
     "answers": "Ответы и сторонники",
     "arguments": "Аргументы за и против",
-    "misconceptions": "Часто считают, но…"
+    "misconceptions": "Часто считают, но…",
+    "context": "Исторический контекст"
   },
   "relations": {
     "influenced_by": {
@@ -245,7 +246,9 @@
       "scientific": "научное",
       "religious": "религиозное",
       "intellectual": "интеллектуальное",
-      "biographical": "биографическое"
+      "biographical": "биографическое",
+      "economic": "экономическое",
+      "social": "социальное"
     }
   },
   "recipes": {
@@ -256,5 +259,15 @@
     "answers": "Ответы на проблему",
     "conceptions": "Сравнение концепций",
     "path": "Путь между двумя"
+  },
+  "qualifiers": {
+    "mechanism": {
+      "political": "политический",
+      "economic": "экономический",
+      "social": "социальный",
+      "religious": "религиозный",
+      "scientific": "научный",
+      "institutional": "институциональный"
+    }
   }
 }
