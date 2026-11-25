@@ -77,7 +77,7 @@
 
 ## 6. Сцена, токены, тексты (разработчик)
 
-- [ ] 6.1 Токены `globe-sea`, `globe-land`, `globe-coast`, `globe-graticule`, `globe-brass` в `docs/design/tokens.json` (группа `scene`, одинаковы в темах); `python scripts/design_tokens.py` → `tokens.css`
+- [x] 6.1 Токены `globe-sea`, `globe-land`, `globe-coast`, `globe-graticule`, `globe-brass` в `docs/design/tokens.json` (группа `scene`, одинаковы в темах); `python scripts/design_tokens.py` → `tokens.css`
 - [ ] 6.2 `styles/map-geo.css`: раскладка 1920×1080, 1366×768, 1024×576 без прокрутки страницы; фокус-кольцо; reduced motion
 - [ ] 6.3 Легенда глобуса в «Условных знаках»: отметка, полое кольцо, пунктир, стрелка, правило года связи, подпись источника береговой линии
 - [ ] 6.4 Строки RU/EN по таблице design.md; множественное число для мест и людей
