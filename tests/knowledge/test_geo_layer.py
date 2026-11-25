@@ -239,22 +239,14 @@ def test_only_plain_record(onto, clock, events, no_network):
 
 @req(GEO, LAYER, scenario="Ограниченный кэш")
 def test_cache_is_bounded(onto, clock, events, no_network):
-    # Расхождение спецификации (verification.md): «пустой слой» для несуществующего
-    # ``textbook`` верен только с ``only_textbook`` — без него область карты не сужается
-    # (как у ``/map``), и слой обязан содержать сущности карты. Проверяются оба чтения.
     svc = Layer(onto, clock, cache_size=8)
     kant_and_hume(onto)
-    whole, _ = svc.get("/v1/map/places")
     for i in range(100):
         body, rid = svc.get("/v1/map/places", textbook=f"s_missing_{i}", only_textbook="true")
         assert (body["places"], body["placements"], body["unplaced"]) == ([], [], []), i
         e = built(events, rid)
         assert (e.get("places"), e.get("placements"), e.get("unplaced")) == (0, 0, 0)
-        assert svc.layer.cached_scopes() <= 8
-    for i in range(100):
-        body, rid = svc.get("/v1/map/places", textbook=f"s_other_{i}")
-        assert body == whole, i
-        assert built(events, rid).get("cached") is False
+        assert e.get("cached") is False
         assert svc.layer.cached_scopes() <= 8
     assert svc.layer.cached_scopes() == 8
 

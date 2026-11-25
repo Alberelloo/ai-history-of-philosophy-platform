@@ -83,7 +83,7 @@ def switch(page, view: str) -> None:
 
 def selection_in_address(page, entity: str) -> bool:
     path, query = address(page)
-    return path.rstrip("/").endswith("/" + entity) or query.get("sel") == entity
+    return path.rstrip("/") == f"/graph/{entity}" and "sel" not in query
 
 
 # --- Вид «Глобус» ----------------------------------------------------------------------
