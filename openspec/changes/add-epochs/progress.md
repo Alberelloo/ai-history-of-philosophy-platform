@@ -170,3 +170,14 @@
 Подгонка тестов: не найдена. Прежние тесты (`test_map.py` — три теста, эталон `demo_map.json`, `tests/web/test_reference.py`, `tests/e2e/test_visual_design.py`) изменены по дельтам `knowledge-graph` «Карта раздела» и `visual-design` «Разделы в разработке» по решению ведущего: точные сравнения остались точными, только дописаны `epochs`/`fuzzy`; в диффе эталона нет ни одной удалённой строки (только добавленные `epochs`, `fuzzy`); пункт «Эпохи и контекст» перенесён из «скоро» в живые. `skip`/`xfail` не добавлены.
 
 Итог: после исправления блокирующего 1 — можно к судье.
+
+## 2026-11-25 — ответ на ревью, круг 1 (разработчик)
+
+- **Блокирующее 1** — `Statements._raw`: порядок по коррелированному скалярному подзапросу `min(journal.id) where journal.statement_id = statements.id` (индекс `journal.statement_id`) вместо агрегата всего журнала. Замер `scratchpad/perf_raw.py` (SQLite, 200 вызовов, мс на вызов): до — 2 000 утверждений: 3,80 (прежний запрос без порядка 0,19); 20 000: 32,17 (0,21). После — 2 000: 0,45 (0,21); 20 000: 0,51 (0,25); рост по журналу устранён. Нормативный тест порядка `tests/knowledge/test_statements.py::test_raw_order_is_write_order` (id нарочно обратны порядку записи).
+- **Желательно 1** — `proposal.md` (Impact) и `design.md` («Контекст», «Выбор решения» п. 1 «Чем платим»): правка общего `Statements` и `graph.py`, `primary[key] = None`, следствие для `duplicate_candidates`.
+- **Желательно 2** — `test_statements.py`: `test_rejected_only_lifespan_clears_primary` (отклонены единственные годы жизни → `primary.dates` None, персоны нет на карте), `test_confirm_keeps_main_value`.
+- **Желательно 3** — QID манифеста отличается от QID эпохи → `result=duplicate_qid` до загрузки, второй QID не пишется (`test_epoch_dates_unit.py::test_manifest_qid_differs_from_epoch_qid`); записано в design («Выбор решения» п. 2).
+- **Желательно 4** — `http_fetch`: проверка хоста до отправки в хуке запроса `httpx` (`event_hooks.request`) для каждого запроса, в том числе перехода по перенаправлению; `max_redirects=3`. Тест: перенаправление на чужой хост — `WikidataError`, отправлен один запрос, только на `www.wikidata.org`.
+- **Желательно 5** — `externals()` читается один раз в `apply` и передаётся в `_entry` и режим `--linked`.
+- **Желательно 6** — в design («`dating.source`») записано: атрибуция персоне и подтверждающий абзац — `source`; спецификация не менялась.
+- Прогоны: test_statements 19 passed; test_wikidata_unit, test_wikidata, test_epoch_dates_unit, test_epoch_dates — 171 passed; test_mentions_cards, test_map, test_map_snapshot_parity, test_graph, test_epochs_list — 62 passed; `ruff check src tests` чисто, `lint-imports` 3 kept.

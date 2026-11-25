@@ -273,13 +273,14 @@ class EpochDates:
         check_manifest(manifest)  # до базы и сети
         report = Report("dry_run" if dry_run else "apply")
         done: set[str] = set()
+        known = self.entities.externals(SYSTEM)  # один раз на запуск: сущность → QID
         for entry in manifest["epochs"]:
-            item = self._entry(entry, fetch, dry_run)
+            item = self._entry(entry, known, fetch, dry_run)
             if item["epoch_id"]:
                 done.add(item["epoch_id"])
             self._record(report, item)
         if linked:
-            for epoch_id, qid in self.entities.externals(SYSTEM).items():
+            for epoch_id, qid in known.items():
                 if epoch_id in done or not self._is_epoch(epoch_id):
                     continue
                 done.add(epoch_id)
@@ -299,7 +300,9 @@ class EpochDates:
         )
         report.epochs.append(item)
 
-    def _entry(self, entry: dict[str, Any], fetch: Fetch, dry_run: bool) -> dict[str, Any]:
+    def _entry(
+        self, entry: dict[str, Any], known: dict[str, str], fetch: Fetch, dry_run: bool
+    ) -> dict[str, Any]:
         ru = entry["ru"].strip()
         en = (entry.get("en") or "").strip() or None
         qid = entry.get("wikidata")
@@ -307,8 +310,12 @@ class EpochDates:
         if len(matches) > 1:
             return {"epoch_id": None, "label": ru, "qid": qid, "result": "ambiguous"}
         epoch_id = matches[0] if matches else None
-        if qid is None and epoch_id is not None:
-            qid = self.entities.externals(SYSTEM).get(epoch_id)
+        own = known.get(epoch_id) if epoch_id is not None else None
+        if qid is None:
+            qid = own
+        elif own is not None and own != qid:
+            # У эпохи уже другой QID: второй не записывается, решает человек.
+            return {"epoch_id": epoch_id, "label": ru, "qid": qid, "result": "duplicate_qid"}
         if qid is None:
             return {"epoch_id": epoch_id, "label": ru, "qid": None, "result": "no_qid"}
         owner = self.entities.by_external(SYSTEM, qid)

@@ -307,3 +307,15 @@ def test_http_fetch_failures():
 
     with pytest.raises(WikidataError):
         http_fetch(URL, wait=lambda s: None, transport=httpx.MockTransport(text))
+
+
+def test_http_fetch_never_sends_to_foreign_redirect():
+    log: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        log.append(request)
+        return httpx.Response(302, headers={"Location": "https://evil.example/steal"})
+
+    with pytest.raises(WikidataError):
+        http_fetch(URL, wait=lambda s: None, transport=httpx.MockTransport(handler))
+    assert [r.url.host for r in log] == ["www.wikidata.org"]

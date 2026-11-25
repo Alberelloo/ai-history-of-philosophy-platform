@@ -45,6 +45,7 @@ SEARCH_URL = (
 )
 PAGE_URL = "https://www.wikidata.org/wiki/{qid}"
 RETRY_STATUSES = (429, 503)
+MAX_REDIRECTS = 3
 DEFAULT_RETRY_AFTER = 1.0  # секунд, если ``Retry-After`` нет или он не число
 LANG = re.compile(r"^[a-z]{2,3}(-[a-z]+)?$")
 
@@ -78,6 +79,12 @@ def _retry_after(response: httpx.Response, max_wait: float) -> float:
     return min(delay, max_wait)
 
 
+def _check_url(url: str) -> None:
+    parts = urlsplit(url)
+    if parts.scheme != "https" or parts.hostname != HOST:
+        raise WikidataError("адрес вне Wikidata")
+
+
 def http_fetch(
     url: str,
     *,
@@ -92,14 +99,20 @@ def http_fetch(
     Адрес — только ``https://www.wikidata.org/…`` (его строит код). На 429 и 503 ждёт
     ``Retry-After`` (не больше ``max_wait``) и повторяет не больше ``retries`` раз; прочие
     сбои (статус, транспорт, не JSON) — ``WikidataError``."""
-    parts = urlsplit(url)
-    if parts.scheme != "https" or parts.hostname != HOST:
-        raise WikidataError("адрес вне Wikidata")
+    _check_url(url)
+
+    def before_send(request: httpx.Request) -> None:
+        # Каждый запрос, в том числе переход по перенаправлению, — только на Wikidata:
+        # проверка до отправки.
+        _check_url(str(request.url))
+
     with httpx.Client(
         transport=transport,
         headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
         timeout=timeout,
         follow_redirects=True,
+        max_redirects=MAX_REDIRECTS,
+        event_hooks={"request": [before_send]},
     ) as client:
         attempt = 0
         while True:
@@ -107,8 +120,6 @@ def http_fetch(
                 response = client.get(url)
             except httpx.HTTPError as exc:
                 raise WikidataError(f"сбой загрузки: {type(exc).__name__}") from exc
-            if response.url.host != HOST:
-                raise WikidataError("перенаправление вне Wikidata")
             if response.status_code in RETRY_STATUSES:
                 if attempt >= retries:
                     raise WikidataError(

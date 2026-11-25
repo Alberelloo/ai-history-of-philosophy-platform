@@ -542,16 +542,16 @@ class Statements:
         }[side]
         # Порядок записи — по первой записи журнала (``add`` пишет её при создании); от него
         # зависит «первое записанное» основное значение, поэтому порядок задаётся явно.
+        # Подзапрос коррелированный — по индексу journal.statement_id, без агрегата журнала.
         first = (
-            select(t.journal.c.statement_id, func.min(t.journal.c.id).label("first"))
-            .group_by(t.journal.c.statement_id)
-            .subquery()
+            select(func.min(t.journal.c.id))
+            .where(t.journal.c.statement_id == t.statements.c.id)
+            .scalar_subquery()
         )
         query = (
             select(t.statements.c.id)
-            .outerjoin(first, first.c.statement_id == t.statements.c.id)
             .where(cond)
-            .order_by(func.coalesce(first.c.first, 2**31 - 1), t.statements.c.id)
+            .order_by(func.coalesce(first, 2**31 - 1), t.statements.c.id)
         )
         with self.engine.begin() as conn:
             ids = list(conn.scalars(query))

@@ -286,3 +286,15 @@ def test_repository_manifest_is_valid_and_unconfirmed():
     manifest = load_manifest(Path(__file__).parents[2] / "sources" / "epochs.yaml")
     assert validate(manifest) == []
     assert all(e["wikidata"] is None for e in manifest["epochs"])  # QID подтверждает человек
+
+
+def test_manifest_qid_differs_from_epoch_qid(onto):
+    epoch = onto.thing("epoch", "Просвещение")
+    onto.entities.add_external(epoch, "wikidata", "Q125928")
+    fetch = FixtureFetch()
+    report = EpochDates(onto.statements).apply(
+        m({"ru": "Просвещение", "wikidata": "Q12539"}), fetch
+    )
+    assert [(e["epoch_id"], e["result"]) for e in report.epochs] == [(epoch, "duplicate_qid")]
+    assert onto.entities.by_external("wikidata", "Q12539") is None  # второй QID не записан
+    assert fetch.calls == [] and datings(onto, epoch) == []
