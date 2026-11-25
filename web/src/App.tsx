@@ -1,6 +1,7 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { AssistantPanel, useAnsweringStage } from "./AssistantPanel";
 import { AssistantPage } from "./AssistantPage";
+import { EpochsPage } from "./epochs/EpochsPage";
 import { FullCard, OPEN_CARD_EVENT } from "./FullCard";
 import { MapPage } from "./map/MapPage";
 import { useT } from "./i18n";
@@ -23,8 +24,18 @@ import { Icon } from "./ui";
 //         /p/:paragraph       — постоянная ссылка на абзац
 //         /graph[/:entity]?sel,q,from,to,…,recipe — карта раздела (synchro-map)
 //         /reference?q,group,epoch,textbook,sort — справочник
+//         /epochs[/:epoch]    — эпохи: лента и описание выбранной
 //         /settings[#раздел]  — настройки читателя
 //         /soon/:раздел       — раздел в разработке
+// Сегмент адреса как текст: неверная %-последовательность не роняет страницу.
+function safeDecode(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+}
+
 export function navigate(path: string, state?: unknown): void {
   window.history.pushState(state ?? null, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
@@ -52,6 +63,7 @@ function activeItem(parts: string[]): string {
   if (parts[0] === "soon") return parts[1] ?? "other";
   if (parts[0] === "assistant") return "assistant";
   if (parts[0] === "reference") return "reference";
+  if (parts[0] === "epochs") return "epochs";
   if (parts[0] === "settings" || parts[0] === "graph") return parts[0];
   return "other";
 }
@@ -203,10 +215,16 @@ function Page({
       window.history.replaceState(null, "", "/reference");
       return <ReferencePage search="" />;
     }
+    if (parts[1] === "epochs") {
+      // Заглушка раздела эпох снята: старая закладка — на страницу эпох без записи в историю.
+      window.history.replaceState(null, "", "/epochs");
+      return <EpochsPage epochId={null} />;
+    }
     return <SoonPage key={parts[1]} code={parts[1]} />;
   }
   if (parts[0] === "assistant") return <AssistantPage search={search} />;
   if (parts[0] === "reference") return <ReferencePage search={search} />;
+  if (parts[0] === "epochs") return <EpochsPage epochId={parts[1] ? safeDecode(parts[1]) : null} />;
   if (parts[0] === "graph") {
     // Карта не пересоздаётся при смене выбранной сущности: /graph/<id> только меняет выбор.
     return <MapPage entityId={parts[1] ? decodeURIComponent(parts[1]) : undefined} query={new URLSearchParams(search)} />;

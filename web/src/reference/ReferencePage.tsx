@@ -504,6 +504,28 @@ export function ReferencePage({ search }: { search: string }) {
                       </span>
                     )}
                   </button>
+                  {item.epochs.length > 0 && (
+                    <span className="reference-item__epochs">
+                      {item.epochs.map((e) => {
+                        const to = `/epochs/${encodeURIComponent(e.id)}`;
+                        return (
+                          <a
+                            key={e.id}
+                            className="reference-item__epoch"
+                            href={to}
+                            aria-label={t.epochs.inEpoch(e.label)}
+                            onClick={(ev) => {
+                              if (ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                              ev.preventDefault();
+                              navigate(to);
+                            }}
+                          >
+                            {e.label}
+                          </a>
+                        );
+                      })}
+                    </span>
+                  )}
                   {onMap(item.type) && (
                     <button
                       type="button"

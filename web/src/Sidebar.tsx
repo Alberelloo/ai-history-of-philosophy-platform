@@ -12,6 +12,7 @@ const LIVE: Partial<Record<SoonCode, string>> = {
   assistant: "/assistant",
   graph: "/graph",
   reference: "/reference",
+  epochs: "/epochs",
 };
 
 // Боковая панель навигации (docs/design/system/components/Sidebar.md): свёрнута до значков,
@@ -223,7 +224,7 @@ export function Sidebar({ active, sourceId, panelOpen }: { active: string; sourc
               </p>
               {SOON.filter((s) => s.group === group).map((s) => {
                 const text = t.soon.sections[s.code];
-                // Работающие разделы ведут на себя и без метки «скоро»: ассистент, карта графа, справочник.
+                // Работающие разделы ведут на себя и без метки «скоро»: ассистент, карта графа, справочник, эпохи.
                 const live = LIVE[s.code];
                 return (
                   <Item

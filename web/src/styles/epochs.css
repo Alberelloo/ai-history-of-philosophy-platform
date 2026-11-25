@@ -1,0 +1,282 @@
+/* Эпохи (/epochs, /epochs/<id>): лента эпох и описание выбранной на токенах дизайн-системы.
+   Раскладки 1920×1080 и 1024×576 — design.md изменения add-epochs, «Концепт интерфейса».
+   Лента шире окна прокручивается внутри себя; страница горизонтально не прокручивается. */
+
+.epochs {
+  max-width: 72rem;
+  min-width: 0;
+}
+
+.epochs__header {
+  margin-bottom: var(--space-4);
+}
+
+.epochs__notice {
+  margin-bottom: var(--space-4);
+}
+
+.epochs__notice p {
+  margin: 0 0 var(--space-2);
+}
+
+/* ---------- лента ---------- */
+
+.epochs-ribbon {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.epochs-ribbon--placeholder {
+  height: 156px;
+}
+
+.epochs-ribbon__bar {
+  position: absolute;
+  left: 16px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
+}
+
+.epochs-ribbon__bar:nth-child(1) {
+  width: 40%;
+}
+
+.epochs-ribbon__bar:nth-child(2) {
+  left: 30%;
+  width: 45%;
+}
+
+.epochs-ribbon__bar:nth-child(3) {
+  left: 55%;
+  width: 30%;
+}
+
+.epochs-ribbon__inner {
+  position: relative;
+  min-width: 100%;
+}
+
+.epochs-ribbon__axis {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.epochs-ribbon__tick {
+  position: absolute;
+  top: 6px;
+  transform: translateX(-50%);
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  white-space: nowrap;
+}
+
+.epochs-span {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  outline: none;
+}
+
+.epochs-span__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.epochs-span__label {
+  position: relative;
+  padding: 0 10px;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.epochs-span:hover .epochs-span__fill {
+  filter: saturate(1.4);
+}
+
+.epochs-span.is-selected {
+  box-shadow: inset 0 0 0 2px var(--history);
+}
+
+.epochs-span.is-selected .epochs-span__label {
+  font-weight: 600;
+}
+
+.epochs-span:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------- описание выбранной ---------- */
+
+.epochs__not-found {
+  color: var(--ink-2);
+  font: var(--type-ui-body);
+  margin: 0 0 var(--space-4);
+}
+
+.epochs-details {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.epochs-details__title {
+  margin: 0 0 var(--space-1);
+  color: var(--ink);
+  font: var(--type-ui-title);
+  letter-spacing: var(--type-ui-title-tracking);
+}
+
+.epochs-details__title:focus {
+  outline: none;
+}
+
+.epochs-details__title:focus-visible {
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+.epochs-details__dating {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-2);
+  font: var(--type-ui-body);
+}
+
+.epochs-details__range {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.epochs-details__wikidata {
+  color: var(--accent);
+}
+
+.epochs-details__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.epochs-details__summary {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-3);
+  color: var(--ink);
+  font: var(--type-ui-body);
+}
+
+.epochs-details__counts {
+  margin: 0 0 var(--space-4);
+  color: var(--ink-2);
+  font: var(--type-ui-label);
+}
+
+.epochs-details__count {
+  color: var(--accent);
+}
+
+.epochs-details__lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+.epochs-members {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.epochs-members__title {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-2);
+  font: var(--type-ui-label);
+}
+
+.epochs-members__placeholder {
+  display: block;
+  height: 4rem;
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
+}
+
+.epochs-members__error {
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+}
+
+.epochs-members__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.epochs-members__item {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: var(--type-ui-body-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.epochs-members__item:hover .epochs-members__name {
+  text-decoration: underline;
+}
+
+.epochs-members__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.epochs-members__year {
+  flex: none;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- без датировки ---------- */
+
+.epochs__undated-title {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-2);
+  font: var(--type-ui-label);
+}
+
+.epochs__undated-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font: var(--type-ui-body-sm);
+}
+
+.epochs__undated-link {
+  color: var(--accent);
+}
+
+.epochs__undated-count {
+  color: var(--ink-3);
+}
