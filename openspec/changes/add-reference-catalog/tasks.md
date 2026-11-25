@@ -9,7 +9,7 @@
 
 ## 2. Сервис знаний
 
-- [ ] 2.0 `dates.span(d)` и `dates.middle(d)` — общая функция начала/конца и середины (как `map._start`/`_end` с `round`); `map.py` переходит на неё (юнит-тесты на округление .5 и до н. э.)
+- [x] 2.0 `dates.span(d)` и `dates.middle(d)` — общая функция начала/конца и середины (как `map._start`/`_end` с `round`); `map.py` переходит на неё (юнит-тесты на округление .5 и до н. э.)
 - [ ] 2.1 `knowledge/snapshot.py`: `Snapshot`, `Snapshots.get(max_stale)` с `Clock`, блокировкой пересборки и событием `knowledge.snapshot.built`; перенос `_fingerprint` и `_load` из `map.py` без изменения правил (юнит-тесты: cached / stale / fresh, одна пересборка при двух параллельных запросах)
 - [ ] 2.2 `SectionMap(statements, settings=None, snapshots=None)` на общем снимке (`max_stale=0`), `main.py` передаёт общий `Snapshots`; кэш ответов карты — LRU на 32 ключа (юнит-тест: 33-й учебник вытесняет первый); `tests/knowledge/test_map.py` и `test_map_view.py` проходят без правок; ответ `/v1/map` на демо-данных совпадает с ответом до рефакторинга (сравнение в юнит-тесте на фикстуре)
 - [ ] 2.3 `knowledge/epochs.py`: `EpochMembership` — явное важнее дат, середина жизни / датировки, `[from, to)`, несколько эпох, эпоха без датировки — только явные (юнит-тесты на каждое правило)

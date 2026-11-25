@@ -21,6 +21,7 @@ from urllib.parse import quote, urlencode
 from sqlalchemy import and_, func, select
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.dates import span
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.statements import INFLUENCE, STRENGTH, Statements
 from philograph.platform import events
@@ -50,11 +51,11 @@ class MapSettings:
 
 
 def _start(dates: dict[str, Any]) -> int:
-    return round((dates["earliest_start"] + dates["latest_start"]) / 2)
+    return span(dates)[0]
 
 
 def _end(dates: dict[str, Any]) -> int:
-    return round((dates["earliest_end"] + dates["latest_end"]) / 2)
+    return span(dates)[1]
 
 
 def _short(label: str) -> str:
