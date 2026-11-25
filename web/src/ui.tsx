@@ -82,6 +82,14 @@ const ICONS = {
   plus: <path d="M12 5.5v13M5.5 12h13" />,
   minus: <path d="M5.5 12h13" />,
   stop: <rect x="7" y="7" width="10" height="10" rx="1.5" />,
+  play: <path d="M8 5.5v13l10.5-6.5Z" />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="7.5" />
+      <path d="M4.5 12h15M12 4.5c-2.6 2.3-2.6 12.7 0 15M12 4.5c2.6 2.3 2.6 12.7 0 15" />
+    </>
+  ),
+  pause: <path d="M8.5 5.5v13M15.5 5.5v13" />,
   copy: (
     <>
       <rect x="8.5" y="8.5" width="11" height="11" rx="1.5" />
