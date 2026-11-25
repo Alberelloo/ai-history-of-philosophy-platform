@@ -84,3 +84,15 @@
 - Старые браузерные тесты глобуса (`tests/web/test_geo_view.py`, `test_geo_scene.py`, `test_geo_limits.py`): прогон остановлен системой из-за нехватки памяти после 67 из 91 тестов. В пройденной части 28 провалов, все на якорях, которые дельта убрала или изменила: помощник `marks()` читает `[data-geo-place]`, а исходное приближение больше не 1. Провалы: `test_link_to_globe`, `test_initial_view_deterministic`, `test_keys_rotate_zoom_reset`, `test_key_steps_and_bounds`, `test_wheel_zoom`, `test_far_hemisphere_hidden`, `test_hidden_boundary_90`, `test_descartes_moves`, `test_hume_without_role`, `test_link_hume_kant_lifetime`, `test_event_visible_150_inclusive`, `test_opacity_by_age`, `test_unverified_place`, `test_mixed_place_is_verified`, `test_place_name_as_text`, `test_no_marks_without_placement`, `test_people_merged_in_one_mark`, `test_kant_selected`, `test_dimmed_still_selectable`, `test_place_mark_selection`, `test_event_selection`, `test_group_selection_c1_c6`, `test_list_matches_globe`, `test_list_includes_hidden`, `test_escape_clears_selection`, `test_loading_state`, `test_empty_year`, `test_layer_error`. Тесты не правились: это задачи тестировщика 5.1 и 5.7. Остаток (24 теста `test_geo_limits.py`) не прогнан.
 
 Статус: 1.1–1.3, 2.1–2.3, 3.1–3.8, 4.1–4.5 — сделаны; 5.x — следующие (тестировщик).
+
+## Ведущий — 2026-11-25, после круга 2 разработчика
+
+- Ревью плана (1.2) закрыто: разработчик принял 4 блокирующих и желательные 1–8 (`fd5ad60`).
+- Реализация 1.3, 2.x–4.x — `9a807ce`…`08dc3c9`.
+- Решения ведущего по отклонениям (владелец вопросов не принимает):
+  1. Правка `web/src/map/MapPanel.tsx` (3 строки: блок «Где в <год> году» и страна в «Выбрано») принята как «связанный с глобусом» файл: панель карты — часть вида «Глобус», без неё не выполнить требование «Место персоны по нажатию». Ревьювер проверяет, что других правок вне списка нет.
+  2. Бюджет раскладки пересмотрен разработчиком (покой ≤ 150 мс, кадр перетаскивания ≤ 16 мс) — принято: в спецификации числа нет, кадр перетаскивания остаётся в 16 мс.
+  3. `ruff` на ветке: ошибки только в файлах основы (`scripts/dev_stack.py`, `src/philograph/platform/queue.py` — запрещены владельцем; `src/philograph/prompts/__init__.py` — вне изменения). G10 замеряется как «изменение не добавляет нарушений»: `ruff` на файлах диффа чисто, плюс полный вывод с перечнем унаследованных нарушений.
+- Тестировщик поднят до Opus: нужна новая тестовая инфраструктура (переписать `tests/web/geo_helpers.py`, независимый расчёт проекции d3 в тестах, свойства на наборах поворотов/размеров).
+- Прогон `tests/web/test_geo_*` целиком упал по памяти — тестировщик гоняет пачками.
+- Следующий шаг: тестировщик (5.1–5.10).
