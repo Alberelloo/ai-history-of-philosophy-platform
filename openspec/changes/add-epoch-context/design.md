@@ -82,11 +82,7 @@ python -m philograph.knowledge.epoch_context harvest [--epochs sources/epochs.ya
 python -m philograph.knowledge.epoch_context apply   [--manifest sources/epoch_context.yaml] [--dry-run]
 ```
 
-<<<<<<< HEAD
-- `harvest`: для эпох с подтверждённым QID (из `sources/epochs.yaml` или внешнего идентификатора) — `wikidata.fetch_entity(qid)` → `record.items("P793")` → для каждого события `fetch_entity` → дата (`wikidata.claim_date` + `dates.interval`; P585 или P580/P582, ранги — `record.best`), вид по `EVENT_CLASSES` (таблица P31 → `event_kind`, данные модуля, как `WIKIDATA_ROLES`; не найдено — вид не пишется), место P276 (первое). Без даты — не предлагается. Уже принятые и отклонённые в манифесте не перезаписываются.
-=======
 - `harvest`: для эпох с подтверждённым QID (из `sources/epochs.yaml` или внешнего идентификатора) — `wikidata.fetch_entity(qid, fetch)` → `record.items("P793")` → для каждого события `fetch_entity(qid, fetch)` → дата (P585 — одна дата, `wikidata.claim_date` без interval; P580/P582 — `claim_date` + `dates.interval`, ранги — `record.best`), вид по `EVENT_CLASSES` (таблица P31 → `event_kind`, данные модуля, как `WIKIDATA_ROLES`; не найдено — вид не пишется), место P276 (первое). Без даты — не предлагается. Уже принятые и отклонённые в манифесте не перезаписываются.
->>>>>>> claude/epoch-context
 - Манифест:
 
 ```yaml
