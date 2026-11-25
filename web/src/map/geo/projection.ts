@@ -91,15 +91,18 @@ export type Frame = { cx: number; cy: number; radius: number }; // круг гл
 export type Projector = { projection: GeoProjection; path: GeoPath; scale: number };
 
 // Ортографическая проекция вида: обрезка по видимому полушарию (clipAngle 90).
-export function projector(v: View, f: Frame): Projector {
+export function projector(v: View, f: Frame, precision = 0.6): Projector {
   const projection = geoOrthographic()
     .rotate([-v.lon, -v.lat])
     .scale(f.radius * v.zoom)
     .translate([f.cx, f.cy])
     .clipAngle(90)
-    .precision(0.6);
+    .precision(precision);
   return { projection, path: geoPath(projection), scale: f.radius * v.zoom };
 }
+
+// Тот же путь для canvas (суша и сетка — вариант Б design): рисует в контекст.
+export const canvasPath = (p: Projector, ctx: CanvasRenderingContext2D): GeoPath => geoPath(p.projection, ctx);
 
 // Путь дуги большого круга между двумя местами; на дальнем полушарии — обрезан (null —
 // дуга целиком не видна).

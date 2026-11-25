@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { useT } from "../../i18n";
 import { mapFonts, type Measure } from "../layout";
 import type { GeoLayer } from "./api";
 import { LAND } from "./land";
 import {
   arcPath,
+  canvasPath,
   centerAttr,
   centerOn,
   degreesPerPixel,
@@ -42,6 +43,7 @@ const WHEEL_STEP = 100; // px колеса на шаг приближения
 const RIM = 16; // поле под обод и деления вокруг круга глобуса
 const LABEL_FONT = mapFonts(false).workTitle;
 const LABEL_GAP = 4;
+const DRAG_PRECISION = 2.5; // px: точность передискретизации путей во время перетаскивания
 
 type Props = {
   width: number;
@@ -150,10 +152,13 @@ export default function GlobeView(props: Props) {
   });
 
   // Анимации (поворот к месту, инерция) — одна за раз; любое действие читателя её снимает.
+  // Пока глобус тянут (и по инерции), путь грубее, подписи не раскладываются: кадр легче.
+  const [moving, setMoving] = useState(false);
   const anim = useRef(0);
   const cancel = useCallback(() => {
     if (anim.current) cancelAnimationFrame(anim.current);
     anim.current = 0;
+    setMoving(false);
   }, []);
   useEffect(() => cancel, [cancel]);
 
@@ -205,7 +210,7 @@ export default function GlobeView(props: Props) {
   // Перетаскивание: поворот по пикселям, кадр — не чаще раза за requestAnimationFrame.
   const drag = useRef<{ id: number; x: number; y: number; start: View; moved: boolean; samples: [number, number, number][] } | null>(null);
   const pending = useRef<View | null>(null);
-  const pr = useMemo(() => projector(view, frame), [view, frame]);
+  const pr = useMemo(() => projector(view, frame, moving ? DRAG_PRECISION : undefined), [view, frame, moving]);
   const onPointerDown = (e: ReactPointerEvent<SVGSVGElement>) => {
     if (e.button !== 0) return;
     cancel();
@@ -219,6 +224,7 @@ export default function GlobeView(props: Props) {
     if (!d.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
     if (!d.moved) {
       d.moved = true;
+      setMoving(true);
       svg.current?.setPointerCapture?.(e.pointerId);
     }
     d.samples.push([e.clientX, e.clientY, performance.now()]);
@@ -247,17 +253,19 @@ export default function GlobeView(props: Props) {
       viewRef.current = pending.current;
       pending.current = null;
     }
-    if (reduced) return; // без инерции
+    const still = () => setMoving(false);
+    if (reduced) return still(); // без инерции
     const [a, b] = [d.samples[0], d.samples[d.samples.length - 1]];
     const dt = b[2] - a[2];
-    if (dt <= 0 || dt > 120) return;
+    if (dt <= 0 || dt > 120) return still();
     const k = degreesPerPixel(projector(viewRef.current, frame));
     let vLon = (-(b[0] - a[0]) * k) / dt; // градусов в мс
     let vLat = ((b[1] - a[1]) * k) / dt;
-    if (Math.hypot(vLon, vLat) < 0.01) return;
+    if (Math.hypot(vLon, vLat) < 0.01) return still();
     const t0 = performance.now();
     let last = t0;
     cancel();
+    setMoving(true);
     const tick = () => {
       const now = performance.now();
       const step = now - last;
@@ -269,6 +277,7 @@ export default function GlobeView(props: Props) {
       viewRef.current = next;
       setView(next);
       anim.current = now - t0 < INERTIA_MS && Math.hypot(vLon, vLat) > 0.002 ? requestAnimationFrame(tick) : 0;
+      if (!anim.current) still();
     };
     anim.current = requestAnimationFrame(tick);
   };
@@ -297,9 +306,62 @@ export default function GlobeView(props: Props) {
   const [keysOpen, setKeysOpen] = useState(false);
 
   // --- сцена ---
+  // Основа — тень, море, сетка, суша — на canvas (вариант Б design: замер 5.6). Цвета —
+  // токены, прочитанные из CSS (getComputedStyle), литералов нет.
+  const base = useRef<HTMLCanvasElement>(null);
+  useLayoutEffect(() => {
+    const c = base.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(width * dpr);
+    const h = Math.round(height * dpr);
+    if (c.width !== w || c.height !== h) {
+      c.width = w;
+      c.height = h;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    const css = getComputedStyle(c);
+    const color = (name: string) => css.getPropertyValue(name).trim();
+    const R0 = pr.scale;
+    // Тень под глобусом: эллипс с радиальным затуханием.
+    ctx.save();
+    ctx.translate(frame.cx + R0 * 0.04, frame.cy + R0 * 0.98);
+    ctx.scale(1, 0.09);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, R0 * 0.8);
+    g.addColorStop(0, color("--globe-coast"));
+    g.addColorStop(1, "transparent");
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, R0 * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    const path = canvasPath(pr, ctx);
+    ctx.beginPath();
+    path({ type: "Sphere" });
+    ctx.fillStyle = color("--globe-sea");
+    ctx.fill();
+    ctx.beginPath();
+    path(GRATICULE);
+    ctx.strokeStyle = color("--globe-graticule");
+    ctx.lineWidth = 0.8;
+    ctx.lineCap = "round";
+    ctx.setLineDash([0.6, 3.2]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    path(LAND);
+    ctx.fillStyle = color("--globe-land");
+    ctx.fill();
+    ctx.strokeStyle = color("--globe-coast");
+    ctx.lineWidth = 0.75;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+    c.dataset.drawn = "true";
+  }, [pr, frame, width, height]);
   const sphere = pr.path({ type: "Sphere" }) ?? "";
-  const land = useMemo(() => pr.path(LAND) ?? "", [pr]);
-  const graticule = useMemo(() => pr.path(GRATICULE) ?? "", [pr]);
   const R = pr.scale;
   const places = scene?.places ?? [];
   const points = places.map((p) => {
@@ -308,7 +370,7 @@ export default function GlobeView(props: Props) {
     return { p, x: xy ? xy[0] : 0, y: xy ? xy[1] : 0, r: markRadius(p.people.length), near };
   });
   const shown = points.filter((q) => q.near && q.x >= -20 && q.x <= width + 20 && q.y >= -20 && q.y <= height + 20);
-  const labels = layoutLabels(shown, measure, width, height);
+  const labels = moving ? [] : layoutLabels(shown, measure, width, height);
   const links = scene?.links ?? [];
   const trail =
     roles.trail.length > 1
@@ -337,6 +399,7 @@ export default function GlobeView(props: Props) {
 
   return (
     <div className="geo-stage" style={{ width, height }}>
+      <canvas ref={base} className="geo-land" data-geo-land="" style={{ width, height }} aria-hidden="true" />
       <svg
         ref={svg}
         className="geo-globe"
@@ -364,15 +427,7 @@ export default function GlobeView(props: Props) {
             <stop className="geo-shade__mid" offset="55%" />
             <stop className="geo-shade__dark" offset="100%" />
           </radialGradient>
-          <radialGradient id="geo-shadow" cx="50%" cy="50%" r="50%">
-            <stop className="geo-shadow__in" offset="0%" />
-            <stop className="geo-shadow__out" offset="100%" />
-          </radialGradient>
         </defs>
-        <ellipse className="geo-shadow" cx={frame.cx + R * 0.04} cy={frame.cy + R * 0.98} rx={R * 0.8} ry={R * 0.07} aria-hidden="true" />
-        <path className="geo-sea" d={sphere} />
-        <path className="geo-graticule" d={graticule} />
-        <path className="geo-land" d={land} />
         <path className="geo-shade" d={sphere} aria-hidden="true" />
         <g className="geo-links" aria-hidden="true">
           {trail && <path className="geo-trail map-role-self" d={trail} />}

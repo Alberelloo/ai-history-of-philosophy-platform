@@ -23,7 +23,17 @@
   overflow: hidden;
 }
 
+/* Основа — тень, море, сетка 15° точками, суша и берег — на canvas под SVG (GlobeView):
+   цвета — токены globe-*, прочитанные из CSS. Поверх — SVG: объём, дуги, отметки, обод. */
+.geo-land {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
 .geo-globe {
+  position: relative;
   display: block;
   cursor: grab;
   touch-action: none;
@@ -47,25 +57,6 @@
   stroke-width: 2;
 }
 
-.geo-sea {
-  fill: var(--globe-sea);
-}
-
-.geo-graticule {
-  fill: none;
-  stroke: var(--globe-graticule);
-  stroke-width: 0.8;
-  stroke-dasharray: 0.6 3.2;
-  stroke-linecap: round;
-}
-
-.geo-land {
-  fill: var(--globe-land);
-  stroke: var(--globe-coast);
-  stroke-width: 0.75;
-  stroke-linejoin: round;
-}
-
 /* Объём — статический радиальный градиент поверх моря и суши. */
 .geo-shade {
   fill: url(#geo-shade);
@@ -85,21 +76,6 @@
 .geo-shade__dark {
   stop-color: var(--globe-coast);
   stop-opacity: 0.2;
-}
-
-.geo-shadow {
-  fill: url(#geo-shadow);
-  pointer-events: none;
-}
-
-.geo-shadow__in {
-  stop-color: var(--globe-coast);
-  stop-opacity: 0.22;
-}
-
-.geo-shadow__out {
-  stop-color: var(--globe-coast);
-  stop-opacity: 0;
 }
 
 /* ---------- латунный обод ---------- */
