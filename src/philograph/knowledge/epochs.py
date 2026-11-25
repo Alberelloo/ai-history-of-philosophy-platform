@@ -15,22 +15,34 @@
 
 Выведенное не записывается в базу (ontology.md, О-8): ``EpochMembership`` строится в памяти
 из снимка, один раз на снимок (``Snapshot.derived``).
+
+Список эпох (``EpochList``, требование «Список эпох», ``GET /v1/epochs``) строится из того же
+снимка справочника: пролёт — ``dates.span``, нечёткие границы — пары «самое раннее, самое
+позднее», источник — по атрибуции основной датировки, счётчики — ``members`` по видам карты.
 """
 
 from __future__ import annotations
 
+import copy
 from collections import defaultdict
-from typing import Literal
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Literal
 
 from philograph.knowledge.dates import middle, span
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.snapshot import Snapshot
+from philograph.knowledge.wikidata import QID
+from philograph.platform import events
+
+if TYPE_CHECKING:  # справочник импортирует этот модуль; здесь — только для типов
+    from philograph.knowledge.catalog import Catalog
 
 Basis = Literal["explicit", "dates"]
 BELONGS = "belongs_to_epoch"
 EPOCH = "epoch"
 # Типы, которые относятся к эпохе по датам (с подтипами по реестру).
 DATED_TYPES = ["person", "work", "event", "phenomenon"]
+WIKIDATA_PREFIX = "wikidata:"  # источник атрибуции импорта из Wikidata
 
 
 class EpochMembership:
@@ -104,3 +116,152 @@ class EpochMembership:
 def membership(snapshot: Snapshot, registry: OntologyRegistry) -> EpochMembership:
     """Принадлежность для снимка — одна на снимок."""
     return snapshot.derived("epochs", lambda s: EpochMembership(s, registry))
+
+
+# --- список эпох (``GET /v1/epochs``) -------------------------------------------------
+
+events.define(
+    "knowledge.epochs.listed",
+    "info",
+    "Отдан список эпох",
+    required=("epochs", "undated", "truncated", "snapshot"),
+)
+
+MAX_EPOCHS = 500
+DATING = "dating"
+# Виды счётчиков эпохи — те же категории, что на карте раздела.
+IDEA_TYPES = ("concept", "conception", "doctrine", "problem", "position", "argument")
+COUNT_KINDS = ("people", "works", "ideas", "events", "groups")
+
+
+def count_kind(registry: OntologyRegistry, entity_type: str) -> str | None:
+    if entity_type == "person":
+        return "people"
+    if entity_type == "work":
+        return "works"
+    if entity_type in IDEA_TYPES:
+        return "ideas"
+    if registry.is_a(entity_type, ["event", "phenomenon"]):
+        return "events"
+    if entity_type == "group":
+        return "groups"
+    return None
+
+
+def dating_source(statement: dict[str, Any] | None) -> dict[str, Any]:
+    """Источник основной датировки по её атрибуции (требование «Список эпох»):
+    ``wikidata:Q…`` — ``wikidata``; источник библиотеки или подтверждающий абзац — ``source``;
+    общее мнение — ``common``; без атрибуции — ``manual``. QID — только по шаблону."""
+    if statement is None:
+        return {"status": None, "source": "manual", "wikidata": None}
+    shown = [a for a in statement["attributions"] if not a["hidden"]]
+    qid = None
+    for a in shown:
+        who = a["who"] or ""
+        if a["who_kind"] == "source" and who.startswith(WIKIDATA_PREFIX):
+            candidate = who[len(WIKIDATA_PREFIX) :]
+            if QID.fullmatch(candidate):
+                qid = candidate
+                break
+    if qid is not None:
+        source = "wikidata"
+    elif any(a["who_kind"] in ("source", "entity") for a in shown) or any(
+        not e["lost"] for e in statement["evidence"]
+    ):
+        source = "source"
+    elif any(a["who_kind"] == "common" for a in shown):
+        source = "common"
+    else:
+        source = "manual"
+    return {"status": statement["status"], "source": source, "wikidata": qid}
+
+
+def _main_dating(rows: list[dict[str, Any]], primary: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Утверждение основной датировки — то, чьё значение скопировано в ``primary.dates``
+    (``Statements._update_primary``: предпочтённое, иначе первое записанное)."""
+    same = [s for s in rows if s["value"] == primary]
+    pool = same or rows
+    if not pool:
+        return None
+    return sorted(pool, key=lambda s: s["rank"] != "preferred")[0]
+
+
+class EpochList:
+    """Список эпох из снимка справочника (окно устарелости справочника), без модели.
+
+    Описание — то же, что в записи справочника (``CatalogIndex``), счётчики — по
+    ``EpochMembership.members``, по видам карты."""
+
+    def __init__(self, catalog: Catalog, max_epochs: int = MAX_EPOCHS) -> None:
+        self.catalog = catalog
+        self.max_epochs = max_epochs
+
+    def _build(self, snapshot: Snapshot) -> dict[str, Any]:
+        registry = self.catalog.registry
+        epochs = membership(snapshot, registry)
+        index = self.catalog.index(snapshot)
+        summaries = {r.id: r.summary for r in index.records}
+        datings: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for s in snapshot.statements:
+            if s["type"] == DATING:
+                datings[s["subject"]].append(s)
+        kinds: dict[str, str | None] = {}
+
+        def counts(epoch_id: str) -> dict[str, int]:
+            found = dict.fromkeys(COUNT_KINDS, 0)
+            for entity_id, _ in epochs.members(epoch_id):
+                type_ = snapshot.entities[entity_id]["type"]
+                if type_ not in kinds:
+                    kinds[type_] = count_kind(registry, type_)
+                if kinds[type_]:
+                    found[kinds[type_]] += 1
+            return found
+
+        ordered = epochs.epochs()
+        truncated = len(ordered) > self.max_epochs
+        dated, undated = [], []
+        for epoch_id in ordered[: self.max_epochs]:
+            label = snapshot.labels[epoch_id]
+            primary = snapshot.entities[epoch_id]["primary"].get("dates")
+            if not primary:
+                undated.append({"id": epoch_id, "label": label, "counts": counts(epoch_id)})
+                continue
+            start, end = span(primary)
+            summary = summaries.get(epoch_id)
+            dated.append(
+                {
+                    "id": epoch_id,
+                    "label": label,
+                    "from": start,
+                    "to": end,
+                    "fuzzy": fuzzy(primary),
+                    "precision": primary.get("precision"),
+                    "original": primary.get("original"),
+                    "dating": dating_source(_main_dating(datings.get(epoch_id, []), primary)),
+                    "summary": dict(summary) if summary else None,
+                    "counts": counts(epoch_id),
+                }
+            )
+        return {"epochs": dated, "undated": undated, "truncated": truncated}
+
+    def list(self) -> dict[str, Any]:
+        snapshot, status = self.catalog.snapshots.get(
+            max_stale=self.catalog.settings.max_stale_seconds
+        )
+        result = snapshot.derived("epoch_list", self._build)
+        events.emit(
+            "knowledge.epochs.listed",
+            epochs=len(result["epochs"]),
+            undated=len(result["undated"]),
+            truncated=result["truncated"],
+            snapshot=status,
+        )
+        return copy.deepcopy(result)
+
+
+def fuzzy(dates: Mapping[str, Any]) -> dict[str, list[int]]:
+    """Нечёткие границы пролёта: пары «самое раннее, самое позднее» начала и конца."""
+    return {
+        "from": [dates["earliest_start"], dates["latest_start"]],
+        "to": [dates["earliest_end"], dates["latest_end"]],
+    }
