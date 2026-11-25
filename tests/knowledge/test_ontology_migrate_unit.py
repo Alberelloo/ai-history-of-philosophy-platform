@@ -306,3 +306,52 @@ def test_cli_bad_batch_and_manifest(tmp_path, capsys):
     bad = tmp_path / "m.yaml"
     bad.write_text("entities:\n- entity: e1\n  decision: accepted\n", encoding="utf-8")
     assert main(["run", "--manifest", str(bad)], service=service) == 2
+
+
+KANT = {
+    "Q9312": record(
+        "Q9312",
+        ru="Кант",
+        en="Kant",
+        classes=("Q5",),
+        times={"P569": ("+1724-04-22T00:00:00Z", 11), "P570": ("+1804-02-12T00:00:00Z", 11)},
+    )
+}
+
+
+def _kant_manifest(ids):
+    return {"entities": [{"entity": ids["kant"], "wikidata": "Q9312", "decision": "accepted"}]}
+
+
+@pytest.mark.parametrize("keep", ["verified", "other_run", None])
+def test_rollback_manifest_qid_by_life_dates_rule(onto, events, keep):
+    """О20: откат шага ``manifest_qids`` — правило ``LifeDates``: QID, на который ссылается
+    проверенное утверждение или утверждение другого запуска, остаётся и идёт в ``kept``."""
+    from philograph.knowledge.statements import Provenance
+
+    ids = build(onto)
+    m = migration(onto, fetch=RecordFetch({**WD, **KANT}))
+    report = m.run(manifest=_kant_manifest(ids))
+    assert onto.entities.by_external("wikidata", "Q9312") == ids["kant"]
+    if keep == "other_run":
+        onto.statements.add(
+            ids["kant"],
+            "description",
+            value="другой запуск",
+            attributions=[Attribution("source", "wikidata:Q9312")],
+            provenance=Provenance("imported", run_id="other"),
+        )
+    if keep == "verified":
+        with onto.entities.engine.begin() as conn:
+            conn.execute(
+                ks.statements.update()
+                .where(ks.statements.c.subject == ids["kant"])
+                .where(ks.statements.c.type == "lifespan")
+                .values(status="verified")
+            )
+    summary = migration(onto).rollback(report.run_id)
+    kept_qid = onto.entities.by_external("wikidata", "Q9312") == ids["kant"]
+    assert kept_qid is (keep is not None)
+    assert summary["kept"] == (1 if keep else 0)
+    [event] = events.where("knowledge.migration.rolled_back")
+    assert event["kept"] == summary["kept"]

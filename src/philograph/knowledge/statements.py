@@ -1084,11 +1084,20 @@ class Statements:
 
     def rollback_run(self, run_id: str) -> dict[str, int]:
         """Убирает всё, что добавил запуск, кроме проверенного человеком."""
+        # Проверенное утверждение остаётся вместе со своими атрибуциями и подтверждениями.
+        verified = select(t.statements.c.id).where(t.statements.c.status == "verified")
         with self.engine.begin() as conn:
             attrs = conn.execute(
-                delete(t.attributions).where(t.attributions.c.run_id == run_id)
+                delete(t.attributions).where(
+                    t.attributions.c.run_id == run_id,
+                    t.attributions.c.statement_id.not_in(verified),
+                )
             ).rowcount
-            evs = conn.execute(delete(t.evidence).where(t.evidence.c.run_id == run_id)).rowcount
+            evs = conn.execute(
+                delete(t.evidence).where(
+                    t.evidence.c.run_id == run_id, t.evidence.c.statement_id.not_in(verified)
+                )
+            ).rowcount
             candidates = (
                 conn.execute(select(t.statements).where(t.statements.c.status != "verified"))
                 .mappings()

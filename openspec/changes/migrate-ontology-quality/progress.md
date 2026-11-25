@@ -154,3 +154,12 @@
 
 Выбор решения: соответствует гибриду из design. Подгонка тестов: юнит-тесты сверяют дамп и вызовы модели; тесты тестировщика — следующим кругом.
 Вердикт: доработать (пп. 1–2), затем к тестировщику и судье.
+
+## О20 (разработчик), правки по ревью
+
+- (1) Откат `manifest_qids` — `LifeDates.rollback_externals` (вынесено из `LifeDates.rollback`, одно правило `_referenced`); оставленные QID — в `kept` отчёта и `knowledge.migration.rolled_back`. Spec («Чужие изменения»), design обновлены. Юнит: `test_ontology_migrate_unit.py::test_rollback_manifest_qid_by_life_dates_rule` (3 случая).
+- (2) `ruff format` только `tests/knowledge/test_quality_report_unit.py`.
+- (3) `integrity.compare`: цель с другим типом или концами, не равными образам исходных через перенаправления, — потеря (`_same`). Spec («Учёт утверждений…»), design. Юнит: `test_integrity_unit.py::test_substituted_target_is_loss`.
+- (4) `schema.has_retired` — кэш на движок (`WeakSet`, «нет» не кэшируется: база может пройти миграцию в том же процессе); `integrity._state` вызывает его вместо своего `inspect`. Юнит: `test_integrity_unit.py::test_has_retired_cached_per_engine`.
+- Попутно: новый тест тестировщика `test_life_dates.py::test_rollback_verified_keeps_attribution` падал. Причина: `Statements.rollback_run` удалял атрибуции и подтверждения запуска и у проверенных утверждений. Теперь они удаляются только у непроверенных (`statements.py`, `rollback_run`). `test_life_dates` 31, `test_filling` 30, `test_statements` 19 — passed.
+- Прогоны по одному: `test_quality_report_unit` 5, `test_retired_unit` 4, `test_life_dates_unit` 14, `test_ontology_migrate_unit` 13, `test_integrity_unit` 7, `test_entity_merge` 13, `test_snapshot` 6, `test_wikidata` 52 — passed; ruff, lint-imports (3 kept), traceability 410 из 410.

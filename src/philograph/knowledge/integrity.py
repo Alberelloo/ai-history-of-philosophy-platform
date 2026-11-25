@@ -8,7 +8,8 @@
 
 - *мусор* (``dropped_garbage``), если его конец (с учётом перенаправлений) снят;
 - *петля*, если стало петлёй при слиянии (``merges.moved.loops``) — не потеря;
-- *потеряно* (``lost``), если иначе его нет или оно не действующее.
+- *потеряно* (``lost``), если иначе его нет, оно не действующее или подменено: у цели другой
+  тип или её концы не равны образам исходных концов через карту перенаправлений.
 
 Атрибуция *потеряна*, если её ``(вид, автор с учётом перенаправлений, позиция)`` нет у
 утверждения, в которое попало исходное; точный повтор после свёртки и автор — снятая
@@ -23,7 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import inspect, select
+from sqlalchemy import select
 
 from philograph.knowledge import schema as t
 
@@ -82,9 +83,8 @@ def baseline(engine: Any) -> Baseline:
 
 def _state(engine: Any) -> dict[str, Any]:
     with engine.begin() as conn:
-        columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=t.SCHEMA)}
         query = [t.entities.c.id, t.entities.c.redirect_to]
-        has_retired = "retired_run" in columns  # схема до knowledge:9 — снятых нет
+        has_retired = t.has_retired(conn)  # схема до knowledge:9 — снятых нет
         if has_retired:
             query.append(t.entities.c.retired_run)
         entities = conn.execute(select(*query)).all()
@@ -109,6 +109,18 @@ def _state(engine: Any) -> dict[str, Any]:
         "folded": folded,
         "loops": loops,
     }
+
+
+def _same(row: Any, content: dict[str, Any], ends: list[str | None], resolve: Any) -> bool:
+    """Цель — то же утверждение: тот же тип, концы — образы исходных через перенаправления."""
+    return (
+        row["type"] == content["type"]
+        and [
+            resolve(row["subject"]),
+            resolve(row["object"]),
+        ]
+        == ends
+    )
 
 
 def _follow(mapping: dict[str, str], key: str | None) -> str | None:
@@ -143,7 +155,7 @@ def compare(base: Baseline, engine: Any) -> dict[str, Any]:
             loops += 1
             continue
         row = state["statements"].get(target)
-        if row is None or not _live(row):
+        if row is None or not _live(row) or not _same(row, content, ends, resolve):
             lost.append(sid)
             continue
         have = {

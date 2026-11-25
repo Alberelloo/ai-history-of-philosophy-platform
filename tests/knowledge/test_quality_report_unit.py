@@ -101,7 +101,7 @@ def test_save_then_baseline_on_old_schema(tmp_path, capsys, events):
     registry.load_defaults()
     with engine.begin() as conn:
         conn.exec_driver_sql(
-            f"INSERT INTO {ks.SCHEMA}.entities (id, type, \"primary\")"
+            f'INSERT INTO {ks.SCHEMA}.entities (id, type, "primary")'
             " VALUES ('e1', 'person', '{}')"
         )
     ks._HAS_RETIRED.clear()

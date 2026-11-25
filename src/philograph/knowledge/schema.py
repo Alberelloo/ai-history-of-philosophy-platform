@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import weakref
 from typing import Any
 
 from sqlalchemy import (
@@ -411,20 +412,23 @@ def retired(entities: Table = entities) -> Any:
     return entities.c.retired_run.is_not(None)
 
 
-_HAS_RETIRED: set[int] = set()
+# Движки, у которых столбец снятия уже найден. Слабые ссылки: ``id`` движка после сборки
+# мусора может достаться другому. «Нет» не запоминается: та же база может пройти миграцию
+# до ``knowledge:9`` в этом же процессе, а столбец, раз появившись, не исчезает.
+_HAS_RETIRED: weakref.WeakSet[Any] = weakref.WeakSet()
 
 
 def has_retired(conn: Connection) -> bool:
     """Есть ли столбец снятия (схема ``knowledge:9``). Замер на чтение работает и на базе
-    до миграции: там снятых нет. Помнится только «есть» — столбец не исчезает."""
-    key = id(conn.engine)
-    if key in _HAS_RETIRED:
+    до миграции: там снятых нет. Проверка схемы кэшируется на движок."""
+    engine = conn.engine
+    if engine in _HAS_RETIRED:
         return True
     from sqlalchemy import inspect
 
     columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
     if "retired_run" in columns:
-        _HAS_RETIRED.add(key)
+        _HAS_RETIRED.add(engine)
         return True
     return False
 

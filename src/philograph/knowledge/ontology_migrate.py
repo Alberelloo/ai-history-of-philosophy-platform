@@ -474,12 +474,15 @@ class Migration:
 
     # --- шаги ---
 
+    def _life(self) -> LifeDates:
+        return LifeDates(self.statements, self.fetch or _no_fetch, self.review)
+
     def _step_manifest_qids(
         self, view: View, report: Report, *, manifest, confirmed, **_: Any
     ) -> list[Action]:
         if manifest is None:
             return []
-        life = LifeDates(self.statements, self.fetch or _no_fetch, self.review)
+        life = self._life()
         result = life.apply(manifest, dry_run=report.dry_run, run_id=report.run_id, merge=False)
         confirmed.extend(result.confirmed)
         report.externals = result.externals
@@ -879,10 +882,9 @@ class Migration:
                     )
             elif kind == "external":
                 externals.append(p)
-        # Шаг QID из манифеста: утверждения запуска (кроме проверенных) и записанные QID.
-        self.statements.rollback_run(run_id)
-        for p in externals:
-            self.entities.remove_external(p["entity"], QID_SYSTEM, p["qid"])
+        # Шаг QID из манифеста — общим правилом ``LifeDates``: QID, на который ссылается
+        # проверенное утверждение или утверждение другого запуска, остаётся и идёт в ``kept``.
+        kept += self._life().rollback_externals(run_id, externals)["kept"]
         self._close_review(run_id)
         summary = {
             "run_id": run_id,

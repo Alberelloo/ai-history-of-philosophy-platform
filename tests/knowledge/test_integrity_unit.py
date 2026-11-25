@@ -89,3 +89,33 @@ def test_retired_author_attribution_is_not_lost(onto):
         conn.execute(update(ks.entities).where(ks.entities.c.id == w["b"]).values(retired_run="m"))
         conn.execute(delete(ks.attributions).where(ks.attributions.c.statement_id == s))
     assert integrity.compare(base, engine)["lost_attributions"] == []
+
+
+def test_substituted_target_is_loss(onto):
+    """О20: цель жива, но тип другой или концы — не образы исходных: потеря (ядро А8)."""
+    w = world(onto)
+    engine = onto.entities.engine
+    base = integrity.baseline(engine)
+    with engine.begin() as conn:
+        conn.execute(
+            update(ks.statements).where(ks.statements.c.id == w["s1"]).values(object=w["junk"])
+        )
+        conn.execute(
+            update(ks.statements).where(ks.statements.c.id == w["s2"]).values(type="rejects")
+        )
+    assert sorted(integrity.compare(base, engine)["lost"]) == sorted([w["s1"], w["s2"]])
+
+
+def test_has_retired_cached_per_engine(onto, monkeypatch):
+    """О20: проверка схемы — один раз на движок."""
+    import sqlalchemy
+
+    engine = onto.entities.engine
+    calls = []
+    real = sqlalchemy.inspect
+    monkeypatch.setattr(sqlalchemy, "inspect", lambda *a, **k: calls.append(a) or real(*a, **k))
+    ks._HAS_RETIRED.discard(engine)
+    for _ in range(3):
+        with engine.begin() as conn:
+            assert ks.has_retired(conn)
+    assert len(calls) == 1

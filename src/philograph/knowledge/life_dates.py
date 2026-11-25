@@ -597,27 +597,28 @@ class LifeDates:
         for merge_id, moved in merges:
             if (moved or {}).get("run_id") == run_id:
                 self.statements.undo_merge(merge_id)
+        summary = {"run_id": run_id, **self.rollback_externals(run_id, [a for (a,) in actions])}
+        events.emit("knowledge.life_dates.rolled_back", **summary)
+        return summary
+
+    def rollback_externals(self, run_id: str, externals: list[dict[str, Any]]) -> dict[str, int]:
+        """Утверждения запуска (кроме проверенных) и QID из ``externals`` (записи ``external``
+        журнала действий, от последней к первой). Одно правило для отката команды и шага
+        ``manifest_qids`` миграции. Возвращает ``statements``, ``externals``, ``kept``."""
         # QID, на который ссылается оставшееся утверждение (проверенное этого запуска или
         # любое другого), остаётся: считается до удаления атрибуций запуска.
         kept = {
             (a["entity"], a["qid"])
-            for (a,) in actions
+            for a in externals
             if self._referenced(a["entity"], a["qid"], run_id)
         }
         removed = self.statements.rollback_run(run_id)["statements"]
-        externals = 0
-        for (a,) in actions:
+        count = 0
+        for a in externals:
             if (a["entity"], a["qid"]) in kept:
                 continue
-            externals += int(self.entities.remove_external(a["entity"], SYSTEM, a["qid"]))
-        summary = {
-            "run_id": run_id,
-            "statements": removed,
-            "externals": externals,
-            "kept": len(kept),
-        }
-        events.emit("knowledge.life_dates.rolled_back", **summary)
-        return summary
+            count += int(self.entities.remove_external(a["entity"], SYSTEM, a["qid"]))
+        return {"statements": removed, "externals": count, "kept": len(kept)}
 
     def _referenced(self, entity_id: str, qid: str, run_id: str) -> bool:
         entity_id = self.entities.resolve(entity_id)
