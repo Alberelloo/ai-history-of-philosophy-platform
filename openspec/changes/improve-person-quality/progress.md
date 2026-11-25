@@ -109,3 +109,10 @@
   - `lint-imports`: 3 kept. `check_traceability.py`: 403 из 403.
   - pytest по одному файлу, ожидания не правились: `test_filling` 30 (включая очередь и «Решения по сущностям»), `test_registry_entities` 33/1 skipped (включая `undo_merge`), `test_statements` 19, `test_snapshot` 6, `test_map` 16, `test_graph` 24, `test_entities_external` 4, `test_mentions_cards` 32 (включая отмену слияния), `test_catalog_unit` 29. Мои юнит-тесты: `test_person_merge_unit` 7, `test_dedupe_unit` 18, `test_entity_items_unit` 11.
 - Исправление по замечанию ведущего, 2026-11-25. Отличие «компонента, заблокированная решением „разные“, уходит в очередь с `review:qid_cluster`» снято. Пара, где единственная преграда — решение «разные», не сливается и в очередь не идёт. Если в компоненте есть другие нерешённые рёбра, они идут в очередь с новой причиной `review:decided_conflict` (добавлена в перечень spec, design обоих изменений, сценарий «Решение „разные“ и третья запись», мутация); `review:qid_cluster` теперь только для двух QID / `apart:qid`. `test_dedupe_unit` 19 passed.
+
+## Тестировщик — 2026-11-25 (субагент `tester`)
+
+- 3.1–3.8 закрыты. Файлы: `tests/knowledge/test_person_quality.py` (person-quality), `tests/knowledge/test_entity_merge.py` (ontology-entities MODIFIED), стратегии `not_persons`, `persons_with_variants`, `ontology_with_duplicates`, `ontology_names` в `tests/knowledge/strategies.py`, мутации `tests/mutations/improve-person-quality/` (18 патчей от HEAD — рабочее дерево параллельно меняет разработчик миграции).
+- Мутации прогнаны в отдельном worktree: 41 ожидаемое падение из 41. `person-quality` добавлена в `enforce`; `ontology-entities` там уже была.
+- Дефектов вывода нет. Наблюдения (в verification.md): `dropped.reason` для отклонённой персоны — текст с названием, а не код; `Statements.add` удваивает одинаковую атрибуцию на одном утверждении (вне этой дельты).
+- Заодно О15 по `improve-extraction-naming`: `test_no_latin_name_has_ru` под новую формулировку инварианта, тест и мутация `dating:type` (там же в verification.md).

@@ -16,7 +16,7 @@
 
 | Требование | Сценарные | Property / нормативные | Мутация | Упал |
 |---|---|---|---|---|
-| person-quality «Качество персон» | test_person_quality.py: test_garbage_person, test_glued, test_person_definition_in_prompt | test_person_rule_any_input (pure 400), test_person_quality_invariant (ci, через извлечение + 9 @example) | person-not-a-name, prompt-no-person-def | да ×4 |
+| person-quality «Качество персон» | test_person_quality.py: test_garbage_person, test_glued, test_person_definition_in_prompt | test_person_rule_any_input (pure 400), test_person_quality_invariant (ci, через извлечение + 9 @example) | person-not-a-name, prompt-no-person-def | да ×5 |
 | person-quality «Слияние вариантов персоны» | test_variants_merge_by_model_pair, test_common_primary_name, test_qid_confirmed_for_other, test_transliteration_with_decision, test_transliteration_pending, test_decided_apart_and_third, test_namesakes, test_different_qids, test_transitive_component_two_qids (3 порядка), test_conflicting_dates, test_dates_on_one_side, test_only_variant_matched | test_plan_partition_any_order (pure 400, две перестановки), test_merge_invariant_two_orders (heavy, через базу, две перестановки) | component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant | да ×23 |
 | ontology-entities «Поиск дублей» (MODIFIED) | test_entity_merge.py: test_candidates, test_primary_on_different_records, test_different_types | test_candidates_invariant (ci) | candidates-primary-only, candidates-no-type | да ×4 |
 | ontology-entities «Слияние с перенаправлением» (MODIFIED) | test_old_link, test_undo, test_repeat_folds, test_author_attribution_moves, test_loop, test_undo_with_fold_and_qid | test_preservation_and_undo (heavy: содержание без петель, атрибуции, подтверждения, одно основное, внешние, упоминания, портреты; отмена ⇒ `dump` равен исходному) | kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown | да ×10 |
@@ -36,7 +36,14 @@
 
 ### Сырые итоги (по одному файлу, SQLite, 1 ГБ RAM)
 
-RUNS
+    test_person_quality.py      20 passed in 97.73s (рабочее дерево); 21 passed in 119.61s (worktree на 2a886ef, с test_person_rule_any_input)
+      38.92s test_merge_invariant_two_orders · 24.47s test_person_quality_invariant · 8.33s test_plan_partition_any_order
+    test_entity_merge.py        11 passed in 82.92s; 11 passed in 62.46s (worktree на 2a886ef)
+      50.41s test_preservation_and_undo · 13.51s test_candidates_invariant
+    test_registry_entities.py   33 passed, 1 skipped in 32.23s (3.6: test_merge_redirect_and_undo, test_duplicate_candidates без правки ожиданий)
+    test_entity_naming.py       35 passed in 36.60s · test_entity_dating_extraction.py 14 passed in 57.70s
+    test_mutation_coverage.py   2 passed · check_traceability: 407 из 407 · lint-imports: 3 kept, 0 broken
+    ruff check / format --check (мои файлы): чисто
 
 ### Мутации (`scripts/mutation_check.py --change improve-person-quality`, отдельный worktree на 3aa55a9)
 
@@ -84,7 +91,9 @@ RUNS
 | Слияние с перенаправлением | loop-shown | tests/knowledge/test_entity_merge.py::test_loop | да (1 failed, 1 warning in 3.54s) |
 | Слияние с перенаправлением | loop-shown | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.04s) |
 
-Итого: 18 мутаций, 41 ожидаемое падение — упали все 41 (rc=0), время 7 мин 42 с. Требований 4, у каждого ≥ 2 мутации; `--coverage improve-person-quality`: «мутации есть у всех 4 требований».
+Дозапуск `--id person-not-a-name` на 2a886ef: и `test_person_rule_any_input` — да (1 failed, 1.92 s).
+
+Итого: 18 мутаций, 42 ожидаемых падения — упали все 42 (rc=0), время 7 мин 42 с. Требований 4, у каждого ≥ 2 мутации; `--coverage improve-person-quality`: «мутации есть у всех 4 требований».
 
 ### Дефекты
 

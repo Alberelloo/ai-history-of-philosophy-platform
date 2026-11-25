@@ -40,16 +40,16 @@
 
 Инфраструктура общая (`improve-extraction-naming` 3.1): профили `ci`/`pure`/`heavy`, `dump.py`, `mutation_check.py`, запрет сети, точные множества ключей событий. Явные `@example` на каждую границу и мутацию и сторожевой токен журнала в каждом тесте с событиями — по общему разделу `improve-extraction-naming/design.md`, «Границы и сторожевые токены» (О11).
 
-- [ ] 3.1 Стратегии «вход + ожидание» `persons_with_variants`, `ontology_with_duplicates`, `not_persons` (design.md). Явные `@example` на границы.
-- [ ] 3.2 Сценарные тесты на **каждый** сценарий `person-quality` и MODIFIED `ontology-entities`. Каждый проверяет:
+- [x] 3.1 Стратегии «вход + ожидание» `persons_with_variants`, `ontology_with_duplicates`, `not_persons` (design.md). Явные `@example` на границы.
+- [x] 3.2 Сценарные тесты на **каждый** сценарий `person-quality` и MODIFIED `ontology-entities`. Каждый проверяет:
   - вывод — база, карточка по старому id, `/entities/{id}/statements`, очередь проверки, перехваченный запрос к шлюзу;
   - события с точным множеством ключей.
-- [ ] 3.3 Property-тест на **каждое** требование:
+- [x] 3.3 Property-тест на **каждое** требование:
   - «Качество персон» (`pure` для правила, `ci` через извлечение): только персоны запуска;
   - «Слияние вариантов» (`ci`): разбиение = ожидаемому, две перестановки, разные QID никогда, ровно одно основное (русское, если было);
   - «Поиск дублей» (`ci`): основное одной = любое название другой ⇒ кандидат, разные типы никогда;
   - «Слияние с перенаправлением» (`heavy`): сохранение без петель, отмена ⇒ `dump` равен исходному.
-- [ ] 3.4 Мутации — на **каждое** требование, с ожидаемым упавшим тестом в `tests/mutations/improve-person-quality/mutations.yaml`:
+- [x] 3.4 Мутации — на **каждое** требование, с ожидаемым упавшим тестом в `tests/mutations/improve-person-quality/mutations.yaml`:
 
   | Требование | Мутация | Ожидаемый упавший тест |
   |---|---|---|
@@ -72,10 +72,10 @@
   | Слияние с перенаправлением | `undo_merge` без `moved.externals` | «Отмена со свёрткой и QID» |
   | Слияние с перенаправлением | петля показывается | «Петля» |
 
-- [ ] 3.5 `python scripts/mutation_check.py --change improve-person-quality` — таблица в `verification.md`; `--coverage improve-person-quality` чисто (О11).
-- [ ] 3.6 Прежние тесты `ontology-entities` («Старая ссылка», «Отмена», «Кандидаты») проходят без правки ожиданий.
-- [ ] 3.7 `person-quality` в `enforce`, `check_traceability.py` чисто.
-- [ ] 3.8 `verification.md`:
+- [x] 3.5 `python scripts/mutation_check.py --change improve-person-quality` — таблица в `verification.md`; `--coverage improve-person-quality` чисто (О11).
+- [x] 3.6 Прежние тесты `ontology-entities` («Старая ссылка», «Отмена», «Кандидаты») проходят без правки ожиданий.
+- [x] 3.7 `person-quality` в `enforce`, `check_traceability.py` чисто.
+- [x] 3.8 `verification.md`:
   - сырые итоги;
   - `--durations`;
   - события;
