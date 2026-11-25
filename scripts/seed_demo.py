@@ -108,6 +108,8 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         seed_core(entities, statements, reading, textbook, text_of)
     if not entities.find("Просвещение"):
         seed_map(entities, statements)
+    if not entities.find("Кёнигсберг"):
+        seed_reference(entities, statements)
 
 
 def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
@@ -267,6 +269,30 @@ def seed_map(entities, statements) -> None:
         attributions=common,
         provenance=Provenance("generated"),
     )
+
+
+def seed_reference(entities, statements) -> None:
+    """Справочник: латинский вариант названия, явное «относится к эпохе», термин и место.
+
+    Названия не встречаются в текстах демо-источников — новых упоминаний нет; у Канта и Юма
+    новых утверждений нет, их карточки и граф не меняются (вариант названия карточка не
+    показывает). Локк по датам (середина жизни 1668) — «Научная революция»; явная связь
+    с «Просвещением» показывает, что явное важнее дат."""
+    from philograph.knowledge.statements import Attribution
+
+    common = [Attribution("common")]
+    kant = entities.find("Кант")[0]["id"]
+    if not entities.find("Kant"):
+        entities.add_name(kant, "en", "Kant")
+    statements.add(
+        entities.find("Локк")[0]["id"],
+        "belongs_to_epoch",
+        obj=entities.find("Просвещение")[0]["id"],
+        qualifiers={"membership_basis": "historians"},
+        attributions=common,
+    )
+    entities.create("term", [("ru", "Эпистемология", "primary")])
+    entities.create("place", [("ru", "Кёнигсберг", "primary")])
 
 
 if __name__ == "__main__":
