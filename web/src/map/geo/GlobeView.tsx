@@ -73,7 +73,23 @@ const overlaps = (a: Rect, b: Rect) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1
 
 // Подписи: не больше MAX_LABELS, у кого больше людей; жадно, без наложений друг на друга
 // и на отметки, внутри кадра. Ширина — тем же измерителем, что у карты (measure.ts).
+// Вертикальные метрики шрифта подписи — те же, что у прямоугольника текста в браузере
+// (fontBoundingBox*); без canvas — с запасом от кегля.
+let metricsCanvas: CanvasRenderingContext2D | null | undefined;
+function labelMetrics(): { ascent: number; descent: number } {
+  if (metricsCanvas === undefined) metricsCanvas = typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : null;
+  const c = metricsCanvas;
+  if (c) {
+    c.font = LABEL_FONT;
+    const m = c.measureText("Ag");
+    if (m.fontBoundingBoxAscent) return { ascent: m.fontBoundingBoxAscent, descent: m.fontBoundingBoxDescent };
+  }
+  return { ascent: 15, descent: 5 };
+}
+const LABEL_PAD = 1.5; // px вокруг прямоугольника подписи
+
 function layoutLabels(points: { p: ScenePlace; x: number; y: number; r: number }[], measure: Measure, w: number, h: number): Label[] {
+  const { ascent, descent } = labelMetrics();
   const placed: Rect[] = [];
   const marks: Rect[] = points.map(({ x, y, r }) => ({ x0: x - r, y0: y - r, x1: x + r, y1: y + r }));
   const out: Label[] = [];
@@ -81,16 +97,15 @@ function layoutLabels(points: { p: ScenePlace; x: number; y: number; r: number }
   for (const { p, x, y, r } of order) {
     if (out.length >= MAX_LABELS) break;
     const tw = measure(p.label, LABEL_FONT);
-    const th = 14;
     const options: Label[] = [
       { id: p.id, x: x + r + LABEL_GAP, y: y + 4.5, w: tw, text: p.label, anchor: "start" },
       { id: p.id, x: x - r - LABEL_GAP, y: y + 4.5, w: tw, text: p.label, anchor: "end" },
-      { id: p.id, x, y: y - r - LABEL_GAP, w: tw, text: p.label, anchor: "middle" },
-      { id: p.id, x, y: y + r + LABEL_GAP + th - 3, w: tw, text: p.label, anchor: "middle" },
+      { id: p.id, x, y: y - r - LABEL_GAP - descent, w: tw, text: p.label, anchor: "middle" },
+      { id: p.id, x, y: y + r + LABEL_GAP + ascent, w: tw, text: p.label, anchor: "middle" },
     ];
     for (const o of options) {
       const x0 = o.anchor === "start" ? o.x : o.anchor === "end" ? o.x - tw : o.x - tw / 2;
-      const rect = { x0: x0 - 2, y0: o.y - th + 2, x1: x0 + tw + 2, y1: o.y + 4 };
+      const rect = { x0: x0 - LABEL_PAD, y0: o.y - ascent - LABEL_PAD, x1: x0 + tw + LABEL_PAD, y1: o.y + descent + LABEL_PAD };
       if (rect.x0 < 2 || rect.x1 > w - 2 || rect.y0 < 2 || rect.y1 > h - 2) continue;
       if (placed.some((q) => overlaps(q, rect))) continue;
       if (marks.some((m, i) => points[i].p.id !== p.id && overlaps(m, rect))) continue;

@@ -16,7 +16,8 @@ export const PLAY_SECONDS = 60;
 export const SPEEDS = [0.5, 1, 2] as const;
 export type Speed = (typeof SPEEDS)[number];
 export const REDUCED_STEP = 10;
-export const ANNOUNCE_GAP = 1000; // мс: живая область — не чаще раза в секунду
+export const ANNOUNCE_GAP = 1000;
+const FRAME_SLACK = 0.02; // с // мс: живая область — не чаще раза в секунду
 
 export function useReducedMotion(): boolean {
   const query = "(prefers-reduced-motion: reduce)";
@@ -40,6 +41,7 @@ export function usePlayback(win: [number, number], year: number, setYear: (y: nu
   latest.current = { win, year, setYear };
 
   const on = useRef(false);
+  const startedAt = useRef<number | null>(null);
   on.current = playing;
 
   const stop = useCallback(() => setPlaying(false), []);
@@ -47,6 +49,7 @@ export function usePlayback(win: [number, number], year: number, setYear: (y: nu
     if (on.current) return setPlaying(false);
     const { win: w, year: y, setYear: set } = latest.current;
     if (y >= w[1]) set(w[0]); // на конце — с начала окна
+    startedAt.current = performance.now(); // отсчёт — от нажатия, а не от эффекта после отрисовки
     setPlaying(true);
   }, []);
   const setSpeed = useCallback((s: Speed) => setSpeedState(s), []);
@@ -69,12 +72,16 @@ export function usePlayback(win: [number, number], year: number, setYear: (y: nu
       };
       timer = window.setTimeout(step, 1000);
     } else {
-      const t0 = performance.now();
+      const t0 = startedAt.current ?? performance.now();
+      startedAt.current = null;
       const perSecond = ((w[1] - w[0]) / PLAY_SECONDS) * speed;
+      // Год — целая часть пройденного; FRAME_SLACK покрывает кадр, не дошедший до границы
+      // секунды (rAF раз в ~16 мс): год сменяется по времени, а не по числу кадров.
+      const slack = perSecond * FRAME_SLACK;
       const frame = () => {
         const { win: cur, setYear: set } = latest.current;
         const y = from + ((performance.now() - t0) / 1000) * perSecond;
-        const next = Math.min(cur[1], Math.round(y));
+        const next = Math.min(cur[1], Math.floor(y + slack));
         if (next !== last) {
           last = next;
           set(next);
@@ -102,26 +109,24 @@ export function usePlayback(win: [number, number], year: number, setYear: (y: nu
   return { playing, speed, setSpeed, toggle, stop };
 }
 
-// Живая область: объявляет текст на паузе и при шаге, не во время проигрывания и не чаще
-// раза в ANNOUNCE_GAP. Первый показ вида не объявляется: только изменения года.
-export function useAnnouncer(text: string, key: number, playing: boolean): string {
+// Живая область: объявляет год и сводку, когда год постоял ANNOUNCE_GAP без изменений и
+// проигрывание не идёт (серия шагов — одно объявление последнего значения; объявления не
+// чаще раза в секунду). До готовности сцены (ready) и при первом показе — пусто: объявляются
+// только изменения года.
+export function useAnnouncer(text: string, key: number, playing: boolean, ready: boolean): string {
   const [said, setSaid] = useState("");
-  const lastAt = useRef(-Infinity);
-  const first = useRef(true);
+  const first = useRef<number | null>(null);
   const latest = useRef(text);
   latest.current = text;
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
+    if (!ready) return;
+    if (first.current == null) {
+      first.current = key; // год первого показа не объявляется
       return;
     }
     if (playing) return;
-    const wait = Math.max(0, lastAt.current + ANNOUNCE_GAP - performance.now());
-    const timer = window.setTimeout(() => {
-      lastAt.current = performance.now();
-      setSaid(latest.current);
-    }, wait);
+    const timer = window.setTimeout(() => setSaid(latest.current), ANNOUNCE_GAP);
     return () => window.clearTimeout(timer);
-  }, [key, playing]);
+  }, [key, playing, ready]);
   return said;
 }

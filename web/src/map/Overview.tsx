@@ -26,7 +26,9 @@ export type YearControl = {
 };
 const MIN_SPAN = 5;
 
-type Drag = { kind: "from" | "to" | "move" | "year"; x0: number; from: number; to: number };
+// moved — рамку сдвинули дальше порога; щелчок по рамке без сдвига в виде «Глобус» — год.
+type Drag = { kind: "from" | "to" | "move" | "year"; x0: number; from: number; to: number; moved?: boolean };
+const CLICK_SLOP = 3; // px
 
 export function Overview({
   range,
@@ -65,6 +67,10 @@ export function Overview({
     const move = (e: globalThis.PointerEvent) => {
       const dy = (e.clientX - drag.x0) / k;
       if (drag.kind === "year") return year?.onChange(Math.round(s.year(e.clientX - (svg.current?.getBoundingClientRect().left ?? 0))));
+      if (year && drag.kind === "move" && !drag.moved) {
+        if (Math.abs(e.clientX - drag.x0) < CLICK_SLOP) return;
+        drag.moved = true;
+      }
       if (drag.kind === "from") commit(Math.min(drag.from + dy, drag.to - MIN_SPAN), drag.to);
       else if (drag.kind === "to") commit(drag.from, Math.max(drag.to + dy, drag.from + MIN_SPAN));
       else {
@@ -73,7 +79,12 @@ export function Overview({
         commit(f, f + span);
       }
     };
-    const up = () => setDrag(null);
+    const up = (e: globalThis.PointerEvent) => {
+      // Рамка окна лежит поверх шкалы: щелчок по ней без сдвига ставит год под курсором.
+      if (year && drag.kind === "move" && !drag.moved && Math.abs(e.clientX - drag.x0) < CLICK_SLOP)
+        year.onChange(Math.round(s.year(e.clientX - (svg.current?.getBoundingClientRect().left ?? 0))));
+      setDrag(null);
+    };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);

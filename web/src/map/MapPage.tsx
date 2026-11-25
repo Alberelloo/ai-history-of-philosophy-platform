@@ -201,7 +201,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const nearest = model && input && scene && !scene.places.length ? nearestYear(model, input, year, win) : null;
   const peopleNow = scene ? scene.places.reduce((n, p) => n + p.people.length, 0) : 0;
   const placesNow = scene?.places.length ?? 0;
-  const said = useAnnouncer(t.geo.announce(year, placesNow, peopleNow), year, playback.playing);
+  const said = useAnnouncer(t.geo.announce(year, placesNow, peopleNow), year, playback.playing, scene != null);
   const geoPanel: GeoPanel | undefined = globe
     ? {
         year,
