@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -88,15 +88,28 @@ def attribution_link(a: dict[str, Any]) -> str | None:
 
 def attribution_label(statements: Statements, a: dict[str, Any]) -> str:
     """Кто так считает, по-человечески: персона, источник библиотеки или общее мнение."""
+    return who_label(
+        a,
+        statements.entities.label,
+        lambda source_id: statements.entities.by_external("library", source_id),
+    )
+
+
+def who_label(
+    a: dict[str, Any],
+    label: Callable[[str], str],
+    library_entity: Callable[[str], str | None],
+) -> str:
+    """Правило подписи атрибуции; названия берутся из базы или из снимка (контекст эпохи)."""
     if a["who_kind"] == "common":
         return "распространённое мнение"
     if a["who_kind"] == "entity" and a["who"]:
-        return statements.entities.label(a["who"])
+        return label(a["who"])
     if a["who_kind"] == "source" and wikidata_qid(a):
         return WIKIDATA_LABEL
     if a["who_kind"] == "source" and a["who"]:
-        entity = statements.entities.by_external("library", a["who"])
-        return statements.entities.label(entity) if entity else a["who"]
+        entity = library_entity(a["who"])
+        return label(entity) if entity else a["who"]
     return a["who"] or "?"
 
 

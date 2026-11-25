@@ -127,3 +127,16 @@
 - `stimulated` от персоны: у `stimulated` нет родителя, `_fit` бросает «тип stimulated не подходит концам person → doctrine» — не записано.
 
 Прогон: `pytest tests/knowledge/test_context_unit.py` — 4 passed. Поведение совпало со спецификацией, `filling.py` и `prompts/__init__.py` не тронуты; «Требует согласования Lead'а» не пополнялось.
+
+### 3.1–3.2 — `knowledge/context.py` и `GET /v1/context`
+
+- `Context(catalog)` (как `EpochList(catalog)`): снимок справочника **без окна устарелости** (`max_stale=0`, как карта — после достройки перезапрос видит сохранённое), подписи на языке `lang` — `CatalogIndex.labels`. Отличие от design.md («`Context(snapshots, registry, membership)`»): берётся `Catalog`, чтобы не копировать подписи по языку; принадлежность — `epochs.membership` того же снимка.
+- `ContextIndex` — один раз на снимок (`Snapshot.derived("context")`): события (`event`, `phenomenon` с подтипами), вид (`map.best_of` — то же правило основного значения, что на карте; `_best` переименован в `best_of`), места `happened_in`, связи `stimulated`, вес — число действующих утверждений.
+- Места: `wikidata` из нового поля снимка `Snapshot.wikidata` (внешние идентификаторы `wikidata`), в ответ — только по `^Q\d+$`. В отпечаток снимка добавлен счётчик `external_ids` (иначе новый внешний id без других записей не пересобирал бы снимок).
+- Подписи атрибуций из снимка: правило `graph.attribution_label` вынесено в `graph.who_label(a, label, library_entity)`; `attribution_label` — обёртка над ним (поведение то же).
+- Механизм в ответе повторно проверяется `registry.check_qualifiers` (вне списка — `null`).
+- `counts` — только виды с событиями (сценарий «Контекст Просвещения» ждёт ровно четыре ключа; пример в design.md с `"none": 0` — иллюстрация). `verified` принимает `true`/`1`, прочее — «нет».
+- Проверка параметров — `ContextRejected(kind, reason)`, порядок: `mode` → `window` → `unknown_epoch` → `unknown_kind`; закрытые источники (`region_closed`) спрашиваются только после проверки параметров (как справочник — вызываемым).
+- События: `knowledge.context.served` (`mode`, `events`, `links`, `generated_links`, `truncated`, `snapshot`), `knowledge.context.rejected` (`reason`).
+- Маршрут `GET /v1/context` строится в `build_app` при переданном `catalog` (тот же стенд, что справочник и эпохи).
+- Юнит-тесты (`tests/knowledge/test_context_unit.py`): порядок, связь, места, цитаты нет, counts, окно, `kinds`, `verified`, закрытый источник (DE/RU), отклонённая связь, таблица отказов (7 случаев), пределы на `Context(max_events=2, max_links=2)`. Прогон: 15 passed. Затронутые снимком/картой: `test_snapshot`, `test_map_snapshot_parity`, `test_map`, `test_epochs_list`, `test_catalog_route` — 39 passed.

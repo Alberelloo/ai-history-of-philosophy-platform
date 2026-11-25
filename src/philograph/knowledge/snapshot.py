@@ -51,7 +51,8 @@ class Snapshot:
     ``names`` по порядку записи); ``labels`` — id → основное русское название (иначе первое
     основное, иначе первое любое, иначе сам id); ``statements`` — действующие утверждения
     с ``attributions`` и ``evidence``; ``mentions`` — источник → сущности, упомянутые в нём;
-    ``library`` — источник библиотеки → его сущность типа ``source``."""
+    ``library`` — источник библиотеки → его сущность типа ``source``; ``wikidata`` —
+    сущность → её внешний идентификатор Wikidata (как записан, без проверки шаблона)."""
 
     entities: Mapping[str, dict[str, Any]]
     names: Mapping[str, list[dict[str, Any]]]
@@ -61,6 +62,7 @@ class Snapshot:
     library: Mapping[str, str]
     fingerprint: tuple
     built_at: datetime
+    wikidata: Mapping[str, str] = field(default_factory=dict)
     _derived: dict[str, Any] = field(default_factory=dict, repr=False)
     # Повторно входимая: производное может опираться на другое (справочник — на эпохи).
     _lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
@@ -76,7 +78,7 @@ class Snapshot:
 def fingerprint(engine: Engine) -> tuple:
     """Меняется при любой записи, влияющей на снимок: новые и изменённые утверждения
     (журнал), атрибуции и подтверждения, события библиотеки (снятие источника), сущности,
-    имена, слияния, упоминания и версия реестра."""
+    имена, слияния, упоминания, внешние идентификаторы и версия реестра."""
     count = func.count
     with engine.begin() as conn:
         return tuple(
@@ -94,6 +96,7 @@ def fingerprint(engine: Engine) -> tuple:
                     select(count()).select_from(t.mentions).scalar_subquery(),
                     select(func.max(t.mentions.c.id)).scalar_subquery(),
                     select(func.max(t.registry_versions.c.version)).scalar_subquery(),
+                    select(count()).select_from(t.external_ids).scalar_subquery(),
                 )
             ).one()
         )
@@ -138,14 +141,17 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             select(t.mentions.c.source_id, t.mentions.c.entity_id)
         ):
             mentioned[source_id].add(entity_id)
-        library = {
-            value: entity_id
-            for entity_id, value in conn.execute(
-                select(t.external_ids.c.entity_id, t.external_ids.c.value).where(
-                    t.external_ids.c.system == "library"
-                )
-            )
-        }
+        library: dict[str, str] = {}
+        wikidata: dict[str, str] = {}
+        for entity_id, system, value in conn.execute(
+            select(t.external_ids.c.entity_id, t.external_ids.c.system, t.external_ids.c.value)
+            .where(t.external_ids.c.system.in_(("library", "wikidata")))
+            .order_by(t.external_ids.c.entity_id, t.external_ids.c.value)
+        ):
+            if system == "library":
+                library[value] = entity_id
+            else:
+                wikidata.setdefault(entity_id, value)
     labels = {}
     for entity_id in entities:
         own = names.get(entity_id, [])
@@ -174,6 +180,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
         library=library,
         fingerprint=stamp,
         built_at=built_at,
+        wikidata=wikidata,
     )
 
 

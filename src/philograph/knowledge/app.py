@@ -14,6 +14,7 @@ from philograph import __version__
 from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.catalog import Catalog, CatalogRejected
+from philograph.knowledge.context import Context, ContextRejected
 from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.epochs import EpochList
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
@@ -250,6 +251,36 @@ def build_app(
             """Эпохи по времени с нечёткими границами, источником датировки и счётчиками по
             видам; без датировки — в ``undated``. Снимок справочника, без модели."""
             return epoch_list.list()
+
+        context = Context(catalog)
+
+        @router.get("/context")
+        def context_of(
+            request: Request,
+            epoch: str | None = None,
+            from_: str | None = Query(default=None, alias="from"),
+            to: str | None = None,
+            kinds: str | None = None,
+            verified: str | None = None,
+            textbook: str | None = None,
+            lang: str | None = None,
+        ) -> dict[str, Any]:
+            """Исторический контекст эпохи (``epoch``) или окна времени (``from``, ``to``):
+            события со связями «стимулировало», без модели и без цитат. Подтверждения
+            и атрибуции закрытых для региона (заголовок шлюза) источников снимаются."""
+            try:
+                return context.get(
+                    epoch=epoch,
+                    from_=from_,
+                    to=to,
+                    kinds=kinds,
+                    verified=verified,
+                    textbook=textbook,
+                    lang=lang,
+                    closed=lambda: region_closed(request),
+                )
+            except ContextRejected as exc:
+                raise UserFacingError(str(exc), status=400, kind=exc.kind) from exc
 
     if section_map is not None:
 

@@ -72,8 +72,9 @@ def _short(label: str) -> str:
     return words[-1] if words else label
 
 
-def _best(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """Основное из нескольких: предпочтённое, затем более сильное по статусу."""
+def best_of(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Основное из нескольких: предпочтённое, затем более сильное по статусу (карта и
+    контекст эпохи — вид события)."""
     if not rows:
         return None
     return sorted(rows, key=lambda s: (s["rank"] != "preferred", -STRENGTH[s["status"]]))[0]
@@ -197,11 +198,11 @@ class SectionMap:
             return entities[entity_id]["primary"].get("dates")
 
         def value(entity_id: str, type_: str) -> Any:
-            best = _best(values.get((entity_id, type_), []))
+            best = best_of(values.get((entity_id, type_), []))
             return best["value"] if best else None
 
         def author(work_id: str) -> str | None:
-            best = _best(authors.get(work_id, []))
+            best = best_of(authors.get(work_id, []))
             return best["object"] if best else None
 
         items: list[tuple[str, dict[str, Any]]] = []  # (раздел ответа, запись)
