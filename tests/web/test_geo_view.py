@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 
 import pytest
@@ -21,20 +22,24 @@ from .geo_helpers import (
     GEO_BUILT,
     MAP_API,
     PLACES_API,
+    SIZES,
     Geo,
     address,
     center,
     errors,
+    fmt,
     focus_globe,
     geo_built,
     globe,
     globe_ready,
-    marks,
     open_globe,
+    persons,
     play_button,
     plural,
     press,
+    project,
     rows,
+    scene,
     settle,
     summary_counts,
     year,
@@ -133,7 +138,7 @@ def test_link_to_globe(knowledge_context, knowledge_stack, events):
     )
     assert year(page) == 1781
     expect(page.locator(".map-selected__name")).to_contain_text("Иммануил Кант")
-    assert marks(page)[w["konigsberg"]]["role"] == "self"
+    assert persons(page)[w["kant"]]["role"] == "self"
     assert page.locator(".map-canvas").count() == 0
     geo_built(events, response)
     errors(page)
@@ -145,7 +150,12 @@ def test_chronology_does_not_load_globe(knowledge_context, knowledge_stack, even
     context = knowledge_context(1920, 1080)
     page = context.new_page()
     urls: list[str] = []
+    bodies: list = []
     page.on("request", lambda r: urls.append(r.url))
+    page.on(
+        "response",
+        lambda r: bodies.append(r) if r.url.endswith((".js", ".css", ".json")) else None,
+    )
     with page.expect_response(lambda r: MAP_API.match(r.url)):
         page.goto(knowledge_stack.url + "/graph")
     page.locator(".map-canvas").wait_for()
@@ -156,7 +166,13 @@ def test_chronology_does_not_load_globe(knowledge_context, knowledge_stack, even
     settle(page)
     assert not [u for u in urls if PLACES_API.match(u)]
     assert not [u for u in urls if "GlobeView" in u]
-    assert not [u for u in urls if re.search(r"land|world-atlas|topojson|110m", u)]
+    assert not [u for u in urls if re.search(r"land|world-atlas|topojson|110m|countries", u)]
+    # Словарь названий стран не в основном бандле: ни одна загруженная строка не содержит
+    # названий из countries.ru.json.
+    for r in bodies:
+        text = r.body().decode("utf-8", "replace")
+        assert "Буркина-Фасо" not in text and "Папуа-Новая Гвинея" not in text, r.url
+    assert [r for r in bodies if r.url.endswith(".js")]
     events.assert_none(GEO_BUILT)
     # Тот же контекст: при переключении фрагмент и слой загружаются — значит, ловушка видит их.
     with page.expect_response(lambda r: PLACES_API.match(r.url)):
@@ -193,33 +209,111 @@ def prague_world(world) -> dict[str, str]:
 
 
 @req(GEO, ROT, scenario="Исходный вид детерминирован")
-def test_initial_view_deterministic(knowledge_context, knowledge_stack, events):
+@pytest.mark.parametrize(("width", "height"), SIZES)
+def test_initial_view_deterministic(knowledge_context, knowledge_stack, events, width, height):
     w = kant_world(knowledge_stack.world)
     path = "/graph?view=globe&t=1760&from=1700&to=1800"
     seen = []
     for _ in range(2):
-        page, response = open_globe(knowledge_context, knowledge_stack, path)
-        seen.append((center(page), zoom(page), {k: v["transform"] for k, v in marks(page).items()}))
+        page, response = open_globe(
+            knowledge_context, knowledge_stack, path, width=width, height=height
+        )
+        sc = scene(page)
+        seen.append(
+            (sc["center"], sc["zoom"], sorted((p["id"], p["x"], p["y"]) for p in sc["persons"]))
+        )
         geo_built(events, response)
         page.context.close()
     assert seen[0] == seen[1]
-    assert set(seen[0][2]) == {w["konigsberg"], w["edinburgh"]}
-    assert seen[0][1] == "1"
+    assert {p[0] for p in seen[0][2]} == {w["kant"], w["hume"]}
+    assert seen[0][1] in SERIES
+
+
+def series_zoom(z: float, k: int) -> float:
+    """Значение ряда 1,25^k после ``k`` шагов от ``z`` (ряд исходного вида), в пределах 1–8."""
+    n = round(math.log(z) / math.log(1.25))
+    return round(min(8.0, max(1.0, 1.25 ** (n + k))), 2)
+
+
+SERIES = [round(1.25**k, 2) for k in range(7)]  # 1 … 3.81; 4.77 > HOME_MAX_ZOOM
+
+
+HOME_SETS = {
+    "athens-rome": [("Афины", 37.98, 23.73), ("Рим", 41.90, 12.50)],
+    "edinburgh-alexandria": [("Эдинбург", 55.95, -3.19), ("Александрия", 31.20, 29.92)],
+    "london-boston": [("Лондон", 51.51, -0.13), ("Бостон", 42.36, -71.06)],
+}
+
+
+def centroid(points: list[tuple[float, float]]) -> tuple[float, float]:
+    """Сферический центр масс (lat, lon) — независимо от кода продукта."""
+    xs = ys = zs = 0.0
+    for lat, lon in points:
+        la, lo = math.radians(lat), math.radians(lon)
+        xs += math.cos(la) * math.cos(lo)
+        ys += math.cos(la) * math.sin(lo)
+        zs += math.sin(la)
+    lon = math.degrees(math.atan2(ys, xs))
+    lat = math.degrees(math.atan2(zs, math.hypot(xs, ys)))
+    return lat, lon
+
+
+def fits(sc: dict, points, zoom_value: float) -> bool:
+    k = zoom_value / sc["zoom"]
+    view = {**sc, "R": sc["R"] * k}
+    for lat, lon in points:
+        x, y, cosc = project(lon, lat, view)
+        if cosc < 0 or not (26 <= x <= sc["w"] - 26 and 26 <= y <= sc["h"] - 26):
+            return False
+    return True
+
+
+@req(GEO, ROT, scenario="Исходное приближение")
+@req(
+    GEO,
+    ROT,
+    invariant="исходный вид — сферический центр масс мест года и наибольшее приближение ряда 1,25^k ≤ 4, при котором места в кадре с полем MEDAL",
+)
+@pytest.mark.parametrize("key", list(HOME_SETS))
+def test_home_zoom(knowledge_context, knowledge_stack, events, key):
+    world = knowledge_stack.world
+    g = Geo(world)
+    pts = []
+    for i, (name, lat, lon) in enumerate(HOME_SETS[key]):
+        g.lived(world.person(f"Житель {i}", "1700", "1780"), g.place(name, lat, lon))
+        pts.append((lat, lon))
+    page, response = open_globe(
+        knowledge_context, knowledge_stack, "/graph?view=globe&t=1750", width=1366, height=768
+    )
+    sc = scene(page)
+    z = sc["zoom"]
+    assert z in SERIES and z <= 4, z
+    lat, lon = centroid(pts)
+    assert sc["center"] == f"{fmt(lon)},{fmt(lat)}", (sc["center"], lon, lat)
+    if fits(sc, pts, 1.0):
+        assert fits(sc, pts, z)
+        nxt = round(z * 1.25, 2)
+        assert nxt > 4 or not fits(sc, pts, z * 1.25), (z, nxt)
+    else:
+        assert z == 1
+    assert z >= 1
+    geo_built(events, response)
 
 
 @req(GEO, ROT, scenario="Клавиши")
 def test_keys_rotate_zoom_reset(knowledge_context, knowledge_stack, events):
     prague_world(knowledge_stack.world)
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe")
-    assert (center(page), zoom(page)) == ("15,50", "1")
+    z0 = float(zoom(page))
+    assert center(page) == "15,50" and z0 in SERIES, (center(page), z0)
     focus_globe(page)
     press(page, "ArrowRight", 3)
     press(page, "ArrowUp", 5)
     assert center(page) == "45,80"
     press(page, "+", 2)
-    assert zoom(page) == "1.56"
+    assert float(zoom(page)) == series_zoom(z0, 2)
     press(page, "0")
-    assert (center(page), zoom(page)) == ("15,50", "1")
+    assert (center(page), float(zoom(page))) == ("15,50", z0)
     geo_built(events, response)
     errors(page)
 
@@ -229,6 +323,8 @@ def test_key_steps_and_bounds(knowledge_context, knowledge_stack, events):
     prague_world(knowledge_stack.world)
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe")
     focus_globe(page)
+    press(page, "-", 12)
+    assert zoom(page) == "1"
     press(page, "ArrowLeft")
     assert center(page) == "5,50"
     press(page, "Shift+ArrowLeft")
@@ -252,6 +348,9 @@ def test_key_steps_and_bounds(knowledge_context, knowledge_stack, events):
 def test_wheel_zoom(knowledge_context, knowledge_stack, events):
     prague_world(knowledge_stack.world)
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe")
+    focus_globe(page)
+    press(page, "-", 12)
+    expect(globe(page)).to_have_attribute("data-zoom", "1")
     box = globe(page).bounding_box()
     page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
     page.mouse.wheel(0, -100)
@@ -300,27 +399,39 @@ def test_far_hemisphere_hidden(knowledge_context, knowledge_stack, events):
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe&t=1760")
     page.locator(f"[data-geo-row='{w['pacific']}'] .geo-row__place").click()
     expect(globe(page)).to_have_attribute("data-center", "-160,0")
-    m = marks(page)
-    assert m[w["konigsberg"]]["hidden"] == "true"
+    settle(page)
+    m = persons(page)
+    assert m[w["kant"]]["hidden"] == "true" and m[w["kant"]]["children"] == 0
     assert w["konigsberg"] in rows(page)
-    assert m[w["pacific"]]["hidden"] == "false"
+    assert rows(page)[w["konigsberg"]]["label"].startswith("Кёнигсберг")
+    assert m[w["cook"]]["hidden"] == "false"
     geo_built(events, response)
 
 
-@req(GEO, ROT, invariant="скрыта отметка дальше 90° от центра, ровно 90° — видна")
+@req(
+    GEO,
+    ROT,
+    invariant="медальон с точкой привязки дальше 90° от центра скрыт и не рисуется, ровно 90° — не скрыт; связь со скрытым концом не рисуется",
+)
 def test_hidden_boundary_90(knowledge_context, knowledge_stack, events):
     w = far_world(knowledge_stack.world)
+    link = knowledge_stack.world.relate(w["edge"], "influenced_by", w["over"])
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe&t=1760")
     page.locator(f"[data-geo-row='{w['pacific']}'] .geo-row__place").click()
     expect(globe(page)).to_have_attribute("data-center", "-160,0")
-    m = marks(page)
-    assert m[w["edge_in"]]["hidden"] == "false"
-    assert m[w["over_in"]]["hidden"] == "true"
-    # Скрытая отметка не рисуется.
-    hidden = page.locator(f"[data-geo-place='{w['over_in']}']")
-    assert hidden.evaluate(
-        "e => getComputedStyle(e).display === 'none' || getComputedStyle(e).visibility === 'hidden' || Number(getComputedStyle(e).opacity) === 0 || e.getBoundingClientRect().width === 0"
-    )
+    settle(page)
+    sc = scene(page)
+    m = {p["id"]: p for p in sc["persons"]}
+    assert project(-70, 0, sc)[2] == pytest.approx(0, abs=1e-9)
+    assert project(-69.99, 0, sc)[2] < 0
+    assert m[w["edge"]]["hidden"] == "false"
+    assert m[w["over"]]["hidden"] == "true"
+    # Скрытый медальон не рисуется, его связь — без пути.
+    assert m[w["over"]]["children"] == 0
+    hidden = page.locator(f"[data-geo-person='{w['over']}']")
+    assert hidden.evaluate("e => e.getBoundingClientRect().width === 0")
+    [lk] = [x for x in sc["links"] if x["id"] == link]
+    assert lk["hidden"] == "true" and lk["d"] is None
     assert {w["edge_in"], w["over_in"]} <= set(rows(page))
     geo_built(events, response)
 
