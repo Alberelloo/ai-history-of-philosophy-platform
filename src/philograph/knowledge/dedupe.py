@@ -242,7 +242,7 @@ def plan(
 def load_persons(engine: Any, ids: Iterable[str] | None = None) -> list[Entity]:
     """Действующие персоны (или выбранные сущности) в виде входа правила."""
     with engine.begin() as conn:
-        query = select(t.entities).where(t.entities.c.redirect_to.is_(None))
+        query = select(t.entities).where(t.active())
         if ids is None:
             query = query.where(t.entities.c.type == PERSON)
         else:

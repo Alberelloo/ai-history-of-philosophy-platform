@@ -932,9 +932,22 @@ class Statements:
             fam = self.registry.relations_in(families)
             allowed_types = fam if allowed_types is None else allowed_types & fam
         result = []
+        with self.engine.begin() as conn:
+            retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
         for s in self._raw(entity_id):
             if s["scope"] not in scopes or s["status"] == "rejected":
                 continue
+            if s["subject"] in retired or (s["object"] and s["object"] in retired):
+                continue  # конец снят миграцией: утверждение хранится, но не показывается
+            own = s["attributions"]
+            s = {
+                **s,
+                "attributions": [
+                    a for a in own if not (a["who_kind"] == "entity" and a["who"] in retired)
+                ],
+            }
+            if own and not s["attributions"]:
+                continue  # единственный автор — снятая сущность
             if s["object"] is not None and s["object"] == s["subject"]:
                 continue  # петля после слияния: хранится, не показывается
             if s["rank"] == "deprecated" and not include_deprecated:

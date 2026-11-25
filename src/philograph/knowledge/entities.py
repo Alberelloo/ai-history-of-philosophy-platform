@@ -149,7 +149,7 @@ class Entities:
                 .mappings()
                 .all()
             )
-        return {
+        entity = {
             "id": row["id"],
             "type": row["type"],
             "primary": dict(row["primary"]),
@@ -157,6 +157,11 @@ class Entities:
                 {"lang": n["lang"], "text": n["text"], "kind": n["kind"]} for n in names_rows
             ],
         }
+        if row.get("retired_run"):
+            # Снятая миграцией: внутренние вызовы по концам утверждений не ломаются, а
+            # показывающие пути проверяют это поле (``schema.active``).
+            entity["retired"] = {"run_id": row["retired_run"], "reason": row["retired_reason"]}
+        return entity
 
     def label(self, entity_id: str, lang: str = "ru") -> str:
         names = self.get(entity_id)["names"]
@@ -271,7 +276,7 @@ class Entities:
         candidates = []
         for entity_id in ids:
             entity = self.get(entity_id)
-            if entity["id"] == entity_id:
+            if entity["id"] == entity_id and "retired" not in entity:
                 candidates.append(entity)
         return candidates
 
@@ -336,9 +341,12 @@ class Entities:
                 .where(t.external_ids.c.system == system)
                 .order_by(t.external_ids.c.value)
             ).all()
+            retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
         found: dict[str, str] = {}
         for entity_id, value in rows:
-            found.setdefault(self.resolve(entity_id), value)
+            entity_id = self.resolve(entity_id)
+            if entity_id not in retired:
+                found.setdefault(entity_id, value)
         return found
 
     def source_entity(self, source_id: str, title: str) -> str:
@@ -356,7 +364,7 @@ class Entities:
         совпадает с любым названием другой."""
         with self.engine.begin() as conn:
             rows = (
-                conn.execute(select(t.entities).where(t.entities.c.redirect_to.is_(None)))
+                conn.execute(select(t.entities).where(t.active()))
                 .mappings()
                 .all()
             )

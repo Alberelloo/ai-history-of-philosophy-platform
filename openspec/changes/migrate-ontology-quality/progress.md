@@ -111,3 +111,9 @@
 Вердикт: можно к коду.
 
 - 2026-11-25, О13 (разработчик): однословные совпавшие основные сливаются `merge:name`; `review:single_name` — только однословное основное, совпавшее с вариантом; решение «разные» → `apart:decided` (шаг 3 правила, блокирует компоненту). Сценарий «Однословные тёзки» заменён на «Тёзки» (Роджер/Фрэнсис Бэкон с решением «разные»), «Общее основное» снова Berkeley×3 без дат, «Совпал только вариант» даёт `review:single_name` и `review:variant`. Миграция: синтетика Berkeley×3 без дат, А4 до = 3 и после = 0 без изменений, слияние идёт после переименований, мутации.
+
+## Код — 2026-11-25 (разработчик, субагент `coder`)
+
+- 2.1 Схема `knowledge:9`: `entities.retired_run`, `entities.retired_reason` (ALTER на старой базе), `schema.active()` и `schema.retired()`. `redirect_to IS NULL` заменено на `active()` в `snapshot.load`, `mentions._index`, `Entities.duplicate_candidates`, `dedupe.load_persons`, `life_dates`; `Entities.find` и `Entities.externals` пропускают снятые. `snapshot.load`: снятые не в `entities`, утверждения со снятым концом не показываются (было и раньше по `entities`), атрибуции с автором-снятой убираются, утверждение без видимых атрибуций не показывается, упоминания — только действующих; отпечаток снимка считает число снятых. `Statements.about` — тот же фильтр. `Entities.get` у снятой отдаёт поле `retired` (у действующей поля нет — прежний ответ не меняется), `Cards.card` для снятой — `EntityNotFound` → 404. Контекст ассистента (`context.py`) читает снимок и `about`, утверждений со снятым концом не получает.
+  - Юнит-тесты `tests/knowledge/test_retired_unit.py` (4 passed).
+  - По прецеденту О14 (#40): ожидания версии схемы `test_portraits.py:97` → `[7, 8, 9]`, `:124` и `test_mentions_cards.py:308` → `latest() == 9`; свой `test_run_actions_unit` → `[8, 9]`. Прогоны: `test_portraits` 13, `test_mentions_cards` 32, `test_snapshot` 6, `test_statements` 19 passed.

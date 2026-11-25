@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Any
 
 from sqlalchemy import (
     JSON,
@@ -16,6 +17,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    and_,
     select,
     text,
     update,
@@ -88,6 +90,8 @@ entities = Table(
     Column("type", String(50), nullable=False, index=True),
     Column("primary", JSON, nullable=False),  # копия основных значений: даты, описание
     Column("redirect_to", String(40)),
+    Column("retired_run", String(64)),  # запуск миграции, снявший сущность (knowledge:9)
+    Column("retired_reason", String(20)),  # причина правила названий
     schema=SCHEMA,
 )
 names = Table(
@@ -394,3 +398,27 @@ run_actions = Table(
     schema=SCHEMA,
 )
 migrations.add(8, "журнал действий запуска")(migrations.create_tables("run_actions"))
+
+
+def active(entities: Table = entities) -> Any:
+    """Условие «действующая сущность»: не перенаправлена слиянием и не снята миграцией.
+    Одно на всех потребителей (снимок, упоминания, поиск, дубли, внешние id)."""
+    return and_(entities.c.redirect_to.is_(None), entities.c.retired_run.is_(None))
+
+
+def retired(entities: Table = entities) -> Any:
+    """Условие «снята миграцией»."""
+    return entities.c.retired_run.is_not(None)
+
+
+def _retired_columns(conn: Connection) -> None:
+    """Столбцы снятия: старые строки — действующие (``NULL``)."""
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    for name in ("retired_run VARCHAR(64)", "retired_reason VARCHAR(20)"):
+        if name.split()[0] not in columns:
+            conn.execute(text(f"ALTER TABLE {SCHEMA}.entities ADD COLUMN {name}"))
+
+
+migrations.add(9, "снятие мусорных сущностей")(_retired_columns)

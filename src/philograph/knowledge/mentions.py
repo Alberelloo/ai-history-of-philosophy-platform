@@ -56,7 +56,7 @@ class Mentions:
             rows = conn.execute(
                 select(t.names.c.entity_id, t.names.c.text, t.entities.c.type)
                 .join(t.entities, t.entities.c.id == t.names.c.entity_id)
-                .where(t.entities.c.redirect_to.is_(None))
+                .where(t.active())
             ).all()
         index: dict[tuple, set[str]] = defaultdict(set)
         longest = 1

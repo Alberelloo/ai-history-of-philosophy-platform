@@ -14,7 +14,7 @@
 
 ## 2. Разработчик
 
-- [ ] 2.1 Схема `knowledge:9`:
+- [x] 2.1 Схема `knowledge:9`:
   - `entities.retired_run`, `entities.retired_reason`;
   - `schema.active(entities)`;
   - замена четырёх копий `redirect_to IS NULL` (`snapshot.load`, `mentions.py`, `Entities.find`/`duplicate_candidates`/`externals`, индекс `dedupe`);

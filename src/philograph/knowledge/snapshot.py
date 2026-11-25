@@ -97,6 +97,7 @@ def fingerprint(engine: Engine) -> tuple:
                     select(func.max(t.mentions.c.id)).scalar_subquery(),
                     select(func.max(t.registry_versions.c.version)).scalar_subquery(),
                     select(count()).select_from(t.external_ids).scalar_subquery(),
+                    select(count()).select_from(t.entities).where(t.retired()).scalar_subquery(),
                 )
             ).one()
         )
@@ -110,7 +111,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             r["id"]: {"type": r["type"], "primary": r["primary"] or {}}
             for r in conn.execute(
                 select(t.entities.c.id, t.entities.c.type, t.entities.c.primary).where(
-                    t.entities.c.redirect_to.is_(None)
+                    t.active()
                 )
             ).mappings()
         }
@@ -130,6 +131,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             .mappings()
             .all()
         )
+        retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
         attrs: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for r in conn.execute(select(t.attributions)).mappings():
             attrs[r["statement_id"]].append(dict(r))
@@ -140,7 +142,8 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
         for source_id, entity_id in conn.execute(
             select(t.mentions.c.source_id, t.mentions.c.entity_id)
         ):
-            mentioned[source_id].add(entity_id)
+            if entity_id in entities:  # только действующие (не слитые и не снятые)
+                mentioned[source_id].add(entity_id)
         library: dict[str, str] = {}
         wikidata: dict[str, str] = {}
         for entity_id, system, value in conn.execute(
@@ -161,13 +164,13 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
         labels[entity_id] = pick["text"]
     statements = []
     for r in rows:
-        s = {
-            **dict(r),
-            "attributions": attrs.get(r["id"], []),
-            "evidence": evs.get(r["id"], []),
-        }
-        if s["attributions"] and all(a["hidden"] for a in s["attributions"]):
-            continue  # основано только на снятом источнике
+        own = attrs.get(r["id"], [])
+        # Атрибуция с автором — снятой сущностью не показывается; утверждение, у которого
+        # не осталось видимых атрибуций, — тоже (как «только снятый источник»).
+        shown = [a for a in own if not (a["who_kind"] == "entity" and a["who"] in retired)]
+        s = {**dict(r), "attributions": shown, "evidence": evs.get(r["id"], [])}
+        if own and all(a["hidden"] for a in shown):
+            continue  # основано только на снятом источнике или снятом авторе
         if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
             continue
         if s["object"] is not None and s["object"] == s["subject"]:

@@ -260,7 +260,7 @@ class LifeDates:
         with self.engine.begin() as conn:
             rows = conn.execute(
                 select(t.entities.c.id, t.entities.c.type)
-                .where(t.entities.c.redirect_to.is_(None))
+                .where(t.active())
                 .order_by(t.entities.c.id)
             ).all()
         return [
