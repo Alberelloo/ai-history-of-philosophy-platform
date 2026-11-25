@@ -35,6 +35,11 @@ events.define(
 )
 
 INFLUENCE_FAMILY = "influenced_by"
+# «Исторический контекст»: события и явления, которые стимулировали сущность (epoch-context).
+CONTEXT_SECTION = ("context", "Исторический контекст", ["stimulated"], "in")
+# Порядок строк раздела контекста — как в контексте эпохи: проверенные, по источникам,
+# сгенерированные.
+CONTEXT_ORDER = {"verified": 0, "sourced": 1, "generated": 2}
 
 # Разделы по типам: (код, заголовок, типы связей, направление: out | in | both)
 SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
@@ -49,6 +54,7 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
             "both",
         ),
         ("problems", "Проблемы", ["answers", "part_of"], "both"),
+        CONTEXT_SECTION,
     ],
     "person": [
         ("life", "Годы и места жизни", ["lifespan", "lived_in"], "out"),
@@ -59,7 +65,9 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
         ("schools", "Школы и направления", ["member_of", "founded"], "out"),
         ("positions", "Позиции и учения", ["holds"], "out"),
         ("epoch", "Контекст эпохи", ["belongs_to_epoch"], "out"),
+        CONTEXT_SECTION,
     ],
+    "work": [CONTEXT_SECTION],
     "event": [
         ("when", "Дата и место", ["dating", "happened_in"], "out"),
         ("effects", "На что повлияло", ["stimulated"], "out"),
@@ -74,6 +82,7 @@ SECTIONS: dict[str, list[tuple[str, str, list[str], str]]] = {
         ("parts", "Состав", ["part_of"], "in"),
         ("answers", "Ответы и сторонники", ["answers", "holds"], "both"),
         ("arguments", "Аргументы за и против", ["supports", "attacks"], "in"),
+        CONTEXT_SECTION,
     ],
 }
 # Раздел «что часто путают» собирается отдельно (_misconceptions).
@@ -130,6 +139,8 @@ class Cards:
             "entity_id": other,
             "label": self.entities.label(other) if other else None,
             "value": s.get("value"),
+            # Уточнители (механизм «стимулировало» и др.) — проверены реестром при записи.
+            "qualifiers": dict(s.get("qualifiers") or {}),
             "status": s["status"],
             "consensus": s["consensus"],
             "disputed": s["consensus"] == "disputed",
@@ -190,6 +201,8 @@ class Cards:
             ]
             if code == "influence":
                 rows = [r for r in rows if r["type"] != "studied_with"]
+            if code == CONTEXT_SECTION[0]:
+                rows.sort(key=lambda r: CONTEXT_ORDER.get(r["status"], 3))
             if rows:  # пустой раздел не показывается заголовком
                 sections.append({"code": code, "title": title, "rows": rows})
                 shown += [r["statement_id"] for r in rows if not r["derived"]]

@@ -140,3 +140,10 @@
 - События: `knowledge.context.served` (`mode`, `events`, `links`, `generated_links`, `truncated`, `snapshot`), `knowledge.context.rejected` (`reason`).
 - Маршрут `GET /v1/context` строится в `build_app` при переданном `catalog` (тот же стенд, что справочник и эпохи).
 - Юнит-тесты (`tests/knowledge/test_context_unit.py`): порядок, связь, места, цитаты нет, counts, окно, `kinds`, `verified`, закрытый источник (DE/RU), отклонённая связь, таблица отказов (7 случаев), пределы на `Context(max_events=2, max_links=2)`. Прогон: 15 passed. Затронутые снимком/картой: `test_snapshot`, `test_map_snapshot_parity`, `test_map`, `test_epochs_list`, `test_catalog_route` — 39 passed.
+
+### 3.3 — раздел карточки «Исторический контекст»
+
+- `cards.CONTEXT_SECTION = ("context", "Исторический контекст", ["stimulated"], "in")` у `concept`, `person`, нового `work` и общего набора учений (`doctrine`, `problem`, `position`, `argument`, `conception`).
+- Строки раздела упорядочены по статусу (проверенные → по источникам → сгенерированные, устойчиво), как связи в `/v1/context`: сценарий «Исторический контекст учения» ждёт этот порядок, порядок записи утверждений не задан.
+- В строку карточки (`_row`) добавлено поле `qualifiers` (у всех строк; механизм проверен реестром при записи) — клиенту нужен механизм. Прежние поля не менялись.
+- Юнит-тест `test_card_context_section`. Прогон: он + `test_mentions_cards.py`, `test_epoch_card_unit.py`, `tests/web/test_design_system.py -k "card or ontology_names or epoch"` — 25 passed (сверка названий разделов теперь сходится).

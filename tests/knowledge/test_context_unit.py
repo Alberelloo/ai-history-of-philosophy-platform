@@ -278,3 +278,30 @@ def test_context_limits(svc, ctx, onto, clock):
     assert [e["label"] for e in body["events"]] == ["Славная революция", "Южноморский пузырь"]
     assert len(body["events"][1]["stimulated"]) == 2
     assert sum(body["counts"].values()) == 4  # счётчики до усечения
+
+
+# --- 3.3: раздел карточки «Исторический контекст» ------------------------------------
+
+
+def test_card_context_section(svc, ctx, events):
+    from philograph.knowledge.cards import SECTIONS, Cards
+
+    generated = svc.world.statements.add(
+        ctx["newton"],
+        "stimulated",
+        obj=ctx["locke"],
+        attributions=COMMON,
+        provenance=Provenance("generated"),
+    )
+    events.clear()
+    card = Cards(svc.onto.statements).card(ctx["locke"])
+    assert [s["code"] for s in card["sections"]] == ["context"]
+    rows = card["sections"][0]["rows"]
+    assert [r["label"] for r in rows] == ["Славная революция", "Выход «Начал» Ньютона"]
+    assert rows[0]["qualifiers"] == {"mechanism": "political"} and rows[0]["evidence"]
+    assert rows[1]["statement_id"] == generated and rows[1]["generated"] is True
+    assert rows[1]["qualifiers"] == {} and rows[0]["inverse"] is True
+    [served] = events.of("knowledge.card.served")
+    assert (served["sections"], served["rows"]) == (1, 2)
+    for type_ in ("concept", "person", "work", "doctrine", "problem", "position", "argument"):
+        assert "context" in [code for code, *_ in SECTIONS[type_]], type_
