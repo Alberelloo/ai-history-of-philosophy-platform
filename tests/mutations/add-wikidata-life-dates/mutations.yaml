@@ -1,0 +1,71 @@
+# Мутации add-wikidata-life-dates (tasks.md 3.4): на каждое требование дельт — одна и больше.
+# expect_fail — тесты, каждый из которых должен упасть под мутацией. Патчи — от HEAD.
+mutations:
+  - id: slice-instead-of-claim-date
+    requirement: Даты жизни из Wikidata
+    patch: slice-instead-of-claim-date.patch
+    note: год берётся срезом строки [1:5] вместо claim_date (знак эры и точность теряются)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: century-as-year
+    requirement: Даты жизни из Wikidata
+    patch: century-as-year.patch
+    note: точность 7 (век) разбирается как год
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_decade_century
+      - tests/knowledge/test_life_dates.py::test_time_rule_any_value
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: existing-overwritten
+    requirement: Даты жизни из Wikidata
+    patch: existing-overwritten.patch
+    note: существующая дата не проверяется — пишется новая
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_existing_dates
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: rollback-removes-verified
+    requirement: Даты жизни из Wikidata
+    patch: rollback-removes-verified.patch
+    note: откат удаляет и проверенные утверждения запуска
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified_and_qid
+  - id: qid-on-pending
+    requirement: Подтверждение QID персон и произведений
+    patch: qid-on-pending.patch
+    note: QID записывается при любом решении, в том числе pending/rejected
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: auto-without-flag
+    requirement: Подтверждение QID персон и произведений
+    patch: auto-without-flag.patch
+    note: auto ставится без флага --auto-exact
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidates_for_person
+      - tests/knowledge/test_life_dates.py::test_suggest_auto_invariant
+  - id: qid-taken-not-merged
+    requirement: Подтверждение QID персон и произведений
+    patch: qid-taken-not-merged.patch
+    note: пара qid_taken с accepted не передаётся слиянию вариантов (только в очередь)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_taken
+  - id: own-qid-overwritten
+    requirement: Подтверждение QID персон и произведений
+    patch: own-qid-overwritten.patch
+    note: у сущности другой QID — проверка qid_conflict убрана
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_entity_has_other_qid
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: holder-not-queued
+    requirement: Подтверждение QID персон и произведений
+    patch: holder-not-queued.patch
+    note: suggest не ставит пару с кандидатом-держателем в очередь duplicate
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_held_by_other
+  - id: import-slice
+    requirement: Импорт из Wikidata
+    patch: import-slice.patch
+    note: import_wikidata берёт год срезом [1:5] (знак эры теряется)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_import_bce
+      - tests/knowledge/test_life_dates.py::test_import_invariant

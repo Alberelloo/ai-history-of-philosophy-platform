@@ -44,3 +44,4 @@ enforce:
   - geo-timeline
   - entity-naming
   - person-quality
+  - entity-dating

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -1090,7 +1090,7 @@
+             ).rowcount
+             evs = conn.execute(delete(t.evidence).where(t.evidence.c.run_id == run_id)).rowcount
+             candidates = (
+-                conn.execute(select(t.statements).where(t.statements.c.status != "verified"))
++                conn.execute(select(t.statements))
+                 .mappings()
+                 .all()
+             )

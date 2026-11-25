@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -370,7 +370,7 @@
+                 index[entity["id"]] = entry
+             entry["candidates"] = [{k: v for k, v in c.items() if k != "dates"} for c in found]
+             candidates_total += len(found)
+-            if auto_exact and self._exact(entity, found):
++            if self._exact(entity, found):
+                 entry["wikidata"], entry["decision"] = found[0]["qid"], "auto"
+                 auto += 1
+         events.emit(

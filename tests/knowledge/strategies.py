@@ -967,3 +967,213 @@ def expected_candidates(entities: list[dict[str, Any]]) -> set[frozenset[int]]:
             if search_form(a["primary"]) in names_b:
                 out.add(frozenset({i, j}))
     return out
+
+
+# --- время Wikidata и манифест QID (add-wikidata-life-dates) -------------------------------
+# Оракул — таблица точностей спецификации ``entity-dating`` «Даты жизни из Wikidata»;
+# модули ``wikidata`` и ``dates`` не импортируются.
+
+WD_ROLES = {  # таблица соответствия ролей P106 (данные реестра, не код разбора)
+    "Q4964182": "philosopher",
+    "Q170790": "scientist",
+    "Q36180": "writer",
+    "Q1234713": "theologian",
+}
+WD_NOT_ROLES = ("Q193391", "Q40348", "Q1622272")  # дипломат, юрист, преподаватель — вне таблицы
+
+
+def wd_astro(year: int, bce: bool) -> int:
+    return 1 - year if bce else year
+
+
+def wd_bounds(sign: str, year: int, precision: int) -> tuple[int, int, str] | None:
+    """Границы и ``precision`` по таблице точностей; ``None`` — пропуск ``bad_value``."""
+    bce = sign == "-"
+    if year == 0 or precision < 6 or precision > 11:
+        return None
+    if precision >= 9:
+        y = wd_astro(year, bce)
+        return y, y, "year"
+    if precision == 8:
+        a, b = wd_astro(year, bce), wd_astro(year + 9, bce)
+        return min(a, b), max(a, b), "decade"
+    unit = 100 if precision == 7 else 1000
+    n = -(-year // unit)
+    a, b = wd_astro((n - 1) * unit + 1, bce), wd_astro(n * unit, bce)
+    return min(a, b), max(a, b), "century" if precision == 7 else "approx"
+
+
+def wd_value(sign: str, year: int, month: int = 0, day: int = 0) -> str:
+    return f"{sign}{year:04d}-{month:02d}-{day:02d}T00:00:00Z"
+
+
+@st.composite
+def wd_times(draw) -> tuple[tuple[str, int], tuple[int, int, str] | None]:
+    """(значение и точность Wikidata, ожидаемые границы и ``precision`` или ``None``)."""
+    kind = draw(st.sampled_from(["ok", "ok", "ok", "ok", "zero", "low", "garbage"]))
+    sign = draw(st.sampled_from("+-"))
+    year = draw(st.integers(1, 3000))
+    precision = draw(st.integers(6, 11))
+    if kind == "zero":
+        return (wd_value(sign, 0), draw(st.integers(6, 11))), None
+    if kind == "low":
+        return (wd_value(sign, year), draw(st.integers(0, 5))), None
+    if kind == "garbage":
+        value = draw(
+            st.sampled_from(
+                [f"{year:04d}-00-00", f"{sign}{year:04d}", f"{sign}17x4-00-00T00:00:00Z", "", "Q5"]
+            )
+        )
+        return (value, precision), None
+    month = draw(st.integers(1, 12)) if precision >= 10 else 0
+    day = draw(st.integers(1, 28)) if precision >= 11 else 0
+    return (wd_value(sign, year, month, day), precision), wd_bounds(sign, year, precision)
+
+
+def wd_width(bounds: tuple[int, int, str]) -> int:
+    return bounds[1] - bounds[0]
+
+
+def expected_lifespan(birth, death) -> dict[str, Any]:
+    """Годы жизни: начало — из рождения, конец — из смерти; ``precision`` — ``year`` при
+    обеих «год», иначе точность той, у которой неопределённость шире."""
+    wider = max((birth, death), key=wd_width)[2]
+    precision = "year" if birth[2] == death[2] == "year" else wider
+    return {
+        "earliest_start": birth[0],
+        "latest_start": birth[1],
+        "earliest_end": death[0],
+        "latest_end": death[1],
+        "precision": precision,
+    }
+
+
+RANKS = ("normal", "preferred", "deprecated")
+
+
+@st.composite
+def wd_claim_values(draw, present: bool) -> tuple[list[tuple[str, int, str]], Any]:
+    """Значения одного свойства с рангами и выбранное по правилу: предпочтённое, иначе
+    первое обычное, устаревшее — никогда. Ожидание: ``None`` — свойства нет, иначе
+    (границы или ``None`` для ``bad_value``)."""
+    if not present:
+        if draw(st.booleans()):  # только устаревшие — как будто свойства нет
+            (value, precision), _ = draw(wd_times())
+            return [(value, precision, "deprecated")], None
+        return [], None
+    values = []
+    for _ in range(draw(st.integers(1, 3))):
+        (value, precision), bounds = draw(wd_times())
+        values.append(((value, precision, draw(st.sampled_from(RANKS))), bounds))
+    if not any(v[0][2] != "deprecated" for v in values):
+        (value, precision, _), bounds = values[0]
+        values[0] = ((value, precision, "normal"), bounds)
+    preferred = [b for v, b in values if v[2] == "preferred"]
+    normal = [b for v, b in values if v[2] == "normal"]
+    chosen = (preferred or normal)[0]
+    return [v for v, _ in values], ("value", chosen)
+
+
+@st.composite
+def wd_person_records(draw, index: int) -> dict[str, Any]:
+    """Персона или произведение с QID и записью Wikidata; ожидание датировки и ролей."""
+    qid = f"Q{700000 + index}"
+    kind = draw(st.sampled_from(["person", "person", "person", "work"]))
+    props = ("P569", "P570") if kind == "person" else ("P577",)
+    times, chosen = {}, {}
+    for prop in props:
+        values, pick = draw(wd_claim_values(draw(st.booleans()) or draw(st.booleans())))
+        if values:
+            times[prop] = values
+        chosen[prop] = pick
+    occupations = (
+        draw(st.lists(st.sampled_from([*WD_ROLES, *WD_NOT_ROLES]), max_size=3))
+        if kind == "person"
+        else []
+    )
+    existing = draw(st.sampled_from([None, None, "1600–1650", "1724–1804"]))
+    return {
+        "qid": qid,
+        "type": kind,
+        "name": f"Лицо {index}" if kind == "person" else f"Труд {index}",
+        "times": times,
+        "chosen": chosen,
+        "occupations": occupations,
+        "roles": {WD_ROLES[q] for q in occupations if q in WD_ROLES},
+        "existing": existing,
+    }
+
+
+def expected_dating(case: dict[str, Any]) -> tuple[str, Any]:
+    """Ожидаемый исход датировки записи: ("write", границы) или ("skip", {причины})."""
+    if case["type"] == "work":
+        pick = case["chosen"]["P577"]
+        if pick is None:
+            return "skip", {("P577", "no_dates")}
+        bounds = pick[1]
+        if bounds is None:
+            return "skip", {("P577", "bad_value")}
+        return "write", {
+            "earliest_start": bounds[0],
+            "latest_start": bounds[1],
+            "earliest_end": bounds[0],
+            "latest_end": bounds[1],
+            "precision": bounds[2],
+        }
+    birth, death = case["chosen"]["P569"], case["chosen"]["P570"]
+    if birth is None and death is None:
+        return "skip", {("P569", "no_dates"), ("P570", "no_dates"), ("item", "no_dates")}
+    bad = {p for p, pick in case["chosen"].items() if pick is not None and pick[1] is None}
+    if birth is None or death is None:
+        missing = "P569" if birth is None else "P570"
+        return "skip", {(missing, "partial"), *((p, "bad_value") for p in bad)}
+    if bad:
+        return "skip", {(p, "bad_value") for p in bad}
+    return "write", expected_lifespan(birth[1], death[1])
+
+
+QID_POOL = ("Q11", "Q12", "Q13", "Q14")
+DECISIONS = ("pending", "accepted", "auto", "rejected")
+
+
+@st.composite
+def manifests(draw) -> dict[str, Any]:
+    """Персоны (часть с QID из малого пула) и записи манифеста в порядке обхода.
+
+    Ожидание — обход по правилу 1–4 «Подтверждение QID»: какие QID записаны, у каких
+    записей ``qid_conflict``/``qid_taken`` (два подтверждения одного QID — первое)."""
+    n = draw(st.integers(2, 5))
+    pool = list(QID_POOL)
+    held = {}
+    for i in range(n):
+        if draw(st.integers(0, 2)) == 0:
+            free = [q for q in pool if q not in held.values()]
+            if free:
+                held[i] = draw(st.sampled_from(free))
+    order = draw(st.permutations(range(n)))
+    entries = []
+    for i in order[: draw(st.integers(1, n))]:
+        decision = draw(st.sampled_from(DECISIONS))
+        qid = draw(st.sampled_from([None, *pool]))
+        if decision in ("accepted", "auto") and qid is None:
+            qid = draw(st.sampled_from(pool))
+        entries.append({"index": i, "wikidata": qid, "decision": decision})
+    # оракул правила
+    owner = {q: i for i, q in held.items()}
+    own = dict(held)
+    written, skipped = {}, []
+    for e in entries:
+        if e["decision"] not in ("accepted", "auto"):
+            continue
+        i, q = e["index"], e["wikidata"]
+        if i in own and own[i] != q:
+            skipped.append((i, "qid_conflict"))
+            continue
+        if i in own:
+            continue
+        if q in owner and owner[q] != i:
+            skipped.append((i, "qid_taken"))
+            continue
+        owner[q], own[i] = i, q
+        written[i] = q
+    return {"n": n, "held": held, "entries": entries, "written": written, "skipped": skipped}
