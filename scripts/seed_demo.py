@@ -110,6 +110,8 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         seed_map(entities, statements)
     if not entities.find("Кёнигсберг"):
         seed_reference(entities, statements)
+    if not entities.find("Барокко"):
+        seed_epochs(entities, statements)
 
 
 def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
@@ -293,6 +295,36 @@ def seed_reference(entities, statements) -> None:
     )
     entities.create("term", [("ru", "Эпистемология", "primary")])
     entities.create("place", [("ru", "Кёнигсберг", "primary")])
+
+
+def seed_epochs(entities, statements) -> None:
+    """Эпохи (add-epochs): эпоха без датировки с явным участником и нечёткий конец пролёта.
+
+    «Барокко» без датировки — в списке «без датировки» страницы эпох, Лейбниц относится
+    к нему явно. У «Научной революции» — вторая датировка с концом между 1687 и 1700 и рангом
+    «предпочтённое»: она становится основной (пролёт 1543–1694 с растушёвкой конца). Названия
+    не встречаются в текстах демо-источников — новых упоминаний нет; у Канта и Юма новых
+    утверждений нет, эталоны чтения не меняются."""
+    from philograph.knowledge.dates import FuzzyDate
+    from philograph.knowledge.statements import Attribution
+
+    common = [Attribution("common")]
+    baroque = entities.create("epoch", [("ru", "Барокко", "primary"), ("en", "Baroque", "variant")])
+    statements.add(
+        entities.find("Лейбниц")[0]["id"],
+        "belongs_to_epoch",
+        obj=baroque,
+        qualifiers={"membership_basis": "historians"},
+        attributions=common,
+    )
+    revolution = entities.find("Научная революция")[0]["id"]
+    fuzzy_end = statements.add(
+        revolution,
+        "dating",
+        value=FuzzyDate(1543, 1543, 1687, 1700, "approx", "1543 – 1687…1700").to_json(),
+        attributions=common,
+    )
+    statements.set_rank(fuzzy_end, "preferred", "seed")
 
 
 if __name__ == "__main__":
