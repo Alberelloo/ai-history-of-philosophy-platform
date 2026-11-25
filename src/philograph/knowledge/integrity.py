@@ -90,6 +90,11 @@ def _state(engine: Any) -> dict[str, Any]:
         entities = conn.execute(select(*query)).all()
         statements = {r["id"]: r for r in conn.execute(select(t.statements)).mappings()}
         attrs = _attributions(conn)
+        symmetric = {
+            code
+            for code, spec in conn.execute(select(t.relation_types.c.code, t.relation_types.c.spec))
+            if (spec or {}).get("symmetric")
+        }
         merges = conn.execute(
             select(t.merges.c.moved).where(t.merges.c.undone.is_(False))
         ).scalars()
@@ -108,19 +113,22 @@ def _state(engine: Any) -> dict[str, Any]:
         "attributions": attrs,
         "folded": folded,
         "loops": loops,
+        "symmetric": symmetric,
     }
 
 
-def _same(row: Any, content: dict[str, Any], ends: list[str | None], resolve: Any) -> bool:
-    """Цель — то же утверждение: тот же тип, концы — образы исходных через перенаправления."""
-    return (
-        row["type"] == content["type"]
-        and [
-            resolve(row["subject"]),
-            resolve(row["object"]),
-        ]
-        == ends
-    )
+def _same(
+    row: Any, content: dict[str, Any], ends: list[str | None], resolve: Any, symmetric: set[str]
+) -> bool:
+    """Цель — то же утверждение: тот же тип, концы — образы исходных через перенаправления.
+    У симметричной связи (флаг реестра) порядок концов не важен: ``Statements._key`` их
+    сортирует, и свёртка «A ↔ B» с «B ↔ A» не потеря."""
+    if row["type"] != content["type"]:
+        return False
+    now = [resolve(row["subject"]), resolve(row["object"])]
+    if row["type"] in symmetric:
+        return sorted(now, key=str) == sorted(ends, key=str)
+    return now == ends
 
 
 def _follow(mapping: dict[str, str], key: str | None) -> str | None:
@@ -155,7 +163,11 @@ def compare(base: Baseline, engine: Any) -> dict[str, Any]:
             loops += 1
             continue
         row = state["statements"].get(target)
-        if row is None or not _live(row) or not _same(row, content, ends, resolve):
+        if (
+            row is None
+            or not _live(row)
+            or not _same(row, content, ends, resolve, state["symmetric"])
+        ):
             lost.append(sid)
             continue
         have = {

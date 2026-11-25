@@ -119,3 +119,24 @@ def test_has_retired_cached_per_engine(onto, monkeypatch):
         with engine.begin() as conn:
             assert ks.has_retired(conn)
     assert len(calls) == 1
+
+
+def test_symmetric_fold_with_swapped_ends_is_not_loss(onto):
+    """Ревью О20: «Hume ↔ Кант» и «Кант ↔ Юм» (симметричная связь реестра) при слиянии
+    Hume → Юм сворачиваются в одно; порядок концов у цели не тот — это не потеря."""
+    e = onto.entities
+    hume = e.create("person", [("en", "Hume", "primary")])
+    yum = e.create("person", [("ru", "Юм", "primary")])
+    kant = e.create("person", [("ru", "Кант", "primary")])
+    assert onto.registry.relation("corresponded").get("symmetric")
+    s1 = onto.statements.add(hume, "corresponded", obj=kant, attributions=SRC)
+    s2 = onto.statements.add(
+        kant, "corresponded", obj=yum, attributions=[Attribution("source", "s2")]
+    )
+    engine = e.engine
+    base = integrity.baseline(engine)
+    onto.statements.merge_entities(yum, hume, reason="merge:name")
+    result = integrity.compare(base, engine)
+    assert result["lost"] == [] and result["lost_attributions"] == []
+    assert result["folded"] == 1
+    assert {s1, s2} == set(base.statements)
