@@ -1,6 +1,6 @@
 # Tasks
 
-Третье в стеке: после `add-reference-catalog` и `add-epochs` (нужны `snapshot.py`, `epochs.py`, `epoch_dates.wikidata_time`/`http_fetch`, страница `/epochs/<id>`, `sources/epochs.yaml`). Ветка — `claude/epoch-context`. После каждого пункта: отметка, `progress.md`, коммит `wip(add-epoch-context): …`, push.
+Третье в стеке: после `add-reference-catalog` и `add-epochs` (нужны `snapshot.py`, `epochs.py`, `knowledge/wikidata.py` (`http_fetch`, `fetch_entity`, `claim_date`), страница `/epochs/<id>`, `sources/epochs.yaml`). Ветка — `claude/epoch-context`. После каждого пункта: отметка, `progress.md`, коммит `wip(add-epoch-context): …`, push.
 
 ## 1. Задача и документы
 
