@@ -12,6 +12,7 @@
 
 import { geoContains, type GeoPath, type GeoProjection } from "d3-geo";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
+import { MAX_PERSONS } from "./timeline";
 
 export const MEDAL = 26;
 export const MEDAL_GAP = 4;
@@ -21,7 +22,7 @@ export const MAX_SHIFT = RINGS * STEP;
 export const EVENT_MARK = 10;
 export const TOUCH = 0.5;
 export const MAX_FAILS = 6;
-export const MAX_PERSONS = 600;
+export { MAX_PERSONS }; // предел медальонов в DOM живёт в timeline.ts (без d3): его читает панель
 export const MAX_PORTRAITS = 60;
 export const LABEL_PAD = 1.5;
 export const NAME_GAP = 4;

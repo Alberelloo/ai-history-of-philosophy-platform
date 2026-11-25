@@ -16,6 +16,7 @@ export const ADULT_AGE = 20;
 export const TRAIL = 150;
 export const MAX_PLACES = 300;
 export const MAX_LINKS = 200;
+export const MAX_PERSONS = 600; // медальонов в DOM (раскладка layout.ts), сверх — в значке «+N»
 export const MIN_OPACITY = 0.15;
 
 export type GeoModel = {
