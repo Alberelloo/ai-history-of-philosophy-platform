@@ -40,3 +40,4 @@ enforce:
   - entity-portraits
   - entity-catalog
   - epochs
+  - epoch-context

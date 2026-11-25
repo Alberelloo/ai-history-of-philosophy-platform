@@ -1330,6 +1330,8 @@ def test_event_highlights_what_it_stimulated(knowledge_context, knowledge_stack,
     drawn = set(page.locator(".map-thread-hit").evaluate_all("els => els.map(e => e.dataset.link)"))
     assert drawn <= influence_ids, drawn - influence_ids
     assert w["basis_link"] not in drawn and w["schelling_link"] not in drawn
+    # У выбранного события нет «влияний выбранного» — линий при выборе события нет вовсе.
+    assert page.locator(".map-thread").count() == 0
     # «Только проверенные» — сгенерированная связь не выделяет Шеллинга.
     check(page, "Связи", "Только проверенные")
     settle(page)
