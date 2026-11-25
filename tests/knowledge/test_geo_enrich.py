@@ -316,6 +316,21 @@ def test_skips_reasons_and_counters(onto, events, no_network):
     assert rows_of(onto, "coordinates") == []
 
 
+@req(GEO, WD, invariant="Значение свойства без идентификатора места — пропуск bad_value")
+def test_value_without_id_is_bad_value(onto, events, no_network):
+    descartes = onto.person("Рене Декарт", "1596", "1650", wikidata="Q9191")
+    record = person_record("Q9191", "Рене Декарт", born=1596, died=1650)
+    record["entities"]["Q9191"]["claims"]["P19"] = [
+        claim("P19", {"type": "wikibase-entityid", "value": {"entity-type": "item"}})
+    ]
+    fetch = Fetch({"Q9191": record})
+    summary = PlaceEnrichment(onto.statements, fetch).run()
+    skipped = [(e.get("entity"), e.get("property"), e.get("reason")) for e in events.of(SKIPPED)]
+    assert skipped == [(descartes, "P19", "bad_value")]
+    assert (summary["skipped"], summary["failed"]) == (1, 0)
+    assert rows_of(onto, "lived_in") == []
+
+
 @req(GEO, WD, scenario="Откат")
 def test_rollback_keeps_verified_and_places(onto, events, no_network):
     onto.person("Иммануил Кант", "1724", "1804", wikidata=KANT_Q)
