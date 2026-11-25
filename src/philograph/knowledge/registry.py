@@ -92,8 +92,8 @@ class OntologyRegistry:
     def _add_missing_defaults(conn: Connection) -> list[str]:
         """Новые коды начального реестра в уже заполненной базе: недостающие типы, уточнители,
         связи и рецепты дописываются; у существующих связей добавляются только новые типы
-        концов и значения списка (например, датировка эпохи). Изменённое оператором не
-        перезаписывается."""
+        концов, значения списка (например, датировка эпохи) и уточнители (вид места у «жил
+        в»). Недостающее дописывается в конец, изменённое оператором не перезаписывается."""
         added: list[str] = []
         types = set(conn.scalars(select(t.entity_types.c.code)))
         for c, title, parent in data.ENTITY_TYPES:
@@ -118,7 +118,7 @@ class OntologyRegistry:
                 continue
             current = dict(stored[code])
             changed = False
-            for key in ("subject_types", "object_types", "values"):
+            for key in ("subject_types", "object_types", "values", "qualifiers"):
                 missing = [x for x in spec.get(key) or [] if x not in (current.get(key) or [])]
                 if missing:
                     current[key] = [*(current.get(key) or []), *missing]
@@ -129,7 +129,7 @@ class OntologyRegistry:
                     .where(t.relation_types.c.code == code)
                     .values(spec=current)
                 )
-                added.append(f"концы и значения {code}")
+                added.append(f"концы, значения и уточнители {code}")
         recipes = set(conn.scalars(select(t.recipes.c.code)))
         for row in data.RECIPES:
             if row[0] not in recipes:

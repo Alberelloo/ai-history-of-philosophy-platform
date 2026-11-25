@@ -19,7 +19,7 @@
 
 ## 2. Онтология (разработчик)
 
-- [ ] 2.1 `registry.py`, `_add_missing_defaults`: дописывать недостающие `qualifiers` существующей связи. Тест: реестр заполнен прежней версией (`lived_in` с одним `time`, оператор добавил тип конца) → после загрузки `time` и `place_role`, тип конца оператора сохранён, версия +1
+- [x] 2.1 `registry.py`, `_add_missing_defaults`: дописывать недостающие `qualifiers` существующей связи. Тест: реестр заполнен прежней версией (`lived_in` с одним `time`, оператор добавил тип конца) → после загрузки `time` и `place_role`, тип конца оператора сохранён, версия +1
 - [ ] 2.2 `registry_data.py`: уточнитель `place_role`; `lived_in` с `("time", "place_role")`; `coordinates` (`value="geo"`, `requires_attribution=True`); `rel()` с `requires_attribution`. Юнит-тесты реестра
 - [ ] 2.3 `statements.py`:
   - нормализация `geo` в `add` до `_key`: конечные числа, не `bool`; пределы включительно; `round(x, 2)`;
