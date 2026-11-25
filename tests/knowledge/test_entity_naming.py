@@ -632,6 +632,36 @@ def test_manual_core(stand, onto, events):
     assert len(events.where(CREATED, type="person")) == 1
 
 
+@req(NM, VALID, invariant="Ядро: отклонённый элемент возвращается с причиной, остальные создаются")
+def test_core_rejection_reasons(stand, onto, events):
+    items = [
+        {"name": "20.1", "type": "concept"},
+        {"name": "Локк", "type": "person"},
+        {"name": "Every", "type": "concept"},
+        {"name": "—", "type": "term"},
+        {"name": "Один Два Три Четыре Пять Шесть Семь", "type": "concept"},
+        {"name": "Hume and Locke", "type": "person"},
+        {"name": "Сознание", "type": "concept"},
+    ]
+    report = stand.filling.accept_core_report(items, "operator")
+    assert [onto.entities.label(e) for e in report["created"]] == ["Локк", "Сознание"]
+    assert report["rejected"] == [
+        {"name": "20.1", "type": "concept", "reason": "number"},
+        {"name": "Every", "type": "concept", "reason": "stopword"},
+        {"name": "—", "type": "term", "reason": "empty"},
+        {"name": items[4]["name"], "type": "concept", "reason": "sentence"},
+        {"name": "Hume and Locke", "type": "person", "reason": "not_a_name"},
+    ]
+    assert [f["reason"] for f in _rejected_fields(events)] == [
+        "number",
+        "stopword",
+        "empty",
+        "sentence",
+        "not_a_name",
+    ]
+    assert len(events.of(CREATED)) == 2
+
+
 @req(NM, VALID, scenario="Стоп-список из данных")
 def test_stopword_list_from_data(onto, events, tmp_path, monkeypatch):
     data = yaml.safe_load(naming.RULES_PATH.read_text(encoding="utf-8"))

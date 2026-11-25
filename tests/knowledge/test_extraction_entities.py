@@ -126,6 +126,8 @@ def test_schema_with_entities_and_dating(stand, events):
     assert set(item["properties"]) == {"name", "type", "ru", "en", "original", "dating"}
     assert set(item["properties"]["type"]["enum"]) == set(REGISTRY_TYPES)
     assert set(item["properties"]["dating"]["properties"]) == {"text", "paragraph", "quote"}
+    assert set(item["properties"]["dating"]["required"]) == {"text", "paragraph", "quote"}
+    assert set(item["required"]) == {"name", "type"}
     assert "entities" not in schema["required"]
     assert body["data"]["language"] == "en"
     # контракт промпта: правила языка, валидности и дат — в тексте шаблона
@@ -165,6 +167,22 @@ def test_prompt_language_and_rules(stand, paragraphs, language):
         "извлекай годы, если они названы",  # даты
     ):
         assert rule in system, rule
+
+
+@req(EX, OUTPUT, invariant="Причина отказа элемента — код без названия: entity:no_type")
+def test_new_entity_without_type_dropped_by_code(stand, onto, events):
+    """Новая сущность без типа (нет ``subject_type`` и элемента ``entities``) не создаётся:
+    утверждение отброшено с кодом ``entity:no_type``, названия в причине нет."""
+    token = sentinel()
+    item = st("Безымянный", "holds", "Привычка", 1, "Безымянный писал")
+    del item["subject_type"]
+    stand.extract([f"Безымянный писал о привычке. {token}"], {"statements": [item]})
+    assert ids_by_text(onto, "Безымянный") == []
+    [drop] = [dict(e.fields) for e in events.of(DROPPED)]
+    assert drop["reason"] == "entity:no_type"
+    assert set(drop) - CTX == {"run_id", "reason"}
+    assert events.where(CREATED, type="person") == []
+    no_token(events, token)
 
 
 @req(EX, OUTPUT, scenario="Тип вне реестра в сущностях")
