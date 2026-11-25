@@ -310,9 +310,76 @@ def not_names(draw) -> tuple[tuple[str, str], str]:
     return (PERSON, text), "not_a_name"
 
 
+@st.composite
+def person_edge_names(draw) -> tuple[tuple[str, str], None]:
+    """Границы правила ``not_a_name`` — названия без причины.
+
+    ``particle_swapcase`` — частица с первой строчной и остальными заглавными («dE», «дЕ»):
+    сравнение частиц без учёта регистра; ``glue_lower_right`` — союз перед словом со строчной
+    («Кант и юм»): склейка — только между двумя словами с заглавной; ``glue_nonperson`` и
+    ``pattern_nonperson`` — склейка и шаблон «the … of …» у типа не «персона»: ``not_a_name``
+    только для персоны."""
+    kind = draw(
+        st.sampled_from(
+            ["particle_swapcase", "glue_lower_right", "glue_nonperson", "pattern_nonperson"]
+        )
+    )
+    from hypothesis import assume
+
+    conj = draw(st.sampled_from(["and", "и", "&"]))
+    if kind == "particle_swapcase":
+        particle = draw(st.sampled_from([p for p in PARTICLES if len(p) > 1]))
+        text = particle[0] + particle[1:].upper() + " " + draw(_cap_word())
+        return (PERSON, text), None
+    if kind == "glue_lower_right":
+        left = draw(_cap_word())
+        alphabet = draw(st.sampled_from([LATIN_LOWER, CYR_LOWER]))
+        right = draw(_word(alphabet, 2, 9, capital=False))
+        return (PERSON, f"{left} {conj} {right}"), None
+    type_ = draw(st.sampled_from(NON_PERSON))
+    tail = draw(_cap_word())
+    if kind == "glue_nonperson":
+        text = f"{draw(_cap_word())} {conj} {tail}"
+    else:
+        text = draw(
+            st.sampled_from(
+                [
+                    f"The author of {tail}",
+                    f"author of {tail}",
+                    f"the author {tail}",
+                    f"The x of {tail}",
+                ]
+            )
+        )
+    assume(_ok_name(text.split()) and search_form(text) not in STOP_FORMS)
+    return (type_, text), None
+
+
+@st.composite
+def rule_order(draw) -> tuple[tuple[str, str], str]:
+    """Порядок правил: ``empty`` и ``number`` раньше ``sentence`` (длинное без букв), а
+    ``sentence`` раньше ``not_a_name`` (длинное строчное описание персоны)."""
+    kind = draw(st.sampled_from(["number_long", "empty_long", "person_long_lower"]))
+    if kind == "person_long_lower":
+        max_words, _ = limits(PERSON)
+        n = draw(st.integers(max_words + 1, max_words + 5))
+        words = [draw(_word(LATIN_LOWER, 2, 5, capital=False)) for _ in range(n)]
+        return (PERSON, " ".join(words)), "sentence"
+    type_ = draw(st.sampled_from(CHECKED_TYPES))
+    max_words, _ = limits(type_)
+    n = draw(st.integers(max_words + 1, max_words + 4))
+    if kind == "number_long":
+        words = [draw(st.text("0123456789", min_size=1, max_size=2)) for _ in range(n)]
+        return (type_, " ".join(words)), "number"
+    words = [draw(st.sampled_from(list("-—.,;:!"))) for _ in range(n)]
+    return (type_, " ".join(words)), "empty"
+
+
 def names_with_reason():
     """Все классы названий вместе: ((тип, сырое название), ожидаемая причина или None)."""
     return st.one_of(
+        person_edge_names(),
+        rule_order(),
         numbers(),
         blank(),
         long_phrases(),
@@ -325,11 +392,13 @@ def names_with_reason():
 
 # --- письменность и язык --------------------------------------------------------------------
 
+# Границы диапазонов письменностей (entity-naming, п. 2): кириллица U+0400–U+052F (``ԯ`` —
+# последняя), греческая U+0370–U+03FF и U+1F00–U+1FFF (``ῳ``), армянская ``Ա`` (U+0531) — прочая.
 _ALPHABETS = {
-    "cyrillic": CYR_LOWER,
+    "cyrillic": CYR_LOWER + "ԁԯ",
     "latin": LATIN_LOWER,
-    "greek": GREEK_LOWER,
-    "other": OTHER_LETTERS,
+    "greek": GREEK_LOWER + "ͱῳ",
+    "other": OTHER_LETTERS + "աԱ",
 }
 
 
@@ -347,11 +416,23 @@ def scripts_mix(
     for _ in range(draw(st.integers(1, max_words))):
         kind = draw(
             st.sampled_from(
-                ["cyrillic", "latin", "greek", "other", "mixed", "roman", "roman_letters"]
+                [
+                    "cyrillic",
+                    "latin",
+                    "greek",
+                    "other",
+                    "mixed",
+                    "roman",
+                    "roman_letters",
+                    "digits",
+                ]
             )
         )
         if kind == "roman":
             word = draw(st.sampled_from(ROMAN))
+        elif kind == "digits":
+            # Цифры — не буквы (категория не ``L*``): письменности не добавляют.
+            word = draw(st.sampled_from(["1781", "20.1", "§3", "1724–1804", "2"]))
         elif kind == "roman_letters":
             # Слово из букв IVXLCDM не целиком заглавными («Mill», «Civil», «Xiv») — латиница,
             # не римское число: римские — только заглавные (entity-naming).
@@ -476,6 +557,13 @@ UNPARSED = (
     "+1724",
     "около середины века",
     "470 до н. э. – 399",
+    "XXII в.",
+    "XXX в.",
+    "IIII в.",
+    "0 в.",
+    "I – V в.",
+    "1 января 1724",
+    "1724 – 1804 до н. э. – 3",
 )
 
 
@@ -591,10 +679,39 @@ def datings(draw) -> dict[str, Any]:
     token = sentinel()
     target = draw(
         st.sampled_from(
-            ["ok", "ok", "century", "paragraph", "quote", "unparsed", "not_in_quote", "era"]
+            [
+                "ok",
+                "ok",
+                "century",
+                "paragraph",
+                "quote",
+                "unparsed",
+                "not_in_quote",
+                "era",
+                # две несработавшие проверки сразу: причина — первая по порядку
+                "m_paragraph_quote",
+                "m_quote_unparsed",
+                "m_unparsed_numbers",
+                "m_numbers_era",
+                "m_era_single",
+                "m_numbers_single",
+            ]
         )
     )
-    d = draw(_valid_dating(person, "century" if target == "century" else None))
+    if target in ("m_era_single", "m_numbers_single"):
+        person = True  # «один год у персоны» — только для персоны
+    d = draw(
+        _valid_dating(
+            person,
+            "century"
+            if target == "century"
+            else (
+                draw(st.sampled_from(["year", "approx", "century"]))
+                if target in ("m_era_single", "m_numbers_single")
+                else None
+            ),
+        )
+    )
     quote = _quote_for(draw, d)
     text = d["text"]
     paragraph = draw(st.integers(1, n))
@@ -640,11 +757,42 @@ def datings(draw) -> dict[str, Any]:
     elif target == "era":
         quote = _quote_for(draw, d, era=not d["era"])
         reason = "dating:era"
+    elif target == "m_paragraph_quote":  # абзац вне фрагмента и цитаты в абзаце нет → paragraph
+        paragraph = draw(st.sampled_from([0, n + 1, -1, n + 7]))
+        quote = quote + " " + sentinel()
+        reason = "dating:paragraph"
+    elif target == "m_quote_unparsed":  # цитаты нет в абзаце и текст не из таблицы → quote
+        text = draw(st.sampled_from(UNPARSED))
+        quote = f"{draw(st.sampled_from(CONTEXT_WORDS))} {text} {sentinel()}"
+        reason = "dating:quote"
+    elif target == "m_unparsed_numbers":  # текст не из таблицы и чисел нет в цитате → unparsed
+        text = draw(st.sampled_from(UNPARSED))
+        quote = f"{draw(st.sampled_from(CONTEXT_WORDS))} {draw(st.sampled_from(CONTEXT_WORDS))}"
+        reason = "dating:unparsed"
+    elif target in ("m_numbers_era", "m_numbers_single"):
+        # чисел текста нет в цитате (и эра другая / один год у персоны) → not_in_quote
+        if d["roman"]:
+            other = draw(st.sampled_from([c for c in CENTURIES if c != d["roman"]]))
+            quote = quote.replace(d["roman"], other)
+        else:
+            missing = draw(st.sampled_from(d["numbers"]))
+            replacement = str(draw(st.integers(1, 2100).filter(lambda v: v not in d["numbers"])))
+            quote = _replace_number(quote, missing, replacement)
+        if target == "m_numbers_era":
+            quote = (
+                quote.replace(" до нашей эры", "").replace(" до н. э.", "").replace(" до н.э.", "")
+            )
+            if not d["era"]:
+                quote = quote + " до н. э."
+        reason = "dating:not_in_quote"
+    elif target == "m_era_single":  # другая эра у одного года персоны → era, не single_year
+        quote = _quote_for(draw, d, era=not d["era"])
+        reason = "dating:era"
     elif person and d["single"]:
         reason = "dating:single_year"
     paragraphs = [f"{sentinel()} Абзац {i} без цитаты." for i in range(1, n + 1)]
     home = paragraph if 1 <= paragraph <= n else 1
-    if target == "quote":
+    if target in ("quote", "m_paragraph_quote", "m_quote_unparsed"):
         paragraphs[home - 1] = _paragraph_with(draw, quote.rsplit(" ", 1)[0], token)
     else:
         paragraphs[home - 1] = _paragraph_with(draw, quote, token)

@@ -304,6 +304,31 @@ def test_spellings_found_different_entities(stand, onto, engine_for, clock, even
 @example((("Аристотель", "grc"), "ru", None))
 @example((("Ἀριστοτέλης", "grc"), "grc", None))
 @example((("汉字", "en"), "und", None))
+# аудит пунктов (О21): п. 1 — знаки по краям слова, римское число с точкой/скобками
+@example((("(XIV) Ки", None), "ru", None))
+@example((("Людовик XIV.", None), "ru", None))
+# п. 2 — цифры не буквы; границы диапазонов кириллицы, греческой и прочих
+@example((("Kant 1781", None), "en", None))
+@example((("Ки 1781 1724", None), "ru", None))
+@example((("Ԯԯ", None), "ru", None))  # U+052E, U+052F — последние кириллические
+@example((("Ͱͱ", None), "el", None))  # U+0370 — первая греческая
+@example((("ῳῳ", "grc"), "grc", None))  # U+1FF3 — расширенная греческая
+@example((("Աբգ", "ru"), "und", None))  # армянская — прочая
+# п. 3–4 — равенство, нет букв
+@example((("Kant-Кант", None), "und", None))
+@example((("1781", "ru"), "und", None))
+@example((("!!!", "en"), "und", None))
+# п. 5 — таблица письменностей переданных языков
+@example((("Ens rationis", "la"), "la", None))
+@example((("Cogito", "fr"), "fr", None))
+@example((("Cogito", "it"), "it", None))
+@example((("Cogito", "zz"), "en", None))
+@example((("Cogito", "ru"), "en", None))
+@example((("Платон", "en"), "ru", None))
+@example((("Платон", "la"), "ru", None))
+@example((("Платон", "ru"), "ru", None))
+@example((("Plato", "grc"), "en", None))
+@example((("Ἀριστοτέλης", "el"), "el", None))
 def test_lang_for_any_text(case):
     (text, given_lang), expected, _info = case
     assert naming.lang_for(text, given_lang) == expected
@@ -596,6 +621,102 @@ def test_stopword_list_from_data(onto, events, tmp_path, monkeypatch):
     assert _rejected_fields(events) == [{"type": "concept", "label": "Некто", "reason": "stopword"}]
 
 
+@req(NM, VALID, invariant="Знаки — кодовые точки названия после strip() и NFC")
+@pytest.mark.parametrize(
+    ("raw", "reason"),
+    [
+        ("Е\u0308" * 80, None),  # NFD: 160 кодовых точек, после NFC — 80
+        ("Е\u0308" * 81, "sentence"),
+        ("  " + "Е\u0308" * 80 + "\t", None),
+    ],
+)
+def test_signs_counted_after_nfc(onto, events, raw, reason):
+    assert naming.check_name("concept", raw) == reason
+    try:
+        onto.entities.create("concept", [("ru", raw, "primary")])
+    except InvalidName as exc:
+        assert exc.reason == reason
+        [rejected] = events.of(REJECTED)
+        assert fields(rejected) == {
+            "type": "concept",
+            "label": expected_label(raw),
+            "reason": "sentence",
+        }
+    else:
+        assert reason is None
+        events.assert_none(REJECTED)
+
+
+def _rules_from(tmp_path, monkeypatch, mutate):
+    data = yaml.safe_load(naming.RULES_PATH.read_text(encoding="utf-8"))
+    mutate(data)
+    path = tmp_path / "naming_rules.yaml"
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    original = naming.load_rules
+    monkeypatch.setattr(naming, "load_rules", lambda *_a, **_k: original(Path(path)))
+
+
+def _limit(data):
+    data["limits"]["default"] = {"max_words": 2, "max_chars": 80}
+
+
+def _limit_chars(data):
+    data["limits"]["concept"] = {"max_words": 6, "max_chars": 5}
+
+
+def _particle(data):
+    data["person"]["particles"].append("зу")
+
+
+def _pattern(data):
+    data["person"]["patterns"].append("^some one ")
+
+
+def _conjunction(data):
+    data["person"]["conjunctions"].append("or")
+
+
+def _person_types(data):
+    data["person"]["types"].append("group")
+
+
+def _exempt(data):
+    data["exempt"].append("concept")
+
+
+@req(
+    NM, VALID, invariant="Правила — данные: стоп-список, пределы, частицы, шаблоны без правки кода"
+)
+@pytest.mark.parametrize(
+    ("mutate", "type_", "label", "control", "reason"),
+    [
+        (_limit, "concept", "Один Два Три", "Один Два", "sentence"),  # предел слов по типу
+        (_limit_chars, "concept", "Шестой", "Пять", "sentence"),  # предел знаков по типу
+        (_particle, "person", "зу Чжи", "зу Чжи", None),  # частица из данных: строчная допустима
+        (_pattern, "person", "Some one Else", "Some two Else", "not_a_name"),  # шаблон
+        (_conjunction, "person", "Kant or Hume", "Kant nor Hume", "not_a_name"),  # союз
+        (_person_types, "group", "группа людей", "Группа людей", "not_a_name"),  # типы персон
+        (_exempt, "concept", "20.1", "20.2", None),  # типы вне проверки
+    ],
+)
+def test_rules_are_data(onto, events, tmp_path, monkeypatch, mutate, type_, label, control, reason):
+    """Без правки данных ``label`` даёт другой результат, чем с ними: код один и тот же."""
+    before = naming.check_name(type_, label)
+    _rules_from(tmp_path, monkeypatch, mutate)
+    after = naming.check_name(type_, label)
+    assert after == reason
+    assert before != after  # данные изменили исход: правило не зашито в код
+    if reason is None:
+        entity = onto.entities.create(type_, [("ru", label, "primary")])
+        assert onto.entities.label(entity) == label
+        events.assert_none(REJECTED)
+    else:
+        with pytest.raises(InvalidName) as caught:
+            onto.entities.create(type_, [("ru", label, "primary")])
+        assert caught.value.reason == reason
+        assert _rejected_fields(events) == [{"type": type_, "label": label, "reason": reason}]
+
+
 # --- инвариант отказа --------------------------------------------------------------------
 
 BOUNDARY_EXAMPLES = [
@@ -633,6 +754,39 @@ BOUNDARY_EXAMPLES = [
     (("concept", "тот кто чувствуёт"), "stopword"),
     (("concept", "  EVERY "), "stopword"),
     (("source", "20.1"), None),
+    # --- аудит пунктов (О21): ветви правила 4 ---
+    (("person", "Кант и юм"), None),  # склейка — только между двумя словами с заглавной
+    (("person", "Kant and hume"), None),
+    (("person", "Kepler & Des Cartes"), "not_a_name"),
+    (("person", "dE Broglie"), None),  # частица без учёта регистра
+    (("person", "дЕ Бройль"), None),
+    (("person", "ван Гог"), None),
+    (("person", "von Neumann"), None),
+    (("person", "ibn Rushd"), None),
+    (("person", "al-Kindi"), None),
+    (("person", "the Author of Hume"), "not_a_name"),
+    (("person", "Author Of Leviathan"), "not_a_name"),
+    (("person", "the author of An Inquiry into the Human Mind"), "sentence"),  # 9 слов > 6
+    (("person", "кант"), "not_a_name"),  # первая буква строчная, частицы нет
+    (("person", "(кант)"), "not_a_name"),
+    (("concept", "кант и Юм"), None),  # не персона: not_a_name не применяется
+    (("concept", "Кант и Юм"), None),
+    (("work", "Kepler and Des Cartes"), None),
+    (("concept", "The author of the Treatise"), None),
+    (("doctrine", "the teacher of Plato"), None),
+    # порядок: empty и number раньше sentence, sentence раньше not_a_name
+    (("concept", "1 2 3 4 5 6 7"), "number"),
+    (("work", " ".join(["1"] * 13)), "number"),
+    (("term", "- - - - - - -"), "empty"),
+    (("person", "a b c d e f g"), "sentence"),
+    # пределы остальных типов и слова по любому пробельному
+    (("idea_event", " ".join(["Слово"] * 12)), None),
+    (("idea_event", " ".join(["Слово"] * 13)), "sentence"),
+    (("phenomenon", "Ж" * 160), None),
+    (("phenomenon", "Ж" * 161), "sentence"),
+    (("place", " ".join(["Слово"] * 7)), "sentence"),
+    (("concept", "Один\tДва\nТри Четыре Пять Шесть Семь"), "sentence"),
+    (("concept", "Тот кто чувствуе\u0308т"), "stopword"),
 ]
 
 

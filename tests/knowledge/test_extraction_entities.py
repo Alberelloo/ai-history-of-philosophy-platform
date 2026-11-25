@@ -137,6 +137,36 @@ def test_schema_with_entities_and_dating(stand, events):
     no_token(events, token)
 
 
+@req(EX, OUTPUT, invariant="Промпт получает язык фрагмента и правила названий и дат")
+@pytest.mark.parametrize(
+    ("paragraphs", "language"),
+    [
+        ([("Кант ответил.", "ru")], "ru"),
+        ([("Locke wrote.", "en")], "en"),
+        ([("Locke wrote.", "en"), ("Hume answered.", "en"), ("Кант ответил.", "ru")], "en"),
+        ([("Кант ответил.", "ru"), ("Юм писал.", "ru"), ("Locke wrote.", "en")], "ru"),
+        ([("Kant antwortete.", "de"), ("Kant schrieb.", "de"), ("Hume wrote.", "en")], "de"),
+        ([("Locke wrote.", "en"), ("Кант ответил.", "ru"), ("Юм писал.", "ru")], "ru"),
+    ],
+)
+def test_prompt_language_and_rules(stand, paragraphs, language):
+    stand.extract(paragraphs, {"statements": []})
+    [body] = stand.llm_transport.bodies
+    assert body["data"]["language"] == language
+    [request] = stand.model.calls
+    system = request.messages[0].content.lower()
+    for rule in (
+        "язык названий",  # правило языка названий
+        "ru — всегда по-русски",
+        "не номер, не фраза и не описание",  # что не считается названием
+        "номера разделов",
+        "местоимения",
+        "роли и описания",
+        "извлекай годы, если они названы",  # даты
+    ):
+        assert rule in system, rule
+
+
 @req(EX, OUTPUT, scenario="Тип вне реестра в сущностях")
 def test_entity_type_outside_registry(passed, onto, events):
     stand = passed
