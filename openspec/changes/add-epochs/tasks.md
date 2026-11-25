@@ -5,7 +5,7 @@
 ## 1. Задача и документы
 
 - [x] 1.1 Изменение OpenSpec: `proposal.md`, `design.md`, `tasks.md`, дельты `epochs`, `knowledge-graph`, `entity-cards`, `visual-design`, `progress.md`
-- [ ] 1.2 `docs/product/ontology.md` — эпоха: датировка из Wikidata, ядро эпох в `sources/epochs.yaml`; `docs/product/system-design.md` — команда оператора `epoch_dates`; `sources/README` (если есть) — манифест эпох
+- [x] 1.2 `docs/product/ontology.md` — эпоха: датировка из Wikidata, ядро эпох в `sources/epochs.yaml`; `docs/product/system-design.md` — команда оператора `epoch_dates`; `sources/README` (если есть) — манифест эпох
 
 ## 2. Даты и Wikidata
 
