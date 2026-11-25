@@ -130,3 +130,25 @@
 | Качество персон | person-empty-as-number | test_person_quality::test_person_quality_invariant | да |
 
 Дефектов нет.
+
+## Судья — 2026-11-25, коммит 172787d (тесты изменения — на 01dc7ca; между ними в src только `integrity.py` другого изменения)
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | Мусорная персона, Склейка, Определение в промпте, Инвариант качества (ci + pure) | 22 passed (файл), мутации person-not-a-name, prompt-no-person-def, person-empty-as-number — упали | test_person_quality.py 22 passed in 274.80s | — (покрыто стендом извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 13 сценариев + test_plan_partition_any_order, test_merge_invariant_two_orders | все мутации упали | passed; component-qids-unchecked — упали все 3 теста; **моя J1 — не упал ни один** | онтология судьи: Berkeley×3 → одна (2× `merged` `merge:name`); Бэкон/Бэкон с решением «разные» — обе остаются, пункта нет; Омир → Гомер (`life_dates.skipped qid_taken`, `merged merge:qid_confirmed`), QID Q6691 у Гомера; Locke/Локк(вариант Locke) — `merge_proposed review:single_name` (по правилу, шаг 8) | **не подтверждено** (ветка компоненты `review:dates`) |
+| ontology-entities «Поиск дублей» (MODIFIED) | Кандидаты, Основное на разных записях, Разные типы, test_candidates_invariant, test_last_word_group_cap | passed, мутации упали | test_entity_merge.py 13 passed in 56.92s | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» (MODIFIED) | Старая ссылка, Отмена, Повтор, Атрибуция автору, Петля, Отмена со свёрткой и QID, test_preservation_and_undo | passed, мутации упали | passed; undo-without-externals, author-attribution-stays — упали; моя J2 (отмена не возвращает `attributions.who`) — упал test_preservation_and_undo | Locke(Q9353)/Локк слиты человеком (`merged merge:review`, `review.decided merge`): QID у оставшейся; отмена — QID снова у Locke, основное «Locke»; после отмены всех 4 слияний `dump` равен исходному (0 различающихся таблиц), `merge_undone` ×4 | подтверждено |
+
+Прежние: test_registry_entities 33 passed, 1 skipped (PostgreSQL-гонка) · test_statements 19 passed · test_snapshot 6 passed · test_filling 30 passed; правок ожиданий в них нет (`git diff origin/claude/embedding-docker...HEAD` пуст по этим файлам).
+`ruff check` / `ruff format --check` по файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 410 из 410, `person-quality` в `enforce`; `mutation_check.py --coverage improve-person-quality` — все 4 требования. Правка файла Lead'а `prompts/__init__.py` — только текст `ontology.extract` (плюс блок `language` и `translate_names` — от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу собранной в памяти онтологии (`Dedupe.run`, `LifeDates.apply`, `Review.resolve_duplicate`, `Statements.undo_merge`).
+
+Мутации (отдельный worktree, удалён; `git diff -- src` пуст):
+- component-qids-unchecked, undo-without-externals, author-attribution-stays (из списка) — упали все ожидаемые тесты;
+- **J1 (моя):** в `dedupe.plan` из условия отказа компоненты убрано `review:dates` (`kinds & {"apart:qid", "apart:decided"}`). Под мутацией `plan` сливает «Berkeley» 1685–1753, «Berkeley» без дат и «Berkeley» 1885–1953 в одну сущность (без мутации — три пункта `review:dates`, по спецификации). **Не упали** test_plan_partition_any_order (1 passed) и test_merge_invariant_two_orders (1 passed); сценарного теста на эту ветку нет;
+- J2 (моя): `undo_merge` не возвращает `attributions.who` — упал test_preservation_and_undo.
+
+Подгонка: признаков не найдено (оракулы не импортируют `dedupe`/`naming`, `@example` на границы дат 4/5 и транзитивные QID есть, skip/xfail нет). Но стратегия `persons_with_variants` строит лица только изолированными видами: противоречие дат — лишь в паре из двух записей, поэтому правило спецификации «компонента, у какой-либо пары которой `review:dates`, не сливается» (транзитивная цепочка через запись без дат) входом не порождается и не проверено ничем. Инвариант «слиты ровно компоненты, допустимые по правилу» доказан не для любых входов. Код ведёт себя по спецификации (проверено вручную), дефект — в покрытии.
+
+Вердикт: **не принято** — вернуть тестировщику: (1) в `persons_with_variants` вид лица «цепочка дат»: ≥ 3 записи с общим основным, крайние с противоречащими датами, между ними запись без дат — ожидание: слияний нет, все пары лица в очереди с `review:dates`; явный `@example` этой границы; (2) сценарный или нормативный тест на эту ветку; (3) мутацию J1 (`review:dates` убрано из условия отказа компоненты) — в `mutations.yaml` с ожидаемым падением обоих property-тестов; перепрогон `--id` и строка в таблице. Разработчику возвращать нечего.
