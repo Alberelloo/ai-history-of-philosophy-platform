@@ -169,3 +169,14 @@
 - разработчику: замечание 1 (raw-строка в `match=`; `ruff check` по файлам изменения чисто);
 - тестировщику: замечание 3 (убрать `strip()` входа в `test_rejection_invariant`, чтобы инвариант проверял `label` после `strip()`/NFC на любых входах; добавить мутацию M3 в `mutations.yaml` с ожиданием падения property-теста);
 - ревьюверу: замечание 2 (вычитка О17/О18, отметить 4.1; ведущему — отметить 1.2).
+
+## Тестировщик — замечание 3 судьи (2026-11-25)
+
+- `test_rejection_invariant`: `raw = raw.strip()` убран, вход сырой; `label` события сверяется с оракулом `expected_label(raw)` (strip + NFC + обрезка). Добавлены `@example` с краевыми пробелами и табуляцией на путях `create`, `add_name`, `set_primary_name`.
+- Мутация судьи M3 добавлена как `reject-label-raw` (`naming.reject` без `strip()`/NFC).
+
+Отдельный worktree:
+
+    test_entity_naming.py  35 passed in 145.30s
+    | Валидность названий сущностей | reject-label-raw | test_entity_naming.py::test_rejection_invariant | да (1 failed) |
+    | Валидность названий сущностей | reject-label-raw | test_entity_naming.py::test_rejected_label_is_name_after_strip | да (1 failed) |
