@@ -213,6 +213,9 @@ class EntityItems:
         spec = item.get("dating") or {}
         entity_type = self.entities.get(entity_id)["type"]
         is_person = self.registry.is_a(entity_type, ["person"])
+        relation = "lifespan" if is_person else "dating"
+        if not self.registry.is_a(entity_type, self.registry.relation(relation)["subject_types"]):
+            raise Skip(dating.TYPE)  # датировка типа, которому реестр её не разрешает
         result = dating.check(
             spec.get("text") or "",
             spec.get("quote") or "",
@@ -225,7 +228,7 @@ class EntityItems:
         paragraph = window[spec["paragraph"] - 1]
         return self.statements.add(
             entity_id,
-            "lifespan" if is_person else "dating",
+            relation,
             value=result.to_json(),
             evidence=[Evidence(paragraph["id"], spec["quote"], source_id=source_id)],
             attributions=[Attribution("source", source_id)],

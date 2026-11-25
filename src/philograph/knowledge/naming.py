@@ -266,7 +266,10 @@ def event_label(label: str) -> str:
 
 
 def reject(type_: str, label: str, reason: str) -> InvalidName:
-    """Событие отказа ровно с полями type, label, reason; возвращает исключение для вызова."""
+    """Событие отказа ровно с полями type, label, reason; возвращает исключение для вызова.
+    ``label`` события — название после ``strip`` и NFC (как его проверяет ``check_name``),
+    обрезка — по нему же."""
+    label = unicodedata.normalize("NFC", label.strip())
     events.emit("knowledge.entity.rejected", type=type_, label=event_label(label), reason=reason)
     return InvalidName(type_, label, reason)
 

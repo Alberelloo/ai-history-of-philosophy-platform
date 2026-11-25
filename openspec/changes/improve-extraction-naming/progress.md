@@ -149,3 +149,10 @@
 - Дефекты: Д1 — противоречие инварианта «латиница не `ru`» и пп. 3–5 (`test_no_latin_name_has_ru` красный); Д2 — `label` отказа не очищается `strip()` (`test_rejected_label_is_name_after_strip` красный). Передать разработчику/ведущему.
 - `entity-dating` в `enforce` не добавлена (по tasks — в `add-wikidata-life-dates` 3.6), `entity-naming` добавлена.
 - `mutation_check.py` проверяет чистоту только файлов патча, а не всего дерева (в ветке параллельно идут другие изменения) — отклонение от design.md, п. 1.
+
+## Правки по О15 — 2026-11-25 (разработчик, субагент `coder`)
+
+- Д1: инвариант «Язык названий» в `specs/entity-naming/spec.md` переформулирован под правило пп. 1–5 (латиница не меньше кириллицы → не `ru`; перевес кириллицы → `ru`). Тест `test_no_latin_name_has_ru` не трогал — его приводит тестировщик; сейчас он красный в двух параметрах («Кантq», «Иммануил Kant») по старой формулировке.
+- Д2: `naming.reject` пишет `label` после `strip` + NFC, обрезка `event_label` — по нему (`naming.py`, `reject`).
+- Пробел О15: `dating.TYPE = "dating:type"`; `EntityItems.date` до проверок 1–6 сверяет тип сущности с `subject_types` связи `lifespan`/`dating` реестра и отказывает кодом. Дописано в `specs/entity-dating/spec.md` (перед пп. 1–6), design (таблица событий), tasks 3.4 (строка мутации для тестировщика). Юнит-тест `test_date_type_not_allowed_is_code`.
+- Прогоны по одному: `test_entity_naming` 31 passed / 2 failed (Д1, ждут тестировщика), `test_entity_dating_extraction` 13 passed, `test_entity_items_unit` 12 passed, `test_naming_unit` 68 passed.
