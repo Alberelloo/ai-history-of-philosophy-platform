@@ -81,6 +81,17 @@ def fingerprint(engine: Engine) -> tuple:
     имена, слияния, упоминания, внешние идентификаторы и версия реестра."""
     count = func.count
     with engine.begin() as conn:
+        extra = [
+            # Переименование и язык меняют подпись без новых строк: число основных русских.
+            select(count())
+            .select_from(t.names)
+            .where(and_(t.names.c.kind == "primary", t.names.c.lang == "ru"))
+            .scalar_subquery()
+        ]
+        if t.has_retired(conn):  # снятие — обновление строки сущности
+            extra.append(
+                select(count()).select_from(t.entities).where(t.retired()).scalar_subquery()
+            )
         return tuple(
             conn.execute(
                 select(
@@ -97,7 +108,7 @@ def fingerprint(engine: Engine) -> tuple:
                     select(func.max(t.mentions.c.id)).scalar_subquery(),
                     select(func.max(t.registry_versions.c.version)).scalar_subquery(),
                     select(count()).select_from(t.external_ids).scalar_subquery(),
-                    select(count()).select_from(t.entities).where(t.retired()).scalar_subquery(),
+                    *extra,
                 )
             ).one()
         )
@@ -120,7 +131,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             r["id"]: {"type": r["type"], "primary": r["primary"] or {}}
             for r in conn.execute(
                 select(t.entities.c.id, t.entities.c.type, t.entities.c.primary).where(
-                    t.active()
+                    t.active_in(conn)
                 )
             ).mappings()
         }
@@ -140,7 +151,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             .mappings()
             .all()
         )
-        retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
+        retired = t.retired_ids(conn)
         attrs: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for r in conn.execute(select(t.attributions)).mappings():
             attrs[r["statement_id"]].append(dict(r))

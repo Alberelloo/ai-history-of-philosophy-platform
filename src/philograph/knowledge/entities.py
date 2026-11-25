@@ -341,7 +341,7 @@ class Entities:
                 .where(t.external_ids.c.system == system)
                 .order_by(t.external_ids.c.value)
             ).all()
-            retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
+            retired = t.retired_ids(conn)
         found: dict[str, str] = {}
         for entity_id, value in rows:
             entity_id = self.resolve(entity_id)

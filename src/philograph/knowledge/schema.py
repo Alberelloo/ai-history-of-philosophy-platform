@@ -411,6 +411,36 @@ def retired(entities: Table = entities) -> Any:
     return entities.c.retired_run.is_not(None)
 
 
+_HAS_RETIRED: set[int] = set()
+
+
+def has_retired(conn: Connection) -> bool:
+    """Есть ли столбец снятия (схема ``knowledge:9``). Замер на чтение работает и на базе
+    до миграции: там снятых нет. Помнится только «есть» — столбец не исчезает."""
+    key = id(conn.engine)
+    if key in _HAS_RETIRED:
+        return True
+    from sqlalchemy import inspect
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    if "retired_run" in columns:
+        _HAS_RETIRED.add(key)
+        return True
+    return False
+
+
+def active_in(conn: Connection) -> Any:
+    """``active()`` для этой базы; на схеме до ``knowledge:9`` — только «не перенаправлена»."""
+    return active() if has_retired(conn) else entities.c.redirect_to.is_(None)
+
+
+def retired_ids(conn: Connection) -> set[str]:
+    """Снятые сущности базы (на схеме до ``knowledge:9`` — пусто)."""
+    if not has_retired(conn):
+        return set()
+    return set(conn.scalars(select(entities.c.id).where(retired())))
+
+
 def _retired_columns(conn: Connection) -> None:
     """Столбцы снятия: старые строки — действующие (``NULL``)."""
     from sqlalchemy import inspect, text

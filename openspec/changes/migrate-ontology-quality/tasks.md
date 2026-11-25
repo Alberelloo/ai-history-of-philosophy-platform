@@ -30,7 +30,7 @@
   - `Migration.plan/run/rollback`, `Report`;
   - события `knowledge.migration.*`, `knowledge.entity.retired/restored`.
 - [x] 2.4 CLI `plan|run|rollback` (`--manifest` — шаг `manifest_qids`, `--translate off|model`, `--batch`, `--from-file`, `--estimate`, `--limit`). Шлюз LLM — `ServiceClient` из настроек сервиса знаний, как в `main.py`. Wikidata — `wikidata.http_fetch` или файл.
-- [ ] 2.5 `knowledge/quality_report.py`:
+- [x] 2.5 `knowledge/quality_report.py`:
   - соединение только на чтение (SQLite `mode=ro`, Postgres `default_transaction_read_only`), без `migrations.upgrade`, совместимость со схемой до `knowledge:9`;
   - `CRITERIA` — данные с формулами А1–А8;
   - таблица, `--json`, `--save`, `--baseline`, коды 0/1/2;

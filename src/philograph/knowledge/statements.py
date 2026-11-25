@@ -933,7 +933,7 @@ class Statements:
             allowed_types = fam if allowed_types is None else allowed_types & fam
         result = []
         with self.engine.begin() as conn:
-            retired = set(conn.scalars(select(t.entities.c.id).where(t.retired())))
+            retired = t.retired_ids(conn)
         for s in self._raw(entity_id):
             if s["scope"] not in scopes or s["status"] == "rejected":
                 continue
