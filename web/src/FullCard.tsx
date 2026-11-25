@@ -77,8 +77,9 @@ export function whereToReadLink(w: { source_id: string; chapter_id: string; firs
 
 function value(row: Row): string {
   if (row.label) return row.label;
-  const v = row.value as { original?: string } | string | null;
+  const v = row.value as { original?: string } | { lat: number; lon: number } | string | null;
   if (v && typeof v === "object" && "original" in v) return String(v.original);
+  if (v && typeof v === "object" && "lat" in v && "lon" in v) return `${v.lat}, ${v.lon}`; // координаты места
   return v ? String(v) : "";
 }
 

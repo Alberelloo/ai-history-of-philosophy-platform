@@ -28,7 +28,7 @@
   - публичный `check_value`.
 
   Юнит-тесты: 54.7104 и 54.71 — одно утверждение; границы ±90/±180; NaN, inf, строка, `True`
-- [ ] 2.4 `output_schema()` не содержит `coordinates` (юнит-тест). Подписи `place_role` — группа `qualifiers` в `ontology.{ru,en}.json`
+- [x] 2.4 `output_schema()` не содержит `coordinates` (юнит-тест). Подписи `place_role` — группа `qualifiers` в `ontology.{ru,en}.json`
 
 ## 3. Сервис знаний: слой мест и обогащение (разработчик)
 

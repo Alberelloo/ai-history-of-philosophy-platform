@@ -219,6 +219,9 @@
     "event_kind": {
       "title": "event kind"
     },
+    "coordinates": {
+      "title": "coordinates"
+    },
     "definition": {
       "title": "definition"
     },
@@ -268,6 +271,12 @@
       "religious": "religious",
       "scientific": "scientific",
       "institutional": "institutional"
+    },
+    "place_role": {
+      "birth": "birth",
+      "death": "death",
+      "activity": "activity",
+      "residence": "residence"
     }
   }
 }

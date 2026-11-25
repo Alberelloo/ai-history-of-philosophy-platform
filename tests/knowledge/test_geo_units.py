@@ -155,3 +155,22 @@ def test_check_value_without_entity(onto, events):
         onto.statements.check_value("lived_in", qualifiers={"place_role": "отпуск"})
     onto.statements.check_value("lived_in", qualifiers={"place_role": "birth"})
     assert not events.of("knowledge.statement.refused")  # сухая проверка событий не пишет
+
+
+# --- 2.4: координаты не для модели ---------------------------------------------------------
+
+
+def test_output_schema_has_no_coordinates(onto):
+    reg = onto.registry
+    families = sorted({f for spec in reg._load()["relations"].values() for f in spec["families"]})
+    for schema in (
+        reg.output_schema(),
+        reg.output_schema(families),
+        reg.output_schema(["context"]),
+    ):
+        assert (
+            "coordinates"
+            not in schema["properties"]["statements"]["items"]["properties"]["type"]["enum"]
+        )
+        assert "coordinates" not in schema["x-relations"]
+    assert "lived_in" in reg.output_schema(["biography"])["x-relations"]

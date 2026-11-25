@@ -219,6 +219,9 @@
     "event_kind": {
       "title": "вид события"
     },
+    "coordinates": {
+      "title": "координаты"
+    },
     "definition": {
       "title": "определение"
     },
@@ -268,6 +271,12 @@
       "religious": "религиозный",
       "scientific": "научный",
       "institutional": "институциональный"
+    },
+    "place_role": {
+      "birth": "рождение",
+      "death": "смерть",
+      "activity": "деятельность",
+      "residence": "проживание"
     }
   }
 }
