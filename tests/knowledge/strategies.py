@@ -713,6 +713,9 @@ FACE_KINDS = (
     "variant_single",
     "variant_multi",
     "date_chain",
+    "model_pair",
+    "mixed_type",
+    "review_inside",
 )
 _TAGS = "бвгджзклмн"
 _LTAGS = "bcdfghklmn"
@@ -733,7 +736,7 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
     очереди (``queue``: {frozenset(ключ1, ключ2): причина}). Названия разных лиц не
     пересекаются (уникальный хвост на лицо)."""
     faces = []
-    confirmed, decided = [], []
+    confirmed, decided, model = [], [], []
     qid_counter = iter(range(900100, 999999))
     for f in range(draw(st.integers(1, max_faces))):
         kind = draw(st.sampled_from(FACE_KINDS))
@@ -787,6 +790,44 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
             face["queue"] = {
                 frozenset({(f, a), (f, b)}): "review:dates" for a, b in ((0, 1), (1, 2), (0, 2))
             }
+        elif kind == "model_pair":
+            # Шаг 7: один элемент ответа модели дал оба написания → merge:model_pair (только с
+            # парами модели; без них — apart:none: ни слияния, ни очереди).
+            other = _face_word(draw, f, not cyr)
+            rec(0, [(lang, word, "primary")])
+            rec(1, [("en" if cyr else "ru", other, "primary")])
+            model.append(((f, 0), (f, 1)))
+            face["merge"] = [[(f, 0), (f, 1)]]
+            face["reason"] = "merge:model_pair"
+            face["needs_model"] = True
+        elif kind == "mixed_type":
+            # Шаг 1: модель связала персону с понятием того же названия → apart:type; две
+            # персоны с общим основным сливаются, понятие остаётся.
+            rec(0, [(lang, word, "primary")])
+            rec(1, [(lang, word, "primary")])
+            records.append(
+                {
+                    "key": (f, 2),
+                    "names": [(lang, word, "primary")],
+                    "qid": None,
+                    "dates": None,
+                    "type": "concept",
+                }
+            )
+            model.append(((f, 0), (f, 2)))
+            face["merge"] = [[(f, 0), (f, 1)]]
+            face["reason"] = "merge:name"
+        elif kind == "review_inside":
+            # Пара review:single_name (основное B = вариант C), обе стороны которой в одной
+            # сливаемой компоненте (B и C подтверждены человеком для QID A) — в очередь не идёт.
+            holder = _face_word(draw, f + 30, not cyr)
+            third = _face_word(draw, f + 60, cyr)
+            rec(0, [("en" if cyr else "ru", holder, "primary")], f"Q{next(qid_counter)}")
+            rec(1, [(lang, word, "primary")])
+            rec(2, [(lang, third, "primary"), (lang, word, "variant")])
+            confirmed += [((f, 1), (f, 0)), ((f, 2), (f, 0))]
+            face["merge"] = [[(f, 0), (f, 1), (f, 2)]]
+            face["reason"] = "merge:qid_confirmed"
         elif kind == "qids_distinct":
             rec(0, [(lang, word, "primary")], f"Q{next(qid_counter)}")
             rec(1, [(lang, word, "primary")], f"Q{next(qid_counter)}")
@@ -822,7 +863,7 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
             rec(1, [(lang, two, "primary")])
             face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:variant"}
         faces.append(face)
-    return {"faces": faces, "confirmed": confirmed, "decided": decided}
+    return {"faces": faces, "confirmed": confirmed, "decided": decided, "model": model}
 
 
 def expected_kept(face_records: list[dict[str, Any]], ids: dict, links: dict | None = None):

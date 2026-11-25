@@ -545,14 +545,17 @@ def _pure_entities(case) -> tuple[list[Entity], dict]:
             dates = (
                 lifespan(str(r["dates"][0]), str(r["dates"][1])).to_json() if r["dates"] else None
             )
-            out.append(Entity(ids[r["key"]], PERSON, names_, dates, r["qid"]))
+            out.append(Entity(ids[r["key"]], r.get("type", PERSON), names_, dates, r["qid"]))
     return out, ids
 
 
-def _expected(case, ids, links=None):
-    """Ожидаемое разбиение (оставшаяся → удалённые), очередь и причины — из построения."""
+def _expected(case, ids, links=None, model=True):
+    """Ожидаемое разбиение (оставшаяся → удалённые), очередь и причины — из построения.
+    ``model=False`` — пар модели нет (``Dedupe.run``): лицо ``model_pair`` без доказательства."""
     merges, queue = {}, {}
     for face in case["faces"]:
+        if face.get("needs_model") and not model:
+            continue
         for block in face["merge"]:
             recs = [r for r in face["records"] if r["key"] in block]
             kept = expected_kept(recs, ids, links)
@@ -616,6 +619,78 @@ DATE_CHAIN = {  # J1 судьи: review:dates через запись без д�
     "confirmed": [],
     "decided": [],
 }
+MODEL_PAIR = {  # шаг 7 и шаг 1: пары модели — слияние и apart:type
+    "faces": [
+        {
+            "kind": "model_pair",
+            "records": [
+                {"key": (0, 0), "names": [("en", "Hume", "primary")], "qid": None, "dates": None},
+                {"key": (0, 1), "names": [("ru", "Хьюм", "primary")], "qid": None, "dates": None},
+            ],
+            "merge": [[(0, 0), (0, 1)]],
+            "reason": "merge:model_pair",
+            "queue": {},
+            "needs_model": True,
+        },
+        {
+            "kind": "mixed_type",
+            "records": [
+                {
+                    "key": (1, 0),
+                    "names": [("en", "Substance", "primary")],
+                    "qid": None,
+                    "dates": None,
+                },
+                {
+                    "key": (1, 1),
+                    "names": [("en", "Substance", "primary")],
+                    "qid": None,
+                    "dates": None,
+                },
+                {
+                    "key": (1, 2),
+                    "names": [("en", "Substance", "primary")],
+                    "qid": None,
+                    "dates": None,
+                    "type": "concept",
+                },
+            ],
+            "merge": [[(1, 0), (1, 1)]],
+            "reason": "merge:name",
+            "queue": {},
+        },
+    ],
+    "confirmed": [],
+    "decided": [],
+    "model": [((0, 0), (0, 1)), ((1, 0), (1, 2))],
+}
+REVIEW_INSIDE = {  # review:single_name внутри сливаемой компоненты — не в очередь
+    "faces": [
+        {
+            "kind": "review_inside",
+            "records": [
+                {
+                    "key": (0, 0),
+                    "names": [("en", "Homer", "primary")],
+                    "qid": "Q6691",
+                    "dates": None,
+                },
+                {"key": (0, 1), "names": [("ru", "Омир", "primary")], "qid": None, "dates": None},
+                {
+                    "key": (0, 2),
+                    "names": [("ru", "Гомерос", "primary"), ("ru", "Омир", "variant")],
+                    "qid": None,
+                    "dates": None,
+                },
+            ],
+            "merge": [[(0, 0), (0, 1), (0, 2)]],
+            "reason": "merge:qid_confirmed",
+            "queue": {},
+        }
+    ],
+    "confirmed": [((0, 1), (0, 0)), ((0, 2), (0, 0))],
+    "decided": [],
+}
 BOUNDARY_DATES = {
     "faces": [
         {
@@ -669,16 +744,19 @@ BOUNDARY_DATES = {
 @example(TRANSITIVE, random.Random(1))
 @example(BOUNDARY_DATES, random.Random(2))
 @example(DATE_CHAIN, random.Random(5))
+@example(MODEL_PAIR, random.Random(7))
+@example(REVIEW_INSIDE, random.Random(8))
 def test_plan_partition_any_order(case, rnd):
     entities, ids = _pure_entities(case)
     confirmed = [(ids[a], ids[b]) for a, b in case["confirmed"]]
     distinct = [(ids[a], ids[b]) for a, b in case["decided"]]
+    by_model = [(ids[a], ids[b]) for a, b in case.get("model", [])]
     merges, queue = _expected(case, ids)
     results = []
     for _ in range(2):
         order = list(entities)
         rnd.shuffle(order)
-        result = plan(order, confirmed=confirmed, distinct=distinct)
+        result = plan(order, pairs_by_model=by_model, confirmed=confirmed, distinct=distinct)
         got = {kept: (sorted(removed), reason) for kept, removed, reason in result.merges}
         assert got == merges
         assert {frozenset((a, b)): r for a, b, r in result.review} == queue
@@ -691,7 +769,9 @@ def _create_case(onto, case, order) -> dict:
     records = [r for face in case["faces"] for r in face["records"]]
     for r in [records[i] for i in order]:
         external = {"wikidata": r["qid"]} if r["qid"] else None
-        ids[r["key"]] = onto.entities.create(PERSON, list(r["names"]), external=external)
+        ids[r["key"]] = onto.entities.create(
+            r.get("type", PERSON), list(r["names"]), external=external
+        )
         if r["dates"]:
             onto.statements.add(
                 ids[r["key"]],
@@ -725,6 +805,8 @@ def _outcome(onto, review, case, ids, events) -> tuple:
 @example(TRANSITIVE, random.Random(3))
 @example(BOUNDARY_DATES, random.Random(4))
 @example(DATE_CHAIN, random.Random(6))
+@example(MODEL_PAIR, random.Random(9))
+@example(REVIEW_INSIDE, random.Random(10))
 def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
     outcomes = []
     for _ in range(2):
@@ -737,7 +819,7 @@ def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
             decide_apart(onto, review, ids[a], ids[b])
         events.clear()
         links = {ids[r["key"]]: 1 for f in case["faces"] for r in f["records"] if r["dates"]}
-        merges, queue = _expected(case, ids, links)
+        merges, queue = _expected(case, ids, links, model=False)  # Dedupe.run — без пар модели
         Dedupe(onto.statements, review).run(
             confirmed=[(ids[a], ids[b]) for a, b in case["confirmed"]]
         )
