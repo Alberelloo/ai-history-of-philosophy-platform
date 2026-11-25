@@ -112,6 +112,8 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         seed_reference(entities, statements)
     if not entities.find("Барокко"):
         seed_epochs(entities, statements)
+    if not entities.find("Южноморский пузырь"):
+        seed_context(entities, statements)
 
 
 def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
@@ -325,6 +327,56 @@ def seed_epochs(entities, statements) -> None:
         attributions=common,
     )
     statements.set_rank(fuzzy_end, "preferred", "seed")
+
+
+def seed_context(entities, statements) -> None:
+    """Исторический контекст (add-epoch-context): место события, связи «стимулировало».
+
+    «Славная революция» произошла в Лондоне и стимулировала «Политическую философию Локка»
+    (механизм — политический; по источникам — импорт общеизвестного факта, без абзаца:
+    в демо-текстах нет подходящей цитаты). «Выход первого тома «Энциклопедии»» стимулировал
+    «Основу общего наукоучения» — связь достроена моделью (без механизма, не проверена).
+    «Южноморский пузырь» — экономическое событие без связей. Названия не встречаются
+    в текстах демо-источников — новых упоминаний нет; у Канта, Юма и Локка новых
+    утверждений нет, эталоны чтения не меняются."""
+    from philograph.knowledge.dates import parse
+    from philograph.knowledge.statements import Attribution, Provenance
+
+    common = [Attribution("common")]
+
+    def found(name: str) -> str:
+        return entities.find(name)[0]["id"]
+
+    london = entities.create("place", [("ru", "Лондон", "primary"), ("en", "London", "primary")])
+    revolution = found("Славная революция")
+    statements.add(revolution, "happened_in", obj=london, attributions=common)
+    locke_politics = entities.create(
+        "doctrine",
+        [
+            ("ru", "Политическая философия Локка", "primary"),
+            ("en", "Locke's political philosophy", "primary"),
+        ],
+    )
+    statements.add(
+        revolution,
+        "stimulated",
+        obj=locke_politics,
+        qualifiers={"mechanism": "political"},
+        attributions=common,
+        provenance=Provenance("imported", actor="seed"),
+    )
+    statements.add(
+        found("Выход первого тома «Энциклопедии»"),
+        "stimulated",
+        obj=found("Основа общего наукоучения"),
+        attributions=common,
+        provenance=Provenance("generated"),
+    )
+    bubble = entities.create(
+        "event", [("ru", "Южноморский пузырь", "primary"), ("en", "South Sea Bubble", "primary")]
+    )
+    statements.add(bubble, "dating", value=parse("1720").to_json(), attributions=common)
+    statements.add(bubble, "event_kind", value="economic", attributions=common)
 
 
 if __name__ == "__main__":

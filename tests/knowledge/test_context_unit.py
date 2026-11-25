@@ -338,3 +338,35 @@ def test_map_event_stimulated(svc, events):
     ]
     assert "stimulated" not in by_id[lonely]
     assert events.of("knowledge.map.built")
+
+
+# --- 3.5: демо-данные контекста ------------------------------------------------------
+
+
+def test_demo_seed_context(svc):
+    from types import SimpleNamespace
+
+    from .test_map_snapshot_parity import TEXTBOOK, TEXTS, _seed_demo
+
+    seed = _seed_demo()
+    svc.onto.paragraphs.update(TEXTS)
+    reading = SimpleNamespace(
+        registry=SimpleNamespace(get=lambda _id: SimpleNamespace(title="Демо-учебник"))
+    )
+    entities, statements = svc.onto.entities, svc.onto.statements
+    seed.seed_core(entities, statements, reading, TEXTBOOK, TEXTS)
+    seed.seed_map(entities, statements)
+    seed.seed_reference(entities, statements)
+    seed.seed_epochs(entities, statements)
+    seed.seed_context(entities, statements)
+    enlightenment = entities.find("Просвещение")[0]["id"]
+    response, _ = context(svc, {"epoch": enlightenment})
+    by_label = {e["label"]: e for e in response.json()["events"]}
+    glorious = by_label["Славная революция"]
+    assert [p["label"] for p in glorious["places"]] == ["Лондон"]
+    [link] = glorious["stimulated"]
+    assert (link["mechanism"], link["status"]) == ("political", "sourced")
+    [gen] = by_label["Выход первого тома «Энциклопедии»"]["stimulated"]
+    assert gen["generated"] is True and gen["mechanism"] is None
+    bubble = by_label["Южноморский пузырь"]
+    assert bubble["kind"] == "economic" and bubble["stimulated"] == []
