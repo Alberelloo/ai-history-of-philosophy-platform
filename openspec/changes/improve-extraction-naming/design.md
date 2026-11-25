@@ -82,7 +82,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
   1. Кандидаты — объединение `Entities.find(n)` по всем написаниям элемента (`name`, `ru`, `en`, `original.text`), отфильтрованное по типу (`registry.is_a`).
   2. Один кандидат — привязка (п. «рус. основное» ниже). Несколько — существующая логика контекста фрагмента и очереди проверки. Её переносят из `_resolve` без изменения поведения. Сюда же попадает случай, когда разные написания нашли разные сущности: новая не создаётся. Для персон до этого шага срабатывает правило `person-quality`.
   0. Элемент с типом вне реестра не используется, событие `knowledge.extraction.dropped` с `reason="entity:type"`. Сервер проверяет сам и не полагается на схему шлюза.
-  3. Кандидатов нет — создание через `create(type_, names_for(item, lang))`. `InvalidName` превращается в `_Skip`: утверждение отбрасывается, `knowledge.extraction.dropped` пишется как сейчас.
+  3. Кандидатов нет — создание через `create(type_, names_for(item, lang))`. `InvalidName` превращается в `_Skip`: утверждение отбрасывается, `knowledge.extraction.dropped` пишется с `reason="entity:<причина>"` (код из `naming.REASONS`, О17). Названия в этом событии нет: оно уже записано в `knowledge.entity.rejected` с обрезкой.
 - **Русское основное у английской сущности:** у кандидата нет основного `ru`, у элемента есть `ru`, и оно прошло `check_name`. Тогда `Entities.set_primary_name(entity, "ru", text)`:
   - прежнее основное с латинским текстом становится вариантом с языком `lang_for` (`en`);
   - пишется `knowledge.entity.renamed` (`entity_id`, `lang`, `previous_lang`).
@@ -141,7 +141,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 |---|---|---|---|
 | `knowledge.entity.rejected` (новое) | warning | `type`, `label` (≤ 80 знаков, длиннее — обрезка с «…»), `reason` (`empty`, `number`, `sentence`, `not_a_name`, `stopword`) | отказ `check_name` при создании или смене основного названия |
 | `knowledge.entity.renamed` (новое) | info | `entity_id`, `lang`, `previous_lang` | русское основное название у сущности с латинским основным |
-| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` (в том числе `dating:type` — реестр не разрешает датировку типа, О15) или `"entity:type"` | отказ датировки или элемента |
+| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` (в том числе `dating:type` — реестр не разрешает датировку типа, О15) или `"entity:<код>"`: `entity:type` (тип вне реестра) или `entity:empty\|number\|sentence\|not_a_name\|stopword` (название отклонено, О17); текста и названий нет | отказ датировки или элемента |
 | `knowledge.statement.created` (есть) | info | `type="lifespan"\|"dating"` | датировка записана |
 
 **Утечка текста.** `label` — название сущности, которое модель взяла из учебника, либо ввод оператора. Это не текст вопроса и не личные данные читателя: названия философов и терминов публичны. Длина ограничена 80 знаками, поэтому предложение из учебника целиком в журнал не попадает. Цитаты и абзацы в событие не пишутся. Без `label` оператор не поймёт, что отклонено, а тестировщику нечего будет проверить.

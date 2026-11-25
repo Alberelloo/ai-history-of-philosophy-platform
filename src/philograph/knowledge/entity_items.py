@@ -124,7 +124,8 @@ class EntityItems:
         try:
             resolved[name] = self.entities.create(type_, names)
         except InvalidName as exc:
-            raise Skip(str(exc)) from exc
+            # Только код: название уже в ``knowledge.entity.rejected`` с обрезкой (О17).
+            raise Skip(f"entity:{exc.reason}") from exc
         self.created.append(resolved[name])
         return resolved[name]
 

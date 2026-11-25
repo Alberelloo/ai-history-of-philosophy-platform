@@ -182,3 +182,8 @@
 
 Выбор решения: соответствует design. Подгонка тестов: не найдена.
 Вердикт: можно к судье после коммита правки О17 (п. 1).
+
+## О17 (разработчик)
+
+- `entity_items.py:126-128`: `InvalidName` при создании → `Skip(f"entity:{exc.reason}")`; `knowledge.extraction.dropped.reason` — код `entity:empty|number|sentence|not_a_name|stopword` без названия (название — только в `knowledge.entity.rejected`). Spec `entity-naming` (требование «Отказ», сценарий «Номер раздела») и design (шаг 3, таблица событий) обновлены.
+- Прогоны по одному: `test_entity_items_unit` 12 passed, `test_extraction_entities` 9 passed, `test_entity_naming` 35 passed. Тестов тестировщика не трогал.
