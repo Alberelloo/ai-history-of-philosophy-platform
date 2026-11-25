@@ -15,7 +15,7 @@
 
 ## 2. Разработчик
 
-- [ ] 2.1 `pyproject.toml`:
+- [x] 2.1 `pyproject.toml`:
   - `hypothesis>=6.100` в `[project.optional-dependencies].dev` (О8);
   - `[tool.setuptools.package-data]` для `philograph/knowledge/*.yaml`.
 - [ ] 2.2 `knowledge/naming_rules.yaml`: стоп-список владельца целиком, пределы по типам (6/80, 12/160), частицы, шаблоны персоны, `exempt: [source]`. `knowledge/naming.py` — определения из спецификации `entity-naming`:

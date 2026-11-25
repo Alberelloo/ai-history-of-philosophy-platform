@@ -107,3 +107,7 @@
 
 - Общий раздел design «Границы и сторожевые токены»: `@example` на границы и мутации, токен `SENTINEL-<uuid4>` в каждом тесте с событиями; tasks остальных трёх изменений ссылаются на него.
 - `scripts/mutation_check.py --coverage <изменение>` и `tests/test_mutation_coverage.py` (пункт 3.1 тестировщика): проверка срабатывает, когда пункт мутационной проверки в tasks отмечен.
+
+## Код — 2026-11-25 (разработчик)
+
+- 2.1 `pyproject.toml`: `hypothesis>=6.100` в dev, `package-data` для `philograph.knowledge/*.yaml`. В `.venv` поставлен hypothesis 6.170.17.
