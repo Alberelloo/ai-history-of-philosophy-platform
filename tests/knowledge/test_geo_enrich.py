@@ -621,6 +621,22 @@ def test_existing_place_reused(onto, events, no_network):
     assert summary["places_created"] == 0
 
 
+@req(GEO, WD, invariant="Сухой прогон с существующим местом считает, но ничего не пишет")
+def test_dry_run_with_existing_place_writes_nothing(onto, events, no_network):
+    onto.person("Иммануил Кант", "1724", "1804", wikidata=KANT_Q)
+    onto.entities.create(
+        "place", [("ru", "Кёнигсберг", "primary")], external={"wikidata": KONIGSBERG_Q}
+    )
+    before = statements_count(onto)
+    summary = PlaceEnrichment(onto.statements, Fetch(kant_records())).run(dry_run=True)
+    assert statements_count(onto) == before
+    assert rows_of(onto, "lived_in") == [] and rows_of(onto, "coordinates") == []
+    e = events.one(ENRICHED)
+    assert (e.get("dry_run"), e.get("placements"), e.get("coordinates")) == (True, 2, 1)
+    assert summary["placements"] == 2
+    events.assert_none("knowledge.statement.created")
+
+
 # --- отказ координат при обогащении (ревью: «при каждом отказе — refused») -----------------
 
 REFUSED = "knowledge.statement.refused"
