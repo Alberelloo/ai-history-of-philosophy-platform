@@ -178,7 +178,7 @@ class Filling:
     def _schema(self) -> dict[str, Any]:
         schema = self.registry.output_schema()
         item = schema["properties"]["statements"]["items"]["properties"]
-        types = sorted(self.registry._load()["entity_types"])
+        types = sorted(self.registry.entity_types())
         item["subject_type"] = {"enum": types}
         item["object_type"] = {"enum": types}
         item["proposed_type"] = {"type": "string"}
@@ -289,8 +289,7 @@ class Filling:
             if not entity.get("dating"):
                 continue
             try:
-                entity_id = self.items.resolve(name, entity["type"], entity, resolved)
-                self.items.date(entity_id, entity, window, data["source_id"], run_id)
+                self.items.date_item(name, entity, resolved, window, data["source_id"], run_id)
                 created += 1
             except (StatementError, RegistryError, _Skip) as exc:
                 self._drop(run_id, str(exc))
@@ -413,7 +412,7 @@ class Filling:
     # --- ядро вручную ---
 
     def propose_core(self, topic: str) -> list[dict[str, Any]]:
-        types = sorted(self.registry._load()["entity_types"])
+        types = sorted(self.registry.entity_types())
         response = self.llm.post(
             "structured",
             json={

@@ -82,7 +82,7 @@
 - **GIVEN** понятия «Substance» и «Субстанция» (разные сущности)
 - **WHEN** модель возвращает `{name: "Субстанция", type: "concept", ru: "Субстанция", en: "Substance"}` в утверждении
 - **THEN** новой сущности нет, утверждение отброшено, в очереди проверки пункт `ambiguous_link` с обоими кандидатами
-- **AND** в журнале `knowledge.extraction.ambiguous` с `candidates=2` и `knowledge.extraction.dropped`
+- **AND** в журнале `knowledge.extraction.ambiguous` с `candidates=2` и `knowledge.extraction.dropped` с `reason="entity:ambiguous"`
 
 #### Scenario: Инвариант языка и основного названия
 

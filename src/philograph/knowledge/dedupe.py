@@ -67,7 +67,8 @@ class Plan:
     apart: int = 0
 
 
-def _pair(a: str, b: str) -> tuple[str, str]:
+def pair_key(a: str, b: str) -> tuple[str, str]:
+    """Пара без учёта порядка — ключ решений и вердиктов."""
     return (a, b) if a <= b else (b, a)
 
 
@@ -154,7 +155,7 @@ def candidate_pairs(entities: Iterable[Entity]) -> set[tuple[str, str]]:
         for n in e.primaries:
             for other in by_name[(e.type, n)]:
                 if other != e.id:
-                    pairs.add(_pair(e.id, other))
+                    pairs.add(pair_key(e.id, other))
     return pairs
 
 
@@ -167,9 +168,9 @@ def plan(
 ) -> Plan:
     """Чистая функция: что слить и что поставить в очередь. Итог не зависит от порядка входа."""
     by_id = {e.id: e for e in entities}
-    model = {_pair(*p) for p in pairs_by_model if p[0] in by_id and p[1] in by_id}
-    sure = {_pair(*p) for p in confirmed if p[0] in by_id and p[1] in by_id}
-    decided = {_pair(*p) for p in distinct}
+    model = {pair_key(*p) for p in pairs_by_model if p[0] in by_id and p[1] in by_id}
+    sure = {pair_key(*p) for p in confirmed if p[0] in by_id and p[1] in by_id}
+    decided = {pair_key(*p) for p in distinct}
     counts = counts or {}
 
     def verdict(p: tuple[str, str]) -> Verdict:
@@ -223,7 +224,7 @@ def plan(
     apart = 0
     for p, v in verdicts.items():
         if v.kind == "review" and p not in review:
-            mapped = _pair(merged_with.get(p[0], p[0]), merged_with.get(p[1], p[1]))
+            mapped = pair_key(merged_with.get(p[0], p[0]), merged_with.get(p[1], p[1]))
             if mapped[0] == mapped[1] or mapped in decided:
                 continue  # обе стороны слиты в одну сущность или человек решил «разные»
             review.setdefault(mapped, v.reason)
@@ -299,7 +300,7 @@ def duplicate_items(engine: Any) -> tuple[set[tuple[str, str]], set[tuple[str, s
         for r in conn.execute(
             select(t.review_items).where(t.review_items.c.kind == "duplicate")
         ).mappings():
-            pair = _pair(*r["payload"]["pair"])
+            pair = pair_key(*r["payload"]["pair"])
             if r["status"] == "open":
                 open_.add(pair)
             elif (r["resolution"] or {}).get("merge") is False:
@@ -317,7 +318,7 @@ def propose(
 ) -> bool:
     """Пункт очереди ``duplicate`` с причиной, если открытого по паре нет. ``run_id`` —
     запуск, поставивший пункт: его откат закрывает пункт (``rolled_back``)."""
-    pair = _pair(a, b)
+    pair = pair_key(a, b)
     if pair in open_:
         return False
     with engine.begin() as conn:

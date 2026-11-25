@@ -26,6 +26,10 @@ from philograph.platform import events
 
 __all__ = ["DuplicateEntity", "Entities", "EntityNotFound", "InvalidName", "normalize"]
 
+# Предел группы «тип + последнее слово названия» в ``duplicate_candidates``: пары группы
+# перебираются все, k² растёт быстро. Больше предела — событие ``duplicate_group_capped``.
+MAX_LAST_WORD_GROUP = 200
+
 events.define(
     "knowledge.entity.created", "info", "Создана сущность онтологии", required=("entity_id", "type")
 )
@@ -35,6 +39,12 @@ events.define(
     "Сущности слиты с перенаправлением",
     required=("kept", "removed"),
     optional=("reason", "statements", "attributions", "folded", "loops"),
+)
+events.define(
+    "knowledge.entity.duplicate_group_capped",
+    "warning",
+    "Группа по последнему слову больше предела — её пары не перебираются",
+    required=("type", "size", "limit"),
 )
 events.define(
     "knowledge.entity.renamed",
@@ -381,7 +391,17 @@ class Entities:
             if n["kind"] == "primary" and n["normalized"]:
                 primaries.setdefault(entity["id"], set()).add(n["normalized"])
         pairs: set[tuple[str, str]] = set()
-        for group in last_words.values():
+        for (type_, _), group in last_words.items():
+            if len(group) > MAX_LAST_WORD_GROUP:
+                # Перебор пар группы — O(k²); большая группа пропускается не молча: событие без
+                # названий (Р2). Совпадения полных названий ниже ищутся и для неё.
+                events.emit(
+                    "knowledge.entity.duplicate_group_capped",
+                    type=type_,
+                    size=len(group),
+                    limit=MAX_LAST_WORD_GROUP,
+                )
+                continue
             for a, b in combinations(sorted(group, key=position.get), 2):
                 if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):
                     pairs.add((a, b))

@@ -89,6 +89,9 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
   
   Идентификатор сущности не меняется, поэтому утверждения, упоминания и внешние id остаются при ней.
 - `date(entity_id, item, window, data, run_id)` — датировка (ниже).
+- `date_item(name, item, resolved, window, source_id, run_id)` — датировка элемента из цикла `Filling` (О18): название, которое во фрагменте уже не привязалось (`EntityItems.unresolved`, сбрасывается в `index`), сразу даёт `dating:unresolved`; иначе `resolve`, и отказ привязки — тоже `dating:unresolved`. Так неоднозначный элемент даёт один пункт `ambiguous_link` и `dropped` с кодом `dating:*`.
+- Причины `resolve` — коды без названия (О18): `entity:no_type`, `entity:ambiguous`, `entity:<naming.REASONS>`.
+- Типы реестра — `OntologyRegistry.entity_types()`, ключ пары — `dedupe.pair_key` (публичные, О18; приватные `registry._load()` и `dedupe._pair` из других модулей не вызываются).
 
 ### Датировка
 
@@ -141,7 +144,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
 |---|---|---|---|
 | `knowledge.entity.rejected` (новое) | warning | `type`, `label` (≤ 80 знаков, длиннее — обрезка с «…»), `reason` (`empty`, `number`, `sentence`, `not_a_name`, `stopword`) | отказ `check_name` при создании или смене основного названия |
 | `knowledge.entity.renamed` (новое) | info | `entity_id`, `lang`, `previous_lang` | русское основное название у сущности с латинским основным |
-| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` (в том числе `dating:type` — реестр не разрешает датировку типа, О15) или `"entity:<код>"`: `entity:type` (тип вне реестра) или `entity:empty\|number\|sentence\|not_a_name\|stopword` (название отклонено, О17); текста и названий нет | отказ датировки или элемента |
+| `knowledge.extraction.dropped` (есть) | warning | `run_id`, `reason="dating:<код>"` (в том числе `dating:type` — реестр не разрешает датировку типа, О15) или `"dating:unresolved"` (сущность элемента не определена, О18), или `"entity:<код>"`: `entity:type` (тип вне реестра), `entity:no_type`, `entity:ambiguous` (О18) или `entity:empty\|number\|sentence\|not_a_name\|stopword` (название отклонено, О17); текста и названий нет | отказ датировки или элемента |
 | `knowledge.statement.created` (есть) | info | `type="lifespan"\|"dating"` | датировка записана |
 
 **Утечка текста.** `label` — название сущности, которое модель взяла из учебника, либо ввод оператора. Это не текст вопроса и не личные данные читателя: названия философов и терминов публичны. Длина ограничена 80 знаками, поэтому предложение из учебника целиком в журнал не попадает. Цитаты и абзацы в событие не пишутся. Без `label` оператор не поймёт, что отклонено, а тестировщику нечего будет проверить.

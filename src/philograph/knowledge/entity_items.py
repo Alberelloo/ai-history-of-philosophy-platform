@@ -41,7 +41,11 @@ events.define(
     required=("name", "candidates"),
 )
 
+# Причины отказа элемента — коды без названия (О17, О18): название, если нужно, есть в
+# ``knowledge.entity.rejected`` с обрезкой; отклонённое название — ``entity:<naming.REASONS>``.
 ENTITY_TYPE_DROPPED = "entity:type"
+ENTITY_NO_TYPE = "entity:no_type"
+ENTITY_AMBIGUOUS = "entity:ambiguous"
 
 
 class Skip(Exception):
@@ -63,13 +67,17 @@ class EntityItems:
         self.statements = statements
         self.registry = statements.registry
         self.created = created if created is not None else []
+        # Названия фрагмента, которые не удалось привязать: датировка их не привязывает снова
+        # (второго пункта ``ambiguous_link`` нет). Сбрасывается в ``index`` — начале фрагмента.
+        self.unresolved: set[str] = set()
 
     # --- элементы ответа ---
 
     def index(self, items: list[dict[str, Any]] | None, run_id: str) -> dict[str, dict[str, Any]]:
         """Элементы ``entities`` по ``name``. Элемент с типом вне реестра не используется:
         сервер проверяет сам и не полагается на схему шлюза."""
-        known = set(self.registry._load()["entity_types"])
+        self.unresolved = set()
+        known = self.registry.entity_types()
         index: dict[str, dict[str, Any]] = {}
         for item in items or []:
             if not isinstance(item, dict) or not item.get("name"):
@@ -95,6 +103,19 @@ class EntityItems:
         проверку (пункт ``ambiguous_link``, утверждение отбрасывается)."""
         if name in resolved:
             return resolved[name]
+        try:
+            return self._resolve(name, type_, item, resolved)
+        except Skip:
+            self.unresolved.add(name)
+            raise
+
+    def _resolve(
+        self,
+        name: str,
+        type_: str | None,
+        item: dict[str, Any] | None,
+        resolved: dict[str, str],
+    ) -> str:
         type_ = type_ or (item or {}).get("type")
         candidates: dict[str, dict[str, Any]] = {}
         hits: dict[str, set[str]] = {}
@@ -119,7 +140,7 @@ class EntityItems:
         if len(found) > 1:
             return self._ambiguous(name, found, resolved)
         if not type_:
-            raise Skip(f"новая сущность «{name}» без типа")
+            raise Skip(ENTITY_NO_TYPE)
         names = names_for(type_, item) if item else [("ru", name, "primary")]
         try:
             resolved[name] = self.entities.create(type_, names)
@@ -145,7 +166,7 @@ class EntityItems:
                 persons[a],
                 persons[b],
                 paired_by_model=True,
-                decided_apart=dedupe._pair(a, b) in distinct,
+                decided_apart=dedupe.pair_key(a, b) in distinct,
             )
             for a, b in combinations(sorted(ids), 2)
         }
@@ -153,7 +174,7 @@ class EntityItems:
             counts = dedupe.link_counts(self.statements.engine, ids)
             kept = dedupe.choose_kept(persons.values(), counts)
             for other in sorted(x for x in ids if x != kept):
-                reason = verdicts[dedupe._pair(kept, other)].reason
+                reason = verdicts[dedupe.pair_key(kept, other)].reason
                 self.statements.merge_entities(kept, other, reason=reason)
             return kept
         for (a, b), v in verdicts.items():
@@ -184,7 +205,7 @@ class EntityItems:
                 )
             )
         events.emit("knowledge.extraction.ambiguous", name=name, candidates=len(candidates))
-        raise Skip(f"неоднозначное название «{name}»")
+        raise Skip(ENTITY_AMBIGUOUS)
 
     def _russian_primary(self, entity: dict[str, Any], item: dict[str, Any]) -> None:
         """У найденной сущности нет русского основного, а элемент дал русское написание,
@@ -200,6 +221,26 @@ class EntityItems:
             self.entities.set_primary_name(entity["id"], "ru", ru)
 
     # --- датировка ---
+
+    def date_item(
+        self,
+        name: str,
+        item: dict[str, Any],
+        resolved: dict[str, str],
+        window: list[dict[str, Any]],
+        source_id: str,
+        run_id: str,
+    ) -> str:
+        """Датировка элемента ``entities``: привязка (или создание) сущности и ``date``.
+        Сущность не определена — название отклонено, неоднозначно, без типа, в том числе уже
+        в утверждениях фрагмента — ``Skip(dating.UNRESOLVED)``, повторной привязки нет."""
+        if name in self.unresolved:
+            raise Skip(dating.UNRESOLVED)
+        try:
+            entity_id = self.resolve(name, item["type"], item, resolved)
+        except Skip as exc:
+            raise Skip(dating.UNRESOLVED) from exc
+        return self.date(entity_id, item, window, source_id, run_id)
 
     def date(
         self,

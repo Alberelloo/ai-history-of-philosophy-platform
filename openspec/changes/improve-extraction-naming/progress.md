@@ -187,3 +187,11 @@
 
 - `entity_items.py:126-128`: `InvalidName` при создании → `Skip(f"entity:{exc.reason}")`; `knowledge.extraction.dropped.reason` — код `entity:empty|number|sentence|not_a_name|stopword` без названия (название — только в `knowledge.entity.rejected`). Spec `entity-naming` (требование «Отказ», сценарий «Номер раздела») и design (шаг 3, таблица событий) обновлены.
 - Прогоны по одному: `test_entity_items_unit` 12 passed, `test_extraction_entities` 9 passed, `test_entity_naming` 35 passed. Тестов тестировщика не трогал.
+
+## О18 (разработчик), желательные ревьювера
+
+- (1) Цикл датировок: `EntityItems.date_item` + `EntityItems.unresolved` (сбрасывается в `index`). Название, не привязанное во фрагменте, и отказ привязки в датировке дают `dropped` с `dating:unresolved` (`dating.UNRESOLVED`); второго `ambiguous_link` нет. Точка вызова в `filling.py:291-293` (цикл датировок) — `self.items.date_item(...)` вместо `resolve` + `date`.
+  - Не сделано: «элемент с `dating` без утверждений сущность не создаёт». Это противоречит spec `entity-dating` («Отказ датировки MUST NOT отменять сущность»; сценарии «Дата жизни в тексте», «Год произведения» — элемент без утверждений) и тестам тестировщика (`test_entity_dating_extraction.py::_rejected` берёт `entity_of(stand, name)` при `statements=[]`). Нужно решение ведущего.
+- (2) `entity:no_type`, `entity:ambiguous` — коды без названия (`ENTITY_NO_TYPE`, `ENTITY_AMBIGUOUS` в `entity_items.py`); spec `ontology-extraction` (перечень причин), `entity-naming` (сценарий «Написания нашли разные сущности»), `entity-dating` (`dating:unresolved`), design.
+- (3) `OntologyRegistry.entity_types()` вместо `registry._load()` (`entity_items.py`, `filling.py:181`, `filling.py:415` — точки вызова); `dedupe.pair_key` вместо `dedupe._pair`.
+- Юнит-тесты: `tests/knowledge/test_extraction_codes_unit.py` (10).

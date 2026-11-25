@@ -21,6 +21,7 @@ NOT_IN_QUOTE = "dating:not_in_quote"
 ERA = "dating:era"
 SINGLE_YEAR = "dating:single_year"
 TYPE = "dating:type"  # реестр не разрешает тип сущности для ``lifespan``/``dating``
+UNRESOLVED = "dating:unresolved"  # сущность элемента не определена (отказ названия и т. п.)
 REASONS = (PARAGRAPH, QUOTE, UNPARSED, NOT_IN_QUOTE, ERA, SINGLE_YEAR)
 
 _DASH = r"\s*[-–—]\s*"

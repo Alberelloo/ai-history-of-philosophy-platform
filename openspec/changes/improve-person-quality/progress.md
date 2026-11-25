@@ -144,3 +144,7 @@
 
 - Spec `person-quality`: сценарий «Слияние по решению человека» (`resolve_duplicate` с `merge=true` → `knowledge.entity.merged` с `reason="merge:review"`). Тест — за тестировщиком.
 - Повтор одинаковой атрибуции в `Statements.add` не чинится здесь: задача `fix-statement-repeat-attribution` записана в `docs/product/roadmap.md`, этап 4.
+
+## О18 (разработчик)
+
+- (5) `Entities.duplicate_candidates`: предел группы «тип + последнее слово» `MAX_LAST_WORD_GROUP = 200`. Если группа больше, её пары не перебираются, пишется `knowledge.entity.duplicate_group_capped` (`type`, `size`, `limit`, без названий); совпадения полных названий ищутся и для неё. Spec `ontology-entities` и design (раздел «как сейчас», таблица событий) обновлены. Юнит-тесты — в `tests/knowledge/test_extraction_codes_unit.py`.

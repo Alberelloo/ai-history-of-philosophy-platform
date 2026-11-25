@@ -14,7 +14,7 @@
   - **оставляет** два основных названия на одном языке;
   - **не пересчитывает** `primary` (`Statements._update_primary` живёт в `Statements`);
   - **не переносит** портреты (`portraits.entity_id`, `UniqueConstraint(entity_id, phash)`).
-- `Entities.duplicate_candidates` — пары одного типа, у которых совпадает последнее слово нормализованного названия и равны `primary.dates`. Сравнение всех со всеми: O(n²), при 1889 сущностях около 1,8 млн пар.
+- `Entities.duplicate_candidates` — пары одного типа, у которых совпадает последнее слово нормализованного названия и равны `primary.dates`. Сравнение всех со всеми: O(n²), при 1889 сущностях около 1,8 млн пар. После изменения пары перебираются внутри групп «тип + последнее слово». Группа больше `entities.MAX_LAST_WORD_GROUP = 200` не перебирается: пишется `knowledge.entity.duplicate_group_capped` (`type`, `size`, `limit`, без названий), и потеря видна в журнале (О18). Совпадения полных названий ищутся по индексу и для неё.
 - `ReviewQueue.resolve_duplicate` вызывает `entities.merge`.
 - Из `improve-extraction-naming` берутся:
   - `naming.check_name` (`not_a_name`, стоп-список), действует при создании;
@@ -104,6 +104,7 @@ class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, st
 | `knowledge.entity.merge_undone` (есть) | info | `kept`, `removed`; новые — `restored` (восстановлено свёрнутых) | отмена |
 | `knowledge.entity.merge_proposed` (новое) | info | `kept`, `removed`, `reason` (`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:decided_conflict`, `review:qid_candidate`, `review:qid_taken`) | пара в очередь проверки |
 | `knowledge.entity.rejected` (из `improve-extraction-naming`) | warning | `type`, `label`, `reason` | мусорная персона |
+| `knowledge.entity.duplicate_group_capped` (новое, О18) | warning | `type`, `size`, `limit` (без названий) | группа «тип + последнее слово» больше предела в `duplicate_candidates` |
 
 Новые поля `knowledge.entity.merged` добавляются в `optional`, `required` прежний: старые вызовы `Entities.merge` событие не ломают.
 
