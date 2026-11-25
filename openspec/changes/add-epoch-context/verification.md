@@ -228,3 +228,70 @@
     возвращено `git checkout -- web/src/epochs/ContextBlock.tsx`, пересобрано, `git diff --stat -- src web/src` пусто; тест — 1 passed.
 
 `test_accessible_names` в этом прогоне прошёл (таймаута нет).
+
+## Судья — 2026-11-25, коммит 032b3d5
+
+Ветка `claude/epoch-context`, рабочее дерево чистое, HEAD = origin. Продуктовый код (`src`, `web/src`, `scripts`, `sources`) с последнего прогона тестировщика (55b6fb6) не менялся (`git diff --stat 55b6fb6 HEAD` — только `openspec/…`, тесты круга 1). Модель везде фейковая, сети нет. Ограничения машины: 1 ГБ RAM, 1 CPU, без Docker. Поэтому `pytest` гонялся по файлам и пакетам последовательно, а не одной командой.
+
+### Свой прогон
+
+    ruff check .                → 1 ошибка E501 scripts/dev_stack.py:100
+    ruff format --check .       → 3 файла: scripts/dev_stack.py, platform/queue.py, prompts/__init__.py
+        все три файла изменением не тронуты (git diff claude/epochs...HEAD по ним пуст); на копии
+        из claude/epochs те же файлы дают 2 ошибки check и 3 файла format — прежний долг базы
+    lint-imports                → Contracts: 3 kept, 0 broken
+    check_traceability.py       → Требований с тестами: 387 из 387
+    cd web && npm run build     → ✓ built in 5.11s
+    tests/knowledge/* по файлам → все зелёные, числа совпадают с журналом тестировщика файл в файл
+        (test_context 84, test_context_unit 25, test_epoch_context_import 16, test_filling 30,
+         test_graph 24, test_map 16, test_mentions_cards 32, test_registry_entities 33 + 1 skip —
+         прежний skip «гонка PostgreSQL»; остальные 25 файлов — как в журнале)
+    tests/web/* по файлам       → test_epochs 43 passed, test_map 51, test_reference 31, остальные 15 файлов зелёные
+    tests/gateway 41, tests/assistant 51, tests/platform 21, tests/llm 20, tests/search 39,
+    tests/library 170, tests/operator 5, tests/evaluation 17 — все passed, падений 0
+
+Не прогонялось: `tests/e2e` и `tests/ops` (нужны Docker / `docker compose`), визуальные эталоны (только Windows), `dev_stack.py --demo` и `seed_demo.py` (память машины). Полного `pytest -q` одной командой не было: те же пакеты пройдены по частям.
+
+### Итоговый вывод системы
+
+Стенд `tests/web/knowledge_stack.py` поднят в процессе (`max_stale=0`): шлюз, библиотека, сервис знаний, граф с `FakeProvider`. Браузер — Chromium, как в наборе тестов. Данные: эпохи «Научная революция» и «Просвещение»; четыре события сценария и Лондон; «Славная революция → Политическая философия Локка» (political, по источникам, абзац Учебника N); «Ньютон → учение Локка» (сгенерировано); «Пузырь → Два трактата» (economic, только абзац Учебника R, закрытого вне РФ); отклонённая «Энциклопедия → Критика религии». Скрипты и сырой вывод — в scratchpad судьи (`walk.py`, `walk2.py`).
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Контекст эпохи | Контекст Просвещения | test_enlightenment_context passed; served epoch/4/1/0/false | passed | `GET /api/knowledge/v1/context?epoch=…&textbook=N` → 200; порядок 1687 Ньютон, 1688 Славная (political, Лондон wikidata null, basis dates, связь political/sourced/in_textbook true/evidence `[{p_…, /p/p_…}]`), 1720, 1751; counts — 4 вида по 1. Событие `knowledge.context.served` с тем же `request_id`: mode=epoch, events=4, links=3, generated_links=1 — в моих данных на 2 связи больше, чем в сценарии | подтверждено |
+| Контекст эпохи | Окно времени | test_window passed | passed | `from=1700&to=1760` → Пузырь, Энциклопедия; epoch null; window {1700,1760}; basis null; served mode=window events=2 | подтверждено |
+| Контекст эпохи | Фильтр видов | test_kinds_filter passed | passed | `kinds=political,economic` → Славная, Пузырь; counts те же, что без kinds; served events=2 | подтверждено |
+| Контекст эпохи | Отклонённое не показывается | test_rejected_not_shown passed | passed | у Энциклопедии stimulated=[], id отклонённой связи в теле нет | подтверждено |
+| Контекст эпохи | Усечение; без вызова модели | test_truncation, test_no_model_calls passed | passed | на стенде `llm_calls=[]`, `router.unexpected=[]` | подтверждено (усечение — только тестом) |
+| Проверка параметров | Границы параметров (7 случаев) | test_parameter_bounds[7] passed | passed | 400 и kind/reason по таблице: mode, mode, window, window, window, unknown_epoch, unknown_kind. На каждый запрос ровно одно `knowledge.context.rejected` с полями только `reason`/`request_id`/`service`, `served` нет, «17x0» и «culinary» в журнал не попали | подтверждено |
+| Пометка непроверенного | Сгенерированная связь помечена | passed (API и страница) | passed | API: generated=true, status generated. Страница: строка «→ Политическая философия Локка · механизм не указан · не проверено», `data-unverified="true"` у 1 строки; served generated_links=1 | подтверждено |
+| Пометка непроверенного | Только проверенные | test_verified_only passed | passed | `verified=true` → статусы только sourced, у Ньютона stimulated=[], событие осталось; served generated_links=0 | подтверждено |
+| Механизм влияния | вне списка / не указан | passed | passed | карточка и блок: «механизм не указан» при qualifiers {}; после достройки в базе qualifiers {} (механизм модели `political` отброшен) | подтверждено |
+| Контекст из текста | 3 сценария | test_filling passed | 30 passed | только тесты на фейковой модели (извлечение на стенде не запускалось) | подтверждено тестами |
+| Контекстные события из Wikidata | Кандидаты, принятый, ожидающий/отклонённый, повтор, dry-run, повторный harvest | test_epoch_context_import 16 passed | 16 passed | CLI `main([...], fetch=FixtureFetch())` на SQLite. `harvest` → кандидаты Q910011 (political, место Q910021) и Q910012 (kind null), без даты нет; событие harvested epochs=1 candidates=2; строки таблиц не менялись. `apply --dry-run` → строки не менялись; run dry_run created=1 statements=4 places_created=1 skipped=1. `apply` → +2 сущности, +4 утверждения (dating, event_kind, belongs_to_epoch, happened_in — все sourced); checked created/rejected. Повторный `apply` → exists, run 0/0/0, строки равны. Повторный `harvest` → решения accepted/rejected на месте, без задвоения. `stimulated` 0. Запросы только к wikidata.org через фикстуру | подтверждено |
+| Достройка контекста моделью | Достроить контекст | test_extend_context passed | passed | клик «Достроить контекст» у Славной → строка «Два трактата о правлении · механизм не указан · не проверено (сохраняется)». По request_id потока: `graph.built` extension=pending, `graph.proposal_dropped` influenced_by/outside_recipe, `graph.extended` recipe=context proposed=1 dropped=1. Очередь — 1 задание, `graph.saved` statements=1; в базе status generated, qualifiers {}. После перезагрузки строка помечена, served generated_links=2 | подтверждено |
+| Достройка контекста моделью | Связей достаточно / Уже достраивали / выключено / scope | passed (сервис и браузер) | passed | повторный клик: модель не вызвана (calls 1→1). В блоке «Связей достаточно, достройка не нужна.» (снимок), `graph.built` extension=not_needed — у события стало 5 связей семейства, поэтому порог сработал раньше однократности. «Уже достраивали», «выключено» и scope — только тестами | подтверждено |
+| Контекст на странице эпохи | Блок, фильтр групп, закрытый источник, XSS, пусто | passed (test_epochs 43) | 43 passed | Блок под описанием эпохи: группы Политика/Экономика/Наука/Идеи со счётчиками, «1688 Славная революция · Лондон», строка «Политическая философия Локка · политический · по источникам · ¶», «связей пока нет» у Энциклопедии. «Наука» → адрес `?kinds=scientific`, 1 событие, served events=1. Закрытый источник: строка Пузыря «по источникам» без ¶ и без «Учебник R», в теле ответа нет id абзаца; прямой запрос к сервису с `X-Philograph-Region: RU` отдаёт evidence и атрибуцию «Учебник R», с DE — `[]`. Цитат в теле нет. pageerror 0 | подтверждено |
+| Контекст и закрытые источники | Цитат нет никогда | test_no_quotes_ever passed | passed | тело ответа без текста абзацев ни в одном регионе | подтверждено |
+| Виды событий (ontology-registry) | Экономическое в существующей базе | passed | passed | economic принят и показан в блоке группой «Экономика» | подтверждено |
+| Разделы карточки (entity-cards) | Исторический контекст учения | test_doctrine_historical_context passed | passed | `GET …/entities/<учение>/card` → разделы ровно `context` «Исторический контекст»; строки по порядку: Славная (political, sourced), Ньютон (qualifiers {}, generated=true); `knowledge.card.served` type=doctrine sections=1 rows=2 | подтверждено |
+| Выбор на карте (knowledge-graph) | Событие и то, что оно стимулировало; вне карты | test_map 51 passed, knowledge/test_map 16 | passed | `/graph/<Французская революция>`: `stimulated=[{basis,false},{marx,true}]`; data-related=true у Фихте, Маркса (вне окна) и «Основы…»; `.map-thread` 0; `knowledge.map.built` по request_id. В `/v1/map` первого стенда у Славной и Ньютона `stimulated` нет (объект — учение, не на карте), у Пузыря `[{Два трактата,false}]`. Цвета при ≥7 современниках и «только проверенные» — только тестами | подтверждено |
+| Разделы в разработке (visual-design) | Старая закладка эпох / без метки | passed | passed | подпись в навигации «Эпохи и контекст», ведёт на /epochs | подтверждено |
+
+### Сверка с журналом тестировщика
+
+Числа passed по всем файлам совпали с последним прогоном тестировщика. События и поля на стенде совпали с журналом. Необъяснённых расхождений нет. Мелочь: в первой таблице журнала (строка `test_map_event_stimulated_api`) ещё упомянут «Шеллинг». Сценарий потом переписан на Маркса (решение ведущего по Д2 в progress.md), тест уже проверяет Маркса. Это устаревшая подпись в журнале, а не расхождение.
+
+Полный pytest: по частям, все пакеты, кроме `e2e` и `ops`, зелёные, 0 failed (1 прежний skip). Прослеживаемость: 387 из 387.
+
+Мутации (повторены судьёй, код возвращён `git checkout`, `git diff` по `src` пуст):
+- (б) в `context.py` `verified` не фильтрует (`links = list(record.links)`) → 3 failed: `test_verified_only`, `test_verified_drops_generated_keeps_events[true,1]` — как в журнале;
+- (г) в `_link` подтверждения закрытого источника не снимаются → 9 failed: `test_closed_source_stripped[epoch|window|textbook × None|DE|US]` — как в журнале.
+
+Подгонка: не найдена. Изменения прежних тестов — только усиление (`exact=True`) по дельте visual-design. `skip`/`xfail`/пауз в новых тестах нет. Стенд подменяет только модель (`FakeProvider` за настоящим шлюзом) и сеть. Правки спецификации после реализации записаны в progress.md как решения ведущего: уточнение требования карты (Д1), смена сценария на Маркса (Д2), поле `events[].wikidata`, `duplicate_qid`.
+
+Задачи: 1.1–7.1 сделаны (проверено по коду и прогону). 7.2 — выполнено этим прогоном; ruff по трём файлам Lead'а — прежний долг базы. 7.3 — ревью круга 2 в progress.md. 7.5 — после вердикта.
+
+Не проверено судьёй: e2e и Docker, `tests/ops`, визуальные эталоны, демо-стенд `dev_stack --demo` с `seed_demo`; на стенде не проверялись сообщения `limit`/`visitor_limit`/`unavailable` в блоке. Это совпадает с «Не прогонялось» тестировщика; закрывается CI.
+
+Вердикт: **принято**.
