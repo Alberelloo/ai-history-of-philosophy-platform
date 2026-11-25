@@ -186,3 +186,56 @@
 | Даты эпох из Wikidata | только подтверждённый QID; второй QID эпохе не записывается | tests/knowledge/test_epoch_dates.py::test_manifest_qid_differs_from_epoch_qid[apply,dry_run] | у «Просвещения» (QID Q12539) манифест Q999: строки всех таблиц равны, датировки нет, внешний id только Q12539, Q999 ни у кого; отчёт duplicate_qid | checked epoch_id=<Просв.> qid=Q999 result=duplicate_qid; run checked=1 added=0 skipped=1; statement.created нет |
 
 Сверка с таблицей `result` дельты `epochs`: строка `duplicate_qid` описана как «идентификатор уже у другой сущности», а здесь у **той же** эпохи уже другой идентификатор. Нормативные фразы требования («только подтверждённый человеком идентификатор», «MUST NOT записывать новую» датировку при действующей; запись — «нет») поведением соблюдены, противоречия MUST нет; но случай в колонке «Когда» не назван — **пробел спецификации**: предлагается дописать в строку `duplicate_qid` «… или у эпохи уже другой идентификатор» (решение ведущего; сценария в дельте нет, покрыто инвариантом).
+
+## Судья — 2026-11-25, коммит c8d33ad
+
+Свои прогоны на `claude/epochs` = `origin/claude/epochs` (c8d33ad), рабочее дерево чистое. База стека — `claude/reference-catalog` (15faa5b). Машина: 1 ГБ RAM, 1 CPU, без Docker. Пакеты гонялись последовательно, `npm run build` — до pytest. Стенд для вывода системы — `tests/web/knowledge_stack.start` в процессе: настоящие шлюз, библиотека и сервис знаний на SQLite. Браузер — Chromium, контекст `tests.helpers.reader_context`. Wikidata — `tests/knowledge/wikidata_fixtures.FixtureFetch`, без сети.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Датировка эпохи | Нечёткая граница; Предпочтённая; Первая записанная; основная — из действующих (Д1) | test_epoch_dates.py: 66 passed после 3fefd87 | test_epoch_dates.py в составе tests/knowledge: passed | `/v1/epochs`: «Научная революция» fuzzy {from:[1543,1543], to:[1687,1700]}, from 1543, to 1694 (середина 1687/1700 округлена), precision approx, original «1543 – 1687…1700» | подтверждено |
+| Доступ к Wikidata | Точности и эра; Повтор при 429; Неверный идентификатор; Ранги | test_wikidata.py 52 passed, unit 36 passed | 88 passed (до мутации) | Через CLI `fetch` вызывается только для эпохи с QID: 1 вызов, у «Барокко» без QID 0 | подтверждено |
+| Даты эпох из Wikidata | Дата из Wikidata; Запасные; Датировка уже есть; Повторный запуск; Проверка без записи; Без QID; Сбой и одинаковый QID; QID манифеста ≠ QID эпохи | все passed, события checked/run | passed | CLI на фикстурах. `apply --linked --dry-run`: строки 23 таблиц схемы не изменились, отчёт `added` 1685–1815 [P580,P582]; `run {dry_run, checked 2, added 1, skipped 1}`; `statement.created` нет. `apply --linked`: изменились statements/attributions/journal, `knowledge.statement.created type=dating status=sourced`, `checked result=added`. Второй `apply`: таблицы не изменились, `result=unchanged`, `run.skipped=2` | подтверждено |
+| Подбор записи Wikidata | Кандидаты без применения; Повторный подбор | passed, suggested epochs=1 candidates=1 | passed | CLI `suggest`: у «Барокко» один кандидат Q37853 «период в искусстве» 1600–1750 (одноимённый фильм отсеян), `wikidata: null`, таблицы не изменились, `knowledge.epoch_dates.suggested {epochs:1, candidates:1}` | подтверждено |
+| Ядро эпох | Новая эпоха из манифеста; Две одноимённые; Неверный манифест | passed | passed | — (покрыто тестами; на стенде не повторял) | подтверждено (по тестам) |
+| Список эпох | Список эпох; Источник датировки | test_epochs_list.py 11 passed | passed | `/v1/epochs`: порядок НР → Просвещение; «Барокко» в `undated`, counts.people=1 (явный Лейбниц). Счётчики совпадают со справочником: НР people 1 = catalog `{'person':1}`, Просвещение people 3 / works 1 / events 1 = catalog `{'person':3,'work':1,'event':1}`. dating.source=common. Событие `knowledge.epochs.listed {epochs:2, undated:1, truncated:false, snapshot:fresh}`, request_id 696ed44c… | подтверждено |
+| Страница эпох | Выбор эпохи; На карте; Пересекающиеся; Растушёвка; Эпох нет; Неизвестная эпоха и разметка | test_epochs.py 23 passed | 23 passed | Chromium 1920×1080: пролёты в разных `data-lane` (0, 1); у НР `data-fuzzy-start=0`, `data-fuzzy-end=13`, у Просвещения 0/0. Выбор → `/epochs/<Просв.>`, «1680–1800 · общепринятое», «Персоны 3 · Труды 1 · События 1», персоны Кант/Локк/Юм, событие 1751. «На карте» → `/graph?epochs=<Просв.>`, `knowledge.map.built` (request_id 2757a4a0…), «Показано 3 из 4 философов · 1 из 1 труда», окно 1680–1800, фасет «Эпоха 1». `/epochs/<img …onerror>` → «Эпоха не найдена.», `window.__xss` undefined. pageerror и console.error нет | подтверждено |
+| Клавиатура и доступность | Выбор с клавиатуры; Края ленты; Малое окно | passed | passed | Фокус → стрелка вправо → Enter: адрес `/epochs/<id>`, фокус на H2 «Просвещение». На последней эпохе стрелка вправо оставляет фокус на месте, Esc → `/epochs`. Доступное имя «Просвещение, 1680–1800». 1024×576 с выбором: scrollWidth 1024 = ширине окна, scrollY 0, заголовок y=285–313 и лента в окне | подтверждено |
+| Карта раздела | Нечёткая граница эпохи; Эпохи в ответе карты; Эпоха года при перекрытии; растушёвка не меняет раскладку | test_map.py (knowledge) 12 и (web) 48 passed | passed (tests/web/test_map.py 48 passed) | `/v1/map`: у эпохи fuzzy {from:[1543,1543], to:[1687,1700]}; Локк (явно) [Просв.], Кант [Просв.], Декарт [НР], событие 1751 и «Критика» [Просв.]; `knowledge.map.built` по request_id | подтверждено |
+| Выбор на карте | Явная эпоха на карте | test_explicit_epoch_on_map passed | passed | На карте с фильтром Просвещения Локк показан, несмотря на середину жизни в НР | подтверждено |
+| Фильтры и поиск карты | Фильтр «Эпоха»; Окно из адреса важнее; Неизвестная эпоха в адресе | passed | passed | `/graph?epochs=e_unknown,<Барокко>` → адрес `/graph`; фильтр «Эпоха» — см. строку «Страница эпох» | подтверждено |
+| Разделы карточки по типу | Карточка эпохи (Д2); по датам строками не показывается | test_mentions_cards.py 23 passed | passed | Карточка Просвещения: разделы `dating` «Датировка» (1680–1800) и `members` «Относятся к эпохе» (только Локк, без Канта и Юма); `knowledge.card.served {type:epoch, sections:2, rows:2}`. Подпись «Wikidata» на стенде не смотрел: данные с общим мнением, атрибуция Wikidata проверена тестом | подтверждено |
+| Разделы в разработке | Старая закладка эпох; Ассистент без метки | test_epochs.py, test_reference.py 31 passed | passed | `/soon/epochs` → `/epochs`, history.length 2 (замена без новой записи). Пункт «Эпохи» → `/epochs`, без «скоро» | подтверждено |
+
+Прогоны (последовательно, `pytest -q -p no:cacheprovider`):
+
+    tests/knowledge                     → 615 passed, 1 skipped in 384.86s
+    tests/gateway                       → 41 passed
+    tests/assistant                     → 51 passed
+    tests/web/test_epochs.py            → 23 passed
+    tests/web/test_reference.py         → 31 passed
+    tests/web/test_map.py               → 48 passed in 261.65s
+    остальные tests/web/test_*.py (по файлам, 14 файлов) → все passed, падений нет
+    cd web && npm run build             → ✓ built in 4.93s
+    lint-imports                        → Contracts: 3 kept, 0 broken
+    python scripts/check_traceability.py → Требований с тестами: 378 из 378
+    ruff check . / ruff format --check . → 1 error (E501 scripts/dev_stack.py:100); 3 files would be reformatted
+                                           (scripts/dev_stack.py, src/philograph/platform/queue.py, src/philograph/prompts/__init__.py)
+
+Ruff: этих трёх файлов нет в диффе `claude/reference-catalog...claude/epochs`. Те же ошибки воспроизведены на `origin/claude/embedding-docker` (отдельное рабочее дерево): E501 в dev_stack.py:100 и те же 3 файла на переформатирование. Ошибки досталась от нижней ступени стека, изменение их не вносит.
+
+Полный `pytest -q`: не запускался — машина не вмещает (1 ГБ RAM). Вместо него — пакеты изменения и затронутые пакеты по частям (выше). Не запускались `tests/e2e` (в том числе обновлённый `test_visual_design.py::test_future_sections_marked_and_described`), `tests/ops`, визуальные эталоны win32, PostgreSQL-вариант порядка `_raw`. Их прогоняет CI/Lead.
+
+Мутации (код возвращён, `git status` чист):
+- своя: `wikidata.check_qid` — `QID.fullmatch(qid)` → `qid.startswith("Q")`. Упало 11 тестов: `test_bad_id_sends_nothing`, `test_hostile_ids_never_requested[6 вариантов]`, `test_check_qid_rejects[3]`, `test_fetch_entity_rejects_bad_qid_without_request`;
+- повтор (а) тестировщика: `epoch_dates` `if existing:` → `if False:`. Упало 8 тестов: `test_existing_dating_kept`, `test_existing_never_overwritten[3]`, `test_repeated_run`, `test_repeated_apply_creates_no_rows`, `test_dry_run_changes_no_table_for_any_result`, `test_every_result_and_totals`. У тестировщика на b0c2bee упало 4: код с тех пор менялся, ловится больше, а не меньше.
+
+Сверка с журналом тестировщика: числа по файлам совпадают (web: epochs 23, reference 31, map 48). tests/knowledge целиком: 615 passed против 606 + 2 failed в первом прогоне. Разница объяснена: добавлены `test_manifest_qid_differs_from_epoch_qid[2]`, 3 теста в `test_statements.py` и юнит-тесты разработчика. Событий, которые есть в журнале, но не появились на стенде, нет. Поля `epochs.listed`, `map.built`, `card.served`, `epoch_dates.checked/run/suggested` совпадают с журналом.
+
+Подгонка: не найдена. Прежние тесты (`tests/knowledge/test_map.py`, `test_reference.py`, `test_visual_design.py`) дополнены полями и пунктом по дельтам «Карта раздела» и «Разделы в разработке». Сравнения остались точными (`==`), ожидания не ослаблены. Новых `skip`/`xfail`/`try` вокруг проверок нет. Правка строки `duplicate_qid` в дельте записана в progress.md как решение ведущего; поведение пришло из ревью и покрыто инвариантом.
+
+Замечания (не блокируют):
+1. В tasks.md не отмечены 6.2 и 6.3, хотя по progress.md и этому прогону они выполнены (ruff — с оговоркой выше).
+2. В `/v1/epochs` QID отдаётся в `dating.wikidata`, а верхнеуровневое `wikidata` у эпохи — null. По форме design.md это допустимо, но спецификация места поля не называет.
+
+Вердикт: **принято**.
