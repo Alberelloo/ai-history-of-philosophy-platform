@@ -187,3 +187,27 @@
 
 - Тестировщик нашёл пробел: строка `duplicate_qid` в таблице `result` («Даты эпох из Wikidata») описывала только «идентификатор уже у другой сущности», а после ревью (желат. 3) тот же код получает и случай «у эпохи уже другой QID». Решение ведущего: дописать этот случай в ту же строку (поведение не новое — оно решено в ревью и покрыто инвариантом `test_manifest_qid_differs_from_epoch_qid`), отдельного кода не вводить. Правка спецификации зафиксирована здесь.
 - Дальше: ревью круг 2 → судья.
+
+## Ревью кода, круг 2 — 2026-11-25, коммит 5149197 (ревьювер, субагент `reviewer`)
+
+Дифф `git diff d2ee34e..claude/epochs`. Прогоны: `pytest tests/knowledge/{test_statements,test_wikidata_unit,test_epoch_dates_unit,test_epoch_dates}.py` — 140 passed; `ruff check src tests` — чисто; `lint-imports` — 3 kept; `check_traceability` — 378 из 378. Замер `scratchpad/perf_raw.py 20000` (SQLite): `_raw` 0,43 мс против 0,20 мс запроса без порядка — рост по журналу устранён.
+
+Блокирует: нет.
+
+Желательно: нет.
+
+Закрытие круга 1:
+- Блок. 1 — закрыто. `_raw`: коррелированный скалярный подзапрос `min(journal.id) where journal.statement_id = statements.id` в `order_by`, `coalesce(…, 2**31-1)` для утверждений без журнала, затем `statements.id` — порядок полный и детерминированный. Индекс есть: `schema.py:174` (`journal.statement_id`, `index=True`). Тест `test_raw_order_is_write_order` — id нарочно обратны порядку записи, проверяет и порядок `_raw`, и основную копию; ловит возврат к порядку по id.
+- Желат. 1 — закрыто: proposal → Impact и design («Контекст», «Выбор решения» п. 1) называют правку `Statements`/`graph.py`, `primary[key] = None` и следствие для `duplicate_candidates`.
+- Желат. 2 — закрыто: `test_rejected_only_lifespan_clears_primary` (копия очищена, персоны нет на карте), `test_confirm_keeps_main_value`.
+- Желат. 3 — закрыто: `_entry` до `by_external` сравнивает QID манифеста с QID эпохи → `duplicate_qid`, загрузки и записи нет; тесты в `test_epoch_dates_unit.py` и `test_epoch_dates.py` (apply и dry_run, отчёт, события, `externals` не изменились).
+- Желат. 4 — закрыто. Хук `event_hooks.request` проверяет схему и хост каждого запроса до отправки, в том числе каждого перехода. Проверено скриптом `scratchpad/redir.py` на `MockTransport`: перенаправление на чужой хост и понижение до `http://www.wikidata.org` — `WikidataError` «адрес вне Wikidata», отправлен один запрос; цикл перенаправлений — `TooManyRedirects` (подкласс `httpx.HTTPError`) → `WikidataError` после 4 запросов (1 + `max_redirects=3`); относительный `Location` на Wikidata проходит. `WikidataError` из хука не перехватывается `except httpx.HTTPError` и уходит наружу без изменений, клиент закрывается контекстом.
+- Желат. 5 — закрыто: `externals()` один раз в `apply`. Снимок `known` не обновляется внутри запуска; при записи QID эпоха получает и датировку, поэтому повторная строка манифеста, указавшая на ту же эпоху (по `en`) с другим QID, получит `conflict`/`unchanged`, а не второй QID — запись не страдает, замечания нет.
+- Желат. 6 — закрыто записью в design (`dating.source`).
+
+Уточнение спецификации ведущим (строка `duplicate_qid` в дельте `epochs`) совпадает с кодом (`epoch_dates.py`, ветка `own != qid`) и тестами; поведение решено в ревью круга 1, это не подгонка спецификации под код.
+
+Выбор решения: соответствует.
+Подгонка тестов: не найдена (прежние тесты не менялись, только добавлены; `skip`/`xfail` нет).
+
+Итог: можно к судье.
