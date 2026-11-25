@@ -389,6 +389,34 @@ def test_no_latin_name_has_ru(onto, events, text, is_ru):
     assert events.where(CREATED, entity_id=entity)
 
 
+@req(NM, LANG, invariant="Основное — русское написание ru, если оно русское и прошло проверку")
+@pytest.mark.parametrize(
+    ("item", "expected"),
+    [
+        # ru не русское (латиница): основное — name, ru — вариант
+        (
+            {"name": "Платон", "type": "person", "ru": "Plato"},
+            {("ru", "Платон", "primary"), ("en", "Plato", "variant")},
+        ),
+        # ru смешанное с перевесом латиницы — не русское
+        (
+            {"name": "Kant", "type": "person", "ru": "Kantt-Кант"},
+            {("en", "Kant", "primary"), ("en", "Kantt-Кант", "variant")},
+        ),
+        # ru русское и годное: основное — ru
+        (
+            {"name": "Plato", "type": "person", "ru": "Платон", "en": "Plato"},
+            {("ru", "Платон", "primary"), ("en", "Plato", "variant")},
+        ),
+        # ru русское, но не прошло проверку: основное — name, ru не записано
+        ({"name": "Plato", "type": "person", "ru": "поэт"}, {("en", "Plato", "primary")}),
+    ],
+)
+def test_primary_choice_by_item(events, item, expected):
+    got = {(lang, text, kind) for lang, text, kind in naming.names_for(item["type"], item)}
+    assert got == expected
+
+
 def stand_count(onto) -> int:
     with onto.statements.engine.begin() as conn:
         return len(list(conn.scalars(select(t.entities.c.id))))
