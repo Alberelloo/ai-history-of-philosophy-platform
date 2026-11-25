@@ -30,7 +30,7 @@
 - [x] 4.1 Карта: `types.ts` (`epochs`, `fuzzy`, `Filter.epochs`, адрес `epochs`), `model.ts` (фильтр — идеи без явной эпохи скрываются; выбор эпохи по `epochs`; удалить `midLife` в `related` для эпохи; `eraOf` остаётся для эпохи года с правилом «самое позднее начало, затем название»), `MapPanel.tsx` (фасет «Эпоха», окно по пролёту, если в адресе нет `from`/`to`; без датированных — без пункта), `MapCanvas.tsx`/`layout.ts` (растушёвка только в страте эпох, `data-fuzzy-start/end`, `data-selected-era`; линии жизни, узлы, `anchorOn` не трогаются), `packIntervals` вынесен из `packPeople`
 - [x] 4.2 `web/src/epochs/{EpochsPage,Timeline,api}.tsx/ts`: лента, дорожки, растушёвка, описание выбранной (счётчики, персоны, труды, события через `/v1/catalog`), до 8 персон и до 8 трудов, до 20 событий, действия, `/epochs/<id>`, ссылка Wikidata из проверенного QID, состояния, клавиатура (края без перехода по кругу, Home/End, Esc), `data-lane`, `data-fuzzy-start/end`; вывод текстом, без `pageerror`
 - [x] 4.3 `App.tsx` (маршруты, `/soon/epochs` → `/epochs`), `Sidebar.tsx` (`LIVE.epochs`, подпись «Эпохи»), `ReferencePage` — эпоха в записи ссылкой на `/epochs/<id>`; строки RU/EN; стили `styles/epochs.css`
-- [ ] 4.4 `cd web && npm run build`
+- [x] 4.4 `cd web && npm run build`
 
 ## 5. Задачи тестировщика
 
