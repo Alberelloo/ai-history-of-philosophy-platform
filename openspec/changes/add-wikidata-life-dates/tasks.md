@@ -22,6 +22,7 @@
   Юнит-тесты.
 - [ ] 2.3 `knowledge/life_dates.py`:
   - `LifeDates.suggest` (фильтр класса, `--auto-exact` по правилу design.md);
+  - кандидат-держатель (О10): `holder` в кандидате, пункт `duplicate` с `reason="qid_candidate"` без повтора;
   - `apply`: QID по правилу 1–4 спецификации (порядок манифеста, `qid_conflict`, `qid_taken`) → даты по таблице точностей (`bad_value`) → роли; `unchanged`/`conflict`; сухой прогон. Пары `qid_taken` с `accepted` идут в `Dedupe.run(confirmed=…)`, с `auto` — в очередь;
   - проверка формы манифеста (код 2);
   - `rollback`: утверждения, кроме проверенных; QID из `run_actions`, кроме тех, на которые ссылается проверенное (`kept`); `undo_merge` слияний запуска;
@@ -64,6 +65,7 @@ Wikidata — только фикстуры (`fetch`-словарь, `--from-file
   | Подтверждение QID | `auto` без флага | «Точное совпадение с флагом» / «Кандидаты для персоны» |
   | Подтверждение QID | `qid_taken` не передаётся слиянию | «QID занят» |
   | Подтверждение QID | перезапись своего другого QID | «У сущности другой QID» |
+  | Подтверждение QID | `suggest` не ставит кандидата-держателя в очередь | «Кандидат уже у другой персоны» |
   | Импорт из Wikidata | `import_wikidata` со срезом `[1:5]` | «Дата до нашей эры» |
 
 - [ ] 3.5 `python scripts/mutation_check.py --change add-wikidata-life-dates` — таблица в `verification.md`.

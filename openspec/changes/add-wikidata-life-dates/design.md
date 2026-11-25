@@ -50,12 +50,16 @@ entities:
   decision: pending         # pending | accepted | auto | rejected
   candidates:
   - {qid: Q859, label: {ru: Платон, en: Plato}, description: …, birth: "427 до н. э.", death: "347 до н. э."}
+  # holder: e_… — если кандидат уже у другой действующей сущности того же типа (О10)
 ```
+
+**Кандидат-держатель (О10).** `suggest` проверяет каждого кандидата по `external_ids`. Если QID уже у другой действующей сущности того же типа, в кандидат пишется `holder`, а пара `(entity, holder)` ставится в очередь `duplicate` (`merge_proposed`, `reason="qid_candidate"`), если открытого пункта по ней нет. Так «Омир» при «Гомер» (Q6691) попадает к человеку; решение `accepted` дальше ведёт к `qid_taken` → `merge:qid_confirmed`. При закрытии пункта решением о слиянии запись манифеста не нужна.
 
 Проверка формы — до базы и сети, как в `epoch_dates.check_manifest`:
 - `wikidata` по `^Q\d+$` или `null`;
 - `decision` — из перечня;
-- `entity` уникален.
+- `entity` уникален;
+- `holder`, если есть, — строка id.
 
 ### Правило `--auto-exact`
 
