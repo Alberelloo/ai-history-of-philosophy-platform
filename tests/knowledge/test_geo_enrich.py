@@ -628,6 +628,7 @@ def test_dry_run_with_existing_place_writes_nothing(onto, events, no_network):
         "place", [("ru", "Кёнигсберг", "primary")], external={"wikidata": KONIGSBERG_Q}
     )
     before = statements_count(onto)
+    events.clear()
     summary = PlaceEnrichment(onto.statements, Fetch(kant_records())).run(dry_run=True)
     assert statements_count(onto) == before
     assert rows_of(onto, "lived_in") == [] and rows_of(onto, "coordinates") == []

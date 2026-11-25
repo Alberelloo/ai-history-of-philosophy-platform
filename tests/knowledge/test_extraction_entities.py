@@ -180,7 +180,8 @@ def test_new_entity_without_type_dropped_by_code(stand, onto, events):
     assert ids_by_text(onto, "Безымянный") == []
     [drop] = [dict(e.fields) for e in events.of(DROPPED)]
     assert drop["reason"] == "entity:no_type"
-    assert set(drop) - CTX == {"run_id", "reason"}
+    assert drop["run_id"]
+    assert set(drop) - CTX == {"reason"}
     assert events.where(CREATED, type="person") == []
     no_token(events, token)
 

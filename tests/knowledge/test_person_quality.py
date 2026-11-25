@@ -921,6 +921,7 @@ def test_component_reason_priority_qid_cluster_over_dates():
     result = plan([a, b, c, d])
     assert result.merges == []
     assert result.review == [
+        ("a", "b", "review:dates"),  # собственный вердикт пары: противоречащие даты
         ("a", "d", "review:qid_cluster"),
         ("b", "c", "review:qid_cluster"),
         ("b", "d", "review:qid_cluster"),
