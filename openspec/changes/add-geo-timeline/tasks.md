@@ -58,7 +58,7 @@
 - [x] 4.1 Зависимости `d3-geo`, `topojson-client`, `world-atlas`, `@types/d3-geo`, `@types/topojson-client` с точными версиями в `web/package.json` и `package-lock.json`; лицензии (ISC, Natural Earth — public domain) — в перечне лицензий клиента
 - [x] 4.2 `map/geo/timeline.ts`: `whereAt` (три ступени, запись без вида — проживание на всю жизнь), `mainPlace`, `linkYear` (рождение + `ADULT_AGE`), `visibleAt` с `age` (границы 150 включительно), `opacity`, `defaultYear`, `nearestYear`, пределы с порядком отбора; без DOM и без `Date`
 - [x] 4.3 `map/geo/projection.ts`: `initialView`, `rotateBy` (зажим ±80), `zoomBy` (×1,25, 1–8), `centerOn`, `isNear` (≤ 90°), путь дуги; `map/geo/land.ts`
-- [ ] 4.4 `types.ts`: `view`, `t` (целое) в `MapState`, `parseState`, `writeState`; зажим года в окно — в модели; `map/geo/api.ts`; `map/geo/geoFixture.ts` для ручного просмотра
+- [x] 4.4 `types.ts`: `view`, `t` (целое) в `MapState`, `parseState`, `writeState`; зажим года в окно — в модели; `map/geo/api.ts`; `map/geo/geoFixture.ts` для ручного просмотра
 
 ## 5. Клиент: вид «Глобус» (разработчик)
 

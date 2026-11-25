@@ -103,16 +103,21 @@ export type Selection = string;
 export type Stratum = "events" | "eras" | "people" | "works";
 export const STRATA: readonly Stratum[] = ["events", "eras", "people", "works"];
 
+// Вид карты: хронология (по умолчанию) или глобус (geo-timeline, openspec/changes/add-geo-timeline).
+export type MapView = "chrono" | "globe";
+
 export type MapState = {
   sel: Selection | null;
   q: string;
   filter: Filter;
   collapsed: Stratum[]; // свёрнутые линзы
+  view: MapView;
+  t?: number; // год глобуса — целое из адреса; зажим в окно времени — в модели (geo/timeline.ts)
 };
 
 export const emptyFilter = (): Filter => ({ groups: [], roles: [], kinds: [], ekinds: [], epochs: [], verified: false });
 
-export const emptyState = (): MapState => ({ sel: null, q: "", filter: emptyFilter(), collapsed: [] });
+export const emptyState = (): MapState => ({ sel: null, q: "", filter: emptyFilter(), collapsed: [], view: "chrono" });
 
 // Свернуть или развернуть страту. Последнюю развёрнутую свернуть нельзя — список не меняется.
 export function toggleLens(collapsed: Stratum[], k: Stratum): Stratum[] {
@@ -121,8 +126,9 @@ export function toggleLens(collapsed: Stratum[], k: Stratum): Stratum[] {
   return STRATA.filter((x) => x === k || collapsed.includes(x));
 }
 
-/* Параметры адреса: sel, q, from, to, groups, roles, kinds, ekinds, epochs, verified, lens.
-   Списки — через запятую; пустые и значения по умолчанию в адрес не пишутся. */
+/* Параметры адреса: sel, q, from, to, groups, roles, kinds, ekinds, epochs, verified, lens,
+   view, t. Списки — через запятую; пустые и значения по умолчанию в адрес не пишутся: view —
+   только globe, t — только в виде глобуса и только целым. */
 
 const list = (p: URLSearchParams, k: string): string[] =>
   (p.get(k) ?? "")
@@ -143,6 +149,8 @@ export function parseState(p: URLSearchParams): MapState {
   const lens = list(p, "lens").filter((k): k is Stratum => (STRATA as readonly string[]).includes(k));
   // все страты свернуть нельзя: тогда адрес игнорируется
   const collapsed = STRATA.filter((k) => lens.includes(k));
+  const view: MapView = p.get("view") === "globe" ? "globe" : "chrono";
+  const t = view === "globe" ? year(p, "t") : undefined; // нецелое t игнорируется
   return {
     sel: p.get("sel") || null,
     q: p.get("q") ?? "",
@@ -157,6 +165,8 @@ export function parseState(p: URLSearchParams): MapState {
       verified: p.get("verified") === "1",
     },
     collapsed: collapsed.length >= STRATA.length ? [] : collapsed,
+    view,
+    ...(t != null ? { t } : {}),
   };
 }
 
@@ -175,6 +185,10 @@ export function writeState(s: MapState): URLSearchParams {
   if (f.verified) p.set("verified", "1");
   const lens = STRATA.filter((k) => s.collapsed.includes(k));
   if (lens.length) p.set("lens", lens.join(","));
+  if (s.view === "globe") {
+    p.set("view", "globe");
+    if (s.t != null && Number.isInteger(s.t)) p.set("t", String(s.t));
+  }
   return p;
 }
 
