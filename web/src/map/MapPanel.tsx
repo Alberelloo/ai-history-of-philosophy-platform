@@ -3,6 +3,7 @@ import { pick, useT, type Catalog } from "../i18n";
 import { ViaNotice } from "./ViaNotice";
 import { Icon, type IconName } from "../ui";
 import { LinkDetails, type GEdge } from "./LinkDetails";
+import { GeoList, GeoPlaceSelected, GlobeLegend, type GeoPanel } from "./geo/GeoList";
 import {
   counts as countsOf,
   epochWindow,
@@ -58,6 +59,8 @@ type Props = {
   generation: boolean;
   onEnableGeneration: () => void;
   onOpenCard: (id: string, title: string) => void;
+  // Вид «Глобус» (geo-timeline): список мест в году, выбор места, легенда глобуса.
+  geo?: GeoPanel;
 };
 
 type Section = "search" | "selected" | "filters" | "legend";
@@ -254,12 +257,15 @@ export function MapPanel(props: Props) {
               <Selected {...props} />
             )}
           </section>
+          {props.geo && (
+            <GeoList data={props.data} geo={props.geo} sel={props.state.sel} onSelect={(id) => props.onSelect(id)} onOpenCard={props.onOpenCard} />
+          )}
           <section className="map-panel__sec" data-section="filters" id="map-sec-filters" aria-label={t.map.sections.filters}>
             <Filters {...props} />
           </section>
           <section className="map-panel__sec" data-section="legend" id="map-sec-legend" aria-label={t.map.sections.legend}>
             <FoldHead k="legend">{t.map.sections.legend}</FoldHead>
-            {!fold.closed("legend") && <Legend />}
+            {!fold.closed("legend") && (props.geo ? <GlobeLegend /> : <Legend />)}
           </section>
         </div>
       )}
@@ -449,6 +455,17 @@ function Selected(props: Props) {
       );
     return <LinkDetails edge={link.edge} label={label} onClose={onCloseLink} />;
   }
+  const geo = props.geo;
+  if (geo?.place)
+    return (
+      <GeoPlaceSelected
+        data={data}
+        place={geo.place}
+        here={geo.scene?.places.find((p) => p.id === geo.place!.id) ?? null}
+        year={geo.year}
+        onSelect={(id) => props.onSelect(id)}
+      />
+    );
   if (!rel) {
     const many = vis.links.length > 15;
     return (
@@ -577,6 +594,7 @@ function Selected(props: Props) {
       <div className="map-selected__name">
         {title} {sub && <span>{sub}</span>}
       </div>
+      {geo?.noPlace && <p className="map-selected__note geo-selected__noplace">{t.geo.noPlace}</p>}
       <ul className="map-selected__list">{items}</ul>
       {hidden && (
         <p className="map-selected__note">
