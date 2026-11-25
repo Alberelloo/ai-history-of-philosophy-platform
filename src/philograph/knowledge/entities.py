@@ -211,6 +211,34 @@ class Entities:
             )
         return self.resolve(found) if found else None
 
+    def add_external(self, entity_id: str, system: str, value: str) -> bool:
+        """Внешний идентификатор существующей сущности. ``True`` — записан, ``False`` — уже
+        был у неё же; у другой сущности — ``DuplicateEntity`` без записи."""
+        entity_id = self.get(entity_id)["id"]  # перенаправление; нет сущности — EntityNotFound
+        existing = self.by_external(system, value)
+        if existing == entity_id:
+            return False
+        if existing is not None:
+            raise DuplicateEntity(existing)
+        with self.engine.begin() as conn:
+            conn.execute(
+                t.external_ids.insert().values(entity_id=entity_id, system=system, value=value)
+            )
+        return True
+
+    def externals(self, system: str) -> dict[str, str]:
+        """Сущность → значение внешнего идентификатора системы (по действующим сущностям)."""
+        with self.engine.begin() as conn:
+            rows = conn.execute(
+                select(t.external_ids.c.entity_id, t.external_ids.c.value)
+                .where(t.external_ids.c.system == system)
+                .order_by(t.external_ids.c.value)
+            ).all()
+        found: dict[str, str] = {}
+        for entity_id, value in rows:
+            found.setdefault(self.resolve(entity_id), value)
+        return found
+
     def source_entity(self, source_id: str, title: str) -> str:
         """Источник библиотеки как сущность: на него ссылаются атрибуции и связь «издание»."""
         existing = self.by_external("library", source_id)
