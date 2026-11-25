@@ -6,7 +6,7 @@
 // - ADULT_AGE — начало деятельности без даты и «год связи» (влияние воспринимает взрослый);
 // - TRAIL — сколько лет после смерти, события или года связи отметка ещё видна, бледнея;
 //   границы включительно;
-// - пределы отметок, дуг и подписей; при избытке остаются самые весомые.
+// - пределы мест и дуг; при избытке остаются самые весомые.
 
 import { midLife } from "../model";
 import type { MapEvent, MapLink, MapPerson } from "../types";
@@ -16,7 +16,6 @@ export const ADULT_AGE = 20;
 export const TRAIL = 150;
 export const MAX_PLACES = 300;
 export const MAX_LINKS = 200;
-export const MAX_LABELS = 12;
 export const MIN_OPACITY = 0.15;
 
 export type GeoModel = {
@@ -106,14 +105,6 @@ export function firstPlacedYear(p: Life, rows: GeoPlacement[]): number | null {
   return Math.min(...list.map((r) => startOf(p, r)));
 }
 
-// Главное место персоны — конец дуг влияния: первое activity (по началу), иначе birth,
-// иначе запись без вида. Одно на все годы: дуги не прыгают при проигрывании.
-export function mainPlace(p: Life, rows: GeoPlacement[]): GeoPlacement | null {
-  const pick = (f: (r: GeoPlacement) => boolean) =>
-    rows.filter(f).sort((a, b) => startOf(p, a) - startOf(p, b) || byId(a, b))[0] ?? null;
-  return pick((r) => r.role === "activity") ?? pick((r) => r.role === "birth") ?? pick((r) => r.role == null);
-}
-
 // Год связи «subject испытал влияние object»: рождение ученика + ADULT_AGE.
 export const linkYear = (student: Life): number => student.birth + ADULT_AGE;
 
@@ -133,12 +124,33 @@ export type ScenePlace = {
   unverified: boolean; // все показанные размещения достроены моделью
 };
 
-export type SceneLink = { id: string; link: MapLink; from: GeoPlace; to: GeoPlace; age: number; weight: number };
+// Персона на год T — медальон глобуса (rework-globe-political-map). rank — место персоны
+// внутри своего места по весу (0 — самая весомая, при равенстве — по id), placeIndex —
+// порядок её места в сцене: раскладка кладёт по (rank, placeIndex).
+export type ScenePerson = {
+  id: string;
+  place: string;
+  lat: number;
+  lon: number;
+  age: number;
+  generated: boolean; // размещение на год T достроено моделью
+  row: GeoPlacement;
+  weight: number;
+  rank: number;
+  placeIndex: number;
+};
+
+export type SceneEvent = { id: string; place: string; lat: number; lon: number; age: number; generated: boolean; placeIndex: number };
+
+// Связь на год T: from — учитель (object), to — ученик (subject), обе персоны в сцене.
+export type SceneLink = { id: string; link: MapLink; from: string; to: string; age: number; weight: number };
 
 export type Scene = {
   year: number;
   places: ScenePlace[]; // не больше MAX_PLACES, по убыванию людей, затем по id
   totalPlaces: number;
+  persons: ScenePerson[]; // персоны мест сцены, по (rank, placeIndex, id)
+  events: SceneEvent[]; // события мест сцены, по (placeIndex, id)
   links: SceneLink[]; // не больше MAX_LINKS, по весу концов, затем по id связи
   totalLinks: number;
   where: Map<string, string>; // персона или событие → место на год T
@@ -147,31 +159,37 @@ export type Scene = {
 export type SceneInput = { people: MapPerson[]; events: MapEvent[]; links: MapLink[] };
 
 // Что видно на год T. Персона — с рождения до смерти + TRAIL, событие — с года + TRAIL,
-// связь — с года связи + TRAIL (границы включительно). Связь без главного места у одного
-// из концов не рисуется и не считается.
+// связь — с года связи + TRAIL (границы включительно) и только если обе персоны в сцене
+// (видны и их место среди мест сцены); иначе не рисуется и не считается.
 export function visibleAt(model: GeoModel, input: SceneInput, T: number): Scene {
   type Acc = { place: GeoPlace; people: string[]; events: string[]; age: number; flags: boolean[] };
+  type Who = { id: string; row: GeoPlacement; age: number };
   const acc = new Map<string, Acc>();
   const where = new Map<string, string>();
-  const add = (placeId: string, kind: "people" | "events", id: string, age: number, generated: boolean) => {
-    const place = model.places.get(placeId);
+  const who = new Map<string, { people: Who[]; events: Who[] }>();
+  const add = (row: GeoPlacement, kind: "people" | "events", id: string, age: number) => {
+    const place = model.places.get(row.place);
     if (!place) return;
-    let a = acc.get(placeId);
-    if (!a) acc.set(placeId, (a = { place, people: [], events: [], age, flags: [] }));
+    let a = acc.get(row.place);
+    if (!a) {
+      acc.set(row.place, (a = { place, people: [], events: [], age, flags: [] }));
+      who.set(row.place, { people: [], events: [] });
+    }
     a[kind].push(id);
     a.age = Math.min(a.age, age);
-    a.flags.push(generated);
-    where.set(id, placeId);
+    a.flags.push(row.generated);
+    who.get(row.place)![kind].push({ id, row, age });
+    where.set(id, row.place);
   };
   for (const p of input.people) {
     if (T < p.birth || T > p.death + TRAIL) continue;
     const r = whereAt(p, model.byEntity.get(p.id) ?? [], T);
-    if (r) add(r.place, "people", p.id, Math.max(0, T - p.death), r.generated);
+    if (r) add(r, "people", p.id, Math.max(0, T - p.death));
   }
   for (const e of input.events) {
     if (T < e.year || T > e.year + TRAIL) continue;
     const r = (model.byEntity.get(e.id) ?? []).filter((x) => x.role === "event").sort(byId)[0];
-    if (r) add(r.place, "events", e.id, T - e.year, r.generated);
+    if (r) add(r, "events", e.id, T - e.year);
   }
   const all: ScenePlace[] = [...acc.values()].map((a) => ({
     id: a.place.id,
@@ -184,16 +202,36 @@ export function visibleAt(model: GeoModel, input: SceneInput, T: number): Scene 
     unverified: a.flags.length > 0 && a.flags.every(Boolean),
   }));
   all.sort((a, b) => b.people.length - a.people.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const places = all.slice(0, MAX_PLACES);
 
   const people = new Map(input.people.map((p) => [p.id, p]));
-  const mains = new Map<string, GeoPlace | null>();
-  const main = (p: MapPerson) => {
-    if (!mains.has(p.id)) {
-      const r = mainPlace(p, model.byEntity.get(p.id) ?? []);
-      mains.set(p.id, r ? (model.places.get(r.place) ?? null) : null);
-    }
-    return mains.get(p.id)!;
-  };
+  const cmpId = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+  const persons: ScenePerson[] = [];
+  const events: SceneEvent[] = [];
+  places.forEach((sp, placeIndex) => {
+    const w = who.get(sp.id)!;
+    const ranked = [...w.people].sort((a, b) => (people.get(b.id)?.weight ?? 0) - (people.get(a.id)?.weight ?? 0) || cmpId(a.id, b.id));
+    ranked.forEach((x, rank) =>
+      persons.push({
+        id: x.id,
+        place: sp.id,
+        lat: sp.lat,
+        lon: sp.lon,
+        age: x.age,
+        generated: x.row.generated,
+        row: x.row,
+        weight: people.get(x.id)?.weight ?? 0,
+        rank,
+        placeIndex,
+      }),
+    );
+    [...w.events]
+      .sort((a, b) => cmpId(a.id, b.id))
+      .forEach((x) => events.push({ id: x.id, place: sp.id, lat: sp.lat, lon: sp.lon, age: x.age, generated: x.row.generated, placeIndex }));
+  });
+  persons.sort((a, b) => a.rank - b.rank || a.placeIndex - b.placeIndex || cmpId(a.id, b.id));
+  const inScene = new Set(persons.map((p) => p.id));
+
   const links: SceneLink[] = [];
   for (const l of input.links) {
     const student = people.get(l.subject);
@@ -201,20 +239,44 @@ export function visibleAt(model: GeoModel, input: SceneInput, T: number): Scene 
     if (!student || !teacher) continue;
     const y = linkYear(student);
     if (T < y || T > y + TRAIL) continue;
-    const from = main(teacher);
-    const to = main(student);
-    if (!from || !to) continue;
-    links.push({ id: l.id, link: l, from, to, age: T - y, weight: student.weight + teacher.weight });
+    if (!inScene.has(teacher.id) || !inScene.has(student.id)) continue;
+    links.push({ id: l.id, link: l, from: teacher.id, to: student.id, age: T - y, weight: student.weight + teacher.weight });
   }
   links.sort((a, b) => b.weight - a.weight || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {
     year: T,
-    places: all.slice(0, MAX_PLACES),
+    places,
     totalPlaces: all.length,
+    persons,
+    events,
     links: links.slice(0, MAX_LINKS),
     totalLinks: links.length,
     where,
   };
+}
+
+// Годы в месте (панель «Где в <год> году»): наибольший непрерывный отрезок лет в пределах
+// жизни, на котором whereAt даёт ту же запись, что в год T; T после смерти — отрезок,
+// содержащий год смерти, и after=true. Правило места — то же whereAt, без второй копии.
+export function stayAt(p: Life, rows: GeoPlacement[], T: number): { row: GeoPlacement; from: number; to: number; after: boolean } | null {
+  const row = whereAt(p, rows, T);
+  if (!row) return null;
+  const at = Math.max(p.birth, Math.min(T, p.death));
+  const same = (y: number) => whereAt(p, rows, y) === row;
+  let from = at;
+  let to = at;
+  if (same(at)) {
+    while (from - 1 >= p.birth && same(from - 1)) from -= 1;
+    while (to + 1 <= p.death && same(to + 1)) to += 1;
+  } else {
+    // Запись года T не действует в год at (не должно случаться): отрезок по последнему году записи в жизни.
+    let last: number | null = null;
+    for (let y = p.death; y >= p.birth; y--) if (same(y)) { last = y; break; }
+    if (last == null) return { row, from: T, to: T, after: T > p.death };
+    from = to = last;
+    while (from - 1 >= p.birth && same(from - 1)) from -= 1;
+  }
+  return { row, from, to, after: T > p.death };
 }
 
 // Год по умолчанию (без t в адресе): середина жизни выбранной персоны (та же формула, что
