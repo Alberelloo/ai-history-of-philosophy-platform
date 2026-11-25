@@ -1,0 +1,10 @@
+{
+  "person": ["person"],
+  "ideas": ["concept", "conception", "doctrine", "problem", "position", "argument"],
+  "term": ["term"],
+  "work": ["work"],
+  "events": ["event", "idea_event", "phenomenon"],
+  "epoch": ["epoch"],
+  "group": ["group"],
+  "place": ["place"]
+}
