@@ -96,7 +96,7 @@
 
 ## 4. Ревьювер
 
-- [ ] 4.1 Дифф против `origin/claude/embedding-docker`:
+- [x] 4.1 Дифф против `origin/claude/embedding-docker`:
   - правило названий только в `naming.py` и данных;
   - в файлах Lead'а только точки вызова;
   - нет подгонки тестов;
