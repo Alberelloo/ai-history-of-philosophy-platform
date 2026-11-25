@@ -24,18 +24,18 @@
 
   Юнит-тесты миграции схемы и фильтра, в том числе `context.py` без `KeyError` на утверждении со снятым концом.
 - [x] 2.2 `knowledge/integrity.py`: `Baseline`, `baseline`, `compare` — определения потерь из спецификации: свёртка через `merges.moved.folded`, мусор через `retired_run`, петли через `moved.loops`, атрибуции со снятым автором. `save`/`load`. Юнит-тесты.
-- [ ] 2.3 `knowledge/ontology_migrate.py`:
+- [x] 2.3 `knowledge/ontology_migrate.py`:
   - `Action`, `View`, `STEPS`;
   - шаги `manifest_qids` (через `LifeDates.apply`, `confirmed` → `dedupe`, `pending` с `holder` → очередь `review:qid_candidate`), `lang_fix`, `retire`, `wikidata_labels`, `translate` (пакеты, проверка ответа по порядку design.md, причины отказов), `dedupe`, `verify` (аварийный откат);
   - `Migration.plan/run/rollback`, `Report`;
   - события `knowledge.migration.*`, `knowledge.entity.retired/restored`.
-- [ ] 2.4 CLI `plan|run|rollback` (`--manifest` — шаг `manifest_qids`, `--translate off|model`, `--batch`, `--from-file`, `--estimate`, `--limit`). Шлюз LLM — `ServiceClient` из настроек сервиса знаний, как в `main.py`. Wikidata — `wikidata.http_fetch` или файл.
+- [x] 2.4 CLI `plan|run|rollback` (`--manifest` — шаг `manifest_qids`, `--translate off|model`, `--batch`, `--from-file`, `--estimate`, `--limit`). Шлюз LLM — `ServiceClient` из настроек сервиса знаний, как в `main.py`. Wikidata — `wikidata.http_fetch` или файл.
 - [ ] 2.5 `knowledge/quality_report.py`:
   - соединение только на чтение (SQLite `mode=ro`, Postgres `default_transaction_read_only`), без `migrations.upgrade`, совместимость со схемой до `knowledge:9`;
   - `CRITERIA` — данные с формулами А1–А8;
   - таблица, `--json`, `--save`, `--baseline`, коды 0/1/2;
   - событие `knowledge.quality.measured`.
-- [ ] 2.6 **Файл Lead'а** `prompts/__init__.py`: шаблон `ontology.translate_names` (поле `items`). Согласование — 5.1.
+- [x] 2.6 **Файл Lead'а** `prompts/__init__.py`: шаблон `ontology.translate_names` (поле `items`). Согласование — 5.1.
 - [ ] 2.7 Юнит-тесты модулей 2.2–2.5. `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q` на `tests/knowledge/test_snapshot.py`, `test_catalog*.py`, `test_map*.py`, `test_mentions_cards.py`, `test_statements.py` (фильтр действующих не ломает прежнее).
 
 ## 3. Тестировщик

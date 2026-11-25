@@ -36,8 +36,7 @@ import sys
 import time
 import uuid
 from collections.abc import Callable
-from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from dataclasses import asdict, dataclass, field
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -45,6 +44,7 @@ from typing import Any
 import yaml
 from sqlalchemy import and_, select
 
+from philograph.knowledge import run_actions
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate, interval, span
 from philograph.knowledge.dedupe import Dedupe, dates_conflict, duplicate_items, propose
@@ -221,9 +221,14 @@ class Report:
     conflicts: int = 0
     skipped: int = 0
     failed: int = 0
+    # Не в отчёте JSON: для команды, внутри которой идёт этот запуск (миграция).
+    externals_list: list[dict[str, str]] = field(default_factory=list)
+    confirmed: list[tuple[str, str]] = field(default_factory=list)
 
     def to_json(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        del data["externals_list"], data["confirmed"]
+        return data
 
 
 class LifeDates:
@@ -385,9 +390,13 @@ class LifeDates:
         linked: bool = False,
         dry_run: bool = False,
         limit: int | None = None,
+        run_id: str | None = None,
+        merge: bool = True,
     ) -> Report:
+        """``run_id`` — номер внешнего запуска (миграция); ``merge=False`` — пары ``qid_taken``
+        с ``accepted`` не сливаются здесь, а отдаются в ``Report.confirmed`` вызывающему."""
         check_manifest(manifest)
-        report = Report(run_id=f"life_{uuid.uuid4().hex[:12]}", dry_run=dry_run)
+        report = Report(run_id=run_id or f"life_{uuid.uuid4().hex[:12]}", dry_run=dry_run)
         # QID, записанные (в сухом прогоне — «записанные») этим запуском: QID → сущность и
         # сущность → QID. Второе подтверждение того же QID видит первое (правило 3).
         planned: dict[str, str] = {}
@@ -395,7 +404,6 @@ class LifeDates:
         confirmed: list[tuple[str, str]] = []
         proposals: list[tuple[str, str]] = []
         done: set[str] = set()
-        seq = 0
         for entry in manifest["entities"]:
             if entry.get("decision") not in CONFIRMED or not entry.get("wikidata"):
                 continue
@@ -422,8 +430,13 @@ class LifeDates:
                     continue
                 if not dry_run:
                     self.entities.add_external(entity_id, SYSTEM, qid)
-                    seq += 1
-                    self._action(report.run_id, seq, entity_id, qid)
+                    run_actions.record(
+                        self.engine,
+                        report.run_id,
+                        "external",
+                        {"kind": "external", "entity": entity_id, "qid": qid},
+                    )
+                report.externals_list.append({"entity": entity_id, "qid": qid})
                 planned[qid], planned_own[entity_id] = entity_id, qid
                 report.externals += 1
             self._import(report, entity_id, qid)
@@ -442,7 +455,7 @@ class LifeDates:
                     self._skip(report, entity_id, "item", "bad_qid")
                     continue
                 self._import(report, entity_id, qid)
-        self._settle(report, confirmed, proposals)
+        self._settle(report, confirmed, proposals, merge)
         summary = report.to_json()
         events.emit("knowledge.life_dates.run", **summary)
         return report
@@ -452,12 +465,16 @@ class LifeDates:
         report: Report,
         confirmed: list[tuple[str, str]],
         proposals: list[tuple[str, str]],
+        merge: bool = True,
     ) -> None:
         """Пары ``qid_taken``: подтверждённые человеком — слиянию вариантов
         (``merge:qid_confirmed``), прочие и не персоны — в очередь ``review:qid_taken``."""
         types = self.entities.types([x for pair in [*confirmed, *proposals] for x in pair])
         persons = [p for p in confirmed if all(types.get(x) == PERSON for x in p)]
         queued = proposals + [p for p in confirmed if p not in persons]
+        report.confirmed = persons
+        if not merge:
+            persons = []  # сливает вызывающий (шаг dedupe миграции)
         if report.dry_run:
             if persons:
                 Dedupe(self.statements, self.review).plan(persons, scope={*sum(persons, ())})
@@ -468,19 +485,7 @@ class LifeDates:
             )
         open_, _ = duplicate_items(self.engine)
         for a, b in queued:
-            propose(self.engine, a, b, "review:qid_taken", open_)
-
-    def _action(self, run_id: str, seq: int, entity_id: str, qid: str) -> None:
-        with self.engine.begin() as conn:
-            conn.execute(
-                t.run_actions.insert().values(
-                    run_id=run_id,
-                    seq=seq,
-                    kind="external",
-                    payload={"kind": "external", "entity": entity_id, "qid": qid},
-                    created_at=datetime.now(UTC),
-                )
-            )
+            propose(self.engine, a, b, "review:qid_taken", open_, run_id=report.run_id)
 
     def _skip(self, report: Report, entity_id: str, prop: str, reason: str) -> None:
         if reason == "fetch_failed":

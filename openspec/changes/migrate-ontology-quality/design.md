@@ -107,7 +107,7 @@ class Migration:
 | `retire` | действующая сущность (не `source`), у которой `check_name(type, label)` даёт причину → `retired_run = run_id`, `retired_reason = причина`; событие `knowledge.entity.retired` | `{entity_id}` |
 | `wikidata_labels` | сущность с QID и с нерусским основным названием: подпись `ru` записи проходит `is_russian` и `check_name` → `set_primary_name(e, "ru", …)` | `{entity_id, names_before}` |
 | `translate` | оставшиеся с нерусским основным названием, пакетами `batch`, шаблон `ontology.translate_names`, роль `main`, бюджет `filling`, `run_id` в контексте | как у `wikidata_labels` |
-| `dedupe` | `Dedupe(...).run(run_id=…)` по персонам. Не-персоны одного типа с общим основным названием → очередь `duplicate` | `{merge_id}` |
+| `dedupe` | `Dedupe(...).run(run_id=…)` по персонам. Не-персоны одного типа с общим основным названием → очередь `duplicate` с `reason="review:same_name"` (своя причина: в А4 не входит, там только персоны) | `{merge_id}` |
 | `verify` | `integrity.compare(baseline, engine)`. Потери > 0 → автоматический `rollback`, `knowledge.migration.aborted`, код выхода 1 | — |
 
 **Проверка перевода сервером.** Для пакета из `k` элементов `{n, type, label}` модель возвращает `{"translations": [{"n": int, "ru": str}]}`. Принимается предложение, у которого:

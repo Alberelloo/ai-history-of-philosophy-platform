@@ -103,6 +103,15 @@ def fingerprint(engine: Engine) -> tuple:
         )
 
 
+def label_of(names: list[Mapping[str, Any]], default: str = "") -> str:
+    """Подпись сущности: основное русское, иначе первое основное, иначе первое любое
+    (названия — по порядку записи). Одно правило для снимка, миграции и замера."""
+    primary = [n for n in names if n["kind"] == "primary"]
+    ru = [n for n in primary if n["lang"] == "ru"]
+    pick = (ru or primary or list(names) or [{"text": default}])[0]
+    return pick["text"]
+
+
 def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
     """Сущности, подписи и действующие утверждения: не отклонённые, не отвергнутые
     (ранг «устаревшее»), не основанные только на снятом источнике — как в ``about``."""
@@ -155,13 +164,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
                 library[value] = entity_id
             else:
                 wikidata.setdefault(entity_id, value)
-    labels = {}
-    for entity_id in entities:
-        own = names.get(entity_id, [])
-        primary = [n for n in own if n["kind"] == "primary"]
-        ru = [n for n in primary if n["lang"] == "ru"]
-        pick = (ru or primary or own or [{"text": entity_id}])[0]
-        labels[entity_id] = pick["text"]
+    labels = {entity_id: label_of(names.get(entity_id, []), entity_id) for entity_id in entities}
     statements = []
     for r in rows:
         own = attrs.get(r["id"], [])

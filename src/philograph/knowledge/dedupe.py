@@ -307,8 +307,16 @@ def duplicate_items(engine: Any) -> tuple[set[tuple[str, str]], set[tuple[str, s
     return open_, distinct
 
 
-def propose(engine: Any, a: str, b: str, reason: str, open_: set[tuple[str, str]]) -> bool:
-    """Пункт очереди ``duplicate`` с причиной, если открытого по паре нет."""
+def propose(
+    engine: Any,
+    a: str,
+    b: str,
+    reason: str,
+    open_: set[tuple[str, str]],
+    run_id: str | None = None,
+) -> bool:
+    """Пункт очереди ``duplicate`` с причиной, если открытого по паре нет. ``run_id`` —
+    запуск, поставивший пункт: его откат закрывает пункт (``rolled_back``)."""
     pair = _pair(a, b)
     if pair in open_:
         return False
@@ -318,7 +326,11 @@ def propose(engine: Any, a: str, b: str, reason: str, open_: set[tuple[str, str]
                 kind="duplicate",
                 status="open",
                 resolution=None,
-                payload={"pair": [a, b], "reason": reason},
+                payload={
+                    "pair": [a, b],
+                    "reason": reason,
+                    **({"run_id": run_id} if run_id else {}),
+                },
             )
         )
     open_.add(pair)
@@ -366,9 +378,13 @@ class Dedupe:
         merged = sum(len(removed) for _, removed, _ in result.merges)
         if dry_run:
             return {"merged": merged, "proposed": len(result.review), "apart": result.apart}
+        proposed = self.apply(result, run_id)
+        return {"merged": merged, "proposed": proposed, "apart": result.apart}
+
+    def apply(self, result: Plan, run_id: str | None = None) -> int:
+        """Выполнить план: слияния компонент, затем пункты очереди; число новых пунктов."""
         for kept, removed, reason in result.merges:
             for other in removed:
                 self.statements.merge_entities(kept, other, reason=reason, run_id=run_id)
         open_, _ = duplicate_items(self.engine)
-        proposed = sum(propose(self.engine, a, b, r, open_) for a, b, r in result.review)
-        return {"merged": merged, "proposed": proposed, "apart": result.apart}
+        return sum(propose(self.engine, a, b, r, open_, run_id) for a, b, r in result.review)
