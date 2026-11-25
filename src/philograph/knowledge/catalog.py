@@ -292,13 +292,14 @@ class CatalogIndex:
 
         keys: dict[str, Callable[[tuple[Record, int, str | None]], tuple]] = {
             "label": lambda m: (sort_label(m[0]), m[0].id),
+            # Равный ключ — по id; название — только у записей без даты (они в конце).
             "date": lambda m: (
                 m[0].start is None,
                 m[0].start or 0,
-                sort_label(m[0]),
+                sort_label(m[0]) if m[0].start is None else "",
                 m[0].id,
             ),
-            "weight": lambda m: (-m[0].weight, sort_label(m[0]), m[0].id),
+            "weight": lambda m: (-m[0].weight, m[0].id),
             "relevance": lambda m: (m[1], -m[0].weight, sort_label(m[0]), m[0].id),
         }
         found.sort(key=keys[sort])

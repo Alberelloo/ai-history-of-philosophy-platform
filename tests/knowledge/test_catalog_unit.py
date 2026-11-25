@@ -165,7 +165,8 @@ def test_sort_date_and_weight(cat, onto, base, clock):
     ]
     onto.statements.add(base["critique"], "author", obj=base["kant"], attributions=COMMON)
     clock.advance(seconds=15)  # окно устарелости справочника
-    assert labels(cat.list(sort="weight"))[:2] == ["Иммануил Кант", "Критика чистого разума"]
+    top = cat.list(sort="weight")["items"][:2]  # оба по 2 утверждения: равный ключ — по id
+    assert [i["id"] for i in top] == sorted([base["kant"], base["critique"]])
     assert cat.list(sort="relevance")["sort"] == "label"
 
 
