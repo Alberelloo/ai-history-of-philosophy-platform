@@ -13,7 +13,7 @@
 
 ## 2. Разработчик
 
-- [ ] 2.1 Схема `knowledge:8`: таблица `run_actions`. Юнит-тест миграции на SQLite.
+- [x] 2.1 Схема `knowledge:8`: таблица `run_actions`. Юнит-тест миграции на SQLite.
 - [ ] 2.2 `wikidata.py`:
   - перенос `WIKIDATA_ROLES`;
   - `simple_time(value)` для упрощённой записи;

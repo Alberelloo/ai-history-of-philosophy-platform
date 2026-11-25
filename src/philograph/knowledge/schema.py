@@ -378,3 +378,19 @@ portraits = Table(
     schema=SCHEMA,
 )
 migrations.add(7, "портреты персон")(migrations.create_tables("portraits"))
+
+# --- журнал действий запуска вне утверждений ---
+# Что команда оператора изменила помимо утверждений (внешний QID, переименование, снятие):
+# откат запуска читает его в обратном порядке ``seq``.
+run_actions = Table(
+    "run_actions",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("run_id", String(40), nullable=False, index=True),
+    Column("seq", Integer, nullable=False),
+    Column("kind", String(30), nullable=False),  # external | …
+    Column("payload", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+migrations.add(8, "журнал действий запуска")(migrations.create_tables("run_actions"))

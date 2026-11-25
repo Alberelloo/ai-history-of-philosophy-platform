@@ -78,3 +78,8 @@
 Блокирующее круга 2 закрыто: сценарий точности 7 ждёт 1801…1900, как `wikidata_time`. Причины очереди с префиксом `review:` согласованы с `person-quality`. Нового не найдено.
 
 Вердикт: можно к коду.
+
+## Код — 2026-11-25 (разработчик, субагент `coder`)
+
+- 2.1 `schema.py`: таблица `run_actions` (`id, run_id, seq, kind, payload, created_at`, индекс по `run_id`), миграция `knowledge:8`. Юнит-тест `tests/knowledge/test_run_actions_unit.py` (1 passed).
+  - **Конфликт с прежними тестами (решение Lead'а / тестировщика):** `tests/knowledge/test_portraits.py:97,124` (`applied == [7]`, `latest() == 7`) и `tests/knowledge/test_mentions_cards.py:308` (`latest() == 7`) закрепляют последнюю версию схемы и падают при любой новой миграции. Ожидания не правлю (чужие тесты). Варианты: ожидание `>= 7` / накат только до 7 в этих тестах, либо отказ от `knowledge:8` (тогда `run_actions` негде хранить).
