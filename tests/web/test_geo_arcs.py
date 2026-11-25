@@ -129,7 +129,8 @@ def test_arc_ends_on_rotations(knowledge_context, knowledge_stack, events, width
     frames = visible = 0
     worst = 0.0
     for _lat_step in range(3):  # широта −60, 0, 60
-        for _lon_step in range(12):  # долгота −180…150 через 30°
+        # Урезано по указанию Lead'а (1 CPU): долгота −180…120 через 60° (18 центров из 36).
+        for _lon_step in range(6):
             for steps in (0, 3, 6):  # приближение 1; 1,95; 3,81
                 press(page, "-", 12)
                 press(page, "+", steps)
@@ -140,12 +141,12 @@ def test_arc_ends_on_rotations(knowledge_context, knowledge_stack, events, width
                 worst = max(worst, arc_end_error(sc))
                 visible += sum(1 for lk in sc["links"] if lk["hidden"] == "false")
                 frames += 1
-            press(page, "Shift+ArrowRight")
+            press(page, "Shift+ArrowRight", 2)
         press(page, "Shift+ArrowUp", 2)
     print(
         f"{width}×{height}: кадров {frames}, видимых дуг {visible}, худшее расхождение {worst:.3f} px"
     )
-    assert frames == 108 and visible > 0
+    assert frames == 54 and visible > 0
     geo_built(events, response)
     errors(page)
 
