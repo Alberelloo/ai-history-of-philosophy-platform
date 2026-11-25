@@ -127,6 +127,8 @@ ORDER = [
     (([1], 0), "geo_not_number"),
     ((-math.inf, 0), "geo_not_number"),
     ((0, math.inf), "geo_not_number"),
+    ((10**400, 0), "geo_not_number"),  # целое вне представимого во float
+    ((0, -(10**400)), "geo_not_number"),
     ((90.004, 0), "geo_out_of_range"),  # round(90.004, 2) = 90.0, но исходное вне пределов
     ((-90.004, 0), "geo_out_of_range"),
     ((0, 180.004), "geo_out_of_range"),
@@ -136,7 +138,7 @@ ORDER = [
 
 
 @req(GEO, COORDS, invariant="порядок проверок и коды code")
-@pytest.mark.parametrize(("value", "code"), ORDER, ids=[repr(v) for v, _ in ORDER])
+@pytest.mark.parametrize(("value", "code"), ORDER, ids=[repr(v)[:24] for v, _ in ORDER])
 def test_check_order_and_codes(onto, events, value, code):
     k = place(onto)
     with pytest.raises(StatementError) as exc:

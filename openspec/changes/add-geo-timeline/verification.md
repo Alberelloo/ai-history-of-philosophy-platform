@@ -132,7 +132,32 @@
 
 Д1 (test_click_on_scale), Д2 (test_live_region_not_chatty), Д3 (test_labels_do_not_overlap[1280-720], [1920-1080]) — проходят, дефекты закрыты. Наблюдение об устаревшей сводке «0 мест, 0 человек» — не воспроизводится (живая область пуста до первого объявления, test_geo_scene зелёный). test_playback_in_window — зелёный в прогоне файла и 3/3 отдельно.
 
+### Дополнение после ревью — код 4eb7bf0, спецификация 38bb63e (2026-11-25)
+
+Новые и дополненные тесты:
+- `test_geo_enrich.py::test_enrich_refusal_writes_one_event` ×6 («Координаты места», inv «при каждом отказе — refused»): P625 Эдинбурга (95, 0) → одно `knowledge.statement.refused` `type=coordinates`, `code=geo_out_of_range`; (10**400, 0) и (0, −10**400) → одно событие с `code=geo_not_number`, исключения нет; всё в обычном прогоне и в dry-run; одно `geo.skipped reason=refused`, `coordinates=0`, координат в базе нет.
+- `test_geo_coordinates.py::test_check_order_and_codes` + 2 значения: `lat=10**400`, `lon=-10**400` → `StatementError geo_not_number`, одно событие, записей нет.
+- `test_geo_enrich.py::test_rollback_leaves_other_run` («Откат»): два запуска (Кант, затем Юм); откат первого удаляет его 3 утверждения, 2 утверждения второго запуска остаются; `geo.rolled_back statements=3`.
+- `test_geo_layer.py::test_cache_is_bounded` (Ж8): после 100 областей с `only_textbook=true` — ещё 100 разных `textbook` без `only_textbook`; `cached=False`, областей в кэше ≤ 8 после каждого, в конце 8.
+- «Вращение и масштаб» (приближение 1 — глобус целиком в кадре): тесты проверяли только `data-zoom="1"` в исходном виде, прежнюю формулировку («места помещаются») не утверждали — правка не затронула. Новое утверждение «глобус целиком в кадре» отдельным тестом не покрыто.
+
+Прогоны (по одному файлу):
+
+    pytest tests/knowledge/test_geo_coordinates.py → 64 passed
+    pytest tests/knowledge/test_geo_enrich.py      → 37 passed
+    pytest tests/knowledge/test_geo_layer.py       → 34 passed
+
+Мутации (код восстановлен после каждой):
+
+    [19] check_value(..., emit=False) в geo_enrich           → упали 6/6 test_enrich_refusal_writes_one_event
+    [20] _finite ловит ZeroDivisionError вместо OverflowError → упали 4 enrich (10**400) + 2 test_check_order_and_codes
+    [18] вытеснение кэша × 100 (geo.py)                      → упал test_cache_is_bounded (assert 9 <= 8)
+    [21] rollback_run без всех фильтров run_id (attributions, evidence, provenance) → упал test_rollback_leaves_other_run
+    [21a] снят только один фильтр run_id (provenance или attributions) → тест проходит: эквивалентный мутант,
+          второй фильтр (утверждение с атрибуцией другого запуска не удаляется) сохраняет поведение.
+
 Не покрыто:
+- «Вращение и масштаб»: «при приближении 1 глобус целиком в кадре» — нет отдельного теста (браузерные файлы в этом шаге не менялись).
 - 7.7 e2e (`tests/e2e/test_geo_globe.py`) — написан, на машине агента не прогнан: нужен Docker или `dev_stack` с памятью больше 1 ГБ.
 - «без границ государств» у суши — визуально по снимку (сетка, суша, берег без границ видны глазами), автоматической проверки нет: суша растровая (canvas, вариант Б).
 - Время кадра 16 мс — замер разработчика (5.6), не утверждение теста.

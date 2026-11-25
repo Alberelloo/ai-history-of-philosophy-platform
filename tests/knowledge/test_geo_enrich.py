@@ -604,3 +604,73 @@ def test_existing_place_reused(onto, events, no_network):
     e = events.one(ENRICHED)
     assert (e.get("places_created"), e.get("placements"), e.get("coordinates")) == (0, 2, 1)
     assert summary["places_created"] == 0
+
+
+# --- отказ координат при обогащении (ревью: «при каждом отказе — refused») -----------------
+
+REFUSED = "knowledge.statement.refused"
+HUME_Q = "Q37160"
+EDINBURGH_Q = "Q23436"
+
+
+def hume_records(lat, lon) -> dict[str, Any]:
+    return {
+        HUME_Q: person_record(
+            HUME_Q, "Дэвид Юм", born=1711, died=1776, items={"P19": [EDINBURGH_Q]}
+        ),
+        EDINBURGH_Q: place_record(EDINBURGH_Q, "Эдинбург", lat, lon),
+    }
+
+
+@req(GEO, "Координаты места", invariant="при каждом отказе — knowledge.statement.refused")
+@pytest.mark.parametrize(
+    ("lat", "lon", "code"),
+    [
+        (95, 0, "geo_out_of_range"),
+        (10**400, 0, "geo_not_number"),
+        (0, -(10**400), "geo_not_number"),
+    ],
+    ids=["95,0", "lat=10**400", "lon=-10**400"],
+)
+@pytest.mark.parametrize("dry_run", [False, True], ids=["run", "dry-run"])
+def test_enrich_refusal_writes_one_event(onto, events, no_network, lat, lon, code, dry_run):
+    onto.person("Дэвид Юм", "1711", "1776", wikidata=HUME_Q)
+    summary = PlaceEnrichment(onto.statements, Fetch(hume_records(lat, lon))).run(dry_run=dry_run)
+    refused = events.of(REFUSED)
+    assert len(refused) == 1, refused
+    assert (refused[0].get("type"), refused[0].get("code")) == ("coordinates", code)
+    assert isinstance(refused[0].get("reason"), str) and refused[0].get("reason")
+    assert len(events.where(SKIPPED, reason="refused")) == 1
+    e = events.one(ENRICHED)
+    assert e.get("dry_run") is dry_run
+    assert e.get("coordinates") == 0 and summary["coordinates"] == 0
+    assert rows_of(onto, "coordinates") == []
+
+
+@req(GEO, WD, scenario="Откат")
+def test_rollback_leaves_other_run(onto, events, no_network):
+    onto.person("Иммануил Кант", "1724", "1804", wikidata=KANT_Q)
+    first = PlaceEnrichment(onto.statements, Fetch(kant_records())).run()
+    onto.person("Дэвид Юм", "1711", "1776", wikidata=HUME_Q)
+    second_enrichment = PlaceEnrichment(
+        onto.statements, Fetch({**kant_records(), **hume_records(55.95, -3.19)})
+    )
+    second = second_enrichment.run()
+    assert first["run_id"] != second["run_id"]
+
+    def by_run(run_id):
+        return sorted(
+            s["id"]
+            for s in rows_of(onto, "lived_in") + rows_of(onto, "coordinates")
+            if s["provenance"].get("run_id") == run_id
+        )
+
+    first_ids, second_ids = by_run(first["run_id"]), by_run(second["run_id"])
+    assert len(first_ids) == 3 and len(second_ids) == 2
+    events.clear()
+    result = second_enrichment.rollback(first["run_id"])
+    assert by_run(first["run_id"]) == []
+    assert by_run(second["run_id"]) == second_ids
+    e = events.one(ROLLED)
+    assert (e.get("run_id"), e.get("statements")) == (first["run_id"], 3)
+    assert result["statements"] == 3

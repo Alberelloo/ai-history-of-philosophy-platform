@@ -249,6 +249,12 @@ def test_cache_is_bounded(onto, clock, events, no_network):
         assert e.get("cached") is False
         assert svc.layer.cached_scopes() <= 8
     assert svc.layer.cached_scopes() == 8
+    # Ж8 ревьювера: предел держится и для 100 разных ``textbook`` без ``only_textbook``.
+    for i in range(100):
+        _body, rid = svc.get("/v1/map/places", textbook=f"s_other_{i}")
+        assert built(events, rid).get("cached") is False
+        assert svc.layer.cached_scopes() <= 8
+    assert svc.layer.cached_scopes() == 8
 
 
 # --- нормативные ------------------------------------------------------------------------
