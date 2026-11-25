@@ -181,6 +181,37 @@ def test_show_more(knowledge_context, knowledge_stack, events):
     no_page_errors(page)
 
 
+@pytest.mark.parametrize("knowledge_stack", [{"max_stale": 0}], indirect=True)
+@req(EC, PAGE, scenario="Показать ещё")
+def test_show_more_after_snapshot_change(knowledge_context, knowledge_stack, events):
+    """Между страницами в начало списка добавилась запись: дозагрузка идёт дальше по
+    страницам, без повторов, и кнопка исчезает, когда загружено всё."""
+    for i in range(50):
+        knowledge_stack.world.thing("concept", f"Понятие {i:02d}")
+    page = open_page(knowledge_context, knowledge_stack)
+    loaded(page)
+    expect(page.locator(ITEMS)).to_have_count(24)
+    knowledge_stack.world.thing("concept", "Аарон понятие")  # по названию — первым
+    more = page.get_by_role("button", name=re.compile("^Показать ещё"))
+    with catalog_response(page, lambda q: q.get("page") == ["2"]) as second:
+        more.click()
+    expect(page.locator(ITEMS)).to_have_count(47)  # старая 24-я пришла повтором и убрана
+    event = event_of(events, second.value)
+    assert (event["page"], event["returned"], event["total"]) == (2, 24, 51)
+    assert event["snapshot"] == "fresh"
+    expect(more).to_be_visible()
+    with catalog_response(page, lambda q: q.get("page") == ["3"]) as third:
+        more.click()
+    expect(page.locator(ITEMS)).to_have_count(50)
+    shown = names(page)
+    assert len(set(shown)) == 50
+    assert shown == [f"Понятие {i:02d}" for i in range(50)]
+    event = event_of(events, third.value)
+    assert (event["page"], event["returned"], event["total"]) == (3, 3, 51)
+    expect(page.get_by_role("button", name=re.compile("^Показать ещё"))).to_have_count(0)
+    no_page_errors(page)
+
+
 @req(EC, PAGE, scenario="Задержка ввода")
 def test_input_debounce(knowledge_context, knowledge_stack, events):
     knowledge_stack.world.base()

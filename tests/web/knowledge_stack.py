@@ -115,7 +115,8 @@ class KnowledgeStack:
         self._thread.join(5)
 
 
-def start(tmp: Path, dist: Path) -> KnowledgeStack:
+def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
+    """``max_stale`` — окно устарелости справочника (0 — изменения базы видны сразу)."""
     # --- библиотека: два учебника ---
     lib_engine = make_engine(
         f"sqlite:///{(tmp / 'library.db').as_posix()}",
@@ -186,7 +187,7 @@ def start(tmp: Path, dist: Path) -> KnowledgeStack:
         mentions=mentions,
         cards=Cards(statements, mentions, llm_client),
         section_map=SectionMap(statements, snapshots=snapshots),
-        catalog=Catalog(snapshots, onto, entities, CatalogSettings()),
+        catalog=Catalog(snapshots, onto, entities, CatalogSettings(max_stale_seconds=max_stale)),
     )
     world = World(entities, statements)
     for key, source_id in textbooks.items():

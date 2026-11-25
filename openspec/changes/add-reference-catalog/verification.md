@@ -203,3 +203,32 @@
 - Визуальные снимки win32.
 - Полный `pytest -q` и `tests/web` целиком: прогнаны только `test_reference.py` и два теста навигации.
 - Это остаётся за CI и Lead.
+
+### Повторный прогон после исправлений — 2026-11-25, код 24b4147 (Д1 — f1812e7, ревью 1 — 24b4147)
+
+Мои прежние тесты не менялись. Добавлен один сценарный тест по замечанию ревью (смена снимка между страницами):
+
+| Требование | Сценарий | Тест | DOM | Журнал |
+|---|---|---|---|---|
+| Страница справочника | Показать ещё | tests/web/test_reference.py::test_show_more_after_snapshot_change (стенд с `max_stale=0`) | 50 понятий → 24; в базу добавлено «Аарон понятие» (по названию первое); щелчок → 47 записей (старая 24-я пришла повтором и убрана), кнопка видна; щелчок → 50 разных записей «Понятие 00…49», кнопки нет | listed page=2 returned=24 total=51 snapshot=fresh; затем listed page=3 returned=3 total=51 |
+
+Для этого теста стенд `knowledge_stack` получил параметр `max_stale` (косвенная параметризация), по умолчанию 15.
+
+Команды и итоги:
+
+    cd tests/knowledge && pytest -q test_catalog.py test_epochs_membership.py test_catalog_unit.py test_catalog_route.py test_snapshot.py test_epochs_unit.py test_dates_span.py test_map_snapshot_parity.py test_reference_groups.py test_map.py test_map_view.py
+        →  262 passed in 191.98s   (test_ties_broken_by_id[date-*|weight-*] теперь зелёные — Д1 исправлен)
+    pytest -q tests/gateway/test_reference_limits.py tests/web/test_reference.py tests/web/test_reference_paging.py tests/web/test_map.py::test_soon_graph_bookmark_leads_to_map tests/web/test_assistant_page.py::test_t43_nav_item_current_without_soon
+        →  42 passed in 83.12s
+    python scripts/check_traceability.py  →  Требований с тестами: 369 из 369
+    ruff check tests                      →  All checks passed!
+    lint-imports                          →  Contracts: 3 kept, 0 broken.
+
+Мутация:
+
+    ReferencePage.tsx: onClick → load(Math.floor(items.length / paging.limit) + 1 + 0 * nextPage(paging)), npm run build
+        →  1 failed: test_show_more_after_snapshot_change (ждали ответ page=3, ушёл повторный page=2: Page.expect_response Timeout)
+    код возвращён `git checkout`, `git diff -- src web/src` пуст, web/dist пересобран.
+    Первая попытка без `0 * nextPage(...)` не собралась (TS6133, неиспользуемый импорт): dist не изменился, тест прошёл. Эта попытка не засчитана.
+
+Не прогонялось: e2e (в том числе обновлённый тест навигации tests/e2e/test_visual_design.py), визуальные снимки win32, полный pytest.

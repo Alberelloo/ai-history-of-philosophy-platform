@@ -181,7 +181,7 @@ def page(browser, site):
 
 
 @pytest.fixture
-def knowledge_stack(tmp_path, events):
+def knowledge_stack(request, tmp_path, events):
     """Шлюз, библиотека и сервис знаний этого теста; данные — через ``stack.world``.
 
     Зависит от ``events``: журнал теста настроен до запуска сервера, события сервисов из его
@@ -191,7 +191,8 @@ def knowledge_stack(tmp_path, events):
         pytest.skip("клиент не собран: npm run build в web/")
     from .knowledge_stack import start
 
-    stack = start(tmp_path, DIST)
+    # Параметры стенда — косвенной параметризацией: {"max_stale": 0} и т. п.
+    stack = start(tmp_path, DIST, **getattr(request, "param", {}))
     yield stack
     stack.stop()
     assert stack.router.unexpected == [], f"запросы шлюза наружу: {stack.router.unexpected}"
