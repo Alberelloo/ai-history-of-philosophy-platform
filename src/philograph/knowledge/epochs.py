@@ -29,9 +29,9 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Literal
 
 from philograph.knowledge.dates import middle, span
+from philograph.knowledge.graph import wikidata_qid
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.snapshot import Snapshot
-from philograph.knowledge.wikidata import QID
 from philograph.platform import events
 
 if TYPE_CHECKING:  # справочник импортирует этот модуль; здесь — только для типов
@@ -42,7 +42,6 @@ BELONGS = "belongs_to_epoch"
 EPOCH = "epoch"
 # Типы, которые относятся к эпохе по датам (с подтипами по реестру).
 DATED_TYPES = ["person", "work", "event", "phenomenon"]
-WIKIDATA_PREFIX = "wikidata:"  # источник атрибуции импорта из Wikidata
 
 
 class EpochMembership:
@@ -155,14 +154,7 @@ def dating_source(statement: dict[str, Any] | None) -> dict[str, Any]:
     if statement is None:
         return {"status": None, "source": "manual", "wikidata": None}
     shown = [a for a in statement["attributions"] if not a["hidden"]]
-    qid = None
-    for a in shown:
-        who = a["who"] or ""
-        if a["who_kind"] == "source" and who.startswith(WIKIDATA_PREFIX):
-            candidate = who[len(WIKIDATA_PREFIX) :]
-            if QID.fullmatch(candidate):
-                qid = candidate
-                break
+    qid = next((q for a in shown if (q := wikidata_qid(a))), None)
     if qid is not None:
         source = "wikidata"
     elif any(a["who_kind"] in ("source", "entity") for a in shown) or any(

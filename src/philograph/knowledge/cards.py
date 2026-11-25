@@ -12,7 +12,12 @@ import json
 from collections.abc import Iterator
 from typing import Any
 
-from philograph.knowledge.graph import attribution_label, hidden_by_region, recipes_for
+from philograph.knowledge.graph import (
+    attribution_label,
+    attribution_link,
+    hidden_by_region,
+    recipes_for,
+)
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.statements import Attribution, Provenance, Statements
@@ -139,6 +144,8 @@ class Cards:
                     "who": attribution_label(self.statements, a),
                     "kind": a["who_kind"],
                     "stance": a["stance"],
+                    # Ссылка — только у Wikidata и только из проверенного QID.
+                    **({"link": link} if (link := attribution_link(a)) else {}),
                 }
                 for a in visible
             ],

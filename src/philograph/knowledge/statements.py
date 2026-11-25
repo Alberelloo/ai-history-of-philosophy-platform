@@ -16,7 +16,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-from sqlalchemy import Engine, and_, delete, or_, select, update
+from sqlalchemy import Engine, and_, delete, func, or_, select, update
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate
@@ -375,6 +375,8 @@ class Statements:
         events.emit(
             "knowledge.statement.status", statement_id=statement_id, old=old, new=new, reason=reason
         )
+        s = self.get(statement_id)
+        self._update_primary(s["subject"], s["type"])  # отклонённое — уже не действующее
 
     def _journal(self, statement_id: str, actor: str, change: dict[str, Any]) -> None:
         with self.engine.begin() as conn:
@@ -426,7 +428,10 @@ class Statements:
         return warnings
 
     def _update_primary(self, entity_id: str, type_: str) -> None:
-        """Копия основного значения у сущности: годы жизни, датировка, описание."""
+        """Копия основного значения у сущности: годы жизни, датировка, описание.
+
+        Основное — предпочтённое, иначе первое записанное из действующих (не отклонённых и не
+        «устаревших»); пересчитывается при записи, смене ранга и смене статуса."""
         key = {"lifespan": "dates", "dating": "dates", "description": "description"}.get(type_)
         if key is None:
             return
@@ -435,9 +440,11 @@ class Statements:
             for s in self._raw(entity_id, side="subject")
             if s["type"] == type_ and s["status"] != "rejected" and s["rank"] != "deprecated"
         ]
-        if rows:
-            best = sorted(rows, key=lambda s: s["rank"] != "preferred")[0]
-            self.entities.set_primary(entity_id, key, best["value"])
+        # Действующих не осталось — копии основного значения больше нет.
+        current = self.entities.get(entity_id)["primary"].get(key)
+        best = sorted(rows, key=lambda s: s["rank"] != "preferred")[0]["value"] if rows else None
+        if best != current:
+            self.entities.set_primary(entity_id, key, best)
 
     # --- согласие, ранг, решения ---
 
@@ -533,8 +540,21 @@ class Statements:
             "object": t.statements.c.object == entity_id,
             "both": or_(t.statements.c.subject == entity_id, t.statements.c.object == entity_id),
         }[side]
+        # Порядок записи — по первой записи журнала (``add`` пишет её при создании); от него
+        # зависит «первое записанное» основное значение, поэтому порядок задаётся явно.
+        first = (
+            select(t.journal.c.statement_id, func.min(t.journal.c.id).label("first"))
+            .group_by(t.journal.c.statement_id)
+            .subquery()
+        )
+        query = (
+            select(t.statements.c.id)
+            .outerjoin(first, first.c.statement_id == t.statements.c.id)
+            .where(cond)
+            .order_by(func.coalesce(first.c.first, 2**31 - 1), t.statements.c.id)
+        )
         with self.engine.begin() as conn:
-            ids = list(conn.scalars(select(t.statements.c.id).where(cond)))
+            ids = list(conn.scalars(query))
         return [self.get(i) for i in ids]
 
     def about(
