@@ -198,7 +198,14 @@ def plan(
         qids = {by_id[x].qid for x in members if by_id[x].qid}
         kinds = {v.reason for v in inner.values()}
         if len(qids) >= 2 or kinds & {"apart:qid", "apart:decided", "review:dates"}:
-            reason = "review:dates" if "review:dates" in kinds else "review:qid_cluster"
+            if len(qids) >= 2 or "apart:qid" in kinds:
+                reason = "review:qid_cluster"
+            elif "review:dates" in kinds:
+                reason = "review:dates"
+            else:
+                # Единственная преграда — решение «разные» по другой паре компоненты: сама
+                # решённая пара в очередь не идёт, нерешённые рёбра — с собственной причиной.
+                reason = "review:decided_conflict"
             for p, v in inner.items():
                 if v.kind == "merge" and p not in decided:
                     review[p] = reason

@@ -102,7 +102,7 @@ class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, st
 |---|---|---|---|
 | `knowledge.entity.merged` (есть, поля расширены) | info | `kept`, `removed`; новые — `reason` (`merge:qid_confirmed`, `merge:name`, `merge:model_pair`, `merge:review`; единый перечень с префиксом, О11), `statements` (перенесено), `attributions` (перенесено `who` + атрибуций свёрнутых), `folded` (свёрнуто утверждений) | слияние |
 | `knowledge.entity.merge_undone` (есть) | info | `kept`, `removed`; новые — `restored` (восстановлено свёрнутых) | отмена |
-| `knowledge.entity.merge_proposed` (новое) | info | `kept`, `removed`, `reason` (`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:qid_candidate`, `review:qid_taken`) | пара в очередь проверки |
+| `knowledge.entity.merge_proposed` (новое) | info | `kept`, `removed`, `reason` (`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:decided_conflict`, `review:qid_candidate`, `review:qid_taken`) | пара в очередь проверки |
 | `knowledge.entity.rejected` (из `improve-extraction-naming`) | warning | `type`, `label`, `reason` | мусорная персона |
 
 Новые поля `knowledge.entity.merged` добавляются в `optional`, `required` прежний: старые вызовы `Entities.merge` событие не ломают.

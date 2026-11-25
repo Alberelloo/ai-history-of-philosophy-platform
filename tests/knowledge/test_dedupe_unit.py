@@ -99,7 +99,15 @@ def test_decided_pair_blocks_transitive_merge():
     ents = [person("e1", "Бэкон"), person("e2", "Бэкон"), person("e3", "Бэкон")]
     result = plan(ents, distinct=[("e1", "e2")])
     assert result.merges == []
-    assert ("e1", "e2") not in {(a, b) for a, b, _ in result.review}
+    assert result.review == [
+        ("e1", "e3", "review:decided_conflict"),
+        ("e2", "e3", "review:decided_conflict"),
+    ]
+
+
+def test_decided_pair_alone_no_merge_no_queue():
+    result = plan([person("e1", "Бэкон"), person("e2", "Бэкон")], distinct=[("e2", "e1")])
+    assert (result.merges, result.review) == ([], [])
 
 
 def test_dedupe_run_merges_and_proposes(onto, events):

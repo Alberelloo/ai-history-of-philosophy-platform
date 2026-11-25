@@ -62,7 +62,7 @@
 9. иначе → `apart:none`.
 
 **Компоненты.** При обходе многих персон строится граф: ребро — пара с вердиктом `merge:*`. Для каждой связной компоненты:
-- если в ней два и больше разных QID или у какой-либо её пары вердикт `apart:qid`, `apart:decided` или `review:dates`, то ни одно слияние в компоненте MUST NOT выполняться. Каждое её ребро уходит в очередь проверки `duplicate` с `reason="review:qid_cluster"` или `"review:dates"`, кроме пар с решением «разные»;
+- если в ней два и больше разных QID или у какой-либо её пары вердикт `apart:qid`, `apart:decided` или `review:dates`, то ни одно слияние в компоненте MUST NOT выполняться. Её рёбра `merge:*` уходят в очередь проверки `duplicate` с причиной: `review:qid_cluster` — при двух QID или `apart:qid`; иначе `review:dates` — при противоречащих датах; иначе `review:decided_conflict` — единственная преграда в решении «разные» по другой паре компоненты. Пара с решением «разные» в очередь MUST NOT ставиться: решение уже принято. Пара, у которой нет других рёбер, кроме решённой, не сливается и в очередь не идёт;
 - иначе вся компонента сливается в одну сущность. Пара с вердиктом `review:*`, обе стороны которой оказались в одной сливаемой компоненте, в очередь не ставится.
 
 Пара, по которой человек уже закрыл пункт `duplicate` решением «разные», повторно в очередь MUST NOT ставиться.
@@ -76,7 +76,7 @@
 
 **Журнал.** Поле `reason` событий слияния — единый перечень с префиксом, тот же, что вердикт правила (О11); значений без префикса нет ни в одном событии.
 - Слияние пишет `knowledge.entity.merged` с `reason` ∈ {`merge:qid_confirmed`, `merge:name`, `merge:model_pair`, `merge:review`}. `merge:review` — человек закрыл пункт очереди решением «слить».
-- Пара в очереди пишет `knowledge.entity.merge_proposed` с полями `kept`, `removed`, `reason` ∈ {`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:qid_candidate`, `review:qid_taken`}. Две последние причины ставит команда QID (`entity-dating`, «Подтверждение QID персон и произведений»).
+- Пара в очереди пишет `knowledge.entity.merge_proposed` с полями `kept`, `removed`, `reason` ∈ {`review:dates`, `review:variant`, `review:single_name`, `review:qid_cluster`, `review:decided_conflict`, `review:qid_candidate`, `review:qid_taken`}. Две последние причины ставит команда QID (`entity-dating`, «Подтверждение QID персон и произведений»).
 
 **Транслитерации** без общего написания («Гомер»/«Омир», «Горгий»/«Горгиас») SHALL сливаться через решение человека в манифесте QID. Человек подтверждает (`accepted`) для одной персоны QID, который уже стоит у другой. Это доказательство `merge:qid_confirmed`. Пока решения нет, пара SHALL стоять в очереди `duplicate`.
 
@@ -120,6 +120,13 @@
 - **WHEN** запущены `suggest` и слияние вариантов
 - **THEN** обе сущности остаются; в очереди проверки пункт `duplicate` с парой «Гомер»/«Омир»
 - **AND** в журнале `knowledge.entity.merge_proposed` с `reason="review:qid_candidate"` и нет `knowledge.entity.merged`
+
+#### Scenario: Решение «разные» и третья запись
+
+- **GIVEN** три персоны «Бэкон» без QID и дат; пункт `duplicate` по паре первой и второй закрыт решением «разные»
+- **WHEN** запускается слияние вариантов
+- **THEN** слияний нет; в очереди два пункта `duplicate` — пары третьей с первой и со второй; пары первой и второй в очереди нет
+- **AND** в журнале два `knowledge.entity.merge_proposed` с `reason="review:decided_conflict"` и нет `knowledge.entity.merged`
 
 #### Scenario: Тёзки
 
