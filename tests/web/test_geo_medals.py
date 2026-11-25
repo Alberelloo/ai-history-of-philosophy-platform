@@ -414,7 +414,9 @@ def test_medal_limit_layout_budget(knowledge_context, knowledge_stack, events, t
     page.evaluate(LAYOUT_WATCH_JS)
     focus_globe(page)
     counts = []
-    for key in ("ArrowRight", "ArrowDown", "PageUp"):
+    # Смена года (PageUp) на этих данных сцену не меняет (у всех одни годы), и полная
+    # раскладка даёт тот же DOM — снаружи её не увидеть; поэтому три поворота.
+    for key in ("ArrowRight", "ArrowDown", "ArrowLeft"):
         page.evaluate("() => { window.__layoutTicks = new Set(); }")
         before = (globe(page).get_attribute("data-center"), globe(page).get_attribute("data-year"))
         page.keyboard.press(key)
