@@ -524,6 +524,7 @@ export const ru = {
     reset: "Сбросить",
     facets: {
       time: "Время",
+      epoch: "Эпоха",
       direction: "Направление",
       school: "Школа",
       role: "Роль",

@@ -510,6 +510,7 @@ export const en: Catalog = {
     reset: "Reset",
     facets: {
       time: "Time",
+      epoch: "Epoch",
       direction: "Movement",
       school: "School",
       role: "Role",
