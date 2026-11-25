@@ -10,7 +10,7 @@
 // точка привязки и кольца k = 1…RINGS по 6k позиций на расстоянии k·STEP, от верхней по
 // часовой стрелке.
 
-import { geoContains, type GeoPath, type GeoProjection } from "d3-geo";
+import { geoCentroid, geoContains, geoDistance, type GeoPath, type GeoProjection } from "d3-geo";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import { MAX_PERSONS } from "./timeline";
 
@@ -346,6 +346,23 @@ export function markerOf(l: Layout, index: Map<string, PersonSlot>, id: string):
 export type CountryInput = { id: string; name: string; feature: Feature<Polygon | MultiPolygon> };
 export type CountryLabel = { id: string; text: string; x: number; y: number; area: number; span: number; rect: Rect };
 
+// Геометрия страны для отсева (один раз на страну): многоугольники, сферический центр и
+// угловой радиус (наибольшее расстояние от центра до вершины).
+type CountryGeo = { polys: Polygon[]; center: [number, number]; radius: number };
+const geoCache = new WeakMap<object, CountryGeo>();
+function geoOf(c: CountryInput): CountryGeo {
+  let g = geoCache.get(c.feature);
+  if (!g) {
+    const polys: Polygon[] =
+      c.feature.geometry.type === "Polygon" ? [c.feature.geometry] : c.feature.geometry.coordinates.map((coordinates) => ({ type: "Polygon", coordinates }));
+    const center = geoCentroid(c.feature) as [number, number];
+    let radius = 0;
+    for (const p of polys) for (const ring of p.coordinates) for (const v of ring) radius = Math.max(radius, geoDistance(center, v as [number, number]));
+    geoCache.set(c.feature, (g = { polys, center, radius }));
+  }
+  return g;
+}
+
 // Подписи стран: кандидаты по видимой площади (path — проекция с обрезкой по полушарию и
 // кадру), точка — центр крупнейшего видимого многоугольника, если он внутри страны; ширина
 // подписи не больше видимой части; без пересечений с уже положенным (grid); не больше
@@ -361,24 +378,33 @@ export function layoutCountries(
 ): CountryLabel[] {
   type Cand = { c: CountryInput; area: number; span: number; x: number; y: number };
   const cands: Cand[] = [];
+  const rot = projection.rotate();
+  const center: [number, number] = [-rot[0], -rot[1]];
+  const scale = projection.scale();
   for (const c of countries) {
+    // Отсев без обрезки путей: страна целиком за полушарием или далеко за кадром.
+    const g = geoOf(c);
+    const dist = geoDistance(g.center, center);
+    if (dist - g.radius > Math.PI / 2) continue;
+    if (dist + g.radius < Math.PI / 2) {
+      const xy = projection(g.center);
+      const reach = 2 * Math.sin(Math.min(g.radius, Math.PI) / 2) * scale; // хорда: проекция не дальше
+      if (xy && (xy[0] < -reach || xy[1] < -reach || xy[0] > f.w + reach || xy[1] > f.h + reach)) continue;
+    }
     const area = path.area(c.feature);
     if (!(area >= COUNTRY_MIN_AREA)) continue;
-    const [[x0], [x1]] = path.bounds(c.feature);
-    const polys: Polygon[] =
-      c.feature.geometry.type === "Polygon"
-        ? [c.feature.geometry]
-        : c.feature.geometry.coordinates.map((coordinates) => ({ type: "Polygon", coordinates }));
-    let best: Polygon | null = null;
+    let best: Polygon | null = g.polys.length === 1 ? g.polys[0] : null;
     let bestA = 0;
-    for (const p of polys) {
-      const a = path.area(p);
-      if (a > bestA) {
-        bestA = a;
-        best = p;
+    if (!best)
+      for (const p of g.polys) {
+        const a = path.area(p);
+        if (a > bestA) {
+          bestA = a;
+          best = p;
+        }
       }
-    }
     if (!best) continue;
+    const [[x0], [x1]] = path.bounds(c.feature);
     const [x, y] = path.centroid(best);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
     const ll = projection.invert?.([x, y]);

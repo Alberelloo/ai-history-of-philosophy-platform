@@ -5,8 +5,9 @@ import type { MapData } from "../types";
 import type { GeoPlace } from "./api";
 import type { Scene, ScenePlace } from "./timeline";
 
-// Панель карты в виде «Глобус» (geo-timeline): текстовая альтернатива глобусу — «Места в
-// <год> году», «N без места», пределы; «Выбрано» для отметки места; легенда глобуса. В
+// Панель карты в виде «Глобус» (geo-timeline, rework-globe-political-map): текстовая
+// альтернатива глобусу — «Места в <год> году» («город, страна»), «N без места», пределы;
+// «Выбрано» для места; блок «Где в <год> году» для персоны и события; легенда глобуса. В
 // основном бандле, без d3: глобус (ленивый фрагмент) и список живут раздельно. Названия —
 // текстовые узлы React, разметка из данных не вставляется.
 
@@ -18,7 +19,13 @@ export type GeoPanel = {
   place: GeoPlace | null; // выбранное место
   noPlace: boolean; // выбранная сущность без места на глобусе
   onPlace: (id: string) => void; // выбор места в списке: выбор и центр вида
+  country: ((placeId: string) => string | null) | null; // страна места (ленивый модуль countries.ts)
+  where: GeoWhereData | null; // выбранная персона или событие: где в год T
+  maxPersons: number; // предел медальонов в DOM (layout.ts)
 };
+
+export type GeoRole = "birth" | "death" | "activity" | "residence" | "none" | "event";
+export type GeoWhereData = { year: number; place: string; country: string | null; role: GeoRole; from: number; to: number; after: boolean };
 
 const label = (data: MapData, id: string) => find(data, id)?.obj.label ?? id;
 const MIN_ROWS = 72; // px: меньше — панель складывает разделы (MapPanel, useFit)
@@ -65,6 +72,11 @@ export function GeoList({
           {t.geo.placesShown(scene.places.length, scene.totalPlaces)}
         </p>
       )}
+      {scene && scene.persons.length > geo.maxPersons && (
+        <p className="geo-list__limit" data-geo-limit="people">
+          {t.geo.peopleShown(geo.maxPersons, scene.persons.length)}
+        </p>
+      )}
       {scene && scene.totalLinks > scene.links.length && (
         <p className="geo-list__limit" data-geo-limit="links">
           {t.geo.linksShown(scene.links.length, scene.totalLinks)}
@@ -80,7 +92,7 @@ export function GeoList({
                 aria-pressed={sel === p.id}
                 onClick={() => geo.onPlace(p.id)}
               >
-                <span className="geo-row__name">{p.label}</span>
+                <span className="geo-row__name">{t.geo.placeWithCountry(p.label, geo.country?.(p.id) ?? null)}</span>
                 {p.people.length > 0 && <span className="geo-row__count">{t.geo.people(p.people.length)}</span>}
               </button>
               {p.unverified && <span className="geo-row__unverified">{t.geo.unverified}</span>}
@@ -117,12 +129,14 @@ export function GeoList({
 export function GeoPlaceSelected({
   data,
   place,
+  country,
   here,
   year,
   onSelect,
 }: {
   data: MapData;
   place: GeoPlace;
+  country: string | null;
   here: ScenePlace | null;
   year: number;
   onSelect: (id: string) => void;
@@ -134,7 +148,7 @@ export function GeoPlaceSelected({
       <h2 className="map-panel__h">
         {t.map.selected} · {t.geo.placeKicker}
       </h2>
-      <div className="map-selected__name">{t.geo.placeTitle(place.label, year)}</div>
+      <div className="map-selected__name">{t.geo.placeTitle(t.geo.placeWithCountry(place.label, country), year)}</div>
       {who.length ? (
         <div className="geo-selected__who">
           {who.map((id) => (
@@ -150,6 +164,23 @@ export function GeoPlaceSelected({
   );
 }
 
+// «Где в <год> году» для выбранной персоны или события: город, страна, роль, годы в месте.
+export function GeoWhere({ where }: { where: GeoWhereData }) {
+  const t = useT();
+  return (
+    <div className="geo-where" data-geo-where="">
+      <h3 className="geo-where__h">{t.geo.whereIn(where.year)}</h3>
+      <p className="geo-where__place">
+        <span data-geo-where-place="">{where.place}</span>, <span data-geo-where-country="">{where.country ?? t.geo.noCountry}</span>
+      </p>
+      <p className="geo-where__meta">
+        <span data-geo-where-role="">{t.geo.roles[where.role]}</span> · <span data-geo-where-years="">{t.geo.years(where.from, where.to)}</span>
+        {where.after && <span className="geo-where__after"> · {t.geo.afterDeath}</span>}
+      </p>
+    </div>
+  );
+}
+
 // Легенда глобуса: отметка с числом людей, полое кольцо, дуга со стрелкой, пунктир, путь
 // выбранного; правило года связи и бледнения; источник береговой линии.
 export function GlobeLegend() {
@@ -160,9 +191,21 @@ export function GlobeLegend() {
       <div className="map-legend geo-legend">
         <span>
           <svg viewBox="0 0 16 16" aria-hidden="true">
-            <circle className="geo-legend__dot" cx="8" cy="8" r="6" />
+            <circle className="geo-legend__medal" cx="8" cy="8" r="6.5" />
           </svg>
           {L.place}
+        </span>
+        <span>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <circle className="geo-legend__more" cx="8" cy="8" r="6.5" />
+          </svg>
+          {L.more}
+        </span>
+        <span>
+          <svg viewBox="0 0 34 12" aria-hidden="true">
+            <path className="geo-legend__border" d="M2 6 L32 6" />
+          </svg>
+          {L.border}
         </span>
         <span>
           <svg viewBox="0 0 16 16" aria-hidden="true">

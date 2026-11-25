@@ -23,8 +23,9 @@
   overflow: hidden;
 }
 
-/* Основа — тень, море, сетка 15° точками, суша и берег — на canvas под SVG (GlobeView):
-   цвета — токены globe-*, прочитанные из CSS. Поверх — SVG: объём, дуги, отметки, обод. */
+/* Основа — тень, море, сетка 15° точками, суша, границы и берег — на canvas под SVG
+   (GlobeView): цвета — токены globe-*, прочитанные из CSS. Поверх — SVG: объём, подписи
+   стран, дуги, выноски, медальоны, значки, подписи персон, обод. */
 .geo-land {
   position: absolute;
   top: 0;
@@ -143,83 +144,155 @@
   stroke-linecap: round;
 }
 
-/* ---------- отметки мест ---------- */
-.geo-place {
+/* ---------- медальоны персон, значки «+N» и событий ---------- */
+/* Медальон — круг с ободком тушью, как медальоны хронологии; портрет — изображение в
+   круге, без портрета — инициал. Непроверенное место — пунктирное кольцо (не только цвет). */
+.geo-medal,
+.geo-more,
+.geo-event {
   cursor: pointer;
 }
 
-.geo-place[data-hidden="true"] {
-  visibility: hidden;
-}
-
-.geo-place__hit {
-  fill: transparent;
-}
-
-.geo-place__dot {
-  fill: var(--role, var(--globe-coast));
-  fill-opacity: 0.9;
-  stroke: var(--globe-land);
-  stroke-width: 1.2;
-}
-
-/* Все размещения достроены моделью — полое кольцо (не только цвет). */
-.geo-place.is-unverified .geo-place__dot {
+.geo-medal__disc {
   fill: var(--globe-land);
-  fill-opacity: 1;
+}
+
+.geo-medal__ring {
+  fill: none;
   stroke: var(--role, var(--globe-coast));
-  stroke-width: 1.8;
-  stroke-dasharray: 2.4 1.6;
+  stroke-width: 1.4;
 }
 
-/* Только события — кольцо. */
-.geo-place.is-event .geo-place__dot {
-  fill: var(--globe-land);
-  stroke: var(--role, var(--globe-coast));
-  stroke-width: 1.6;
+.geo-medal.is-on .geo-medal__ring {
+  stroke-width: 2.4;
 }
 
-.geo-place.is-on .geo-place__dot {
-  stroke-width: 2;
+.geo-medal.is-unverified .geo-medal__ring {
+  stroke-dasharray: 3 2;
 }
 
-.geo-place[data-dim="true"] .geo-place__dot {
-  fill-opacity: 0.3;
-  stroke-opacity: 0.45;
-}
-
-.geo-place__count {
-  fill: var(--globe-land);
-  font: 700 0.5625rem var(--font-ui);
+.geo-medal__mono {
+  fill: var(--m-ink);
+  font: 600 0.6875rem var(--font-read);
   text-anchor: middle;
   pointer-events: none;
 }
 
-.geo-place.is-unverified .geo-place__count,
-.geo-place.is-event .geo-place__count {
-  fill: var(--role, var(--globe-coast));
+/* Приглушение — по дочерним элементам: непрозрачность группы задаёт бледнение (data-age). */
+.geo-medal[data-dim="true"] > * {
+  opacity: 0.45;
 }
 
-/* ---------- подписи ---------- */
-.geo-labels {
+.geo-more__disc {
+  fill: var(--globe-coast);
+  stroke: var(--globe-land);
+  stroke-width: 1.4;
+}
+
+.geo-more__count {
+  fill: var(--globe-land);
+  font: 700 0.625rem var(--font-ui);
+  text-anchor: middle;
   pointer-events: none;
 }
 
-.geo-label {
+.geo-event__mark {
+  fill: var(--globe-land);
+  stroke: var(--role, var(--globe-coast));
+  stroke-width: 1.4;
+}
+
+.geo-event.is-unverified .geo-event__mark {
+  stroke-dasharray: 2 1.5;
+}
+
+.geo-event[data-dim="true"] > * {
+  opacity: 0.45;
+}
+
+/* Выноска от сдвинутого маркера к месту и точка привязки места. */
+.geo-leaders {
+  pointer-events: none;
+}
+
+.geo-leader {
+  stroke: var(--globe-coast);
+  stroke-width: 0.7;
+  stroke-opacity: 0.6;
+}
+
+.geo-anchor {
+  fill: var(--globe-coast);
+}
+
+/* ---------- подписи персон и стран ---------- */
+.geo-name {
   fill: var(--m-ink);
   paint-order: stroke;
   stroke: var(--globe-land);
   stroke-width: 3.2;
   stroke-linejoin: round;
+  cursor: pointer;
 }
 
-.geo-label.is-on {
+.geo-name.is-on {
   fill: var(--role, var(--sel-self));
   font-weight: 600;
 }
 
-.geo-label.is-dim {
+.geo-name.is-dim {
   fill: var(--m-ink-2);
+}
+
+.geo-countries {
+  pointer-events: none;
+}
+
+.geo-country {
+  fill: var(--globe-country);
+  paint-order: stroke;
+  stroke: var(--globe-land);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+}
+
+/* Подсказка у указателя: «<имя> — <город>, <страна>». */
+.geo-tip {
+  position: absolute;
+  max-width: 18rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--m-rule-soft);
+  border-radius: 4px;
+  background: var(--m-paper);
+  color: var(--m-ink);
+  font: 400 0.75rem var(--font-ui);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---------- «Где в <год> году» в «Выбрано» ---------- */
+.geo-where {
+  margin: 0.5rem 0;
+}
+
+.geo-where__h {
+  margin: 0 0 0.125rem;
+  color: var(--m-ink-2);
+  font: 600 0.6875rem var(--font-ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.geo-where__place {
+  margin: 0;
+  color: var(--m-ink);
+  font: 600 0.875rem var(--font-read);
+}
+
+.geo-where__meta {
+  margin: 0;
+  color: var(--m-ink-2);
+  font-size: 0.75rem;
 }
 
 /* ---------- подписи сцены и состояния ---------- */
@@ -442,9 +515,21 @@
 }
 
 /* ---------- легенда глобуса ---------- */
-.geo-legend__dot {
+.geo-legend__medal {
+  fill: var(--globe-land);
+  stroke: var(--globe-coast);
+  stroke-width: 1.4;
+}
+
+.geo-legend__more {
   fill: var(--globe-coast);
   stroke: var(--globe-land);
+  stroke-width: 1;
+}
+
+.geo-legend__border {
+  fill: none;
+  stroke: var(--globe-border);
   stroke-width: 1;
 }
 

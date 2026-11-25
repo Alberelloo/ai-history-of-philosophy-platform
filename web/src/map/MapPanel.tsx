@@ -3,7 +3,7 @@ import { pick, useT, type Catalog } from "../i18n";
 import { ViaNotice } from "./ViaNotice";
 import { Icon, type IconName } from "../ui";
 import { LinkDetails, type GEdge } from "./LinkDetails";
-import { GeoList, GeoPlaceSelected, GlobeLegend, type GeoPanel } from "./geo/GeoList";
+import { GeoList, GeoPlaceSelected, GeoWhere, GlobeLegend, type GeoPanel } from "./geo/GeoList";
 import {
   counts as countsOf,
   epochWindow,
@@ -461,6 +461,7 @@ function Selected(props: Props) {
       <GeoPlaceSelected
         data={data}
         place={geo.place}
+        country={geo.country?.(geo.place.id) ?? null}
         here={geo.scene?.places.find((p) => p.id === geo.place!.id) ?? null}
         year={geo.year}
         onSelect={(id) => props.onSelect(id)}
@@ -595,6 +596,7 @@ function Selected(props: Props) {
         {title} {sub && <span>{sub}</span>}
       </div>
       {geo?.noPlace && <p className="map-selected__note geo-selected__noplace">{t.geo.noPlace}</p>}
+      {geo?.where && <GeoWhere where={geo.where} />}
       <ul className="map-selected__list">{items}</ul>
       {hidden && (
         <p className="map-selected__note">

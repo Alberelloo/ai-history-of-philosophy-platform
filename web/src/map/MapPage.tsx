@@ -16,10 +16,11 @@ import { OVERVIEW_HEIGHT, Overview, YEAR_BAR_HEIGHT } from "./Overview";
 import { KNOWLEDGE_API, ndjson } from "./stream";
 import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapState, type MapView } from "./types";
 import { fetchPlaces, type GeoLayer } from "./geo/api";
-import type { GeoPanel } from "./geo/GeoList";
+import type { GeoPanel, GeoRole, GeoWhereData } from "./geo/GeoList";
+import type { GlobeInfo } from "./geo/GlobeView";
 import { SPEEDS, useAnnouncer, usePlayback, useReducedMotion, type Speed } from "./geo/playback";
 import { globeRoles } from "./geo/selection";
-import { clampYear, defaultYear, geoModel, nearestYear, visibleAt } from "./geo/timeline";
+import { clampYear, defaultYear, geoModel, MAX_PERSONS, nearestYear, stayAt, visibleAt } from "./geo/timeline";
 
 // Глобус — ленивый фрагмент (d3-geo, суша Natural Earth): хронология его не грузит.
 const GlobeView = lazy(() => import("./geo/GlobeView"));
@@ -91,6 +92,8 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const [geoRetry, setGeoRetry] = useState(0);
   const geoDone = useRef<string | null>(null);
   const [focus, setFocus] = useState<{ lat: number; lon: number; nonce: number } | null>(null);
+  // Страна места — ленивый модуль (словарь стран не в основном бандле): грузится с видом «Глобус».
+  const [countryOf, setCountryOf] = useState<((p: { id: string; lat: number; lon: number }) => { name: string } | null) | null>(null);
   const reduced = useReducedMotion();
 
   // Переход по ссылке /graph/<id> на уже открытой карте (из карточки) — выбор этой сущности.
@@ -132,6 +135,10 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     if (geoDone.current === want) return;
     const ctl = new AbortController();
     setGeo({ status: "loading", data: null });
+    import("./geo/countries").then(
+      (m) => setCountryOf(() => m.countryOf),
+      () => undefined,
+    );
     const got: Promise<GeoLayer | null> =
       fixture === "dense"
         ? import("./geo/geoFixture").then((m) => m.DENSE_GEO, () => null)
@@ -202,6 +209,34 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const peopleNow = scene ? scene.places.reduce((n, p) => n + p.people.length, 0) : 0;
   const placesNow = scene?.places.length ?? 0;
   const said = useAnnouncer(t.geo.announce(year, placesNow, peopleNow), year, playback.playing, scene != null);
+  const info = useMemo(() => {
+    const ix = new Map<string, GlobeInfo>();
+    for (const p of data.people) ix.set(p.id, { name: p.short || p.label, full: p.label, portrait: p.portrait ?? null });
+    for (const e of data.events) ix.set(e.id, { name: e.label, full: e.label });
+    return (id: string) => ix.get(id) ?? null;
+  }, [data]);
+  const country = useCallback(
+    (placeId: string) => {
+      const g = model?.places.get(placeId);
+      return g && countryOf ? (countryOf(g)?.name ?? null) : null;
+    },
+    [model, countryOf],
+  );
+  // «Где в <год> году»: место выбранной персоны или события в сцене года T.
+  let where: GeoWhereData | null = null;
+  if (model && scene && found?.type === "person") {
+    const sp = scene.persons.find((p) => p.id === found.obj.id);
+    const stay = sp ? stayAt(found.obj, model.byEntity.get(found.obj.id) ?? [], year) : null;
+    const g = sp ? model.places.get(sp.place) : null;
+    if (sp && stay && g) {
+      const role: GeoRole = stay.row.role == null ? "none" : stay.row.role;
+      where = { year, place: g.label, country: country(g.id), role, from: stay.from, to: stay.to, after: stay.after };
+    }
+  } else if (model && scene && found?.type === "event") {
+    const se = scene.events.find((e) => e.id === found.obj.id);
+    const g = se ? model.places.get(se.place) : null;
+    if (se && g) where = { year, place: g.label, country: country(g.id), role: "event", from: found.obj.year, to: found.obj.year, after: false };
+  }
   const geoPanel: GeoPanel | undefined = globe
     ? {
         year,
@@ -210,6 +245,9 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
         unplaced: model && gvis ? model.unplaced.filter((id) => gvis.people.some((p) => p.id === id) || gvis.events.some((e) => e.id === id)) : [],
         place: placeSel,
         noPlace: Boolean(model && found && found.type !== "era" && found.type !== "group" && !model.byEntity.has(found.obj.id)),
+        country: countryOf ? country : null,
+        where,
+        maxPersons: MAX_PERSONS,
         onPlace: (id) => {
           const g = model?.places.get(id);
           if (!g) return;
@@ -502,7 +540,8 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                         reduced={reduced}
                         focus={focus}
                         nearest={nearest}
-                        onSelectPlace={(id) => select(id)}
+                        info={info}
+                        onSelect={(id) => select(id)}
                         onYearStep={(d) => setYear(year + d)}
                         onTogglePlay={playback.toggle}
                         onRetry={() => setGeoRetry((n) => n + 1)}
