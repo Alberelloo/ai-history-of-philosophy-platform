@@ -23,7 +23,7 @@
   - **`external_ids` в `moved.externals`**.
 
   `undo_merge` возвращает всё перечисленное, **включая QID удалённой**. Формат `moved` — с умолчаниями для старых записей. `merge` удаляет `graph_extensions` удалённой.
-- [ ] 2.3 `statements.py`:
+- [x] 2.3 `statements.py`:
   - `merge_entities` — пересчёт ключей, свёртка с архивом строки, перенос атрибуций и подтверждений, согласие, петли (`moved.loops`), `_update_primary`, событие с полями `reason`, `statements`, `attributions`, `folded`, `loops`;
   - `undo_merge` — свёрнутые восстанавливаются с прежними id;
   - `get` по свёрнутому id отдаёт `survivor`;

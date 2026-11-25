@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from sqlalchemy import Engine, and_, delete, func, or_, select, update
+from sqlalchemy.exc import NoResultFound
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate
@@ -25,6 +26,13 @@ from philograph.knowledge.entities import Entities
 from philograph.knowledge.registry import OntologyRegistry, RegistryError
 from philograph.platform import events
 from philograph.platform.clock import Clock, SystemClock
+
+events.define(
+    "knowledge.entity.merge_proposed",
+    "info",
+    "Пара персон поставлена в очередь проверки дублей",
+    required=("kept", "removed", "reason"),
+)
 
 Status = Literal["verified", "sourced", "generated", "rejected"]
 STRENGTH = {"verified": 3, "sourced": 2, "generated": 1, "rejected": 0}
@@ -617,15 +625,238 @@ class Statements:
     def reject(self, statement_id: str, actor: str) -> None:
         self._set_status(statement_id, "rejected", "отклонил человек", actor)
 
+    # --- слияние сущностей ---
+
+    def merge_entities(
+        self, kept: str, removed: str, reason: str = "merge:review", run_id: str | None = None
+    ) -> int:
+        """Слияние с перенаправлением и пересчётом утверждений: ключи концов, свёртка повторов
+        (атрибуции и подтверждения переходят на оставшееся, строка повтора — в архив слияния),
+        петли, основные значения. Отменяется ``undo_merge`` целиком."""
+        kept, removed = self.entities.resolve(kept), self.entities.resolve(removed)
+        merge_id = self.entities.merge(kept, removed, emit=False)
+        with self.engine.begin() as conn:
+            moved = conn.scalar(select(t.merges.c.moved).where(t.merges.c.id == merge_id))
+        ids = list(dict.fromkeys([*moved["subject"], *moved["object"]]))
+        keys: dict[str, str] = {}
+        folded: list[dict[str, Any]] = []
+        loops: list[str] = []
+        attributions = len(moved.get("attributions_who", []))
+        for sid in ids:
+            with self.engine.begin() as conn:
+                row = dict(
+                    conn.execute(select(t.statements).where(t.statements.c.id == sid))
+                    .mappings()
+                    .one()
+                )
+            if row["object"] is not None and row["subject"] == row["object"]:
+                loops.append(sid)
+            key = self._key(
+                row["subject"], row["type"], row["object"], row["value"], row["qualifiers"]
+            )
+            if key == row["key"]:
+                continue
+            with self.engine.begin() as conn:
+                survivor = conn.scalar(
+                    select(t.statements.c.id).where(
+                        and_(
+                            t.statements.c.key == key,
+                            t.statements.c.scope == row["scope"],
+                            t.statements.c.id != sid,
+                        )
+                    )
+                )
+            if survivor is None:
+                keys[sid] = row["key"]
+                with self.engine.begin() as conn:
+                    conn.execute(
+                        update(t.statements).where(t.statements.c.id == sid).values(key=key)
+                    )
+                continue
+            fold = self._fold(row, survivor)
+            attributions += len(fold["attributions"])
+            folded.append(fold)
+        for sid in moved.get("attributions_who", []):
+            with self.engine.begin() as conn:
+                owner = conn.scalar(
+                    select(t.attributions.c.statement_id).where(t.attributions.c.id == sid)
+                )
+            if owner is not None:
+                self._recompute_consensus(owner)
+        moved = {
+            **moved,
+            "keys": keys,
+            "folded": folded,
+            "loops": loops,
+            "reason": reason,
+            "run_id": run_id,
+        }
+        with self.engine.begin() as conn:
+            conn.execute(update(t.merges).where(t.merges.c.id == merge_id).values(moved=moved))
+        self._refresh_primary(kept)
+        events.emit(
+            "knowledge.entity.merged",
+            kept=kept,
+            removed=removed,
+            reason=reason,
+            statements=len(ids) - len(folded),
+            attributions=attributions,
+            folded=len(folded),
+            loops=len(loops),
+        )
+        return merge_id
+
+    def _refresh_primary(self, entity_id: str) -> None:
+        """Копии основных значений после переноса утверждений. «Годы жизни» и «датировка»
+        пишут один ключ ``dates``: пересчитывается тот тип, что есть у сущности."""
+        types = {s["type"] for s in self._raw(entity_id, side="subject")}
+        dated = [ty for ty in ("lifespan", "dating") if ty in types] or ["lifespan"]
+        for type_ in [*dated[:1], "description"]:
+            self._update_primary(entity_id, type_)
+
+    def _fold(self, row: dict[str, Any], survivor: str) -> dict[str, Any]:
+        """Повтор сворачивается в ``survivor``: его атрибуции (кроме точных повторов) и
+        подтверждения переходят туда, строка повтора и пропущенные атрибуции — в архив."""
+        sid = row["id"]
+        with self.engine.begin() as conn:
+            have = {
+                (a.who_kind, a.who, a.stance)
+                for a in conn.execute(
+                    select(t.attributions).where(t.attributions.c.statement_id == survivor)
+                )
+            }
+            attrs = [
+                dict(a)
+                for a in conn.execute(
+                    select(t.attributions).where(t.attributions.c.statement_id == sid)
+                ).mappings()
+            ]
+            moved_attrs, skipped = [], []
+            for a in attrs:
+                triple = (a["who_kind"], a["who"], a["stance"])
+                if triple in have:
+                    skipped.append(a)
+                else:
+                    have.add(triple)
+                    moved_attrs.append(a["id"])
+            if moved_attrs:
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id.in_(moved_attrs))
+                    .values(statement_id=survivor)
+                )
+            if skipped:
+                conn.execute(
+                    delete(t.attributions).where(
+                        t.attributions.c.id.in_([a["id"] for a in skipped])
+                    )
+                )
+            evidence = list(
+                conn.scalars(select(t.evidence.c.id).where(t.evidence.c.statement_id == sid))
+            )
+            if evidence:
+                conn.execute(
+                    update(t.evidence)
+                    .where(t.evidence.c.id.in_(evidence))
+                    .values(statement_id=survivor)
+                )
+            conn.execute(delete(t.statements).where(t.statements.c.id == sid))
+        self._recompute_consensus(survivor)
+        self._journal(survivor, "system", {"folded": sid, "reason": "свёрнуто при слиянии"})
+        return {
+            "id": sid,
+            "into": survivor,
+            "row": row,
+            "attributions": moved_attrs,
+            "skipped": skipped,
+            "evidence": evidence,
+        }
+
+    def undo_merge(self, merge_id: int) -> dict[str, int]:
+        """Отмена слияния: свёрнутые утверждения возвращаются с прежними идентификаторами,
+        атрибуциями и подтверждениями; ключи, названия, внешние id, портреты — как были."""
+        with self.engine.begin() as conn:
+            m = conn.execute(select(t.merges).where(t.merges.c.id == merge_id)).mappings().one()
+        moved = m["moved"]
+        folded = moved.get("folded") or []
+        survivors = []
+        for fold in reversed(folded):
+            with self.engine.begin() as conn:
+                conn.execute(t.statements.insert().values(**fold["row"]))
+                if fold["attributions"]:
+                    conn.execute(
+                        update(t.attributions)
+                        .where(t.attributions.c.id.in_(fold["attributions"]))
+                        .values(statement_id=fold["id"])
+                    )
+                for a in fold["skipped"]:
+                    conn.execute(t.attributions.insert().values(**a))
+                if fold["evidence"]:
+                    conn.execute(
+                        update(t.evidence)
+                        .where(t.evidence.c.id.in_(fold["evidence"]))
+                        .values(statement_id=fold["id"])
+                    )
+            survivors.append(fold["into"])
+        for sid, key in (moved.get("keys") or {}).items():
+            with self.engine.begin() as conn:
+                conn.execute(update(t.statements).where(t.statements.c.id == sid).values(key=key))
+        self.entities.undo_merge(merge_id, emit=False)
+        touched = set(survivors)
+        for aid in moved.get("attributions_who", []):
+            with self.engine.begin() as conn:
+                owner = conn.scalar(
+                    select(t.attributions.c.statement_id).where(t.attributions.c.id == aid)
+                )
+            if owner is not None:
+                touched.add(owner)
+        for sid in sorted(touched):
+            with self.engine.begin() as conn:
+                exists = conn.scalar(select(t.statements.c.id).where(t.statements.c.id == sid))
+            if exists:
+                self._recompute_consensus(sid)
+        for entity in (m["kept"], m["removed"]):
+            self._refresh_primary(entity)
+        events.emit(
+            "knowledge.entity.merge_undone",
+            kept=m["kept"],
+            removed=m["removed"],
+            restored=len(folded),
+        )
+        return {"restored": len(folded)}
+
+    def folded_into(self, statement_id: str) -> str | None:
+        """Куда свёрнуто утверждение при слиянии (по действующим слияниям), или ``None``."""
+        with self.engine.begin() as conn:
+            rows = conn.execute(
+                select(t.merges.c.moved).where(t.merges.c.undone.is_(False))
+            ).scalars()
+            for moved in rows:
+                for fold in moved.get("folded") or []:
+                    if fold["id"] == statement_id:
+                        return fold["into"]
+        return None
+
     # --- чтение ---
 
     def get(self, statement_id: str) -> dict[str, Any]:
+        """Утверждение по идентификатору; свёрнутое при слиянии отдаёт то, в которое свёрнуто."""
+        seen: set[str] = set()
+        while True:
+            with self.engine.begin() as conn:
+                row = (
+                    conn.execute(select(t.statements).where(t.statements.c.id == statement_id))
+                    .mappings()
+                    .one_or_none()
+                )
+            if row is not None:
+                break
+            seen.add(statement_id)
+            into = self.folded_into(statement_id)
+            if into is None or into in seen:
+                raise NoResultFound(f"утверждение {statement_id} не найдено")
+            statement_id = into
         with self.engine.begin() as conn:
-            row = (
-                conn.execute(select(t.statements).where(t.statements.c.id == statement_id))
-                .mappings()
-                .one()
-            )
             attrs = (
                 conn.execute(
                     select(t.attributions).where(t.attributions.c.statement_id == statement_id)

@@ -107,3 +107,60 @@ def test_old_merge_record_undo_with_defaults(onto):
         conn.execute(t.merges.update().where(t.merges.c.id == merge_id).values(moved=old))
     onto.entities.undo_merge(merge_id)
     assert onto.entities.get(b)["id"] == b
+
+
+def _influence(onto, subject, obj, who, paragraph="p2", quote="Кант испытал влияние Юма"):
+    return onto.sourced(subject, "influenced_by", obj, paragraph=paragraph, quote=quote, who=who)
+
+
+def test_merge_entities_folds_repeat_and_undo_restores(onto, events):
+    hume = onto.entities.create("person", [("en", "Hume", "primary")], external={"wikidata": "Q1"})
+    yum = onto.entities.create("person", [("ru", "Юм", "primary")])
+    locke = onto.thing("person", "Локк")
+    kept_st = _influence(onto, yum, locke, "s_a")
+    dup_st = _influence(onto, hume, locke, "s_b")
+    loop = _influence(onto, hume, yum, "s_a")
+    before = _dump(onto)
+
+    merge_id = onto.statements.merge_entities(yum, hume, reason="merge:qid_confirmed")
+
+    survivor = onto.statements.get(dup_st)  # свёрнутое ведёт на оставшееся
+    assert survivor["id"] == kept_st
+    assert sorted(a["who"] for a in survivor["attributions"]) == ["s_a", "s_b"]
+    assert len(survivor["evidence"]) == 2
+    assert onto.statements.get(loop)["subject"] == onto.statements.get(loop)["object"] == yum
+    assert _names(onto, yum) == {("ru", "Юм", "primary"), ("en", "Hume", "variant")}
+    assert onto.entities.by_external("wikidata", "Q1") == yum
+    merged = events.one("knowledge.entity.merged")
+    assert {k: merged.fields[k] for k in ("reason", "statements", "folded", "loops")} == {
+        "reason": "merge:qid_confirmed",
+        "statements": 1,
+        "folded": 1,
+        "loops": 1,
+    }
+
+    assert onto.statements.undo_merge(merge_id) == {"restored": 1}
+    assert _dump(onto) == before
+    assert onto.statements.get(dup_st)["id"] == dup_st
+    assert events.one("knowledge.entity.merge_undone").fields["restored"] == 1
+
+
+def test_fold_skips_exact_attribution_repeat(onto):
+    a = onto.thing("person", "Беркли")
+    b = onto.entities.create("person", [("en", "Berkeley", "primary")])
+    locke = onto.thing("person", "Локк")
+    first = _influence(onto, a, locke, "s_a")
+    second = _influence(onto, b, locke, "s_a")
+    before = _dump(onto)
+    merge_id = onto.statements.merge_entities(a, b)
+    assert [x["who"] for x in onto.statements.get(first)["attributions"]] == ["s_a"]
+    assert onto.statements.get(second)["id"] == first
+    onto.statements.undo_merge(merge_id)
+    assert _dump(onto) == before
+
+
+def test_merge_updates_primary_dates(onto):
+    a = onto.person("Беркли")
+    b = onto.person("Berkeley", "1685", "1753")
+    onto.statements.merge_entities(a, b)
+    assert onto.entities.get(a)["primary"]["dates"]["earliest_start"] == 1685

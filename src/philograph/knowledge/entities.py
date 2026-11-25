@@ -34,6 +34,7 @@ events.define(
     "info",
     "Сущности слиты с перенаправлением",
     required=("kept", "removed"),
+    optional=("reason", "statements", "attributions", "folded", "loops"),
 )
 events.define(
     "knowledge.entity.renamed",
@@ -46,6 +47,7 @@ events.define(
     "info",
     "Слияние сущностей отменено",
     required=("kept", "removed"),
+    optional=("restored",),
 )
 
 
