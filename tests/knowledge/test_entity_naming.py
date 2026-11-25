@@ -281,7 +281,7 @@ def test_spellings_found_different_entities(stand, onto, engine_for, clock, even
     assert {substance, substantia} <= set(repr(item).replace("'", '"').split('"'))
     [ambiguous] = events.of("knowledge.extraction.ambiguous")
     assert ambiguous["candidates"] == 2
-    assert events.of(DROPPED)
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:ambiguous"]  # О18: код
 
 
 # --- инвариант языка ---------------------------------------------------------------------

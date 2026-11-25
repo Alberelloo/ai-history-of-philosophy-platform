@@ -16,7 +16,7 @@ from philograph.knowledge.dates import span
 
 from ..conftest import PROFILES
 from .extraction_stand import Stand
-from .strategies import datings, sentinel
+from .strategies import assert_dropped_codes, datings, sentinel
 
 req = pytest.mark.req
 ED = "entity-dating"
@@ -430,6 +430,57 @@ def test_dating_of_type_not_allowed(stand, onto, events):
     no_token(events, token)
 
 
+@req(ED, EXTRACT, invariant="Сущность не определена — dating:unresolved, без второй привязки (О18)")
+def test_dating_of_unresolved_entity(stand, onto, clock, events):
+    """Неоднозначное название в утверждении и в датировке: один пункт ``ambiguous_link``,
+    ``entity:ambiguous`` для утверждения и ``dating:unresolved`` для датировки; отклонённое
+    название с датировкой — ``entity:<причина>`` и ``dating:unresolved``."""
+    from philograph.knowledge.review import Review
+    from philograph.operator.access import ActionLog
+
+    onto.person("Бэкон", "1214", "1292")
+    onto.person("Бэкон", "1561", "1626")
+    token = sentinel()
+    before = {s["id"] for s in stand.statements()}
+    events.clear()
+    stand.extract(
+        [f"Бэкон (1561–1626) ценил опыт. Об этом знают и children (1700). {token}"],
+        {
+            "statements": [
+                {
+                    "subject": "Бэкон",
+                    "subject_type": "person",
+                    "type": "holds",
+                    "object": "Опыт",
+                    "object_type": "position",
+                    "paragraph": 1,
+                    "quote": "Бэкон (1561–1626) ценил опыт",
+                }
+            ],
+            "entities": [
+                {
+                    "name": "Бэкон",
+                    "type": "person",
+                    "dating": {"text": "1561–1626", "paragraph": 1, "quote": "Бэкон (1561–1626)"},
+                },
+                {
+                    "name": "children",
+                    "type": "person",
+                    "dating": {"text": "1700", "paragraph": 1, "quote": "children (1700)"},
+                },
+            ],
+        },
+    )
+    review = Review(onto.statements, ActionLog(onto.statements.engine, clock))
+    assert len(review.queue(kind="ambiguous_link")) == 1
+    assert sorted(d["reason"] for d in dropped(events)) == sorted(
+        ["entity:ambiguous", "dating:unresolved", "dating:unresolved"]
+    )
+    assert [s for s in stand.statements() if s["id"] not in before] == []
+    assert_dropped_codes(events)
+    no_token(events, token)
+
+
 @req(ED, EXTRACT, scenario="Инвариант датировки")
 @req(ED, EXTRACT, invariant="Записана по таблице либо отклонена одной причиной")
 @settings(parent=PROFILES["ci"], suppress_health_check=[HealthCheck.function_scoped_fixture])
@@ -470,6 +521,7 @@ def test_dating_invariant(stand, onto, events, case):
         assert drop["reason"] == case["reason"]
         events.assert_none(STATEMENT)
     no_token(events, case["token"])
+    assert_dropped_codes(events)
 
 
 @req(ED, EXTRACT, invariant="Проверка датировки по порядку причин, чистая функция")

@@ -488,3 +488,37 @@ def test_preservation_and_undo(onto, events, case):
     assert dump(onto.statements.engine) == before
     [undone] = events.of(UNDONE)
     assert keys(undone) == UNDONE_KEYS
+
+
+# --- предел группы «тип + последнее слово» (О18) -------------------------------------------
+
+LIMIT = 200  # предел из спецификации ontology-entities «Поиск дублей»
+CAPPED = "knowledge.entity.duplicate_group_capped"
+
+
+def _first_name(i: int) -> str:
+    letters = "бвгдклмнпрст"
+    return "А" + letters[i % 12] + letters[(i // 12) % 12] + letters[(i // 144) % 12] + "ий"
+
+
+@req(OE, SEARCH, invariant="Группа последнего слова больше 200 не перебирается — событие")
+@pytest.mark.parametrize("size", [LIMIT, LIMIT + 1])
+def test_last_word_group_cap(onto, events, size):
+    ids = [
+        onto.entities.create("person", [("ru", f"{_first_name(i)} Локк", "primary")])
+        for i in range(size - 2)
+    ]
+    twins = [onto.entities.create("person", [("ru", "Джон Локк", "primary")]) for _ in range(2)]
+    events.clear()
+    pairs = {frozenset(p) for p in onto.entities.duplicate_candidates()}
+    assert frozenset(twins) in pairs  # совпадение полного названия — и в большой группе
+    last_word_pair = frozenset({ids[0], ids[1]})
+    if size <= LIMIT:
+        assert last_word_pair in pairs
+        events.assert_none(CAPPED)
+    else:
+        assert last_word_pair not in pairs
+        [capped] = events.of(CAPPED)
+        assert set(capped.fields) - {"request_id", "service", "run_id"} == {"type", "size", "limit"}
+        assert (capped["type"], capped["size"], capped["limit"]) == ("person", size, LIMIT)
+        assert "Локк" not in repr(capped.fields)

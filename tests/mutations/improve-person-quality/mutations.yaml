@@ -140,3 +140,21 @@ mutations:
     note: решение человека «слить» пишет reason=merge:name вместо merge:review (О17)
     expect_fail:
       - tests/knowledge/test_person_quality.py::test_merge_by_human_decision
+  - id: group-cap-silent
+    requirement: Поиск дублей
+    patch: group-cap-silent.patch
+    note: большая группа последнего слова пропускается молча — без duplicate_group_capped (О18)
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_last_word_group_cap[201]
+  - id: group-cap-off
+    requirement: Поиск дублей
+    patch: group-cap-off.patch
+    note: предел группы 2000 вместо 200 (О18)
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_last_word_group_cap[201]
+  - id: person-empty-as-number
+    requirement: Качество персон
+    patch: person-empty-as-number.patch
+    note: пустое название персоны отклоняется как number, а не empty
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_person_quality_invariant

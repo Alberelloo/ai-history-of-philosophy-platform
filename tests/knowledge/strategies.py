@@ -1177,3 +1177,31 @@ def manifests(draw) -> dict[str, Any]:
         owner[q], own[i] = i, q
         written[i] = q
     return {"n": n, "held": held, "entries": entries, "written": written, "skipped": skipped}
+
+
+# --- коды причин knowledge.extraction.dropped (О17, О18) -----------------------------------
+
+DATING_CODES = {
+    f"dating:{c}"
+    for c in (
+        "paragraph",
+        "quote",
+        "unparsed",
+        "not_in_quote",
+        "era",
+        "single_year",
+        "type",
+        "unresolved",
+    )
+}
+ENTITY_CODES = {"entity:type", "entity:no_type", "entity:ambiguous"} | {
+    f"entity:{r}" for r in ("empty", "number", "sentence", "not_a_name", "stopword")
+}
+DROPPED_CODES = DATING_CODES | ENTITY_CODES
+
+
+def assert_dropped_codes(events) -> None:
+    """Каждая причина ``knowledge.extraction.dropped`` — код из перечня спецификаций, без
+    названий и текста (``entity-naming`` «Отказ», ``ontology-extraction``, ``entity-dating``)."""
+    for e in events.of("knowledge.extraction.dropped"):
+        assert e["reason"] in DROPPED_CODES, e.fields

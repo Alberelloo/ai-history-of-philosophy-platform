@@ -33,6 +33,7 @@ from ..conftest import PROFILES
 from .extraction_stand import Stand
 from .strategies import (
     PERSON,
+    assert_dropped_codes,
     expected_kept,
     expected_label,
     name_of,
@@ -140,6 +141,7 @@ def test_garbage_person(stand, onto, events):
     assert [d["reason"] for d in events.of(DROPPED)] == ["entity:not_a_name"]  # О17: код
     assert stand.statements() == []
     no_token(events, token)
+    assert_dropped_codes(events)
 
 
 @req(PQ, QUALITY, scenario="Склейка")
@@ -168,9 +170,7 @@ def test_person_definition_in_prompt(stand, events):
 
 
 def _person_cases():
-    return names_with_reason().filter(
-        lambda c: c[0][0] == PERSON and c[1] not in ("empty",)
-    ) | not_persons().filter(lambda c: c[1] != "empty")
+    return names_with_reason().filter(lambda c: c[0][0] == PERSON) | not_persons()
 
 
 @req(PQ, QUALITY, scenario="Инвариант качества персон")
@@ -178,6 +178,8 @@ def _person_cases():
 @CI
 @given(_person_cases())
 @example(((PERSON, "your Lordship"), "not_a_name"))
+@example(((PERSON, "   "), "empty"))
+@example(((PERSON, ""), "empty"))
 @example(((PERSON, "Your Lordship"), "stopword"))
 @example(((PERSON, "blind mathematician"), "not_a_name"))
 @example(((PERSON, "Children"), "stopword"))
@@ -209,6 +211,7 @@ def test_person_quality_invariant(stand, onto, events, case):
         assert fields(rejected) == {"type": PERSON, "label": expected_label(raw), "reason": reason}
         assert [d["reason"] for d in events.of(DROPPED)] == [f"entity:{reason}"]  # О17
     no_token(events, token)
+    assert_dropped_codes(events)
 
 
 @req(PQ, QUALITY, invariant="Правило названий персон — чистая функция: ожидаемая причина")

@@ -23,6 +23,7 @@ from .extraction_stand import Stand
 from .strategies import (
     LANG_SCRIPT,
     REGISTRY_TYPES,
+    assert_dropped_codes,
     fragment_items,
     sentinel,
 )
@@ -243,6 +244,7 @@ def test_only_registry_types_for_any_items(passed, onto, events, items):
     for item in junk:
         assert ids_by_text(onto, item["name"]) == []
     assert [e["reason"] for e in events.of(DROPPED)].count("entity:type") == len(junk)
+    assert_dropped_codes(events)
 
 
 # =========================== Нормализация сущностей =======================================
@@ -274,6 +276,7 @@ def test_ambiguous_goes_to_review(stand, onto, clock, events):
     review = Review(onto.statements, ActionLog(onto.statements.engine, clock))
     assert len(review.queue(kind="ambiguous_link")) == 1
     assert events.one("knowledge.extraction.ambiguous")["candidates"] == 2
+    assert [d["reason"] for d in events.of(DROPPED)] == ["entity:ambiguous"]  # О18
 
 
 @req(EX, NORM, scenario="Привязка по английскому написанию")
@@ -418,3 +421,4 @@ def test_normalization_and_language_for_any_items(stand, onto, events, case):
             primaries[lang] = primaries.get(lang, 0) + 1
     assert set(primaries.values()) == {1}
     no_token(events, token)
+    assert_dropped_codes(events)

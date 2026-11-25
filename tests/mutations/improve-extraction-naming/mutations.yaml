@@ -121,3 +121,23 @@ mutations:
       - tests/knowledge/test_entity_naming.py::test_section_number
       - tests/knowledge/test_entity_naming.py::test_role_instead_of_name
       - tests/knowledge/test_person_quality.py::test_person_quality_invariant
+  - id: ambiguous-reason-text
+    requirement: Язык названий сущностей
+    patch: ambiguous-reason-text.patch
+    note: неоднозначная привязка даёт reason с названием вместо entity:ambiguous (О18)
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_spellings_found_different_entities
+      - tests/knowledge/test_extraction_entities.py::test_ambiguous_goes_to_review
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_unresolved_entity
+  - id: unresolved-reresolved
+    requirement: Извлечение дат
+    patch: unresolved-reresolved.patch
+    note: датировка заново привязывает название, не привязанное во фрагменте (второй ambiguous_link, О18)
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_unresolved_entity
+  - id: unresolved-inner-reason
+    requirement: Извлечение дат
+    patch: unresolved-inner-reason.patch
+    note: отказ привязки в датировке даёт entity:<код> вместо dating:unresolved (О18)
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_unresolved_entity
