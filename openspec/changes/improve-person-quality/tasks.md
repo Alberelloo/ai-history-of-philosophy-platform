@@ -16,7 +16,7 @@
   - `Dedupe.run(confirmed=…)`.
 
   Юнит-тесты.
-- [ ] 2.2 `entities.py`, `merge` переносит:
+- [x] 2.2 `entities.py`, `merge` переносит:
   - `attributions.who` (`who_kind="entity"`);
   - `portraits` (конфликт `phash` — остаётся за удалённой);
   - вид названий (основное → вариант, `moved.kinds`);

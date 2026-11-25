@@ -13,7 +13,14 @@ from typing import Any
 from sqlalchemy import Engine, and_, select, update
 
 from philograph.knowledge import schema as t
-from philograph.knowledge.naming import InvalidName, check_name, lang_for, normalize, reject
+from philograph.knowledge.naming import (
+    InvalidName,
+    check_name,
+    is_russian,
+    lang_for,
+    normalize,
+    reject,
+)
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.platform import events
 
@@ -334,19 +341,51 @@ class Entities:
                 pairs.append((a["id"], b["id"]))
         return pairs
 
-    def merge(self, kept: str, removed: str) -> int:
-        """Переносит названия и утверждения, старый идентификатор становится перенаправлением."""
+    def merge(self, kept: str, removed: str, *, emit: bool = True) -> int:
+        """Переносит названия, утверждения, внешние идентификаторы, упоминания, атрибуции-автора
+        и портреты; старый идентификатор становится перенаправлением. Всё перенесённое пишется
+        в ``merges.moved`` для отмены. Ключи утверждений и свёртку повторов пересчитывает
+        ``Statements.merge_entities``."""
         kept, removed = self.resolve(kept), self.resolve(removed)
         with self.engine.begin() as conn:
-            moved_names = list(
-                conn.scalars(select(t.names.c.id).where(t.names.c.entity_id == removed))
+            all_names = (
+                conn.execute(select(t.names).where(t.names.c.entity_id.in_([kept, removed])))
+                .mappings()
+                .all()
             )
+            kinds = _merged_kinds(kept, removed, all_names)
+            for name_id, kind in kinds.items():
+                conn.execute(update(t.names).where(t.names.c.id == name_id).values(kind=kind))
+            moved_names = [n["id"] for n in all_names if n["entity_id"] == removed]
             moved_subject = list(
                 conn.scalars(select(t.statements.c.id).where(t.statements.c.subject == removed))
             )
             moved_object = list(
                 conn.scalars(select(t.statements.c.id).where(t.statements.c.object == removed))
             )
+            moved_externals = [
+                [r.system, r.value]
+                for r in conn.execute(
+                    select(t.external_ids).where(t.external_ids.c.entity_id == removed)
+                )
+            ]
+            moved_who = list(
+                conn.scalars(
+                    select(t.attributions.c.id).where(
+                        and_(t.attributions.c.who_kind == "entity", t.attributions.c.who == removed)
+                    )
+                )
+            )
+            kept_phash = set(
+                conn.scalars(select(t.portraits.c.phash).where(t.portraits.c.entity_id == kept))
+            )
+            portraits = conn.execute(
+                select(t.portraits.c.id, t.portraits.c.phash).where(
+                    t.portraits.c.entity_id == removed
+                )
+            ).all()
+            moved_portraits = [pid for pid, phash in portraits if phash not in kept_phash]
+            portraits_kept = [pid for pid, phash in portraits if phash in kept_phash]
             conn.execute(
                 update(t.names).where(t.names.c.entity_id == removed).values(entity_id=kept)
             )
@@ -367,6 +406,21 @@ class Entities:
             conn.execute(
                 update(t.mentions).where(t.mentions.c.entity_id == removed).values(entity_id=kept)
             )
+            if moved_who:
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id.in_(moved_who))
+                    .values(who=kept)
+                )
+            if moved_portraits:
+                conn.execute(
+                    update(t.portraits)
+                    .where(t.portraits.c.id.in_(moved_portraits))
+                    .values(entity_id=kept)
+                )
+            conn.execute(
+                t.graph_extensions.delete().where(t.graph_extensions.c.entity_id == removed)
+            )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == removed).values(redirect_to=kept)
             )
@@ -380,13 +434,20 @@ class Entities:
                         "subject": moved_subject,
                         "object": moved_object,
                         "mentions": moved_mentions,
+                        "kinds": {str(n["id"]): n["kind"] for n in all_names if n["id"] in kinds},
+                        "externals": moved_externals,
+                        "attributions_who": moved_who,
+                        "portraits": moved_portraits,
+                        "portraits_kept": portraits_kept,
                     },
                 )
             ).inserted_primary_key[0]
-        events.emit("knowledge.entity.merged", kept=kept, removed=removed)
+        if emit:
+            events.emit("knowledge.entity.merged", kept=kept, removed=removed)
         return merge_id
 
-    def undo_merge(self, merge_id: int) -> None:
+    def undo_merge(self, merge_id: int, *, emit: bool = True) -> dict[str, Any]:
+        """Возвращает перенесённое удалённой сущности; записи старого формата — с умолчаниями."""
         with self.engine.begin() as conn:
             m = conn.execute(select(t.merges).where(t.merges.c.id == merge_id)).mappings().one()
             moved = m["moved"]
@@ -395,6 +456,8 @@ class Entities:
                 .where(t.names.c.id.in_(moved["names"]))
                 .values(entity_id=m["removed"])
             )
+            for name_id, kind in (moved.get("kinds") or {}).items():
+                conn.execute(update(t.names).where(t.names.c.id == int(name_id)).values(kind=kind))
             conn.execute(
                 update(t.statements)
                 .where(t.statements.c.id.in_(moved["subject"]))
@@ -410,8 +473,49 @@ class Entities:
                 .where(t.mentions.c.id.in_(moved.get("mentions", [])))
                 .values(entity_id=m["removed"])
             )
+            for system, value in moved.get("externals", []):
+                conn.execute(
+                    update(t.external_ids)
+                    .where(and_(t.external_ids.c.system == system, t.external_ids.c.value == value))
+                    .values(entity_id=m["removed"])
+                )
+            if moved.get("attributions_who"):
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id.in_(moved["attributions_who"]))
+                    .values(who=m["removed"])
+                )
+            if moved.get("portraits"):
+                conn.execute(
+                    update(t.portraits)
+                    .where(t.portraits.c.id.in_(moved["portraits"]))
+                    .values(entity_id=m["removed"])
+                )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == m["removed"]).values(redirect_to=None)
             )
             conn.execute(update(t.merges).where(t.merges.c.id == merge_id).values(undone=True))
-        events.emit("knowledge.entity.merge_undone", kept=m["kept"], removed=m["removed"])
+        if emit:
+            events.emit("knowledge.entity.merge_undone", kept=m["kept"], removed=m["removed"])
+        return dict(m)
+
+
+def _merged_kinds(kept: str, removed: str, names: Any) -> dict[int, str]:
+    """Новые виды названий после слияния: ровно одно основное — русское основное любой из
+    сторон (сначала оставшейся), иначе основное оставшейся (иначе удалённой); прочие бывшие
+    основные и точные повторы названий оставшейся — варианты. Только изменённые строки."""
+    primaries = [n for n in names if n["kind"] == "primary"]
+    order = sorted(primaries, key=lambda n: (n["entity_id"] != kept, n["id"]))
+    russian = [n for n in order if is_russian(n["text"])]
+    chosen = (russian or order or [None])[0]
+    seen = {(n["lang"], n["normalized"]) for n in names if n["entity_id"] == kept}
+    kinds: dict[int, str] = {}
+    for n in names:
+        new = n["kind"]
+        if n["kind"] == "primary" and n is not chosen:
+            new = "variant"
+        if n["entity_id"] == removed and n is not chosen and (n["lang"], n["normalized"]) in seen:
+            new = "variant"
+        if new != n["kind"]:
+            kinds[n["id"]] = new
+    return kinds
