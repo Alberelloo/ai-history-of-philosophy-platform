@@ -9,9 +9,10 @@
 
 from __future__ import annotations
 
+from itertools import combinations
 from typing import Any
 
-from philograph.knowledge import dating
+from philograph.knowledge import dating, dedupe
 from philograph.knowledge import schema as t
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.naming import (
@@ -19,6 +20,7 @@ from philograph.knowledge.naming import (
     check_name,
     is_russian,
     names_for,
+    normalize,
     reject,
 )
 from philograph.knowledge.statements import Attribution, Evidence, Provenance, Statements
@@ -95,9 +97,11 @@ class EntityItems:
             return resolved[name]
         type_ = type_ or (item or {}).get("type")
         candidates: dict[str, dict[str, Any]] = {}
+        hits: dict[str, set[str]] = {}
         for spelling in _spellings(name, item):
             for c in self.entities.find(spelling):
                 candidates.setdefault(c["id"], c)
+                hits.setdefault(c["id"], set()).add(normalize(spelling))
         found = list(candidates.values())
         if type_:
             found = [c for c in found if self.registry.is_a(c["type"], [type_])]
@@ -106,6 +110,12 @@ class EntityItems:
             if item:
                 self._russian_primary(found[0], item)
             return resolved[name]
+        if len(found) > 1 and item:
+            kept = self._merge_variants(found, hits)
+            if kept is not None:
+                resolved[name] = kept
+                self._russian_primary(self.entities.get(kept), item)
+                return kept
         if len(found) > 1:
             return self._ambiguous(name, found, resolved)
         if not type_:
@@ -117,6 +127,38 @@ class EntityItems:
             raise Skip(str(exc)) from exc
         self.created.append(resolved[name])
         return resolved[name]
+
+    def _merge_variants(self, found: list[dict[str, Any]], hits: dict[str, set[str]]) -> str | None:
+        """Разные написания одного элемента нашли разных персон: правило слияния вариантов с
+        парой от модели. Все пары — ``merge`` → слияние, привязка к оставшейся; есть ``review``
+        → пункт очереди ``duplicate``, дальше прежняя неоднозначность; ``apart`` — она же."""
+        ids = [c["id"] for c in found]
+        if any(c["type"] != dedupe.PERSON for c in found):
+            return None
+        if any(not hits[a].isdisjoint(hits[b]) for a, b in combinations(ids, 2)):
+            return None  # одно написание нашло нескольких — это неоднозначность, не варианты
+        persons = {e.id: e for e in dedupe.load_persons(self.statements.engine, ids)}
+        open_, distinct = dedupe.duplicate_items(self.statements.engine)
+        verdicts = {
+            (a, b): dedupe.same_person(
+                persons[a],
+                persons[b],
+                paired_by_model=True,
+                decided_apart=dedupe._pair(a, b) in distinct,
+            )
+            for a, b in combinations(sorted(ids), 2)
+        }
+        if all(v.kind == "merge" for v in verdicts.values()):
+            counts = dedupe.link_counts(self.statements.engine, ids)
+            kept = dedupe.choose_kept(persons.values(), counts)
+            for other in sorted(x for x in ids if x != kept):
+                reason = verdicts[dedupe._pair(kept, other)].reason
+                self.statements.merge_entities(kept, other, reason=reason)
+            return kept
+        for (a, b), v in verdicts.items():
+            if v.kind == "review":
+                dedupe.propose(self.statements.engine, a, b, v.reason, open_)
+        return None
 
     def _ambiguous(self, name: str, candidates: list[dict[str, Any]], resolved: dict[str, str]):
         # Контекст фрагмента: кандидат, уже связанный с найденными здесь сущностями.

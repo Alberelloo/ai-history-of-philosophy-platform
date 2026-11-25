@@ -88,3 +88,29 @@ def test_date_rejected_reason(onto, items):
     item = {"dating": {"text": "1724", "paragraph": 1, "quote": "в 1724 году"}}
     with pytest.raises(Skip, match="dating:single_year"):
         items.date(kant, item, [{"id": "px", "text": "в 1724 году"}], "s_textbook", "run1")
+
+
+def test_spellings_found_two_persons_merge(onto, items, events):
+    locke = onto.entities.create(
+        "person", [("en", "Locke", "primary")], external={"wikidata": "Q9353"}
+    )
+    lokk = onto.entities.create("person", [("ru", "Локк", "primary")])
+    item = {"name": "Локк", "type": "person", "ru": "Локк", "en": "Locke"}
+    assert items.resolve("Локк", "person", item, {}) == locke
+    assert onto.entities.resolve(lokk) == locke
+    assert events.one("knowledge.entity.merged").fields["reason"] == "merge:model_pair"
+    assert {(n["lang"], n["text"], n["kind"]) for n in onto.entities.get(locke)["names"]} == {
+        ("ru", "Локк", "primary"),
+        ("en", "Locke", "variant"),
+    }
+
+
+def test_spellings_found_two_persons_with_conflicting_dates(onto, items, events):
+    onto.person("Berkeley", "1685", "1753")
+    onto.person("Беркли", "1885", "1953")
+    item = {"name": "Беркли", "type": "person", "ru": "Беркли", "en": "Berkeley"}
+    with pytest.raises(Skip):
+        items.resolve("Беркли", "person", item, {})
+    assert events.one("knowledge.entity.merge_proposed").fields["reason"] == "review:dates"
+    assert events.of("knowledge.entity.merged") == []
+    assert len(events.of("knowledge.extraction.ambiguous")) == 1
