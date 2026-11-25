@@ -25,7 +25,7 @@
   - `event_label`, `InvalidName`, `names_for`.
 
   Юнит-тесты модуля.
-- [ ] 2.3 `entities.py`:
+- [x] 2.3 `entities.py`:
   - `normalize` с NFC;
   - `create` и `add_name` ставят язык `lang_for` для любого пути;
   - `create` и `add_name(kind="primary")` вызывают `check_name`, событие `knowledge.entity.rejected` ровно с `type`, `label` (`event_label`), `reason`;

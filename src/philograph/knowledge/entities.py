@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-import re
 import uuid
 from itertools import combinations
 from typing import Any
@@ -14,8 +13,11 @@ from typing import Any
 from sqlalchemy import Engine, and_, select, update
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.naming import InvalidName, check_name, lang_for, normalize, reject
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.platform import events
+
+__all__ = ["DuplicateEntity", "Entities", "EntityNotFound", "InvalidName", "normalize"]
 
 events.define(
     "knowledge.entity.created", "info", "Создана сущность онтологии", required=("entity_id", "type")
@@ -25,6 +27,12 @@ events.define(
     "info",
     "Сущности слиты с перенаправлением",
     required=("kept", "removed"),
+)
+events.define(
+    "knowledge.entity.renamed",
+    "info",
+    "Сменилось основное название сущности",
+    required=("entity_id", "lang", "previous_lang"),
 )
 events.define(
     "knowledge.entity.merge_undone",
@@ -46,12 +54,6 @@ class EntityNotFound(Exception):
         self.entity_id = entity_id
 
 
-def normalize(name: str) -> str:
-    name = name.lower().replace("ё", "е")
-    name = re.sub(r"[^\w\s]", " ", name)
-    return re.sub(r"\s+", " ", name).strip()
-
-
 class Entities:
     def __init__(self, engine: Engine, registry: OntologyRegistry) -> None:
         self.engine = engine
@@ -65,8 +67,16 @@ class Entities:
         external: dict[str, str] | None = None,
         entity_id: str | None = None,
     ) -> str:
-        """``names``: (язык, текст, вид: primary | variant | original)."""
+        """``names``: (язык, текст, вид: primary | variant | original).
+
+        Язык каждого названия ставится по письменности (``naming.lang_for``): переданный
+        сохраняется, только если совпадает с ней. Основное название проверяется правилом
+        названий; отказ — событие ``knowledge.entity.rejected`` и ``InvalidName``."""
         self.registry.entity_type(type_)
+        names = [(lang_for(text, lang), text, kind) for lang, text, kind in names]
+        for _, text, kind in names:
+            if kind == "primary":
+                self._check(type_, text)
         for system, value in (external or {}).items():
             with self.engine.begin() as conn:
                 existing = conn.scalar(
@@ -173,17 +183,69 @@ class Entities:
                 .values(primary={**entity["primary"], key: value})
             )
 
+    @staticmethod
+    def _check(type_: str, text: str) -> None:
+        reason = check_name(type_, text)
+        if reason is not None:
+            raise reject(type_, text, reason)
+
     def add_name(self, entity_id: str, lang: str, text: str, kind: str = "variant") -> None:
+        """Язык — по письменности; основное название проверяется, как в ``create``."""
+        entity_id = self.resolve(entity_id)
+        if kind == "primary":
+            self._check(self.get(entity_id)["type"], text)
         with self.engine.begin() as conn:
             conn.execute(
                 t.names.insert().values(
-                    entity_id=self.resolve(entity_id),
-                    lang=lang,
+                    entity_id=entity_id,
+                    lang=lang_for(text, lang),
                     text=text,
                     normalized=normalize(text),
                     kind=kind,
                 )
             )
+
+    def set_primary_name(self, entity_id: str, lang: str, text: str) -> None:
+        """Новое основное название той же сущности: прежние основные становятся вариантами
+        (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
+        Название, уже бывшее вариантом, повышается, а не дублируется."""
+        entity = self.get(entity_id)
+        self._check(entity["type"], text)
+        lang = lang_for(text, lang)
+        key = normalize(text)
+        with self.engine.begin() as conn:
+            rows = (
+                conn.execute(select(t.names).where(t.names.c.entity_id == entity["id"]))
+                .mappings()
+                .all()
+            )
+            previous = [r for r in rows if r["kind"] == "primary"]
+            for row in previous:
+                conn.execute(
+                    update(t.names)
+                    .where(t.names.c.id == row["id"])
+                    .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
+                )
+            same = next((r for r in rows if r["normalized"] == key), None)
+            if same is not None:
+                conn.execute(
+                    update(t.names)
+                    .where(t.names.c.id == same["id"])
+                    .values(kind="primary", lang=lang, text=text)
+                )
+            else:
+                conn.execute(
+                    t.names.insert().values(
+                        entity_id=entity["id"], lang=lang, text=text, normalized=key, kind="primary"
+                    )
+                )
+        previous_lang = lang_for(previous[0]["text"], previous[0]["lang"]) if previous else None
+        events.emit(
+            "knowledge.entity.renamed",
+            entity_id=entity["id"],
+            lang=lang,
+            previous_lang=previous_lang,
+        )
 
     def find(self, name: str) -> list[dict[str, Any]]:
         """Все сущности с таким названием или вариантом: выбор не делается молча."""
