@@ -699,9 +699,10 @@ def test_live_items_without_soon(knowledge_context, knowledge_stack, events):
         ("Ассистент", "/assistant"),
         ("Граф", "/graph"),
         ("Справочник", "/reference"),
-        ("Эпохи", "/epochs"),  # add-epochs: раздел реализован
+        ("Эпохи и контекст", "/epochs"),  # add-epoch-context: подпись раздела
     ):
-        link = nav.get_by_role("link", name=name)
+        link = nav.get_by_role("link", name=name, exact=True)
+        assert link.count() == 1, name
         assert "скоро" not in link.inner_text().lower(), name
         assert link.get_attribute("href") == href, name
     assert nav.get_by_role("link", name="Справочник").get_attribute("aria-current") == "page"

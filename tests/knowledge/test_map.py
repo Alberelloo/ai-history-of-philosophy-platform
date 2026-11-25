@@ -379,3 +379,100 @@ def test_epochs_by_membership_rule_on_map(svc, events):
             .where(schema.statements.c.type == "belongs_to_epoch")
         )
     assert stored == 1
+
+
+# --- add-epoch-context: «стимулировало» у событий карты (задача 6.6) -------------------------
+
+CHOICE = "Выбор на карте"
+
+
+def _revolution_world(svc):
+    w = svc.world
+    ids = {
+        "revolution": w.thing("event", "Французская революция", "1789"),
+        "fichte": w.person("Иоганн Готлиб Фихте", "1762", "1814"),
+        "schelling": w.person("Фридрих Шеллинг", "1775", "1854"),
+        "basis": w.thing("work", "Основа общего наукоучения", "1794"),
+        "freedom": w.thing("concept", "Свобода"),  # без даты — не на карте
+    }
+    w.relate(ids["basis"], "author", ids["fichte"])
+    ids["basis_link"] = w.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["basis"],
+        qualifiers={"mechanism": "political"},
+        attributions=[Attribution("common")],
+    )
+    ids["schelling_link"] = w.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["schelling"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+def _map_event(svc, events, event_id):
+    response, rid = svc.get("/v1/map")
+    assert response.status_code == 200, response.text
+    assert events.where("knowledge.map.built", request_id=rid)
+    return {e["id"]: e for e in response.json()["events"]}[event_id], response.json()
+
+
+@req(KG, CHOICE, scenario="Событие и то, что оно стимулировало")
+def test_map_event_stimulated_api(svc, events):
+    ids = _revolution_world(svc)
+    event, _ = _map_event(svc, events, ids["revolution"])
+    assert event["stimulated"] == [
+        {"id": ids["basis"], "generated": False},
+        {"id": ids["schelling"], "generated": True},
+    ]
+
+
+@req(KG, CHOICE, scenario="Стимулированное вне карты")
+def test_map_stimulated_outside_map(svc, events):
+    w = svc.world
+    revolution = w.thing("event", "Французская революция", "1789")
+    freedom = w.thing("concept", "Свобода")  # без даты — не на карте
+    w.relate(revolution, "stimulated", freedom)
+    other = w.thing("event", "Южноморский пузырь", "1720")
+    w.relate(other, "stimulated", freedom)
+    w.relate(other, "stimulated", w.person("Бернард Мандевиль", "1670", "1733"))
+    event, data = _map_event(svc, events, revolution)
+    assert "stimulated" not in event
+    assert freedom not in {p["id"] for p in data.get("people", [])}
+    bubble = {e["id"]: e for e in data["events"]}[other]
+    assert [s["id"] for s in bubble["stimulated"]] != [] and freedom not in [
+        s["id"] for s in bubble["stimulated"]
+    ]
+
+
+@req(
+    KG, CHOICE, invariant="stimulated у события — не больше 30, проверенные раньше сгенерированных"
+)
+def test_map_stimulated_limit_and_order(svc, events):
+    w = svc.world
+    event = w.thing("event", "Французская революция", "1789")
+    generated = []
+    for i in range(5):
+        person = w.person(f"Сгенерированный {i}", "1760", "1820")
+        generated.append(person)
+        w.statements.add(event, "stimulated", obj=person, provenance=Provenance("generated"))
+    verified = []
+    for i in range(30):
+        person = w.person(f"Проверенный {i:02d}", "1760", "1820")
+        verified.append(person)
+        w.relate(event, "stimulated", person)
+    record, _ = _map_event(svc, events, event)
+    links = record["stimulated"]
+    assert len(links) == 30
+    assert {s["id"] for s in links} == set(verified)
+    assert all(s["generated"] is False for s in links)
+
+
+@req(KG, CHOICE, invariant="отклонённая связь «стимулировало» на карту не попадает")
+def test_map_stimulated_rejected(svc, events):
+    ids = _revolution_world(svc)
+    svc.onto.statements.reject(ids["schelling_link"], "operator")
+    event, _ = _map_event(svc, events, ids["revolution"])
+    assert event["stimulated"] == [{"id": ids["basis"], "generated": False}]

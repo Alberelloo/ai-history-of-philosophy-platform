@@ -539,3 +539,94 @@ def test_epoch_card_without_date_membership(svc, events):
         for s in svc.onto.statements.about(epoch, derived=False)
         if s["type"] == "belongs_to_epoch"
     ] == []
+
+
+# --- add-epoch-context: раздел «Исторический контекст» (задача 6.5) --------------------------
+
+
+def _context_card_world(svc):
+    from philograph.knowledge.statements import Attribution, Evidence, Provenance
+
+    w = svc.world
+    ids = {
+        "doctrine": w.thing("doctrine", "Политическая философия Локка"),
+        "glorious": w.thing("event", "Славная революция", "1688"),
+        "newton": w.thing("event", "Выход «Начал» Ньютона", "1687"),
+    }
+    w.paragraphs["p_1"] = "Революция дала Локку повод писать о правлении."
+    ids["sourced"] = w.statements.add(
+        ids["glorious"],
+        "stimulated",
+        obj=ids["doctrine"],
+        qualifiers={"mechanism": "political"},
+        attributions=[Attribution("source", "s_textbook_n")],
+        evidence=[Evidence("p_1", "дала Локку повод", source_id="s_textbook_n")],
+        provenance=Provenance("extracted"),
+    )
+    # Сгенерированная записывается позже, но идёт второй: порядок — по статусу.
+    ids["generated"] = w.statements.add(
+        ids["newton"],
+        "stimulated",
+        obj=ids["doctrine"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+@req(EC, "Разделы карточки по типу", scenario="Исторический контекст учения")
+def test_doctrine_historical_context(svc, events):
+    ids = _context_card_world(svc)
+    response, rid = svc.get(f"/v1/entities/{ids['doctrine']}/card")
+    assert response.status_code == 200, response.text
+    card = response.json()
+    assert [s["code"] for s in card["sections"]] == ["context"]
+    [section] = card["sections"]
+    assert section["title"] == "Исторический контекст"
+    first, second = section["rows"]
+    assert (first["statement_id"], first["label"]) == (ids["sourced"], "Славная революция")
+    assert first["qualifiers"] == {"mechanism": "political"}
+    assert first["status"] == "sourced" and first["generated"] is False
+    assert [e["paragraph_id"] for e in first["evidence"]] == ["p_1"]
+    assert (second["statement_id"], second["label"]) == (ids["generated"], "Выход «Начал» Ньютона")
+    assert second["qualifiers"] == {} and second["generated"] is True
+    assert second["status"] == "generated"
+    [served] = events.where("knowledge.card.served", request_id=rid)
+    assert (served["sections"], served["rows"]) == (1, 2)
+
+
+@req(
+    EC,
+    "Разделы карточки по типу",
+    invariant="«Исторический контекст» — у понятия, персоны, произведения и учений",
+)
+@pytest.mark.parametrize(
+    "type_", ["concept", "person", "work", "doctrine", "problem", "position", "argument"]
+)
+def test_context_section_for_types(svc, events, type_):
+    w = svc.world
+    target = w.person("Джон Локк", "1632", "1704") if type_ == "person" else w.thing(type_, "Цель")
+    event = w.thing("event", "Славная революция", "1688")
+    sid = w.relate(event, "stimulated", target, qualifiers={"mechanism": "political"})
+    response, rid = svc.get(f"/v1/entities/{target}/card")
+    assert response.status_code == 200, response.text
+    sections = {s["code"]: s for s in response.json()["sections"]}
+    assert "context" in sections, list(sections)
+    [row] = sections["context"]["rows"]
+    assert row["statement_id"] == sid and row["entity_id"] == event
+    assert row["qualifiers"] == {"mechanism": "political"}
+    assert events.where("knowledge.card.served", request_id=rid)
+
+
+@req(
+    EC,
+    "Разделы карточки по типу",
+    invariant="у события «стимулировало» — не «Исторический контекст»",
+)
+def test_event_card_has_no_context_section(svc, events):
+    w = svc.world
+    event = w.thing("event", "Славная революция", "1688")
+    w.relate(event, "stimulated", w.thing("doctrine", "Политическая философия Локка"))
+    response, rid = svc.get(f"/v1/entities/{event}/card")
+    codes = [s["code"] for s in response.json()["sections"]]
+    assert "context" not in codes and codes, codes
+    assert events.where("knowledge.card.served", request_id=rid)

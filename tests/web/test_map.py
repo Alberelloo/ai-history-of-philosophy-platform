@@ -1257,3 +1257,128 @@ def test_fuzzy_edge_keeps_design_anchors(knowledge_context, knowledge_stack, eve
     assert era(page, w["sci"]).locator(".map-era__fade").count() == 1
     assert _geometry(page) == sharp
     map_errors(page)
+
+
+# --- add-epoch-context: событие и то, что оно стимулировало (задача 6.6) ----------------------
+
+
+def revolution_world(world) -> dict[str, str]:
+    """«Французская революция» (1789) стимулировала «Основу общего наукоучения» Фихте (1794)
+    и — сгенерированной связью — Шеллинга. Шесть других современников значимее Фихте и
+    Шеллинга (больше трудов), у двоих — влияние между ними."""
+    from philograph.knowledge.statements import Provenance
+
+    ids = {
+        "revolution": world.thing("event", "Французская революция", "1789"),
+        "fichte": world.person("Иоганн Готлиб Фихте", "1762", "1814"),
+        "schelling": world.person("Фридрих Шеллинг", "1775", "1854"),
+        "basis": world.thing("work", "Основа общего наукоучения", "1794"),
+    }
+    world.relate(ids["basis"], "author", ids["fichte"])
+    others = []
+    for i, (name, birth, death) in enumerate(
+        [
+            ("Иммануил Кант", "1724", "1804"),
+            ("Иоганн Гердер", "1744", "1803"),
+            ("Фридрих Якоби", "1743", "1819"),
+            ("Моисей Мендельсон", "1729", "1786"),
+            ("Карл Рейнгольд", "1757", "1823"),
+            ("Соломон Маймон", "1753", "1800"),
+            ("Георг Гаман", "1730", "1788"),
+        ]
+    ):
+        person = world.person(name, birth, death)
+        others.append(person)
+        for j in range(3):
+            work = world.thing("work", f"Труд {i}-{j}", str(1781 + j))
+            world.relate(work, "author", person)
+    ids["others"] = others
+    ids["influence"] = world.relate(others[1], "influenced_by", others[0])
+    ids["basis_link"] = world.relate(
+        ids["revolution"], "stimulated", ids["basis"], qualifiers={"mechanism": "political"}
+    )
+    ids["schelling_link"] = world.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["schelling"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+def related(page, selector: str) -> str | None:
+    return page.locator(selector).get_attribute("data-related")
+
+
+@req(KG, "Выбор на карте", scenario="Событие и то, что оно стимулировало")
+def test_event_highlights_what_it_stimulated(knowledge_context, knowledge_stack, events):
+    w = revolution_world(knowledge_stack.world)
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{w['revolution']}")
+    map_built(events, response)
+    payload = response.json()
+    event = {e["id"]: e for e in payload["events"]}[w["revolution"]]
+    assert event["stimulated"] == [
+        {"id": w["basis"], "generated": False},
+        {"id": w["schelling"], "generated": True},
+    ]
+    assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
+    assert related(page, f".map-person[data-person='{w['schelling']}']") == "true"
+    assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
+    colours = {who: role_of(page, w[who]) for who in ("fichte", "schelling")}
+    # Линий от события нет: линии — только влияния между людьми из ответа карты.
+    influence_ids = {link["id"] for link in payload["links"]}
+    drawn = set(page.locator(".map-thread-hit").evaluate_all("els => els.map(e => e.dataset.link)"))
+    assert drawn <= influence_ids, drawn - influence_ids
+    assert w["basis_link"] not in drawn and w["schelling_link"] not in drawn
+    # «Только проверенные» — сгенерированная связь не выделяет Шеллинга.
+    check(page, "Связи", "Только проверенные")
+    settle(page)
+    assert address(page)[1].get("verified") == "1"
+    schelling_verified = related(page, f".map-person[data-person='{w['schelling']}']")
+    assert related(page, f".map-person[data-person='{w['fichte']}']") == "true"
+    assert related(page, f".map-work[data-entity='{w['basis']}']") == "true"
+    map_errors(page)
+    # Последними — утверждения, на которых найдены расхождения (verification.md), чтобы
+    # остальные утверждения THEN были проверены и при отказе здесь.
+    # Свои цвета (c1…c6) — у Фихте и Шеллинга раньше прочих участников: семь современников
+    # значимее их, а своих цветов шесть — без приоритета Фихте и Шеллинг их бы не получили.
+    for who, colour in colours.items():
+        assert re.fullmatch(r"c[1-6]", colour or ""), (who, colours)
+    assert schelling_verified == "false", schelling_verified
+
+
+@req(KG, "Выбор на карте", invariant="стимулированное выделяется и вне десятилетнего окна")
+def test_event_stimulated_outside_window(knowledge_context, knowledge_stack, events):
+    world = knowledge_stack.world
+    revolution = world.thing("event", "Славная революция", "1688")
+    kant = world.person("Иммануил Кант", "1724", "1804")  # родился после события
+    late = world.thing("work", "Критика чистого разума", "1781")  # вне ±10 лет
+    world.relate(late, "author", kant)
+    world.relate(revolution, "stimulated", late)
+    world.person("Джон Локк", "1632", "1704")
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{revolution}")
+    map_built(events, response)
+    assert related(page, f".map-work[data-entity='{late}']") == "true"
+    map_errors(page)
+
+
+@req(
+    KG,
+    "Выбор на карте",
+    invariant="«только проверенные» снимает выделение по сгенерированной связи «стимулировало»",
+)
+def test_event_generated_stimulated_off_when_verified(knowledge_context, knowledge_stack, events):
+    from philograph.knowledge.statements import Provenance
+
+    world = knowledge_stack.world
+    revolution = world.thing("event", "Славная революция", "1688")
+    world.person("Джон Локк", "1632", "1704")
+    hume = world.person("Дэвид Юм", "1711", "1776")  # родился после события
+    world.statements.add(revolution, "stimulated", obj=hume, provenance=Provenance("generated"))
+    page, response = open_stack_map(knowledge_context, knowledge_stack, f"/graph/{revolution}")
+    map_built(events, response)
+    assert related(page, f".map-person[data-person='{hume}']") == "true"
+    check(page, "Связи", "Только проверенные")
+    settle(page)
+    assert related(page, f".map-person[data-person='{hume}']") == "false"
+    map_errors(page)

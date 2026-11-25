@@ -13,6 +13,12 @@
 - вызов модели (``http://llm``) записывается в ``llm_calls`` и получает 503;
 - запрос браузера не к стенду обрывается и записывается в ``outside``.
 
+Граф (``POST /v1/graph/build``, add-epoch-context, задача 6.4) достраивает фейковая модель
+шлюза моделей (``stack.model`` — ``FakeProvider``: ответы — ``stack.model.push(...)``, вызовы —
+``stack.model.calls``); это единственный путь к модели на стенде, его вызовы — не ловушка
+``llm_calls``. Сохранение достроенного идёт через очередь ``stack.queue`` — тест запускает её
+сам (``stack.queue.run_until_empty()``), как воркер.
+
 Фикстура ``knowledge_stack`` (``conftest.py``) в конце теста требует, чтобы все три списка
 были пусты. ``page.route`` в тестах — только для 503, задержки и гонки ответов.
 """
@@ -35,6 +41,7 @@ from philograph.knowledge.app import library_paragraphs
 from philograph.knowledge.cards import Cards
 from philograph.knowledge.catalog import Catalog, CatalogSettings
 from philograph.knowledge.entities import Entities
+from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.registry import OntologyRegistry
@@ -45,17 +52,42 @@ from philograph.library.app import build_app as library_app
 from philograph.library.processing import Pipeline
 from philograph.library.reading import Reading
 from philograph.library.registry import License, Registry
+from philograph.llm import store as llm_store
+from philograph.llm.app import build_app as llm_app
+from philograph.llm.config import GatewayConfig
+from philograph.llm.gateway import LLMGateway
+from philograph.llm.providers import FakeProvider
+from philograph.llm.templates import Template, TemplateRegistry
 from philograph.operator.access import migrations as operator_migrations
 from philograph.platform.client import ServiceClient
 from philograph.platform.db import make_engine
 from philograph.platform.files import FileStore
+from philograph.platform.queue import Queue
+from philograph.platform.queue import migrations as queue_migrations
+from philograph.prompts import PROMPTS
 
 from ..helpers import HostRouter, asgi_transport
 from ..knowledge.world import World
 from ..library.builders import epub
 
 RU_KIND = "public-domain-ru"
-BOOK = epub([("Глава 1. Опыт", "<p>Кант пишет об опыте.</p><p>Юм пишет о причинности.</p>")])
+NO_PROPOSALS = '{"statements": []}'
+MODEL_CONFIG = {
+    "providers": {"fake": {"kind": "fake"}},
+    "roles": {"main": {"provider": "fake", "model": "flash"}},
+    "prices": {"flash": {"input_cache_miss": 0.3, "input_cache_hit": 0.03, "output": 1.2}},
+    "budgets": {"site": {"daily_limit_usd": 2.0}, "filling": {}},
+}
+BOOK = epub(
+    [
+        (
+            "Глава 1. Опыт",
+            "<p>Кант пишет об опыте.</p><p>Юм пишет о причинности.</p>"
+            # Абзац для сценариев контекста эпохи (add-epoch-context): уникальная фраза.
+            "<p>Тогда парламент низложил короля.</p>",
+        )
+    ]
+)
 
 
 def _free_port() -> int:
@@ -79,9 +111,12 @@ class KnowledgeStack:
     world: World
     textbooks: dict[str, str]  # "N" | "R" → id источника библиотеки
     router: HostRouter
+    model: Any = None  # FakeProvider достройки графа
+    queue: Any = None  # очередь сохранения достроенного
     llm_calls: list[str] = field(default_factory=list)
     outside: list[str] = field(default_factory=list)
     responses: list[Seen] = field(default_factory=list)
+    paragraphs: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # "N" → (id, текст)
     _server: Any = None
     _thread: Any = None
 
@@ -106,6 +141,11 @@ class KnowledgeStack:
                 )
 
         context.on("response", on_response)
+
+    def paragraph(self, key: str, needle: str) -> str:
+        """Идентификатор абзаца учебника ``key`` («N» | «R»), содержащего ``needle``."""
+        [found] = [pid for pid, text in self.paragraphs[key] if needle in text]
+        return found
 
     def catalog_responses(self) -> list[Seen]:
         return [r for r in self.responses if "/api/knowledge/v1/catalog" in r.url]
@@ -156,6 +196,15 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
         textbooks[key] = source_id
     reading = Reading(registry, lib_engine)
     reading.set_default("operator", textbooks["N"])
+    paragraphs: dict[str, list[tuple[str, str]]] = {}
+    for key, source_id in textbooks.items():
+        doc = registry.load_document(registry.get(source_id).published_version)
+        paragraphs[key] = [
+            (block.id, block.text)
+            for chapter in reading.chapters(doc)
+            for section in chapter.walk()
+            for block in section.blocks
+        ]
     library = library_app(reading)
 
     # --- сервис знаний ---
@@ -181,12 +230,33 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
     llm_client = ServiceClient("llm", "http://llm", transport=httpx.MockTransport(llm))
     snapshots = Snapshots(engine)
     mentions = Mentions(statements, library_client)
+    # --- граф: шлюз моделей с фейковым провайдером и очередь сохранения ---
+    jobs_engine = make_engine(
+        f"sqlite:///{(tmp / 'jobs.db').as_posix()}",
+        [llm_store.migrations.schema, queue_migrations.schema],
+    )
+    llm_store.migrations.upgrade(jobs_engine)
+    queue_migrations.upgrade(jobs_engine)
+    templates = TemplateRegistry()
+    for spec in PROMPTS:
+        templates.register(Template(spec.name, spec.instructions, spec.data_slots))
+    model = FakeProvider(default=NO_PROPOSALS)
+    model_gateway = LLMGateway(
+        GatewayConfig.model_validate(MODEL_CONFIG),
+        {"fake": model},
+        templates,
+        llm_store.Store(jobs_engine),
+    )
+    graph_llm = ServiceClient("llm", "http://llm", transport=asgi_transport(llm_app(model_gateway)))
+    queue = Queue(jobs_engine)
+    graphs = Graphs(statements, graph_llm, queue, GraphSettings(min_edges=5, max_nodes=60))
     knowledge = knowledge_app(
         statements,
         library=library_client,
         mentions=mentions,
         cards=Cards(statements, mentions, llm_client),
         section_map=SectionMap(statements, snapshots=snapshots),
+        graphs=graphs,
         catalog=Catalog(snapshots, onto, entities, CatalogSettings(max_stale_seconds=max_stale)),
     )
     world = World(entities, statements)
@@ -214,6 +284,9 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
     thread.start()
     while not server.started:
         time.sleep(0.02)  # запуск сервера, не проверка поведения
-    stack = KnowledgeStack(f"http://127.0.0.1:{port}", world, textbooks, router, llm_calls)
+    stack = KnowledgeStack(
+        f"http://127.0.0.1:{port}", world, textbooks, router, model, queue, llm_calls
+    )
+    stack.paragraphs = paragraphs
     stack._server, stack._thread = server, thread
     return stack
