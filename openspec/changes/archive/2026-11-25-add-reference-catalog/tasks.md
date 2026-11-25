@@ -49,7 +49,7 @@
 - [ ] 5.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/gateway tests/web/test_reference.py`
 - [ ] 5.3 Ревьювер: вычитка диффа против спецификации, выбранных вариантов (API, снимок, лимиты, принадлежность, пагинация), признаков костылей и подгонки тестов; замечания — в `progress.md`
 - [ ] 5.4 Судья (новый субагент): независимый прогон и вердикт в `verification.md`; PR остаётся draft до вердикта «принято»
-- [ ] 5.5 Архив: перенос дельт в `openspec/specs/` (вручную, CLI `openspec` нет), `openspec/changes/archive/<дата>-add-reference-catalog/`
+- [x] 5.5 Архив: перенос дельт в `openspec/specs/` (вручную, CLI `openspec` нет), `openspec/changes/archive/<дата>-add-reference-catalog/`
 
 ## Вне объёма, отдельной задачей
 
