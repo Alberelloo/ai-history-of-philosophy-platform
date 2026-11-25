@@ -271,6 +271,17 @@ def reject(type_: str, label: str, reason: str) -> InvalidName:
     return InvalidName(type_, label, reason)
 
 
+def invalid_primary(type_: str, names: list[tuple[str, str, str]]) -> tuple[str, str] | None:
+    """Первое основное название, не прошедшее проверку, и причина — до записи, без события.
+    Нужна путям, которые создают несколько сущностей сразу и не должны писать половину."""
+    for _, text, kind in names:
+        if kind == "primary":
+            reason = check_name(type_, text)
+            if reason is not None:
+                return text, reason
+    return None
+
+
 def names_for(type_: str, item: dict[str, Any]) -> list[tuple[str, str, str]]:
     """Названия новой сущности из элемента ``entities`` ответа модели.
 

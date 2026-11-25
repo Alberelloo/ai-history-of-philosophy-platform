@@ -40,22 +40,10 @@ events.define(
     required=("run_id", "paragraphs", "created", "dropped"),
 )
 events.define(
-    "knowledge.extraction.dropped",
-    "warning",
-    "Утверждение модели отброшено",
-    required=("run_id", "reason"),
-)
-events.define(
     "knowledge.extraction.skipped",
     "info",
     "Источник пропущен извлечением",
     required=("source_id", "reason"),
-)
-events.define(
-    "knowledge.extraction.ambiguous",
-    "info",
-    "Неоднозначная привязка — на проверку",
-    required=("name", "candidates"),
 )
 events.define(
     "knowledge.run.started", "info", "Запуск наполнения начат", required=("run_id", "kind")

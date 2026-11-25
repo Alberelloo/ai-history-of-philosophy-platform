@@ -47,6 +47,7 @@ import yaml
 from philograph.knowledge.dates import FuzzyDate, interval
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.epoch_dates import ManifestError, load_manifest, save_manifest
+from philograph.knowledge.naming import invalid_primary, reject
 from philograph.knowledge.statements import Attribution, Provenance, Statements
 from philograph.knowledge.wikidata import (
     QID,
@@ -420,6 +421,15 @@ class EpochContextImport:
         new_place = place is not None and place_id is None
         if place_id is not None and not self._of_type(place_id, PLACE):
             return {"result": "duplicate_qid"}  # QID места занят не местом: решает человек
+        # Названия новых сущностей — до записи: кандидат не пишется наполовину.
+        new = ([(EVENT, names)] if event_id is None else []) + (
+            [(PLACE, _names(place.get("label") or {}, {}, place["qid"]))] if new_place else []
+        )
+        for type_, new_names in new:
+            bad = invalid_primary(type_, new_names)
+            if bad is not None:
+                reject(type_, *bad)
+                return {"result": "invalid_name"}
         attribution = [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))]
         provenance = Provenance(
             "imported", extra={"wikidata": qid, "from": SIGNIFICANT_EVENT, "epoch": entry["qid"]}

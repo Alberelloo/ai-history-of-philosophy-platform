@@ -117,6 +117,24 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
   - новый `accept_core_report(items, actor) -> {"created": [id], "rejected": [{name, type, reason}]}`: ловит `InvalidName` по элементу, отказы возвращает в ответе, а не в состоянии объекта (ревью, желательное 3). `accept_core` = `accept_core_report(...)["created"]`, поэтому единственный вызов в `tests/knowledge/test_filling.py` не меняется.
   - `import_wikidata` создаёт сущности через `create`. `InvalidName` там пропускает элемент: место или учитель с мусорной подписью не создаётся.
 
+### Пути из внешних данных (последствие, дельты MODIFIED)
+
+`Entities.create` теперь может отказать, поэтому каждый путь, создающий сущность из внешних данных, обрабатывает `InvalidName` пропуском со своим существующим событием и не роняет шаг. Пути найдены по всем вызовам `create`, `add_name` и `set_primary_name`:
+
+| Путь | Что при отказе | Событие пропуска | Дельта |
+|---|---|---|---|
+| `Filling.import_wikidata` | главная запись — `[]`; место/учитель/автор — пропуск элемента | `knowledge.entity.rejected` | `ontology-extraction` (импорт не менял `result`) |
+| `Filling.accept_core_report` | элемент в `rejected` с причиной | ответ принятия | `entity-naming`, «Ручное создание» |
+| `MetadataIngest.handle` | автор или цитируемое — пропуск; заголовок — 0 утверждений | `knowledge.metadata.ingested` | нет: метаданные — служебный путь, событие прежнее |
+| `PlaceEnrichment` (новое место) | место не создаётся, утверждение не пишется | `knowledge.geo.skipped`, `reason=refused` | `geo-timeline` |
+| `EpochDates.apply` (новая эпоха) | эпоха не заводится | `knowledge.epoch_dates.checked`, `result=invalid_name` | `epochs` |
+| `EpochContextImport.apply` (новое событие или место) | кандидат не пишется целиком | `knowledge.context_import.checked`, `result=invalid_name` | `epoch-context` |
+| `Entities.source_entity` | — (`source` вне правила) | — | — |
+
+Пути, создающие сразу несколько сущностей (событие и место), проверяют названия **до записи** функцией `naming.invalid_primary`, чтобы не оставить кандидата записанным наполовину. Событие отказа пишется один раз через `naming.reject`.
+
+**Описание событий извлечения.** `knowledge.extraction.dropped` и `knowledge.extraction.ambiguous` описаны в `entity_items.py`, а не в `filling.py`: их пишет `EntityItems`, и путь без `Filling` (миграция) получает их зарегистрированными. `filling.py` импортирует `entity_items`, описание не дублируется.
+
 ## События журнала
 
 | Событие | Уровень | Поля | Когда |

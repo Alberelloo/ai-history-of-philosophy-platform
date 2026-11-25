@@ -48,6 +48,7 @@ from sqlalchemy import select
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate, interval
 from philograph.knowledge.entities import Entities
+from philograph.knowledge.naming import invalid_primary, reject
 from philograph.knowledge.statements import Attribution, Provenance, StatementError, Statements
 from philograph.knowledge.wikidata import (
     ENTITY_URL,
@@ -372,6 +373,12 @@ class PlaceEnrichment:
         except StatementError:
             self._skip(report, entity_id, prop, "refused")
             return
+        if place_record is not None:
+            bad = invalid_primary(PLACE, _names(place_record))
+            if bad is not None:  # подпись места не прошла правило названий
+                reject(PLACE, *bad)
+                self._skip(report, entity_id, prop, "refused")
+                return
         if place_id is None and not report.dry_run:
             place_id = self.entities.create(PLACE, _names(place_record), external={SYSTEM: target})
             # Пометка в происхождении: при откате место остаётся, и его можно посчитать.

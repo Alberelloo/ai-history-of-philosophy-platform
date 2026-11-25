@@ -24,6 +24,21 @@ from philograph.knowledge.naming import (
 from philograph.knowledge.statements import Attribution, Evidence, Provenance, Statements
 from philograph.platform import events
 
+# События извлечения описаны здесь: их пишут и ``EntityItems``, и ``Filling`` (он импортирует
+# этот модуль), поэтому они зарегистрированы при любом пути, в том числе из миграции.
+events.define(
+    "knowledge.extraction.dropped",
+    "warning",
+    "Утверждение модели отброшено",
+    required=("run_id", "reason"),
+)
+events.define(
+    "knowledge.extraction.ambiguous",
+    "info",
+    "Неоднозначная привязка — на проверку",
+    required=("name", "candidates"),
+)
+
 ENTITY_TYPE_DROPPED = "entity:type"
 
 

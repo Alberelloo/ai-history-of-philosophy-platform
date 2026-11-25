@@ -42,6 +42,7 @@
 
   Прогон `tests/knowledge/test_filling.py` — прежние тесты зелёные без правки ожиданий.
 - [x] 2.7 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py`; `pytest -q tests/knowledge/test_filling.py tests/knowledge/test_registry_entities.py tests/knowledge/test_snapshot.py tests/knowledge/test_geo_enrich.py tests/knowledge/test_epoch_dates.py`. Язык по письменности в `create` затрагивает все пути создания.
+- [x] 2.8 Пути из внешних данных: `geo_enrich`, `epoch_dates`, `epoch_context`, `metadata` обрабатывают отказ названия пропуском (design.md, «Пути из внешних данных»), дельты MODIFIED `epochs`, `epoch-context`, `geo-timeline`; `knowledge.extraction.dropped`/`ambiguous` описаны в `entity_items.py`. Юнит-проверки `tests/knowledge/test_invalid_name_paths_unit.py`.
 
 ## 3. Тестировщик
 
@@ -63,6 +64,7 @@
   - «Извлечение дат»: `span`/`precision` = ожидание по таблице, иначе одно `dropped` с ожидаемой причиной;
   - «Структурированный вывод»: в базе только типы реестра для любых типов элементов;
   - «Нормализация»: найденная по любому написанию сущность не дублируется.
+- [ ] 3.3а Сценарные тесты новых сценариев дельт MODIFIED: «Название эпохи не прошло проверку», «Название события не прошло проверку», «Подпись места не прошла проверку».
 - [ ] 3.4 Мутации — по одной и больше на **каждое** требование. В `tests/mutations/improve-extraction-naming/mutations.yaml` указан ожидаемый упавший тест:
 
   | Требование | Мутация | Ожидаемый упавший тест |
@@ -78,6 +80,9 @@
   | Извлечение дат | римский век не ищется в цитате | «Века нет в цитате» |
   | Структурированный вывод | тип элемента не проверяется сервером | «Тип вне реестра в сущностях» |
   | Нормализация | кандидаты не ищутся по `en` | «Привязка по английскому написанию» |
+  | Даты эпох из Wikidata | `invalid_name` не проверяется (создание падает) | «Название эпохи не прошло проверку» |
+  | Контекстные события из Wikidata | место создаётся до проверки названия события | «Название события не прошло проверку» |
+  | Места и координаты из Wikidata | подпись места не проверяется | «Подпись места не прошла проверку» |
 
 - [ ] 3.5 `python scripts/mutation_check.py --change improve-extraction-naming` — таблица в `verification.md`; `--coverage improve-extraction-naming` чисто.
 - [ ] 3.6 `openspec/traceability.yaml`: `entity-naming` в `enforce` (`entity-dating` — в `add-wikidata-life-dates` 3.6). `python scripts/check_traceability.py` чисто.

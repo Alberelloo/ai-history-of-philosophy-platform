@@ -38,6 +38,7 @@ import yaml
 
 from philograph.knowledge.dates import FuzzyDate, interval
 from philograph.knowledge.entities import DuplicateEntity, Entities
+from philograph.knowledge.naming import invalid_primary, reject
 from philograph.knowledge.statements import Attribution, Provenance, Statements
 from philograph.knowledge.wikidata import (
     QID,
@@ -330,8 +331,12 @@ class EpochDates:
             return {"epoch_id": None, "label": ru, "qid": qid, "result": found}
         dating, props = found
         new_id = None
+        names = [("ru", ru, "primary")] + ([("en", en, "variant")] if en else [])
+        bad = invalid_primary(EPOCH, names)
+        if bad is not None:  # название из манифеста не прошло правило названий
+            reject(EPOCH, *bad)
+            return {"epoch_id": None, "label": ru, "qid": qid, "result": "invalid_name"}
         if not dry_run:
-            names = [("ru", ru, "primary")] + ([("en", en, "variant")] if en else [])
             new_id = self.entities.create(EPOCH, names, external={SYSTEM: qid})
             self._write(new_id, qid, dating, props)
         return {
