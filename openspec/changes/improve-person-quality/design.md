@@ -27,31 +27,26 @@
 ```python
 @dataclass(frozen=True)
 class Verdict:  kind: Literal["merge", "review", "apart"]; reason: str
-def same_person(a: Entity, b: Entity, *, paired_by_model: bool = False) -> Verdict
-def choose_kept(a: Entity, b: Entity, counts: Mapping[str, int]) -> tuple[str, str]   # (kept, removed)
-def clusters(entities: Iterable[Entity]) -> list[list[str]]   # для миграции: связные компоненты по правилу
+def same_person(a: Entity, b: Entity, *, paired_by_model=False, qid_confirmed=False) -> Verdict
+def choose_kept(component: list[Entity], counts: Mapping[str, int]) -> str
+def plan(entities: Iterable[Entity], pairs_by_model=(), confirmed=()) -> Plan   # чистая функция
+@dataclass(frozen=True)
+class Plan: merges: list[tuple[str, list[str], str]]; review: list[tuple[str, str, str]]   # (kept, removed[], reason), (a, b, reason)
 ```
 
-`Entity` — `{id, type, names, primary, externals}`. Правило `same_person` проверяет по порядку:
-
-1. **Разный тип** или **тип не `person`** → `apart:type`. Правило из этого изменения работает только для персон.
-2. **Разные QID** (у обеих есть `wikidata`, значения различны) → `apart:qid`.
-3. **Один QID** → `merge:qid`.
-4. **Даты противоречат:** обе `primary.dates` есть, и интервалы начала `[earliest_start − 2, latest_start + 2]` не пересекаются, или так же не пересекаются интервалы конца → `review:dates`. Неопределённость учитывается: «V в. до н. э.» не противоречит «ок. 470 до н. э.».
-5. **Доказательство тождества** → `merge:name` или `merge:model_pair`:
-   - совпадает хотя бы одно *основное* нормализованное название (на любом языке);
-   - или `paired_by_model`: один элемент `entities` дал оба написания, и каждое нашло ровно одну из двух сущностей.
-6. **Совпадает только вариант** → `review:variant`. Пример: «Бэкон» у Фрэнсиса и Роджера.
-7. Иначе → `apart:none`.
+`Entity` — `{id, type, names, primary, externals}`. Правило `same_person` по шагам 1–8 и правило компонент заданы в спецификации `person-quality` и здесь не повторяются. Изменения после ревью (О9):
+- **`merge:qid` убран.** Первичный ключ `external_ids (system, value)` не допускает один QID у двух сущностей. Его место заняло `merge:qid_confirmed`: человек подтвердил в манифесте QID для сущности, у которой его нет, а QID уже у другой (`qid_taken` в `add-wikidata-life-dates`);
+- **компоненты.** `plan` строит граф по рёбрам `merge:*` (индекс по нормализованным основным названиям, плюс пары от модели и подтверждения) и находит связные компоненты объединением множеств. Компонента с ≥ 2 QID или с парой `apart:qid`/`review:dates` целиком уходит в очередь. Это закрывает обход запрета QID по транзитивности: «Hume»(Q1)~«Hume»~«Hume»(Q2). Итог зависит только от множества входа: компоненты, `choose_kept` по компоненте и сортировка вывода по id;
+- **даты у одной стороны** — не противоречие.
 
 `choose_kept` выбирает оставшуюся по порядку:
 - сущность с QID;
 - иначе ту, у которой больше ссылок (утверждения как субъект и объект плюс атрибуции `who`);
 - иначе меньший id.
 
-`clusters` строит компоненты по `merge` для миграции. Индекс — по нормализованному основному названию и по QID, а не все пары: O(n · названий).
+Сложность `plan` — O(n · названий) по индексу, без перебора всех пар.
 
-`Dedupe(statements, review).run(*, dry_run=False, run_id=None) -> {merged, proposed, apart}` — «запуск слияния вариантов» из сценариев. Он обходит персон по индексу и сливает пары с вердиктом `merge` через `merge_entities`, а пары `review` ставит в очередь. Сухой прогон только считает. Своего CLI у него нет: оператор запускает его шагом миграции (`migrate-ontology-quality`) или из юнит-кода. Слияния запуска записываются в `merges` с `run_id` в `moved.run_id`, чтобы миграция могла откатить их по запуску.
+`Dedupe(statements, review).run(*, dry_run=False, run_id=None, confirmed=()) -> {merged, proposed, apart}`. Здесь `confirmed` — пары `(entity, holder)` из `qid_taken`. Метод — — «запуск слияния вариантов» из сценариев. Он обходит персон по индексу и сливает пары с вердиктом `merge` через `merge_entities`, а пары `review` ставит в очередь. Сухой прогон только считает. Своего CLI у него нет: оператор запускает его шагом миграции (`migrate-ontology-quality`) или из юнит-кода. Слияния запуска записываются в `merges` с `run_id` в `moved.run_id`, чтобы миграция могла откатить их по запуску.
 
 ### `Statements.merge_entities(kept, removed, reason) -> merge_id` (новый, `statements.py`)
 
@@ -60,7 +55,7 @@ def clusters(entities: Iterable[Entity]) -> list[list[str]]   # для мигр�
 1. `Entities.merge` переносит:
    - названия: основное удалённой на языке, где у оставшейся уже есть основное, становится `variant`; прежний вид пишется в `moved.kinds`. Точные повторы названий `(lang, normalized)` не дублируются: строка удалённой переносится, но получает вид `variant`;
    - `statements.subject` и `statements.object`;
-   - `external_ids`;
+   - `external_ids` — перенесённые пишутся в `moved.externals` (исправление: сейчас `undo_merge` их не возвращает, ревью п. 3);
    - `mentions`;
    - `attributions.who`, где `who_kind="entity"` и `who=removed` (`moved.attributions_who`);
    - `portraits`. При конфликте уникальности (одинаковый `phash`) портрет удалённой остаётся за ней, это записывается в `moved.portraits_kept`.
@@ -72,12 +67,14 @@ def clusters(entities: Iterable[Entity]) -> list[list[str]]   # для мигр�
    - полная строка повтора сохраняется в `moved.folded[].row`, сама строка удаляется;
    - согласие `survivor` пересчитывается, в журнал утверждения (`journal`) пишется запись «свёрнуто при слиянии».
 4. `_update_primary(kept, "lifespan" | "dating" | "description")`.
-5. Событие `knowledge.entity.merged` с полями `kept`, `removed`, `reason`, `statements`, `attributions`, `folded`.
+5. **Петли.** Утверждение, у которого после переноса `subject == object`, остаётся в базе как есть. Снимок не показывает утверждения-связи с `subject == object`. Число петель пишется в `moved.loops`, `integrity` (миграция) считает их отдельно от потерь.
+6. Событие `knowledge.entity.merged` с полями `kept`, `removed`, `reason`, `statements`, `attributions`, `folded`, `loops`.
 
 `Statements.undo_merge(merge_id)` выполняет шаги в обратном порядке:
 - восстанавливает строки свёрнутых утверждений;
 - возвращает атрибуции и подтверждения на них;
-- возвращает ключи, виды названий, `attributions.who`, портреты;
+- возвращает ключи, виды названий, `attributions.who`, портреты, `external_ids` (`moved.externals`);
+- восстанавливает свёрнутые утверждения с прежними id;
 - вызывает `Entities.undo_merge`;
 - пересчитывает `primary` обеих сущностей.
 
@@ -127,28 +124,37 @@ def clusters(entities: Iterable[Entity]) -> list[list[str]]   # для мигр�
 | А. Не сворачивать, скрывать повторы в снимке по содержимому | Без записи в базу | Правило объединения повторов размазано по снимку, карточкам и графу | Каждый новый потребитель должен помнить про повторы |
 | Б. Свёртка в `Statements.merge_entities` с архивом строки в `merges.moved` (выбрано) | Одна транзакция на слияние | Ключ, согласие и `primary` у их владельца (`Statements`); `Entities.merge` остаётся переносом строк | Отмена полная по архиву; формат `moved` расширяется ключами, старые записи отменяются как прежде (`get` с умолчаниями) |
 
-## Генераторы для property-тестов (О7)
+## Стратегии для property-тестов (О7, О9)
 
-Генераторы лежат в `tests/knowledge/strategies.py` (общий файл с `improve-extraction-naming`).
+Инфраструктура (профили, «вход + ожидание», `dump.py`, `mutation_check.py`, запрет сети) — общая, из `improve-extraction-naming`. Стратегии этого изменения — в `tests/knowledge/strategies.py`. Оракул не импортирует `dedupe`.
 
-- `persons_with_variants()` — кластеры 1–4 сущностей одного лица:
+- `persons_with_variants()` — персоны и **ожидаемое разбиение**. Стратегия сначала выбирает «лица», затем раздаёт каждому 1–4 записи. Из каждого лица в разбиение попадает один блок, если в блоке нет двух QID и противоречащих дат. Иначе ожидается очередь. Части:
   - написания ru/en/транслит, регистр;
-  - QID: общий, разные или нет;
-  - даты: равные, в пределах 2 лет, противоречащие или нет.
-- `ontology_with_duplicates()` — 5–30 сущностей и 0–60 утверждений между ними:
-  - атрибуции `source`, `entity` (в том числе на дубль), `common`;
+  - QID: нет, один на лицо, два на лицо (цепочка через запись без QID);
+  - даты: равные, в допуске, противоречащие, у одной стороны.
+
+  Тест прогоняет `Dedupe.run` на двух перестановках входа.
+- `ontology_with_duplicates()` — 5–30 сущностей и 0–60 утверждений и **ожидаемое множество содержания** после слияния. В нём:
+  - атрибуции `source`, `entity` (в том числе на удаляемую), `common`;
   - подтверждения;
-  - повторы утверждений, которые совпадут после слияния;
+  - повторы, которые совпадут после слияния;
+  - петли;
   - упоминания;
-  - портреты с одинаковым `phash`.
-- `not_persons()` — роли, обращения, группы, местоимения, склейки `A and B`/`А и Б` (переиспользует `not_names`).
+  - портреты с одинаковым `phash`;
+  - QID у одной стороны.
+- `not_persons()` — переиспользует `not_names` с ожидаемой причиной.
+- Явные `@example`:
+  - «Hume»(Q1) / «Hume» / «Hume»(Q2);
+  - разные QID «Бэкон»;
+  - даты на границе допуска ±2;
+  - петля;
+  - повтор с одинаковой атрибуцией.
 
-## Инварианты, которые доказывают тесты
-
-- **Сохранение при слиянии.** Для любой онтологии и любой пары множество троек `(resolve(subject), type, resolve(object), value, qualifiers)` до и после слияния одинаково. Мультимножество атрибуций `(тройка, who_kind, resolve(who), stance)` не теряет элементов, кроме точных повторов на одном утверждении. Подтверждения сохраняются полностью.
-- **Отмена.** После `undo_merge` дамп таблиц `names`, `statements`, `attributions`, `evidence`, `external_ids`, `mentions`, `portraits`, `entities` равен дампу до слияния. Исключение — порядок строк и кэш `graph_extensions`.
-- **Одно основное.** После слияния у сущности не больше одного основного названия на язык.
-- **QID.** Сущности с разными QID никогда не сливаются автоматически; общий QID после слияния один и принадлежит оставшейся.
+**Инварианты** (формулировки — в спецификации):
+- **Сохранение.** Множество `(resolve(subject), type, resolve(object), value, qualifiers)` после слияния равно ожидаемому без петель. Мультимножество атрибуций `(тройка, who_kind, resolve(who), stance)` не теряет элементов, кроме точных повторов. Подтверждения сохраняются.
+- **Отмена.** `dump.dump()` после `undo_merge` равен дампу до слияния.
+- **QID.** Ни одна сущность после слияния не содержит записей двух разных QID.
+- **Независимость от порядка.** Итог `Dedupe.run` одинаков на перестановках.
 
 ## Риски
 
