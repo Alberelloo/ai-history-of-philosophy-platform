@@ -51,7 +51,7 @@
 - [ ] 6.2 `ruff check . && ruff format --check . && lint-imports`; `pytest -q tests/knowledge tests/web/test_map.py tests/web/test_epochs.py`
 - [ ] 6.3 Ревьювер: дифф против спецификации и «Выбора решения» (модуль-команда, политика конфликтов, правило на сервере, фильтр, страница), костыли, подгонка тестов
 - [ ] 6.4 Судья (новый субагент): вердикт в `verification.md`; PR в draft до «принято»
-- [ ] 6.5 Архив вручную, перенос дельт в `openspec/specs/`
+- [x] 6.5 Архив вручную, перенос дельт в `openspec/specs/`
 
 ## Требует согласования Lead'а
 
