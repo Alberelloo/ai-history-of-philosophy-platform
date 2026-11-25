@@ -27,7 +27,7 @@
   - проверка формы манифеста (код 2);
   - `rollback`: утверждения, кроме проверенных; QID из `run_actions`, кроме тех, на которые ссылается проверенное (`kept`); `undo_merge` слияний запуска;
   - события `knowledge.life_dates.*`.
-- [ ] 2.4 CLI `suggest|apply|rollback` (`--manifest`, `--auto-exact`, `--linked`, `--dry-run`, `--limit`, `--from-file`). Сеть — только `wikidata.http_fetch`. Манифест `sources/person_qids.yaml` с шапкой-комментарием и `entities: []`. Проверка формы до базы и сети.
+- [x] 2.4 CLI `suggest|apply|rollback` (`--manifest`, `--auto-exact`, `--linked`, `--dry-run`, `--limit`, `--from-file`). Сеть — только `wikidata.http_fetch`. Манифест `sources/person_qids.yaml` с шапкой-комментарием и `entities: []`. Проверка формы до базы и сети.
 - [ ] 2.5 **Файл Lead'а** `filling.py`:
   - импорт `WIKIDATA_ROLES` из `wikidata.py`;
   - даты `import_wikidata` через `simple_time` + `interval` — оба блока: P569/P570 и P577 (`filling.py:535`);

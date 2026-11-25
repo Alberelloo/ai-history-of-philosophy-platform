@@ -9,7 +9,7 @@ from philograph.knowledge import schema as t
 from philograph.knowledge.dates import parse, span
 from philograph.knowledge.life_dates import LifeDates, ManifestError, main, validate
 from philograph.knowledge.statements import Attribution
-from tests.knowledge.wd_records import RecordFetch, record
+from tests.knowledge.wd_records import RecordFetch, no_network, record  # noqa: F401
 
 HUMAN = ("Q5",)
 PHILOSOPHER = "Q4964182"
@@ -249,3 +249,36 @@ def _dump(onto):
     from tests.knowledge.dump import dump
 
     return dump(onto.entities.engine)
+
+
+def test_cli_apply_from_file_and_suggest_keeps_header(onto, tmp_path, capsys, no_network):
+    import json
+
+    plato = create(onto, "Платон")
+    records = tmp_path / "records.json"
+    records.write_text(json.dumps({"Q859": PLATO}), encoding="utf-8")
+    manifest = tmp_path / "m.yaml"
+    manifest.write_text(
+        f"# шапка\nentities:\n- entity: {plato}\n  wikidata: Q859\n  decision: accepted\n",
+        encoding="utf-8",
+    )
+    service = lambda fetch: LifeDates(onto.statements, fetch)  # noqa: E731
+    argv = ["apply", "--manifest", str(manifest), "--from-file", str(records)]
+    assert main(argv, service=service) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert (report["externals"], report["lifespans"], report["dry_run"]) == (1, 1, False)
+    assert (
+        main(["suggest", "--manifest", str(manifest), "--from-file", str(records)], service=service)
+        == 0
+    )
+    assert manifest.read_text(encoding="utf-8").startswith("# шапка\n")
+
+
+def test_default_manifest_is_valid():
+    from pathlib import Path
+
+    from philograph.knowledge.epoch_dates import load_manifest
+
+    path = Path(__file__).resolve().parents[2] / "sources" / "person_qids.yaml"
+    assert validate(load_manifest(path)) == []
+    assert path.read_text(encoding="utf-8").startswith("# ")
