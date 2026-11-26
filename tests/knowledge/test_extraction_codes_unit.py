@@ -113,3 +113,17 @@ def test_group_within_limit_has_no_event(onto, events):
     onto.entities.create("person", [("ru", "Роджер Бэкон", "primary")])
     assert onto.entities.duplicate_candidates()
     assert events.of("knowledge.entity.duplicate_group_capped") == []
+
+
+def _texts(onto, entity_id):
+    return {(n["text"], n["kind"]) for n in onto.entities.get(entity_id)["names"]}
+
+
+def test_names_stored_strip_nfc(onto):
+    """О22: текст названия хранится в форме strip + NFC на всех путях записи."""
+    decomposed = "  Фёдоров "  # «ё» как «е» + U+0308
+    entity = onto.entities.create("person", [("ru", decomposed, "primary")])
+    onto.entities.add_name(entity, "en", "  Fedorov\t", "variant")
+    assert _texts(onto, entity) == {("Фёдоров", "primary"), ("Fedorov", "variant")}
+    onto.entities.set_primary_name(entity, "ru", " Николаи\u0306 Фёдоров ")  # «й» = «и» + U+0306
+    assert ("Николай Фёдоров", "primary") in _texts(onto, entity)

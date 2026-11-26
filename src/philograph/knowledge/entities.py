@@ -16,6 +16,7 @@ from philograph.knowledge import schema as t
 from philograph.knowledge.naming import (
     InvalidName,
     check_name,
+    clean,
     is_russian,
     lang_for,
     normalize,
@@ -92,7 +93,7 @@ class Entities:
         сохраняется, только если совпадает с ней. Основное название проверяется правилом
         названий; отказ — событие ``knowledge.entity.rejected`` и ``InvalidName``."""
         self.registry.entity_type(type_)
-        names = [(lang_for(text, lang), text, kind) for lang, text, kind in names]
+        names = [(lang_for(clean(text), lang), clean(text), kind) for lang, text, kind in names]
         for _, text, kind in names:
             if kind == "primary":
                 self._check(type_, text)
@@ -216,7 +217,9 @@ class Entities:
             raise reject(type_, text, reason)
 
     def add_name(self, entity_id: str, lang: str, text: str, kind: str = "variant") -> None:
-        """Язык — по письменности; основное название проверяется, как в ``create``."""
+        """Язык — по письменности; основное название проверяется, как в ``create``. Текст
+        хранится в форме ``strip`` + NFC."""
+        text = clean(text)
         entity_id = self.resolve(entity_id)
         if kind == "primary":
             self._check(self.get(entity_id)["type"], text)
@@ -234,7 +237,8 @@ class Entities:
     def set_primary_name(self, entity_id: str, lang: str, text: str) -> None:
         """Новое основное название той же сущности: прежние основные становятся вариантами
         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
-        Название, уже бывшее вариантом, повышается, а не дублируется."""
+        Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+        text = clean(text)
         entity = self.get(entity_id)
         self._check(entity["type"], text)
         lang = lang_for(text, lang)

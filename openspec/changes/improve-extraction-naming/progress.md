@@ -209,3 +209,8 @@
 
 Тесты усилены: `assert events.of(DROPPED)` заменён проверкой точного кода. Новые мутации есть, `--coverage` чисто. `ruff check` и `format --check` на изменённых файлах чисто, `lint-imports` — 3 kept, traceability — 410/410.
 Блокирует: нет. Пункт 4.1 отмечен.
+
+## О22 (разработчик)
+
+- Spec `entity-naming`, определение *Название*: текст SHALL храниться в форме strip+NFC на любом пути записи. Код: `naming.clean` (strip+NFC; им же пользуются `check_name` и `reject`), применён в `Entities.create`, `add_name`, `set_primary_name` — раньше хранился сырой текст. Юнит: `test_extraction_codes_unit.py::test_names_stored_strip_nfc`.
+- Прогоны: `test_extraction_codes_unit` 11, `test_entity_naming` 50, `test_registry_entities` 33 + 1 skipped, `test_entity_items_unit` 12, `test_invalid_name_paths_unit` 4, `test_ontology_migrate_unit` 13 — passed.

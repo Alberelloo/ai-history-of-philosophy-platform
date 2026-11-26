@@ -141,6 +141,12 @@ def load_rules(path: Path = RULES_PATH) -> Rules:
 # --- нормализация и письменность ---
 
 
+def clean(text: str) -> str:
+    """*Название* по определению ``entity-naming``: ``strip`` и NFC. Так оно хранится и
+    проверяется (О22)."""
+    return unicodedata.normalize("NFC", text.strip())
+
+
 def normalize(name: str) -> str:
     """Правило поиска сущностей: NFC, нижний регистр, «ё» → «е», всё, кроме букв, цифр и
     пробелов, — пробел; пробелы схлопываются, края обрезаются."""
@@ -243,7 +249,7 @@ def check_name(type_: str, label: str, rules: Rules | None = None) -> str | None
     rules = rules or load_rules()
     if type_ in rules.exempt:
         return None
-    label = unicodedata.normalize("NFC", label.strip())
+    label = clean(label)
     has_letter = any(unicodedata.category(ch).startswith("L") for ch in label)
     has_digit = any(ch.isdigit() for ch in label)
     if not has_letter and not has_digit:
@@ -269,7 +275,7 @@ def reject(type_: str, label: str, reason: str) -> InvalidName:
     """Событие отказа ровно с полями type, label, reason; возвращает исключение для вызова.
     ``label`` события — название после ``strip`` и NFC (как его проверяет ``check_name``),
     обрезка — по нему же."""
-    label = unicodedata.normalize("NFC", label.strip())
+    label = clean(label)
     events.emit("knowledge.entity.rejected", type=type_, label=event_label(label), reason=reason)
     return InvalidName(type_, label, reason)
 
