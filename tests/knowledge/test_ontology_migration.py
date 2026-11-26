@@ -17,7 +17,7 @@ import pytest
 import yaml
 from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as hst
-from sqlalchemy import delete, select, text
+from sqlalchemy import delete, select, text, update
 
 from philograph.knowledge import naming, run_actions
 from philograph.knowledge import schema as t
@@ -2274,3 +2274,46 @@ def test_retired_names_not_normalized(onto, events):
             for r in conn.execute(select(t.names).where(t.names.c.entity_id == gone))
         }
     assert raw_back == {("en", "20.1", "primary"), ("en", f" {nfd}", "variant")}, raw_back
+
+
+@req(
+    OM,
+    MIG,
+    invariant="J22: атрибуция сравнивается по (вид, автор, позиция): смена позиции — потеря",
+)
+def test_stance_change_aborts(onto, events, capsys, monkeypatch, tmp_path, database_url):
+    ids = stand(onto)
+    sid = add_statement(
+        onto, ids["kant"], "studied_with", ids["b1"], [Attribution("source", "s_only", "asserts")]
+    )
+    base = tmp_path / "before.json"
+    quality(capsys, database_url, "--save", str(base))
+    original = onto.statements.merge_entities
+    changed: list[int] = []
+
+    def restance(kept, removed, **kw):
+        result = original(kept, removed, **kw)
+        if not changed:
+            with onto.statements.engine.begin() as conn:  # сбой: слияние меняет позицию
+                row = conn.execute(
+                    select(t.attributions).where(t.attributions.c.who == "s_only")
+                ).first()
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id == row.id)
+                    .values(stance="disputes")
+                )
+                changed.append(row.id)
+        return result
+
+    monkeypatch.setattr(onto.statements, "merge_entities", restance)
+    code, report = cli(onto, capsys, ["run", "--translate", "off"])
+    monkeypatch.undo()
+    assert code == 1 and changed
+    [aborted] = events.of("knowledge.migration.aborted")
+    assert aborted["lost_attributions"] == 1 and aborted["lost"] == 0
+    assert events.one("knowledge.migration.rolled_back")["run_id"] == report["run_id"]
+    # Откат вернул всё, что сделал запуск; смену позиции сделала подмена — А8 её видит.
+    _code, result = quality(capsys, database_url, "--baseline", str(base))
+    assert values(result)["a8"] == 1, values(result)
+    assert sid in {s["id"] for s in State.read(onto.statements.engine).statements.values()}
