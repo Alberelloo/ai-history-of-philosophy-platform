@@ -17,8 +17,10 @@ jobs:
     name: checks
     runs-on: ubuntu-latest
     # Два прогона pytest (SQLite и PostgreSQL) с браузерными тестами: в ноябре 2026 — до 15 мин,
-    # прогон #42 отменён по прежнему пределу в 15 мин при зелёных тестах.
-    timeout-minutes: 25
+    # прогон #42 отменён по прежнему пределу в 15 мин при зелёных тестах. С браузерными тестами
+    # глобуса (#55, #58) шаг SQLite идёт ~31 мин, шаг PostgreSQL без tests/web — ~16 мин.
+    # Оба остаются в одном задании: обязательная проверка в защите main — `checks`.
+    timeout-minutes: 60
     env:
       PYTHONUTF8: "1"
     services:
@@ -113,8 +115,10 @@ jobs:
         if: steps.py.outputs.present == 'true'
         env:
           PHILOGRAPH_TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/test
-        # Сквозные тесты идут на своём стенде, второй прогон им не нужен.
-        run: pytest -q -m "not e2e"
+        # Сквозные тесты идут на своём стенде, второй прогон им не нужен. Браузерные тесты
+        # (tests/web) поднимают стенд на своих SQLite и PHILOGRAPH_TEST_DATABASE_URL не читают:
+        # на PostgreSQL они повторили бы прогон SQLite один в один.
+        run: pytest -q -m "not e2e" --ignore=tests/web
 
   e2e:
     name: e2e

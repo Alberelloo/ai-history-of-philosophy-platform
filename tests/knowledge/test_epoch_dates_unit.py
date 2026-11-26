@@ -278,14 +278,14 @@ def test_cli_apply_prints_report(onto, tmp_path, capsys):
     assert read("entity_Q4692.json")  # фикстура на месте
 
 
-def test_repository_manifest_is_valid_and_unconfirmed():
+def test_repository_manifest_is_valid():
     from pathlib import Path
 
     from philograph.knowledge.epoch_dates import load_manifest
 
+    # QID в манифесте подтверждает человек (sources/epochs.yaml), тест проверяет только форму.
     manifest = load_manifest(Path(__file__).parents[2] / "sources" / "epochs.yaml")
     assert validate(manifest) == []
-    assert all(e["wikidata"] is None for e in manifest["epochs"])  # QID подтверждает человек
 
 
 def test_manifest_qid_differs_from_epoch_qid(onto):

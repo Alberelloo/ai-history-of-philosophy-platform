@@ -598,15 +598,20 @@ def test_name_as_text(knowledge_context, knowledge_stack, events):
     world = knowledge_stack.world
     g = Geo(world)
     place = g.place("Афины", 37.98, 23.73)
-    evil = world.person(XSS_IMG, "1700", "1780")
-    evil2 = world.person(XSS_IMG_NOSPACE, "1700", "1780")
+    # Онтология не примет такое имя (правила названий), а сценарий — о том, как клиент
+    # выводит то, что пришло в /map. Поэтому враждебные label и short подставляются в ответ.
+    evil = world.person("Враждебный Первый", "1700", "1780")
+    evil2 = world.person("Враждебный Второй", "1700", "1780")
     g.lived(evil, place)
     g.lived(evil2, place)
     page, response, data = open_globe_map(
-        knowledge_context, knowledge_stack, "/graph?view=globe&t=1750"
+        knowledge_context,
+        knowledge_stack,
+        "/graph?view=globe&t=1750",
+        before_extra=hostile_names({evil: XSS_IMG, evil2: XSS_IMG_NOSPACE}),
     )
     short = {p["id"]: p.get("short") or p["label"] for p in data["people"]}
-    assert short[evil2] == XSS_IMG_NOSPACE
+    assert short[evil] == XSS_IMG and short[evil2] == XSS_IMG_NOSPACE
     names = {n["id"]: n for n in scene(page)["names"]}
     for who in (evil, evil2):
         assert names[who]["text"] == short[who]
@@ -616,6 +621,19 @@ def test_name_as_text(knowledge_context, knowledge_stack, events):
     assert page.locator(".geo-globe image").count() == 0  # портретов нет
     geo_built(events, response)
     errors(page)
+
+
+def hostile_names(labels: dict[str, str]):
+    """``before_extra`` для ``open_globe_map``: в ответе /map у персон label и short — из ``labels``."""
+
+    def patch(route):
+        body = route.fetch().json()
+        for p in body["people"]:
+            if p["id"] in labels:
+                p["label"] = p["short"] = labels[p["id"]]
+        route.fulfill(json=body)
+
+    return lambda page: page.route(MAP_API, patch)
 
 
 HOSTILE = {
@@ -637,8 +655,11 @@ def test_name_is_short_or_label(knowledge_context, knowledge_stack, events):
     g = Geo(world)
     places = [g.place(n, lat, lon) for n, lat, lon in europe(8)]
     ids = {}
+    hostile = {}
     for i, (k, label) in enumerate(HOSTILE.items()):
-        ids[k] = world.person(label, "1700", "1780")
+        # html, long и quote не пройдут правила названий онтологии — подставляются в ответ /map.
+        ids[k] = world.person(f"Враждебный {k.capitalize()}", "1700", "1780")
+        hostile[ids[k]] = label
         g.lived(ids[k], places[i])
     ids["noshort"] = world.person("Без краткого Имени", "1700", "1780")
     g.lived(ids["noshort"], places[6])
@@ -648,6 +669,8 @@ def test_name_is_short_or_label(knowledge_context, knowledge_stack, events):
     def patch(route):
         body = route.fetch().json()
         for p in body["people"]:
+            if p["id"] in hostile:
+                p["label"] = p["short"] = hostile[p["id"]]
             if p["id"] == ids["noshort"]:
                 p.pop("short", None)
             if p["id"] == ids["emptyshort"]:

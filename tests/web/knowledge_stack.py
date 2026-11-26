@@ -289,9 +289,15 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
     while not server.started:
         time.sleep(0.02)  # запуск сервера, не проверка поведения
     stack = KnowledgeStack(
-        f"http://127.0.0.1:{port}", world, textbooks, router, model, queue, llm_calls
+        f"http://127.0.0.1:{port}",
+        world,
+        textbooks,
+        router,
+        model=model,
+        portraits=portraits,
+        queue=queue,
+        llm_calls=llm_calls,
+        paragraphs=paragraphs,
     )
-    stack.paragraphs = paragraphs
-    stack.portraits = portraits
     stack._server, stack._thread = server, thread
     return stack

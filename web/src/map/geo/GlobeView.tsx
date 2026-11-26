@@ -402,9 +402,12 @@ export default function GlobeView(props: Props) {
   const eventOf = new Map((scene?.events ?? []).map((e) => [e.id, e]));
   const placeOf = new Map(places.map((p) => [p.id, p]));
 
-  // Портреты — только у нарисованных медальонов, не больше MAX_PORTRAITS (по порядку раскладки).
+  // Портреты — только у нарисованных медальонов, не больше MAX_PORTRAITS (по порядку раскладки),
+  // и только после исходного вида: до него раскладка временная (вид по умолчанию, шрифты не
+  // загружены), и портреты грузились бы для медальонов, которых в итоге не будет.
+  const homed = home.current !== null && (view === home.current || appliedHome.current === home.current);
   const portraitFor = new Map<string, string>();
-  for (const s of lay.persons) {
+  for (const s of homed ? lay.persons : []) {
     if (portraitFor.size >= MAX_PORTRAITS) break;
     const url = !s.hidden && !s.packed ? props.info(s.id)?.portrait : null;
     if (url && !failed.has(s.id)) portraitFor.set(s.id, url);

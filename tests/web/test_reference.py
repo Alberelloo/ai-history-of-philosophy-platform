@@ -41,7 +41,8 @@ def open_page(make, stack, path: str = "/reference", *, width=1920, height=1080,
     page = context.new_page()
     page.set_default_timeout(8000)
     if clock:
-        page.clock.install()
+        # Часы ставятся на момент паузы: pause_at в прошлое от настоящего времени не идёт.
+        page.clock.install(time="2026-11-25T10:00:00")
         page.clock.pause_at("2026-11-25T10:00:00")
     with page.expect_response(CATALOG):
         page.goto(stack.url + path)
@@ -266,6 +267,12 @@ def test_stale_response_discarded(knowledge_context, knowledge_stack, events):
         lambda r: "q=%D0%BA%D0%B0&" in r.url or r.url.endswith("q=%D0%BA%D0%B0")
     ):
         page.clock.run_for(300)
+    # expect_request срабатывает, когда браузер отправил запрос; обработчик маршрута на стороне
+    # Python может быть вызван чуть позже — ждём его (реальное время, не часы страницы).
+    for _ in range(100):
+        if held:
+            break
+        page.wait_for_timeout(50)
     assert len(held) == 1
     with catalog_response(page, lambda q: q.get("q") == ["кан"]) as newer:
         box.press_sequentially("н")
@@ -481,10 +488,26 @@ def test_loading_state(knowledge_context, knowledge_stack, events):
 # --- Безопасный вывод справочника ---------------------------------------------------------
 
 
+def legacy_person(world, label: str, birth: str, death: str) -> str:
+    """Персона с названием, которое правила названий уже не пропустят: так выглядят данные,
+    записанные до правил. Создаётся с допустимым именем, затем название меняется в базе."""
+    from philograph.knowledge import schema as t
+    from philograph.knowledge.entities import normalize
+
+    pid = world.person("Прежняя Запись", birth, death)
+    with world.engine.begin() as conn:
+        conn.execute(
+            t.names.update()
+            .where(t.names.c.entity_id == pid)
+            .values(text=label, normalized=normalize(label))
+        )
+    return pid
+
+
 @req(EC, SAFE, scenario="Разметка в названии и запросе")
 def test_markup_in_name_and_query(knowledge_context, knowledge_stack, events):
     knowledge_stack.world.base()
-    knowledge_stack.world.person(XSS, "1700", "1760")
+    legacy_person(knowledge_stack.world, XSS, "1700", "1760")
     context = knowledge_context()
     page = context.new_page()
     url = f"{knowledge_stack.url}/reference?q={quote(XSS)}&epoch={quote('<script>')}"
