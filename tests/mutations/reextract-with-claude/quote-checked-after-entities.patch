@@ -1,0 +1,14 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..3a829c5 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -624,9 +624,6 @@ class Filling:
+         if not 1 <= number <= len(window):
+             raise _Skip("ссылка на абзац вне фрагмента", codes.PARAGRAPH_OUT_OF_WINDOW)
+         paragraph = window[number - 1]
+-        refused = quotes.check(clean["quote"], paragraph.get("text"))
+-        if refused is not None:
+-            raise _Skip(f"цитата не найдена в абзаце {paragraph['id']}", refused)
+         return clean
+ 
+     def _store(

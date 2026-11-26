@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..9a87066 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -263,7 +263,7 @@ def ingest(
+             numbered: dict[int, Any] = {}
+             for key, reply in replies.items():
+                 number = int(key) if key.strip().isdigit() else None
+-                if number is None or not 1 <= number <= len(fragments):
++                if number is None or number < 1:
+                     filling.drop(run_id, "ответ на фрагмент вне задания", codes.REPLY_INVALID)
+                     continue
+                 numbered[number] = reply

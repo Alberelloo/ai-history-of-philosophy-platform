@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/dating.py b/src/philograph/knowledge/dating.py
+index 9759fed..1c8406c 100644
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -101,7 +101,7 @@ def check(
+         return PARAGRAPH
+     if not 1 <= paragraph <= len(paragraphs):
+         return PARAGRAPH
+-    if not quotes.found(quote or "", paragraphs[paragraph - 1]):  # правило цитат утверждений
++    if (quote or "") not in paragraphs[paragraph - 1]:  # правило цитат утверждений
+         return QUOTE
+     fmt = _format(text or "")
+     if fmt is None:

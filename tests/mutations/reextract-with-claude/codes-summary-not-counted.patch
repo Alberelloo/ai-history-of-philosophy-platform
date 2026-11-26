@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..b855e30 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -564,7 +564,7 @@ class Filling:
+                 except (StatementError, RegistryError, _Skip) as exc:
+                     drop(str(exc), _code(exc))
+         total = sum(dropped.values())
+-        self._count(run_id, created=created, dropped=total, reasons=dropped)
++        self._count(run_id, created=created, dropped=total, reasons=Counter())
+         events.emit(
+             "knowledge.extraction.fragment",
+             run_id=run_id,

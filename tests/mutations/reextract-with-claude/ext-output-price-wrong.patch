@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..110726f 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -82,7 +82,7 @@ class Price:
+     def cost(self, input_tokens: int, output_tokens: int, cache_read_tokens: int = 0) -> float:
+         total = (
+             input_tokens * self.input
+-            + output_tokens * self.output
++            + output_tokens * self.input
+             + cache_read_tokens * self.cache_read
+         )
+         return round(total / 1_000_000, 6)

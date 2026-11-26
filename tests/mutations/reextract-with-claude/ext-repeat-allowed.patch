@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..ca5623f 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -239,7 +239,7 @@ def ingest(
+     _allowed(filling, data)
+     version_id = data["version_id"]
+     previous = _previous(filling.statements.engine, version_id)
+-    if previous and not replace:
++    if False:
+         raise CommandError(
+             f"версия {version_id} уже записана запуском {', '.join(previous)}: повтор — с --replace"
+         )

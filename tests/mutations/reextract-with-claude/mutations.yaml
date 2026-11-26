@@ -1,0 +1,325 @@
+# Мутации reextract-with-claude (tasks.md 3.4): на каждое требование дельт — одна и больше.
+# expect_fail — тесты, каждый из которых должен упасть под мутацией.
+mutations:
+- id: frag-ignore-volume
+  requirement: Фрагменты из нескольких абзацев
+  patch: frag-ignore-volume.patch
+  note: объём не ограничивает фрагмент, только число абзацев
+  expect_fail:
+  - tests/knowledge/test_reextract_fragments.py::test_short_paragraphs_gather_by_volume
+  - tests/knowledge/test_reextract_fragments.py::test_fragment_rules_property
+- id: frag-no-overlap
+  requirement: Фрагменты из нескольких абзацев
+  patch: frag-no-overlap.patch
+  note: соседние фрагменты не перекрываются
+  expect_fail:
+  - tests/knowledge/test_reextract_fragments.py::test_statement_on_boundary_is_stored_once
+  - tests/knowledge/test_reextract_fragments.py::test_paragraph_limit_gives_overlapping_pairs
+- id: frag-size-off-by-one
+  requirement: Фрагменты из нескольких абзацев
+  patch: frag-size-off-by-one.patch
+  note: предел абзацев на единицу больше
+  expect_fail:
+  - tests/knowledge/test_reextract_fragments.py::test_paragraph_limit_gives_overlapping_pairs
+  - tests/knowledge/test_reextract_fragments.py::test_fragment_rules_property
+- id: frag-changed-ignored
+  requirement: Фрагменты из нескольких абзацев
+  patch: frag-changed-ignored.patch
+  note: changed не отбирает фрагменты
+  expect_fail:
+  - tests/knowledge/test_reextract_fragments.py::test_changed_limits_extraction_run
+  - tests/knowledge/test_reextract_fragments.py::test_changed_filters_fragments_property
+- id: quote-order-ignored
+  requirement: Цитата у каждого утверждения
+  patch: quote-order-ignored.patch
+  note: части многоточия ищутся без порядка
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_ellipsis_gap_in_order_and_reversed
+  - tests/knowledge/test_reextract_quotes.py::test_ellipsis_parts_property
+- id: quote-overlap-allowed
+  requirement: Цитата у каждого утверждения
+  patch: quote-overlap-allowed.patch
+  note: части могут накладываться
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_overlapping_parts_rejected
+- id: quote-no-min-part
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-min-part.patch
+  note: короткие части многоточия допустимы
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_ellipsis_parts_property
+  - tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere
+- id: quote-no-edge-strip
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-edge-strip.patch
+  note: внешние кавычки не снимаются
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_outer_quotes_and_other_dash
+  - tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property
+- id: quote-no-dash-map
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-dash-map.patch
+  note: тире не приводятся к дефису
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_outer_quotes_and_other_dash
+  - tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property
+- id: quote-no-yo
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-yo.patch
+  note: ё не сводится к е
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere
+  - tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property
+- id: quote-substring-loose
+  requirement: Цитата у каждого утверждения
+  patch: quote-substring-loose.patch
+  note: ищется только первое слово части (пересказ проходит)
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_paraphrase_and_extra_words_rejected_property
+  - tests/knowledge/test_reextract_quotes.py::test_quote_not_found
+- id: quote-add-unchecked
+  requirement: Цитата у каждого утверждения
+  patch: quote-add-unchecked.patch
+  note: Statements.add не сверяет цитату
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere
+- id: quote-recheck-unchecked
+  requirement: Цитата у каждого утверждения
+  patch: quote-recheck-unchecked.patch
+  note: перепроверка изменённого абзаца не теряет подтверждение
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere
+- id: quote-dating-own-check
+  requirement: Цитата у каждого утверждения
+  patch: quote-dating-own-check.patch
+  note: датировка сверяет цитату дословно, не общим правилом
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_dating_uses_same_quote_check
+- id: quote-checked-after-entities
+  requirement: Цитата у каждого утверждения
+  patch: quote-checked-after-entities.patch
+  note: цитата проверяется только при записи, после создания сущностей
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_no_orphans
+  - tests/knowledge/test_reextract_quotes.py::test_refusal_creates_no_entities_with_attribution_and_entities_block
+- id: runs-no-fail-run
+  requirement: Запуски наполнения
+  patch: runs-no-fail-run.patch
+  note: при исключении запуск остаётся running
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_failure_in_second_fragment
+  - tests/knowledge/test_reextract_runs.py::test_failure_text_limited
+- id: runs-model-is-role
+  requirement: Запуски наполнения
+  patch: runs-model-is-role.patch
+  note: в запуск пишется имя роли вместо модели
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics
+  - tests/knowledge/test_reextract_runs.py::test_run_model_is_identifier_never_role
+- id: runs-tokens-lost
+  requirement: Запуски наполнения
+  patch: runs-tokens-lost.patch
+  note: токены запуска шлюза не берутся из сводки
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics
+- id: runs-duration-lost
+  requirement: Запуски наполнения
+  patch: runs-duration-lost.patch
+  note: время запуска не считается по часам сервиса
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics
+- id: runs-429-as-refused
+  requirement: Запуски наполнения
+  patch: runs-429-as-refused.patch
+  note: 429 получает код model_refused
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_gateway_429_budget
+- id: runs-gateway-failure-not-counted
+  requirement: Запуски наполнения
+  patch: runs-gateway-failure-not-counted.patch
+  note: отказ шлюза даёт событие, но не учтён в dropped
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_gateway_429_budget
+- id: check-isolation-broken
+  requirement: Проверка ответа по утверждениям
+  patch: check-isolation-broken.patch
+  note: первый отказ прекращает обработку ответа
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_bad_item_does_not_reject_the_rest_property
+  - tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply
+- id: check-null-not-absent
+  requirement: Проверка ответа по утверждениям
+  patch: check-null-not-absent.patch
+  note: null обрабатывается как значение
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply
+  - tests/knowledge/test_reextract_items.py::test_null_equals_absent
+- id: check-paragraph-string
+  requirement: Проверка ответа по утверждениям
+  patch: check-paragraph-string.patch
+  note: номер абзаца строкой не приводится
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_paragraph_digit_string
+- id: check-unknown-relation-dropped
+  requirement: Проверка ответа по утверждениям
+  patch: check-unknown-relation-dropped.patch
+  note: код связи вне реестра отбрасывается, а не предлагается
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_unknown_relation_becomes_proposal
+  - tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply
+- id: check-stance-unchecked
+  requirement: Проверка ответа по утверждениям
+  patch: check-stance-unchecked.patch
+  note: позиция вне перечня принимается
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_item_fault_is_isolated_and_coded
+- id: check-hard-schema
+  requirement: Проверка ответа по утверждениям
+  patch: check-hard-schema.patch
+  note: в схеме шлюза у полей появились типы
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_soft_schema_in_request
+- id: check-reply-invalid-ignored
+  requirement: Проверка ответа по утверждениям
+  patch: check-reply-invalid-ignored.patch
+  note: неверный ответ молча считается пустым
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_reply_invalid
+- id: codes-always-refused
+  requirement: Коды причин отбраковки
+  patch: codes-always-refused.patch
+  note: код всегда statement_refused
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_drop_reasons_summary
+  - tests/knowledge/test_reextract_quotes.py::test_quote_not_found
+- id: codes-summary-not-counted
+  requirement: Коды причин отбраковки
+  patch: codes-summary-not-counted.patch
+  note: drop_reasons не пополняется
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_drop_reasons_summary
+  - tests/knowledge/test_reextract_items.py::test_summary_matches_events_over_fragments
+- id: codes-leak-quote
+  requirement: Коды причин отбраковки
+  patch: codes-leak-quote.patch
+  note: причина не ограничена 300 знаками
+  expect_fail:
+  - tests/knowledge/test_reextract_items.py::test_event_fields_and_no_leak
+- id: ext-output-price-wrong
+  requirement: Внешний извлекатель
+  patch: ext-output-price-wrong.patch
+  note: выходные токены по цене входных
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_cost_formula
+  - tests/knowledge/test_reextract_external.py::test_ingest_claude_replies
+- id: ext-replace-no-rollback
+  requirement: Внешний извлекатель
+  patch: ext-replace-no-rollback.patch
+  note: --replace не откатывает прежний запуск
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_ingest_repeat
+  - tests/knowledge/test_reextract_external.py::test_replace_does_not_double_property
+- id: ext-repeat-allowed
+  requirement: Внешний извлекатель
+  patch: ext-repeat-allowed.patch
+  note: повтор без --replace записывает второй раз
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_ingest_repeat
+- id: ext-missing-not-dropped
+  requirement: Внешний извлекатель
+  patch: ext-missing-not-dropped.patch
+  note: фрагмент без ответа не отбраковывается
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_ingest_claude_replies
+  - tests/knowledge/test_reextract_external.py::test_missing_reply_one_drop_each
+- id: ext-forbidden-exported
+  requirement: Внешний извлекатель
+  patch: ext-forbidden-exported.patch
+  note: источник без разрешения выгружается
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_export_forbidden_exit_3
+  - tests/knowledge/test_reextract_external.py::test_ingest_forbidden_exit_3
+- id: ext-fragment-numbering
+  requirement: Внешний извлекатель
+  patch: ext-fragment-numbering.patch
+  note: номера фрагментов в задании с нуля
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_export_task
+- id: ext-out-of-range-applied
+  requirement: Внешний извлекатель
+  patch: ext-out-of-range-applied.patch
+  note: ответ с номером за пределами не игнорируется
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_reply_out_of_range_ignored
+- id: ext-model-fixed
+  requirement: Внешний извлекатель
+  patch: ext-model-fixed.patch
+  note: модель запуска — не переданный идентификатор
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_model_is_passed_identifier
+  - tests/knowledge/test_reextract_external.py::test_ingest_claude_replies
+- id: rep-includes-rolled-back
+  requirement: Отчёт о запусках извлечения
+  patch: rep-includes-rolled-back.patch
+  note: откатанные запуски входят в отчёт
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_report_for_a_day
+  - tests/knowledge/test_reextract_external.py::test_report_period_and_rollbacks
+- id: rep-total-tokens-swapped
+  requirement: Отчёт о запусках извлечения
+  patch: rep-total-tokens-swapped.patch
+  note: в «Итого» токены вход и выход перепутаны
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_report_for_a_day
+- id: rep-top-two
+  requirement: Отчёт о запусках извлечения
+  patch: rep-top-two.patch
+  note: топ из двух кодов вместо трёх
+  expect_fail:
+  - tests/knowledge/test_reextract_external.py::test_report_top_codes_and_rates
+- id: to-no-margin
+  requirement: Таймаут вызова модели при извлечении
+  patch: to-no-margin.patch
+  note: таймаут без запаса 30 с
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_timeout_by_role_budget
+- id: to-fallback-ignored
+  requirement: Таймаут вызова модели при извлечении
+  patch: to-fallback-ignored.patch
+  note: без бюджета берётся не настройка
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_timeout_fallback_default
+- id: fic-prompt-rule-dropped
+  requirement: Художественный текст
+  patch: fic-prompt-rule-dropped.patch
+  note: из промпта убрано правило атрибуции
+  expect_fail:
+  - tests/knowledge/test_reextract_prompt.py::test_prompt_rules_reach_the_model
+  - tests/knowledge/test_reextract_prompt.py::test_prompt_rules_in_external_task
+- id: spend-no-tokens
+  requirement: Сводка расходов
+  patch: spend-no-tokens.patch
+  note: в сводке нет токенов
+  expect_fail:
+  - tests/llm/test_reextract_role_spend.py::test_spend_tokens_by_run
+  - tests/llm/test_reextract_role_spend.py::test_every_group_has_token_sums
+- id: role-budget-no-schema-retries
+  requirement: Сведения о роли
+  patch: role-budget-no-schema-retries.patch
+  note: бюджет без повторов по схеме
+  expect_fail:
+  - tests/llm/test_reextract_role_spend.py::test_role_info_extraction_role
+  - tests/llm/test_reextract_role_spend.py::test_role_budget_formula_property
+- id: role-leaks-price
+  requirement: Сведения о роли
+  patch: role-leaks-price.patch
+  note: в ответ попадает цена
+  expect_fail:
+  - tests/llm/test_reextract_role_spend.py::test_role_info_has_no_secrets_or_prices
+  - tests/llm/test_reextract_role_spend.py::test_role_info_extraction_role
+- id: runs-migration-noop
+  requirement: Запуски наполнения
+  patch: runs-migration-noop.patch
+  note: миграция 10 ничего не добавляет
+  expect_fail:
+  - tests/knowledge/test_reextract_runs.py::test_migration_10_keeps_old_rows

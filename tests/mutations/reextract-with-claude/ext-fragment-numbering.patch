@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..1af841c 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -149,7 +149,7 @@ def task(filling: Filling, data: dict[str, Any]) -> list[dict[str, Any]]:
+             "fragments": len(fragments),
+         }
+     ]
+-    for number, window in enumerate(fragments, start=1):
++    for number, window in enumerate(fragments, start=0):
+         prompt = filling.prompt_data(window, schema)
+         lines.append(
+             {

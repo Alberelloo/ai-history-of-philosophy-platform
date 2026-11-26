@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..7191893 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -240,8 +240,8 @@ class Filling:
+         self, state: _Run | None, fragments: int | None, duration: float | None
+     ) -> dict[str, Any]:
+         now = self.clock.now()
+-        if duration is None and state is not None:
+-            duration = round((now - state.started).total_seconds(), 3)
++        if False:
++            duration = 0
+         if fragments is None and state is not None:
+             fragments = state.fragments
+         values: dict[str, Any] = {"finished_at": now, "duration_seconds": duration}

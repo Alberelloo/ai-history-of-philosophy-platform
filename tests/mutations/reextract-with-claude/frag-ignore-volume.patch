@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..6beaf52 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -385,8 +385,6 @@ class Filling:
+                 while end < len(chapter) and end - start < self.fragment_size:
+                     length += len(chapter[end].get("text") or "")
+                     end += 1
+-                    if length >= self.fragment_chars:
+-                        break
+                 window = chapter[start:end]
+                 if changed is None or {p["id"] for p in window} & changed:
+                     result.append(window)

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..4460d0a 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -78,7 +78,7 @@ FRAGMENT = 30  # предел абзацев во фрагменте; сосед
+ FRAGMENT_CHARS = 3000  # цель длины фрагмента в символах (ontology-extraction, П12)
+ EXTRACT_ROLE = "strong"
+ EXTRACT_TIMEOUT = 1200.0  # таймаут вызова, если шлюз не сообщил бюджет роли
+-TIMEOUT_MARGIN = 30.0  # запас сверх бюджета шлюза на все попытки
++TIMEOUT_MARGIN = 0.0  # запас сверх бюджета шлюза на все попытки
+ STANCES = ("asserts", "disputes", "mentions")
+ REQUIRED = ("subject", "type", "object", "paragraph", "quote")
+ FAILURE_LIMIT = 500

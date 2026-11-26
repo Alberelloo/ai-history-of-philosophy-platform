@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..69451eb 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -578,7 +578,7 @@ class Filling:
+         events.emit(
+             "knowledge.extraction.dropped",
+             run_id=run_id,
+-            reason=reason[:300],
++            reason=(reason + ' ' + reason)[:600],
+             code=code if code in codes.CODES else codes.code_for(reason),
+         )
+ 

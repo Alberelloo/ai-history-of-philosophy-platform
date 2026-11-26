@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..c85d4ad 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -336,7 +336,7 @@ class Filling:
+                     "items": {
+                         "type": "object",
+                         "required": list(REQUIRED),
+-                        "properties": {k: {} for k in statement},
++                        "properties": {k: {"type": "string"} for k in statement},
+                     },
+                 },
+                 "entities": {

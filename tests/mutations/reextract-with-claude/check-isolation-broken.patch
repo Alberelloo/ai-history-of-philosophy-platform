@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..fa4c852 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -553,6 +553,7 @@ class Filling:
+                     created += 1
+                 except (StatementError, RegistryError, _Skip) as exc:
+                     drop(str(exc), _code(exc))
++                    break
+             for name, entity in index.items():
+                 if not entity.get("dating"):
+                     continue

@@ -1,0 +1,12 @@
+diff --git a/src/philograph/llm/gateway.py b/src/philograph/llm/gateway.py
+index cb91201..4883e77 100644
+--- a/src/philograph/llm/gateway.py
++++ b/src/philograph/llm/gateway.py
+@@ -931,6 +931,7 @@ class LLMGateway:
+         return {
+             "role": role,
+             "model": conf.model,
++            "price": str(self.config.prices[conf.model].output),
+             "call_budget_seconds": round((self.config.schema_retries + 1) * attempt, 3),
+         }
+ 

@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..0acf8eb 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -297,7 +297,6 @@ def report_rows(engine: Engine, since: date, until: date | None = None) -> list[
+     query = select(runs).where(
+         and_(
+             runs.c.kind == "extraction",
+-            runs.c.status != "rolled_back",
+             runs.c.started_at >= _day(since),
+         )
+     )

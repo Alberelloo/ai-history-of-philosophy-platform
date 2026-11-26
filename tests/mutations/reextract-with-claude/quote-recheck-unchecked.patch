@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index d85d15e..ef56c24 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -1172,7 +1172,7 @@ class Statements:
+                         .all()
+                     )
+                 for ev in rows:
+-                    if not quotes.found(ev["quote"], text):
++                    if False:
+                         counts["lost"] += self._lose_evidence(
+                             pid, "цитата не найдена", only=ev["id"]
+                         )

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..e598fa6 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -243,8 +243,6 @@ def ingest(
+         raise CommandError(
+             f"версия {version_id} уже записана запуском {', '.join(previous)}: повтор — с --replace"
+         )
+-    for run_id in previous:
+-        filling.rollback(run_id)
+     run_id = filling.start_run(
+         "extraction",
+         version_id,

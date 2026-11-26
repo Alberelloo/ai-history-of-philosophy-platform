@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..f3eb4c6 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -596,7 +596,7 @@ class Filling:
+         if not clean["type"].strip():
+             raise _Skip("поле type: пустой код связи", codes.SCHEMA_ITEM)
+         number = clean.get("paragraph")
+-        if isinstance(number, str) and number.strip().isdigit():
++        if False:
+             number = int(number.strip())
+         if isinstance(number, bool) or not isinstance(number, int):
+             raise _Skip("поле paragraph: нужно целое число", codes.SCHEMA_ITEM)
