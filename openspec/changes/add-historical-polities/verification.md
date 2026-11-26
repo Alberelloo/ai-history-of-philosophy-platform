@@ -218,3 +218,72 @@
     served: 26 событий; у всех образований всех 13 лет from ≤ T ≤ to (H1)
 
 Итог: H1–H9 выполнены, открытых дефектов нет. Не покрыто по-прежнему: браузерная часть 8.4 и 8.5 (указание Lead'а).
+
+## Судья — 2026-11-26, коммит c14fb70
+
+Проверял по дельте, `tasks.md`, `owner-spec.md` (H1–H9), этому журналу, своим прогонам и выводу работающего сервиса знаний. Перед прогоном коммит тот же, `git status` чист. База `origin/claude/embedding-docker` ушла вперёд (merge-base 2c4c171), на результат это не влияет.
+
+### Свои прогоны (по одному файлу, по указанию Lead'а)
+
+    pytest -q tests/knowledge/test_polities_build_spec.py   → 23 passed in 13.99s
+    pytest -q tests/knowledge/test_polities_unit.py         → 40 passed in 2.85s
+    pytest -q tests/knowledge/test_wikidata_unit.py         → 36 passed in 0.17s
+    pytest -q tests/knowledge/test_polities_layer_spec.py   → 46 passed in 53.86s
+    cd web && npm run build                                 → tsc чисто, built; GlobeView gzip 20.65 kB
+    pytest -q tests/web/test_geo_units.py                   → 7 passed (unit/geo, в т. ч. polities.test.ts: passed 12, failed 0)
+    pytest -q tests/web/test_geo_polities.py                → 10 passed in 216.00s (один прогон, после npm run build)
+    pytest -q tests/web/test_geo_political.py               → 32 passed in 612.53s (регресс прежних сценариев «Политической карты» в режиме 503)
+    lint-imports                                            → Contracts: 3 kept, 0 broken
+    python scripts/check_traceability.py                    → Требований с тестами: 426 из 426
+    ruff check . / ruff format --check .                    → 1 ошибка / 2 файла: scripts/dev_stack.py:100, src/philograph/platform/queue.py:168.
+                                                              Оба файла из базы, в диффе ветки их нет (git diff merge-base..HEAD пуст); в базе dev_stack уже поправлен (a1df8a4)
+
+Полный `pytest -q` и `dev_stack.py` не запускал (указание Lead'а: 1 CPU / 1,9 ГБ). Полный набор прогонит CI `checks` на PR.
+
+### Вывод системы
+
+Запустил настоящий процесс сервиса знаний: `uvicorn philograph.knowledge.main:app`, `PHILOGRAPH_POLITIES_DB=data/cliopatria/polities.sqlite`, SQLite-база во временном каталоге. Запросы через curl с `X-Request-Id`:
+
+    year=1650  200  0.0198 s  273565 B   served year=1650 polities=124 untranslated=9 valid_from=1648 valid_to=1652 cached=false (judge-1650)
+    year=1650  200  0.0038 s             served ... cached=true
+    year=1700  200  0.0154 s             served polities=111 1700–1701
+    year=1800  200  0.0192 s  343312 B   served polities=128 untranslated=13 1800–1802
+    year=-500  200  0.0138 s             served polities=47
+    year=2000  200  0.0202 s  484885 B   served polities=191
+    year=2100  200                       served polities=0 valid_from=2025 valid_to=9999 — пустой список, не ошибка
+    year=abc / пусто / %D9%A1%D9%A2%D9%A3 (١٢٣)  400 bad_year   rejected code=bad_year (judge-abc, judge-, judge-arabic)
+    артефакта нет (другой путь)  503 polities_unavailable       unavailable reason=missing (judge-missing)
+
+- 1650: «Священная Римская империя» (Q12548, ru), «Речь Посполитая» (Q172107), «Русское царство», «Республика Соединённых провинций». На 1800 «Речи Посполитой» нет, есть «Российская империя» и «Королевство Пруссия» (H4).
+- Блок `source`: Cliopatria, Seshat, Ed Chalstrey и James Bennett, v0.2.2, CC BY 4.0, ссылки https (H7).
+- Активность сверил своим SQL по артефакту (`from_year ≤ T ≤ to_year`), года 1650, 1800, −500 и 2000. Набор id совпадает с ответом. На всём `valid_from…valid_to` набор строк постоянный, на `valid_from−1` и `valid_to+1` он другой: интервал наибольший (H1).
+- H6: ответ сервиса 4–20 мс по HTTP, это гораздо меньше 1 с.
+- `measure` на артефакте (сам, exit 0, 1,0 с, maxrss 44 МБ): `max_gzip_bytes` 138836 (2000), `ru_share` 0,9442, `inactive` 0, `full_sphere` 0. Совпадает с журналом тестировщика по всем 13 годам, по каждому числу polities/ru/gzip (H2, H3).
+
+Наблюдение о качестве данных, а не о коде: у Q3300409 русская метка «история Швеции (1772–1809)» (Kingdom of Sweden, 1800). По правилу дельты это принятая метка `ru`, так что поведение верное.
+
+### Сверка
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Сборка исторических границ | 7 сценариев + 10 инвариантов | build_spec 23 passed | 23 passed; мутация M4c повторена | артефакт: координаты ≤ 2 знаков, full_sphere 0 | подтверждено |
+| Слой на год | 9 сценариев + 11 инвариантов, H1 | layer_spec 46 passed, served/rejected/unavailable | 46 passed; мутация M1 повторена | 200/400/503 и события served/rejected/unavailable с request_id; SQL-сверка активности | подтверждено |
+| Русские названия | 7 сценариев + 5 инвариантов, H3 | layer_spec + web flow | passed | ru_share 0,9442; СРИ, Речь Посполитая по-русски | подтверждено |
+| Исторические границы на глобусе | 8 сценариев, H4, H5 (3 размера × 10 кадров) | web 10 passed (разработчик), тестировщик частями | 10 passed одним прогоном | — (браузер, на фикстуре) | подтверждено |
+| Атрибуция | 3 сценария, H7 | web flow, build_spec docs | passed | блок `source` в ответе | подтверждено |
+| Пределы слоя | замер на фикстуре и реальном артефакте, H2 | measure 138836 / 0,9442 | passed; свой measure — те же числа | — | подтверждено |
+| MODIFIED (Вид «Глобус», Политическая карта, Пределы, Без WebGL, Состояния, Страна места) | новые сценарии | web polities | 10 passed; прежние сценарии — test_geo_political 32 passed | 503 → modern (событие unavailable) | подтверждено |
+| H8 / H9 | lint, traceability, данные вне git | 3 kept / 426 / test_data_outside_git | то же; ruff по диффу чист | — | подтверждено |
+
+Мутации (повторил сам, код возвращён, `git diff` пуст):
+- `orient(sign=+1.0)` в `polities_build.py:327`. Упали `test_ring_orientation`, `test_geometry_rules_hostile_input` и `test_measure_detects_full_sphere`: сферическая площадь 12,5652 > 2π.
+- `from_year < ?` вместо `<=` в двух запросах `polities.py`. `test_activity_every_year` упал на году 697 (нет `eb367fed203b`). Сценарные `test_year_1650`, `test_interval_maximal` и `test_merge_rows_same_id` на этой мутации проходят: границу ловит инвариант H1, сценарии её не ловят.
+
+Подгонка: не найдена. В `git diff merge-base..HEAD -- tests openspec` один `skip` («клиент не собран», как в прежних файлах). `except Exception` есть только в тестовом наблюдателе ответов, при разборе тела. Допуски объяснены. Тестов тестировщика разработчик не правил: после d9c6672 коммит 2451530 трогает только `test_polities_unit.py`, это юниты разработчика. Две правки дельты в 2451530 (ASCII-цифры, вырожденное кольцо) делают требования строже. Они записаны в `progress.md` как решения ведущего, тесты им соответствуют. Код круга 3 я прочитал: особых случаев по имени или QID нет, флагов ради тестов нет.
+
+Открытое, но не возврат роли:
+- `tasks.md`: 7.1/7.2 не отмечены, хотя ревью сделано (progress.md, «Ревью (задача 7)»). Код круга 3 повторно не ревьюили, я прочитал его сам. 10.1 закрывают мои прогоны выше. 9.2 по плану вынесен в отдельный PR. Ведущему — отметить.
+- 8.4 (H6 в браузере на стенде) и 8.5 (снимки и H5 на реальных данных в браузере) пропущены по указанию Lead'а. H6 подтверждён замером работающего сервиса. H5 доказан на фикстуре: 3 размера × 10 кадров, правило раскладки от данных не зависит. Ведущему — записать снятие пунктов как решение Lead'а, вынести их владельцу при приёмке или на сервере мощнее.
+- Полный `pytest` не запускался (ограничение сервера). Его прогонит CI `checks` до слияния.
+
+Вердикт: **принято**. Каждый сценарий и инвариант дельты подтверждён и журналом тестировщика, и моим прогоном. Числа H1–H3 и H6 совпадают с выводом работающего сервиса. Подгонки нет. Пункты выше — работа ведущего по `tasks.md`, а не возврат роли.
