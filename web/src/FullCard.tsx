@@ -112,8 +112,12 @@ function markOf(row: Row): Mark {
   return row.mark ?? (row.disputed ? "disputed" : (row.status as Mark));
 }
 
+// «Так считает» — только те, кто не возражает: несогласные идут отдельно («не согласны»).
 function believers(t: T, row: Row): string[] {
-  return row.attributions ? [...new Set(row.attributions.map((a) => whoLabel(t, a)))] : row.attributed_to;
+  if (row.attributions) {
+    return [...new Set(row.attributions.filter((a) => a.stance !== "disputes").map((a) => whoLabel(t, a)))];
+  }
+  return row.attributed_to.filter((who) => !row.disputed_by.includes(who));
 }
 
 function disputers(t: T, row: Row): string[] {
@@ -134,7 +138,18 @@ function markName(t: T, row: Row): string {
     if (who.length) parts.push(t.card.believes(who.join(", ")));
     if (against.length) parts.push(t.card.disagree(against.join(", ")));
   }
-  return parts.join(". ");
+  // Доступное имя читается как предложения: каждая часть — с заглавной буквы.
+  return parts.map(capitalize).join(". ");
+}
+
+function capitalize(text: string): string {
+  return text ? text[0].toUpperCase() + text.slice(1) : text;
+}
+
+// Подпись инфобокса: человеческая подпись поля («Автор», «Дата»), а не название связи реестра.
+function factLabel(t: T, row: Row): string {
+  const own = row.type && !row.inverse ? (t.card.facts as Record<string, string>)[row.type] : undefined;
+  return own ?? capitalize(relationTitle(t, row.type, Boolean(row.inverse), row.relation));
 }
 
 // Метка статуса: форма и цвет по отметке, без текста; нажатие раскрывает подробности строки.
@@ -258,7 +273,7 @@ function CardSection({ section }: { section: Section }) {
       <dl className="card-facts">
         {rows.map((row) => (
           <div key={row.statement_id} className="card-facts__item">
-            <dt>{relationTitle(t, row.type, Boolean(row.inverse), row.relation)}</dt>
+            <dt>{factLabel(t, row)}</dt>
             <CardRow row={row} section={section.code} as="dd" />
           </div>
         ))}
