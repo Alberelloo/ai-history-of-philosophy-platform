@@ -61,7 +61,6 @@ from philograph.knowledge.naming import (
     is_russian,
     lang_for,
     normalize,
-    script_of,
 )
 from philograph.knowledge.snapshot import label_of
 from philograph.knowledge.statements import Statements
@@ -580,7 +579,7 @@ class Migration:
         for entity_id in view.active():
             for n in view.entities[entity_id]["names"]:
                 lang = lang_for(n["text"], n["lang"])
-                if script_of(n["text"]) is None or lang == n["lang"]:
+                if lang == n["lang"]:
                     continue
                 action = Action(
                     "lang_fix",

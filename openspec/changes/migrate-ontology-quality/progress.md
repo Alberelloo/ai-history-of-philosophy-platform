@@ -184,3 +184,7 @@
 - `ontology_migrate.py`: шаг `normalize_names` первым в `STEPS` (до сравнений названий и слияния): `text` → `naming.clean` (strip+NFC), `normalized` → `normalize(text)`; действие `name_text` (`name_id`, `old_text`, `old_normalized`, `text`, `normalized`) в `run_actions`; `View.apply` — только проекция в сухом прогоне; откат возвращает прежние значения, если текст не меняли после запуска (иначе `kept`); `Report.names_normalized`; число в `knowledge.migration.step` (`actions`). Названия в событиях нет.
 - Spec `ontology-migration`: шаг 1 «Форма названий», нумерация шагов сдвинута, сценарий «Форма названий», строка инварианта. Design: `STEPS`, таблица шагов, отчёт, откат. Tasks: 2.8 (сделано), 3.2а — тестировщику.
 - Юнит: `test_ontology_migrate_unit.py` — `test_normalize_names_step_plan_run_rollback`, `test_normalize_names_rollback_keeps_later_change`, `test_normalize_names_then_duplicate_merges`; файл 16 passed.
+
+## Д3-mig (разработчик): `lang_fix` и названия без письменности
+
+- `ontology_migrate.py`: `_step_lang_fix` больше не пропускает названия без письменности; язык берётся из `naming.lang_for` (без письменности → `und`, переданный язык не сохраняется), как в извлечении. Неиспользуемый импорт `script_of` убран. Ловит `test_lang_fix_no_script`.
