@@ -54,8 +54,6 @@ class _Format:
     single: bool  # один год или век
 
 
-
-
 def _roman_value(roman: str) -> int | None:
     roman = roman.upper()
     if not _ROMAN_CANON.match(roman):
