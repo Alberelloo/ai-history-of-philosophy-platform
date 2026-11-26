@@ -16,11 +16,11 @@
 
 ## 2. Сервер (разработчик)
 
-- [ ] 2.1 `knowledge/cards.py`: `SECTIONS` — данные (`Section`: `code`, `title`, `relations`, `direction`, `display`, `visible`, `dedupe`, `derive`), таблица типов → `layout`, флаг `where` у шаблона. Разделы всех типов по таблице design.md, включая `term`, `group`, `place`, полный `work`, `other`. Эпоха — без изменений кодов. Юнит-тесты на таблицу: каждый тип реестра, кроме `source`, есть в таблице; у каждого раздела допустимый `display`
-- [ ] 2.2 Строка: `mark` (одно правило в `cards.py`), `inferred`, `via`, `note` (год труда, роль места), `geo` у мест, `also`; «одна строка на сущность» в разделах с `dedupe`; порядок по силе отметки. Раздел: `display`, `visible`, `total`, `inferred`
-- [ ] 2.3 Персона: `summary` (`roles`, `place` — правило «основное место», `years`), раздел `places` с основным местом первым; `influenced_by`/`influenced` без `studied_with`; `where_to_read: []` без обращения к указателю
-- [ ] 2.4 Выводы: `interests` и `relates_to` (через труды и термины), отметка — самое слабое звено лучшей цепочки, только видимые утверждения (`closed`, отвергнутые), предел `INFER_SCAN = 30`, без записи в онтологию и без `on_view`
-- [ ] 2.5 Верхний уровень: `layout`, `geo` у места, `legend`, `empty`. Событие `knowledge.card.served`: поля `layout`, `empty`, `inferred`, `polity` (обязательные). `summary.polity` через `PolityLayer.at(lat, lon, year)` (в `polities.py`, кэш рамок по интервалу), `Cards(polities=…)` в `main.py`. `ruff`, `lint-imports`, `pytest -q tests/knowledge -k card` чисто, кроме тестов MODIFIED-требований, которые переписывает тестировщик (список в `progress.md`)
+- [x] 2.1 `knowledge/cards.py`: `SECTIONS` — данные (`Section`: `code`, `title`, `relations`, `direction`, `display`, `visible`, `dedupe`, `derive`), таблица типов → `layout`, флаг `where` у шаблона. Разделы всех типов по таблице design.md, включая `term`, `group`, `place`, полный `work`, `other`. Эпоха — без изменений кодов. Юнит-тесты на таблицу: каждый тип реестра, кроме `source`, есть в таблице; у каждого раздела допустимый `display`
+- [x] 2.2 Строка: `mark` (одно правило в `cards.py`), `inferred`, `via`, `note` (год труда, роль места), `geo` у мест, `also`; «одна строка на сущность» в разделах с `dedupe`; порядок по силе отметки. Раздел: `display`, `visible`, `total`, `inferred`
+- [x] 2.3 Персона: `summary` (`roles`, `place` — правило «основное место», `years`), раздел `places` с основным местом первым; `influenced_by`/`influenced` без `studied_with`; `where_to_read: []` без обращения к указателю
+- [x] 2.4 Выводы: `interests` и `relates_to` (через труды и термины), отметка — самое слабое звено лучшей цепочки, только видимые утверждения (`closed`, отвергнутые), предел `INFER_SCAN = 30`, без записи в онтологию и без `on_view`
+- [x] 2.5 Верхний уровень: `layout`, `geo` у места, `legend`, `empty`. Событие `knowledge.card.served`: поля `layout`, `empty`, `inferred`, `polity` (обязательные). `summary.polity` через `PolityLayer.at(lat, lon, year)` (в `polities.py`, кэш рамок по интервалу), `Cards(polities=…)` в `main.py`. `ruff`, `lint-imports`, `pytest -q tests/knowledge -k card` чисто, кроме тестов MODIFIED-требований, которые переписывает тестировщик (список в `progress.md`)
 
 ## 3. Клиент (разработчик)
 

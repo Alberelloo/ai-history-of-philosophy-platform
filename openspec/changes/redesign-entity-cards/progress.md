@@ -70,3 +70,16 @@
 3. Государство — вариант Г: `PolityLayer.at` на год рождения, иначе современная страна с пометкой «ныне …». Сценарии: найдено, слоя нет, вне покрытия, место, без координат. В событие добавлено поле `polity`.
 
 Учтены желательные 1–7: список тестов в Impact; правило «край панели − 24px»; K3 на 1680 при закреплённой навигации; `legend` учитывает сгенерированное описание, у пунктов есть описание; сценарий «Карточка на карте»; `mark = sourced` без подтверждений — в контракте и сценарии; браузерные тесты 6.3 — один-два файла с `page.route`.
+
+## 2026-11-26 — сервер, задачи 2.1–2.5 (разработчик)
+
+- `knowledge/cards.py`: разделы задаются данными (`Section`, `Template`, `TEMPLATES`). Ради прежних потребителей (`tests/web/test_design_system.py`, `test_context_unit.py`) оставлено производное представление `SECTIONS`: код → заголовок, один заголовок на код. Строка получила поля `mark`, `inferred`, `via`, `note`, `geo`, `also`; выведенная строка заполняет все прежние поля. Есть «одна строка на сущность», правило основного места, выводы `interests` и `relates_to`, раздел `other`, `summary`, `geo`, `legend`, `empty`. У персоны `where_to_read: []`. Событие `knowledge.card.served` получило обязательные поля `layout`, `empty`, `inferred`, `polity`.
+- `knowledge/polities.py`: `PolityLayer.at(lat, lon, year)`. Рамки строк кэшируются по интервалу (`INDEX_CACHE = 8`), лучевой алгоритм, из нескольких образований — меньшее по площади. `main.py`: один `PolityLayer` на `Cards` и `build_app`.
+- Код группы «Состав» — `membership`, а не `members`: переводы на клиенте идут по коду раздела, а `members` уже занят эпохой («Относятся к эпохе»). Дельта и design.md исправлены. У труда заголовок `influence` — «Влияния», как у идей.
+- `web/src/i18n/ontology.{ru,en}.json`: `sections` приведены к новым кодам (русский совпадает с `SECTIONS`).
+- Юнит-тесты разработчика — `tests/knowledge/test_cards_redesign_unit.py`, 11 штук, все прошли.
+- Прогон `pytest -q tests/knowledge/test_mentions_cards.py test_context_unit.py test_context.py test_epoch_card_unit.py test_graph.py test_regions.py test_retired_unit.py`: 176 passed, 4 failed. `test_context_unit::test_card_context_section` упал на импорте `SECTIONS`, после возврата `SECTIONS` проходит. Три падения ждут тестировщика — это тесты MODIFIED-требований, их ожидания противоречат новой спецификации:
+  - `test_mentions_cards.py::test_where_to_read_first_paragraph` — `card["where_to_read"]` у Канта (персона), теперь `[]`;
+  - `test_mentions_cards.py::test_sections_by_type` — `"life" in codes` у Канта (раздела `life` больше нет);
+  - `test_mentions_cards.py::test_no_empty_sections` — `["life"]` и `where_to_read[0]` у Гоббса.
+- `ruff check` и `lint-imports` чисто (3 контракта соблюдены). `tests/web/test_design_system.py -k "ontology_names or client_styles"` — 2 passed.

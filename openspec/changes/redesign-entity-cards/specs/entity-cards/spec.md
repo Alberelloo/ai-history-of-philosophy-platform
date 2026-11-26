@@ -212,7 +212,7 @@
 - **Термин:** `facts` «Сведения» (`denotes`, `introduced_by`, `derives_from`), `translations` «Переводы», `in_works`, `epoch`, `other`.
 - **Произведение:** `facts` «Сведения» (`author`, `dating`, `work_part_of`), `topics` «Вопросы и сферы» (`discusses`, `expresses` out), `cites`, `response`, `influence`, `parts`, `epoch`, `context`, `other`.
 - **Событие, явление, идейное событие:** `when` «Дата и место» (`event_kind`, `dating`, `happened_in`; инфобокс), `participants` «Участники», `genesis` «Как возникло» (только идейное событие), `effects` «На что повлияло», `epoch`, `other`.
-- **Группа:** `facts` «Сведения» (`group_kind`), `members` «Состав», `founders` «Основатели», `positions` «Учения», `debated` «Полемика», `staff` «Работали», `epoch`, `context`, `other`.
+- **Группа:** `facts` «Сведения» (`group_kind`), `membership` «Состав», `founders` «Основатели», `positions` «Учения», `debated` «Полемика», `staff` «Работали», `epoch`, `context`, `other`.
 - **Место:** `residents` «Жили здесь», `events` «Что произошло», `other`. Координаты — в поле ответа `geo`.
 - **Эпоха:** `dating` «Датировка» (с атрибуцией, например «Wikidata») и `members` «Относятся к эпохе» — кто и что относится к эпохе по явным утверждениям «относится к эпохе». Раздела `other` у эпохи нет.
 
@@ -237,7 +237,7 @@
 
 - **GIVEN** у группы «Кембриджские платоники» `group_kind` `school` и два члена (`member_of` in)
 - **WHEN** открывается её карточка
-- **THEN** коды разделов — `["facts", "members"]`. В `facts` строка с `value = "school"`, в DOM — «школа». В `members` две строки через запятую
+- **THEN** коды разделов — `["facts", "membership"]`. В `facts` строка с `value = "school"`, в DOM — «школа». В `membership` две строки через запятую
 - **AND** в журнале `knowledge.card.served` с `type=group`, `sections=2`, `rows=3`
 
 #### Scenario: Карточка события
