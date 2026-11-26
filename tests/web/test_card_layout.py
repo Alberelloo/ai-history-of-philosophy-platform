@@ -492,3 +492,68 @@ def test_country_data_is_a_separate_chunk():
     assert "countries-" in entry_text  # точка входа ссылается на него динамически
     size = len(gzip.compress(entry_text.encode("utf-8"), 9))
     assert size <= BASE_ENTRY_GZIP + 15 * 1024, size
+
+
+# --- Временное сворачивание навигации и плавный масштаб -------------------------------------
+
+
+@req(VD, "Раскладка экрана чтения", scenario="Временное сворачивание навигации")
+@pytest.mark.parametrize("width,collapses", [(1366, True), (1440, True), (1680, False)])
+def test_pinned_navigation_collapses_while_panel_open(
+    knowledge_context, knowledge_stack, events, width, collapses
+):
+    kant_world(knowledge_stack)
+    page = start(knowledge_context, knowledge_stack, width, 800, pinned=True)
+    sidebar = page.locator(".sidebar")
+    expect(sidebar).to_have_attribute("data-state", "pinned")
+    response = open_card(page)
+    if collapses:
+        expect(sidebar).to_have_attribute("data-state", "collapsed")
+        assert abs(sidebar.bounding_box()["width"] - 56) <= 1
+        pin = sidebar.locator('button[aria-disabled="true"]')
+        expect(pin).to_have_count(1)
+        assert pin.get_attribute("title")  # объясняет, почему закрепление недоступно
+        page.locator("#side-panel").get_by_role("button", name="Закрыть карточку").click()
+        page.locator("#side-panel").wait_for(state="detached")
+        expect(sidebar).to_have_attribute("data-state", "pinned")
+        expect(sidebar.locator('button[aria-disabled="true"]')).to_have_count(0)
+    else:
+        expect(sidebar).to_have_attribute("data-state", "pinned")
+        expect(sidebar.locator('button[aria-disabled="true"]')).to_have_count(0)
+        assert sidebar.bounding_box()["width"] > 200
+    served_for(events, response, type="person")
+
+
+@req(VD, "Раскладка экрана чтения", scenario="Плавный масштаб")
+def test_root_font_scales_above_1920(browser, site):
+    from ..helpers import reader_context
+
+    def clamp(width: int) -> float:
+        return min(max(16.0, 0.531 * 16 + 0.0039 * width), 16 * 1.16)
+
+    context = reader_context(browser, viewport={"width": 1440, "height": 900})
+    page = context.new_page()
+    try:
+        page.goto(f"{site.url}/read/{site.ids['textbook']}")
+        page.wait_for_selector("article.chapter p.block")
+        seen = {}
+        for width in (1440, 1920, 2560, 3840):
+            page.set_viewport_size({"width": width, "height": 900})
+            page.evaluate("document.fonts.ready.then(() => true)")
+            seen[width] = page.evaluate(
+                "() => ({root: parseFloat(getComputedStyle(document.documentElement).fontSize),"
+                " text: parseFloat(getComputedStyle(document.querySelector('article.chapter p.block')).fontSize)})"
+            )
+        assert seen[1440]["root"] == 16.0 and seen[1920]["root"] == 16.0, seen
+        for width in (2560, 3840):
+            assert abs(seen[width]["root"] - clamp(width)) < 0.05, (width, seen)
+        assert seen[2560]["root"] > 18 and seen[3840]["root"] == pytest.approx(18.56, abs=0.01), (
+            seen
+        )
+        # Размеры в rem растут вместе с кеглем: кегль текста чтения — доля корневого.
+        ratio = seen[1920]["text"] / seen[1920]["root"]
+        for width in (1440, 2560, 3840):
+            assert abs(seen[width]["text"] / seen[width]["root"] - ratio) < 0.01, (width, seen)
+        assert seen[2560]["text"] > seen[1920]["text"] and seen[3840]["text"] > seen[2560]["text"]
+    finally:
+        context.close()

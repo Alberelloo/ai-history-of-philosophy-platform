@@ -25,6 +25,7 @@ from .test_cards_redesign_unit import _artifact
 req = pytest.mark.req
 EC = "entity-cards"
 SERVED = "knowledge.card.served"
+REQUEST_IDS = itertools.count(1)
 MARKS = ("verified", "sourced", "generated", "disputed")
 
 
@@ -57,24 +58,32 @@ def src(who: str = "s_a") -> list[Attribution]:
 class CardSvc:
     """Сервис знаний с настоящим маршрутом карточки; ``onto`` — данные теста."""
 
-    def __init__(self, onto, *, polities=None, mentions=None, on_view=None) -> None:
+    def __init__(self, onto, *, events, polities=None, mentions=None, on_view=None) -> None:
         self.onto = onto
+        self.events = events
         self.w = onto.statements
         self.cards = Cards(onto.statements, mentions, None, on_view, polities=polities)
         self.client = TestClient(
             build_app(onto.statements, cards=self.cards, mentions=mentions),
             raise_server_exceptions=False,
         )
-        self.n = 0
 
     def get(self, entity_id: str, **params) -> tuple[dict, str]:
-        self.n += 1
-        rid = f"rid-card-{self.n}"
+        rid = f"rid-card-{next(REQUEST_IDS)}"
         response = self.client.get(
             f"/v1/entities/{entity_id}/card", params=params, headers={"X-Request-Id": rid}
         )
         assert response.status_code == 200, response.text
-        return response.json(), rid
+        card = response.json()
+        # Журнал каждого запроса: одно событие, его поля равны ответу (sections, rows, empty,
+        # layout, inferred); запрос карточки не пишет ничего лишнего.
+        [event] = self.events.where(SERVED, request_id=rid)
+        rows = [r for s in card["sections"] for r in s["rows"]]
+        assert (event["entity_id"], event["type"]) == (card["id"], card["type"])
+        assert (event["sections"], event["rows"]) == (len(card["sections"]), len(rows))
+        assert (event["layout"], event["empty"]) == (card["layout"], card["empty"])
+        assert event["inferred"] == sum(1 for r in rows if r["inferred"])
+        return card, rid
 
     def served(self, events, rid: str) -> dict:
         [event] = events.where(SERVED, request_id=rid)
@@ -112,8 +121,8 @@ def imported_statements_are_sourced(onto):
 
 
 @pytest.fixture
-def cs(onto, clock) -> CardSvc:
-    return CardSvc(onto)
+def cs(onto, clock, events) -> CardSvc:
+    return CardSvc(onto, events=events)
 
 
 def section(card: dict, code: str) -> dict:
@@ -147,7 +156,7 @@ def prussia_layer(tmp_path):
 
 @req(EC, "Карточка персоны", scenario="Шапка и сводка Локка")
 def test_locke_header_and_summary(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     locke = onto.person("Локк", "1632", "1704")
     onto.statements.add(locke, "person_role", value="philosopher", attributions=src())
     london = svc.place("Лондон", 51.51, -0.13)
@@ -362,7 +371,7 @@ def test_person_has_no_influence_code_and_no_where(onto, events):
         def where_to_read(self, *a, **k):
             raise AssertionError("указатель упоминаний не должен вызываться у персоны")
 
-    svc = CardSvc(onto, mentions=Forbidden())
+    svc = CardSvc(onto, events=events, mentions=Forbidden())
     p = onto.person("Кант", "1724", "1804")
     q = onto.person("Кнутцен", "1713", "1751")
     r = onto.person("Юм", "1711", "1776")
@@ -654,9 +663,9 @@ def test_inferred_row_has_all_old_fields(cs, onto):
     "Выведенные строки",
     invariant="выведенное не пишется в онтологию и не идёт в очередь проверки",
 )
-def test_inferred_rows_not_written_and_not_queued(onto):
+def test_inferred_rows_not_written_and_not_queued(onto, events):
     seen: list[list[str]] = []
-    svc = CardSvc(onto, on_view=seen.append)
+    svc = CardSvc(onto, events=events, on_view=seen.append)
     hume = onto.person("Юм", "1711", "1776")
     work = onto.thing("work", "Трактат")
     idea = onto.thing("concept", "Скептицизм")
@@ -773,7 +782,7 @@ def kant_world(cs, onto, born="1724", place_name="Кёнигсберг", coords=
 
 @req(EC, "Государство основного места", scenario="Историческое государство")
 def test_historical_polity(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     kant = kant_world(svc, onto)
     card, rid = svc.get(kant)
     polity = card["summary"]["polity"]
@@ -783,7 +792,7 @@ def test_historical_polity(onto, tmp_path, events):
 
 @req(EC, "Государство основного места", scenario="Слоя нет — современная страна с пометкой")
 def test_no_layer(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=PolityLayer(tmp_path / "absent.sqlite"))
+    svc = CardSvc(onto, events=events, polities=PolityLayer(tmp_path / "absent.sqlite"))
     kant = kant_world(svc, onto)
     card, rid = svc.get(kant)
     assert card["summary"]["polity"] is None
@@ -793,7 +802,7 @@ def test_no_layer(onto, tmp_path, events):
 
 @req(EC, "Государство основного места", scenario="Вне покрытия слоя")
 def test_outside_layer_coverage(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     kant = kant_world(svc, onto, coords=(10.0, 100.0), place_name="Далёкий город")
     card, rid = svc.get(kant)
     assert card["summary"]["polity"] is None
@@ -802,7 +811,7 @@ def test_outside_layer_coverage(onto, tmp_path, events):
 
 @req(EC, "Государство основного места", scenario="Место с координатами")
 def test_place_card_has_geo_without_polity(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     place = svc.place("Кёнигсберг", 54.71, 20.51)
     card, rid = svc.get(place)
     assert card["geo"] == {"lat": 54.71, "lon": 20.51} and card["summary"] is None
@@ -812,7 +821,7 @@ def test_place_card_has_geo_without_polity(onto, tmp_path, events):
 
 @req(EC, "Государство основного места", scenario="Без координат")
 def test_no_coordinates(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     kant = kant_world(svc, onto, coords=None)
     card, rid = svc.get(kant)
     assert card["summary"]["place"]["geo"] is None and card["summary"]["polity"] is None
@@ -826,7 +835,7 @@ def test_no_coordinates(onto, tmp_path, events):
     invariant="образование — на год рождения, из слоя, меньшее по площади",
 )
 def test_polity_depends_on_birth_year_and_picks_smallest(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     early = kant_world(svc, onto, born="1650")  # Пруссии ещё нет: остаётся большая держава
     late = kant_world(svc, onto, born="1724")  # точку содержат Пруссия (меньше) и большая
     after = kant_world(svc, onto, born="1850")  # на 1850 год — только Пруссия
@@ -851,7 +860,7 @@ def test_polity_depends_on_birth_year_and_picks_smallest(onto, tmp_path, events)
     invariant="без года рождения образование не ищется; название не из словаря",
 )
 def test_polity_needs_birth_year(onto, tmp_path, events):
-    svc = CardSvc(onto, polities=prussia_layer(tmp_path))
+    svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
     nameless = onto.person("Аноним")
     city = svc.place("Кёнигсберг", 54.71, 20.51)
     svc.lived(nameless, city, "activity")
@@ -859,7 +868,7 @@ def test_polity_needs_birth_year(onto, tmp_path, events):
     assert card["summary"]["polity"] is None
     assert svc.served(events, rid)["polity"] in ("skipped", "unavailable")
     # Город известный, но слоя нет: название государства не берётся ни из какого словаря.
-    bare = CardSvc(onto)
+    bare = CardSvc(onto, events=events)
     kant = kant_world(bare, onto)
     card, _ = bare.get(kant)
     assert card["summary"]["polity"] is None
@@ -1378,3 +1387,27 @@ def test_place_with_only_coordinates_is_not_empty(cs, onto):
     card, _ = cs.get(place)
     assert card["geo"] == {"lat": 54.71, "lon": 20.51}
     assert card["empty"] is False
+
+
+@req(EC, "Природа каждой строки", invariant="регион снимает подтверждение, но не меняет отметку")
+def test_region_hides_evidence_but_keeps_mark(cs, onto, events):
+    from philograph.knowledge.statements import Evidence
+
+    kant, hume = onto.person("Кант", "1724", "1804"), onto.person("Юм", "1711", "1776")
+    onto.paragraphs["pr1"] = "Кант испытал влияние Юма."
+    onto.statements.add(
+        kant,
+        "influenced_by",
+        obj=hume,
+        attributions=src("s_closed"),
+        evidence=[Evidence("pr1", "испытал влияние Юма", source_id="s_closed")],
+        provenance=Provenance("extracted"),
+    )
+    [open_row] = section(cs.get(kant)[0], "influenced_by")["rows"]
+    assert open_row["mark"] == "sourced" and len(open_row["evidence"]) == 1
+    card = cs.cards.card(kant, closed=frozenset({"s_closed"}))
+    [row] = section(card, "influenced_by")["rows"]
+    assert (row["mark"], row["status"]) == ("sourced", "sourced")
+    assert row["evidence"] == [] and row["attributions"] == []
+    assert card["legend"] == ["sourced"]
+    assert [e["rows"] for e in events.of(SERVED)] == [1, 1]

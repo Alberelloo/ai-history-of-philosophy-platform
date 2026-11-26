@@ -810,8 +810,9 @@ def test_markup_in_values_notes_and_via_is_text(knowledge_context, knowledge_sta
     expect(relates.locator(".card-row__details")).to_contain_text("<u>Труд</u>")
     for selector in ("i#pwned", "u", "#pwned"):
         assert panel(page).locator(selector).count() == 0, selector
-    page, _ = open_card(knowledge_context, knowledge_stack, "Автор Значений", page=page)
+    page, response = open_card(knowledge_context, knowledge_stack, "Автор Значений", page=page)
     loaded(page, "Автор Значений")
+    served(events, response, type="person")
     assert panel(page).locator("u").count() == 0
     expect(panel(page).locator("[data-section=works]")).to_contain_text("<u>Труд</u>")
     expect(panel(page).locator("[data-section=works] .card-row__note")).to_contain_text("1739")
