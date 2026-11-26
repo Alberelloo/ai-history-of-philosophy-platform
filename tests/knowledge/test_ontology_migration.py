@@ -33,6 +33,7 @@ from .dump import dump
 from .migration_world import (
     GARBAGE,
     LATIN_CONCEPTS,
+    PENDING_SPEC,
     SYMPTOMS_SPEC,
     THRESHOLDS,
     FakeLLM,
@@ -1142,6 +1143,7 @@ def test_rollback_keeps_verified_qid(onto, events):
 @settings(PROFILES["heavy"], **DB_SETTINGS)
 @given(spec=ontologies())
 @example(spec=SYMPTOMS_SPEC)
+@example(spec=PENDING_SPEC)
 def test_rollback_invariant(onto, events, spec):
     wipe(onto)
     world = build(onto, spec)
@@ -1152,8 +1154,10 @@ def test_rollback_invariant(onto, events, spec):
     m.rollback(report.run_id)
     assert dump(engine) == before
     with engine.begin() as conn:
-        statuses = {r.status for r in conn.execute(select(t.review_items))}
-    assert statuses <= {"rolled_back"}
+        statuses = [r.status for r in conn.execute(select(t.review_items))]
+    # J14: пункты очереди запуска после отката — ровно rolled_back, все report.review
+    assert set(statuses) <= {"rolled_back"}, statuses
+    assert len(statuses) == report.review, (statuses, report.review)
 
 
 # =========================== Замер ========================================================
@@ -2036,3 +2040,194 @@ def test_sources_not_translated(onto, events):
     assert not [
         e for e in events.of("knowledge.entity.renamed") if e["entity_id"] in (src_wd, src_llm)
     ]
+
+
+@req(
+    OM,
+    "Перевод названий",
+    invariant="J11: шаг 5 только для нерусских основных — русское с QID не меняется",
+)
+def test_wikidata_labels_skip_russian_primary(onto, events):
+    records = {
+        "Q900031": record("Q900031", ru="Монада Лейбница", en="Monad", classes=HUMAN),
+        "Q900033": record("Q900033", ru="Дэвид Юм", en="David Hume", classes=HUMAN),
+        "Q900034": record("Q900034", ru="Субстанция", en="Substance", classes=HUMAN),
+    }
+    monad = raw_entity(onto, "concept", [("ru", "Монада", "primary")], "Q900031")
+    hume = raw_entity(onto, "person", [("ru", "Юм", "primary")], "Q900033")
+    substance = raw_entity(onto, "concept", [("en", "substance", "primary")], "Q900034")
+    before = State.read(onto.statements.engine)
+    report = migration(onto, fetch=RecordFetch(records)).run()
+    after = State.read(onto.statements.engine)
+    assert after.label(substance) == "Субстанция"  # нерусское с QID — переименовано
+    for e in (monad, hume):
+        assert after.name_set(e) == before.name_set(e), after.name_set(e)
+    assert {r["id"] for r in report.renamed_list} == {substance}
+
+
+@req(OM, QM, invariant="J13: А7 — справочник с lang=ru (название на русском, а не на английском)")
+def test_a7_catalog_lang_ru(onto, events, capsys, clock, database_url):
+    raw_entity(onto, "concept", [("ru", "Причинность", "primary"), ("en", "20.1", "primary")])
+    _code, result = quality(capsys, database_url)
+    assert values(result)["a7"] == 0
+
+
+# --- Условия отбора шагов: вход с «не-X», который привёл бы к изменению (правило судьи) ---
+
+
+@req(
+    OM,
+    "Перевод названий",
+    invariant="Шаг 5 — только действующие: снятая на шаге 4 не переименовывается из Wikidata",
+)
+def test_retired_not_renamed_from_wikidata(onto, events):
+    records = {
+        "Q900041": record("Q900041", ru="Милорд", en="Lordship", classes=HUMAN),
+        "Q900042": record("Q900042", ru="Субстанция", en="Substance", classes=HUMAN),
+    }
+    lordship = raw_entity(onto, "person", [("en", "your Lordship", "primary")], "Q900041")
+    substance = raw_entity(onto, "concept", [("en", "substance", "primary")], "Q900042")
+    before = State.read(onto.statements.engine)
+    report = migration(onto, fetch=RecordFetch(records)).run()
+    after = State.read(onto.statements.engine)
+    assert after.retired(lordship)
+    assert after.name_set(lordship) == before.name_set(lordship), after.name_set(lordship)
+    assert after.label(substance) == "Субстанция"
+    assert lordship not in {r["id"] for r in report.renamed_list}
+
+
+@req(
+    OM,
+    "Перевод названий",
+    invariant="Шаг 6 — только действующие: снятые на шаге 4 не уходят к модели",
+)
+def test_retired_not_sent_to_model(onto, events):
+    number = raw_entity(onto, "concept", [("en", "20.1", "primary")])
+    every = raw_entity(onto, "term", [("en", "Every", "primary")])
+    substance = raw_entity(onto, "concept", [("en", "substance", "primary")])
+    llm = FakeLLM.by_label({"20.1": "Двадцать", "Every": "Каждый", "substance": "Субстанция"})
+    before = State.read(onto.statements.engine)
+    migration(onto, llm=llm).run(translate="model")
+    after = State.read(onto.statements.engine)
+    sent = {i["label"] for call in llm.calls for i in llm.items(call)}
+    assert "substance" in sent and not {"20.1", "Every"} & sent, sent
+    assert after.label(substance) == "Субстанция"
+    for e in (number, every):  # язык меняет lang_fix (шаг 3), текст и вид — нет
+        assert after.retired(e)
+        assert {(x, k) for _l, x, k in after.name_set(e)} == {
+            (x, k) for _l, x, k in before.name_set(e)
+        }
+
+
+@req(
+    OM,
+    "Снятие мусорных сущностей",
+    invariant="Снятие — по основному названию: негодный вариант не снимает",
+)
+def test_retire_by_primary_only(onto, events):
+    kept = raw_entity(onto, "concept", [("ru", "Субстанция", "primary"), ("en", "20.1", "variant")])
+    gone = raw_entity(onto, "concept", [("en", "21.1", "primary")])
+    report = migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert not after.retired(kept) and after.retired(gone)
+    assert {r["id"] for r in report.retired_list} >= {gone}
+    assert kept not in {r["id"] for r in report.retired_list}
+
+
+@req(
+    OM,
+    "Миграция существующей онтологии",
+    invariant="Совпадение имён в очередь — только одного типа",
+)
+def test_same_name_other_type_not_queued(onto, events):
+    concept = raw_entity(onto, "concept", [("ru", "Форма вещи", "primary")])
+    term = raw_entity(onto, "term", [("ru", "Форма вещи", "primary")])
+    twin = raw_entity(onto, "concept", [("ru", "Форма вещи", "primary")])
+    migration(onto).run()
+    assert _pair_items(onto, concept, term) == [] and _pair_items(onto, twin, term) == []
+    assert len(_pair_items(onto, concept, twin)) == 1
+
+
+@req(
+    OM,
+    "Миграция существующей онтологии",
+    invariant="Совпадение имён в очередь — только основных названий",
+)
+def test_same_name_variant_not_queued(onto, events):
+    a = raw_entity(onto, "concept", [("ru", "Форма вещи", "primary")])
+    b = raw_entity(
+        onto, "concept", [("ru", "Материя вещи", "primary"), ("ru", "Форма вещи", "variant")]
+    )
+    migration(onto).run()
+    assert _pair_items(onto, a, b) == []
+
+
+@req(
+    OM,
+    "Миграция существующей онтологии",
+    invariant="Совпадение имён в очередь — только действующие сущности",
+)
+def test_same_name_retired_not_queued(onto, events):
+    a = raw_entity(onto, "concept", [("en", "20.1", "primary")])
+    b = raw_entity(onto, "concept", [("en", "20.1", "primary")])
+    migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert after.retired(a) and after.retired(b)
+    assert _pair_items(onto, a, b) == []
+
+
+@req(
+    OM,
+    "Миграция существующей онтологии",
+    invariant="Манифест: в очередь — только pending с действующим держателем",
+)
+def test_manifest_pending_retired_holder_not_queued(onto, events):
+    lordship = raw_entity(onto, "person", [("en", "your Lordship", "primary")])
+    kant = raw_entity(onto, "person", [("ru", "Кантович", "primary")])
+    migration(onto).run()
+    assert State.read(onto.statements.engine).retired(lordship)
+    manifest = {
+        "entities": [
+            {
+                "entity": kant,
+                "wikidata": None,
+                "decision": "pending",
+                "candidates": [{"qid": "Q900051", "holder": lordship}],
+            }
+        ]
+    }
+    migration(onto).run(manifest=manifest)
+    assert _pair_items(onto, kant, lordship) == []
+
+
+@req(OM, QM, invariant="А3 — только персоны: строчное название понятия не считается")
+def test_a3_ignores_non_persons(onto, events, capsys, database_url):
+    _code, before = quality(capsys, database_url)
+    raw_entity(onto, "concept", [("ru", "причинность вещей", "primary")])
+    _code, after = quality(capsys, database_url)
+    assert values(after)["a3"] == values(before)["a3"]
+
+
+@req(
+    OM,
+    "Миграция существующей онтологии",
+    invariant="Манифест: в очередь — только записи без решения; принятая с держателем сливается",
+)
+def test_manifest_accepted_with_holder_not_queued(onto, events):
+    homer = raw_entity(onto, "person", [("ru", "Гомерос", "primary")], "Q900061")
+    omir = raw_entity(onto, "person", [("ru", "Омирос", "primary")])
+    rec = {"Q900061": record("Q900061", ru="Гомерос", en="Homeros", classes=HUMAN)}
+    manifest = {
+        "entities": [
+            {
+                "entity": omir,
+                "wikidata": "Q900061",
+                "decision": "accepted",
+                "candidates": [{"qid": "Q900061", "holder": homer}],
+            }
+        ]
+    }
+    report = migration(onto, fetch=RecordFetch(rec)).run(manifest=manifest)
+    after = State.read(onto.statements.engine)
+    assert after.entities[omir]["redirect_to"] == homer  # слиты
+    assert _pair_items(onto, omir, homer) == [] and report.review == 0

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..0181832 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -897,7 +897,7 @@ class Migration:
+             if row["type"] in (PERSON, SOURCE):
+                 continue
+             for n in row["names"]:
+-                if n["kind"] == "primary" and normalize(n["text"]):
++                if normalize(n["text"]):
+                     groups[(row["type"], normalize(n["text"]))].add(e)
+         pairs = {(a, b) for members in groups.values() for a, b in combinations(sorted(members), 2)}
+         return [(a, b, SAME_NAME) for a, b in sorted(pairs)]

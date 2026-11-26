@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..7eea4a7 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -739,7 +739,7 @@ class Migration:
+         if self.fetch is None:
+             return []
+         found = []
+-        for entity_id in self._not_russian(view):
++        for entity_id in [e for e in view.active() if view.entities[e]["type"] != SOURCE]:
+             qid = view.entities[entity_id]["qid"]
+             if not qid:
+                 continue

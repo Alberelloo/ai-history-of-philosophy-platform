@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..d9401ed 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -1074,7 +1074,7 @@ class Migration:
+                     conn.execute(
+                         update(t.review_items)
+                         .where(t.review_items.c.id == item_id)
+-                        .values(status="rolled_back")
++                        .values(status="closed")
+                     )
+ 
+ 

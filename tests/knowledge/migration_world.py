@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import re
 import unicodedata
@@ -93,6 +94,11 @@ RU_PERSONS = (
 )  # fmt: skip
 RU_CONCEPTS = ("Априори", "Душа", "Материя", "Форма")
 RU_POSITIONS = ("Эмпиризм", "Рационализм")
+# J11: русское основное и QID, подпись ru в Wikidata другая — шаг 5 не трогает (не «нерусское»).
+RU_QID = (
+    ("Монада", "Q900031", "Монада Лейбница"),
+    ("Апперцепция", "Q900032", "Чистая апперцепция"),
+)
 SOURCES = ("s_a", "s_b")
 # Источники библиотеки: правило названий их не проверяет, А1/А2 их не считают.
 SOURCE_NAMES = ("A Treatise of Human Nature", "3.1")
@@ -778,6 +784,17 @@ def ontologies(draw, *, manifest: bool = True) -> dict[str, Any]:
                 "label": label,
             }
         )
+    for label, qid, wd_ru in draw(hst.lists(hst.sampled_from(RU_QID), max_size=2, unique=True)):
+        spec["wd"][qid] = wd_ru
+        ents.append(
+            {
+                "key": f"c:{label}",
+                "type": "concept",
+                "names": [("ru", label, "primary")],
+                "qid": qid,
+                "label": label,
+            }
+        )
     clusters = []
     for en, qid, ru in draw(hst.lists(hst.sampled_from(LATIN_QID), max_size=2, unique=True)):
         wd = draw(hst.sampled_from(["ru", "none", "latin", "number"]))
@@ -1071,8 +1088,9 @@ SYMPTOMS_SPEC: dict[str, Any] = {
         _e("p:Йоганн", "person", "Йоганн", "ru"),
         _e("s:A Treatise of Human Nature", "source", "A Treatise of Human Nature"),
         _e("s:3.1", "source", "3.1"),
+        _e("c:Монада", "concept", "Монада", "ru", qid="Q900031"),  # J11
     ],
-    "wd": {"Q41568": "Юм", "Q6691": "Гомер", "Q913": "Сократ"},
+    "wd": {"Q41568": "Юм", "Q6691": "Гомер", "Q913": "Сократ", "Q900031": "Монада Лейбница"},
     "wd_times": {
         "Q913": {"P569": ("-0469-00-00T00:00:00Z", 9), "P570": ("-0399-00-00T00:00:00Z", 9)}
     },
@@ -1147,3 +1165,19 @@ SYMPTOMS_SPEC: dict[str, Any] = {
     "mentions": ["p:Hume", "g:20.1", "p:Омир"],
     "portraits": ["p:Юм", "p:Berkeley#1"],
 }
+
+
+def _pending(spec: dict[str, Any]) -> dict[str, Any]:
+    """Тот же пример, но «Омир» в манифесте без решения: пункт очереди запуска (J14)."""
+    out = copy.deepcopy(spec)
+    out["manifest"] = [
+        m | {"decision": "pending"} if m["key"] == "p:Омир" else m for m in out["manifest"]
+    ]
+    out["clusters"] = [c for c in out["clusters"] if c != {"p:Гомер", "p:Омир"}]
+    for e in out["entities"]:
+        if e["key"] == "p:Омир":
+            e["label"] = "Омир"
+    return out
+
+
+PENDING_SPEC: dict[str, Any] = _pending(SYMPTOMS_SPEC)

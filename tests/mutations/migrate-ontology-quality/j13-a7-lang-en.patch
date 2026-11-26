@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quality_report.py b/src/philograph/knowledge/quality_report.py
+index e594d5f..a241c23 100644
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -169,7 +169,7 @@ def catalog_items(engine: Engine) -> list[dict[str, Any]]:
+     items: list[dict[str, Any]] = []
+     page = 1
+     while True:
+-        result = catalog.list(lang="ru", page=str(page), limit="60")
++        result = catalog.list(lang="en", page=str(page), limit="60")
+         items.extend(result["items"])
+         if not result["items"] or len(items) >= result["total"]:
+             return items

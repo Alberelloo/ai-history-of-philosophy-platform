@@ -652,3 +652,85 @@ mutations:
     note: О33 — шаг 6 (модель) берёт и источники
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_sources_not_translated
+  - id: j11-wd-labels-include-russian
+    requirement: Перевод названий
+    patch: j11-wd-labels-include-russian.patch
+    note: J11 судьи — шаг 5 берёт и русские основные
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_skip_russian_primary
+  - id: wd-labels-include-retired
+    requirement: Перевод названий
+    patch: wd-labels-include-retired.patch
+    note: отбор шага 5 — и снятые на шаге 4
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_retired_not_renamed_from_wikidata
+  - id: translate-include-russian
+    requirement: Перевод названий
+    patch: translate-include-russian.patch
+    note: отбор шага 6 — и русские основные
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_no_model_without_flag
+  - id: translate-include-retired
+    requirement: Перевод названий
+    patch: translate-include-retired.patch
+    note: отбор шага 6 — и снятые на шаге 4
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_no_model_without_flag
+      - tests/knowledge/test_ontology_migration.py::test_retired_not_sent_to_model
+  - id: retire-any-name
+    requirement: Снятие мусорных сущностей
+    patch: retire-any-name.patch
+    note: отбор шага 4 — по любому названию, а не основному
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_retire_by_primary_only
+  - id: same-name-any-type
+    requirement: Миграция существующей онтологии
+    patch: same-name-any-type.patch
+    note: очередь same_name без учёта типа
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_other_type_not_queued
+  - id: same-name-any-kind
+    requirement: Миграция существующей онтологии
+    patch: same-name-any-kind.patch
+    note: очередь same_name и по вариантам
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_variant_not_queued
+  - id: same-name-include-inactive
+    requirement: Миграция существующей онтологии
+    patch: same-name-include-inactive.patch
+    note: очередь same_name и по снятым
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_retired_not_queued
+  - id: manifest-queue-decided
+    requirement: Миграция существующей онтологии
+    patch: manifest-queue-decided.patch
+    note: шаг 2 ставит в очередь и записи с решением
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_manifest_accepted_with_holder_not_queued
+  - id: manifest-queue-inactive
+    requirement: Миграция существующей онтологии
+    patch: manifest-queue-inactive.patch
+    note: шаг 2 ставит в очередь пару со снятым держателем
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_manifest_pending_retired_holder_not_queued
+  - id: a3-all-types
+    requirement: Замер качества онтологии
+    patch: a3-all-types.patch
+    note: А3 по всем типам, а не только персонам
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_before_after
+      - tests/knowledge/test_ontology_migration.py::test_a3_ignores_non_persons
+  - id: j13-a7-lang-en
+    requirement: Замер качества онтологии
+    patch: j13-a7-lang-en.patch
+    note: J13 судьи — справочник для А7 с lang=en
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_a7_catalog_lang_ru
+  - id: j14-rollback-closed
+    requirement: Откат миграции
+    patch: j14-rollback-closed.patch
+    note: J14 судьи — пункты очереди запуска закрываются статусом closed
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
+      - tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items
