@@ -1712,3 +1712,121 @@ def test_pending_candidate_distinct_not_queued(onto, events, capsys, tmp_path):
     items = _pair_items(onto, ids["omir"], ids["homer"])
     assert [i["status"] for i in items] == ["resolved"]
     events.assert_none("knowledge.entity.merge_proposed")
+
+
+# ============ О31: поздние названия при откате, отрицательный --limit, неизвестный run_id ==
+
+
+@req(
+    OM,
+    RB,
+    invariant="Откат удаляет только своё название; название человека после запуска остаётся, kept",
+)
+def test_rollback_keeps_later_added_name(onto, events):
+    ids = _concepts(onto, ["causality"], lang="ru")
+    m = migration(onto, llm=FakeLLM.by_label(TWO))
+    report = m.run(translate="model")
+    e = ids["causality"]
+    onto.entities.add_name(e, "ru", "Казуальность")
+    events.clear()
+    m.rollback(report.run_id)
+    after = State.read(onto.statements.engine)
+    assert ("ru", "Казуальность", "variant") in after.name_set(e)
+    assert ("ru", "Причинность", "primary") not in after.name_set(e)
+    assert events.one("knowledge.migration.rolled_back")["kept"] == 1
+    check_keys(events)
+
+
+@req(OM, RB, invariant="Откат: название, пришедшее слиянием другого запуска, остаётся, kept")
+def test_rollback_keeps_name_from_later_merge(onto, events):
+    ids = _concepts(onto, ["causality"], lang="ru")
+    m = migration(onto, llm=FakeLLM.by_label(TWO))
+    report = m.run(translate="model")
+    e = ids["causality"]
+    other = raw_entity(onto, "concept", [("ru", "Каузальность", "primary")])
+    onto.statements.merge_entities(e, other, run_id="later_run")
+    events.clear()
+    m.rollback(report.run_id)
+    after = State.read(onto.statements.engine)
+    assert after.resolve(other) == e
+    assert any(text_ == "Каузальность" for _l, text_, _k in after.name_set(e))
+    assert events.one("knowledge.migration.rolled_back")["kept"] == 1
+
+
+@req(OM, MIG, invariant="Отрицательный --limit отклоняется с ненулевым кодом до любых изменений")
+@pytest.mark.parametrize("command", ["plan", "run"])
+def test_negative_limit_rejected(onto, events, capsys, command):
+    stand(onto)
+    before = dump(onto.statements.engine)
+    llm = FakeLLM.by_label(TWO)
+    argv = [command, "--limit", "-1"] + (["--translate", "model"] if command == "run" else [])
+    try:
+        code, _ = cli(onto, capsys, argv, llm=llm)
+    except SystemExit as exc:  # отказ разбора аргументов — тоже ненулевой код
+        code = exc.code
+    assert code not in (0, None)
+    assert dump(onto.statements.engine) == before and llm.calls == []
+    events.assert_none("knowledge.migration.step")
+
+
+@req(OM, RB, invariant="Откат неизвестного run_id — ненулевой код, сообщение, без изменений")
+def test_rollback_unknown_run(onto, events, capsys):
+    stand(onto)
+    before = dump(onto.statements.engine)
+    capsys.readouterr()
+    try:
+        code = main(
+            ["rollback", "mig_doesnotexist"],
+            fetch=RecordFetch(WD),
+            llm=None,
+            service=lambda fetch_, llm_: Migration(onto.statements, None, fetch_, llm_),
+        )
+    except SystemExit as exc:
+        code = exc.code
+    out = capsys.readouterr()
+    assert code not in (0, None)
+    assert (out.out + out.err).strip()
+    assert dump(onto.statements.engine) == before
+    events.assert_none("knowledge.migration.rolled_back")
+
+
+LATER = "бвгдежзклмнп"
+
+
+@req(OM, RB, invariant="Инвариант отката: произвольные последующие изменения сохраняются")
+@settings(PROFILES["heavy"], **DB_SETTINGS)
+@given(spec=ontologies(), data=hst.data())
+@example(spec=SYMPTOMS_SPEC, data=None)
+def test_rollback_keeps_arbitrary_later_names(onto, events, spec, data):
+    wipe(onto)
+    world = build(onto, spec)
+    engine = onto.statements.engine
+    pre = State.read(engine)
+    m = Migration(onto.statements, None, RecordFetch(world.wd), FakeLLM.by_label(world.llm_table))
+    report = m.run(manifest=world.manifest, translate="model")
+    mid = State.read(engine)
+    active = mid.active()
+    if data is None:  # явный пример: позднее название у каждой переименованной
+        chosen = sorted({r["id"] for r in report.renamed_list} & set(active))
+    else:
+        chosen = (
+            data.draw(hst.lists(hst.sampled_from(active), unique=True, max_size=4))
+            if active
+            else []
+        )
+    later = {}
+    for i, e in enumerate(chosen):
+        later[e] = f"Позднее имя {LATER[i % len(LATER)]}{LATER[i // len(LATER)]}"
+        onto.entities.add_name(e, "ru", later[e])
+    events.clear()
+    m.rollback(report.run_id)
+    after = State.read(engine)
+    for e, text_ in later.items():
+        assert ("ru", text_, "variant") in after.name_set(e), (e, after.name_set(e))
+    renamed = {r["id"] for r in report.renamed_list}
+    [rolled] = events.of("knowledge.migration.rolled_back")
+    assert rolled["kept"] >= len(renamed & set(later))
+    # сущности без последующих изменений откатываются полностью
+    for e in pre.entities:
+        if e not in later:
+            assert after.name_set(e) == pre.name_set(e), e
