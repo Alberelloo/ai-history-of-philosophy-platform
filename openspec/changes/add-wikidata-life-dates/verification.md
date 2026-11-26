@@ -1,5 +1,54 @@
 # Verification
 
+## Итог: требование → доказывающий тест (HEAD 09087b9)
+
+Сводка на текущий HEAD. Тесты — по маркерам `@pytest.mark.req` (собраны из `tests/` разбором AST, имена сверены с файлами). Мутации — по `expect_fail` в `tests/mutations/add-wikidata-life-dates/mutations.yaml`: каждая проверена `mutation_check.py --id`, все патчи накладываются на HEAD. Инвариант — property-тест (`@given`) или тест сценария «Инвариант …». Нормативные фразы — тесты с `invariant=` в маркере. История кругов — ниже, в разделах ролей.
+
+### entity-dating / Даты жизни из Wikidata
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любых записей Wikidata верно следующее. - Записанные границы и `precision` равны значению по таблице точностей, а год со знаком «−» всегда даёт границы ≤ 0. - Ни одна существующая дата не перезаписана. - Сухой про… | `test_life_dates_invariant`, `test_rollback_without_verified_restores_dump`, `test_rollback_keeps_verified_and_qid` | slice-instead-of-claim-date, century-as-year, existing-overwritten, rollback-removes-verified, millennium-floor, millennium-precision-century, best-normal-first, best-takes-deprecated, no-dates-as-partial, roles-outside-table, rerun-recounts |
+| Сценарий «Персона с QID» | `test_person_with_qid` | slice-instead-of-claim-date, sign-inverted, attribution-no-link, status-generated, provenance-no-run, linked-skipped |
+| Сценарий «Кант с днями» | `test_kant_with_days` | prec-9-only |
+| Сценарий «Год произведения» | `test_work_year` | work-as-lifespan |
+| Сценарий «Точность десятилетия, века и дня» | `test_decade_century` | century-as-year, decade-plus-10, century-floor |
+| Сценарий «Год 0000 и малая точность» | `test_year_zero_and_low_precision` | prec-5-accepted, year-zero-accepted, bad-value-as-partial, skipped-event-entity-wrong |
+| Сценарий «Одна дата» | `test_one_date` | partial-accepted |
+| Сценарий «Дата уже есть» | `test_existing_dates` | existing-overwritten, unchanged-as-conflict, conflict-not-counted |
+| Сценарий «Сухой прогон и откат» | `test_dry_run_and_rollback_cli` | dry-run-writes, rollback-externals-kept |
+| Сценарий «Откат с проверенным утверждением» | `test_rollback_keeps_verified`, `test_rollback_verified_keeps_attribution` | rollback-removes-verified, rollback-kept-zero, referenced-ignored |
+| Нормативные фразы (тестов: 5) | `test_linked_after_skips`, `test_linked_bad_qid_skipped_without_fetch`, `test_fetch_failed_counted_as_failed`, `test_life_dates_journal`, `test_wd_precisions_generated` | linked-bad-qid-passed, fetch-failed-as-skipped, linked-stops-after-done, linked-stops-after-kind, linked-stops-after-bad-qid, life-dates-no-journal |
+| Требование целиком | файлы: `tests/knowledge/test_life_dates.py`, `tests/knowledge/test_operator_commands_journal.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 19 | все 37: slice-instead-of-claim-date, century-as-year, existing-overwritten, rollback-removes-verified, prec-9-only, decade-plus-10, century-floor, millennium-floor, millennium-precision-century, prec-5-accepted, year-zero-accepted, sign-inverted, best-normal-first, best-takes-deprecated, bad-value-as-partial, no-dates-as-partial, partial-accepted, unchanged-as-conflict, conflict-not-counted, skipped-event-entity-wrong, roles-outside-table, attribution-no-link, status-generated, provenance-no-run, dry-run-writes, rerun-recounts, rollback-externals-kept, rollback-kept-zero, referenced-ignored, linked-skipped, linked-bad-qid-passed, fetch-failed-as-skipped, work-as-lifespan, linked-stops-after-done, linked-stops-after-kind, linked-stops-after-bad-qid, life-dates-no-journal |
+
+### entity-dating / Подтверждение QID персон и произведений
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого манифеста: - внешний QID записывается только при `decision ∈ {accepted, auto}`; - существующий QID не перезаписывается; - из двух подтверждений одного QID записывается только первое по порядку; - `auto` поя… | `test_qid_confirmation_invariant`, `test_suggest_auto_invariant` | qid-on-pending, auto-without-flag, own-qid-overwritten, exact-label-unchecked, same-qid-conflict, taken-before-conflict, apply-stops-after-taken |
+| Сценарий «Кандидаты для персоны» | `test_candidates_for_person` | auto-without-flag, suggest-person-class-unchecked, suggest-single-lang |
+| Сценарий «Кандидат уже у другой персоны» | `test_candidate_held_by_other` | holder-not-queued |
+| Сценарий «Точное совпадение с флагом» | `test_exact_with_flag` | suggested-event-auto-zero |
+| Сценарий «Два кандидата» | `test_two_candidates` | exact-multi-candidates |
+| Сценарий «QID занят» | `test_qid_taken` | qid-taken-not-merged, qid-taken-not-skipped |
+| Сценарий «Два подтверждения одного QID» | `test_two_confirmations` | — |
+| Сценарий «У сущности другой QID» | `test_entity_has_other_qid` | own-qid-overwritten |
+| Сценарий «Неверный манифест» | `test_bad_manifest` | validate-accepted-needs-qid-dropped |
+| Нормативные фразы (тестов: 10) | `test_candidate_holder_after_skipped`, `test_work_candidate_needs_publication_date`, `test_auto_exact_needs_compatible_dates`, `test_suggest_searches_variants`, `test_suggest_keeps_human_decision`, `test_holder_of_other_kind_ignored`, `test_holder_pair_decided_apart_not_requeued`, `test_qid_taken_queued`, `test_refused_then_applied`, `test_bad_manifest_forms` | suggest-work-needs-no-date, exact-dates-unchecked, suggest-only-primary-name, suggest-decided-reprocessed, suggest-holder-any-type, suggest-decided-apart-requeued, validate-entity-unique-dropped, validate-qid-shape-dropped, validate-decision-set-dropped, suggest-stops-after-free-candidate, suggest-stops-after-other-type-holder, apply-stops-after-refused |
+| Требование целиком | файлы: `tests/knowledge/test_life_dates.py`; маркеров 21 | все 28: qid-on-pending, auto-without-flag, qid-taken-not-merged, own-qid-overwritten, holder-not-queued, suggest-person-class-unchecked, suggest-work-needs-no-date, exact-multi-candidates, exact-label-unchecked, exact-dates-unchecked, suggest-only-primary-name, suggest-single-lang, suggest-decided-reprocessed, suggest-holder-any-type, suggest-decided-apart-requeued, suggested-event-auto-zero, validate-entity-unique-dropped, validate-qid-shape-dropped, validate-decision-set-dropped, validate-accepted-needs-qid-dropped, qid-taken-not-skipped, same-qid-conflict, auto-confirmed-merged, taken-before-conflict, suggest-stops-after-free-candidate, suggest-stops-after-other-type-holder, apply-stops-after-refused, apply-stops-after-taken |
+| (мутации, которые роняют тесты других требований) | — | auto-confirmed-merged |
+
+### ontology-extraction / Импорт из Wikidata
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любой записи год со знаком «−» даёт дату до нашей эры (начало ≤ 0), а записанные годы жизни равны разбору общим правилом. | `test_time_rule_any_value`, `test_import_invariant` | import-slice |
+| Сценарий «Влияние не импортируется» | `test_influence_not_imported` | import-skipped-event-missing |
+| Сценарий «Дата до нашей эры» | `test_import_bce` | import-slice |
+| Сценарий «Одна дата при импорте» | `test_import_one_date` | import-partial-event-missing |
+| Требование целиком | файлы: `tests/knowledge/test_filling.py`, `tests/knowledge/test_life_dates.py`; маркеров 6 | все 3: import-slice, import-skipped-event-missing, import-partial-event-missing |
+
+
 ## Тестировщик — 2026-11-25, тесты на коммите 2cc4f44 (ветка claude/ontology-extraction)
 
 Тесты — от дельт `specs/entity-dating`, `specs/ontology-extraction` и design.md; код читался только для точек входа и, после коммита тестов, для патчей мутаций. Wikidata — записи теста (`wd_records.record`, `RecordFetch`, `--from-file`), сеть запрещена (`no_network` + автофикстура). Файл: `tests/knowledge/test_life_dates.py`.

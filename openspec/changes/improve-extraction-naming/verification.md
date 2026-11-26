@@ -1,5 +1,131 @@
 # Verification
 
+## Итог: требование → доказывающий тест (HEAD 09087b9)
+
+Сводка на текущий HEAD. Тесты — по маркерам `@pytest.mark.req` (собраны из `tests/` разбором AST, имена сверены с файлами). Мутации — по `expect_fail` в `tests/mutations/improve-extraction-naming/mutations.yaml`: каждая проверена `mutation_check.py --id`, все патчи накладываются на HEAD. Инвариант — property-тест (`@given`) или тест сценария «Инвариант …». Нормативные фразы — тесты с `invariant=` в маркере. История кругов — ниже, в разделах ролей.
+
+### entity-dating / Извлечение дат
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого элемента с датировкой выполняется одно из двух. - Датировка записана. Тогда каждое целое число её текста есть в цитате целым числом, эра текста совпадает с эрой цитаты, цитата есть в абзаце, а `span(primary… | `test_dating_invariant`, `test_dating_check_any_input` | numbers-substring, era-unchecked, roman-unchecked, reverse-interval-accepted, check-order-quote-unparsed, check-order-numbers-era, check-order-era-single, paragraph-bounds-off, quote-case-sensitive, quote-yo-kept, quote-spaces-kept, roman-substring, era-one-way, century-person-allowed, approx-year-not-single, year-max-2101, year-zero-allowed, century-max-22, dash-hyphen-only, approx-markers-short, era-text-spaced-only, era-quote-nashei-missing, approx-slack-year-wrong, approx-slack-interval-wrong, century-bounds-off, century-bce-bounds-off, century-precision-year, approx-precision-year, era-one-boundary-accepted, century-interval-accepted, unparsed-lenient, single-year-dropped, era-text-nashei, era-text-case |
+| Сценарий «Дата жизни в тексте» | `test_life_dates_in_text` | dating-person-as-dating, dating-evidence-dropped, dating-attribution-dropped, dating-provenance-manual |
+| Сценарий «Дата до нашей эры» | `test_bc_dates` | dating-person-as-dating, dating-evidence-dropped |
+| Сценарий «Год произведения» | `test_work_year` | dating-evidence-dropped |
+| Сценарий «Века у события» | `test_event_century` | dating-evidence-dropped |
+| Сценарий «Века нет в цитате» | `test_century_not_in_quote` | roman-unchecked |
+| Сценарий «Эра не совпадает» | `test_era_mismatch` | era-unchecked |
+| Сценарий «Года нет в цитате» | `test_year_not_in_quote` | dating-person-as-dating, dating-drop-doubled |
+| Сценарий «Число внутри другого числа» | `test_number_inside_number` | numbers-substring |
+| Сценарий «Один год у персоны» | `test_single_year_person` | — |
+| Сценарий «Неразборчивая дата» | `test_unparsed` | dating-person-as-dating, dating-drop-doubled |
+| Сценарий «Абзац вне фрагмента» | `test_paragraph_outside_fragment` | dating-drop-doubled |
+| Нормативные фразы (тестов: 9) | `test_dating_of_type_not_allowed`, `test_dating_of_unresolved_entity`, `test_dating_check_order_pairs`, `test_dating_check_order_pairs_complete`, `test_dating_sets`, `test_dating_reasons_generated`, `test_dating_pieces_generated`, `test_quote_only_era_marker_unparsed`, `test_marker_case_generated` | dating-type-unchecked, unresolved-reresolved, unresolved-inner-reason, dating-drop-doubled, check-order-unparsed-paragraph, check-order-era-quote, check-order-era-unparsed, check-order-single-numbers, check-order-numbers-quote |
+| Требование целиком | файлы: `tests/knowledge/test_entity_dating_extraction.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 23 | все 47: numbers-substring, era-unchecked, roman-unchecked, dating-type-unchecked, unresolved-reresolved, unresolved-inner-reason, reverse-interval-accepted, dating-person-as-dating, dating-evidence-dropped, dating-attribution-dropped, dating-provenance-manual, check-order-quote-unparsed, check-order-numbers-era, check-order-era-single, paragraph-bounds-off, quote-case-sensitive, quote-yo-kept, quote-spaces-kept, roman-substring, era-one-way, century-person-allowed, approx-year-not-single, year-max-2101, year-zero-allowed, century-max-22, dash-hyphen-only, approx-markers-short, era-text-spaced-only, era-quote-nashei-missing, approx-slack-year-wrong, approx-slack-interval-wrong, century-bounds-off, century-bce-bounds-off, century-precision-year, approx-precision-year, dating-drop-doubled, era-one-boundary-accepted, century-interval-accepted, unparsed-lenient, single-year-dropped, era-text-nashei, era-text-case, check-order-unparsed-paragraph, check-order-era-quote, check-order-era-unparsed, check-order-single-numbers, check-order-numbers-quote |
+
+### entity-naming / Язык названий сущностей
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого ответа модели и любого пути записи у каждой сущности не больше одного основного названия на язык, и язык каждого названия удовлетворяет правилу пп. 1–5. Название, в котором латинских букв (вне слов из римск… | `test_lang_for_any_text`, `test_language_invariant_create_and_add_name`, `test_normalization_and_language_for_any_items` | lang-given, rename-creates, roman-any-case, words-edge-kept, digits-as-letters, cyrillic-range-short, tie-first-wins, given-lang-table-short, given-kept-without-script, add-name-lang-given, create-lang-given, created-event-doubled, latin-ascii-only, greek-extended-dropped, other-script-as-latin, und-as-en, greek-el-as-grc, latin-en-as-la, renamed-extra-field, roman-without-l |
+| Сценарий «Русский учебник» | `test_russian_textbook` | variants-dropped, created-event-doubled |
+| Сценарий «Существующая английская сущность» | `test_existing_english_entity_gets_russian_primary` | rename-creates, rename-keeps-old-primary, renamed-previous-lang-wrong, renamed-extra-field |
+| Сценарий «Латиница без русского написания» | `test_latin_without_russian` | — |
+| Сценарий «Язык по письменности на любом пути» | `test_language_by_script_on_every_path` | lang-given, tie-first-wins, given-kept-without-script, create-lang-given, created-event-doubled, und-as-en, greek-el-as-grc, latin-en-as-la |
+| Сценарий «Русское написание не прошло проверку» | `test_rejected_russian_spelling` | items-russian-primary-as-concept |
+| Сценарий «Написания нашли разные сущности» | `test_spellings_found_different_entities` | ambiguous-reason-text, ambiguous-creates-new, ambiguous-candidates-count, ambiguous-no-review-item |
+| Нормативные фразы (тестов: 7) | `test_no_latin_name_has_ru`, `test_primary_choice_by_item`, `test_new_entity_spellings_checked_by_type`, `test_roman_letters_generated`, `test_edge_marks_generated`, `test_script_boundaries_generated`, `test_scripts_and_langs_generated` | ru-primary-not-russian, latin-en-as-la, is-russian-ignores-latin, names-for-stops-after-rejected, names-for-ru-as-concept, names-for-variant-as-concept, items-names-for-as-concept |
+| Требование целиком | файлы: `tests/knowledge/test_entity_naming.py`, `tests/knowledge/test_extraction_entities.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 17 | все 36: lang-given, rename-creates, ambiguous-reason-text, roman-any-case, words-edge-kept, digits-as-letters, cyrillic-range-short, tie-first-wins, given-lang-table-short, given-kept-without-script, ru-primary-unchecked, ru-primary-not-russian, variants-dropped, rejected-spelling-variant, add-name-lang-given, create-lang-given, rename-keeps-old-primary, renamed-previous-lang-wrong, created-event-doubled, ambiguous-creates-new, ambiguous-candidates-count, ambiguous-no-review-item, latin-ascii-only, greek-extended-dropped, other-script-as-latin, und-as-en, greek-el-as-grc, latin-en-as-la, is-russian-ignores-latin, renamed-extra-field, roman-without-l, names-for-stops-after-rejected, names-for-ru-as-concept, names-for-variant-as-concept, items-names-for-as-concept, items-russian-primary-as-concept |
+| (мутации, которые роняют тесты других требований) | — | ru-primary-unchecked, rejected-spelling-variant |
+
+### entity-naming / Валидность названий сущностей
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого названия и типа сущность создаётся тогда и только тогда, когда правила 1–5 не нашли причины. Каждому отказу соответствует ровно одно событие `knowledge.entity.rejected` с той же причиной и `label` по правил… | `test_check_name_any_input`, `test_rejection_invariant`, `test_stored_form_strip_nfc` | number-regex, patterns-case, stopword-before-person, label-no-trim, rule-sentence-before-number, rule-empty-as-number, rule-sentence-chars-unchecked, rule-sentence-words-unchecked, rule-limit-ge, rule-limits-default-only, rule-particle-apostrophe-ignored, rule-particle-case-sensitive, rule-glue-lower-neighbors, rule-not-a-name-all-types, rule-lowercase-first-unchecked, rule-patterns-dropped, rule-glue-dropped, rule-stopword-raw-compare, rule-exempt-ignored, label-cut-80, rejected-extra-field, add-name-unchecked, set-primary-unchecked, create-unchecked, stored-raw-create, stored-raw-add-name, stored-raw-set-primary, not-a-name-before-sentence, clean-nfkc, normalize-keeps-underscore |
+| Сценарий «Номер раздела» | `test_section_number` | dropped-reason-text, rejected-extra-field, create-unchecked |
+| Сценарий «Номер со знаками» | `test_numbers_with_marks` | number-regex |
+| Сценарий «Предложение вместо термина» | `test_sentence_instead_of_term` | rule-sentence-words-unchecked |
+| Сценарий «Описание с заглавной» | `test_description_with_capital` | patterns-case, rule-patterns-dropped, entities-check-as-concept |
+| Сценарий «Роль вместо имени» | `test_role_instead_of_name` | stopword-before-person, dropped-reason-text, rule-lowercase-first-unchecked |
+| Сценарий «Стоп-слово у понятия» | `test_stopword_concept` | — |
+| Сценарий «Пустое название» | `test_empty_names` | rule-empty-as-number |
+| Сценарий «Склейка двух имён» | `test_glued_names` | rule-glue-dropped, entities-check-as-concept |
+| Сценарий «Границы предела» | `test_limit_boundaries` | label-no-trim, rule-sentence-chars-unchecked, rule-sentence-words-unchecked, rule-limit-ge, rule-limits-default-only, label-cut-80 |
+| Сценарий «Имя с частицей и римским числом» | `test_particles_and_roman` | rule-particle-apostrophe-ignored |
+| Сценарий «Ручное создание» | `test_manual_core` | rule-lowercase-first-unchecked, rejected-extra-field, create-unchecked, core-reject-aborts |
+| Сценарий «Стоп-список из данных» | `test_stopword_list_from_data` | — |
+| Нормативные фразы (тестов: 12) | `test_core_rejection_reasons`, `test_signs_counted_after_nfc`, `test_rules_are_data`, `test_rule_order_pairs`, `test_rule_order_pairs_complete`, `test_rejected_label_is_name_after_strip`, `test_rejected_variant_label_after_strip`, `test_stored_form_via_extraction`, `test_whitespace_generated`, `test_normal_forms_distinguished`, `test_reasons_generated`, `test_underscore_generated` | stopword-before-person, reject-label-raw, rule-sentence-before-number, rule-sentence-chars-unchecked, rule-sentence-words-unchecked, rule-limit-ge, rule-limits-default-only, rule-not-a-name-all-types, rule-lowercase-first-unchecked, rule-patterns-dropped, rule-glue-dropped, rule-exempt-ignored, rule-no-nfc, rule-no-strip, label-cut-80, rejected-extra-field, rules-limits-hardcoded, rules-particles-hardcoded, rules-patterns-hardcoded, rules-conjunctions-hardcoded, rules-person-types-hardcoded, create-unchecked, core-reason-wrong, stored-raw-create, not-a-name-before-sentence, clean-nfkc, entities-check-as-concept |
+| Требование целиком | файлы: `tests/knowledge/test_entity_naming.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 28 | все 42: number-regex, patterns-case, stopword-before-person, label-no-trim, dropped-reason-text, reject-label-raw, rule-sentence-before-number, rule-empty-as-number, rule-sentence-chars-unchecked, rule-sentence-words-unchecked, rule-limit-ge, rule-limits-default-only, rule-particle-apostrophe-ignored, rule-particle-case-sensitive, rule-glue-lower-neighbors, rule-not-a-name-all-types, rule-lowercase-first-unchecked, rule-patterns-dropped, rule-glue-dropped, rule-stopword-raw-compare, rule-exempt-ignored, rule-no-nfc, rule-no-strip, label-cut-80, rejected-extra-field, rules-limits-hardcoded, rules-particles-hardcoded, rules-patterns-hardcoded, rules-conjunctions-hardcoded, rules-person-types-hardcoded, add-name-unchecked, set-primary-unchecked, create-unchecked, core-reject-aborts, core-reason-wrong, stored-raw-create, stored-raw-add-name, stored-raw-set-primary, not-a-name-before-sentence, clean-nfkc, normalize-keeps-underscore, entities-check-as-concept |
+
+### epoch-context / Контекстные события из Wikidata
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Сценарий «Кандидаты в манифест» | `test_harvest_candidates` | ctx-undated-offered, ctx-kind-any-class, ctx-point-time-ignored |
+| Сценарий «Принятый кандидат» | `test_accepted_candidate`, `test_accepted_only_candidate_skipped_zero` | ctx-pending-applied, ctx-membership-basis-missing, ctx-kind-statement-dropped, ctx-status-generated, ctx-statements-count-zero, ctx-places-created-zero, ctx-attribution-no-link |
+| Сценарий «Ожидающий и отклонённый» | `test_pending_and_rejected` | ctx-rejected-applied |
+| Сценарий «Повторный запуск и проверка» | `test_repeat_apply_and_dry_run` | ctx-exists-as-created, ctx-dry-run-writes, ctx-event-not-reused |
+| Сценарий «Повторный подбор не сбрасывает решения» | `test_repeat_harvest_keeps_decisions` | ctx-harvest-duplicates |
+| Сценарий «Название события не прошло проверку» | `test_context_event_name_rejected` | context-place-before-event |
+| Нормативные фразы (тестов: 11) | `test_repeat_harvest_keeps_human_fields`, `test_never_writes_stimulated_mechanism_influence`, `test_unknown_class_no_kind`, `test_undated_never_offered`, `test_found_by_qid`, `test_no_date_and_fetch_failed`, `test_cli_dry_run_changes_nothing`, `test_import_events_only_codes`, `test_duplicate_qid_other_type`, `test_event_label_checked_by_event_rule`, `test_epoch_context_journal` | ctx-no-date-as-fetch-failed, ctx-fetch-failed-as-no-date, ctx-duplicate-qid-event-ignored, ctx-duplicate-qid-place-ignored, ctx-place-always-new, invalid-primary-as-concept, epoch-context-primary-as-concept, epoch-context-no-journal |
+| Требование целиком | файлы: `tests/knowledge/test_epoch_context_import.py`, `tests/knowledge/test_invalid_name_external.py`, `tests/knowledge/test_operator_commands_journal.py`; маркеров 19 | все 24: context-place-before-event, ctx-undated-offered, ctx-harvest-duplicates, ctx-kind-any-class, ctx-point-time-ignored, ctx-pending-applied, ctx-rejected-applied, ctx-exists-as-created, ctx-no-date-as-fetch-failed, ctx-fetch-failed-as-no-date, ctx-duplicate-qid-event-ignored, ctx-duplicate-qid-place-ignored, ctx-membership-basis-missing, ctx-kind-statement-dropped, ctx-status-generated, ctx-dry-run-writes, ctx-statements-count-zero, ctx-places-created-zero, ctx-attribution-no-link, ctx-place-always-new, ctx-event-not-reused, invalid-primary-as-concept, epoch-context-primary-as-concept, epoch-context-no-journal |
+
+### epochs / Даты эпох из Wikidata
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Сценарий «Дата из Wikidata» | `test_date_from_wikidata` | epoch-attribution-no-link, epoch-provenance-no-props, epoch-status-generated, epoch-linked-skipped |
+| Сценарий «Запасные свойства» | `test_fallback_properties` | epoch-fallback-props-dropped |
+| Сценарий «Датировка уже есть» | `test_existing_dating_kept` | epoch-conflict-overwrites |
+| Сценарий «Повторный запуск» | `test_repeated_run` | epoch-unchanged-as-conflict |
+| Сценарий «Проверка без записи» | `test_dry_run` | epoch-dry-run-writes |
+| Сценарий «Без QID» | `test_without_qid` | epoch-no-qid-result |
+| Сценарий «Сбой загрузки и одинаковый QID» | `test_fetch_failed_and_duplicate_qid` | — |
+| Сценарий «Название эпохи не прошло проверку» | `test_epoch_name_rejected` | epoch-invalid-unchecked |
+| Нормативные фразы (тестов: 12) | `test_property_choice`, `test_dry_run_changes_no_table_for_any_result`, `test_no_qid_never_fetches`, `test_added_from_manifest_gets_external_id`, `test_every_result_and_totals`, `test_existing_never_overwritten`, `test_inactive_dating_does_not_block`, `test_repeated_apply_creates_no_rows`, `test_influences_not_imported`, `test_events_only_ids_codes_numbers`, `test_manifest_qid_differs_from_epoch_qid`, `test_epoch_dates_journal` | epoch-unchanged-as-conflict, epoch-conflict-overwrites, epoch-no-qid-result, epoch-ambiguous-picks-first, epoch-own-qid-conflict-ignored, epoch-qid-owner-ignored, epoch-fetch-failed-as-no-dates, epoch-no-dates-as-fetch-failed, epoch-added-without-external, epoch-dry-run-creates, epoch-skipped-without-conflicts, epoch-dates-no-journal |
+| Требование целиком | файлы: `tests/knowledge/test_epoch_dates.py`, `tests/knowledge/test_invalid_name_external.py`, `tests/knowledge/test_operator_commands_journal.py`; маркеров 21 | все 20: epoch-invalid-unchecked, epoch-unchanged-as-conflict, epoch-conflict-overwrites, epoch-fallback-props-dropped, epoch-no-qid-result, epoch-ambiguous-picks-first, epoch-own-qid-conflict-ignored, epoch-qid-owner-ignored, epoch-fetch-failed-as-no-dates, epoch-no-dates-as-fetch-failed, epoch-created-without-external, epoch-added-without-external, epoch-dry-run-writes, epoch-dry-run-creates, epoch-skipped-without-conflicts, epoch-attribution-no-link, epoch-provenance-no-props, epoch-status-generated, epoch-linked-skipped, epoch-dates-no-journal |
+| (мутации, которые роняют тесты других требований) | — | epoch-created-without-external |
+
+### geo-timeline / Места и координаты из Wikidata
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Сценарий «Кант из Wikidata» | `test_kant_from_wikidata` | geo-time-dropped, geo-place-role-dropped, geo-attribution-no-link, geo-status-generated, geo-provenance-no-run, geo-birth-no-time |
+| Сценарий «Повторный запуск» | `test_rerun_adds_nothing` | geo-rerun-counts-again |
+| Сценарий «Влияние и чужие свойства не импортируются» | `test_influence_and_foreign_properties_not_imported` | geo-influence-imported, geo-citizenship-imported |
+| Сценарий «Сухой прогон» | `test_dry_run_writes_nothing` | geo-dry-run-creates-places |
+| Сценарий «Пропуски» | `test_skips_reasons_and_counters` | geo-value-qid-unchecked, geo-fetch-failed-as-skipped, geo-skipped-entity-wrong, geo-refused-as-bad-value |
+| Сценарий «Откат» | `test_rollback_keeps_verified_and_places`, `test_rollback_leaves_other_run` | geo-places-kept-zero, geo-rollback-removes-verified, geo-rollback-removes-verified |
+| Сценарий «Не из пути читателя» | `test_not_from_reader_path` | — |
+| Сценарий «Подпись места не прошла проверку» | `test_place_label_rejected` | geo-label-unchecked |
+| Нормативные фразы (тестов: 12) | `test_value_without_id_is_bad_value`, `test_no_new_people_or_events`, `test_only_table_properties`, `test_activity_from_p937`, `test_bad_external_id_never_fetched`, `test_bad_value_id_not_fetched_or_written`, `test_every_record_attributed`, `test_event_fields_only_ids_codes_numbers`, `test_file_run_without_network`, `test_existing_place_reused`, `test_dry_run_with_existing_place_writes_nothing`, `test_geo_enrich_journal` | geo-qid-shape-unchecked, geo-bad-value-as-bad-qid, geo-dry-run-writes, geo-activity-no-time, geo-no-journal |
+| Требование целиком | файлы: `tests/knowledge/test_geo_enrich.py`, `tests/knowledge/test_invalid_name_external.py`, `tests/knowledge/test_operator_commands_journal.py`; маркеров 22 | все 23: geo-label-unchecked, geo-qid-shape-unchecked, geo-value-qid-unchecked, geo-fetch-failed-as-skipped, geo-skipped-entity-wrong, geo-bad-value-as-bad-qid, geo-refused-as-bad-value, geo-dry-run-writes, geo-dry-run-creates-places, geo-rerun-counts-again, geo-time-dropped, geo-place-role-dropped, geo-attribution-no-link, geo-status-generated, geo-provenance-no-run, geo-places-kept-zero, geo-influence-imported, geo-citizenship-imported, geo-activity-no-time, geo-birth-no-time, geo-rollback-removes-verified, geo-rollback-removes-verified, geo-no-journal |
+
+### ontology-extraction / Структурированный вывод по реестру
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого ответа модели в онтологию попадают только типы, концы и уточнители из реестра. Поля `entities` никогда не создают утверждений других типов, кроме `lifespan` и `dating`. | `test_only_registry_types_for_any_items` | entity-type-unchecked |
+| Сценарий «Неуверенность в типе» | `test_uncertain_type_falls_back_to_general` | fit-no-parent |
+| Сценарий «Схема с сущностями и датировкой» | `test_schema_with_entities_and_dating` | schema-no-original, schema-entities-required, prompt-no-years-rule, schema-dating-required-short, entities-required-in-answer |
+| Сценарий «Тип вне реестра в сущностях» | `test_entity_type_outside_registry` | entity-type-unchecked |
+| Сценарий «Ответ без сущностей» | `test_answer_without_entities` | schema-entities-required, entities-required-in-answer |
+| Нормативные фразы (тестов: 2) | `test_prompt_language_and_rules`, `test_new_entity_without_type_dropped_by_code` | language-first-paragraph, prompt-no-years-rule, prompt-no-not-a-name-rule, prompt-no-ru-language-rule, entities-required-in-answer |
+| Требование целиком | файлы: `tests/knowledge/test_extraction_entities.py`, `tests/knowledge/test_filling.py`; маркеров 8 | все 10: entity-type-unchecked, schema-no-original, schema-entities-required, language-first-paragraph, prompt-no-years-rule, prompt-no-not-a-name-rule, prompt-no-ru-language-rule, schema-dating-required-short, entities-required-in-answer, fit-no-parent |
+
+### ontology-extraction / Нормализация сущностей
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого ответа модели сущность, найденная хотя бы по одному написанию элемента, не дублируется новой сущностью. Неоднозначная привязка всегда даёт пункт очереди проверки, а не выбор. | `test_normalization_and_language_for_any_items` | spellings-without-en, spellings-without-ru, spellings-without-original |
+| Сценарий «Привязка» | `test_binding_by_variant` | binding-by-variant-dropped |
+| Сценарий «Неоднозначность» | `test_ambiguous_goes_to_review` | — |
+| Сценарий «Привязка по английскому написанию» | `test_binding_by_english_spelling` | spellings-without-en |
+| Требование целиком | файлы: `tests/knowledge/test_extraction_entities.py`, `tests/knowledge/test_filling.py`; маркеров 5 | все 5: spellings-without-en, no-type-creates-entity, spellings-without-ru, spellings-without-original, binding-by-variant-dropped |
+| (мутации, которые роняют тесты других требований) | — | no-type-creates-entity |
+
+
 ## Тестировщик — 2026-11-25, тесты на коммите b255417 (ветка claude/ontology-extraction)
 
 Тесты написаны от дельт `specs/` и design.md (контракты, «Тестовая инфраструктура», «Границы и сторожевые токены»). Продуктовый код читался только после коммита тестов, для патчей мутаций.

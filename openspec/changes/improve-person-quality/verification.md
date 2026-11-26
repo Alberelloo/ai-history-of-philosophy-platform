@@ -1,5 +1,69 @@
 # Verification
 
+## Итог: требование → доказывающий тест (HEAD 09087b9)
+
+Сводка на текущий HEAD. Тесты — по маркерам `@pytest.mark.req` (собраны из `tests/` разбором AST, имена сверены с файлами). Мутации — по `expect_fail` в `tests/mutations/improve-person-quality/mutations.yaml`: каждая проверена `mutation_check.py --id`, все патчи накладываются на HEAD. Инвариант — property-тест (`@given`) или тест сценария «Инвариант …». Нормативные фразы — тесты с `invariant=` в маркере. История кругов — ниже, в разделах ролей.
+
+### ontology-entities / Поиск дублей
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любой онтологии каждая пара одного типа, у которой основное название одной совпадает с каким-либо названием другой, попадает в кандидаты. Пара разных типов не попадает никогда. | `test_candidates_invariant` | candidates-primary-only, candidates-no-type |
+| Сценарий «Кандидаты» | `test_candidates`, `test_candidates_need_equal_dates_for_last_word` | candidates-primary-only, candidates-dates-ignored, candidates-last-word-dropped |
+| Сценарий «Основное название на разных записях» | `test_primary_on_different_records` | — |
+| Сценарий «Разные типы» | `test_different_types` | candidates-no-type |
+| Нормативные фразы (тестов: 1) | `test_last_word_group_cap` | capped-event-leaks-name, capped-group-aborts, capped-group-stops-scan |
+| Требование целиком | файлы: `tests/knowledge/test_entity_merge.py`, `tests/knowledge/test_registry_entities.py`; маркеров 7 | все 10: candidates-primary-only, candidates-no-type, group-cap-silent, group-cap-off, candidates-ignore-variants, candidates-dates-ignored, candidates-last-word-dropped, capped-event-leaks-name, capped-group-aborts, capped-group-stops-scan |
+| (мутации, которые роняют тесты других требований) | — | group-cap-silent, group-cap-off, candidates-ignore-variants |
+
+### ontology-entities / Слияние с перенаправлением
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любой онтологии и любой пары после слияния не потеряно: - ни одно утверждение по содержанию: концы с учётом перенаправлений, тип, значение, уточнители; петли учитываются отдельно; - ни одна атрибуция, кроме точног… | `test_preservation_and_undo` | kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown, merge-object-not-moved, merge-mentions-not-moved, merge-names-not-moved, merge-portraits-same-phash-moved, merge-portraits-not-moved, merge-russian-not-preferred, undo-mentions-not-restored, undo-portraits-not-restored, undo-attributions-not-restored, fold-consensus-kept, who-consensus-kept, merge-primary-stale, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing, loop-deleted, undo-fold-not-restored, undo-evidence-not-restored, undo-consensus-stale, undo-primary-stale, merge-repeat-name-kept, merge-verified-folded, undo-dropped-names-lost |
+| Сценарий «Старая ссылка» | `test_old_link` | merge-redirect-missing |
+| Сценарий «Отмена» | `test_undo` | undo-names-kinds-not-restored, undo-subject-not-restored, undo-redirect-kept, undo-event-kept-removed-swapped, undo-fold-not-restored |
+| Сценарий «Повтор сворачивается» | `test_repeat_folds` | key-not-recomputed, merge-subject-not-moved, merged-folded-zero, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing |
+| Сценарий «Атрибуция автору переносится» | `test_author_attribution_moves` | author-attribution-stays, merged-attributions-zero |
+| Сценарий «Петля» | `test_loop` | loop-shown, merged-loops-zero, loop-deleted |
+| Сценарий «Отмена со свёрткой и QID» | `test_undo_with_fold_and_qid` | undo-without-externals, undo-event-restored-zero, fold-attributions-dropped, fold-evidence-dropped, undo-fold-not-restored, undo-evidence-not-restored |
+| Нормативные фразы (тестов: 1) | `test_external_rows_move_to_kept` | merge-externals-not-moved |
+| Требование целиком | файлы: `tests/knowledge/test_entity_merge.py`, `tests/knowledge/test_registry_entities.py`; маркеров 15 | все 40: kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown, merge-subject-not-moved, merge-object-not-moved, merge-externals-not-moved, merge-mentions-not-moved, merge-names-not-moved, merge-portraits-same-phash-moved, merge-portraits-not-moved, merge-redirect-missing, merge-russian-not-preferred, undo-names-kinds-not-restored, undo-subject-not-restored, undo-mentions-not-restored, undo-portraits-not-restored, undo-attributions-not-restored, undo-redirect-kept, undo-event-restored-zero, undo-event-kept-removed-swapped, merged-statements-count, merged-attributions-zero, merged-folded-zero, merged-loops-zero, fold-consensus-kept, who-consensus-kept, merge-primary-stale, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing, loop-deleted, undo-fold-not-restored, undo-evidence-not-restored, undo-consensus-stale, undo-primary-stale, merge-repeat-name-kept, merge-verified-folded, undo-dropped-names-lost |
+| (мутации, которые роняют тесты других требований) | — | merged-statements-count |
+
+### person-quality / Качество персон
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого ответа модели ни у одной персоны, созданной запуском, основное название не даёт причины отказа правила названий. Каждое отклонённое предложение персоны даёт ровно одно событие `knowledge.entity.rejected` с … | `test_person_quality_invariant`, `test_person_rule_any_input` | person-not-a-name, person-empty-as-number, person-stopword-skipped, person-sentence-unchecked |
+| Сценарий «Мусорная персона» | `test_garbage_person` | person-not-a-name |
+| Сценарий «Склейка» | `test_glued` | person-not-a-name |
+| Сценарий «Определение персоны в промпте» | `test_person_definition_in_prompt` | prompt-no-person-def |
+| Требование целиком | файлы: `tests/knowledge/test_person_quality.py`; маркеров 6 | все 5: person-not-a-name, prompt-no-person-def, person-empty-as-number, person-stopword-skipped, person-sentence-unchecked |
+
+### person-quality / Слияние вариантов персоны
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого набора персон и любого порядка обхода: - слиты ровно компоненты, допустимые по правилу; - ни одна пара с разными QID не оказалась в одной сущности; - у каждой оставшейся не больше одного QID и ровно одно ос… | `test_plan_partition_any_order`, `test_merge_invariant_two_orders` | component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant, component-dates-ignored, type-rule-dropped, model-pair-ignored, review-inside-queued, dates-slack-zero, dates-slack-three, dates-start-only, dates-end-only, kept-counts-ignored, kept-id-tiebreak-reversed, dates-interval-ignored, reason-decided-before-dates, reason-decided-before-qid, component-verdicts-candidates-only |
+| Сценарий «Слияние вариантов» | `test_variants_merge_by_model_pair` | kept-qid-ignored |
+| Сценарий «Общее основное название» | `test_common_primary_name` | single-word-primary-review, step-name-merge-dropped |
+| Сценарий «QID подтверждён человеком для другой» | `test_qid_confirmed_for_other` | qid-confirmed-ignored |
+| Сценарий «Транслитерация» | `test_transliteration_with_decision` | qid-confirmed-ignored, step-qid-dropped |
+| Сценарий «Транслитерация без решения человека» | `test_transliteration_pending` | — |
+| Сценарий «Решение «разные» и третья запись» | `test_decided_apart_and_third` | decided-ignored, decided-as-qid-cluster |
+| Сценарий «Слияние по решению человека» | `test_merge_by_human_decision` | merge-review-reason |
+| Сценарий «Тёзки» | `test_namesakes` | decided-ignored |
+| Сценарий «Разные QID» | `test_different_qids` | — |
+| Сценарий «Транзитивная компонента с двумя QID» | `test_transitive_component_two_qids` | component-qids-unchecked |
+| Сценарий «Противоречащие даты» | `test_conflicting_dates` | dates-unchecked |
+| Сценарий «Даты у одной стороны» | `test_dates_on_one_side` | — |
+| Сценарий «Совпал только вариант» | `test_only_variant_matched` | variant-merges, single-word-variant |
+| Нормативные фразы (тестов: 14) | `test_date_chain_component`, `test_person_scenario_codes`, `test_dates_conflict_on_start_or_end_interval`, `test_decided_pair_not_requeued_after_merge_mapping`, `test_component_reason_priority_qid_cluster_over_dates`, `test_redirected_person_not_loaded`, `test_link_counts_subject_object_author`, `test_same_person_step_order`, `test_external_id_unique`, `test_person_codes_generated`, `test_person_codes_partition`, `test_component_reason_combos_generated`, `test_person_date_shapes_generated`, `test_person_date_one_side_generated` | component-dates-ignored, dates-start-only, dates-end-only, cluster-reason-dates-first, decided-pair-requeued, load-persons-inactive, link-counts-no-authors, link-counts-no-object, dates-one-side-conflict, dates-after-confirmed, decided-before-qid, model-pair-before-name, external-not-unique, add-external-duplicate, dates-interval-ignored |
+| Требование целиком | файлы: `tests/knowledge/test_person_quality.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 30 | все 40: component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant, merge-review-reason, component-dates-ignored, type-rule-dropped, model-pair-ignored, review-inside-queued, step-qid-dropped, step-name-merge-dropped, step-none-as-review, dates-slack-zero, dates-slack-three, dates-start-only, dates-end-only, kept-qid-ignored, kept-counts-ignored, kept-id-tiebreak-reversed, cluster-reason-dates-first, decided-pair-requeued, propose-repeats, load-persons-inactive, link-counts-no-authors, link-counts-no-object, dates-one-side-conflict, dates-after-confirmed, decided-before-qid, model-pair-before-name, external-not-unique, add-external-duplicate, dates-interval-ignored, reason-decided-before-dates, reason-decided-before-qid, component-verdicts-candidates-only |
+| (мутации, которые роняют тесты других требований) | — | step-none-as-review, propose-repeats |
+
+
 ## Тестировщик — 2026-11-25, тесты на коммите 3aa55a9 и следующем (ветка claude/ontology-extraction)
 
 Тесты написаны от дельт `specs/person-quality`, `specs/ontology-entities` и design.md; продуктовый код читался только для точек входа (сигнатуры) и, после коммита тестов, для патчей мутаций. Инфраструктура общая с `improve-extraction-naming` 3.1 (профили `ci`/`pure`/`heavy`, `dump.py`, стенд извлечения, запрет сети, `mutation_check.py`).
