@@ -204,7 +204,7 @@ mutations:
   patch: codes-leak-quote.patch
   note: причина не ограничена 300 знаками
   expect_fail:
-  - tests/knowledge/test_reextract_items.py::test_event_fields_and_no_leak
+  - tests/knowledge/test_reextract_items.py::test_reason_is_cut_to_300
 - id: ext-output-price-wrong
   requirement: Внешний извлекатель
   patch: ext-output-price-wrong.patch

@@ -14,10 +14,11 @@ import pytest
 from philograph.knowledge import external_extraction as ext
 
 from .extraction_stand import Stand
-from .reextract_common import EO, dropped_codes
+from .reextract_common import dropped_codes
 from .reextract_common import st as stmt
 
 req = pytest.mark.req
+EO = "ontology-extraction"
 FICTION = "Художественный текст"
 TEXT = "Так говорил Заратустра: человек есть нечто, что должно преодолеть."
 

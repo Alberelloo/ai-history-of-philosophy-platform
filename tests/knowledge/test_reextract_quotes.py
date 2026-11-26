@@ -25,6 +25,7 @@ from .reextract_common import EO, assert_event_keys, dropped, dropped_codes, no_
 from .reextract_common import st as stmt
 
 req = pytest.mark.req
+EO = "ontology-extraction"
 QUOTE = "Цитата у каждого утверждения"
 CREATED = "knowledge.statement.created"
 
@@ -480,7 +481,6 @@ def test_overlapping_parts_rejected():
 
 
 @req(
-    EO,
     QUOTE,
     invariant="Единственная часть короче 10 знаков допустима (минимум — только при многоточии)",
 )

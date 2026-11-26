@@ -26,7 +26,6 @@ from philograph.knowledge import schema as t
 from ..conftest import PROFILES
 from .extraction_stand import Stand
 from .reextract_common import (
-    EO,
     FRAGMENT,
     assert_event_keys,
     check_run_accounting,
@@ -36,6 +35,7 @@ from .reextract_common import (
 from .reextract_common import st as stmt
 
 req = pytest.mark.req
+EO = "ontology-extraction"
 CHECK = "Проверка ответа по утверждениям"
 CODE = "Коды причин отбраковки"
 
@@ -782,3 +782,15 @@ def test_entity_ambiguous_code(stand, events):
     assert stand.entities_of("person") == before
     assert stand.statements() == []
     check_run_accounting(stand, events)
+
+
+@req(
+    EO,
+    CODE,
+    invariant="reason события — до 300 знаков, даже если причина содержит длинный текст модели",
+)
+def test_reason_is_cut_to_300(stand, events):
+    external(stand, [stmt("Кант", "holds", "Опыт", 1, Q1, qualifiers={"к" * 1000: 1})])
+    [event] = events.of("knowledge.extraction.dropped")
+    assert event["code"] == "qualifier_invalid"
+    assert len(event["reason"]) == 300

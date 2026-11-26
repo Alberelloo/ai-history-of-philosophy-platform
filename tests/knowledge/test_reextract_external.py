@@ -25,7 +25,6 @@ from philograph.prompts import PROMPTS
 from ..conftest import PROFILES
 from .extraction_stand import Stand
 from .reextract_common import (
-    EO,
     FRAGMENT,
     assert_event_keys,
     check_run_accounting,
@@ -39,6 +38,7 @@ from .reextract_common import st as stmt
 from .test_reextract_items import FAULTS, PARAGRAPHS
 
 req = pytest.mark.req
+EO = "ontology-extraction"
 EXTERNAL = "Внешний извлекатель"
 REPORT = "Отчёт о запусках извлечения"
 

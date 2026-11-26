@@ -23,7 +23,6 @@ from philograph.platform.db import make_engine
 
 from .extraction_stand import Stand
 from .reextract_common import (
-    EO,
     FRAGMENT,
     check_run_accounting,
     dropped_codes,
@@ -34,6 +33,7 @@ from .reextract_common import (
 from .reextract_common import st as stmt
 
 req = pytest.mark.req
+EO = "ontology-extraction"
 RUNS = "Запуски наполнения"
 TIMEOUT = "Таймаут вызова модели при извлечении"
 
