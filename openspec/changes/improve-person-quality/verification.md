@@ -387,3 +387,45 @@
 Правило О23 (каждое множество спецификации — в генераторах целиком) проверяется тестом `tests/knowledge/test_strategies_cover_spec_sets.py`: множества переписаны из дельт руками, для каждого элемента `hypothesis.find` ищет пример в генераторе (82 passed). По этому изменению:
 - person-quality: генератор лиц `persons_with_variants` порождает `merge:name`, `merge:model_pair`, `merge:qid_confirmed`, `review:dates`, `review:decided_conflict`, `review:qid_cluster`, `review:single_name`, `review:variant`; коды решений человека и команды QID (`merge:review`, `review:qid_candidate`, `review:qid_taken`, `apart:decided/none/qid/type`) есть в сценарных тестах. Найденные пробелы закрыты: шаги 8–9 `same_person` (`review:single_name`, `review:variant`, `apart:none`) — test_person_quality::test_same_person_step_order (11 passed); `review:qid_taken` — test_life_dates::test_qid_taken_queued (`auto` и не-персона, 2 passed).
 - life-dates: `wd_times` порождает каждую строку таблицы точностей (11, 10, 9, 8, 7, 6), точность ниже 6, год 0000, оба знака; `wd_claim_values` — все три ранга; `DECISIONS` = {pending, accepted, auto, rejected}.
+
+## Судья — повторно, 2026-11-26, коммит 4550a9d (после прогонов в ветку пришли d94f8e2 и др. — только тесты других изменений и перенос `raw_names` в `strategies.py`; часть `person-quality` в `strategies.py` и `src` не менялись)
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant, test_person_rule_any_input | passed, мутации упали | test_person_quality.py 46 passed in 92.92s; моя J-D (проверка склейки по союзу убрана) — упали test_glued, test_person_quality_invariant, test_person_rule_any_input | — (стенд извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 14 сценариев, test_plan_partition_any_order, test_merge_invariant_two_orders, test_date_chain_component | passed, мутации упали | passed; `--id` component-dates-ignored (J1), cluster-reason-dates-first, decided-as-qid-cluster — упали все ожидаемые; **dates-start-only и моя J-B (интервал неопределённости дат не учитывается) — оба property-теста проходят** (4 passed / 5 passed), роняет только параметризованный test_dates_conflict_on_start_or_end_interval | одна онтология судьи: Berkeley×3 → одна (2× `merged merge:name`); Бэкон×3 с решением «разные» по 1–2 — слияний нет, 2× `merge_proposed review:decided_conflict`, пары 1–2 в очереди нет; цепочка «Беркли Цепь» 1685–1753 / без дат / 1885–1953 — слияний нет, 3× `review:dates`; Омир → Гомер уже в `LifeDates.apply` (`life_dates.skipped qid_taken`, `merged merge:qid_confirmed`), Q6691 у Гомера, `/v1/entities/<Омир>` отдаёт Гомера; Locke(Q9353)/Локк по элементу модели — `merged merge:model_pair statements=1`, основное «Локк», вариант «Locke» | J1 закрыт; пробел в генераторе дат (см. ниже) |
+| ontology-entities «Поиск дублей» | 3 сценария, test_candidates_invariant, test_last_word_group_cap | passed | test_entity_merge.py 15 passed in 69.91s; моя J-C (первое слово вместо последнего) — упали test_candidates, test_last_word_group_cap[200/201] | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed; `--id` undo-without-externals, merge-russian-not-preferred — упали; **моя J-A (в `_fold` не пересчитывается согласие) — не упал ни один тест** (test_entity_merge, test_person_merge_unit, test_statements: 41 passed); **моя J-E (`_refresh_primary(kept)` после слияния убран) — роняет только test_person_merge_unit::test_merge_updates_primary_dates без маркера `req`**, тесты тестировщика (68 в трёх файлах) проходят | отмена трёх слияний (Омир и два Berkeley) — дамп равен дампу до `apply` (0 различающихся таблиц), `merge_undone` ×3; отмена Locke/Локк — Q9353 у Locke, основное «Locke», «Локк» снова основное у своей | **не подтверждено** (согласие, копия основных значений) |
+
+Прежние: test_registry_entities 33 passed, 1 skipped · test_statements 19 passed · test_snapshot 6 passed; `git diff origin/claude/embedding-docker...HEAD` по ним пуст. test_strategies_cover_spec_sets 91 passed in 318.27s.
+`ruff check` / `ruff format --check` по 13 файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования. Файл Lead'а `prompts/__init__.py` — только текст `ontology.extract` (и блок `language`, `translate_names` от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу собранной онтологии (`LifeDates.apply`, `Dedupe.run`, стенд извлечения, `Statements.undo_merge`, `GET /v1/entities/{id}`). Мутации — в отдельном worktree, удалён; `git diff -- src` пуст.
+
+**Неэквивалентность J-A** (зонд): «Юм» — «испытал влияние Локка» с `asserts` s_a (`prevailing`), «Hume» — то же с `disputes` s_b; после слияния «Hume» в «Юм» у свёрнутого утверждения атрибуции `asserts s_a`, `disputes s_b`. Без мутации согласие `disputed`, под мутацией остаётся `prevailing`. Пункт спецификации «согласие пересчитывается» нарушен, а тесты этого не видят.
+
+**Тест полноты стратегий.** Множества кодов сверены со спецификацией: `merge:*` 4 (3 в генераторе плюс `merge:review`), `review:*` 7 (5 плюс `qid_candidate` и `qid_taken`), `apart:*` 4. Все 9 вердиктов правила `same_person` перечислены. Проверяемый код тест не импортирует: на HEAD `raw_names` взят из `strategies`. Но допуска и определения дат для `person-quality` в тесте нет. Генератор `persons_with_variants` даёт только точные годы и одинаковый сдвиг начала и конца, поэтому расхождение только начала, только конца и интервалы неопределённости входом не порождаются. Строки аудита «Даты противоречат: интервалы начала / конца» указывают вид `S.persons_with_variants dates`, а он такого входа не даёт. Кроме того, `test_person_scenario_codes` проверяет коды `apart:*` по тексту исходников и без маркера `req`.
+
+**Аудит пунктов.** Выбраны 8 нормативных пунктов:
+- найдены 6: «ровно одно `rejected` на отказ», «`dropped` с кодом», «интервалы начала», «решённая пара не в очередь», «группа ≤ 200», «отмена: QID удалённой»;
+- **нет строк** у двух пунктов «Слияния с перенаправлением»: «согласие пересчитывается» и «Копия основных значений оставшейся SHALL пересчитываться». У обоих есть выжившая мутация (J-A, J-E).
+
+Подгонка: признаков не найдено. Ожидания не правились, skip/xfail нет, оракулы не берут ответ из `dedupe`/`naming`. Найденное — пробелы покрытия, дефектов кода нет.
+
+Вердикт: **не принято** — вернуть тестировщику:
+1. «Согласие пересчитывается» при свёртке и при переносе атрибуции-автора. Нужны:
+   - в `ontology_with_duplicates` позиции `disputes` и ≥ 3 источника;
+   - в `test_preservation_and_undo` сверка согласия оставшегося с ожидаемым по атрибуциям;
+   - мутация J-A (без `_recompute_consensus` в `_fold`) и аналог для `attributions_who` — в `mutations.yaml`;
+   - строки аудита.
+2. «Копия основных значений пересчитывается». Нужны:
+   - property или сценарий, где даты есть только у удалённой (оставшаяся — по QID или ссылкам), с ожиданием `primary.dates` оставшейся;
+   - мутация J-E в `mutations.yaml`;
+   - строка аудита.
+3. Определение «Даты противоречат» в генераторе лиц. Нужны:
+   - виды с расхождением только начала, только конца и с интервалами неопределённости (earliest ≠ latest) по обе стороны границы допуска;
+   - `@example` границ;
+   - `dates-start-only`, `dates-end-only` и J-B с ожиданием падения обоих property-тестов;
+   - проверка допуска и обоих интервалов в `test_strategies_cover_spec_sets.py`;
+   - исправленные строки аудита.
+
+Разработчику возвращать нечего.
