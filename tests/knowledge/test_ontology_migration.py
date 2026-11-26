@@ -829,11 +829,12 @@ def test_russian_stopword(onto, events, monkeypatch, tmp_path):
     path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
     original = naming.load_rules
     monkeypatch.setattr(naming, "load_rules", lambda *_a, **_k: original(Path(path)))
-    ids = _concepts(onto, ["every"])
-    llm = FakeLLM.by_label({"every": "Всякий"})
+    ids = _concepts(onto, ["universality"])
+    llm = FakeLLM.by_label({"universality": "Всякий"})
     report = migration(onto, llm=llm).run(translate="model")
     after = State.read(onto.statements.engine)
-    assert all(n["text"] != "Всякий" for n in after.names.get(ids["every"], []))
+    assert all(n["text"] != "Всякий" for n in after.names.get(ids["universality"], []))
+    assert after.label(ids["universality"]) == "universality"  # сущность не снята, имя прежнее
     assert report.to_json()["untranslated"].get("invalid:stopword") == 1
 
 
