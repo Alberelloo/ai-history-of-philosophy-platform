@@ -113,8 +113,10 @@ jobs:
         if: steps.py.outputs.present == 'true'
         env:
           PHILOGRAPH_TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/test
-        # Сквозные тесты идут на своём стенде, второй прогон им не нужен.
-        run: pytest -q -m "not e2e"
+        # Сквозные тесты идут на своём стенде, второй прогон им не нужен. Браузерные тесты
+        # (tests/web) поднимают стенд на своих SQLite и PHILOGRAPH_TEST_DATABASE_URL не читают:
+        # на PostgreSQL они повторили бы прогон SQLite один в один.
+        run: pytest -q -m "not e2e" --ignore=tests/web
 
   e2e:
     name: e2e
