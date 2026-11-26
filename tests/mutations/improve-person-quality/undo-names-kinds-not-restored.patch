@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 2f813ef..1b486f4 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -528,8 +528,6 @@
+@@ -543,8 +543,6 @@ class Entities:
                  .where(t.names.c.id.in_(moved["names"]))
                  .values(entity_id=m["removed"])
              )
 -            for name_id, kind in (moved.get("kinds") or {}).items():
 -                conn.execute(update(t.names).where(t.names.c.id == int(name_id)).values(kind=kind))
+             for row in moved.get("names_dropped") or []:
+                 conn.execute(t.names.insert().values(**row))
              conn.execute(
-                 update(t.statements)
-                 .where(t.statements.c.id.in_(moved["subject"]))

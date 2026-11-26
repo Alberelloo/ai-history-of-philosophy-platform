@@ -702,3 +702,16 @@
 
 После исправления `-k preservation_and_undo` — 1 passed in 35.22s.
 
+
+### Патчи, снятые заново после 1923675 (правка слияния), `--id`
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair | да (1 failed, 1 warning in 4.82s) |
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.96s) |
+| Слияние с перенаправлением | merge-russian-not-preferred | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.54s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.85s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 1.72s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.63s) |
+| Слияние с перенаправлением | undo-names-kinds-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.67s) |
+| Слияние с перенаправлением | undo-subject-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.88s) |

@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 2f813ef..443275a 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -579,7 +579,7 @@
-     primaries = [n for n in names if n["kind"] == "primary"]
-     order = sorted(primaries, key=lambda n: (n["entity_id"] != kept, n["id"]))
-     russian = [n for n in order if is_russian(n["text"])]
--    chosen = (russian or order or [None])[0]
-+    chosen = (order or [None])[0]
-     seen = {(n["lang"], n["normalized"]) for n in names if n["entity_id"] == kept}
-     kinds: dict[int, str] = {}
-     for n in names:
+@@ -601,7 +601,7 @@ def merge_names(
+     стороны слияние не трогает."""
+     sides = [("kept", n) for n in kept] + [("removed", n) for n in removed]
+     primaries = [n for _, n in sides if n["kind"] == "primary"]
+-    chosen = next((n for n in primaries if is_russian(n["text"])), None)
++    chosen = None
+     if chosen is None and primaries:
+         chosen = primaries[0]
+     keys = {
