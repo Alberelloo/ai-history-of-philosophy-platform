@@ -113,7 +113,9 @@ function unsqueeze(root: HTMLElement | null) {
 
 // Подгонка разделов под высоту панели: складывает по FOLD_ORDER, пока содержимое выше
 // панели, и раскрывает сложенные подгонкой, когда освобождённого места снова хватает.
-function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, active: boolean, focusKey: string) {
+// squeeze — только вид «Глобус»: сжатие списков вместо складывания «Выбрано». На хронологии
+// его нет (прокрутки внутри панели не бывает, «Панель карты»).
+function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, active: boolean, focusKey: string, squeeze: boolean) {
   const [closed, setClosed] = useState<ReadonlySet<Step>>(new Set());
   const [pin, setPin] = useState<Fold | null>(null);
   const [, setTick] = useState(0);
@@ -159,15 +161,15 @@ function useFit(panel: RefObject<HTMLElement>, body: RefObject<HTMLElement>, act
       // и «Где в <год> году» над ними остаются видны.
       // Сначала уступает список мест глобуса (до своего минимума), как уступает при подгонке.
       let over = need - avail;
-      for (const el of b.querySelectorAll<HTMLElement>(".geo-list__rows")) {
+      for (const el of squeeze ? b.querySelectorAll<HTMLElement>(".geo-list__rows") : []) {
         const h = el.clientHeight;
         const target = Math.max(GEO_ROWS_MIN, Math.floor(h - over));
         if (target >= h) continue;
         el.style.maxHeight = `${target}px`;
         over -= h - target;
       }
-      if (over <= 0.5) return;
-      if (pin === "selected" && !closed.has("selected") && !FOLD_ORDER.some((k) => !closed.has(k) && k !== pin)) {
+      if (squeeze && over <= 0.5) return;
+      if (squeeze && pin === "selected" && !closed.has("selected") && !FOLD_ORDER.some((k) => !closed.has(k) && k !== pin)) {
         const shrink = (sel: string, min: number, mark: boolean) => {
           for (const el of b.querySelectorAll<HTMLElement>(sel)) {
             const h = el.clientHeight;
@@ -228,8 +230,8 @@ export function MapPanel(props: Props) {
   const searchInput = useRef<HTMLInputElement>(null);
   const [focus, setFocus] = useState<Section | null>(null);
   const aside = useRef<HTMLElement>(null);
-  const focusKey = props.link?.id ?? props.rel?.obj.id ?? props.state.sel ?? ""; // и место глобуса: оно не сущность графа
-  const { api: fold, tight } = useFit(aside, body, !collapsed, focusKey);
+  const focusKey = props.link?.id ?? props.rel?.obj.id ?? (props.geo ? props.state.sel : null) ?? ""; // и место глобуса: оно не сущность графа
+  const { api: fold, tight } = useFit(aside, body, !collapsed, focusKey, !!props.geo);
 
   // После разворачивания — к разделу, с которого его открыли.
   useEffect(() => {
