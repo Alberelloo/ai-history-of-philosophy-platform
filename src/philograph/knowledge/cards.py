@@ -458,8 +458,10 @@ class Cards:
                 return {"lat": v["lat"], "lon": v["lon"]}
         return None
 
-    def _work_facts(self, work_id: str) -> list[dict[str, Any]]:
-        return self.statements.about(work_id, derived=False)
+    def _work_facts(self, work_id: str, attributed_to: str | None) -> list[dict[str, Any]]:
+        # Звенья вывода в режиме «только выбранный учебник» проходят тот же фильтр
+        # атрибуции, что и утверждения о самой сущности (source-scope).
+        return self.statements.about(work_id, attributed_to=attributed_to, derived=False)
 
     def card(
         self,
@@ -483,7 +485,7 @@ class Cards:
 
         def work_statements(work_id: str) -> list[dict[str, Any]]:
             if work_id not in works_cache:
-                works_cache[work_id] = self._work_facts(work_id)
+                works_cache[work_id] = self._work_facts(work_id, attributed_to)
             return works_cache[work_id]
 
         used: set[str] = set()
@@ -513,7 +515,9 @@ class Cards:
             elif section.code != "places":  # места — по правилу основного места
                 rows.sort(key=lambda r: -MARK_RANK.get(r["mark"], 0))
             if section.derive == "relates_to":
-                rows += self._relates_to(entity_id, etype, statements, rows, work_statements)
+                rows += self._relates_to(
+                    entity_id, etype, statements, rows, work_statements, attributed_to
+                )
             elif section.derive == "interests":
                 rows = self._interests(built, statements, work_statements)
             built[section.code] = rows
@@ -558,6 +562,8 @@ class Cards:
             marks |= {r["mark"] for r in summary["roles"]}
             if summary["place"]:
                 marks.add(summary["place"]["mark"])
+            if summary["years_row"]:
+                marks.add(summary["years_row"]["mark"])
         if description_row and description_row["generated"]:
             marks.add("generated")
         summary_filled = bool(
@@ -654,6 +660,7 @@ class Cards:
             if s["type"] == "person_role" and s["direction"] == "out"
         ]
         dates = entity["primary"].get("dates")
+        years_row = self._years_row(entity["id"], statements, dates, closed)
         place = places[0] if places else None
         polity, outcome = None, "skipped"
         year = _birth_year(dates)
@@ -676,9 +683,34 @@ class Cards:
             "roles": roles,
             "place": place,
             "years": dates.get("original") if dates else None,
+            # Отметка годов — строка утверждения ``lifespan`` (та же шкала, что у ролей и места);
+            # ``None``, если годы есть только в записи сущности без видимого утверждения.
+            "years_row": years_row if dates else None,
             "polity": polity,
         }
         return summary, outcome
+
+    def _years_row(
+        self,
+        entity_id: str,
+        statements: list[dict[str, Any]],
+        dates: dict[str, Any] | None,
+        closed: frozenset[str],
+    ) -> dict[str, Any] | None:
+        """Строка утверждения ``lifespan`` для годов сводки: та, чьё значение совпадает с
+        показанными годами, иначе самая сильная по отметке."""
+        rows = [
+            self._row(s, entity_id, closed=closed)
+            for s in statements
+            if s["type"] == "lifespan" and s["direction"] == "out"
+        ]
+        if not rows:
+            return None
+        shown = dates.get("original") if dates else None
+        same = [
+            r for r in rows if isinstance(r["value"], dict) and r["value"].get("original") == shown
+        ]
+        return max(same or rows, key=self._strength)
 
     def _interests(
         self,
@@ -729,6 +761,7 @@ class Cards:
         statements: list[dict[str, Any]],
         direct: list[dict[str, Any]],
         work_statements,
+        attributed_to: str | None = None,
     ) -> list[dict[str, Any]]:
         """«К кому относится»: авторы трудов об идее и персоны через термин (вывод)."""
         have = {r["entity_id"] for r in direct}
@@ -749,7 +782,10 @@ class Cards:
                 if link["direction"] != "in":
                     continue
                 for a in self.statements.about(
-                    link["subject"], types=["introduced_by"], derived=False
+                    link["subject"],
+                    types=["introduced_by"],
+                    attributed_to=attributed_to,
+                    derived=False,
                 ):
                     who = a["object"]
                     if a["direction"] == "out" and who not in have and who not in found:

@@ -69,6 +69,7 @@ type Card = {
     roles: Row[];
     place: Row | null;
     years: string | null;
+    years_row?: Row | null; // утверждение lifespan: отметка годов
     polity: { name: string; name_status: string; year: number } | null;
   } | null;
   geo?: Geo | null;
@@ -348,7 +349,7 @@ function useModernCountry(geo: Geo | null | undefined, skip: boolean): string | 
   return name;
 }
 
-// Часть сводки персоны, взятая из утверждения (роль, основное место), помечается так же,
+// Часть сводки персоны, взятая из утверждения (роль, основное место, годы), помечается так же,
 // как строка: метка по отметке, подробности по нажатию, `data-unverified` у сгенерированного.
 // Иначе легенда объясняла бы метку, которой в карточке не видно.
 function SummaryPart({ row, children }: { row: Row; children: ReactNode }) {
@@ -415,12 +416,18 @@ function PersonSummary({ card }: { card: Card }) {
         {t.card.nowCountry(modern)}
       </span>,
     );
-  if (summary.years)
+  if (summary.years) {
+    const years = <span data-summary="years">{summary.years}</span>;
     parts.push(
-      <span key="years" data-summary="years">
-        {summary.years}
-      </span>,
+      summary.years_row ? (
+        <SummaryPart key="years" row={summary.years_row}>
+          {years}
+        </SummaryPart>
+      ) : (
+        <span key="years">{years}</span>
+      ),
     );
+  }
   if (parts.length === 0) return null;
   return (
     <p className="card-summary-line" data-card-summary="">
