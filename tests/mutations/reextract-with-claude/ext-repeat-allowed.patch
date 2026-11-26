@@ -1,13 +1,13 @@
 diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
-index 232efc1..ca5623f 100644
+index 840d747..df8bdc8 100644
 --- a/src/philograph/knowledge/external_extraction.py
 +++ b/src/philograph/knowledge/external_extraction.py
-@@ -239,7 +239,7 @@ def ingest(
-     _allowed(filling, data)
-     version_id = data["version_id"]
-     previous = _previous(filling.statements.engine, version_id)
+@@ -323,7 +323,7 @@ def ingest(
+             f"запись идёт: версия {version_id}, запуск {', '.join(live)} (running); "
+             f"повтор — после его завершения или через {STALE_RUNNING_HOURS} ч"
+         )
 -    if previous and not replace:
 +    if False:
-         raise CommandError(
-             f"версия {version_id} уже записана запуском {', '.join(previous)}: повтор — с --replace"
-         )
+         ids = ", ".join(r["run_id"] for r in previous)
+         raise CommandError(f"версия {version_id} уже записана запуском {ids}: повтор — с --replace")
+     for row in previous:

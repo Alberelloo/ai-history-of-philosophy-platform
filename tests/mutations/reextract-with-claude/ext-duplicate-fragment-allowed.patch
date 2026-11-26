@@ -1,13 +1,13 @@
 diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
-index 95edbcc..20a0218 100644
+index 840d747..0d4b6be 100644
 --- a/src/philograph/knowledge/external_extraction.py
 +++ b/src/philograph/knowledge/external_extraction.py
-@@ -206,8 +206,6 @@ def read_replies(path: Path) -> dict[str, Any]:
-         if not isinstance(row, dict) or "fragment" not in row or "reply" not in row:
-             raise CommandError(f"{path}: строка {number} — нужны поля fragment и reply")
-         key = str(row["fragment"])
--        if key in replies:
--            raise CommandError(f"{path}: строка {number} — фрагмент {key} указан дважды")
-         replies[key] = row["reply"]
-     return replies
- 
+@@ -226,7 +226,7 @@ def _distinct(path: Path, pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+     for key, reply in pairs:
+         number = _number(key)
+         canonical = number if number is not None else key
+-        if canonical in seen:
++        if False:
+             raise CommandError(
+                 f"{path}: фрагмент {canonical} указан дважды ({seen[canonical]!r} и {key!r})"
+             )

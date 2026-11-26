@@ -1,13 +1,13 @@
 diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
-index d2f6132..7bfcad7 100644
+index 53037ae..46b2979 100644
 --- a/src/philograph/knowledge/quotes.py
 +++ b/src/philograph/knowledge/quotes.py
-@@ -42,8 +42,6 @@ def normalize(text: str) -> str:
- def parts(quote: str) -> list[str]:
-     """Части цитаты: нормализация, снятие обрамляющих кавычек, деление по многоточию."""
+@@ -45,8 +45,6 @@ def normalize(text: str) -> str:
+ 
+ def _unquoted(quote: str) -> str:
      q = normalize(quote)
 -    while len(q) >= 2 and q[0] in _EDGE_QUOTES and q[-1] in _EDGE_QUOTES:
 -        q = q[1:-1].strip()
-     return [p for p in (s.strip() for s in _ELLIPSIS.split(q)) if p]
+     return q
  
  

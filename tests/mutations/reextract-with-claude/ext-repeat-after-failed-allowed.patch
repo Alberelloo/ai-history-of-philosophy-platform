@@ -1,8 +1,8 @@
 diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
-index 95edbcc..93ca5de 100644
+index 840d747..60c8e21 100644
 --- a/src/philograph/knowledge/external_extraction.py
 +++ b/src/philograph/knowledge/external_extraction.py
-@@ -240,7 +240,7 @@ def _previous(engine: Engine, version_id: str) -> list[str]:
+@@ -270,7 +270,7 @@ def _previous(engine: Engine, version_id: str) -> list[dict[str, Any]]:
                          runs.c.target == version_id,
                          # done, failed и брошенный running: у всех могут быть записанные
                          # утверждения — повтор без отката удвоил бы подтверждения.
@@ -10,4 +10,4 @@ index 95edbcc..93ca5de 100644
 +                        runs.c.status == "done",
                      )
                  )
-             )
+             ).mappings()

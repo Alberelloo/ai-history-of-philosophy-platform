@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 840d747..5e31cfa 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -225,7 +225,7 @@ def _distinct(path: Path, pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+     replies: dict[str, Any] = {}
+     for key, reply in pairs:
+         number = _number(key)
+-        canonical = number if number is not None else key
++        canonical = key
+         if canonical in seen:
+             raise CommandError(
+                 f"{path}: фрагмент {canonical} указан дважды ({seen[canonical]!r} и {key!r})"

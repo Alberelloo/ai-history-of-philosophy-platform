@@ -1,16 +1,13 @@
 diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
-index d2f6132..5d9063f 100644
+index 53037ae..12b0a83 100644
 --- a/src/philograph/knowledge/quotes.py
 +++ b/src/philograph/knowledge/quotes.py
-@@ -57,9 +57,10 @@ def check(quote: str, text: str | None) -> str | None:
-     haystack = normalize(text)
+@@ -80,7 +80,7 @@ def check(quote: str, text: str | None) -> str | None:
+         return QUOTE_TOO_SHORT
      position = 0
      for part in found:
 -        at = haystack.find(part, position)
 +        at = haystack.find(part.split()[0] if part.split() else part, position)
          if at < 0:
              return QUOTE_NOT_FOUND
-+        part = part.split()[0] if part.split() else part
          position = at + len(part)
-     return None
- 

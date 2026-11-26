@@ -452,3 +452,16 @@ mutations:
   note: dating не объект не проверяется
   expect_fail:
   - tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept
+- id: ext-dup-after-normalization-missed
+  requirement: Внешний извлекатель
+  patch: ext-dup-after-normalization-missed.patch
+  note: повтор номера определяется по строке ключа, не по номеру
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_duplicate_fragment_after_normalization_jsonl
+  - tests/knowledge/test_reextract_review.py::test_duplicate_fragment_after_normalization_json
+- id: ext-report-needs-library
+  requirement: Отчёт о запусках извлечения
+  patch: ext-report-needs-library.patch
+  note: report требует адрес библиотеки
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_report_needs_no_library

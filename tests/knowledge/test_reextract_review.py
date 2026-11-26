@@ -17,6 +17,7 @@ import pytest
 from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as hst
 
+from philograph.knowledge import external_extraction as ext
 from philograph.knowledge import quotes
 from philograph.knowledge import schema as t
 from philograph.knowledge.statements import Attribution, Evidence
@@ -669,3 +670,106 @@ def test_live_running_of_other_version_or_gateway_does_not_block(stand, tmp_path
     seed_run(stand, vid, "running", 1, "gw_live", extractor="gateway")
     assert cli(stand, argv) == 0
     assert {r["run_id"]: r["status"] for r in runs(stand)}["ext_other"] == "running"
+
+
+@req(EO, EXTERNAL, invariant="Повтор номера фрагмента — по номеру после приведения: JSONL")
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [(1, "01"), ("1", " 1"), (1, "1"), ("001", 1), (" 1 ", "1"), ("01", "001")],
+)
+def test_duplicate_fragment_after_normalization_jsonl(
+    stand, tmp_path, events, capsys, first, second
+):
+    vid, _ = stand.version(TEXTS)
+    path = tmp_path / "dup.jsonl"
+    rows = [
+        {"fragment": first, "reply": reply_for(0)},
+        {"fragment": second, "reply": {"statements": []}},
+    ]
+    path.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
+    code = cli(
+        stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
+    )
+    err = capsys.readouterr().err
+    assert code == 2 and err.strip() and "Traceback" not in err
+    assert runs(stand) == [] and counts(stand) == [0, 0, 0]
+    assert events.of("knowledge.run.started") == []
+
+
+@req(EO, EXTERNAL, invariant="Повтор номера фрагмента — по номеру после приведения: JSON-объект")
+@pytest.mark.parametrize(
+    ("first", "second"), [("1", " 1"), ("1", "001"), ("01", "1"), (" 2", "2 ")]
+)
+def test_duplicate_fragment_after_normalization_json(
+    stand, tmp_path, events, capsys, first, second
+):
+    vid, _ = stand.version(TEXTS)
+    path = tmp_path / "dup.json"
+    path.write_text(
+        json.dumps({first: reply_for(0), second: {"statements": []}}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    code = cli(
+        stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
+    )
+    assert code == 2 and capsys.readouterr().err.strip()
+    assert runs(stand) == [] and counts(stand) == [0, 0, 0]
+
+
+@req(EO, EXTERNAL, invariant="Разные номера и нечисловые ключи — не повтор")
+def test_distinct_fragment_numbers_are_not_duplicates(stand, tmp_path):
+    stand.filling.fragment_size = 2
+    vid, _ = stand.version(TEXTS)
+    path = replies_file(tmp_path, {"1": reply_for(0), "2": reply_for(1), "abc": {"statements": []}})
+    code = cli(
+        stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
+    )
+    assert code == 0 and one_run(stand)["drop_reasons"].get("reply_invalid") == 1
+
+
+@req(
+    EO,
+    "Отчёт о запусках извлечения",
+    invariant="report читает только базу знаний: PHILOGRAPH_LIBRARY_URL не нужен",
+)
+def test_report_needs_no_library(tmp_path, events, clock):
+    from datetime import date
+
+    from philograph.platform.db import make_engine
+
+    db = tmp_path / "k.db"
+    env = {"PHILOGRAPH_DATABASE_URL": f"sqlite:///{db.as_posix()}"}  # без PHILOGRAPH_LIBRARY_URL
+    out = tmp_path / "r.md"
+    since = clock.now().date().isoformat()
+    assert ext.main(["report", "--since", since, "--out", str(out)], env=env) == 0
+    assert "Итого" in out.read_text(encoding="utf-8")
+    assert events.one("knowledge.extraction.report")["runs"] == 0
+    engine = make_engine(env["PHILOGRAPH_DATABASE_URL"], [t.SCHEMA])
+    with engine.begin() as conn:
+        conn.execute(
+            t.filling_runs.insert().values(
+                run_id="ext_r1",
+                kind="extraction",
+                target="v1",
+                extractor="external",
+                model="claude-opus-5-5",
+                source_id="s_1",
+                started_at=clock.now(),
+                created=3,
+                dropped=1,
+                status="done",
+                fragments=2,
+                input_tokens=10,
+                output_tokens=5,
+                cost_usd=0.5,
+                drop_reasons={"quote_not_found": 1},
+            )
+        )
+    events.clear()
+    assert ext.main(["report", "--since", since, "--out", str(out)], env=env) == 0
+    text = out.read_text(encoding="utf-8")
+    assert "s_1" in text and "claude-opus-5-5" in text and "quote_not_found 1" in text
+    assert events.one("knowledge.extraction.report")["runs"] == 1
+    assert date.fromisoformat(since)
+    # команды с библиотекой без адреса — по-прежнему код 2
+    assert ext.main(["export", "--version", "v1", "--out", str(tmp_path / "o")], env=env) == 2
