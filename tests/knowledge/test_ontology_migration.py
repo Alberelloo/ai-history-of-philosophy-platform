@@ -538,7 +538,7 @@ def test_name_form(onto, events, clock):
     assert after.names[johann][0]["normalized"] == "йоганн"  # NFC, нижний регистр
     assert johann in Surface(onto, clock).find("Йоганн").text
     assert after.resolve(padded) == after.resolve(kant)
-    assert {n["text"] for n in after.names[padded]} == {"Кант"}
+    assert {n["text"] for n in after.names[after.resolve(padded)]} == {"Кант"}
     assert report.to_json()["names_normalized"] == 2
     [step] = events.where("knowledge.migration.step", step="normalize_names")
     assert step["actions"] == 2 and step["dry_run"] is False
