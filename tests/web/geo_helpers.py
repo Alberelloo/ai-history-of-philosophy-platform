@@ -1,7 +1,7 @@
 """Общее для браузерных тестов глобуса (geo-timeline; rework-globe-political-map, задача 5.1).
 
 Данные задаёт каждый тест сам через ``stack.world`` (настоящий сервис знаний, ``knowledge_stack``).
-Ожидания берутся из дельты ``openspec/changes/rework-globe-political-map/specs/geo-timeline``.
+Ожидания берутся из дельты ``openspec/changes/archive/2026-11-26-rework-globe-political-map/specs/geo-timeline``.
 Клиент событий журнала не пишет: серверный якорь — ``knowledge.geo.built`` по ``request_id``
 ответа ``/map/places``, полученного страницей (``geo_built``).
 

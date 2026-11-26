@@ -1,7 +1,7 @@
 """Глобус: точные связи (rework-globe-political-map, задача 5.6).
 
 Требование «Точные связи» дельты
-``openspec/changes/rework-globe-political-map/specs/geo-timeline/spec.md``.
+``openspec/changes/archive/2026-11-26-rework-globe-political-map/specs/geo-timeline/spec.md``.
 Концы дуг сверяются с центрами маркеров по прямоугольнику элемента и по ``data-x``/``data-y``;
 вершина стрелки — с кривой, разобранной из ``d``, и с окружностью маркера цели (``arc_faults``).
 Клиент событий журнала не пишет: серверный якорь — ``knowledge.geo.built`` по ``request_id``.

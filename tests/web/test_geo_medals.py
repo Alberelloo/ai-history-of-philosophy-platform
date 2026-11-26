@@ -1,7 +1,7 @@
 """Глобус: медальоны философов и место персоны по нажатию (rework-globe-political-map, 5.3–5.4).
 
 Требования «Медальоны философов» и «Место персоны по нажатию» дельты
-``openspec/changes/rework-globe-political-map/specs/geo-timeline/spec.md``.
+``openspec/changes/archive/2026-11-26-rework-globe-political-map/specs/geo-timeline/spec.md``.
 Настоящий сервис знаний (``knowledge_stack``); ``page.route`` — только там, где сервер такие
 данные не отдаёт: 51 360 персон («Предел медальонов») и ответ ``/map`` без ``short``.
 Центры кругов — по прямоугольнику элемента, проекция мест — формулой теста (``project``).

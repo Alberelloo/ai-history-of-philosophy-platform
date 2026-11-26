@@ -1,7 +1,7 @@
 """Глобус: наложенные элементы вида — препятствия раскладки (rework-globe-political-map, 6а.11, Д10).
 
 Сценарий «Наложенные элементы вида» и нормативные фразы дельты
-``openspec/changes/rework-globe-political-map/specs/geo-timeline/spec.md``: правило 5
+``openspec/changes/archive/2026-11-26-rework-globe-political-map/specs/geo-timeline/spec.md``: правило 5
 «Политической карты», правило 3 и инвариант раскладки «Медальонов философов».
 
 Прямоугольники наложенных элементов тест меряет сам (``getBoundingClientRect`` относительно

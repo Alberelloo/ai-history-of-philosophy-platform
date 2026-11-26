@@ -1,7 +1,7 @@
 """Глобус: политическая карта и страна места (rework-globe-political-map, задачи 5.2, 5.5).
 
 Требования «Политическая карта» и «Страна места» дельты
-``openspec/changes/rework-globe-political-map/specs/geo-timeline/spec.md``.
+``openspec/changes/archive/2026-11-26-rework-globe-political-map/specs/geo-timeline/spec.md``.
 Настоящий сервис знаний (``knowledge_stack``), данные задаёт каждый тест.
 Площадь и ширина видимой части стран, линии границ и страна точки считаются независимо:
 d3-geo на пустой странице теста (``Oracle``) по ``world-atlas/countries-110m.json``.
