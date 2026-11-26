@@ -241,3 +241,55 @@
 **Дефекты:** расхождений кода со спецификацией не найдено.
 
 Штатный прогон `scripts/mutation_check.py --change add-wikidata-life-dates --id suggest-work-needs-no-date` в worktree: test_work_candidate_needs_publication_date упал. Остальные мутации — тем же способом (патч в worktree от HEAD, pytest по связанным файлам).
+
+## Судья — 2026-11-26, коммит 694a9a1
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| entity-dating «Даты жизни из Wikidata» | 9 сценариев + «Инвариант импорта дат»; property `test_life_dates_invariant`, `test_rollback_without_verified_restores_dump`, `test_rollback_keeps_verified_and_qid` | passed (после Д1), мутации ×35 упали | passed; мутации slice-instead-of-claim-date, J1, J2, J4 — упали | CLI `apply --linked` на фикстуре Q859 (P569 `-0427`, P570 `-0347`, P106 философ, P737): `primary.dates` (−426, −426, −346, −346), `year`, «427 до н. э. – 347 до н. э.»; `lifespan` `sourced`, атрибуция `wikidata:Q859` со ссылкой; роль `philosopher`; P737 не записан; отчёт `lifespans=1, roles=1, dry_run=false` | подтверждено |
+| entity-dating «Подтверждение QID персон и произведений» | 9 сценариев + «Инвариант подтверждения»; property `test_qid_confirmation_invariant`, `test_suggest_auto_invariant` | passed, мутации ×27 упали | passed; мутации qid-on-pending, J3 — упали | — (сеть и подтверждение человеком на стенде — 5.2, за Lead'ом) | подтверждено |
+| ontology-extraction «Импорт из Wikidata» (MODIFIED) | 3 сценария; property `test_time_rule_any_value`, `test_import_invariant` | passed, мутации ×3 упали | passed; мутации import-slice, J1 — упали | — | подтверждено |
+
+Прогоны (по одному pytest за раз):
+- `pytest -q tests/knowledge/test_life_dates.py`: 39 passed in 275.75s.
+- `pytest -q` по `test_life_dates_unit.py`, `test_filling.py`, `test_wikidata.py`, `test_wikidata_unit.py`, `test_statements.py`, `test_portraits.py`, `test_mentions_cards.py`: 196 passed in 233.85s.
+- Полный pytest и e2e не запускались: машина 1 ГБ RAM, запрет ведущего. Остаётся за CI `checks`.
+- `ruff check` и `ruff format --check` по 10 файлам изменения: чисто. `lint-imports`: 3 kept, 0 broken. `check_traceability.py`: 415 из 415, `entity-dating` в `enforce`. `mutation_check.py --coverage add-wikidata-life-dates`: мутации есть у всех 3 требований, rc=0.
+
+Мутации тестировщика, штатный `--id`, в отдельном worktree:
+- slice-instead-of-claim-date → упали `test_person_with_qid`, `test_life_dates_invariant`;
+- qid-on-pending → упал `test_qid_confirmation_invariant`;
+- import-slice → упали `test_import_bce`, `test_import_invariant`.
+
+Свои мутации, в том же worktree:
+- J1, знак эры: `_astro` даёт `-year` вместо `1 - year`, сдвиг на год у дат до н. э. → упали `test_person_with_qid`, `test_time_rule_any_value`, `test_import_bce`.
+- J2, точности: `interval` берёт более узкую точность (`min` вместо `max`) → упали `test_decade_century`, `test_life_dates_invariant`.
+- J3, манифест QID: `apply` пропускает только `pending`, поэтому `rejected` пишет QID → упал `test_qid_confirmation_invariant`.
+- J4, откат с проверенными: `_referenced` не учитывает `verified`, QID проверенного утверждения удаляется → упали `test_rollback_keeps_verified`, `test_rollback_keeps_verified_and_qid`.
+
+Worktree удалён, `git diff -- src` пуст.
+
+Аудит пунктов (О21). Я сам выбрал 5 нормативных пунктов, у каждого есть строка в таблице:
+- «Устаревшее не берётся никогда» → best-takes-deprecated;
+- «Сухой прогон — тот же отчёт» → dry-run-writes и сравнение отчётов в `test_life_dates_invariant`;
+- «Повторный запуск не добавляет утверждений» → rerun-recounts;
+- «Кандидаты в манифест с подписями, описанием и датами» → `test_candidates_for_person` проверяет `label`, `description`, `birth`/`death`;
+- «Свойства вне перечня и P737 не импортируются» → строка есть, но о ней ниже.
+
+Замечания, не блокирующие:
+1. Строка «P737 не импортируется» в «Датах жизни» ссылается на тест пути `Filling.import_wikidata`. Отдельного теста для команды `life_dates` нет. Мой прогон CLI с P737 в записи подтвердил, что влияние не пишется.
+2. Генератор `wd_times` не меняет `calendarmodel`, поэтому пункт «календарная модель не учитывается» доказан только структурно.
+3. В `test_life_dates_invariant` у ветки пропуска стоит проверка `reasons <= expected or reasons & expected`. Она слабее точного равенства. Границы и `precision` проверяются строго.
+4. CLI не выводит события журнала в stderr. События проверены в тестах точным множеством ключей.
+
+Платон: Wikidata `-0427` значит 427 до н. э. В астрономическом счёте это 1 − 427 = −426, `-0347` даёт −346. Исходная запись «427 до н. э. – 347 до н. э.» показывает, что год тот же. Цифры владельца −427/−347 — тот же год в историческом счёте со знаком. Расхождение только в счёте, ошибки нет. Вынесено в PR, решение в `proposal.md`, вопрос 3.
+
+`filling.py`, коммит 1eea1c2 этого изменения: только импорт `WIKIDATA_ROLES`, `simple_time`, `format_original`, `interval` в двух блоках `import_wikidata` и событие `partial`, которого требует MODIFIED-дельта. Прочие правки файла пришли из `improve-extraction-naming`.
+
+Подгонка не найдена:
+- оракул `strategies.py` (`wd_bounds`, `expected_lifespan`, `expected_dating`, `manifests`) не импортирует `wikidata` и `dates`;
+- стратегии не сужены: год 1…3000, знак ±, точности 0–11, год `0000`, мусорные строки, ранги, роли из таблицы и вне её;
+- `skip` и `xfail` нет;
+- Д1 закрыт правкой кода, а не теста.
+
+Вердикт: **принято**. Полный pytest остаётся за CI `checks`.
