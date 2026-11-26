@@ -355,7 +355,6 @@ mutations:
   note: вид dating элемента entities не проверяется
   expect_fail:
   - tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind
-  - tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property
 - id: check-unicode-digits
   requirement: Проверка ответа по утверждениям
   patch: check-unicode-digits.patch

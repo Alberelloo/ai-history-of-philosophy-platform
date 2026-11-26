@@ -211,3 +211,56 @@
         →  394 passed, 1 warning in 379s
 
 Д1 (`paragraph: "²"`), Д2 (ключ ответа `"²"`), Д3 (сломанная сводка расходов, `not-json` и `object`): все четыре прежде красных теста зелёные. Мутации после правки не перепрогонялись.
+
+## Тестировщик — дополнение после ревью (дельта в коммите 7e8d8db)
+
+Новые тесты: `tests/knowledge/test_reextract_review.py` (53 теста, с маркерами `req`); обновлён `test_reextract_external.py::test_replace_without_previous_and_failed_previous` (по новой формулировке: после `failed` без `--replace` — код 2 и ничего не записано; с `--replace` — `rolled_back` + новый `done`). Остальные свои тесты не ослаблялись.
+
+| Требование | Сценарий / инвариант | Тест | Вывод и журнал |
+|---|---|---|---|
+| Цитата у каждого утверждения | Многоточие автора в цитате | `test_authors_ellipsis_in_quote` | абзац «Он сказал... и замолчал.», цитата «сказал... и» найдена, записана как есть, без `dropped`; перепроверка `rechecked=1, lost=0`, `evidence.lost=False`; `knowledge.library.event lost=0` |
+| то же | инвариант: целиком сначала, части потом (7 случаев) | `test_whole_first_then_parts` | `None` / `quote_too_short` / `quote_not_found` |
+| то же | инвариант: U+200B/U+2060/U+FEFF; ″ ′ ` | `test_zero_width_removed` ×3, `test_primes_and_backtick` ×3 | цитата и абзац — в обе стороны |
+| то же | инвариант: `Statements.add` с многоточием автора; property подстрок с «...» (300) | `test_add_accepts_authors_ellipsis`, `test_substring_with_authors_ellipsis_property` | — |
+| Проверка ответа по утверждениям | Элемент entities не того вида | `test_entities_item_wrong_kind` | утверждение записано, запуск `done`, сущностей/датировок нет, 3×`dropped code=schema_item`, `drop_reasons={"schema_item":3}` |
+| то же | инвариант: 10 видов (type не строка, dating.text/quote не строки, paragraph float/bool/список/`²`/`٣`/`１`) | `test_entities_item_kinds_dropped_rest_kept` | один `schema_item`, верное утверждение записано |
+| то же | инвариант: `dating.paragraph` — int или ASCII-цифры | `test_dating_paragraph_ascii_digits_pass_kind_check` | датировка записана |
+| то же | инвариант: ASCII 0-9 у `paragraph` (`² ٣ １ १ ①`) | `test_paragraph_unicode_digits_refused` | `schema_item`, остальное записано |
+| то же | **property: произвольные значения полей `entities` не роняют запуск** (150 внешний путь, 40 — через шлюз) | `test_arbitrary_entities_never_crash_property`, `…_gateway_property` | `done`, `failure=None`, верное утверждение записано, `dropped == Σ drop_reasons == событий`, коды из перечня |
+| Внешний извлекатель | Повтор после прерванной записи | `test_repeat_after_interrupted_ingest` | `failed`; без `--replace` код 2, счётчики те же, `run.started` нет; с `--replace` — `rolled_back` + `done`, счётчики = одной полной записи на пустой онтологии |
+| то же | инвариант: любой неоткатанный (done/failed/running и сочетания) блокирует, `--replace` откатывает все (5 наборов); откатанные и чужая версия не блокируют | `test_any_unrolled_external_run_blocks_repeat`, `test_rolled_back_and_other_version_do_not_block`, обновлённый `test_replace_without_previous_and_failed_previous` | — |
+| то же | Повтор фрагмента в файле ответов | `test_duplicate_fragment_in_jsonl` | код 2, stderr, нет запуска и записей |
+| то же | инвариант: повтор ключа в JSON-объекте (верхний и вложенный) | `test_duplicate_key_in_json_object` ×2 | код 2 |
+| то же | инвариант: версия не найдена (404), библиотека 500/недоступна; export и ingest | `test_version_missing_or_library_down` ×6 | код 2, сообщение без «Traceback», ничего не создано |
+
+Прогон:
+
+    ruff check . / ruff format --check .   →  All checks passed! / 720 files already formatted
+    python scripts/check_traceability.py   →  Требований с тестами: 427 из 427
+    pytest -q tests/knowledge/test_reextract_{fragments,quotes,items,runs,external,prompt,review}.py tests/llm
+              + правленные прежние + test_external_extraction_unit/test_quotes_unit/test_extraction_codes_map_unit
+                                          →  497 passed, 1 warning in 436s
+
+Мутации на новые правила (12, `--id`; сырой вывод):
+
+| Цитата у каждого утверждения | quote-whole-first-removed | tests/knowledge/test_reextract_review.py::test_authors_ellipsis_in_quote | да (1 failed, 1 warning in 1.01s) |
+| Цитата у каждого утверждения | quote-whole-first-removed | tests/knowledge/test_reextract_review.py::test_whole_first_then_parts | да (1 failed, 1 warning in 0.27s) |
+| Цитата у каждого утверждения | quote-no-zero-width | tests/knowledge/test_reextract_review.py::test_zero_width_removed | да (1 failed, 1 warning in 0.24s) |
+| Цитата у каждого утверждения | quote-no-primes | tests/knowledge/test_reextract_review.py::test_primes_and_backtick | да (1 failed, 1 passed, 1 warning in 0.30s) |
+| Проверка ответа по утверждениям | check-entities-type-unchecked | tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind | да (1 failed, 1 warning in 0.94s) |
+| Проверка ответа по утверждениям | check-entities-type-unchecked | tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property | да (1 failed, 1 warning in 19.77s) |
+| Проверка ответа по утверждениям | check-dating-kind-unchecked | tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind | да (1 failed, 1 warning in 1.07s) |
+| Проверка ответа по утверждениям | check-dating-kind-unchecked | tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property | НЕТ (1 passed, 1 warning in 19.63s) |
+| Проверка ответа по утверждениям | check-unicode-digits | tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept | да (1 failed, 7 passed, 1 warning in 5.55s) |
+| Проверка ответа по утверждениям | check-statement-unicode-digits | tests/knowledge/test_reextract_review.py::test_paragraph_unicode_digits_refused | да (1 failed, 1 passed, 1 warning in 1.69s) |
+| Внешний извлекатель | ext-repeat-after-failed-allowed | tests/knowledge/test_reextract_review.py::test_repeat_after_interrupted_ingest | да (1 failed, 1 warning in 1.33s) |
+| Внешний извлекатель | ext-repeat-after-failed-allowed | tests/knowledge/test_reextract_review.py::test_any_unrolled_external_run_blocks_repeat | да (1 failed, 1 warning in 1.20s) |
+| Внешний извлекатель | ext-duplicate-fragment-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_fragment_in_jsonl | да (1 failed, 1 warning in 0.93s) |
+| Внешний извлекатель | ext-json-duplicate-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_key_in_json_object | да (1 failed, 1 warning in 0.82s) |
+| Внешний извлекатель | ext-library-down-traceback | tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down | да (1 failed, 2 passed, 1 warning in 2.22s) |
+| Внешний извлекатель | ext-404-not-handled | tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down | да (1 failed, 1 warning in 0.87s) |
+| Проверка ответа по утверждениям | check-dating-kind-unchecked | tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind | да (1 failed, 1 warning in 1.1s) |  (повтор после правки списка)
+
+В первом прогоне `check-dating-kind-unchecked` пережила property `test_arbitrary_entities_never_crash_property`: без проверки вида `dating` дальнейшая проверка датировки (`dating_*`) всё равно отбрасывает элемент, и запуск не падает. Мутацию убивает сценарий «Элемент entities не того вида» (`schema_item` вместо `dating_*`); property из `expect_fail` этой мутации убран. Остальные 11 убиты всеми заявленными тестами.
+
+Наблюдение (не дефект по тексту дельты): раз цитата ищется целиком, цитата из одного многоточия (`...`) находится в любом абзаце, где есть многоточие автора, и проходит как подтверждение с пустым смыслом; без многоточия в абзаце — `quote_not_found`.
