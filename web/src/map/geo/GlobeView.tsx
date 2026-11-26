@@ -22,6 +22,8 @@ import {
   type LPlace,
   type Metrics,
   type PersonSlot,
+  type Rect,
+  round2,
 } from "./layout";
 import {
   canvasPath,
@@ -119,7 +121,7 @@ const COUNTRY_FONTS = [COUNTRY_FONT, COUNTRY_FILL_FONT];
 const COUNTRY_INPUT = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
 
 // --- раскладка покоя: чистые шаги (кадр, исходный вид) ---
-type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number };
+type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[] };
 
 function anchorsAt(projection: (p: [number, number]) => [number, number] | null, view: View, places: ScenePlace[], width: number, height: number): LPlace[] {
   return places.map((p) => {
@@ -138,6 +140,7 @@ function markersAt(anchors: LPlace[], lf: LFrame, r: RestInput): Layout {
     frame: lf,
     measure: (text) => r.measure(text, NAME_FONT),
     metrics: fontMetrics(NAME_FONT, r.fv),
+    obstacles: r.obstacles,
   });
 }
 
@@ -182,13 +185,30 @@ export default function GlobeView(props: Props) {
 
   const info = props.info;
   const nameOf = useCallback((id: string) => info(id)?.name || null, [info]); // без имени — без подписи, не id
-  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height };
+  // Наложенные на вид элементы ([data-geo-overlay]: подпись источника, «Клавиши» и подсказка
+  // к ним, сообщения состояний) — препятствия раскладки. Прямоугольники меряются после
+  // отрисовки (шрифты, размер окна, раскрытая подсказка); null — ещё не мерили.
+  const stage = useRef<HTMLDivElement>(null);
+  const [overlays, setOverlays] = useState<Rect[] | null>(null);
+  useLayoutEffect(() => {
+    const st = stage.current;
+    if (!st) return;
+    const o = st.getBoundingClientRect();
+    const next: Rect[] = [];
+    for (const el of st.querySelectorAll<HTMLElement>("[data-geo-overlay]")) {
+      const b = el.getBoundingClientRect();
+      if (b.width > 0 && b.height > 0) next.push({ kind: "rect", x0: round2(b.left - o.left), y0: round2(b.top - o.top), x1: round2(b.right - o.left), y1: round2(b.bottom - o.top) });
+    }
+    setOverlays((old) => (old && JSON.stringify(old) === JSON.stringify(next) ? old : next));
+  });
+  const obstacles = useMemo(() => overlays ?? [], [overlays]);
+  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
 
   // Исходный вид — из мест первого показа слоя (после загрузки шрифтов: от них зависят
   // подписи стран, а значит и приближение); «0» возвращает к нему для года T и размера сейчас.
   const home = useRef<View | null>(null);
   const homeLayer = useRef<GeoLayer | null>(null);
-  if (scene && layer && props.fontsVersion > 0 && homeLayer.current !== layer) {
+  if (scene && layer && props.fontsVersion > 0 && overlays && homeLayer.current !== layer) {
     homeLayer.current = layer;
     home.current = homeFor(scene.places, restIn);
   }
@@ -365,17 +385,17 @@ export default function GlobeView(props: Props) {
   const places = useMemo(() => scene?.places ?? [], [scene]);
   const rest = useRef<RestLayout | null>(null);
   const { anchors, lay, countries } = useMemo(() => {
-    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height };
+    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
     const anchors = anchorsAt(pr.projection, view, places, width, height);
     const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
-    const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r));
+    const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r), obstacles);
     rest.current = got.rest;
     const lay = got.layout;
     if (moving) return { anchors, lay, countries: [] as CountryLabel[] };
     return { anchors, lay, countries: countriesAt(view, lf, lay.grid, r) };
     // fontsVersion: шрифты загрузились — ширины подписей меряются заново.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion]);
+  }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion, obstacles]);
   const anchorOf = new Map(anchors.map((a) => [a.id, a]));
   const slotOf = new Map<string, PersonSlot>(lay.persons.map((s) => [s.id, s]));
   const personOf = new Map((scene?.persons ?? []).map((p) => [p.id, p]));
@@ -501,7 +521,7 @@ export default function GlobeView(props: Props) {
       : null;
   const dim = roles.active;
   const busy = status === "loading";
-  const ready = !busy && (status !== "ok" || props.fontsVersion > 0); // слой разложен по загруженным шрифтам
+  const ready = !busy && (status !== "ok" || (props.fontsVersion > 0 && overlays !== null)); // слой разложен по шрифтам и препятствиям
   const empty = status === "ok" && (layer?.places.length ?? 0) === 0;
   const nobody = status === "ok" && !empty && places.length === 0;
 
@@ -536,7 +556,7 @@ export default function GlobeView(props: Props) {
     [base, role ? `is-on map-role-${role}` : "", ...extra].filter(Boolean).join(" ");
 
   return (
-    <div className="geo-stage" style={{ width, height }}>
+    <div ref={stage} className="geo-stage" style={{ width, height }}>
       <canvas ref={base} className="geo-land" data-geo-land="" style={{ width, height }} aria-hidden="true" />
       <svg
         ref={svg}
@@ -747,22 +767,24 @@ export default function GlobeView(props: Props) {
           {tip.text}
         </div>
       )}
-      <p className="geo-coast">{t.geo.coast}</p>
+      <p className="geo-coast" data-geo-overlay="coast">
+        {t.geo.coast}
+      </p>
       <div className="geo-keys">
-        <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" aria-expanded={keysOpen} aria-controls="geo-keys-hint" onClick={() => setKeysOpen((o) => !o)}>
+        <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" aria-expanded={keysOpen} aria-controls="geo-keys-hint" data-geo-overlay="keys" onClick={() => setKeysOpen((o) => !o)}>
           {t.geo.keys}
         </button>
-        <p id="geo-keys-hint" className="geo-keys__hint" hidden={!keysOpen}>
+        <p id="geo-keys-hint" className="geo-keys__hint" data-geo-overlay="keys-hint" hidden={!keysOpen}>
           {t.geo.keysHint}
         </p>
       </div>
       {busy && (
-        <p className="geo-state geo-state--loading" role="status">
+        <p className="geo-state geo-state--loading" data-geo-overlay="state" role="status">
           {t.geo.loading}
         </p>
       )}
       {status === "error" && (
-        <div className="geo-state pg-notice pg-notice--danger pg-notice--stacked" role="alert">
+        <div className="geo-state pg-notice pg-notice--danger pg-notice--stacked" data-geo-overlay="state" role="alert">
           <div>
             <strong>{t.geo.error}</strong>
             <p>{t.geo.errorHint}</p>
@@ -773,7 +795,7 @@ export default function GlobeView(props: Props) {
         </div>
       )}
       {empty && (
-        <div className="geo-state">
+        <div className="geo-state" data-geo-overlay="state">
           <strong>{t.geo.empty}</strong>
           <p>{t.geo.emptyHint}</p>
           <button type="button" className="pg-btn pg-btn--secondary pg-btn--sm" onClick={props.onToChrono}>
@@ -782,7 +804,7 @@ export default function GlobeView(props: Props) {
         </div>
       )}
       {nobody && (
-        <div className="geo-state" role="status">
+        <div className="geo-state" data-geo-overlay="state" role="status">
           <strong>{t.geo.nobody(props.year)}</strong>
           {props.nearest != null && (
             <button type="button" className="pg-btn pg-btn--secondary pg-btn--sm" onClick={props.onNearest}>

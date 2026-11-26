@@ -103,4 +103,17 @@ test("кэш: сначала без добора, потом с добором (
   eq(sig(after), sig(fresh), "как со свежим кэшем");
 });
 
+test("подписи стран не на препятствиях из сетки", () => {
+  for (const [w, h] of [[564, 322], [1024, 576]])
+    for (const [lon, lat] of [[15, 50], [20, 0]]) {
+      const g = new Grid();
+      const obs = [
+        { kind: "rect" as const, x0: 4, y0: h - 18, x1: 300, y1: h - 4 },
+        { kind: "rect" as const, x0: w - 80, y0: 4, x1: w - 4, y1: 30 },
+      ];
+      for (const o of obs) g.add(o);
+      for (const l of run(w, h, lon, lat, 1, g, [...input])) for (const o of obs) ok(!overlaps(l.rect, o), `${w} ${l.text} на препятствии`);
+    }
+});
+
 done();

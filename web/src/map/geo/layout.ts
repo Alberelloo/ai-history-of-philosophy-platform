@@ -187,11 +187,13 @@ export type LayoutInput = {
   measure: Measure;
   metrics: Metrics;
   maxPersons?: number;
+  obstacles?: Rect[]; // наложенные на вид элементы (подпись источника, «Клавиши»): занятые места
 };
 
 export function layoutMarkers(inp: LayoutInput): Layout {
   const f = inp.frame;
   const grid = new Grid();
+  for (const o of inp.obstacles ?? []) grid.add(o);
   const places = new Map(inp.places.map((p) => [p.id, p]));
   const R = MEDAL / 2;
   const limit = inp.maxPersons ?? MAX_PERSONS;
@@ -318,15 +320,17 @@ export function layoutMarkers(inp: LayoutInput): Layout {
 }
 
 // Кадр перетаскивания: сдвиги последней раскладки сохраняются, подписи не показываются.
-// Маркер, чей центр вышел из круга или фигура из кадра, скрыт.
-export function shiftLayout(prev: Layout, places: LPlace[], f: Frame): Layout {
+// Маркер, чей центр вышел из круга, фигура из кадра или попала на наложенный элемент
+// (obstacles), скрыт.
+export function shiftLayout(prev: Layout, places: LPlace[], f: Frame, obstacles: Rect[] = []): Layout {
   const at = new Map(places.map((p) => [p.id, p]));
   const place = (id: string, dx: number, dy: number, r: number) => {
     const a = at.get(id);
     if (!a || !a.visible) return null;
     const x = round2(a.x + dx);
     const y = round2(a.y + dy);
-    return inCircle(f, x, y) && inFrame(f, { kind: "circle", x, y, r }) ? { x, y } : null;
+    const c: Circle = { kind: "circle", x, y, r };
+    return inCircle(f, x, y) && inFrame(f, c) && !obstacles.some((o) => overlaps(c, o)) ? { x, y } : null;
   };
   const badges = prev.badges.map((b) => {
     const p = b.hidden ? null : place(b.places[0], b.dx, b.dy, MEDAL / 2);
@@ -360,11 +364,12 @@ export function frameLayout(
   places: LPlace[],
   f: Frame,
   full: () => Layout,
+  obstacles: Rect[] = [],
 ): { layout: Layout; rest: RestLayout } {
-  if (moving && rest && rest.key === key) return { layout: shiftLayout(rest.layout, places, f), rest };
+  if (moving && rest && rest.key === key) return { layout: shiftLayout(rest.layout, places, f, obstacles), rest };
   const layout = full();
   const next = { key, layout };
-  return { layout: moving ? shiftLayout(layout, places, f) : layout, rest: next };
+  return { layout: moving ? shiftLayout(layout, places, f, obstacles) : layout, rest: next };
 }
 
 // Маркер персоны на экране: её медальон или значок, куда она свёрнута; null — не виден.

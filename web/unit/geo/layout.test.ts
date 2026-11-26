@@ -125,4 +125,24 @@ test("персона без имени — медальон без подпис�
   eq([l.persons[0].hidden, l.persons[0].packed, l.persons[0].label], [false, false, null], "медальон без подписи");
 });
 
+test("наложенные элементы — препятствия раскладки и кадров движения", () => {
+  for (const seed of [1, 2, 3, 4, 5, 6]) {
+    const r = rng(seed * 31);
+    const f: Frame = { w: 600, h: 400, cx: 300, cy: 200, R: 190 };
+    const obstacles = [
+      { kind: "rect" as const, x0: 4, y0: 380, x1: 300, y1: 396 },
+      { kind: "rect" as const, x0: 520, y0: 4, x1: 596, y1: 30 },
+      { kind: "rect" as const, x0: 200 + r() * 100, y0: 150 + r() * 100, x1: 330 + r() * 100, y1: 270 + r() * 100 },
+    ];
+    const places = Array.from({ length: 12 }, (_, i) => ({ id: `p${i}`, x: 120 + r() * 360, y: 40 + r() * 330, visible: true }));
+    const persons = Array.from({ length: 60 }, (_, i) => ({ id: `x${i}`, place: `p${i % 12}`, name: `Имя ${i}` }));
+    const l = layoutMarkers({ places, persons, events: [], frame: f, measure, metrics, obstacles });
+    for (const sh of drawnShapes(l)) for (const o of obstacles) ok(!overlaps(sh, o), `seed ${seed}: фигура на препятствии`);
+    const moved = shiftLayout(l, places.map((p) => ({ ...p, x: p.x + 40, y: p.y + 25 })), f, obstacles);
+    for (const s of moved.persons)
+      if (!s.hidden && !s.packed) for (const o of obstacles) ok(!overlaps({ kind: "circle", x: s.x, y: s.y, r: MEDAL / 2 }, o), `seed ${seed}: в движении на препятствии`);
+    for (const b of moved.badges) if (!b.hidden) for (const o of obstacles) ok(!overlaps({ kind: "circle", x: b.x, y: b.y, r: MEDAL / 2 }, o), `seed ${seed}: значок на препятствии`);
+  }
+});
+
 done();
