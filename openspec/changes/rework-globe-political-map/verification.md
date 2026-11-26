@@ -758,3 +758,32 @@
 ### Статус
 
 Д11 закрыт: `test_fewer_labels_only_when_few_fit` passed на 1024×576, 1366×768 и 1920×1080.
+
+## Судья, круг 3 — 2026-11-26, коммит 7d2ae10
+
+Проверялся только Д11 и то, что после вердикта круга 2 (eb76423) ничего не сломалось.
+
+**Дифф eb76423..HEAD.** Изменены только `tests/web/geo_helpers.py`, `tests/web/test_geo_overlay.py`, `tests/web/test_geo_political.py` и этот журнал. `git diff eb76423..HEAD -- web/src` пуст, поэтому замер G1–G10 круга 2 в силе и не повторялся.
+
+**Правка оракула — не подгонка.**
+- Правило 5 дельты «Политическая карта» прямо относит к препятствиям подписи страны наложенные элементы вида (`[data-geo-overlay]`). Значит, `fitting_countries` без них считал «помещающимися» страны, которые продукт по спецификации ставить не должен. Добавить их в препятствия — привести оракул к правилу, а не ослабить проверку.
+- Прямоугольники тест меряет сам (`getBoundingClientRect`, поиск по тексту, роли и `aria-controls`, плюс помеченные). Значения `data-*` продукта он не использует.
+- Проверку `label_faults` правка ужесточила: подпись страны на наложенном элементе теперь нарушение в `test_country_label_rule_on_many_views` и `test_only_large_countries`.
+- Перенос `OVERLAYS_JS` / `overlays` / `obstacle_rects` из `test_geo_overlay.py` в `geo_helpers.py` сделан без изменения логики.
+
+**Мой прогон** (по одному файлу, `--tb=line`):
+
+| Команда | Журнал тестировщика | Мой прогон |
+|---|---|---|
+| `test_geo_political.py -k "fewer_labels_only_when_few_fit or country_label_rule_on_many_views or only_large"` | 7 passed | 7 passed, 279 с (включая `test_fewer_labels_only_when_few_fit[1366-768]`) |
+| `test_geo_overlay.py` | 6 passed | 6 passed, 71 с |
+| `scripts/check_traceability.py` | 408 из 408 | «Требований с тестами: 408 из 408» |
+| `lint-imports` | — | 3 kept, 0 broken |
+| `ruff check` / `ruff format --check` (py-файлы диффа против origin/claude/embedding-docker) | — | All checks passed / 11 files already formatted |
+
+**Мутация.** В `GlobeView.tsx` раскладке передавался пустой список препятствий (`obstacles = []`, наложенные элементы игнорируются). После `npm run build` прогнал `test_geo_political.py -k "country_label_rule_on_many_views or fewer_labels_only_when_few_fit"`: 2 failed. Причина — новая проверка `label_faults`: «подпись страны на наложенном элементе вида», страны 466 и 562, прямоугольник подписи источника (4, 494)–(302, 510), вид (15, 50) ×2. Код вернул (`git checkout`), сборку повторил, `git diff -- web/src` пуст.
+
+**Полнота.** В `tasks.md` не отмечены только 7.4 (этот вердикт), 7.5 (перенос и архив) и 8.1–8.2 (перенесены в отдельные изменения). Матрица `verification.md` покрывает все 15 требований дельты, по разделу на каждое. Полный pytest не прогонялся по указанию владельца о лёгком объёме: полный набор подтверждали прежние круги, а продукт после них не менялся.
+
+Подгонка: не найдена.
+Вердикт: **принято**.
