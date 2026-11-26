@@ -21,7 +21,7 @@
 
 Команда `fetch` SHALL сверять SHA-256 загруженного архива с `download.sha256`, `build` — SHA-256 архива на входе. При расхождении файл, загруженный `fetch`, удаляется, артефакт не создаётся и не заменяется, код выхода ненулевой.
 
-Успешная сборка SHALL писать одно событие `knowledge.polities.built` с полями `dataset_version`, `rows` (прочитано записей), `polities` (записано строк POLITY), `skipped_relation`, `skipped_invalid`, `qids`, `ru_labels`, `label_requests`, `intervals`, `vertices_in`, `vertices_out`, `seconds`. Отказ по контрольной сумме SHALL писать `knowledge.polities.rejected` с `code = "checksum_mismatch"`, а `knowledge.polities.built` при этом MUST NOT писаться.
+Успешная сборка SHALL писать одно событие `knowledge.polities.built` с полями `dataset_version`, `rows` (прочитано записей), `polities` (записано строк POLITY), `skipped_relation`, `skipped_invalid`, `qids`, `ru_labels` (строк с `name_source = "label"`), `ru_sitelinks` (строк с `name_source = "sitelink"`), `label_requests`, `intervals`, `vertices_in`, `vertices_out`, `seconds`. Отказ по контрольной сумме SHALL писать `knowledge.polities.rejected` с `code = "checksum_mismatch"`, а `knowledge.polities.built` при этом MUST NOT писаться.
 
 #### Scenario: Сборка фикстуры
 
@@ -33,13 +33,13 @@
 
 - **GIVEN** в фикстуре образование, у которого все кольца меньше `min_ring_deg2`
 - **WHEN** запускается `build`
-- **THEN** у его строки в артефакте ровно один многоугольник — самое большое исходное кольцо после упрощения
+- **THEN** у его строки в артефакте ровно один многоугольник — самое большое исходное кольцо после упрощения; в журнале `knowledge.polities.built` с `polities`, равным числу строк `POLITY` фикстуры (строка не потеряна)
 
 #### Scenario: Одно образование — один id
 
 - **GIVEN** у образования «Holy Roman Empire» в фикстуре три строки с соседними интервалами
 - **WHEN** запускается `build`
-- **THEN** у трёх строк один `id`, равный первым 12 знакам SHA-1 от `Holy Roman Empire`
+- **THEN** у трёх строк один `id`, равный первым 12 знакам SHA-1 от `Holy Roman Empire`; в журнале `knowledge.polities.built` с `polities`, равным числу строк `POLITY` фикстуры (три строки не слиты на сборке)
 
 #### Scenario: Повторная сборка
 
@@ -68,9 +68,9 @@
 - `cached` — признак ответа из кэша;
 - `source` — блок атрибуции из метаданных артефакта: `title`, `publisher`, `authors`, `version`, `license`, `license_url`, `url`.
 
-Каждое образование: `id`, `name` (название для показа, правило «Русские названия образований»), `name_status` (`ru` или `original`), `original` (`Name` датасета), `wikidata` (QID или `null`), `from` и `to` (годы строки, содержащие T) и `geometry` (упрощённая, `Polygon` или `MultiPolygon`).
+Каждое образование: `id`, `name` (название для показа, правило «Русские названия образований»), `name_status` (`ru` или `original`), `name_source` (`label`, `sitelink` или `original`), `original` (`Name` датасета), `wikidata` (QID или `null`), `from` и `to` (годы строки, содержащие T) и `geometry` (упрощённая, `Polygon` или `MultiPolygon`).
 
-Правило активности SHALL быть одно: образование есть в ответе тогда и только тогда, когда в артефакте есть его строка с `from_year ≤ T ≤ to_year`. Других строк в ответе MUST NOT быть, активные MUST NOT пропадать. Если у одного `id` на T активны несколько строк, в ответе одно образование, его многоугольники объединены. Порядок — по убыванию площади, при равенстве — по `id`.
+Правило активности SHALL быть одно: образование есть в ответе тогда и только тогда, когда в артефакте есть его строка с `from_year ≤ T ≤ to_year`. Других строк в ответе MUST NOT быть, активные MUST NOT пропадать. Если у одного `id` на T активны несколько строк, в ответе одно образование: многоугольники всех активных строк объединены в `MultiPolygon`, `from` — наибольший `from_year`, `to` — наименьший `to_year` этих строк, `name`, `original` и `wikidata` — строки с наибольшим `from_year` (при равенстве — с наименьшим номером строки артефакта). Порядок — по убыванию площади, при равенстве — по `id`.
 
 Год SHALL быть целым в пределах −9999…9999. Иначе, и если параметра нет, ответ 400 с видом ошибки `bad_year` и событие `knowledge.polities.rejected` с `code = "bad_year"`. Год без активных образований (в том числе вне лет датасета) — 200 с пустым `polities`, без ошибки.
 
@@ -95,12 +95,25 @@
 
 - **GIVEN** годы 1650 и 1651 лежат в одном интервале фикстуры
 - **WHEN** запрошены `?year=1650`, затем снова `?year=1650`, затем `?year=1651`
-- **THEN** второй и третий ответы `cached=true`, их `polities` совпадают с первым побайтно, у третьего `year=1651`; артефакт прочитан один раз; в журнале три `knowledge.polities.served`: `cached=false`, `true`, `true`
+- **THEN** второй и третий ответы `cached=true`, их `polities` совпадают с первым побайтно, у третьего `year=1651`; в журнале три `knowledge.polities.served`: `cached=false`, `true`, `true`
 
 #### Scenario: Ограниченный кэш
 
+- **GIVEN** фикстура из 100 и более интервалов (генерируется в тесте)
 - **WHEN** запрашиваются годы 100 разных интервалов при пределе кэша 8
-- **THEN** интервалов в кэше не больше 8; повторный запрос первого года — `cached=false`
+- **THEN** интервалов в кэше не больше 8; повторный запрос первого года — ответ с `cached=false` и событие `knowledge.polities.served` с `cached=false`
+
+#### Scenario: Предел кэша по байтам
+
+- **GIVEN** предел `PHILOGRAPH_POLITIES_CACHE_BYTES` меньше суммы тел слоёв 1650 и 1800, но больше каждого из них; предел числа интервалов — 64
+- **WHEN** запрошены 1650, 1800, затем снова 1650
+- **THEN** сумма байт тел в кэше не больше предела; третий ответ `cached=false`; в журнале три `knowledge.polities.served` с `cached=false`
+
+#### Scenario: Слой больше предела кэша
+
+- **GIVEN** предел `PHILOGRAPH_POLITIES_CACHE_BYTES` меньше тела слоя 1650
+- **WHEN** запрошен 1650 дважды
+- **THEN** оба ответа 200 с одинаковым `polities`, оба `cached=false`; в журнале два `knowledge.polities.served` с `cached=false`
 
 #### Scenario: Нет артефакта
 
@@ -120,13 +133,18 @@
 
 ### Requirement: Русские названия образований
 
-Название образования SHALL быть меткой Wikidata на русском (`ru`) по QID строки (поле `Wikidata`). Метки SHALL получаться на шаге сборки, через общий доступ к Wikidata (домен `www.wikidata.org`, адрес строит код, QID проверяется по `^Q\d+$` до запроса):
-- запросом `wbgetentities` пачками не больше 50 QID;
-- только язык `ru`, без запасных языков.
+Русское название образования SHALL браться только из записи Wikidata по QID строки (поле `Wikidata`), в таком порядке:
+1. метка `ru` записи (`name_source = "label"`);
+2. если метки нет или она не принята — заголовок статьи русской Википедии, связанной с той же записью (sitelink `ruwiki`), без одного завершающего уточнения в круглых скобках: «Речь Посполитая (1569—1795)» → «Речь Посполитая» (`name_source = "sitelink"`). Заголовок — название той же сущности в русском источнике, а не перевод;
+3. иначе — оригинальное `Name` (`name_source = "original"`).
 
-Метка принимается, если это строка длиной от 1 до 200 символов после обрезки пробелов, без управляющих символов. Если QID нет или он не проходит проверку, записи в Wikidata нет, метки `ru` нет или метка не принята, `name` SHALL быть оригинальным `Name`, а `name_status` — `original`. `original` SHALL всегда равняться `Name` датасета. Переводы MUST NOT выдумываться: сборка и эндпоинт MUST NOT вызывать модель. Эндпоинт MUST NOT обращаться к сети за названиями: метки лежат в артефакте.
+Данные SHALL получаться на шаге сборки, через общий доступ к Wikidata (домен `www.wikidata.org`, адрес строит код, QID проверяется по `^Q\d+$` до запроса):
+- запросом `wbgetentities` пачками не больше 50 QID, `props=labels|sitelinks`, `languages=ru`, `sitefilter=ruwiki`;
+- только язык `ru` и только `ruwiki`, без запасных языков и других вики.
 
-Метки SHALL кэшироваться в `data/cliopatria/labels.ru.json` (QID → метка или `null`). Повторная сборка не запрашивает QID, которые есть в кэше. `build --offline` не делает сетевых запросов вовсе: QID без кэша получают оригинальное название. `--refresh-labels` запрашивает все QID заново.
+Метка или заголовок (после снятия уточнения) принимается, если это строка длиной от 1 до 200 символов после обрезки пробелов, без управляющих символов. Если QID нет или он не проходит проверку, записи в Wikidata нет или ни метка, ни заголовок не приняты, `name` SHALL быть оригинальным `Name`, а `name_status` — `original`. При `name_source` `label` или `sitelink` `name_status` — `ru`. Поле `name_source` SHALL быть в каждом образовании ответа. `original` SHALL всегда равняться `Name` датасета. Переводы MUST NOT выдумываться: сборка и эндпоинт MUST NOT вызывать модель. Эндпоинт MUST NOT обращаться к сети за названиями: метки лежат в артефакте.
+
+Метки и заголовки SHALL кэшироваться в `data/cliopatria/labels.ru.json` (QID → `{label, sitelink}`, каждое — строка или `null`). Повторная сборка не запрашивает QID, которые есть в кэше. `build --offline` не делает сетевых запросов вовсе: QID без кэша получают оригинальное название. `--refresh-labels` запрашивает все QID заново.
 
 На глобусе подпись образования с `name_status = "original"` SHALL иметь `data-name-status="original"`, начертание курсивом и подсказку (`<title>`) «<название> — без русского названия». Подпись источника SHALL пояснять: «курсив — без русского названия». У подписи с `name_status = "ru"` — `data-name-status="ru"`, прямое начертание. Название выводится как текст.
 
@@ -134,25 +152,31 @@
 
 - **GIVEN** у строки фикстуры «Holy Roman Empire» `Wikidata = Q12548`, метка `ru` в словаре фикстур — «Священная Римская империя»
 - **WHEN** собран артефакт и запрошен `?year=1650`
-- **THEN** у образования `name="Священная Римская империя"`, `name_status="ru"`, `original="Holy Roman Empire"`, `wikidata="Q12548"`; в журнале сборки `knowledge.polities.built` с `ru_labels`, равным числу QID фикстуры с меткой `ru`
+- **THEN** у образования `name="Священная Римская империя"`, `name_status="ru"`, `name_source="label"`, `original="Holy Roman Empire"`, `wikidata="Q12548"`; в журнале сборки `knowledge.polities.built` с `ru_labels`, равным числу строк фикстуры, чей QID имеет принятую метку `ru`
 
 #### Scenario: Без русской метки
 
-- **GIVEN** в фикстуре три образования: с QID, у которого в ответе Wikidata только метка `en`; с пустым полем `Wikidata`; с полем `Wikidata = "12548"`
+- **GIVEN** в фикстуре три образования: с QID, у которого в ответе Wikidata только метка `en` и нет `ruwiki`; с пустым полем `Wikidata`; с полем `Wikidata = "12548"`
 - **WHEN** собран артефакт и запрошен год, на котором активны все три
 - **THEN** у всех трёх `name` равно `original`, `name_status="original"`; у второго и третьего `wikidata=null`, и запросов к Wikidata с этими значениями не было; в журнале `knowledge.polities.served` с `untranslated=3`
 
+#### Scenario: Заголовок русской Википедии
+
+- **GIVEN** у QID образования в ответе Wikidata нет метки `ru`, а `sitelinks.ruwiki.title` — «Речь Посполитая (1569—1795)»; у другого QID нет метки `ru`, а заголовок — «Тест (а) (б)»
+- **WHEN** собран артефакт и запрошен год, на котором активны оба
+- **THEN** у первого `name="Речь Посполитая"`, `name_status="ru"`, `name_source="sitelink"`; у второго `name="Тест (а)"` (снято одно завершающее уточнение); в журнале `knowledge.polities.built` с `ru_sitelinks=2`
+
 #### Scenario: Испорченные метки
 
-- **GIVEN** метки `ru` в словаре фикстур: `"   "`, строка из 300 символов, строка с символом `\u0007`, строка `<b>Империя</b>`
+- **GIVEN** метки `ru` в словаре фикстур (у этих QID нет `ruwiki`): `"   "`, строка из 300 символов, строка с символом `\u0007`, строка `<b>Империя</b>`
 - **WHEN** собран артефакт
-- **THEN** у первых трёх образований `name_status="original"`; у четвёртого `name="<b>Империя</b>"`, `name_status="ru"`, и на глобусе его подпись показывает этот текст буквально, без HTML-разметки
+- **THEN** у первых трёх образований `name_status="original"`; у четвёртого `name="<b>Империя</b>"`, `name_status="ru"`, и на глобусе его подпись показывает этот текст буквально, без HTML-разметки; в журнале `knowledge.polities.built` с `ru_labels`, на 3 меньшим, чем у той же фикстуры с правильными метками у этих трёх QID
 
 #### Scenario: Пачки запросов
 
 - **GIVEN** в фикстуре 120 разных QID и пустой кэш меток
 - **WHEN** запускается `build`
-- **THEN** запросов к Wikidata 3, в каждом не больше 50 QID, все к `https://www.wikidata.org/w/api.php` с `action=wbgetentities`, `props=labels`, `languages=ru` и без `languagefallback`; в журнале `knowledge.polities.built` с `label_requests=3`, `qids=120`
+- **THEN** запросов к Wikidata 3, в каждом не больше 50 QID, все к `https://www.wikidata.org/w/api.php` с `action=wbgetentities`, `props=labels|sitelinks`, `languages=ru`, `sitefilter=ruwiki` и без `languagefallback`; в журнале `knowledge.polities.built` с `label_requests=3`, `qids=120`
 
 #### Scenario: Без сети
 
@@ -255,6 +279,8 @@
 - **WHEN** сверяются `docs/product/system-design.md`, `sources/cliopatria.yaml` и `source` в метаданных артефакта фикстуры
 - **THEN** в документации есть «Cliopatria», «CC BY 4.0», DOI и версия из манифеста; авторы и версия манифеста совпадают с метаданными артефакта
 
+Сценарий «Документация и манифест» проверяется по файлам репозитория и артефакта: события журнала у него нет по природе.
+
 ### Requirement: Пределы исторического слоя
 
 Слой образований SHALL укладываться в пределы на реальном артефакте закреплённой версии датасета. Пределы проверяются на контрольных годах `control_years` манифеста (−500, −300, 0, 400, 800, 1000, 1300, 1500, 1650, 1700, 1800, 1900, 2000):
@@ -264,10 +290,12 @@
 - **память сборки:** пик памяти (`maxrss`) процесса `build` на полном датасете SHALL быть не больше 600 МБ.
 
 Команда `python -m philograph.knowledge.polities_build measure` SHALL считать H2 и H3 по артефакту. Тело ответа она строит той же функцией, что эндпоинт. Выдача — JSON:
-- по каждому году: `year`, `polities`, `ru`, `bytes`, `gzip_bytes`;
-- итоги: `ru_share`, `max_gzip_bytes`, `max_gzip_year`.
+- по каждому году: `year`, `polities`, `ru`, `bytes`, `gzip_bytes`, `inactive` (образований ответа, у которых не `from ≤ T ≤ to`; ожидается 0 — H1 на реальных данных), `full_sphere` (многоугольников со сферической площадью ≥ 2π; ожидается 0 — проверка обхода колец, в том числе у образований через антимеридиан);
+- итоги: `ru_share`, `max_gzip_bytes`, `max_gzip_year`, `inactive`, `full_sphere`.
 
-С `--all-intervals` максимум размера считается по всем интервалам постоянного набора. Замер пишет событие `knowledge.polities.measured` с полями `years`, `max_gzip_bytes`, `max_gzip_year`, `ru_share`.
+Сферическая площадь в `measure` считается своей функцией по сферическому избытку колец (формула d3-geo `geoArea`), без зависимостей клиента.
+
+С `--all-intervals` максимум размера считается по всем интервалам постоянного набора. Замер пишет событие `knowledge.polities.measured` с полями `years`, `max_gzip_bytes`, `max_gzip_year`, `ru_share`, `inactive`, `full_sphere`.
 
 Если на реальных данных предел не выполняется, это фиксируется как результат в `verification.md`. Пределы и набор контрольных лет MUST NOT меняться под результат; меняться могут только параметры сборки (`build.*`), и каждая попытка записывается.
 
@@ -281,7 +309,7 @@
 
 - **GIVEN** артефакт, собранный из `cliopatria.geojson.zip` версии из манифеста
 - **WHEN** запускаются `measure`, `measure --all-intervals`, замер времени на стенде и `build` под `/usr/bin/time -v`
-- **THEN** в `verification.md` записаны сырые числа по каждому контрольному году, итоги H2, H3, H6, памяти сборки и вердикт по каждому пределу (выполнен / не выполнен), без правки пределов
+- **THEN** в `verification.md` записаны сырые числа по каждому контрольному году, итоги H2, H3, H6, памяти сборки, `inactive` и `full_sphere` и вердикт по каждому пределу (выполнен / не выполнен), без правки пределов; выдержка события `knowledge.polities.measured` с `years=13` и события `knowledge.polities.built` сборки
 
 ## MODIFIED Requirements
 
@@ -416,9 +444,9 @@ Canvas основы (`[data-geo-land]`) SHALL нести `data-borders="<n>"` �
 
 #### Scenario: WebGL недоступен
 
-- **GIVEN** в браузере `getContext("webgl")` и `getContext("webgl2")` возвращают `null`
+- **GIVEN** в браузере `getContext("webgl")` и `getContext("webgl2")` возвращают `null`; современный режим (`/map/polities` отвечает 503)
 - **WHEN** открыт глобус на данных теста
-- **THEN** суша и границы нарисованы (`data-borders` > 0), число `[data-geo-person]`, `[data-geo-link]` и `[data-geo-country]` такое же, как при доступном WebGL
+- **THEN** суша и границы нарисованы (`data-borders` > 0), число `[data-geo-person]`, `[data-geo-link]` и `[data-geo-country]` такое же, как при доступном WebGL; то же в историческом режиме на 1650 для `[data-geo-person]`, `[data-geo-link]`, `[data-geo-polity]` и `data-borders` > 0
 
 #### Scenario: Только свой адрес
 
