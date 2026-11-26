@@ -1,40 +1,67 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { useT } from "../../i18n";
-import { mapFonts, type Measure } from "../layout";
+import { monogram } from "../../ui";
+import type { Measure } from "../layout";
+import { COUNTRY_FILL_FONT, COUNTRY_FONT, NAME_FONT } from "./fonts";
 import type { GeoLayer } from "./api";
-import { LAND } from "./land";
+import { arcBetween } from "./arcs";
+import { countryName, countryOf } from "./countries";
 import {
-  arcPath,
+  layoutCountries,
+  layoutMarkers,
+  markerOf,
+  MAX_PORTRAITS,
+  MEDAL,
+  EVENT_MARK,
+  frameLayout,
+  COUNTRY_MIN_LABELS,
+  type CountryLabel,
+  type Layout,
+  type Frame as LFrame,
+  type RestLayout,
+  type LPlace,
+  type Metrics,
+  type PersonSlot,
+  type Rect,
+  round2,
+} from "./layout";
+import {
   canvasPath,
   centerAttr,
   centerOn,
   degreesPerPixel,
   fmt,
   GRATICULE,
+  homeView,
   initialView,
   interpolateCenter,
   isNear,
+  MAX_ZOOM,
   projector,
   rotateBy,
   STEP,
   STEP_SHIFT,
   zoomBy,
+  ZOOM_STEP,
   type Frame,
-  type Projector,
   type View,
 } from "./projection";
 import type { GlobeRoles } from "./selection";
-import { markRadius, MAX_LABELS, opacity, type Scene, type ScenePlace } from "./timeline";
+import { opacity, type Scene, type ScenePlace } from "./timeline";
+import { BORDERS, COUNTRIES, COUNTRY_COUNT, LAND } from "./world";
 
-// Вид «Глобус» карты раздела (openspec/changes/archive/2026-11-25-add-geo-timeline): ортографическая проекция
-// d3-geo. Основа — тень, море, сетка 15°, суша Natural Earth — на canvas 2D (вариант Б по
-// замеру 5.6); поверх — SVG с объёмом, дугами влияний, отметками мест, подписями и латунным
-// ободом. Ленивый фрагмент: грузится только при открытии вида (MapPage).
+// Вид «Глобус» карты раздела (openspec/changes/rework-globe-political-map): ортографическая
+// проекция d3-geo. Основа — тень, море, сетка 15°, суша, границы государств и береговая
+// линия Natural Earth 1:110m — на canvas 2D; поверх — SVG: объём, путь жизни, дуги влияний
+// между маркерами, выноски к местам, медальоны персон, значки «+N» и событий, подписи
+// персон и стран, латунный обод. Ленивый фрагмент: грузится только при открытии вида.
 //
 // Движение — только по действию читателя: перетаскивание (короткая инерция), колесо,
 // клавиши, поворот к месту из списка (не дольше FOCUS_MS). При уменьшенном движении повороты
 // и приближение — сразу. Кадры — requestAnimationFrame, время — performance.now (без Date).
-// Отметки дальнего полушария остаются в DOM с data-hidden="true" и не рисуются.
+// Во время движения медальоны держат сдвиги последней раскладки (shiftLayout), подписи
+// скрыты; в покое раскладка заново (layoutMarkers, layoutCountries). Маркеры дальнего
+// полушария и вышедшие за круг или кадр остаются в DOM с data-hidden="true" и не рисуются.
 // SVG-фильтров нет: объём — статический радиальный градиент и обод.
 
 const FOCUS_MS = 600;
@@ -42,9 +69,10 @@ const INERTIA_MS = 700;
 const DRAG_THRESHOLD = 4; // px: меньше — щелчок
 const WHEEL_STEP = 100; // px колеса на шаг приближения
 const RIM = 16; // поле под обод и деления вокруг круга глобуса
-const LABEL_FONT = mapFonts(false).workTitle;
-const LABEL_GAP = 4;
+const COUNTRY_PRECISION = 2; // px: площадь и центр видимой части стран (расхождение с точной < 0,01 %)
 const DRAG_PRECISION = 2.5; // px: точность передискретизации путей во время перетаскивания
+
+export type GlobeInfo = { name: string; full: string; portrait?: string | null };
 
 type Props = {
   width: number;
@@ -60,7 +88,8 @@ type Props = {
   reduced: boolean;
   focus: { lat: number; lon: number; nonce: number } | null;
   nearest: number | null;
-  onSelectPlace: (id: string | null) => void;
+  info: (id: string) => GlobeInfo | null; // имя, полное имя и портрет персоны, название события
+  onSelect: (id: string | null) => void; // персона, событие или место; null — снять выбор
   onYearStep: (delta: number) => void;
   onTogglePlay: () => void;
   onRetry: () => void;
@@ -68,76 +97,81 @@ type Props = {
   onNearest: () => void;
 };
 
-type Label = { id: string; x: number; y: number; w: number; text: string; anchor: "start" | "end" | "middle" };
-type Rect = { x0: number; y0: number; x1: number; y1: number };
-const overlaps = (a: Rect, b: Rect) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
-
-// Подписи: не больше MAX_LABELS, у кого больше людей; жадно, без наложений друг на друга
-// и на отметки, внутри кадра. Ширина — тем же измерителем, что у карты (measure.ts).
-// Вертикальные метрики шрифта подписи — те же, что у прямоугольника текста в браузере
+// Вертикальные метрики шрифта — те же, что у прямоугольника текста в браузере
 // (fontBoundingBox*); без canvas — с запасом от кегля.
 let metricsCanvas: CanvasRenderingContext2D | null | undefined;
-function labelMetrics(): { ascent: number; descent: number } {
+const metricsCache = new Map<string, Metrics>(); // ключ — начертание и версия шрифтов
+function fontMetrics(font: string, version: number): Metrics {
+  const key = `${version}\u0000${font}`;
+  const hit = metricsCache.get(key);
+  if (hit) return hit;
   if (metricsCanvas === undefined) metricsCanvas = typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : null;
   const c = metricsCanvas;
+  let m: Metrics = { ascent: 15, descent: 5 };
   if (c) {
-    c.font = LABEL_FONT;
-    const m = c.measureText("Ag");
-    if (m.fontBoundingBoxAscent) return { ascent: m.fontBoundingBoxAscent, descent: m.fontBoundingBoxDescent };
+    c.font = font;
+    const t = c.measureText("Ag");
+    if (t.fontBoundingBoxAscent) m = { ascent: t.fontBoundingBoxAscent, descent: t.fontBoundingBoxDescent };
   }
-  return { ascent: 15, descent: 5 };
-}
-const LABEL_PAD = 1.5; // px вокруг прямоугольника подписи
-
-function layoutLabels(points: { p: ScenePlace; x: number; y: number; r: number }[], measure: Measure, w: number, h: number): Label[] {
-  const { ascent, descent } = labelMetrics();
-  const placed: Rect[] = [];
-  const marks: Rect[] = points.map(({ x, y, r }) => ({ x0: x - r, y0: y - r, x1: x + r, y1: y + r }));
-  const out: Label[] = [];
-  const order = [...points].sort((a, b) => b.p.people.length - a.p.people.length || (a.p.id < b.p.id ? -1 : 1));
-  for (const { p, x, y, r } of order) {
-    if (out.length >= MAX_LABELS) break;
-    const tw = measure(p.label, LABEL_FONT);
-    const options: Label[] = [
-      { id: p.id, x: x + r + LABEL_GAP, y: y + 4.5, w: tw, text: p.label, anchor: "start" },
-      { id: p.id, x: x - r - LABEL_GAP, y: y + 4.5, w: tw, text: p.label, anchor: "end" },
-      { id: p.id, x, y: y - r - LABEL_GAP - descent, w: tw, text: p.label, anchor: "middle" },
-      { id: p.id, x, y: y + r + LABEL_GAP + ascent, w: tw, text: p.label, anchor: "middle" },
-    ];
-    for (const o of options) {
-      const x0 = o.anchor === "start" ? o.x : o.anchor === "end" ? o.x - tw : o.x - tw / 2;
-      const rect = { x0: x0 - LABEL_PAD, y0: o.y - ascent - LABEL_PAD, x1: x0 + tw + LABEL_PAD, y1: o.y + descent + LABEL_PAD };
-      if (rect.x0 < 2 || rect.x1 > w - 2 || rect.y0 < 2 || rect.y1 > h - 2) continue;
-      if (placed.some((q) => overlaps(q, rect))) continue;
-      if (marks.some((m, i) => points[i].p.id !== p.id && overlaps(m, rect))) continue;
-      placed.push(rect);
-      out.push(o);
-      break;
-    }
-  }
-  return out;
+  metricsCache.set(key, m);
+  return m;
 }
 
-// Стрелка к ученику: треугольник у конца видимой части дуги.
-function arrowAt(pr: Projector, from: { lat: number; lon: number }, to: { lat: number; lon: number }): string | null {
-  const end = pr.projection([to.lon, to.lat]);
-  if (!end || !isNear({ lon: -pr.projection.rotate()[0], lat: -pr.projection.rotate()[1], zoom: 1 }, to)) return null;
-  // Точка чуть раньше конца по большому кругу — направление стрелки.
-  const k = 0.9;
-  const lon = from.lon + (to.lon - from.lon) * k;
-  const lat = from.lat + (to.lat - from.lat) * k;
-  const before = pr.projection([lon, lat]);
-  if (!before) return null;
-  const dx = end[0] - before[0];
-  const dy = end[1] - before[1];
-  const len = Math.hypot(dx, dy);
-  if (len < 0.5) return null;
-  const ux = dx / len;
-  const uy = dy / len;
-  const tipX = end[0] - ux * 5; // не залезать на отметку
-  const tipY = end[1] - uy * 5;
-  const s = 5;
-  return `M${(tipX).toFixed(1)},${(tipY).toFixed(1)}L${(tipX - ux * s - uy * s * 0.55).toFixed(1)},${(tipY - uy * s + ux * s * 0.55).toFixed(1)}L${(tipX - ux * s + uy * s * 0.55).toFixed(1)},${(tipY - uy * s - ux * s * 0.55).toFixed(1)}Z`;
+const COUNTRY_FONTS = [COUNTRY_FONT, COUNTRY_FILL_FONT];
+const COUNTRY_INPUT = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
+
+// --- раскладка покоя: чистые шаги (кадр, исходный вид) ---
+type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[] };
+
+function anchorsAt(projection: (p: [number, number]) => [number, number] | null, view: View, places: ScenePlace[], width: number, height: number): LPlace[] {
+  return places.map((p) => {
+    const xy = projection([p.lon, p.lat]);
+    const x = xy ? xy[0] : 0;
+    const y = xy ? xy[1] : 0;
+    return { id: p.id, x, y, visible: !!xy && isNear(view, p) && x >= 0 && y >= 0 && x <= width && y <= height };
+  });
+}
+
+function markersAt(anchors: LPlace[], lf: LFrame, r: RestInput): Layout {
+  return layoutMarkers({
+    places: anchors,
+    persons: (r.scene?.persons ?? []).map((p) => ({ id: p.id, place: p.place, name: r.nameOf(p.id) })),
+    events: (r.scene?.events ?? []).map((e) => ({ id: e.id, place: e.place })),
+    frame: lf,
+    measure: (text) => r.measure(text, NAME_FONT),
+    metrics: fontMetrics(NAME_FONT, r.fv),
+    obstacles: r.obstacles,
+  });
+}
+
+function countriesAt(view: View, lf: LFrame, grid: Layout["grid"], r: RestInput): CountryLabel[] {
+  const cp = projector(view, r.frame, COUNTRY_PRECISION);
+  cp.projection.clipExtent([
+    [0, 0],
+    [r.width, r.height],
+  ]);
+  return layoutCountries(
+    COUNTRY_INPUT,
+    cp.path,
+    cp.projection,
+    lf,
+    grid,
+    COUNTRY_FONTS.map((font) => ({ font, measure: (text: string) => r.measure(text, font), metrics: fontMetrics(font, r.fv) })),
+  );
+}
+
+// Исходный вид: homeView (все точки привязки в кадре), затем, пока подписей стран меньше
+// COUNTRY_MIN_LABELS, — на шаг ряда дальше, до приближения 1 (правило «Исходное приближение»).
+function homeFor(places: ScenePlace[], r: RestInput): View {
+  let v = homeView(places, r.frame, r.width, r.height, MEDAL);
+  while (v.zoom > 1 + 1e-9) {
+    const p = projector(v, r.frame);
+    const lf: LFrame = { w: r.width, h: r.height, cx: r.frame.cx, cy: r.frame.cy, R: p.scale };
+    const lay = markersAt(anchorsAt(p.projection, v, places, r.width, r.height), lf, r);
+    if (countriesAt(v, lf, lay.grid, r).length >= COUNTRY_MIN_LABELS) break;
+    v = { ...v, zoom: Math.max(1, Math.round((v.zoom / ZOOM_STEP) * 1e6) / 1e6) };
+  }
+  return v;
 }
 
 export default function GlobeView(props: Props) {
@@ -149,12 +183,34 @@ export default function GlobeView(props: Props) {
     return { cx: width / 2, cy: height / 2, radius };
   }, [width, height]);
 
-  // Исходный вид — из видимых мест первого показа слоя; «0» возвращает к нему.
+  const info = props.info;
+  const nameOf = useCallback((id: string) => info(id)?.name || null, [info]); // без имени — без подписи, не id
+  // Наложенные на вид элементы ([data-geo-overlay]: подпись источника, «Клавиши» и подсказка
+  // к ним, сообщения состояний) — препятствия раскладки. Прямоугольники меряются после
+  // отрисовки (шрифты, размер окна, раскрытая подсказка); null — ещё не мерили.
+  const stage = useRef<HTMLDivElement>(null);
+  const [overlays, setOverlays] = useState<Rect[] | null>(null);
+  useLayoutEffect(() => {
+    const st = stage.current;
+    if (!st) return;
+    const o = st.getBoundingClientRect();
+    const next: Rect[] = [];
+    for (const el of st.querySelectorAll<HTMLElement>("[data-geo-overlay]")) {
+      const b = el.getBoundingClientRect();
+      if (b.width > 0 && b.height > 0) next.push({ kind: "rect", x0: round2(b.left - o.left), y0: round2(b.top - o.top), x1: round2(b.right - o.left), y1: round2(b.bottom - o.top) });
+    }
+    setOverlays((old) => (old && JSON.stringify(old) === JSON.stringify(next) ? old : next));
+  });
+  const obstacles = useMemo(() => overlays ?? [], [overlays]);
+  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
+
+  // Исходный вид — из мест первого показа слоя (после загрузки шрифтов: от них зависят
+  // подписи стран, а значит и приближение); «0» возвращает к нему для года T и размера сейчас.
   const home = useRef<View | null>(null);
   const homeLayer = useRef<GeoLayer | null>(null);
-  if (scene && layer && homeLayer.current !== layer) {
+  if (scene && layer && props.fontsVersion > 0 && overlays && homeLayer.current !== layer) {
     homeLayer.current = layer;
-    home.current = initialView(scene.places);
+    home.current = homeFor(scene.places, restIn);
   }
   const [view, setView] = useState<View>(() => home.current ?? initialView([]));
   const viewRef = useRef(view);
@@ -168,7 +224,7 @@ export default function GlobeView(props: Props) {
   });
 
   // Анимации (поворот к месту, инерция) — одна за раз; любое действие читателя её снимает.
-  // Пока глобус тянут (и по инерции), путь грубее, подписи не раскладываются: кадр легче.
+  // Пока глобус тянут (и по инерции), путь грубее, раскладка не пересчитывается: кадр легче.
   const [moving, setMoving] = useState(false);
   const anim = useRef(0);
   const cancel = useCallback(() => {
@@ -196,11 +252,13 @@ export default function GlobeView(props: Props) {
     cancel();
     const lerp = interpolateCenter(viewRef.current, target);
     const t0 = performance.now();
+    setMoving(true); // кадры поворота — сдвиги раскладки, полная — в покое
     const tick = () => {
       const k = Math.min(1, (performance.now() - t0) / FOCUS_MS);
       const e = k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
       setView(k >= 1 ? target : lerp(e));
       anim.current = k >= 1 ? 0 : requestAnimationFrame(tick);
+      if (!anim.current) setMoving(false);
     };
     anim.current = requestAnimationFrame(tick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -223,6 +281,9 @@ export default function GlobeView(props: Props) {
     return () => el.removeEventListener("wheel", onWheel);
   }, [apply]);
 
+  // Подсказка: что под указателем; при перетаскивании скрыта.
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
+
   // Перетаскивание: поворот по пикселям, кадр — не чаще раза за requestAnimationFrame.
   const drag = useRef<{ id: number; x: number; y: number; start: View; moved: boolean; samples: [number, number, number][] } | null>(null);
   const pending = useRef<View | null>(null);
@@ -241,6 +302,7 @@ export default function GlobeView(props: Props) {
     if (!d.moved) {
       d.moved = true;
       setMoving(true);
+      setTip(null);
       svg.current?.setPointerCapture?.(e.pointerId);
     }
     d.samples.push([e.clientX, e.clientY, performance.now()]);
@@ -258,12 +320,7 @@ export default function GlobeView(props: Props) {
     const d = drag.current;
     drag.current = null;
     if (!d || d.id !== e.pointerId) return;
-    if (!d.moved) {
-      // Щелчок: по отметке — выбор места, по полю — снять выбор.
-      const mark = (e.target as Element).closest?.("[data-geo-place]");
-      props.onSelectPlace(mark ? mark.getAttribute("data-geo-place") : null);
-      return;
-    }
+    if (!d.moved) return click(e.target as Element);
     if (pending.current) {
       setView(pending.current);
       viewRef.current = pending.current;
@@ -308,7 +365,7 @@ export default function GlobeView(props: Props) {
     else if (e.key === "ArrowDown") next = rotateBy(v, 0, -step);
     else if (e.key === "+" || e.key === "=") next = zoomBy(v, 1);
     else if (e.key === "-" || e.key === "_" || e.key === "−") next = zoomBy(v, -1);
-    else if (e.key === "0") next = home.current ?? initialView([]);
+    else if (e.key === "0") next = scene ? homeFor(scene.places, restIn) : initialView([]); // по местам года T и размеру сейчас
     else if (e.key === "PageUp") props.onYearStep(10);
     else if (e.key === "PageDown") props.onYearStep(-10);
     else if (e.key === "]") props.onYearStep(1);
@@ -320,10 +377,76 @@ export default function GlobeView(props: Props) {
   };
 
   const [keysOpen, setKeysOpen] = useState(false);
+  const [failed, setFailed] = useState<Set<string>>(() => new Set());
 
-  // --- сцена ---
-  // Основа — тень, море, сетка, суша — на canvas (вариант Б design: замер 5.6). Цвета —
-  // токены, прочитанные из CSS (getComputedStyle), литералов нет.
+  // --- раскладка ---
+  const R = pr.scale;
+  const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R };
+  const places = useMemo(() => scene?.places ?? [], [scene]);
+  const rest = useRef<RestLayout | null>(null);
+  const { anchors, lay, countries } = useMemo(() => {
+    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
+    const anchors = anchorsAt(pr.projection, view, places, width, height);
+    const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
+    const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r), obstacles);
+    rest.current = got.rest;
+    const lay = got.layout;
+    if (moving) return { anchors, lay, countries: [] as CountryLabel[] };
+    return { anchors, lay, countries: countriesAt(view, lf, lay.grid, r) };
+    // fontsVersion: шрифты загрузились — ширины подписей меряются заново.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion, obstacles]);
+  const anchorOf = new Map(anchors.map((a) => [a.id, a]));
+  const slotOf = new Map<string, PersonSlot>(lay.persons.map((s) => [s.id, s]));
+  const personOf = new Map((scene?.persons ?? []).map((p) => [p.id, p]));
+  const eventOf = new Map((scene?.events ?? []).map((e) => [e.id, e]));
+  const placeOf = new Map(places.map((p) => [p.id, p]));
+
+  // Портреты — только у нарисованных медальонов, не больше MAX_PORTRAITS (по порядку раскладки).
+  const portraitFor = new Map<string, string>();
+  for (const s of lay.persons) {
+    if (portraitFor.size >= MAX_PORTRAITS) break;
+    const url = !s.hidden && !s.packed ? props.info(s.id)?.portrait : null;
+    if (url && !failed.has(s.id)) portraitFor.set(s.id, url);
+  }
+
+  const where = (placeId: string) => {
+    const p = placeOf.get(placeId);
+    if (!p) return "";
+    return t.geo.placeWithCountry(p.label, countryOf(p)?.name ?? null);
+  };
+  const showTip = (target: Element, x: number, y: number) => {
+    const el = target.closest?.("[data-geo-person],[data-geo-name],[data-geo-event]");
+    if (!el || drag.current?.moved) return setTip(null);
+    const id = el.getAttribute("data-geo-person") ?? el.getAttribute("data-geo-name") ?? el.getAttribute("data-geo-event")!;
+    const place = personOf.get(id)?.place ?? eventOf.get(id)?.place;
+    if (!place) return setTip(null);
+    const name = props.info(id)?.name;
+    if (!name) return setTip(null);
+    const text = `${name} — ${where(place)}`;
+    setTip((old) => (old && old.text === text ? old : { text, x, y }));
+  };
+
+  // Щелчок: медальон, подпись или значок события — выбор сущности; значок «+N» одного места —
+  // выбор места, нескольких — приближение вдвое к их середине (на пределе — первое место);
+  // поле — снять выбор.
+  function click(target: Element) {
+    const el = target.closest?.("[data-geo-person],[data-geo-name],[data-geo-event],[data-geo-more]");
+    if (!el) return props.onSelect(null);
+    const more = el.getAttribute("data-places");
+    if (el.hasAttribute("data-geo-more") && more != null) {
+      const ids = more.split(" ").filter(Boolean);
+      if (ids.length <= 1 || viewRef.current.zoom >= MAX_ZOOM - 1e-9) return props.onSelect(ids[0] ?? null);
+      const pts = ids.map((id) => placeOf.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
+      const mid = initialView(pts);
+      return apply({ lon: mid.lon, lat: mid.lat, zoom: Math.min(MAX_ZOOM, viewRef.current.zoom * 2) });
+    }
+    props.onSelect(el.getAttribute("data-geo-person") ?? el.getAttribute("data-geo-name") ?? el.getAttribute("data-geo-event"));
+  }
+
+  // --- основа на canvas ---
+  // Тень, море, сетка, суша, границы, береговая линия. Цвета — токены, прочитанные из CSS
+  // (getComputedStyle), литералов нет.
   const base = useRef<HTMLCanvasElement>(null);
   useLayoutEffect(() => {
     const c = base.current;
@@ -371,22 +494,26 @@ export default function GlobeView(props: Props) {
     path(LAND);
     ctx.fillStyle = color("--globe-land");
     ctx.fill();
-    ctx.strokeStyle = color("--globe-coast");
-    ctx.lineWidth = 0.75;
+    ctx.beginPath();
+    path(BORDERS);
+    ctx.strokeStyle = color("--globe-border");
+    ctx.lineWidth = 0.6;
     ctx.lineJoin = "round";
     ctx.stroke();
+    ctx.beginPath();
+    path(LAND);
+    ctx.strokeStyle = color("--globe-coast");
+    ctx.lineWidth = 0.75;
+    ctx.stroke();
+    // Линии границ на видимом полушарии: хотя бы одна вершина ближе 90° к центру.
+    const v = { lon: -pr.projection.rotate()[0], lat: -pr.projection.rotate()[1], zoom: 1 };
+    const seen = BORDERS.coordinates.filter((line) => line.some(([lon, lat]) => isNear(v, { lon, lat }))).length;
+    c.dataset.borders = String(seen);
+    c.dataset.countries = String(COUNTRY_COUNT);
     c.dataset.drawn = "true";
   }, [pr, frame, width, height]);
+
   const sphere = pr.path({ type: "Sphere" }) ?? "";
-  const R = pr.scale;
-  const places = scene?.places ?? [];
-  const points = places.map((p) => {
-    const xy = pr.projection([p.lon, p.lat]);
-    const near = isNear(view, p);
-    return { p, x: xy ? xy[0] : 0, y: xy ? xy[1] : 0, r: markRadius(p.people.length), near };
-  });
-  const shown = points.filter((q) => q.near && q.x >= -20 && q.x <= width + 20 && q.y >= -20 && q.y <= height + 20);
-  const labels = moving ? [] : layoutLabels(shown, measure, width, height);
   const links = scene?.links ?? [];
   const trail =
     roles.trail.length > 1
@@ -394,8 +521,20 @@ export default function GlobeView(props: Props) {
       : null;
   const dim = roles.active;
   const busy = status === "loading";
+  const ready = !busy && (status !== "ok" || (props.fontsVersion > 0 && overlays !== null)); // слой разложен по шрифтам и препятствиям
   const empty = status === "ok" && (layer?.places.length ?? 0) === 0;
   const nobody = status === "ok" && !empty && places.length === 0;
+
+  // Выноски: от сдвинутого больше чем на MEDAL/2 маркера к точке привязки его места.
+  const leaders: { key: string; x1: number; y1: number; x2: number; y2: number; place: string }[] = [];
+  const lead = (key: string, x: number, y: number, placeId: string) => {
+    const a = anchorOf.get(placeId);
+    if (a && a.visible && Math.hypot(x - a.x, y - a.y) > MEDAL / 2) leaders.push({ key, x1: x, y1: y, x2: a.x, y2: a.y, place: placeId });
+  };
+  lay.persons.forEach((s) => !s.hidden && !s.packed && lead(`p:${s.id}`, s.x, s.y, s.place));
+  lay.badges.forEach((b, i) => !b.hidden && b.places.forEach((pl) => lead(`b:${i}:${pl}`, b.x, b.y, pl)));
+  lay.events.forEach((e) => !e.hidden && lead(`e:${e.id}`, e.x, e.y, e.place));
+  const anchorsShown = [...new Set(leaders.map((l) => l.place))];
 
   // Деления латунного обода — через 10°, крупные через 30° (неподвижны, как меридианное кольцо).
   const ticks = useMemo(() => {
@@ -413,8 +552,11 @@ export default function GlobeView(props: Props) {
     return out.join("");
   }, [frame, view.zoom]);
 
+  const cls = (base: string, role: string | undefined, extra: string[] = []) =>
+    [base, role ? `is-on map-role-${role}` : "", ...extra].filter(Boolean).join(" ");
+
   return (
-    <div className="geo-stage" style={{ width, height }}>
+    <div ref={stage} className="geo-stage" style={{ width, height }}>
       <canvas ref={base} className="geo-land" data-geo-land="" style={{ width, height }} aria-hidden="true" />
       <svg
         ref={svg}
@@ -426,14 +568,18 @@ export default function GlobeView(props: Props) {
         aria-roledescription={t.geo.roledescription}
         aria-label={props.summary}
         aria-describedby="geo-keys-hint"
-        aria-busy={busy}
+        aria-busy={!ready}
         tabIndex={0}
         data-year={props.year}
         data-center={centerAttr(view)}
         data-zoom={fmt(view.zoom)}
         onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
+        onPointerMove={(e) => {
+          onPointerMove(e);
+          if (!drag.current?.moved) showTip(e.target as Element, e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+        }}
         onPointerUp={onPointerUp}
+        onPointerLeave={() => setTip(null)}
         onPointerCancel={() => (drag.current = null)}
         onKeyDown={onKeyDown}
       >
@@ -445,97 +591,200 @@ export default function GlobeView(props: Props) {
           </radialGradient>
         </defs>
         <path className="geo-shade" d={sphere} aria-hidden="true" />
+        <g className="geo-countries" aria-hidden="true">
+          {countries.map((c) => (
+            <text key={c.id} className={dim ? "geo-country is-dim" : "geo-country"} data-geo-country={c.id} data-area={c.area} data-span={c.span} x={c.x} y={c.y} textAnchor="middle" data-fill={c.fill ? "true" : undefined} style={{ font: COUNTRY_FONTS[c.font] }}>
+              {c.text}
+            </text>
+          ))}
+        </g>
         <g className="geo-links" aria-hidden="true">
           {trail && <path className="geo-trail map-role-self" d={trail} />}
           {links.map((l) => {
-            const d = arcPath(pr, l.from, l.to);
+            const a = markerOf(lay, slotOf, l.from);
+            const b = markerOf(lay, slotOf, l.to);
+            const same = a && b && Math.hypot(a.x - b.x, a.y - b.y) < 0.5;
+            const arc = a && b && !same ? arcBetween(a, b, lf) : null;
             const role = roles.links.get(l.id);
-            const arrow = d ? arrowAt(pr, l.from, l.to) : null;
             return (
               <g
                 key={l.id}
-                className={["geo-link", role ? `is-on map-role-${role}` : "", l.link.generated ? "is-generated" : ""].join(" ").trim()}
+                className={cls("geo-link", role, l.link.generated ? ["is-generated"] : [])}
                 data-geo-link={l.id}
+                data-from={l.from}
+                data-to={l.to}
                 data-status={l.link.status}
                 data-generated={l.link.generated ? "true" : "false"}
                 data-age={l.age}
+                data-hidden={arc ? "false" : "true"}
                 data-role={role}
                 data-dim={dim && !role ? "true" : undefined}
                 style={{ opacity: opacity(l.age) }}
               >
-                {d && <path className="geo-link__arc" d={d} />}
-                {arrow && <path className="geo-link__arrow" d={arrow} />}
+                {arc && <path className="geo-link__arc" d={arc.d} />}
+                {arc && <path className="geo-link__arrow" d={arc.arrow} />}
               </g>
             );
           })}
         </g>
-        <g className="geo-places" aria-hidden="true">
-          {points.map(({ p, x, y, r, near }) => {
-            const role = roles.places.get(p.id);
-            const n = p.people.length;
+        <g className="geo-leaders" aria-hidden="true">
+          {leaders.map((l) => (
+            <line key={l.key} className="geo-leader" x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />
+          ))}
+          {anchorsShown.map((id) => {
+            const a = anchorOf.get(id)!;
+            return <circle key={id} className="geo-anchor" data-geo-anchor={id} cx={a.x} cy={a.y} r={1.75} />;
+          })}
+        </g>
+        <g className="geo-events" aria-hidden="true">
+          {lay.events.map((e) => {
+            const se = eventOf.get(e.id);
+            const role = roles.events.get(e.id);
+            const r = EVENT_MARK / 2;
             return (
               <g
-                key={p.id}
-                className={["geo-place", role ? `is-on map-role-${role}` : "", p.unverified ? "is-unverified" : "", n === 0 ? "is-event" : ""]
-                  .join(" ")
-                  .trim()}
-                data-geo-place={p.id}
-                data-people={n}
-                data-age={p.age}
-                data-unverified={p.unverified ? "true" : "false"}
-                data-hidden={near ? "false" : "true"}
+                key={e.id}
+                className={cls("geo-event", role, se?.generated ? ["is-unverified"] : [])}
+                data-geo-event={e.id}
+                data-place={e.place}
+                data-age={se?.age ?? 0}
+                data-unverified={se?.generated ? "true" : "false"}
+                data-hidden={e.hidden ? "true" : "false"}
+                data-x={e.x}
+                data-y={e.y}
                 data-role={role}
                 data-dim={dim && !role ? "true" : undefined}
-                transform={`translate(${x.toFixed(1)},${y.toFixed(1)})`}
-                style={{ opacity: opacity(p.age) }}
+                transform={e.hidden ? undefined : `translate(${e.x},${e.y})`}
+                style={{ opacity: opacity(se?.age ?? 0) }}
               >
-                <circle className="geo-place__hit" r={Math.max(r + 4, 9)} />
-                <circle className="geo-place__dot" r={r} />
-                {n >= 2 && (
-                  <text className="geo-place__count" y={3.5}>
-                    {n}
-                  </text>
+                {!e.hidden && <path className="geo-event__mark" d={`M0,${-r}L${r},0L0,${r}L${-r},0Z`} />}
+              </g>
+            );
+          })}
+        </g>
+        <g className="geo-persons" aria-hidden="true">
+          {lay.persons.map((s, i) => {
+            const sp = personOf.get(s.id);
+            const role = roles.persons.get(s.id);
+            const drawn = !s.hidden && !s.packed;
+            const info = props.info(s.id);
+            const url = portraitFor.get(s.id);
+            const r = MEDAL / 2;
+            return (
+              <g
+                key={s.id}
+                className={cls("geo-medal", role, sp?.generated ? ["is-unverified"] : [])}
+                data-geo-person={s.id}
+                data-place={s.place}
+                data-age={sp?.age ?? 0}
+                data-unverified={sp?.generated ? "true" : "false"}
+                data-hidden={s.hidden ? "true" : "false"}
+                data-packed={s.packed ? "true" : "false"}
+                data-x={s.x}
+                data-y={s.y}
+                data-role={role}
+                data-dim={dim && !role ? "true" : undefined}
+                transform={drawn ? `translate(${s.x},${s.y})` : undefined}
+                style={{ opacity: opacity(sp?.age ?? 0) }}
+              >
+                {drawn && (
+                  <>
+                    <circle className="geo-medal__disc" r={r} />
+                    {url ? (
+                      <>
+                        <clipPath id={`geo-clip-${i}`}>
+                          <circle r={r - 1.5} />
+                        </clipPath>
+                        <image
+                          href={url}
+                          x={-r}
+                          y={-r}
+                          width={r * 2}
+                          height={r * 2}
+                          preserveAspectRatio="xMidYMid slice"
+                          clipPath={`url(#geo-clip-${i})`}
+                          onError={() => setFailed((f) => new Set(f).add(s.id))}
+                        />
+                      </>
+                    ) : (
+                      <text className="geo-medal__mono" y={3.5}>
+                        {monogram(info?.full || info?.name || "")}
+                      </text>
+                    )}
+                    <circle className="geo-medal__ring" r={r} />
+                  </>
                 )}
               </g>
             );
           })}
-        </g>
-        <g className="geo-labels" aria-hidden="true">
-          {labels.map((l) => (
-            <text
-              key={l.id}
-              className={roles.places.get(l.id) ? `geo-label is-on map-role-${roles.places.get(l.id)}` : dim ? "geo-label is-dim" : "geo-label"}
-              data-geo-label={l.id}
-              x={l.x}
-              y={l.y}
-              textAnchor={l.anchor}
-              style={{ font: LABEL_FONT }}
+          {lay.badges.map((b, i) => (
+            <g
+              key={`more-${i}`}
+              className="geo-more"
+              data-geo-more=""
+              data-places={b.places.join(" ")}
+              data-count={b.count}
+              data-hidden={b.hidden ? "true" : "false"}
+              data-x={b.x}
+              data-y={b.y}
+              transform={b.hidden ? undefined : `translate(${b.x},${b.y})`}
             >
-              {l.text}
-            </text>
+              {!b.hidden && (
+                <>
+                  <circle className="geo-more__disc" r={MEDAL / 2} />
+                  <text className="geo-more__count" y={3.5}>
+                    +{b.count}
+                  </text>
+                </>
+              )}
+            </g>
           ))}
+        </g>
+        <g className="geo-names" aria-hidden="true">
+          {lay.persons.map((s) =>
+            s.label && !s.hidden && !s.packed ? (
+              <text
+                key={s.id}
+                className={roles.persons.get(s.id) ? `geo-name is-on map-role-${roles.persons.get(s.id)}` : dim ? "geo-name is-dim" : "geo-name"}
+                data-geo-name={s.id}
+                x={s.label.x}
+                y={s.label.y}
+                textAnchor={s.label.anchor}
+                style={{ font: NAME_FONT }}
+              >
+                {nameOf(s.id)}
+              </text>
+            ) : null,
+          )}
         </g>
         <circle className="geo-rim" cx={frame.cx} cy={frame.cy} r={R + 2.5} aria-hidden="true" />
         <circle className="geo-rim__inner" cx={frame.cx} cy={frame.cy} r={R} aria-hidden="true" />
         <path className="geo-rim__ticks" d={ticks} aria-hidden="true" />
       </svg>
 
-      <p className="geo-coast">{t.geo.coast}</p>
+      {tip && (
+        <div className="geo-tip" data-geo-tip="" aria-hidden="true" style={{ left: tip.x + 14, top: tip.y + 14 }}>
+          {tip.text}
+        </div>
+      )}
+      <p className="geo-coast" data-geo-overlay="coast">
+        {t.geo.coast}
+      </p>
       <div className="geo-keys">
-        <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" aria-expanded={keysOpen} aria-controls="geo-keys-hint" onClick={() => setKeysOpen((o) => !o)}>
+        <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" aria-expanded={keysOpen} aria-controls="geo-keys-hint" data-geo-overlay="keys" onClick={() => setKeysOpen((o) => !o)}>
           {t.geo.keys}
         </button>
-        <p id="geo-keys-hint" className="geo-keys__hint" hidden={!keysOpen}>
+        <p id="geo-keys-hint" className="geo-keys__hint" data-geo-overlay="keys-hint" hidden={!keysOpen}>
           {t.geo.keysHint}
         </p>
       </div>
       {busy && (
-        <p className="geo-state geo-state--loading" role="status">
+        <p className="geo-state geo-state--loading" data-geo-overlay="state" role="status">
           {t.geo.loading}
         </p>
       )}
       {status === "error" && (
-        <div className="geo-state pg-notice pg-notice--danger pg-notice--stacked" role="alert">
+        <div className="geo-state pg-notice pg-notice--danger pg-notice--stacked" data-geo-overlay="state" role="alert">
           <div>
             <strong>{t.geo.error}</strong>
             <p>{t.geo.errorHint}</p>
@@ -546,7 +795,7 @@ export default function GlobeView(props: Props) {
         </div>
       )}
       {empty && (
-        <div className="geo-state">
+        <div className="geo-state" data-geo-overlay="state">
           <strong>{t.geo.empty}</strong>
           <p>{t.geo.emptyHint}</p>
           <button type="button" className="pg-btn pg-btn--secondary pg-btn--sm" onClick={props.onToChrono}>
@@ -555,7 +804,7 @@ export default function GlobeView(props: Props) {
         </div>
       )}
       {nobody && (
-        <div className="geo-state" role="status">
+        <div className="geo-state" data-geo-overlay="state" role="status">
           <strong>{t.geo.nobody(props.year)}</strong>
           {props.nearest != null && (
             <button type="button" className="pg-btn pg-btn--secondary pg-btn--sm" onClick={props.onNearest}>

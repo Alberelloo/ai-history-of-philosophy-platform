@@ -51,6 +51,27 @@ export function initialView(places: { lat: number; lon: number }[]): View {
   return { lon: round2(wrapLon(lon)), lat: round2(clampLat(lat)), zoom: 1 };
 }
 
+// Исходный вид глобуса с медальонами: центр — центр масс мест, приближение — наибольшее из
+// ряда ZOOM_STEP^k, не больше HOME_MAX_ZOOM, при котором точки привязки всех мест лежат в
+// кадре с полем margin; не помещаются и при 1 (или мест нет) — 1.
+export const HOME_MAX_ZOOM = 4;
+export function homeView(places: { lat: number; lon: number }[], f: Frame, w: number, h: number, margin: number): View {
+  const base = initialView(places);
+  if (!places.length) return base;
+  const fits = (zoom: number) => {
+    const { projection } = projector({ ...base, zoom }, f);
+    return places.every((p) => {
+      if (!isNear(base, p)) return false;
+      const xy = projection([p.lon, p.lat]);
+      return !!xy && xy[0] >= margin && xy[1] >= margin && xy[0] <= w - margin && xy[1] <= h - margin;
+    });
+  };
+  let zoom = 1;
+  if (!fits(1)) return base;
+  while (zoom * ZOOM_STEP <= HOME_MAX_ZOOM + 1e-9 && fits(zoom * ZOOM_STEP)) zoom *= ZOOM_STEP;
+  return { ...base, zoom };
+}
+
 export const rotateBy = (v: View, dLon: number, dLat: number): View => ({
   ...v,
   lon: round2(wrapLon(v.lon + dLon)),
