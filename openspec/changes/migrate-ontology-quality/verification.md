@@ -662,3 +662,27 @@
 Вердикт: **не принято**.
 - Разработчику: подключить приёмник журнала в CLI `ontology_migrate` и `quality_report`. Нужен поток, который не ломает JSON отчёта в stdout. Нужен ли общий подход для остальных команд оператора, решает ведущий.
 - Тестировщику: (1) тест, который запускает обе команды подпроцессом и проверяет события в выводе (`knowledge.migration.step/run/rolled_back`, `knowledge.quality.measured`, `knowledge.migration.aborted`), плюс мутация «без `events.configure`»; (2) сценарий или property, где шаг меняет позицию атрибуции, → аварийный откат и А8 > 0, плюс мутация J22 в `mutations.yaml`.
+
+## Судья (четвёртый круг) — 2026-11-26, коммит adf0721
+
+Машина: 1 ГБ ОЗУ, 1 CPU, без Docker. Полный `pytest` и e2e не запускались. Каждый pytest и `mutation_check.py` шли под `flock`. Мутации делались в отдельном worktree (`PYTHONPATH` на его `src`), worktree удалён. Рабочая копия не менялась: `git diff` пуст. С 7b258e1 в `src/` добавлено только подключение журнала в блоке `__main__` шести команд оператора (`events.json_sink(sys.stderr)`). `integrity.compare` не менялся: J22 из прошлого круга была мутацией судьи, теперь её ловит тест.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы (CLI-подпроцессы, файл SQLite: стенд П1–П4 и 24 датированные персоны, шлюз модели — HTTP-заглушка) | Итог |
+|---|---|---|---|---|---|
+| Миграция | сценарии, test_migration_invariant, журнал команд (Д4-mig), J22 | passed; migrate-no-journal и j22 убиты | passed. JM1 (журнал `ontology_migrate` в stdout) → test_migrate_plan_and_run_journal упал. JM2 «`verify` без отката» → test_loss_aborts и test_migrate_aborted_journal упали. Повторы yaml: j22-attribution-no-stance → test_stance_change_aborts упал, migrate-no-journal → test_migrate_failed_journal упал | `plan`: код 0, дамп не изменился, в stderr 8 `knowledge.migration.step` и `migration.run`. `run --translate model`: код 0, 1 вызов модели, «Hume» в запросе нет, 8 `step`, 7 `entity.retired` (поля `entity_id, type, reason, run_id`), 4 `entity.merged` (3 `merge:name`, 1 `merge:qid_confirmed`), `migration.translated` (`batch=1, accepted=5, rejected=0`), `migration.run` с `lost=0`. Названий в событиях миграции нет | подтверждено |
+| Снятие | сценарии, test_retire_invariant | passed | passed | `run`: 7 `entity.retired`; `rollback`: 7 `entity.restored` | подтверждено |
+| Перевод | сценарии, test_translation_invariant | passed | passed | `renamed` wikidata 1 / model 5; событие `migration.translated` в stderr | подтверждено |
+| Откат | сценарии, test_rollback_invariant | passed | passed | `rollback`: код 0, дамп данных равен дампу до `run`, `migration.rolled_back` с `merges_undone=4, restored=7, kept=0`; неизвестный run_id — код 2 | подтверждено |
+| Замер | сценарии, test_quality_invariant, test_quality_report_journal | passed; quality-no-journal убита | passed. JM3 (журнал замера в stdout) и JM4 (`configure(sinks=[])`) → test_quality_report_journal упал. Повтор quality-writable → test_read_only упал | До: код 1, А1=0,7292, А2=1, А3=4, А4=3, А5=24, А6=12, А7=7, А8 «не измерено». После `--baseline`: код 0, А1=1, А2=А3=А4=А7=0, А5=24, А6=12, А8=0. В stderr `knowledge.quality.measured` с теми же числами и `passed`. md5 файлов базы не изменились | подтверждено |
+
+Прогоны:
+- `test_ontology_migration.py`, `test_ontology_migrate_unit.py`, `test_integrity_unit.py`: 108 passed за 339 s;
+- `test_operator_commands_journal.py` и `test_stance_change_aborts`: 9 passed.
+
+Проверки: `lint-imports` — 3 kept. Трассировка: 415 из 415. `mutation_check --coverage`: чисто. `ruff check` (E501) и `ruff format --check` падают только на `scripts/dev_stack.py`. Это файл Lead'а из базы, а не этого изменения; нужен пункт для Lead'а в PR.
+
+Приёмка А1–А8 на синтетике показана (таблица выше). Замер на стенде Lead'а запускается так же: `python -m philograph.knowledge.quality_report [--save|--baseline] [--json]` с `PHILOGRAPH_DATABASE_URL`, события идут в stderr. А9 чисто, кроме ruff в файле Lead'а. Пункты 5.x (стенд, оплачиваемый перевод) остаются за Lead'ом, как и записано в `tasks.md`.
+
+Подгонка не найдена. `skip` и `xfail` нет. Изменения тестов после 7b258e1 только добавляют проверки: новый файл журнала команд и `test_stance_change_aborts`.
+
+Вердикт: **принято**. Дыры третьего круга закрыты. Журнал команд виден при настоящем запуске, а J22 ловит тест.
