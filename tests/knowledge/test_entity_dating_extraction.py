@@ -144,7 +144,9 @@ def _rejected(stand, events, paragraphs, name, type_, dating, reason, statements
     assert "dates" not in (stand.onto.entities.get(entity)["primary"] or {})
     [drop] = dropped(events)
     assert drop["reason"] == reason
-    assert set(drop) - {"request_id", "service"} == {"run_id", "reason"}
+    # reextract-with-claude: событие несёт код из перечня (dating:x → dating_x)
+    assert drop["code"] == reason.replace("dating:", "dating_")
+    assert set(drop) - {"request_id", "service"} == {"run_id", "reason", "code"}
     if not statements:
         events.assert_none(STATEMENT)
     return entity

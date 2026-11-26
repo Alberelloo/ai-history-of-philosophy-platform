@@ -305,7 +305,7 @@ def test_migration_6_adds_mention_position(tmp_path):
         ks._mention_position(conn)
         columns = {c["name"] for c in inspect(conn).get_columns("mentions", schema=ks.SCHEMA)}
     assert "position" in columns
-    assert ks.migrations.latest() == 9
+    assert ks.migrations.latest() == 10  # reextract-with-claude: knowledge:10
 
 
 @req(EM, "Метрики упоминаний")

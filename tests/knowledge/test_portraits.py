@@ -94,7 +94,7 @@ def test_migration_7_adds_portraits_and_keeps_old_data(tmp_path):
             ks.entities.insert().values(id="e_old", type="person", primary={}, redirect_to=None)
         )
     applied = ks.migrations.upgrade(engine)
-    assert applied == [7, 8, 9]
+    assert applied == [7, 8, 9, 10]  # reextract-with-claude: knowledge:10
     with engine.begin() as conn:
         columns = {c["name"] for c in inspect(conn).get_columns("portraits", schema=ks.SCHEMA)}
         old = (
@@ -121,7 +121,7 @@ def test_migration_7_adds_portraits_and_keeps_old_data(tmp_path):
         "created_at",
     } <= columns
     assert old == ["e_old"]
-    assert ks.migrations.latest() == 9
+    assert ks.migrations.latest() == 10  # reextract-with-claude: knowledge:10
 
 
 # --- черновики и порядок -------------------------------------------------------------
