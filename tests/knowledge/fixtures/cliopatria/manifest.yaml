@@ -1,0 +1,24 @@
+# Манифест фикстуры (тесты add-historical-polities). download.sha256 подставляет тест:
+# архив фикстуры собирается во временный каталог.
+title: Cliopatria
+publisher: Seshat Global History Databank
+version: v9.9.9-test
+authors: [Ed Chalstrey, James Bennett]
+license: cc-by-4.0
+license_title: CC BY 4.0
+license_url: https://creativecommons.org/licenses/by/4.0/
+zenodo:
+  record: 24518977
+  doi: 10.5281/zenodo.24518977
+  url: https://doi.org/10.5281/zenodo.24518977
+repository: https://github.com/Seshat-Global-History-Databank/cliopatria
+download:
+  url: https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/v0.2.2/cliopatria.geojson.zip
+  file: cliopatria.geojson.zip
+  member: cliopatria.geojson
+  sha256: null
+build:
+  tolerance_deg: 0.05
+  precision: 2
+  min_ring_deg2: 0.01
+control_years: [1650, 1800, -3500]

@@ -22,6 +22,7 @@ from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import MapSettings, SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.metadata import MetadataIngest
+from philograph.knowledge.polities import PolityLayer
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
@@ -56,6 +57,7 @@ class Components:
     snapshots: Snapshots
     catalog: Catalog
     place_layer: PlaceLayer
+    polity_layer: PolityLayer
 
 
 def components(env: dict[str, str]) -> Components:
@@ -138,6 +140,7 @@ def components(env: dict[str, str]) -> Components:
         snapshots,
         catalog,
         place_layer,
+        PolityLayer.from_env(env),
     )
 
 
@@ -163,4 +166,5 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         section_map=_c.section_map,
         catalog=_c.catalog,
         place_layer=_c.place_layer,
+        polity_layer=_c.polity_layer,
     )

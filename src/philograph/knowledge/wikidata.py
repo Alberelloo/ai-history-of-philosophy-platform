@@ -4,7 +4,7 @@
 и разбора времени у них нет. Правила — требование «Доступ к Wikidata» возможности ``epochs``:
 
 - сеть — только ``http_fetch``: один домен (``www.wikidata.org``), адрес строится кодом из
-  идентификатора, проверенного ``check_qid`` (``^Q\\d+$``), иначе запрос не делается;
+  идентификатора, проверенного ``check_qid`` (``^Q[0-9]+$``), иначе запрос не делается;
   ``User-Agent`` проекта без сведений об операторе, таймаут, на 429/503 — ожидание по
   ``Retry-After`` (не дольше ``max_wait``) и не больше ``retries`` повторов. Ожидание —
   внедряемой функцией ``wait``: в тестах реального ожидания нет;
@@ -35,7 +35,7 @@ import httpx
 
 from philograph.knowledge.dates import FuzzyDate, join_original
 
-QID = re.compile(r"^Q\d+$")
+QID = re.compile(r"^Q[0-9]+$")  # только ASCII-цифры: «Q１２» не QID
 HOST = "www.wikidata.org"
 USER_AGENT = "PhiloGraph/1.0 (+https://github.com/Alberelloo/ai-history-of-philosophy-platform)"
 ENTITY_URL = "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
@@ -44,6 +44,13 @@ SEARCH_URL = (
     "&limit=10&language={lang}&search={label}"
 )
 PAGE_URL = "https://www.wikidata.org/wiki/{qid}"
+# Метки и заголовки статей пачкой (add-historical-polities): только указанный язык и одна
+# вики, без запасных языков (``languagefallback`` не передаётся).
+LABELS_URL = (
+    "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json"
+    "&props=labels%7Csitelinks&languages={lang}&sitefilter={lang}wiki&ids={ids}"
+)
+LABEL_BATCH = 50  # предел ``ids`` у ``wbgetentities``
 RETRY_STATUSES = (429, 503)
 MAX_REDIRECTS = 3
 DEFAULT_RETRY_AFTER = 1.0  # секунд, если ``Retry-After`` нет или он не число
@@ -79,7 +86,7 @@ class WikidataError(Exception):
 
 
 def check_qid(qid: str) -> str:
-    """Идентификатор записи по шаблону ``^Q\\d+$``; иначе ``WikidataError``. Запросов нет."""
+    """Идентификатор записи по шаблону ``^Q[0-9]+$``; иначе ``WikidataError``. Запросов нет."""
     if not isinstance(qid, str) or not QID.fullmatch(qid):
         raise WikidataError(f"неверный идентификатор Wikidata: {qid!r}")
     return qid
@@ -188,7 +195,7 @@ class WikidataRecord:
         return None
 
     def items(self, prop: str) -> list[str]:
-        """QID-значения свойства (кроме «устаревших»), только по шаблону ``^Q\\d+$``."""
+        """QID-значения свойства (кроме «устаревших»), только по шаблону ``^Q[0-9]+$``."""
         found = []
         for claim in self.claims.get(prop, []):
             if claim.rank == "deprecated" or not isinstance(claim.value, dict):
@@ -291,6 +298,57 @@ def search(label: str, lang: str, fetch: Fetch) -> list[dict[str, Any]]:
             }
         )
     return found
+
+
+def labels_url(qids: list[str], lang: str) -> str:
+    """Адрес ``wbgetentities`` на пачку QID (не больше ``LABEL_BATCH``), каждый проверен."""
+    if not LANG.fullmatch(lang) or "-" in lang:
+        raise WikidataError(f"неверный язык: {lang!r}")
+    if not qids or len(qids) > LABEL_BATCH:
+        raise WikidataError(f"пачка из {len(qids)} QID, допустимо 1…{LABEL_BATCH}")
+    return LABELS_URL.format(lang=lang, ids="%7C".join(check_qid(q) for q in qids))
+
+
+def _text(raw: Any, key: str) -> str | None:
+    value = raw.get(key) if isinstance(raw, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def labels(qids: list[str], lang: str, fetch: Fetch) -> tuple[dict[str, dict[str, Any]], int]:
+    """Метка языка ``lang`` и заголовок статьи ``<lang>wiki`` для каждого QID.
+
+    Возвращает ``({qid: {"label": str | None, "sitelink": str | None}}, число запросов)``.
+    Строки — как в ответе, без проверки: правило приёмки названия — у вызывающего.
+    Неверный QID в запрос не попадает (``check_qid`` — до запроса) и получает ``None``.
+    Запись ``missing`` — ``None``/``None``. Запись, ушедшая перенаправлением, ищется по
+    ``redirects.from``."""
+    out: dict[str, dict[str, Any]] = {}
+    valid: list[str] = []
+    for q in dict.fromkeys(qids):
+        if isinstance(q, str) and QID.fullmatch(q):
+            valid.append(q)
+        out[q] = {"label": None, "sitelink": None}
+    requests = 0
+    for i in range(0, len(valid), LABEL_BATCH):
+        batch = valid[i : i + LABEL_BATCH]
+        data = fetch(labels_url(batch, lang))
+        requests += 1
+        entities = data.get("entities")
+        if not isinstance(entities, dict):
+            raise WikidataError("ответ не по форме")
+        wanted = set(batch)
+        for key, entity in entities.items():
+            if not isinstance(entity, dict) or "missing" in entity:
+                continue
+            redirect = entity.get("redirects")
+            source = _text(redirect, "from") if isinstance(redirect, dict) else None
+            qid = source if source in wanted else key if key in wanted else None
+            if qid is None:
+                continue
+            label = (entity.get("labels") or {}).get(lang)
+            link = (entity.get("sitelinks") or {}).get(f"{lang}wiki")
+            out[qid] = {"label": _text(label, "value"), "sitelink": _text(link, "title")}
+    return out, requests
 
 
 # --- время ----------------------------------------------------------------------------

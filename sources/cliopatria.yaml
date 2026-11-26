@@ -1,0 +1,34 @@
+# Исторические границы для глобуса (add-historical-polities): датасет Cliopatria
+# (Seshat Global History Databank), CC BY 4.0. Сами данные в git не лежат: архив, артефакт
+# сборки и кэш русских названий — в data/cliopatria/ (каталог в .gitignore).
+#
+#   python -m philograph.knowledge.polities_build fetch     # архив → data/cliopatria/, сверка SHA-256
+#   python -m philograph.knowledge.polities_build build     # артефакт data/cliopatria/polities.sqlite
+#   python -m philograph.knowledge.polities_build measure   # пределы H2/H3 на контрольных годах
+#
+# Сервис знаний читает артефакт по пути PHILOGRAPH_POLITIES_DB; без артефакта глобус
+# показывает современную карту (запасной режим).
+title: Cliopatria
+publisher: Seshat Global History Databank
+version: v0.2.2
+authors: [Ed Chalstrey, James Bennett]
+license: cc-by-4.0
+license_title: CC BY 4.0
+license_url: https://creativecommons.org/licenses/by/4.0/
+zenodo:
+  record: 24518977
+  doi: 10.5281/zenodo.24518977
+  url: https://doi.org/10.5281/zenodo.24518977
+repository: https://github.com/Seshat-Global-History-Databank/cliopatria
+download:
+  # Архив Zenodo (300 МБ) содержит ещё original_map_images; берём сам GeoJSON-архив с тега.
+  url: https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/v0.2.2/cliopatria.geojson.zip
+  file: cliopatria.geojson.zip
+  member: cliopatria.geojson
+  sha256: 20d8e38baf8ea958d149883bc9b8e10f72c703bfdc79cb655b4fe16534c2f003
+build:
+  tolerance_deg: 0.05   # допуск упрощения (shapely.simplify, preserve_topology)
+  precision: 2          # знаков после запятой у координат (0,01° ≈ 1,1 км)
+  min_ring_deg2: 0.01   # кольца меньше отбрасываются; самое большое кольцо записи остаётся
+# Контрольные годы пределов H2/H3 (закреплены до первого замера, под результат не меняются).
+control_years: [-500, -300, 0, 400, 800, 1000, 1300, 1500, 1650, 1700, 1800, 1900, 2000]
