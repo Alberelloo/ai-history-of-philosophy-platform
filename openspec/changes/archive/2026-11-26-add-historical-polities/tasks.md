@@ -73,23 +73,23 @@
 
 ## 7. Ревью (ревьювер)
 
-- [ ] 7.1 Дифф против `origin/claude/embedding-docker`: соответствие дельте и «Выбору решения»; правило активности — в одном месте; `polities.py` не импортирует `shapely`/`ijson`; сеть — только через `wikidata.py` и `fetch`
-- [ ] 7.2 Костыли из working-principles.md, раздел 5: особые случаи по имени или QID образования, допуск «под год», флаги ради теста, правки тестов тестировщика, `except Exception` без события
+- [x] 7.1 Дифф против `origin/claude/embedding-docker`: соответствие дельте и «Выбору решения»; правило активности — в одном месте; `polities.py` не импортирует `shapely`/`ijson`; сеть — только через `wikidata.py` и `fetch`
+- [x] 7.2 Костыли из working-principles.md, раздел 5: особые случаи по имени или QID образования, допуск «под год», флаги ради теста, правки тестов тестировщика, `except Exception` без события
 
 ## 8a. Замеры на стенде и снимки (после 4.x)
 
-- [ ] 8.4 H6: `PHILOGRAPH_POLITIES_DB=data/cliopatria/polities.sqlite python scripts/dev_stack.py --demo`; `curl -w '%{time_total}'` через шлюз на каждый контрольный год без кэша (первый запрос после старта) и с кэшем; в браузере — время от смены года до `data-polity-from ≤ T ≤ data-polity-to` на 1650 → 1800 (один короткий скрипт Playwright)
-- [ ] 8.5 Снимки глобуса на реальных данных: 1024×576 и 1920×1080, годы 1650 и 1800, обе темы; проверка H5 по DOM на этих кадрах; снимки — в `openspec/changes/add-historical-polities/qa/` (не больше 8 файлов)
+- [ ] 8.4 (пропущено по указанию Lead'а: стенд не тянет 1 CPU; H6 подтверждён замером эндпоинта через ASGI и работающим uvicorn судьи) H6: `PHILOGRAPH_POLITIES_DB=data/cliopatria/polities.sqlite python scripts/dev_stack.py --demo`; `curl -w '%{time_total}'` через шлюз на каждый контрольный год без кэша (первый запрос после старта) и с кэшем; в браузере — время от смены года до `data-polity-from ≤ T ≤ data-polity-to` на 1650 → 1800 (один короткий скрипт Playwright)
+- [ ] 8.5 (пропущено по указанию Lead'а; H5 подтверждён браузерным тестом на фикстуре, не на реальных данных — владельцу) Снимки глобуса на реальных данных: 1024×576 и 1920×1080, годы 1650 и 1800, обе темы; проверка H5 по DOM на этих кадрах; снимки — в `openspec/changes/add-historical-polities/qa/` (не больше 8 файлов)
 
 ## 9. Развёртывание
 
 - [x] 9.1 Инструкция оператора (в `docs/product/system-design.md`, 5.1): как получить артефакт на сервере, где он лежит, как проверить (`measure`), что без него — запасной режим
-- [ ] 9.2 Подключение тома `data/cliopatria` и `PHILOGRAPH_POLITIES_DB` в `compose.yaml` — не в этом изменении: отдельный PR с согласия Lead'а. В `progress.md` — запись о передаче
+- [ ] 9.2 (отдельный PR с согласия Lead'а) Подключение тома `data/cliopatria` и `PHILOGRAPH_POLITIES_DB` в `compose.yaml` — не в этом изменении: отдельный PR с согласия Lead'а. В `progress.md` — запись о передаче
 
 ## 10. Перед передачей судье (разработчик)
 
-- [ ] 10.1 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py` (H8) — чисто; `pytest -q tests/knowledge`; `cd web && npm run build`; новый браузерный файл — отдельным прогоном
+- [x] 10.1 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py` (H8) — чисто; `pytest -q tests/knowledge`; `cd web && npm run build`; новый браузерный файл — отдельным прогоном
 
 ## 11. Судья (новый субагент)
 
-- [ ] 11.1 Независимая проверка по `verification.md`: полнота `tasks.md`; каждый сценарий и инвариант (включая H1–H9) подтверждён журналом тестировщика и собственным прогоном; повтор хотя бы одной мутации; сверка чисел замеров 8.x с собственным `measure` на артефакте; признаки подгонки (`git diff origin/claude/embedding-docker -- tests openspec`). Вердикт — в `verification.md`, раздел «Судья». До вердикта «принято» PR в draft
+- [x] 11.1 Независимая проверка по `verification.md`: полнота `tasks.md`; каждый сценарий и инвариант (включая H1–H9) подтверждён журналом тестировщика и собственным прогоном; повтор хотя бы одной мутации; сверка чисел замеров 8.x с собственным `measure` на артефакте; признаки подгонки (`git diff origin/claude/embedding-docker -- tests openspec`). Вердикт — в `verification.md`, раздел «Судья». До вердикта «принято» PR в draft
