@@ -267,6 +267,12 @@ def test_stale_response_discarded(knowledge_context, knowledge_stack, events):
         lambda r: "q=%D0%BA%D0%B0&" in r.url or r.url.endswith("q=%D0%BA%D0%B0")
     ):
         page.clock.run_for(300)
+    # expect_request срабатывает, когда браузер отправил запрос; обработчик маршрута на стороне
+    # Python может быть вызван чуть позже — ждём его (реальное время, не часы страницы).
+    for _ in range(100):
+        if held:
+            break
+        page.wait_for_timeout(50)
     assert len(held) == 1
     with catalog_response(page, lambda q: q.get("q") == ["кан"]) as newer:
         box.press_sequentially("н")
