@@ -165,19 +165,23 @@ class Queue:
                     .limit(1)
                     .scalar_subquery()
                 )
-                row = conn.execute(
-                    update(jobs)
-                    .where(jobs.c.id == target)
-                    .values(status="running", attempts=jobs.c.attempts + 1)
-                    .returning(
-                        jobs.c.id,
-                        jobs.c.kind,
-                        jobs.c.payload,
-                        jobs.c.attempts,
-                        jobs.c.run_id,
-                        jobs.c.request_id,
+                row = (
+                    conn.execute(
+                        update(jobs)
+                        .where(jobs.c.id == target)
+                        .values(status="running", attempts=jobs.c.attempts + 1)
+                        .returning(
+                            jobs.c.id,
+                            jobs.c.kind,
+                            jobs.c.payload,
+                            jobs.c.attempts,
+                            jobs.c.run_id,
+                            jobs.c.request_id,
+                        )
                     )
-                ).mappings().first()
+                    .mappings()
+                    .first()
+                )
                 if row is None:
                     return None
                 job = Job(row["id"], row["kind"], dict(row["payload"]), row["attempts"])
