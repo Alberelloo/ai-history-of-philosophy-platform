@@ -1295,3 +1295,24 @@ mutations:
     note: О22 — set_primary_name хранит сырой текст
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
+  - id: roman-without-l
+    requirement: Язык названий сущностей
+    patch: roman-without-l.patch
+    note: судья O1 (О23) — слово из римских цифр без L
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: not-a-name-before-sentence
+    requirement: Валидность названий сущностей
+    patch: not-a-name-before-sentence.patch
+    note: судья O2 (О23) — not_a_name раньше sentence
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: clean-nfkc
+    requirement: Валидность названий сущностей
+    patch: clean-nfkc.patch
+    note: судья O5 (О23) — название через NFKC вместо NFC
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc

@@ -29,6 +29,7 @@ from ..conftest import PROFILES
 from .conftest import CatalogService
 from .extraction_stand import Stand
 from .strategies import (
+    WHITESPACE,
     expected_label,
     name_of,
     names_with_reason,
@@ -317,6 +318,18 @@ def test_spellings_found_different_entities(stand, onto, engine_for, clock, even
 @example((("Աբգ", "ru"), "und", None))  # армянская — прочая
 # п. 3–4 — равенство, нет букв
 @example((("Kant-Кант", None), "und", None))
+# О23, O1: все буквы римских чисел, в том числе L; строчные и смешанный регистр — латиница
+@example((("Ли XL", None), "ru", None))
+@example((("Пий XL", "en"), "ru", None))
+@example((("Ли L", None), "ru", None))
+@example((("Ли LX LIV", None), "ru", None))
+@example((("Ли xl", None), "und", None))  # 2 кириллические, 2 латинские
+@example((("Лии Xl", None), "ru", None))
+# O5: лигатура — одна латинская буква, полноширинные — «прочие»
+@example((("Кк \ufb01", None), "ru", None))
+@example((("К \ufb01\ufb01", None), "en", None))
+@example((("\uff2b\uff41\uff4e\uff54", "en"), "und", None))
+@example((("Кант\u00a0Kant", None), "und", None))
 @example((("1781", "ru"), "und", None))
 @example((("!!!", "en"), "und", None))
 # п. 5 — таблица письменностей переданных языков
@@ -350,6 +363,7 @@ def _primaries_per_lang(onto, entity_id: str) -> dict[str, int]:
 @example(main=(("Kant-Кант", "ru"), "und", None), extra=(("Locke", "ru"), "en", None))
 @example(main=(("Людовик XIV", "en"), "ru", None), extra=(("Ἀριστοτέλης", "ru"), "el", None))
 @example(main=(("Mill", "ru"), "en", None), extra=(("Lid", None), "en", None))  # J1
+@example(main=(("Ли XL", "en"), "ru", None), extra=(("Пий LIV", None), "ru", None))  # O1
 def test_language_invariant_create_and_add_name(onto, events, main, extra):
     (text, given_lang), expected, _ = main
     (vtext, vgiven), vexpected, _ = extra
@@ -687,6 +701,11 @@ def test_stopword_list_from_data(onto, events, tmp_path, monkeypatch):
         ("Е\u0308" * 80, None),  # NFD: 160 кодовых точек, после NFC — 80
         ("Е\u0308" * 81, "sentence"),
         ("  " + "Е\u0308" * 80 + "\t", None),
+        # O5: NFC ≠ NFKC — лигатура «ﬁ» одна кодовая точка (NFKC дал бы 2)
+        ("\ufb01" * 41, None),
+        ("\ufb01" * 80, None),
+        ("\ufb01" * 81, "sentence"),
+        ("\uff2b" * 80, None),  # полноширинные: NFKC меняет текст, не число
     ],
 )
 def test_signs_counted_after_nfc(onto, events, raw, reason):
@@ -973,14 +992,29 @@ def test_strategies_oracle_independent():
 
 # --- О22: хранимая форма названия — strip + NFC на любом пути записи --------------------
 
-_PAD = hs.sampled_from(["", " ", "  ", "\t", "\n", "  ", " "])
-_STORED_POOL = ["Пётр Абеляр", "Йозеф Шумпетер", "Ἀριστοτέλης", "Renée Descartes", "Декарт"]
+_PAD = hs.sampled_from(["", " ", "  ", *WHITESPACE, " \u00a0", "\u2003\u3000"])
+_STORED_POOL = [
+    "Пётр Абеляр",
+    "Йозеф Шумпетер",
+    "Ἀριστοτέλης",
+    "Renée Descartes",
+    "Декарт",
+    # NFC ≠ NFKC (О23, O5): лигатуры, полноширинные, надстрочные, внутренние NBSP/EM SPACE
+    "\ufb01losoﬁa",
+    "\uff2b\uff41\uff4e\uff54",
+    "Kant\u2003Hume",
+    "Kant\u00a0Hume",
+    "Пий XL",
+    "Декарт\u00b2",
+]
 
 
 @hs.composite
 def raw_names(draw, pool: bool = False) -> str:
     """Вход записи: пробелы по краям, NFD или NFC, смешанные письменности (``scripts_mix``)."""
     text = draw(hs.sampled_from(_STORED_POOL)) if pool else draw(scripts_mix())[0][0]
+    if not pool and draw(hs.booleans()):  # совместимые знаки и внутренние пробелы — и в смеси
+        text = draw(hs.sampled_from(_STORED_POOL)) + draw(hs.sampled_from(WHITESPACE)) + text
     form = draw(hs.sampled_from(["NFC", "NFD", "NFKD"]))
     if form != "NFKD":  # NFKD меняет совместимые знаки — не тот же текст; только NFD/NFC
         text = unicodedata.normalize(form, text)
@@ -1003,6 +1037,9 @@ def _stored(onto, entity_id) -> dict[str, str]:
     primary=unicodedata.normalize("NFD", "Йозеф Шумпетер") + " ",
 )
 @example(main="Kant-Кант ", variant=" Людовик XIV", primary="Декарт")
+# O5: NFC ≠ NFKC — хранится NFC, не совместимая форма
+@example(main="Kant\u2003Hume", variant="\ufb01losoﬁa ", primary="\uff2b\uff41\uff4e\uff54")
+@example(main=" Kant\u00a0Hume", variant="Декарт\u00b2", primary="Пий XL")
 def test_stored_form_strip_nfc(onto, events, main, variant, primary):
     try:
         entity = onto.entities.create("concept", [("ru", main, "primary")])

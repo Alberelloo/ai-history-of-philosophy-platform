@@ -71,7 +71,22 @@ LATIN_LOWER = "abcdefghijklmnopqrstuvwxyzäöüéèçñ"
 CYR_LOWER = "абвгдежзийклмнопрстуфхцчшщъыьэюяё"
 GREEK_LOWER = "αβγδεζηθικλμνξοπρστυφχψωἀἐἰὀὐἠὠ"
 OTHER_LETTERS = "אבגדהוזחטابتثجح汉字仮名"
-ROMAN = ("I", "II", "III", "IV", "V", "IX", "X", "XI", "XIV", "XVII", "XX", "XXI", "MDC")
+# Множества спецификации entity-naming — целиком (О23); сверка: test_strategies_cover_spec_sets.
+ROMAN_LETTERS = "IVXLCDM"  # п. 1: ^[IVXLCDM]+$, только заглавные
+ROMAN = (
+    *ROMAN_LETTERS,
+    "II", "III", "IV", "IX", "XI", "XIV", "XVII", "XX", "XXI", "MDC",
+    "XL", "LX", "LIV", "XLIV", "CD", "DC", "CM", "MCM", "MMXXIV", "LXXX",
+)  # fmt: skip
+# «Похожие, но вне множества»: строчные и смешанный регистр — латиница, не римское число.
+ROMAN_LOOKALIKE = ("l", "xl", "Xl", "xL", "Liv", "liv", "Mdc", "iv", "Civil", "Mill")
+# Пробельные символы (``str.split``): обычный, табуляция, перевод строки, NBSP, EM SPACE,
+# идеографический. NBSP/EM SPACE/U+3000 при NFKC превращаются в пробел, при NFC — нет.
+WHITESPACE = (" ", "\t", "\n", "\u00a0", "\u2003", "\u3000")
+# Знаки, на которых NFC ≠ NFKC (совместимые формы): лигатуры, полноширинные, надстрочные.
+NFKC_DISTINCT_LATIN = "\ufb01\ufb02"  # ﬁ ﬂ — имя LATIN SMALL LIGATURE …: латинская буква
+NFKC_DISTINCT_OTHER = "\uff41\uff42\uff4b"  # ａ ｂ ｋ — FULLWIDTH LATIN …: буква «прочая»
+NFKC_DISTINCT_SIGNS = "\u00b2\u00b9\u2122"  # ² ¹ ™ — не буквы
 LANG_SCRIPT = {
     "ru": "cyrillic",
     "en": "latin",
@@ -395,11 +410,18 @@ def names_with_reason():
 # Границы диапазонов письменностей (entity-naming, п. 2): кириллица U+0400–U+052F (``ԯ`` —
 # последняя), греческая U+0370–U+03FF и U+1F00–U+1FFF (``ῳ``), армянская ``Ա`` (U+0531) — прочая.
 _ALPHABETS = {
-    "cyrillic": CYR_LOWER + "ԁԯ",
-    "latin": LATIN_LOWER,
-    "greek": GREEK_LOWER + "ͱῳ",
-    "other": OTHER_LETTERS + "աԱ",
+    # границы диапазонов спецификации: U+0400…U+052F; U+0370…U+03FF, U+1F00…U+1FFF
+    "cyrillic": CYR_LOWER + "ѐԁԯ",
+    "latin": LATIN_LOWER + NFKC_DISTINCT_LATIN,
+    "greek": GREEK_LOWER + "ͱϿἀῳ",
+    "other": OTHER_LETTERS + "աԱ" + NFKC_DISTINCT_OTHER,
 }
+
+
+def _cap(body: str) -> str:
+    """Первая буква заглавной, если заглавная — одна кодовая точка («ﬁ».upper() = «FI»)."""
+    head = body[0].upper()
+    return (head if len(head) == 1 else body[0]) + body[1:]
 
 
 @st.composite
@@ -429,7 +451,9 @@ def scripts_mix(
             )
         )
         if kind == "roman":
-            word = draw(st.sampled_from(ROMAN))
+            word = draw(
+                st.one_of(st.sampled_from(ROMAN), st.text(ROMAN_LETTERS, min_size=1, max_size=5))
+            )
         elif kind == "digits":
             # Цифры — не буквы (категория не ``L*``): письменности не добавляют.
             word = draw(st.sampled_from(["1781", "20.1", "§3", "1724–1804", "2"]))
@@ -437,8 +461,8 @@ def scripts_mix(
             # Слово из букв IVXLCDM не целиком заглавными («Mill», «Civil», «Xiv») — латиница,
             # не римское число: римские — только заглавные (entity-naming).
             body = draw(st.text("ivxlcdm", min_size=2, max_size=6))
-            word = draw(st.sampled_from([body.capitalize(), body]))
-            counts["latin"] += len(body)
+            word = draw(st.sampled_from([body.capitalize(), body, *ROMAN_LOOKALIKE]))
+            counts["latin"] += len(word)
         elif kind == "mixed":
             a, b = (
                 draw(st.sampled_from(["cyrillic", "latin", "greek"])),
@@ -447,19 +471,21 @@ def scripts_mix(
             wa = draw(st.text(_ALPHABETS[a], min_size=1, max_size=4))
             wb = draw(st.text(_ALPHABETS[b], min_size=1, max_size=4))
             join = draw(st.sampled_from(["", "-"]))
-            word = wa.capitalize() + join + wb
+            word = _cap(wa) + join + wb
             counts[a] += len(wa)
             counts[b] += len(wb)
         else:
             body = draw(st.text(_ALPHABETS[kind], min_size=2, max_size=8))
-            word = body[0].upper() + body[1:]
+            word = _cap(body)
             counts[kind] += len(body)
-        if kind != "roman" and kind != "mixed":
-            pass
-        left = draw(st.sampled_from(["", "", "(", "«", '"']))
-        right = draw(st.sampled_from(["", "", ")", "»", ".", ",", '"']))
+        left = draw(st.sampled_from(["", "", *EDGE_MARKS]))
+        right = draw(st.sampled_from(["", "", *EDGE_MARKS]))
+        if kind == "digits" and draw(st.booleans()):
+            word += draw(st.sampled_from(NFKC_DISTINCT_SIGNS))
         words.append(left + word + right)
-    text = " ".join(words)
+    text = words[0]
+    for w in words[1:]:
+        text += draw(st.sampled_from(WHITESPACE[:1] * 3 + WHITESPACE)) + w
     from hypothesis import assume
 
     assume(len(text) <= max_chars and search_form(text) not in STOP_FORMS)

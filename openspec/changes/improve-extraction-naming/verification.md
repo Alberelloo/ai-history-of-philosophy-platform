@@ -311,7 +311,7 @@
 | Правило 5 `stopword` | S.stopwords_perturbed | NM::…@example «  EVERY », «Тот, кто  чувствует», «тот кто чувствуёт», «your lordship» (фактически роняет: test_check_name_any_input, test_rejection_invariant, test_role_instead_of_name) | stopword-before-person |
 | Порядок: первое подходящее; `not_a_name` раньше `stopword` | S.stopwords_perturbed (person) | NM::test_role_instead_of_name; @example «blind mathematician» | stopword-before-person |
 | Порядок: `empty`/`number` раньше `sentence` | S.rule_order number_long, empty_long | NM::…@example «1 2 3 4 5 6 7», «- - - - - - -» (фактически роняет: test_check_name_any_input) | rule-sentence-before-number |
-| Порядок: `sentence` раньше `not_a_name` | S.rule_order person_long_lower | NM::…@example «a b c d e f g», «the author of An Inquiry…» (фактически роняет: test_check_name_any_input) | rule-sentence-before-number |
+| Порядок: `sentence` раньше `not_a_name` | S.rule_order person_long_lower | NM::…@example «a b c d e f g», «the author of An Inquiry…» (фактически роняет: test_check_name_any_input) | not-a-name-before-sentence (O2, О23: меняет местами именно эти два правила; прежняя ссылка на rule-sentence-before-number была неверной) |
 | Правила — данные: пределы (слова, знаки) | параметры теста (правка yaml) | NM::test_rules_are_data (_limit, _limit_chars) | rules-limits-hardcoded |
 | Правила — данные: частицы | то же | NM::test_rules_are_data (_particle) | rules-particles-hardcoded |
 | Правила — данные: шаблоны | то же | NM::test_rules_are_data (_pattern) | rules-patterns-hardcoded |

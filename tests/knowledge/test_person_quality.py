@@ -996,6 +996,27 @@ def test_link_counts_subject_object_author(onto):
             {"paired_by_model": True},
             "merge:model_pair",
         ),
+        # шаг 8: основное одной = вариант другой; одно слово → review:single_name (О23)
+        (
+            Entity("a", "person", (("primary", "x"),), None, None),
+            Entity("b", "person", (("primary", "y"), ("variant", "x")), None, None),
+            {},
+            "review:single_name",
+        ),
+        # шаг 8: то же, но название из двух слов → review:variant
+        (
+            Entity("a", "person", (("primary", "x z"),), None, None),
+            Entity("b", "person", (("primary", "y"), ("variant", "x z")), None, None),
+            {},
+            "review:variant",
+        ),
+        # шаг 9: ничего не сработало → apart:none
+        (
+            Entity("a", "person", (("primary", "x"),), None, None),
+            Entity("b", "person", (("primary", "y"),), None, None),
+            {},
+            "apart:none",
+        ),
         # шаг 1 раньше всех: не обе персоны, пара модели, общее название → apart:type
         (
             Entity("a", "person", (("primary", "x"),), None, None),

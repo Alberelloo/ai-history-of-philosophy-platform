@@ -780,6 +780,27 @@ def test_qid_taken(onto, events, clock, no_network):
     check_keys(events)
 
 
+@req(
+    ED,
+    QIDS,
+    invariant="qid_taken: auto и не персоны — в очередь review:qid_taken, без слияния (О23)",
+)
+@pytest.mark.parametrize(("decision", "type_"), [("auto", "person"), ("accepted", "work")])
+def test_qid_taken_queued(onto, events, clock, no_network, decision, type_):
+    holder = create(onto, "Holder", type_=type_, qid="Q41568", lang="en")
+    other = create(onto, "Держатель" if type_ == "person" else "Трактат", type_=type_)
+    life(onto, RecordFetch(), review_of(onto, clock)).apply(
+        {"entities": [entry(other, "Q41568", decision)]}
+    )
+    assert onto.entities.resolve(other) == other != onto.entities.resolve(holder)
+    assert [(e["entity"], e["reason"]) for e in events.of(SKIPPED)] == [(other, "qid_taken")]
+    events.assert_none(MERGED)
+    [proposed] = events.of(PROPOSED)
+    assert proposed["reason"] == "review:qid_taken"
+    assert {proposed["kept"], proposed["removed"]} == {holder, other}
+    check_keys(events)
+
+
 @req(ED, QIDS, scenario="Два подтверждения одного QID")
 def test_two_confirmations(onto, events, clock, no_network):
     plato = create(onto, "Платон")
