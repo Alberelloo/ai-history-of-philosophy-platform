@@ -234,7 +234,8 @@
 | Даты противоречат: интервалы конца | S.persons_with_variants dates_any — исправлено в О25 | PQ::DATE_INTERVALS (только конец врозь; зазор конца 4 и 5 при интервале); test_dates_conflict_on_start_or_end_interval | dates-start-only, dates-interval-ignored |
 | Даты противоречат: интервал неопределённости `[earliest − 2, latest + 2]` (earliest ≠ latest) | S.persons_with_variants dates_any — добавлено в О25 | PQ::DATE_INTERVALS (Reid/Рид, Hume/Юм) | dates-interval-ignored |
 | Даты у одной стороны — не противоречие | S.persons_with_variants plain one_side | PQ::test_dates_on_one_side (фактически роняет: test_date_chain_component) | dates-one-side-conflict |
-| Причина отказа компоненты: порядок qid_cluster → dates → decided_conflict, все сочетания | S.persons_with_variants reasons_mix (О26) | PQ::DATES_AND_DECIDED (пример судьи) в test_plan_partition_any_order, test_merge_invariant_two_orders; test_component_priority (cover) | reason-decided-before-dates (J3-1), reason-decided-before-qid, cluster-reason-dates-first |
+| Преграда компоненты на паре без общего названия (компонента через merge:qid_confirmed / merge:model_pair) | @example HIDDEN_BARRIER (Hume a, Hume b, Юм c; b–c QID подтверждён, a–c «разные»), HIDDEN_BARRIER_MODEL (b–c пара модели) | PQ::test_plan_partition_any_order (оба), test_merge_invariant_two_orders (HIDDEN_BARRIER) | component-verdicts-candidates-only (M4) |
+| Причина отказа компоненты: порядок qid_cluster → dates → decided_conflict, все сочетания | S.persons_with_variants reasons_mix (О26) | PQ::DATES_AND_DECIDED (пример судьи) в test_plan_partition_any_order, test_merge_invariant_two_orders; test_component_reason_combos_generated (cover) | reason-decided-before-dates (J3-1), reason-decided-before-qid, cluster-reason-dates-first |
 | Шаг 1 `apart:type` | S.persons_with_variants mixed_type | PQ::test_merge_invariant_two_orders; PM (фактически роняет: test_plan_partition_any_order) | type-rule-dropped |
 | Шаг 2 `apart:qid` | S.persons_with_variants qids_distinct | PQ::test_different_qids (фактически роняет: test_transliteration_with_decision) | step-qid-dropped |
 | Шаг 3 `apart:decided` | S.persons_with_variants decided, decided3 | PQ::test_namesakes, test_decided_apart_and_third | decided-ignored |
@@ -650,8 +651,20 @@
 
 Замечания третьего круга J3-1, J3-3 закрыты: пример судьи стоит `@example` в обоих property-тестах, мутации в `mutations.yaml` и падают.
 `check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования; `ruff check` по `tests/knowledge` и `src/philograph/knowledge` чисто. Полный pytest и стенд не запускались (1 ГБ ОЗУ, указание ведущего).
-Неточность журнала: строка аудита О26 ссылается на `test_component_priority (cover)`, такого теста нет; есть `test_component_reason_combos_generated`.
+Неточность журнала: строка аудита О26 ссылается на `test_component_reason_combos_generated (cover)`, такого теста нет; есть `test_component_reason_combos_generated`.
 
 Подгонка: не найдена (ожидания не правились, skip/xfail нет, пример судьи проверяется, а не обходится).
 
 Вердикт: **не принято** — вернуть тестировщику: инвариант «если у какой-либо пары компоненты вердикт `apart:decided`/`review:dates`/`apart:qid` — слияний нет» не проверен для пар компоненты, которые не являются кандидатами по названию (компонента связана рёбрами `merge:model_pair` или `merge:qid_confirmed`, преграда — на паре без общего названия). Нужны: вид генератора лиц (или `@example`) с такой компонентой — и с решением «разные», и с противоречием дат на паре без общего названия; мутация M4 в `mutations.yaml`; строка аудита. Разработчику возвращать нечего: зонд на текущем коде даёт поведение по спецификации.
+
+## Тестировщик — M4 четвёртого судьи, 2026-11-26
+
+- `@example(HIDDEN_BARRIER)`: «Hume» a, «Hume» b, «Юм» c с QID; b подтверждён для QID c (`merge:qid_confirmed`), по a–c решение «разные». Пример стоит в обоих property-тестах.
+- `@example(HIDDEN_BARRIER_MODEL)`: b–c — пара модели (`merge:model_pair`). Только в `test_plan_partition_any_order`: на стенде пар модели нет.
+- Ожидание: слияний нет; a–b и b–c уходят в очередь с `review:decided_conflict`; a–c в очередь не идёт.
+- Прогон: `-k "plan_partition_any_order or merge_invariant_two_orders"` — 2 passed in 33.67s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 1.57s) |
+| Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 7.39s) |

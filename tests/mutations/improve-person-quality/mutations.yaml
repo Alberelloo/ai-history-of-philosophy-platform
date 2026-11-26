@@ -595,3 +595,10 @@ mutations:
     note: J3-3 судьи (О26) — после большой группы перебор групп прекращается (continue → break)
     expect_fail:
       - tests/knowledge/test_entity_merge.py::test_last_word_group_cap
+  - id: component-verdicts-candidates-only
+    requirement: Слияние вариантов персоны
+    patch: component-verdicts-candidates-only.patch
+    note: M4 судьи — вердикты компоненты только у пар-кандидатов; преграда на паре без общего названия не видна
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders

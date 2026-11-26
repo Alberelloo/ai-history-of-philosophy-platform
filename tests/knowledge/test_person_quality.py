@@ -842,6 +842,49 @@ DATES_AND_DECIDED = {
     "model": [],
 }
 
+
+# M4 судьи (четвёртый круг): компонента связана через пару без общего названия
+# (merge:qid_confirmed или merge:model_pair), а преграда стоит на паре без общего названия
+# a–c. Преграда видна, только если вердикт берётся у всех пар компоненты, а не у пар-кандидатов.
+def _hume3(face, c_qid=None, dates=(None, None, None)):
+    return [
+        {"key": (face, 0), "names": [("en", "Hume", "primary")], "qid": None, "dates": dates[0]},
+        {"key": (face, 1), "names": [("en", "Hume", "primary")], "qid": None, "dates": dates[1]},
+        {"key": (face, 2), "names": [("ru", "Юм", "primary")], "qid": c_qid, "dates": dates[2]},
+    ]
+
+
+def _blocked(face, reason):
+    return {frozenset({(face, 0), (face, 1)}): reason, frozenset({(face, 1), (face, 2)}): reason}
+
+
+HIDDEN_BARRIER = {  # через подтверждение QID: годится и для стенда (Dedupe.run)
+    "faces": [
+        {
+            "kind": "hidden_barrier",
+            "records": _hume3(0, "Q41568"),
+            "merge": [],
+            "queue": _blocked(0, "review:decided_conflict"),
+        },
+    ],
+    "confirmed": [((0, 1), (0, 2))],
+    "decided": [((0, 0), (0, 2))],
+    "model": [],
+}
+HIDDEN_BARRIER_MODEL = {  # через пару модели: только чистая функция plan
+    "faces": [
+        {
+            "kind": "hidden_barrier",
+            "records": _hume3(0),
+            "merge": [],
+            "queue": _blocked(0, "review:decided_conflict"),
+        },
+    ],
+    "confirmed": [],
+    "decided": [((0, 0), (0, 2))],
+    "model": [((0, 1), (0, 2))],
+}
+
 BOUNDARY_DATES = {
     "faces": [
         {
@@ -899,6 +942,8 @@ BOUNDARY_DATES = {
 @example(REVIEW_INSIDE, random.Random(8))
 @example(DATE_INTERVALS, random.Random(11))
 @example(DATES_AND_DECIDED, random.Random(13))
+@example(HIDDEN_BARRIER, random.Random(15))
+@example(HIDDEN_BARRIER_MODEL, random.Random(16))
 def test_plan_partition_any_order(case, rnd):
     entities, ids = _pure_entities(case)
     confirmed = [(ids[a], ids[b]) for a, b in case["confirmed"]]
@@ -962,6 +1007,7 @@ def _outcome(onto, review, case, ids, events) -> tuple:
 @example(REVIEW_INSIDE, random.Random(10))
 @example(DATE_INTERVALS, random.Random(12))
 @example(DATES_AND_DECIDED, random.Random(14))
+@example(HIDDEN_BARRIER, random.Random(17))
 def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
     outcomes = []
     for _ in range(2):
