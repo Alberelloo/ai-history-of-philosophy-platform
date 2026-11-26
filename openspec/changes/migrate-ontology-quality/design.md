@@ -90,7 +90,7 @@ python -m philograph.knowledge.ontology_migrate rollback <run_id>
 class Action:  step: str; kind: str; payload: dict          # пишется в run_actions
 class View:    # проекция: entities, names, externals, retired — из snapshot-подобной выборки
     def apply(self, action: Action) -> None
-STEPS = ("manifest_qids", "lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
+STEPS = ("normalize_names", "manifest_qids", "lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
 class Migration:
     def __init__(self, statements, review, fetch: Fetch | None, llm: ServiceClient | None)
     def plan(self, *, estimate=False) -> Report          # без записи; translate — подсчёт
@@ -102,6 +102,7 @@ class Migration:
 
 | Шаг | Действие | `payload` для отката |
 |---|---|---|
+| `normalize_names` (О24) | название, у которого `text ≠ naming.clean(text)` или `normalized ≠ normalize(clean(text))` → оба значения приводятся; сухой прогон — только проекция | `{name_id, old_text, old_normalized, text, normalized}` |
 | `manifest_qids` | при `--manifest`: `LifeDates.apply` по манифесту в рамках запуска (`run_id` общий); пары `qid_taken` с `accepted` идут в шаг `dedupe` как `confirmed`, без решения — в очередь | `{kind: external}` из `run_actions`, слияния — `{merge_id}` |
 | `lang_fix` | название с `lang ≠ script_lang(text)` (и `script_lang` не `None`) → язык по письменности | `{name_id, old_lang}` |
 | `retire` | действующая сущность (не `source`), у которой `check_name(type, label)` даёт причину → `retired_run = run_id`, `retired_reason = причина`; событие `knowledge.entity.retired` | `{entity_id}` |
@@ -127,7 +128,7 @@ class Migration:
 
 ```json
 {"run_id": "...", "dry_run": false, "translate": "model",
- "lang_fixed": 0, "retired": {"number": 7, "not_a_name": 19, "stopword": 3, "empty": 1, "sentence": 2},
+ "names_normalized": 0, "lang_fixed": 0, "retired": {"number": 7, "not_a_name": 19, "stopword": 3, "empty": 1, "sentence": 2},
  "retired_list": [{"id": "e_…", "type": "position", "label": "…", "reason": "sentence"}],
  "renamed": {"wikidata": 0, "model": 0}, "renamed_list": [{"id": "e_…", "from": "causality", "to": "Причинность", "by": "model"}], "untranslated": {"not_russian": 0, "invalid:stopword": 0, "missing": 0},
  "to_translate": 0, "batches": 0, "failed_batches": 0,
@@ -144,7 +145,8 @@ class Migration:
 - `manifest_qids` (О12): `{kind: external, entity, qid}` → удаление внешнего идентификатора; утверждения шага (годы жизни, датировки, роли P106) и QID → `LifeDates.rollback_externals(run_id, externals)`, одно правило с `LifeDates.rollback` (О20): QID, на который ссылается проверенное утверждение или утверждение другого запуска, остаётся и считается в `kept` отката. Слияния по `qid_confirmed` уже отменены вместе с `dedupe`. Проверенные человеком утверждения не трогаются;
 - переименования → восстановление `names_before` (тексты, виды, языки);
 - `retire` → `retired_run = NULL`, событие `knowledge.entity.restored`;
-- `lang_fix` → прежний язык.
+- `lang_fix` → прежний язык;
+- `normalize_names` → прежние `text` и `normalized`, если текст с тех пор не меняли (иначе — в `kept`).
 
 Пункты очереди проверки, созданные запуском, закрываются со статусом `rolled_back`. Пересчёт `primary` у затронутых сущностей. Событие `knowledge.migration.rolled_back`.
 

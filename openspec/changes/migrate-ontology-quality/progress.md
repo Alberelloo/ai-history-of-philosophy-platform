@@ -178,3 +178,9 @@
 ## Ревью круг 2 (разработчик)
 
 - `integrity._same`: у симметричной связи (флаг `symmetric` в `relation_types.spec`, читается в `_state`, не по коду типа) концы сравниваются без порядка — как в `Statements._key`. Свёртка «Hume ↔ Кант» + «Кант ↔ Юм» при слиянии Hume → Юм не даёт ложной потери. Юнит: `test_integrity_unit.py::test_symmetric_fold_with_swapped_ends_is_not_loss` (без правки — падает, проверено). `test_integrity_unit` 8, `test_ontology_migrate_unit` 13, `test_quality_report_unit` 5 — passed.
+
+## О24 (разработчик): шаг `normalize_names`
+
+- `ontology_migrate.py`: шаг `normalize_names` первым в `STEPS` (до сравнений названий и слияния): `text` → `naming.clean` (strip+NFC), `normalized` → `normalize(text)`; действие `name_text` (`name_id`, `old_text`, `old_normalized`, `text`, `normalized`) в `run_actions`; `View.apply` — только проекция в сухом прогоне; откат возвращает прежние значения, если текст не меняли после запуска (иначе `kept`); `Report.names_normalized`; число в `knowledge.migration.step` (`actions`). Названия в событиях нет.
+- Spec `ontology-migration`: шаг 1 «Форма названий», нумерация шагов сдвинута, сценарий «Форма названий», строка инварианта. Design: `STEPS`, таблица шагов, отчёт, откат. Tasks: 2.8 (сделано), 3.2а — тестировщику.
+- Юнит: `test_ontology_migrate_unit.py` — `test_normalize_names_step_plan_run_rollback`, `test_normalize_names_rollback_keeps_later_change`, `test_normalize_names_then_duplicate_merges`; файл 16 passed.

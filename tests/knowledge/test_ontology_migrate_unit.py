@@ -355,3 +355,73 @@ def test_rollback_manifest_qid_by_life_dates_rule(onto, events, keep):
     assert summary["kept"] == (1 if keep else 0)
     [event] = events.where("knowledge.migration.rolled_back")
     assert event["kept"] == summary["kept"]
+
+
+def _stale(onto, type_, text, normalized):
+    """Название «старых данных»: сырой текст и устаревший ключ поиска."""
+    entity_id = raw(onto, type_, [("ru", text, "primary")])
+    with onto.entities.engine.begin() as conn:
+        conn.execute(
+            ks.names.update().where(ks.names.c.entity_id == entity_id).values(normalized=normalized)
+        )
+    return entity_id
+
+
+def test_normalize_names_step_plan_run_rollback(onto, events):
+    """О24: шаг ``normalize_names`` — strip+NFC и пересчёт ключа; сухой прогон — только
+    проекция; откат возвращает прежние значения."""
+    engine = onto.entities.engine
+    nfd = "\u0418\u0306оганн"  # «Й» = «И» + U+0306 (NFD)
+    johann = _stale(onto, "person", nfd, "иоганн-старый")
+    kant = _stale(onto, "person", " Кант ", "кант-старый")
+    assert onto.entities.find("Кант") == [] and onto.entities.find("Йоганн") == []
+    before = dump(engine)
+    plan = migration(onto).plan()
+    assert dump(engine) == before
+    assert plan.to_json()["names_normalized"] == 2
+    assert plan.steps["normalize_names"] == 2
+    report = migration(onto).run()
+    assert report.to_json()["names_normalized"] == 2
+    assert [e["id"] for e in onto.entities.find("Кант")] == [kant]
+    assert [e["id"] for e in onto.entities.find("Йоганн")] == [johann]
+    assert primary(onto, kant) == ["Кант"] and primary(onto, johann) == ["Йоганн"]
+    steps = [e for e in events.where("knowledge.migration.step") if e["step"] == "normalize_names"]
+    assert [e["actions"] for e in steps] == [2, 2]
+    plan_actions = [a.to_json() for a in plan.actions if a.step == "normalize_names"]
+    run_actions_ = [
+        a["payload"]
+        for a in run_actions.actions(engine, report.run_id, reverse=False)
+        if a["kind"] == "name_text"
+    ]
+    assert plan_actions == [{"step": "normalize_names", "kind": "name_text", **p} for p in []] + [
+        {**p} for p in run_actions_
+    ]
+    migration(onto).rollback(report.run_id)
+    assert dump(engine) == before
+
+
+def test_normalize_names_rollback_keeps_later_change(onto, events):
+    kant = _stale(onto, "person", " Кант ", "кант-старый")
+    report = migration(onto).run()
+    with onto.entities.engine.begin() as conn:  # правка названия после запуска
+        conn.execute(
+            ks.names.update()
+            .where(ks.names.c.entity_id == kant)
+            .values(text="Иммануил Кант", normalized="иммануил кант")
+        )
+    summary = migration(onto).rollback(report.run_id)
+    assert primary(onto, kant) == ["Иммануил Кант"]
+    assert summary["kept"] == 1
+
+
+def test_normalize_names_then_duplicate_merges(onto, events):
+    """О24: « Кант » с устаревшим ключом после шага сливается с «Кант» (``merge:name``)."""
+    engine = onto.entities.engine
+    spaced = _stale(onto, "person", " Кант ", "кант-старый")
+    plain = raw(onto, "person", [("ru", "Кант", "primary")])
+    before = dump(engine)
+    report = migration(onto).run()
+    assert onto.entities.resolve(spaced) == onto.entities.resolve(plain)
+    assert [e["reason"] for e in events.where("knowledge.entity.merged")] == ["merge:name"]
+    migration(onto).rollback(report.run_id)
+    assert dump(engine) == before

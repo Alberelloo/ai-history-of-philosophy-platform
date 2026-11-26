@@ -36,6 +36,7 @@
   - таблица, `--json`, `--save`, `--baseline`, коды 0/1/2;
   - событие `knowledge.quality.measured`.
 - [x] 2.6 **Файл Lead'а** `prompts/__init__.py`: шаблон `ontology.translate_names` (поле `items`). Согласование — 5.1.
+- [x] 2.8 Шаг `normalize_names` (О24): strip+NFC текста и пересчёт `normalized`, действие `name_text` в `run_actions`, откат с `kept`, `names_normalized` в отчёте. Юнит-тесты.
 - [x] 2.7 Юнит-тесты модулей 2.2–2.5. `ruff`, `lint-imports`, `check_traceability.py`; `pytest -q` на `tests/knowledge/test_snapshot.py`, `test_catalog*.py`, `test_map*.py`, `test_mentions_cards.py`, `test_statements.py` (фильтр действующих не ломает прежнее).
 
 ## 3. Тестировщик
@@ -57,6 +58,7 @@
   - «Перевод» (`ci`): записаны ровно ожидаемые, причины по порядку, повтор номера отклоняет все; без флага запросов нет;
   - «Откат» (`heavy`): `dump` равен исходному;
   - «Замер» (`ci`): `dump` не меняется, каждое Аi равно независимому расчёту по дампу и API, итог ⇔ все пороги.
+- [ ] 3.2а Шаг `normalize_names` (О24): сценарий «Форма названий» и строка инварианта (текст = strip+NFC, `normalized` = нормализация текста); мутации — шаг пропущен; `normalized` не пересчитан; откат не возвращает текст.
 - [ ] 3.4 Мутации — на **каждое** требование, с ожидаемым тестом в `tests/mutations/migrate-ontology-quality/mutations.yaml`:
 
   | Требование | Мутация | Ожидаемый упавший тест |

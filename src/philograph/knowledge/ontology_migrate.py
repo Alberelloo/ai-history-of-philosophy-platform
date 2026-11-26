@@ -8,16 +8,18 @@
 (``run``) выполняет те же действия и пишет каждое в журнал действий запуска ``run_actions``;
 ``rollback`` отменяет их в обратном порядке.
 
-1. ``manifest_qids`` — решения манифеста QID (``LifeDates.apply`` с общим ``run_id``); пары
+1. ``normalize_names`` — текст названия в форме strip+NFC (``naming.clean``), ключ поиска
+   ``normalized`` — по текущему ``naming.normalize`` (О24).
+2. ``manifest_qids`` — решения манифеста QID (``LifeDates.apply`` с общим ``run_id``); пары
    ``qid_taken`` с ``accepted`` — шагу ``dedupe`` как подтверждённые, ``pending`` с держателем
    — в очередь ``review:qid_candidate``.
-2. ``lang_fix`` — язык названия по письменности (``naming.lang_for``).
-3. ``retire`` — снятие сущности (кроме источников), чья подпись не проходит правило названий.
-4. ``wikidata_labels`` — подпись ``ru`` записи Wikidata основным названием.
-5. ``translate`` — перевод моделью пакетами, только при ``translate="model"``.
-6. ``dedupe`` — слияние вариантов персон (``dedupe.plan``); совпадения основных названий у
+3. ``lang_fix`` — язык названия по письменности (``naming.lang_for``).
+4. ``retire`` — снятие сущности (кроме источников), чья подпись не проходит правило названий.
+5. ``wikidata_labels`` — подпись ``ru`` записи Wikidata основным названием.
+6. ``translate`` — перевод моделью пакетами, только при ``translate="model"``.
+7. ``dedupe`` — слияние вариантов персон (``dedupe.plan``); совпадения основных названий у
    не-персон одного типа — в очередь (``review:same_name``).
-7. ``verify`` — ``integrity.compare``: потеря — аварийный откат (код 1).
+8. ``verify`` — ``integrity.compare``: потеря — аварийный откат (код 1).
 
 В событиях — только идентификаторы, коды и числа; названия видны лишь в отчёте JSON.
 
@@ -53,7 +55,14 @@ from philograph.knowledge import schema as t
 from philograph.knowledge.epoch_dates import ManifestError, load_manifest
 from philograph.knowledge.geo_enrich import file_fetch
 from philograph.knowledge.life_dates import LifeDates, check_manifest
-from philograph.knowledge.naming import check_name, is_russian, lang_for, normalize, script_of
+from philograph.knowledge.naming import (
+    check_name,
+    clean,
+    is_russian,
+    lang_for,
+    normalize,
+    script_of,
+)
 from philograph.knowledge.snapshot import label_of
 from philograph.knowledge.statements import Statements
 from philograph.knowledge.wikidata import Fetch, WikidataError, fetch_entity, http_fetch
@@ -118,7 +127,16 @@ events.define(
     required=("entity_id", "run_id"),
 )
 
-STEPS = ("manifest_qids", "lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
+STEPS = (
+    "normalize_names",
+    "manifest_qids",
+    "lang_fix",
+    "retire",
+    "wikidata_labels",
+    "translate",
+    "dedupe",
+    "verify",
+)
 SOURCE = "source"
 PERSON = "person"
 QID_SYSTEM = "wikidata"
@@ -205,7 +223,11 @@ class View:
 
     def apply(self, action: Action) -> None:
         p = action.payload
-        if action.kind == "lang":
+        if action.kind == "name_text":
+            for n in self.entities[p["entity"]]["names"]:
+                if n["id"] == p["name_id"]:
+                    n["text"], n["normalized"] = p["text"], p["normalized"]
+        elif action.kind == "lang":
             for n in self.entities[p["entity"]]["names"]:
                 if n["id"] == p["name_id"]:
                     n["lang"] = p["lang"]
@@ -291,6 +313,7 @@ class Report:
     run_id: str
     dry_run: bool
     translate: str
+    names_normalized: int = 0
     lang_fixed: int = 0
     retired: Counter[str] = field(default_factory=Counter)
     retired_list: list[dict[str, Any]] = field(default_factory=list)
@@ -317,6 +340,7 @@ class Report:
             "dry_run": self.dry_run,
             "translate": self.translate,
             "steps": {s: self.steps.get(s, 0) for s in STEPS},
+            "names_normalized": self.names_normalized,
             "lang_fixed": self.lang_fixed,
             "retired": dict(sorted(self.retired.items())),
             "retired_list": self.retired_list,
@@ -515,6 +539,40 @@ class Migration:
                         open_,
                         run_id=report.run_id,
                     )
+        return found
+
+    def _step_normalize_names(self, view: View, report: Report, **_: Any) -> list[Action]:
+        """Хранимый текст — strip+NFC, ключ поиска — текущий ``normalize``: иначе запрос не
+        находит название, а дубль не сливается (О24)."""
+        found = []
+        for entity_id in view.active():
+            for n in view.entities[entity_id]["names"]:
+                text = clean(n["text"])
+                key = normalize(text)
+                if text == n["text"] and key == n["normalized"]:
+                    continue
+                action = Action(
+                    "normalize_names",
+                    "name_text",
+                    {
+                        "entity": entity_id,
+                        "name_id": n["id"],
+                        "old_text": n["text"],
+                        "old_normalized": n["normalized"],
+                        "text": text,
+                        "normalized": key,
+                    },
+                )
+                if not report.dry_run:
+                    with self.engine.begin() as conn:
+                        conn.execute(
+                            update(t.names)
+                            .where(t.names.c.id == n["id"])
+                            .values(text=text, normalized=key)
+                        )
+                self._record(report, action)
+                found.append(action)
+        report.names_normalized = len(found)
         return found
 
     def _step_lang_fix(self, view: View, report: Report, **_: Any) -> list[Action]:
@@ -873,6 +931,15 @@ class Migration:
                 if changed:
                     restored += 1
                     events.emit("knowledge.entity.restored", entity_id=p["entity"], run_id=run_id)
+            elif kind == "name_text":
+                # Прежние текст и ключ; если текст с тех пор сменили — чужое изменение.
+                with self.engine.begin() as conn:
+                    changed = conn.execute(
+                        update(t.names)
+                        .where(and_(t.names.c.id == p["name_id"], t.names.c.text == p["text"]))
+                        .values(text=p["old_text"], normalized=p["old_normalized"])
+                    ).rowcount
+                kept += 0 if changed else 1
             elif kind == "lang":
                 with self.engine.begin() as conn:
                     conn.execute(
