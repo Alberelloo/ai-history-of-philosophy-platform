@@ -1,5 +1,5 @@
 diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
-index 3016536..6ad4a55 100644
+index 3016536..5b9c07f 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
 @@ -539,8 +539,7 @@ class Migration:
@@ -12,3 +12,39 @@ index 3016536..6ad4a55 100644
  
      # --- шаги ---
  
+@@ -616,7 +615,7 @@ class Migration:
+                             .where(t.names.c.id == n["id"])
+                             .values(text=text, normalized=key)
+                         )
+-                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                        (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 found.append(action)
+         report.names_normalized = len(found)
+         return found
+@@ -638,7 +637,7 @@ class Migration:
+                         conn.execute(
+                             update(t.names).where(t.names.c.id == n["id"]).values(lang=lang)
+                         )
+-                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                        (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 found.append(action)
+         report.lang_fixed = len(found)
+         return found
+@@ -663,7 +662,7 @@ class Migration:
+                         .where(t.entities.c.id == entity_id)
+                         .values(retired_run=report.run_id, retired_reason=reason)
+                     )
+-                    run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                    (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 events.emit(
+                     "knowledge.entity.retired",
+                     entity_id=entity_id,
+@@ -702,7 +701,7 @@ class Migration:
+                     ).mappings()
+                 ]
+                 self.entities.set_primary_name(entity_id, "ru", text, conn=conn)
+-                run_actions.record_in(
++                (lambda *a, **k: 0)(
+                     conn,
+                     report.run_id,
+                     action.kind,

@@ -1039,9 +1039,17 @@ def test_later_change_kept(onto, events):
     m = migration(onto, llm=FakeLLM.by_label(TWO))
     report = m.run(translate="model")
     onto.entities.set_primary_name(ids["causality"], "ru", "Каузальность")
+    renamed_again = {
+        (text_, kind)
+        for _l, text_, kind in State.read(onto.statements.engine).name_set(ids["causality"])
+    }
     events.clear()
     m.rollback(report.run_id)
-    assert State.read(onto.statements.engine).label(ids["causality"]) == "Каузальность"
+    after = State.read(onto.statements.engine)
+    assert after.label(ids["causality"]) == "Каузальность"
+    # переименование не откатывается: тексты и виды как после смены человеком (язык lang_fix
+    # откатывается отдельным действием)
+    assert {(x, k) for _l, x, k in after.name_set(ids["causality"])} == renamed_again
     assert events.one("knowledge.migration.rolled_back")["kept"] == 1
     check_keys(events)
 
