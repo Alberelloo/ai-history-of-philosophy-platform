@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..828333a 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -370,7 +370,7 @@ def report(engine: Engine, entities: Entities, since: date, until: date | None =
+     lines.append(
+         "| **Итого** | | | "
+         + f"{len(rows)} запусков | {total['duration_seconds']:.1f} | {int(total['fragments'])} "
+-        + f"| {int(total['input_tokens'])} | {int(total['output_tokens'])} "
++        + f"| {int(total['output_tokens'])} | {int(total['input_tokens'])} "
+         + f"| {total['cost_usd']:.4f} | {int(total['created'])} | {int(total['dropped'])} "
+         + f"| {_rate(int(total['created']), int(total['dropped']))} | {_top(reasons_all)} |"
+     )

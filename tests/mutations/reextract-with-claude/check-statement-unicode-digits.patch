@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index ef51a66..0c16fe3 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -83,7 +83,7 @@ TIMEOUT_MARGIN = 30.0  # запас сверх бюджета шлюза на в
+ STANCES = ("asserts", "disputes", "mentions")
+ REQUIRED = ("subject", "type", "object", "paragraph", "quote")
+ FAILURE_LIMIT = 500
+-_DIGITS = re.compile(r"[0-9]+")  # только ASCII: str.isdigit пропускает «²», а int() — нет
++_DIGITS = re.compile(r"\d+")  # только ASCII: str.isdigit пропускает «²», а int() — нет
+ # Wikidata: только простые факты. Влияние (P737) не берём: там нет обоснований.
+ WIKIDATA_SIMPLE = {
+     "P569": "birth",

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..4b5d5cb 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -515,7 +515,7 @@ class Migration:
+         open_, distinct = dedupe.duplicate_items(self.engine)
+         for entry in manifest["entities"]:
+             if entry.get("decision", "pending") != "pending":
+-                continue
++                break
+             for c in entry.get("candidates") or []:
+                 holder = c.get("holder")
+                 if (

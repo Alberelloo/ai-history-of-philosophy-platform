@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -280,7 +280,7 @@
+         return {
+             "attributions": [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))],
+             "provenance": Provenance(
+-                "imported", run_id=run_id, extra={"wikidata": qid, "property": prop, **extra}
++                "imported", extra={"wikidata": qid, "property": prop, **extra}
+             ),
+             "status": "sourced",
+         }

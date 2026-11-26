@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -493,9 +493,6 @@
+             conn.execute(
+                 t.graph_extensions.delete().where(t.graph_extensions.c.entity_id == removed)
+             )
+-            conn.execute(
+-                update(t.entities).where(t.entities.c.id == removed).values(redirect_to=kept)
+-            )
+             merge_id = conn.execute(
+                 t.merges.insert().values(
+                     kept=kept,

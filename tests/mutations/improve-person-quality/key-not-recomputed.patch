@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -656,7 +656,7 @@
+             key = self._key(
+                 row["subject"], row["type"], row["object"], row["value"], row["qualifiers"]
+             )
+-            if key == row["key"]:
++            if True:
+                 continue
+             with self.engine.begin() as conn:
+                 survivor = conn.scalar(

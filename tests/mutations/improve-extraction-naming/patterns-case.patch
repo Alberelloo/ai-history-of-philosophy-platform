@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -227,7 +227,7 @@
+     ):
+         return True
+     normalized = normalize(label)
+-    if any(p.search(normalized) for p in rules.patterns):
++    if any(re.search(p.pattern, label) for p in rules.patterns):
+         return True
+     stripped = _words(label)
+     for i in range(1, len(stripped) - 1):

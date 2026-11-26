@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -492,8 +492,6 @@
+             report.failed += 1
+         else:
+             report.skipped += 1
+-        if reason == "conflict":
+-            report.conflicts += 1
+         events.emit("knowledge.life_dates.skipped", entity=entity_id, property=prop, reason=reason)
+ 
+     def _import(self, report: Report, entity_id: str, qid: str) -> None:

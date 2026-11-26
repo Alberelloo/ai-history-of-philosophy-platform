@@ -1,0 +1,59 @@
+# Эпохи раздела «Теория познания» — ядро эпох (возможность epochs, «Ядро эпох»).
+# ru — название (уникально), en — английское название (вариант), wikidata — только QID,
+# подтверждённый человеком; candidates заполняет команда
+#   python -m philograph.knowledge.epoch_dates suggest
+# человек переносит верный qid кандидата в wikidata, затем apply --dry-run и apply.
+# QID здесь не выдумываются: пока человек не подтвердил — wikidata: null.
+# suggest перезаписывает файл и сохраняет только эти строки комментария в начале.
+epochs:
+- ru: Античность
+  en: Classical antiquity
+  wikidata: Q486761
+  candidates:
+  - qid: Q486761
+    label: античность
+    description: период истории греко-римского мира
+    start: VIII в. до н. э.
+    end: III в.
+  - qid: Q41493
+    label: Древний мир
+    description: период в истории человечества
+    start: IV тыс. до н. э.
+    end: V в.
+- ru: Средние века
+  en: Middle Ages
+  wikidata: Q12554
+  candidates:
+  - qid: Q12554
+    label: Средние века
+    description: период европейской истории, следующий за Античностью и предшествующий
+      Новому времени
+    start: '476'
+    end: 1500-е
+- ru: Возрождение
+  en: Renaissance
+  wikidata: Q4692
+  candidates:
+  - qid: Q4692
+    label: Возрождение
+    description: эпоха в истории культуры Европы
+    start: XIV в.
+    end: XVII в.
+- ru: Научная революция
+  en: Scientific Revolution
+  wikidata: Q214078
+  candidates:
+  - qid: Q214078
+    label: Революция в науке
+    description: events that marked the emergence of modern science in the early modern
+      period
+    start: '1543'
+    end: '1687'
+- ru: Просвещение
+  en: Age of Enlightenment
+  wikidata: Q12539
+  candidates: []
+- ru: Немецкая классическая философия
+  en: German classical philosophy
+  wikidata: Q679842
+  candidates: []

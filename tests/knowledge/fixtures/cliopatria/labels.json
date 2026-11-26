@@ -1,0 +1,162 @@
+{
+ "Q12548": {
+  "id": "Q12548",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Священная Римская империя"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Священная Римская империя"
+   }
+  }
+ },
+ "Q172107": {
+  "id": "Q172107",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Речь Посполитая"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Речь Посполитая"
+   }
+  }
+ },
+ "Q12560": {
+  "id": "Q12560",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Османская империя"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Османская империя"
+   }
+  }
+ },
+ "Q27306": {
+  "id": "Q27306",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Королевство Пруссия"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Королевство Пруссия"
+   }
+  }
+ },
+ "Q34266": {
+  "id": "Q34266",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Российская империя"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Российская империя"
+   }
+  }
+ },
+ "Q70972": {
+  "id": "Q70972",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Французское королевство"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Французское королевство"
+   }
+  }
+ },
+ "Q80702": {
+  "id": "Q80702",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Испанская империя"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Испанская империя"
+   }
+  }
+ },
+ "Q4948": {
+  "id": "Q4948",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Венецианская республика"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Венецианская республика"
+   }
+  }
+ },
+ "Q215443": {
+  "id": "Q215443",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Шведская империя"
+   }
+  },
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Шведская империя"
+   }
+  }
+ },
+ "Q999999901": {
+  "id": "Q999999901",
+  "labels": {},
+  "sitelinks": {}
+ },
+ "Q999999902": {
+  "id": "Q999999902",
+  "labels": {
+   "ru": {
+    "language": "ru",
+    "value": "Малый город"
+   }
+  },
+  "sitelinks": {}
+ },
+ "Q999999903": {
+  "id": "Q999999903",
+  "labels": {},
+  "sitelinks": {
+   "ruwiki": {
+    "site": "ruwiki",
+    "title": "Пример (государство)"
+   }
+  }
+ }
+}

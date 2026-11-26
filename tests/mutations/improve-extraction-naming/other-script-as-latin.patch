@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -161,7 +161,7 @@
+         return "greek"
+     if unicodedata.name(ch, "").startswith("LATIN"):
+         return "latin"
+-    return "other"
++    return "latin"
+ 
+ 
+ def _script_counts(text: str) -> dict[str, int]:

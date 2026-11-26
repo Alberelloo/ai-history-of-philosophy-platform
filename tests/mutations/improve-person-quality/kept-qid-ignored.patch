@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -120,8 +120,6 @@
+     """Оставшаяся: с QID; иначе с большим числом ссылок; иначе с меньшим идентификатором."""
+     members = sorted(component, key=lambda e: e.id)
+     with_qid = [e for e in members if e.qid]
+-    if with_qid:
+-        return with_qid[0].id
+     return min(members, key=lambda e: (-counts.get(e.id, 0), e.id)).id
+ 
+ 

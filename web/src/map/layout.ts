@@ -139,19 +139,24 @@ export function packPeople(people: MapPerson[], s: TimeScale, measure: Measure, 
     const end = yearsIn ? Math.max(dx, nameEnd) + 6 : Math.max(dx, nameEnd) + 8 + yw + 12;
     return { id: p.id, p, bx, dx, label, yearsIn, occ: [bx - r0 - 6, end], lane: 0 };
   });
+  return { items, lanes: packIntervals(items, (a, b) => a.p.birth - b.p.birth) };
+}
+
+// Жадная упаковка отрезков по дорожкам: в порядке ``order`` каждый занимает первую дорожку,
+// где предыдущий отрезок кончился левее его начала. Пишет ``lane``, возвращает число дорожек.
+// Общая для лент людей на карте и пролётов на ленте эпох.
+export function packIntervals<T extends { occ: [number, number]; lane: number }>(items: T[], order: (a: T, b: T) => number): number {
   const lanes: number[] = [];
-  [...items]
-    .sort((a, b) => a.p.birth - b.p.birth)
-    .forEach((it) => {
-      let k = lanes.findIndex((end) => end < it.occ[0]);
-      if (k < 0) {
-        k = lanes.length;
-        lanes.push(0);
-      }
-      lanes[k] = it.occ[1];
-      it.lane = k;
-    });
-  return { items, lanes: lanes.length };
+  [...items].sort(order).forEach((it) => {
+    let k = lanes.findIndex((end) => end < it.occ[0]);
+    if (k < 0) {
+      k = lanes.length;
+      lanes.push(0);
+    }
+    lanes[k] = it.occ[1];
+    it.lane = k;
+  });
+  return lanes.length;
 }
 
 /* ---------- «булавки» ---------- */
@@ -323,7 +328,17 @@ function planEvents(v: Visible, rel: Related | null, s: TimeScale, measure: Meas
 
 /* ---------- эпохи ---------- */
 
-export type EraPlace = { id: string; x1: number; x2: number; labelFits: boolean; active: boolean };
+// Пролёт эпохи: x1–x2 — середины границ (как прежде, по ним подпись); fuzzy — края растушёвки
+// от самого раннего до самого позднего года границы; у чёткой границы края совпадают.
+export type EraPlace = {
+  id: string;
+  x1: number;
+  x2: number;
+  labelFits: boolean;
+  active: boolean;
+  fuzzy: { s0: number; s1: number; e0: number; e1: number };
+  fuzzyYears: { start: number; end: number }; // ширина неопределённости границ в годах
+};
 
 /* ---------- линии влияний ---------- */
 
@@ -511,7 +526,17 @@ export function layout(input: LayoutInput): MapLayout {
   const eras: EraPlace[] = v.eras.map((e) => {
     const x1 = s.clampX(s.x(e.from));
     const x2 = s.clampX(s.x(e.to));
-    return { id: e.id, x1, x2, labelFits: measure(e.label, fonts.eraText) <= x2 - x1 - 12, active: !!rel && rel.era?.id === e.id };
+    const f = e.fuzzy ?? { from: [e.from, e.from], to: [e.to, e.to] };
+    const x = (year: number) => s.clampX(s.x(year));
+    return {
+      id: e.id,
+      x1,
+      x2,
+      labelFits: measure(e.label, fonts.eraText) <= x2 - x1 - 12,
+      active: !!rel && rel.era?.id === e.id,
+      fuzzy: { s0: x(f.from[0]), s1: x(f.from[1]), e0: x(f.to[0]), e1: x(f.to[1]) },
+      fuzzyYears: { start: f.from[1] - f.from[0], end: f.to[1] - f.to[0] },
+    };
   });
 
   // линии влияний: от учителя (object) к ученику (subject); у каждой ленты концы разводятся по слотам

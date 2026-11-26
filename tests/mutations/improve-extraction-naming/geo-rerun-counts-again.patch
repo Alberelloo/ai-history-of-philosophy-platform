@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -306,7 +306,7 @@
+             if entity_id is not None and self.statements.find(
+                 entity_id, type_, obj=obj, value=stored, qualifiers=qualifiers
+             ):
+-                return False
++                return True
+             if not report.dry_run:
+                 assert entity_id is not None
+                 self.statements.add(

@@ -1,0 +1,14 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index ef51a66..1ed2a87 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -467,8 +467,7 @@ class Filling:
+                 for window in fragments:
+                     self._extract_fragment(window, data, source, schema, run_id, timeout)
+             return self.finish_run(run_id)  # внутри: сбой завершения тоже не оставит running
+-        except BaseException as exc:
+-            self.fail_run(run_id, exc)
++        except BaseException:
+             raise
+ 
+     def _extract_fragment(

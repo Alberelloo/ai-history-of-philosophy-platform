@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -189,7 +189,7 @@
+     found = {p: claim_date(c) for p, c in claims.items()}
+     for p in props:
+         if claims[p] is not None and found[p] is None:
+-            raise Skip(p, "bad_value")
++            raise Skip(p, "partial")
+     if all(found[p] is None for p in props):
+         raise Skip(props[0], "no_dates")
+     if kind != PERSON:

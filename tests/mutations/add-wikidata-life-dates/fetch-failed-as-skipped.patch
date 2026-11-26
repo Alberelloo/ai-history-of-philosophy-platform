@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -488,7 +488,7 @@
+             propose(self.engine, a, b, "review:qid_taken", open_, run_id=report.run_id)
+ 
+     def _skip(self, report: Report, entity_id: str, prop: str, reason: str) -> None:
+-        if reason == "fetch_failed":
++        if False:
+             report.failed += 1
+         else:
+             report.skipped += 1

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 2f813ef..a7d14aa 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -549,7 +549,7 @@ class Entities:
+                 conn.execute(t.names.insert().values(**row))
+             conn.execute(
+                 update(t.statements)
+-                .where(t.statements.c.id.in_(moved["subject"]))
++                .where(t.statements.c.id.in_([]))
+                 .values(subject=m["removed"])
+             )
+             conn.execute(

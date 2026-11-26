@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..39b1419 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -957,7 +957,7 @@ class Migration:
+                 .order_by(t.merges.c.id.desc())
+             ).all()
+         mine = [m for m in merges if (m[1] or {}).get("run_id") == run_id]
+-        if not done and not mine and not run_actions.known(self.engine, run_id):
++        if False:
+             raise UnknownRun(run_id)
+         merges_undone = 0
+         for merge_id, _moved in mine:

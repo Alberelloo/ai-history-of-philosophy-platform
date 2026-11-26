@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/wikidata.py
++++ b/src/philograph/knowledge/wikidata.py
+@@ -181,7 +181,7 @@
+     def best(self, prop: str) -> Claim | None:
+         """Значение свойства: «предпочтённое», иначе первое «обычное»; «устаревшее» — никогда."""
+         claims = self.claims.get(prop, [])
+-        for rank in ("preferred", "normal"):
++        for rank in ("normal", "preferred"):
+             for claim in claims:
+                 if claim.rank == rank:
+                     return claim

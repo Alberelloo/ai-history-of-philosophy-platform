@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -341,7 +341,7 @@
+             if limit is not None and processed >= limit:
+                 break
+             entry = index.get(entity["id"])
+-            if entry is not None and (entry.get("decision", "pending") != "pending"):
++            if False:
+                 continue  # решение уже принято: подбор его не трогает
+             kind = self._kind(entity["type"])
+             assert kind is not None

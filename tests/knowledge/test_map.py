@@ -105,16 +105,32 @@ def test_contemporaries_on_time_axis(onto, mx):
         "precision": "year",
         "roles": ["philosopher", "scientist"],
         "weight": kant["weight"],
+        # add-epochs, «Карта раздела»: эпохи персоны (середина жизни 1764 — Просвещение).
+        "epochs": [mx["enlightenment"]],
     }
     assert kant["weight"] > people[mx["descartes"]]["weight"]
     assert [p["id"] for p in data["people"]][:2] == [mx["descartes"], mx["locke"]]  # по году
     assert data["range"] == [1596, 1814]
     assert data["truncated"] is False and data["limit"] == 400
+    # add-epochs, «Карта раздела»: у эпохи — нечёткие границы (у чётких значения равны),
+    # у события — эпохи, к которым оно относится (1751 — Просвещение).
     assert data["eras"] == [
-        {"id": mx["enlightenment"], "label": "Просвещение", "from": 1680, "to": 1800}
+        {
+            "id": mx["enlightenment"],
+            "label": "Просвещение",
+            "from": 1680,
+            "to": 1800,
+            "fuzzy": {"from": [1680, 1680], "to": [1800, 1800]},
+        }
     ]
     assert data["events"] == [
-        {"id": mx["encyclopedia"], "label": "Энциклопедия", "year": 1751, "kind": "intellectual"}
+        {
+            "id": mx["encyclopedia"],
+            "label": "Энциклопедия",
+            "year": 1751,
+            "kind": "intellectual",
+            "epochs": [mx["enlightenment"]],
+        }
     ]
     # Места, источники и термины на карту не попадают.
     assert mx["place"] not in {x["id"] for x in placed(data)}
@@ -125,11 +141,12 @@ def test_work_and_idea_on_year(onto, mx):
     data = SectionMap(onto.statements).build()
     works = by_id(data["works"])
     critique = works[mx["critique"]]
-    assert {k: critique[k] for k in ("type", "kind", "year", "author")} == {
+    assert {k: critique[k] for k in ("type", "kind", "year", "author", "epochs")} == {
         "type": "work",
         "kind": "work",
         "year": 1781,
         "author": mx["kant"],
+        "epochs": [mx["enlightenment"]],  # add-epochs: труд 1781 — Просвещение по дате
     }
     causality = works[mx["causality"]]
     assert (causality["kind"], causality["year"], causality["author"]) == (
@@ -137,7 +154,10 @@ def test_work_and_idea_on_year(onto, mx):
         1781,
         mx["kant"],
     )
-    assert set(causality) == {"id", "label", "type", "kind", "year", "author", "weight"}
+    # add-epochs: у идеи есть поле ``epochs``; идея без явной принадлежности — пусто
+    # («Принадлежность к эпохе»: идеи относятся к эпохе только явно).
+    assert set(causality) == {"id", "label", "type", "kind", "year", "author", "weight", "epochs"}
+    assert causality["epochs"] == []
     # Без датировки и без датированного труда — не на оси, а в «без даты».
     assert mx["experience"] not in works
     assert {"id": mx["experience"], "label": "Опыт", "type": "concept"} in data["undated"]
@@ -227,7 +247,15 @@ def test_epoch_span_on_map(onto):
         attributions=[Attribution("common")],
     )
     data = SectionMap(onto.statements).build()
-    assert data["eras"] == [{"id": epoch, "label": "Схоластика", "from": 1100, "to": 1450}]
+    assert data["eras"] == [
+        {
+            "id": epoch,
+            "label": "Схоластика",
+            "from": 1100,
+            "to": 1450,
+            "fuzzy": {"from": [1050, 1150], "to": [1400, 1500]},  # add-epochs
+        }
+    ]
     assert data["range"] == [1100, 1450]
 
 
@@ -266,3 +294,185 @@ def test_map_route_and_cache(onto, mx, events):
 def test_empty_map(onto):
     data = SectionMap(onto.statements).build()
     assert data["range"] is None and data["people"] == [] and data["truncated"] is False
+
+
+# --- add-epochs: эпохи в ответе карты (задача 5.4) -----------------------------------------
+
+
+def _map(svc):
+    response, rid = svc.get("/v1/map")
+    assert response.status_code == 200, response.text
+    return response.json(), rid
+
+
+@req(KG, "Карта раздела", scenario="Нечёткая граница эпохи")
+def test_fuzzy_epoch_boundary_in_map(svc, events):
+    from philograph.knowledge.dates import FuzzyDate
+
+    sci = svc.world.dated(
+        "epoch",
+        "Научная революция",
+        FuzzyDate(1543, 1543, 1687, 1700, "approx", "1543 – 1687…1700").to_json(),
+    )
+    data, rid = _map(svc)
+    [era] = data["eras"]
+    assert era["id"] == sci
+    assert era["fuzzy"] == {"from": [1543, 1543], "to": [1687, 1700]}
+    assert len(events.where("knowledge.map.built", request_id=rid)) == 1
+
+
+@req(KG, "Карта раздела", scenario="Эпохи в ответе карты")
+def test_epochs_in_map_answer(svc, events):
+    w = svc.world
+    sci = w.thing("epoch", "Научная революция", "1543–1687")
+    enl = w.thing("epoch", "Просвещение", "1680–1800")
+    locke = w.person("Джон Локк", "1632", "1704")
+    kant = w.person("Иммануил Кант", "1724", "1804")
+    descartes = w.person("Рене Декарт", "1596", "1650")
+    w.belongs(locke, enl)
+    data, rid = _map(svc)
+    people = by_id(data["people"])
+    assert people[locke]["epochs"] == [enl]
+    assert people[kant]["epochs"] == [enl]
+    assert people[descartes]["epochs"] == [sci]
+    assert len(events.where("knowledge.map.built", request_id=rid)) == 1
+
+
+@req(
+    KG,
+    "Карта раздела",
+    invariant="эпохи у персон, трудов, идей и событий — по правилу принадлежности",
+)
+def test_epochs_by_membership_rule_on_map(svc, events):
+    w = svc.world
+    sci = w.thing("epoch", "Научная революция", "1543–1687")
+    enl = w.thing("epoch", "Просвещение", "1680–1800")
+    baroque = w.thing("epoch", "Барокко")  # без датировки
+    leibniz = w.person("Готфрид Лейбниц", "1646", "1716")  # середина 1681 — обе эпохи
+    revocation = w.thing("event", "Отмена Нантского эдикта", "1685")
+    principia = w.thing("event", "Выход «Начал» Ньютона", "1687")  # конец эпохи не включается
+    essay = w.thing("work", "Опыт о человеческом разумении", "1690")
+    locke = w.person("Джон Локк", "1632", "1704")
+    w.relate(essay, "author", locke)
+    causality = w.thing("concept", "Причинность")
+    w.relate(essay, "discusses", causality)  # идея на году труда, без явной эпохи
+    monad = w.thing("concept", "Монада")
+    w.relate(essay, "discusses", monad)
+    w.belongs(monad, baroque)  # явная — к эпохе без датировки
+    data, rid = _map(svc)
+    people, works, evs = by_id(data["people"]), by_id(data["works"]), by_id(data["events"])
+    assert people[leibniz]["epochs"] == [sci, enl]  # порядок — по началу эпохи
+    assert evs[revocation]["epochs"] == [sci, enl]
+    assert evs[principia]["epochs"] == [enl]
+    assert works[essay]["epochs"] == [enl]
+    assert works[causality]["epochs"] == []
+    assert works[monad]["epochs"] == [baroque]
+    assert [e["id"] for e in data["eras"]] == [sci, enl]  # эпоха без датировки не на оси
+    assert len(events.where("knowledge.map.built", request_id=rid)) == 1
+    # Вывод не стал утверждением.
+    with svc.onto.statements.engine.begin() as conn:
+        from sqlalchemy import func, select
+
+        stored = conn.scalar(
+            select(func.count())
+            .select_from(schema.statements)
+            .where(schema.statements.c.type == "belongs_to_epoch")
+        )
+    assert stored == 1
+
+
+# --- add-epoch-context: «стимулировало» у событий карты (задача 6.6) -------------------------
+
+CHOICE = "Выбор на карте"
+
+
+def _revolution_world(svc):
+    w = svc.world
+    ids = {
+        "revolution": w.thing("event", "Французская революция", "1789"),
+        "fichte": w.person("Иоганн Готлиб Фихте", "1762", "1814"),
+        "marx": w.person("Карл Маркс", "1818", "1883"),
+        "basis": w.thing("work", "Основа общего наукоучения", "1794"),
+        "freedom": w.thing("concept", "Свобода"),  # без даты — не на карте
+    }
+    w.relate(ids["basis"], "author", ids["fichte"])
+    ids["basis_link"] = w.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["basis"],
+        qualifiers={"mechanism": "political"},
+        attributions=[Attribution("common")],
+    )
+    ids["marx_link"] = w.statements.add(
+        ids["revolution"],
+        "stimulated",
+        obj=ids["marx"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+def _map_event(svc, events, event_id):
+    response, rid = svc.get("/v1/map")
+    assert response.status_code == 200, response.text
+    assert events.where("knowledge.map.built", request_id=rid)
+    return {e["id"]: e for e in response.json()["events"]}[event_id], response.json()
+
+
+@req(KG, CHOICE, scenario="Событие и то, что оно стимулировало")
+def test_map_event_stimulated_api(svc, events):
+    ids = _revolution_world(svc)
+    event, _ = _map_event(svc, events, ids["revolution"])
+    assert event["stimulated"] == [
+        {"id": ids["basis"], "generated": False},
+        {"id": ids["marx"], "generated": True},
+    ]
+
+
+@req(KG, CHOICE, scenario="Стимулированное вне карты")
+def test_map_stimulated_outside_map(svc, events):
+    w = svc.world
+    revolution = w.thing("event", "Французская революция", "1789")
+    freedom = w.thing("concept", "Свобода")  # без даты — не на карте
+    w.relate(revolution, "stimulated", freedom)
+    other = w.thing("event", "Южноморский пузырь", "1720")
+    w.relate(other, "stimulated", freedom)
+    w.relate(other, "stimulated", w.person("Бернард Мандевиль", "1670", "1733"))
+    event, data = _map_event(svc, events, revolution)
+    assert "stimulated" not in event
+    assert freedom not in {p["id"] for p in data.get("people", [])}
+    bubble = {e["id"]: e for e in data["events"]}[other]
+    assert [s["id"] for s in bubble["stimulated"]] != [] and freedom not in [
+        s["id"] for s in bubble["stimulated"]
+    ]
+
+
+@req(
+    KG, CHOICE, invariant="stimulated у события — не больше 30, проверенные раньше сгенерированных"
+)
+def test_map_stimulated_limit_and_order(svc, events):
+    w = svc.world
+    event = w.thing("event", "Французская революция", "1789")
+    generated = []
+    for i in range(5):
+        person = w.person(f"Сгенерированный {i}", "1760", "1820")
+        generated.append(person)
+        w.statements.add(event, "stimulated", obj=person, provenance=Provenance("generated"))
+    verified = []
+    for i in range(30):
+        person = w.person(f"Проверенный {i:02d}", "1760", "1820")
+        verified.append(person)
+        w.relate(event, "stimulated", person)
+    record, _ = _map_event(svc, events, event)
+    links = record["stimulated"]
+    assert len(links) == 30
+    assert {s["id"] for s in links} == set(verified)
+    assert all(s["generated"] is False for s in links)
+
+
+@req(KG, CHOICE, invariant="отклонённая связь «стимулировало» на карту не попадает")
+def test_map_stimulated_rejected(svc, events):
+    ids = _revolution_world(svc)
+    svc.onto.statements.reject(ids["marx_link"], "operator")
+    event, _ = _map_event(svc, events, ids["revolution"])
+    assert event["stimulated"] == [{"id": ids["basis"], "generated": False}]

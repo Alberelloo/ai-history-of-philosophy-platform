@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -198,7 +198,7 @@
+ def is_russian(text: str) -> bool:
+     """Есть кириллическая буква и нет латинских (слова из римских цифр не считаются)."""
+     counts = _script_counts(text)
+-    return counts.get("cyrillic", 0) > 0 and counts.get("latin", 0) == 0
++    return counts.get("cyrillic", 0) > 0
+ 
+ 
+ # --- валидность ---

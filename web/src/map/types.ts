@@ -4,7 +4,14 @@
 
 // Роли персоны и виды событий — значения из списка реестра (person_role, event_kind).
 export type PersonRole = "philosopher" | "scientist" | "writer" | "theologian" | "ruler" | "translator";
-export type EventKind = "political" | "scientific" | "religious" | "intellectual" | "biographical";
+export type EventKind =
+  | "political"
+  | "economic"
+  | "social"
+  | "scientific"
+  | "religious"
+  | "intellectual"
+  | "biographical";
 // Вид значка на страте трудов: произведение или идея (понятие, позиция, аргумент).
 export type WorkKind = "work" | "concept" | "position" | "argument";
 export type GroupKind = "school" | "direction" | "institution" | "circle";
@@ -20,6 +27,7 @@ export type MapPerson = {
   roles: string[];
   portrait?: string;
   weight: number; // значимость: число утверждений в области
+  epochs?: string[]; // эпохи по правилу сервера (явные важнее дат), по началу эпохи
 };
 
 export type MapWork = {
@@ -30,10 +38,23 @@ export type MapWork = {
   year: number; // год труда; у идеи — год самого раннего труда, где она высказана
   author: string | null; // id персоны; может не быть или указывать на персону вне карты
   weight: number;
+  epochs?: string[]; // у идеи — только явные
 };
 
-export type MapEvent = { id: string; label: string; year: number; kind?: string | null };
-export type MapEra = { id: string; label: string; from: number; to: number };
+// Что событие стимулировало (связи «стимулировало» к персонам, трудам и идеям на карте):
+// до 30, проверенные и по источникам раньше сгенерированных; нет таких — поля нет.
+export type MapStimulated = { id: string; generated: boolean };
+export type MapEvent = {
+  id: string;
+  label: string;
+  year: number;
+  kind?: string | null;
+  epochs?: string[];
+  stimulated?: MapStimulated[];
+};
+// Нечёткие границы пролёта: пары «самое раннее, самое позднее»; у чёткой границы равны.
+export type Fuzzy = { from: [number, number]; to: [number, number] };
+export type MapEra = { id: string; label: string; from: number; to: number; fuzzy?: Fuzzy };
 export type MapGroup = { id: string; label: string; kind: GroupKind | null; members: string[] };
 
 // Связь между персонами (influenced_by и подтипы, studied_with).
@@ -71,6 +92,7 @@ export type Filter = {
   roles: string[];
   kinds: string[];
   ekinds: string[];
+  epochs: string[]; // id датированных эпох карты; неизвестные карте отбрасываются
   verified: boolean; // только проверенные: без достроенных моделью связей
 };
 
@@ -81,16 +103,21 @@ export type Selection = string;
 export type Stratum = "events" | "eras" | "people" | "works";
 export const STRATA: readonly Stratum[] = ["events", "eras", "people", "works"];
 
+// Вид карты: хронология (по умолчанию) или глобус (geo-timeline, openspec/changes/archive/2026-11-25-add-geo-timeline).
+export type MapView = "chrono" | "globe";
+
 export type MapState = {
   sel: Selection | null;
   q: string;
   filter: Filter;
   collapsed: Stratum[]; // свёрнутые линзы
+  view: MapView;
+  t?: number; // год глобуса — целое из адреса; зажим в окно времени — в модели (geo/timeline.ts)
 };
 
-export const emptyFilter = (): Filter => ({ groups: [], roles: [], kinds: [], ekinds: [], verified: false });
+export const emptyFilter = (): Filter => ({ groups: [], roles: [], kinds: [], ekinds: [], epochs: [], verified: false });
 
-export const emptyState = (): MapState => ({ sel: null, q: "", filter: emptyFilter(), collapsed: [] });
+export const emptyState = (): MapState => ({ sel: null, q: "", filter: emptyFilter(), collapsed: [], view: "chrono" });
 
 // Свернуть или развернуть страту. Последнюю развёрнутую свернуть нельзя — список не меняется.
 export function toggleLens(collapsed: Stratum[], k: Stratum): Stratum[] {
@@ -99,8 +126,9 @@ export function toggleLens(collapsed: Stratum[], k: Stratum): Stratum[] {
   return STRATA.filter((x) => x === k || collapsed.includes(x));
 }
 
-/* Параметры адреса: sel, q, from, to, groups, roles, kinds, ekinds, verified, lens.
-   Списки — через запятую; пустые и значения по умолчанию в адрес не пишутся. */
+/* Параметры адреса: sel, q, from, to, groups, roles, kinds, ekinds, epochs, verified, lens,
+   view, t. Списки — через запятую; пустые и значения по умолчанию в адрес не пишутся: view —
+   только globe, t — только в виде глобуса и только целым. */
 
 const list = (p: URLSearchParams, k: string): string[] =>
   (p.get(k) ?? "")
@@ -121,6 +149,8 @@ export function parseState(p: URLSearchParams): MapState {
   const lens = list(p, "lens").filter((k): k is Stratum => (STRATA as readonly string[]).includes(k));
   // все страты свернуть нельзя: тогда адрес игнорируется
   const collapsed = STRATA.filter((k) => lens.includes(k));
+  const view: MapView = p.get("view") === "globe" ? "globe" : "chrono";
+  const t = view === "globe" ? year(p, "t") : undefined; // нецелое t игнорируется
   return {
     sel: p.get("sel") || null,
     q: p.get("q") ?? "",
@@ -131,9 +161,12 @@ export function parseState(p: URLSearchParams): MapState {
       roles: list(p, "roles"),
       kinds: list(p, "kinds"),
       ekinds: list(p, "ekinds"),
+      epochs: [...new Set(list(p, "epochs"))],
       verified: p.get("verified") === "1",
     },
     collapsed: collapsed.length >= STRATA.length ? [] : collapsed,
+    view,
+    ...(t != null ? { t } : {}),
   };
 }
 
@@ -148,9 +181,14 @@ export function writeState(s: MapState): URLSearchParams {
   if (f.roles.length) p.set("roles", f.roles.join(","));
   if (f.kinds.length) p.set("kinds", f.kinds.join(","));
   if (f.ekinds.length) p.set("ekinds", f.ekinds.join(","));
+  if (f.epochs.length) p.set("epochs", f.epochs.join(","));
   if (f.verified) p.set("verified", "1");
   const lens = STRATA.filter((k) => s.collapsed.includes(k));
   if (lens.length) p.set("lens", lens.join(","));
+  if (s.view === "globe") {
+    p.set("view", "globe");
+    if (s.t != null && Number.isInteger(s.t)) p.set("t", String(s.t));
+  }
   return p;
 }
 

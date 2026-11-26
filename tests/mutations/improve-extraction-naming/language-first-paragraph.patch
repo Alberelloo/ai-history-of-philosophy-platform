@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -241,7 +241,7 @@
+         run_id: str,
+     ) -> None:
+         passages = "\n\n".join(f"[{i + 1}] {p['text']}" for i, p in enumerate(window))
+-        langs = Counter(p["lang"] for p in window if p.get("lang")).most_common(1)
++        langs = Counter(p["lang"] for p in window[:1] if p.get("lang")).most_common(1)
+         language = langs[0][0] if langs else "ru"
+         try:
+             response = self.llm.post(

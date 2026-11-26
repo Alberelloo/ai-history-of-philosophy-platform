@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -227,7 +227,7 @@
+             "added": added,
+             "created": created,
+             "conflicts": conflicts,
+-            "skipped": len(results) - added - created - conflicts,
++            "skipped": len(results) - added - created,
+         }
+ 
+     def to_json(self) -> dict[str, Any]:

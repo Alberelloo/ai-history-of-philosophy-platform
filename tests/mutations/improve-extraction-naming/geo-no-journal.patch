@@ -1,0 +1,10 @@
+diff --git a/src/philograph/knowledge/geo_enrich.py b/src/philograph/knowledge/geo_enrich.py
+index d8351fb..f22aaae 100644
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -496,5 +496,4 @@ if __name__ == "__main__":
+     # идут в stderr. Вызов main() из тестов оставляет приёмник фикстуры как есть.
+     if hasattr(sys.stderr, "reconfigure"):
+         sys.stderr.reconfigure(encoding="utf-8")
+-    events.configure(sinks=[events.json_sink(sys.stderr)])
+     sys.exit(main())

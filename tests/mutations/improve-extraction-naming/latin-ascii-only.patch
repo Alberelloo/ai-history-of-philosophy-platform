@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -159,7 +159,7 @@
+         return "cyrillic"
+     if 0x0370 <= code <= 0x03FF or 0x1F00 <= code <= 0x1FFF:
+         return "greek"
+-    if unicodedata.name(ch, "").startswith("LATIN"):
++    if ch.isascii():
+         return "latin"
+     return "other"
+ 

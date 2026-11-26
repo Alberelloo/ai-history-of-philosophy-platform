@@ -1,0 +1,7 @@
+# Тарифы внешних извлекателей, USD за 1M токенов (ontology-extraction, «Внешний извлекатель»).
+# Модели шлюза здесь не описываются: их цены — в config/llm.yaml и в сводке расходов шлюза.
+# Аргументы команды ingest (--price-in, --price-out, --price-cache-read) важнее этого файла.
+claude-opus-5-5:
+  input: 4.0
+  output: 20.0
+  cache_read: 0.20

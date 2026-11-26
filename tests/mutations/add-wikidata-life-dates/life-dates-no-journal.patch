@@ -1,0 +1,10 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index aee2c05..acde142 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -716,5 +716,4 @@ if __name__ == "__main__":
+     # идут в stderr. Вызов main() из тестов оставляет приёмник фикстуры как есть.
+     if hasattr(sys.stderr, "reconfigure"):
+         sys.stderr.reconfigure(encoding="utf-8")
+-    events.configure(sinks=[events.json_sink(sys.stderr)])
+     sys.exit(main())

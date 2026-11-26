@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..1c5162d 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -695,7 +695,6 @@ class Statements:
+         }
+         with self.engine.begin() as conn:
+             conn.execute(update(t.merges).where(t.merges.c.id == merge_id).values(moved=moved))
+-        self._refresh_primary(kept)
+         events.emit(
+             "knowledge.entity.merged",
+             kept=kept,

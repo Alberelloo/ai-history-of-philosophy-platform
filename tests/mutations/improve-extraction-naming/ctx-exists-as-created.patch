@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -451,7 +451,7 @@
+             or self.statements.find(event_id, p[0], obj=p[1], value=p[2], qualifiers=p[3]) is None
+         ]
+         if event_id is not None and not missing:
+-            return {"result": "exists", "event_id": event_id}
++            return {"result": "created", "event_id": event_id}
+         report.statements += len(missing)
+         report.places_created += int(new_place)
+         if dry_run:

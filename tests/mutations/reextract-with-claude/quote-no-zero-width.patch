@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 53037ae..0a1ef0c 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -20,7 +20,7 @@ MIN_PART = 10  # символов после нормализации у каж
+ # абзаца не должно стать потерянным.
+ MIN_WHOLE = 1
+ 
+-_REMOVE = dict.fromkeys(map(ord, "­́̀​⁠﻿"))
++_REMOVE = dict.fromkeys(map(ord, "­́̀"))
+ _MAP = str.maketrans(
+     {
+         **dict.fromkeys("«»„“”‟″", '"'),

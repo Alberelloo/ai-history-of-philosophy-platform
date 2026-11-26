@@ -1,0 +1,30 @@
+{
+  "searchinfo": {
+    "search": "Барокко"
+  },
+  "search": [
+    {
+      "id": "Q37853",
+      "title": "Q37853",
+      "label": "барокко",
+      "description": "период в искусстве",
+      "match": {
+        "type": "label",
+        "language": "ru",
+        "text": "барокко"
+      }
+    },
+    {
+      "id": "Q900003",
+      "title": "Q900003",
+      "label": "Барокко",
+      "description": "фильм",
+      "match": {
+        "type": "label",
+        "language": "ru",
+        "text": "Барокко"
+      }
+    }
+  ],
+  "success": 1
+}

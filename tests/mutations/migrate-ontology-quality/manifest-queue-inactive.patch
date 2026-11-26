@@ -1,0 +1,17 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..95811e0 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -583,11 +583,7 @@ class Migration:
+                 continue
+             for c in entry.get("candidates") or []:
+                 holder = c.get("holder")
+-                if (
+-                    not holder
+-                    or holder not in view.entities
+-                    or entry["entity"] not in view.entities
+-                ):
++                if not holder:
+                     continue
+                 pair = tuple(sorted((entry["entity"], holder)))
+                 if pair in open_ or pair in distinct:

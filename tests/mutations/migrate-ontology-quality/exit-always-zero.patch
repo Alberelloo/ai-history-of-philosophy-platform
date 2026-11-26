@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -252,7 +252,7 @@
+         print(f"замер: {type(exc).__name__}: {exc}", file=sys.stderr)
+         return 2
+     print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else table(result))
+-    return 0 if result["passed"] else 1
++    return 0
+ 
+ 
+ if __name__ == "__main__":

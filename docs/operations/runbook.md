@@ -111,9 +111,51 @@ docker compose -f compose.yaml -f compose.prod.yaml exec ops python -m philograp
 Собирать заново имеет смысл при уточнении атрибуции, смене лицензии на Commons или добавлении
 новых персон; повторный `sync` идемпотентен и не плодит дублей.
 
+## Извлечение связей
+
+**Через шлюз** (по событию публикации). Таймаут вызова — бюджет шлюза на все попытки роли
+`strong` (`GET /v1/roles/strong`, поле `call_budget_seconds`) плюс 30 с. Если шлюз бюджет не
+сообщил, берётся `PHILOGRAPH_EXTRACTION_TIMEOUT_SECONDS` (по умолчанию 1200). Запуски — в
+`knowledge.filling_runs`: модель, извлекатель, фрагменты, время, токены, стоимость, причины
+отбраковки (`drop_reasons`), причина сбоя (`failure`, статус `failed`).
+
+**Внешнее извлечение** (ответы даёт модель вне шлюза, например Claude). Нужны
+`PHILOGRAPH_DATABASE_URL` (база знаний) и `PHILOGRAPH_LIBRARY_URL` (поднятый сервис библиотеки).
+
+1. Задание: `python -m philograph.knowledge.external_extraction export --version V --out DIR` →
+   `DIR/V.jsonl` (строка `task` с инструкцией и реестром, по строке на фрагмент).
+2. Ответы извлекателя — JSON `{"<номер фрагмента>": {"statements": […], "entities": […]}}` или
+   JSONL `{"fragment": n, "reply": {…}}`; номер фрагмента — один раз.
+3. Запись: `python -m philograph.knowledge.external_extraction ingest --version V --replies FILE
+   --model claude-opus-5-5 --input-tokens N --output-tokens N --duration S`. Тариф —
+   `src/philograph/knowledge/extraction_prices.yaml`, либо `--price-in/--price-out`.
+4. Отчёт: `python -m philograph.knowledge.external_extraction report --since ГГГГ-ММ-ДД --out
+   docs/audit/extraction-run-ГГГГ-ММ-ДД.md`.
+
+Коды выхода: 0 — готово, 2 — отказ (ничего не записано: повтор без `--replace`, нет тарифа,
+нет версии, ошибка файла ответов), 3 — источнику запрещена внешняя обработка.
+
+**Перед переизвлечением на боевой базе** — посчитать подтверждения без значимого текста: при
+перепроверке изменённого абзаца они станут потерянными (правило цитат требует хотя бы одну
+букву или цифру). Число записать в отчёт переизвлечения:
+
+```sql
+SELECT count(*) FROM knowledge.evidence
+WHERE NOT lost AND (quote IS NULL OR btrim(quote) = '' OR quote !~ '[[:alnum:]]');
+```
+
+**Повтор версии — только с `--replace`.** Он сначала откатывает прежние внешние запуски версии
+(`done`, прерванные `failed`, брошенные `running` старше 6 ч), потом пишет новый. Если запуск
+`running` моложе 6 ч — команда отказывает «запись идёт» (параллельный `ingest`). Откат снимает и
+подтверждения, которые прежний запуск добавил к уже существовавшим утверждениям. Проверенные
+человеком утверждения откат не снимает. Если новая
+запись упадёт, у версии не будет внешних утверждений до следующего `ingest --replace` (он
+безопасен: прерванный запуск тоже откатится). На боевой базе перед `--replace` — резервная
+копия (раздел «Резервные копии»).
+
 ## Лимиты
 
-Лимиты платных операций на посетителя задаются переменными `PHILOGRAPH_LIMIT_ASK`, `PHILOGRAPH_LIMIT_GRAPH`, `PHILOGRAPH_LIMIT_DESCRIPTION`, `PHILOGRAPH_LIMIT_MAP` и `PHILOGRAPH_LIMIT_MAP_VIEW` в формате «в час/в сутки», по умолчанию `20/100`, `30/200`, `60/300`, `300/2000` и `300/2000` (карта раздела и проверка вида карты модель не вызывают и токена страницы не требуют, но читают всю область). Предел числа сущностей на карте — `PHILOGRAPH_MAP_MAX_ENTITIES` (по умолчанию 400). Общая частота задаётся `PHILOGRAPH_RATE_PER_SECOND` и `PHILOGRAPH_RATE_BURST`. Срабатывания видны в журнале шлюза как `gateway.limit.triggered`.
+Лимиты платных операций на посетителя задаются переменными `PHILOGRAPH_LIMIT_ASK`, `PHILOGRAPH_LIMIT_GRAPH`, `PHILOGRAPH_LIMIT_DESCRIPTION`, `PHILOGRAPH_LIMIT_MAP` и `PHILOGRAPH_LIMIT_MAP_VIEW` в формате «в час/в сутки», по умолчанию `20/100`, `30/200`, `60/300`, `300/2000` и `300/2000` (карта раздела и проверка вида карты модель не вызывают и токена страницы не требуют, но читают всю область). Предел числа сущностей на карте — `PHILOGRAPH_MAP_MAX_ENTITIES` (по умолчанию 400). Справочник (`/api/knowledge/v1/catalog`) квот платных операций не тратит, ограничен только общей частотой; окно устарелости его снимка — `PHILOGRAPH_CATALOG_MAX_STALE_SECONDS` (по умолчанию 15 с, карта — без окна). Общая частота задаётся `PHILOGRAPH_RATE_PER_SECOND` и `PHILOGRAPH_RATE_BURST`. Срабатывания видны в журнале шлюза как `gateway.limit.triggered`.
 
 ## Правовой статус источника
 

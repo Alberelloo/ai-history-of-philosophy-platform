@@ -291,6 +291,19 @@
   fill-opacity: 0.17;
 }
 
+/* Растушёвка нечёткой границы: градиент цвета эпохи, прозрачность — как у заливки. */
+.map-era__stop {
+  stop-color: var(--m-era);
+}
+
+.map-era__fade {
+  fill-opacity: 0.06;
+}
+
+.map-era.is-active .map-era__fade {
+  fill-opacity: 0.17;
+}
+
 .map-era__text {
   fill: var(--m-ink-2);
   text-anchor: middle;

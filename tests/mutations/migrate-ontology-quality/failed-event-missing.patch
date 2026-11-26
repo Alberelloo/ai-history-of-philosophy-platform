@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..129d7ca 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -529,8 +529,8 @@ class Migration:
+             self._abort(report)
+ 
+     def _emit_failed(self, report: Report, exc: BaseException) -> None:
+-        events.emit(
+-            "knowledge.migration.failed",
++        (lambda **_: None)(
++            name="knowledge.migration.failed",
+             error_kind="exception",
+             run_id=report.run_id,
+             dry_run=report.dry_run,

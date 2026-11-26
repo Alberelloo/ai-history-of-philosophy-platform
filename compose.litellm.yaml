@@ -1,0 +1,42 @@
+# Опциональный оверлей: self-hosted LiteLLM-прокси для эмбеддингов.
+# Поднять: docker compose -f compose.yaml -f compose.litellm.yaml up -d --build
+# Перед запуском переключи роль эмбеддингов в config/llm.yaml на litellm/bge-m3/dimensions:1024
+# (см. docs/architecture/embeddings.md) и задай ключи в .env.
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    restart: unless-stopped
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    volumes:
+      - ./config/litellm.yaml:/app/config.yaml:ro
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-litellm}
+      HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+      COHERE_API_KEY: ${COHERE_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      BGE_M3_API_BASE: ${BGE_M3_API_BASE:-http://bge-m3:80}
+      JINA_V3_API_BASE: ${JINA_V3_API_BASE:-http://jina-v3:80}
+      E5_API_BASE: ${E5_API_BASE:-http://e5-large:80}
+    ports: ["4000:4000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness').status == 200 else 1)"]
+      interval: 10s
+      retries: 6
+
+  llm:
+    environment:
+      # В docker LiteLLM — отдельный сервис по имени, а не localhost.
+      LITELLM_BASE_URL: http://litellm:4000
+      LITELLM_API_KEY: ${LITELLM_API_KEY:-sk-litellm}
+
+  search:
+    environment:
+      PHILOGRAPH_EMBEDDING_MODEL: bge-m3
+      PHILOGRAPH_EMBEDDING_DIMENSION: "1024"
+
+  worker:
+    environment:
+      PHILOGRAPH_EMBEDDING_MODEL: bge-m3
+      PHILOGRAPH_EMBEDDING_DIMENSION: "1024"

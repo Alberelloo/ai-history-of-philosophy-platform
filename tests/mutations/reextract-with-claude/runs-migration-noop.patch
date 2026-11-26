@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/schema.py b/src/philograph/knowledge/schema.py
+index d6e397d..406ee8f 100644
+--- a/src/philograph/knowledge/schema.py
++++ b/src/philograph/knowledge/schema.py
+@@ -486,6 +486,7 @@ def _run_metrics(conn: Connection) -> None:
+     столбцы из метаданных в ``knowledge:2`` — здесь они пропускаются."""
+     from sqlalchemy import inspect, text
+ 
++    return
+     inspector = inspect(conn)
+     if not inspector.has_table("filling_runs", schema=SCHEMA):
+         return  # частичная схема (проверки отдельных миграций): столбцы придут с таблицей

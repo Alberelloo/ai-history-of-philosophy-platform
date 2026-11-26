@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -350,8 +350,6 @@
+             for c in found:
+                 holder = self.entities.by_external(SYSTEM, c["qid"])
+                 if holder is None or holder == entity["id"]:
+-                    continue
+-                if self._kind(self.entities.get(holder)["type"]) != kind:
+                     continue
+                 c["holder"] = holder
+                 pair = tuple(sorted((entity["id"], holder)))

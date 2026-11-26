@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..af7fbbb 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -793,7 +793,7 @@ class Statements:
+                     )
+                 for a in fold["skipped"]:
+                     conn.execute(t.attributions.insert().values(**a))
+-                if fold["evidence"]:
++                if False and fold["evidence"]:
+                     conn.execute(
+                         update(t.evidence)
+                         .where(t.evidence.c.id.in_(fold["evidence"]))

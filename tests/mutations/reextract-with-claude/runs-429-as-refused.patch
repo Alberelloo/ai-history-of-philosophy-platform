@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..7863a86 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -503,7 +503,7 @@ class Filling:
+                 kind = response.json().get("kind", response.status_code)
+             except ValueError:
+                 kind = response.status_code
+-            code = codes.MODEL_BUDGET if response.status_code == 429 else codes.MODEL_REFUSED
++            code = codes.MODEL_REFUSED
+             self.drop_fragment(run_id, f"модель: {kind}", code)
+             return
+         self.apply_reply(window, data, source, run_id, response.json().get("value"), schema)

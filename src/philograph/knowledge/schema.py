@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import weakref
+from typing import Any
 
 from sqlalchemy import (
     JSON,
     Boolean,
     Column,
     DateTime,
+    Float,
     Integer,
     MetaData,
     String,
     Table,
     Text,
     UniqueConstraint,
+    and_,
     select,
     text,
     update,
@@ -88,6 +92,8 @@ entities = Table(
     Column("type", String(50), nullable=False, index=True),
     Column("primary", JSON, nullable=False),  # копия основных значений: даты, описание
     Column("redirect_to", String(40)),
+    Column("retired_run", String(64)),  # запуск миграции, снявший сущность (knowledge:9)
+    Column("retired_reason", String(20)),  # причина правила названий
     schema=SCHEMA,
 )
 names = Table(
@@ -219,7 +225,16 @@ filling_runs = Table(
     Column("created", Integer, nullable=False),
     Column("dropped", Integer, nullable=False),
     Column("cost_usd", JSON),
-    Column("status", String(20), nullable=False),  # running | done | rolled_back
+    Column("status", String(20), nullable=False),  # running | done | failed | rolled_back
+    # Метрики запуска (миграция 10): извлекатель, источник, объём, время, токены, причины.
+    Column("extractor", String(20)),  # gateway | external
+    Column("source_id", String(100)),
+    Column("fragments", Integer),
+    Column("duration_seconds", Float),
+    Column("input_tokens", Integer),
+    Column("output_tokens", Integer),
+    Column("drop_reasons", JSON),  # {код: число}
+    Column("failure", Text),
     schema=SCHEMA,
 )
 review_items = Table(
@@ -378,3 +393,106 @@ portraits = Table(
     schema=SCHEMA,
 )
 migrations.add(7, "портреты персон")(migrations.create_tables("portraits"))
+
+# --- журнал действий запуска вне утверждений ---
+# Что команда оператора изменила помимо утверждений (внешний QID, переименование, снятие):
+# откат запуска читает его в обратном порядке ``seq``.
+run_actions = Table(
+    "run_actions",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("run_id", String(40), nullable=False, index=True),
+    Column("seq", Integer, nullable=False),
+    Column("kind", String(30), nullable=False),  # external | …
+    Column("payload", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+migrations.add(8, "журнал действий запуска")(migrations.create_tables("run_actions"))
+
+
+def active(entities: Table = entities) -> Any:
+    """Условие «действующая сущность»: не перенаправлена слиянием и не снята миграцией.
+    Одно на всех потребителей (снимок, упоминания, поиск, дубли, внешние id)."""
+    return and_(entities.c.redirect_to.is_(None), entities.c.retired_run.is_(None))
+
+
+def retired(entities: Table = entities) -> Any:
+    """Условие «снята миграцией»."""
+    return entities.c.retired_run.is_not(None)
+
+
+# Движки, у которых столбец снятия уже найден. Слабые ссылки: ``id`` движка после сборки
+# мусора может достаться другому. «Нет» не запоминается: та же база может пройти миграцию
+# до ``knowledge:9`` в этом же процессе, а столбец, раз появившись, не исчезает.
+_HAS_RETIRED: weakref.WeakSet[Any] = weakref.WeakSet()
+
+
+def has_retired(conn: Connection) -> bool:
+    """Есть ли столбец снятия (схема ``knowledge:9``). Замер на чтение работает и на базе
+    до миграции: там снятых нет. Проверка схемы кэшируется на движок."""
+    engine = conn.engine
+    if engine in _HAS_RETIRED:
+        return True
+    from sqlalchemy import inspect
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    if "retired_run" in columns:
+        _HAS_RETIRED.add(engine)
+        return True
+    return False
+
+
+def active_in(conn: Connection) -> Any:
+    """``active()`` для этой базы; на схеме до ``knowledge:9`` — только «не перенаправлена»."""
+    return active() if has_retired(conn) else entities.c.redirect_to.is_(None)
+
+
+def retired_ids(conn: Connection) -> set[str]:
+    """Снятые сущности базы (на схеме до ``knowledge:9`` — пусто)."""
+    if not has_retired(conn):
+        return set()
+    return set(conn.scalars(select(entities.c.id).where(retired())))
+
+
+def _retired_columns(conn: Connection) -> None:
+    """Столбцы снятия: старые строки — действующие (``NULL``)."""
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    for name in ("retired_run VARCHAR(64)", "retired_reason VARCHAR(20)"):
+        if name.split()[0] not in columns:
+            conn.execute(text(f"ALTER TABLE {SCHEMA}.entities ADD COLUMN {name}"))
+
+
+migrations.add(9, "снятие мусорных сущностей")(_retired_columns)
+
+
+# Столбцы метрик запуска (knowledge:10): тип ``JSON`` есть и в Postgres, и в SQLite.
+RUN_METRICS = (
+    ("extractor", "VARCHAR(20)"),
+    ("source_id", "VARCHAR(100)"),
+    ("fragments", "INTEGER"),
+    ("duration_seconds", "FLOAT"),
+    ("input_tokens", "INTEGER"),
+    ("output_tokens", "INTEGER"),
+    ("drop_reasons", "JSON"),
+    ("failure", "TEXT"),
+)
+
+
+def _run_metrics(conn: Connection) -> None:
+    """Метрики запуска: старые строки сохраняются, у них столбцы пусты. Свежая база получает
+    столбцы из метаданных в ``knowledge:2`` — здесь они пропускаются."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(conn)
+    if not inspector.has_table("filling_runs", schema=SCHEMA):
+        return  # частичная схема (проверки отдельных миграций): столбцы придут с таблицей
+    columns = {c["name"] for c in inspector.get_columns("filling_runs", schema=SCHEMA)}
+    for name, kind in RUN_METRICS:
+        if name not in columns:
+            conn.execute(text(f"ALTER TABLE {SCHEMA}.filling_runs ADD COLUMN {name} {kind}"))
+
+
+migrations.add(10, "метрики запусков извлечения")(_run_metrics)

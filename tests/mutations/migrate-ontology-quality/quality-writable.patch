@@ -1,0 +1,14 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -86,9 +86,9 @@
+ 
+         def connect() -> sqlite3.Connection:
+             conn = sqlite3.connect(
+-                f"{path.resolve().as_uri()}?mode=ro", uri=True, check_same_thread=False
++                f"{path.resolve().as_uri()}", uri=True, check_same_thread=False
+             )
+-            conn.execute(f"ATTACH DATABASE '{target.resolve().as_uri()}?mode=ro' AS {t.SCHEMA}")
++            conn.execute(f"ATTACH DATABASE '{target.resolve().as_uri()}' AS {t.SCHEMA}")
+             return conn
+ 
+         return create_engine("sqlite://", creator=connect)

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -358,7 +358,7 @@
+             qualifiers["place_role"] = spec.role
+         when = claim_time(record, claim, spec.time)
+         if when is not None:
+-            qualifiers["time"] = when
++            pass
+         place_id = self.entities.by_external(SYSTEM, target)
+         place_record = None
+         if place_id is None and target not in report.planned:

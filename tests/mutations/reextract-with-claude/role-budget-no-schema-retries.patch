@@ -1,0 +1,13 @@
+diff --git a/src/philograph/llm/gateway.py b/src/philograph/llm/gateway.py
+index cb91201..d75dfdc 100644
+--- a/src/philograph/llm/gateway.py
++++ b/src/philograph/llm/gateway.py
+@@ -931,7 +931,7 @@ class LLMGateway:
+         return {
+             "role": role,
+             "model": conf.model,
+-            "call_budget_seconds": round((self.config.schema_retries + 1) * attempt, 3),
++            "call_budget_seconds": round(attempt, 3),
+         }
+ 
+     def spend_summary(

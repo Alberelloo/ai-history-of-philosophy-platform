@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -690,8 +690,6 @@
+         self, view: View, report: Report, *, translate, batch, limit, estimate, **_: Any
+     ) -> list[Action]:
+         todo = self._not_russian(view)
+-        if limit is not None:
+-            todo = todo[:limit]
+         report.to_translate = len(todo)
+         report.batches = math.ceil(len(todo) / batch) if todo else 0
+         packs = [todo[i : i + batch] for i in range(0, len(todo), batch)]

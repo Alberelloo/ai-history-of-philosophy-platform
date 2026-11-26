@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 95edbcc..1804094 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -554,7 +554,7 @@ def main(
+     except Forbidden as exc:
+         print(f"источник {exc} без разрешения на внешнюю обработку", file=sys.stderr)
+         return 3
+-    except (OSError, ServiceUnavailable) as exc:
++    except OSError as exc:
+         print(str(exc), file=sys.stderr)
+         return 2
+     return 0

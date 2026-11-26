@@ -350,3 +350,51 @@ def test_library_events(onto, events):
         "source.unpublished", {"event_id": "e3", "source_id": "s_textbook"}
     )  # повтор события ничего не делает
     assert len(events.of("knowledge.library.event")) == 3
+
+
+@req(OS, "Отклонённые не показываются")
+def test_rejected_only_lifespan_clears_primary(onto):
+    from philograph.knowledge.map import SectionMap
+
+    person = onto.person("Безвестный", "1700", "1750")
+    [life] = [s for s in onto.statements.about(person) if s["type"] == "lifespan"]
+    assert onto.entities.get(person)["primary"]["dates"]
+    onto.statements.reject(life["id"], "test")
+    assert onto.entities.get(person)["primary"].get("dates") is None
+    data = SectionMap(onto.statements).build()
+    assert person not in {p["id"] for p in data["people"]}
+
+
+@req(OS, "Статусы и переходы")
+def test_confirm_keeps_main_value(onto):
+    from philograph.knowledge.dates import parse
+
+    epoch = onto.thing("epoch", "Просвещение", "1680–1800")
+    second = onto.statements.add(
+        epoch, "dating", value=parse("1715–1789").to_json(), attributions=[Attribution("common")]
+    )
+    before = onto.entities.get(epoch)["primary"]["dates"]
+    assert before == parse("1680–1800").to_json()
+    onto.statements.confirm(second, "test")
+    assert onto.entities.get(epoch)["primary"]["dates"] == before
+
+
+@req(OS, "Запрос утверждений о сущности")
+def test_raw_order_is_write_order(onto, monkeypatch):
+    """«Первое записанное» — по порядку записи, а не по id: id случайны."""
+    import uuid
+
+    from philograph.knowledge.dates import parse
+
+    epoch = onto.entities.create("epoch", [("ru", "Барокко", "primary")])
+    ids = iter(["ffff", "0000"])  # id нарочно обратны порядку записи
+    monkeypatch.setattr(uuid, "uuid4", lambda: uuid.UUID(next(ids).ljust(32, "0")))
+    first = onto.statements.add(
+        epoch, "dating", value=parse("1600–1750").to_json(), attributions=[Attribution("common")]
+    )
+    second = onto.statements.add(
+        epoch, "dating", value=parse("1580–1730").to_json(), attributions=[Attribution("common")]
+    )
+    assert first > second  # id второго меньше
+    assert [s["id"] for s in onto.statements._raw(epoch)] == [first, second]
+    assert onto.entities.get(epoch)["primary"]["dates"] == parse("1600–1750").to_json()

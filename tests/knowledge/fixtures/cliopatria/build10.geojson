@@ -1,0 +1,581 @@
+{
+"type": "FeatureCollection",
+"features": [
+{
+"type": "Feature",
+"properties": {
+"Name": "Holy Roman Empire",
+"FromYear": 962,
+"ToYear": 1500,
+"Area": 800000,
+"Type": "POLITY",
+"Wikipedia": "Holy Roman Empire",
+"Wikidata": "Q12548",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+6,
+45
+],
+[
+6.25,
+45.01
+],
+[
+6.5,
+45.0
+],
+[
+6.75,
+45.01
+],
+[
+7.0,
+45.0
+],
+[
+7.25,
+45.01
+],
+[
+7.5,
+45.0
+],
+[
+7.75,
+45.01
+],
+[
+8.0,
+45.0
+],
+[
+8.25,
+45.01
+],
+[
+8.5,
+45.0
+],
+[
+8.75,
+45.01
+],
+[
+9.0,
+45.0
+],
+[
+9.25,
+45.01
+],
+[
+9.5,
+45.0
+],
+[
+9.75,
+45.01
+],
+[
+10.0,
+45.0
+],
+[
+10.25,
+45.01
+],
+[
+10.5,
+45.0
+],
+[
+10.75,
+45.01
+],
+[
+11.0,
+45.0
+],
+[
+11.25,
+45.01
+],
+[
+11.5,
+45.0
+],
+[
+11.75,
+45.01
+],
+[
+12.0,
+45.0
+],
+[
+12.25,
+45.01
+],
+[
+12.5,
+45.0
+],
+[
+12.75,
+45.01
+],
+[
+13.0,
+45.0
+],
+[
+13.25,
+45.01
+],
+[
+13.5,
+45.0
+],
+[
+13.75,
+45.01
+],
+[
+14.0,
+45.0
+],
+[
+14.25,
+45.01
+],
+[
+14.5,
+45.0
+],
+[
+14.75,
+45.01
+],
+[
+15.0,
+45.0
+],
+[
+15.25,
+45.01
+],
+[
+15.5,
+45.0
+],
+[
+15.75,
+45.01
+],
+[
+16,
+45
+],
+[
+16,
+54
+],
+[
+6,
+54
+],
+[
+6,
+45
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Polish-Lithuanian Commonwealth",
+"FromYear": 1569,
+"ToYear": 1795,
+"Area": 900000,
+"Type": "POLITY",
+"Wikipedia": "Polish-Lithuanian Commonwealth",
+"Wikidata": "Q172107",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+16,
+49
+],
+[
+32,
+49
+],
+[
+32,
+57
+],
+[
+16,
+57
+],
+[
+16,
+49
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Ottoman Empire",
+"FromYear": 1299,
+"ToYear": 1922,
+"Area": 1500000,
+"Type": "POLITY",
+"Wikipedia": "Ottoman Empire",
+"Wikidata": "Q12560",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+20,
+35
+],
+[
+45,
+35
+],
+[
+45,
+42
+],
+[
+20,
+42
+],
+[
+20,
+35
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Kingdom of Prussia",
+"FromYear": 1701,
+"ToYear": 1918,
+"Area": 300000,
+"Type": "POLITY",
+"Wikipedia": "Kingdom of Prussia",
+"Wikidata": "Q27306",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+10,
+51
+],
+[
+23,
+51
+],
+[
+23,
+55.5
+],
+[
+10,
+55.5
+],
+[
+10,
+51
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Russian Empire",
+"FromYear": 1721,
+"ToYear": 1917,
+"Area": 5000000,
+"Type": "POLITY",
+"Wikipedia": "Russian Empire",
+"Wikidata": "Q34266",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+30,
+50
+],
+[
+60,
+50
+],
+[
+60,
+65
+],
+[
+30,
+65
+],
+[
+30,
+50
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Kingdom of France",
+"FromYear": 1500,
+"ToYear": 1791,
+"Area": 500000,
+"Type": "POLITY",
+"Wikipedia": "Kingdom of France",
+"Wikidata": "Q70972",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+-4,
+43
+],
+[
+7,
+43
+],
+[
+7,
+50
+],
+[
+-4,
+50
+],
+[
+-4,
+43
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Spanish Empire",
+"FromYear": 1500,
+"ToYear": 1800,
+"Area": 500000,
+"Type": "POLITY",
+"Wikipedia": "Spanish Empire",
+"Wikidata": "Q80702",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+-9,
+36
+],
+[
+3,
+36
+],
+[
+3,
+43
+],
+[
+-9,
+43
+],
+[
+-9,
+36
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Republic of Venice",
+"FromYear": 697,
+"ToYear": 1797,
+"Area": 30000,
+"Type": "POLITY",
+"Wikipedia": "Republic of Venice",
+"Wikidata": "Q4948",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+11,
+45
+],
+[
+14,
+45
+],
+[
+14,
+46.5
+],
+[
+11,
+46.5
+],
+[
+11,
+45
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "(Ottoman Empire)",
+"FromYear": 1500,
+"ToYear": 1700,
+"Area": 1000.0,
+"Type": "RELATION",
+"Wikipedia": "(Ottoman Empire)",
+"Wikidata": "Q12560",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+26,
+44
+],
+[
+29,
+44
+],
+[
+29,
+47
+],
+[
+26,
+47
+],
+[
+26,
+44
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Broken Years",
+"FromYear": 1700,
+"ToYear": 1600,
+"Area": 1000.0,
+"Type": "POLITY",
+"Wikipedia": "Broken Years",
+"Wikidata": "Q4948",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+1,
+1
+],
+[
+2,
+1
+],
+[
+2,
+2
+],
+[
+1,
+2
+],
+[
+1,
+1
+]
+]
+]
+}
+}
+]
+}

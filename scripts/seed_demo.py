@@ -108,6 +108,14 @@ def seed_ontology(database_url: str, reading: Reading, textbook: str) -> None:
         seed_core(entities, statements, reading, textbook, text_of)
     if not entities.find("Просвещение"):
         seed_map(entities, statements)
+    if not entities.find("Кёнигсберг"):
+        seed_reference(entities, statements)
+    if not entities.find("Барокко"):
+        seed_epochs(entities, statements)
+    if not entities.find("Южноморский пузырь"):
+        seed_context(entities, statements)
+    if not entities.find("Амстердам"):
+        seed_places(entities, statements)
 
 
 def seed_core(entities, statements, reading, textbook: str, text_of: dict[str, str]) -> None:
@@ -266,6 +274,202 @@ def seed_map(entities, statements) -> None:
         obj=people["Декарт"],
         attributions=common,
         provenance=Provenance("generated"),
+    )
+
+
+def seed_reference(entities, statements) -> None:
+    """Справочник: латинский вариант названия, явное «относится к эпохе», термин и место.
+
+    Названия не встречаются в текстах демо-источников — новых упоминаний нет; у Канта и Юма
+    новых утверждений нет, их карточки и граф не меняются (вариант названия карточка не
+    показывает). Локк по датам (середина жизни 1668) — «Научная революция»; явная связь
+    с «Просвещением» показывает, что явное важнее дат."""
+    from philograph.knowledge.statements import Attribution
+
+    common = [Attribution("common")]
+    kant = entities.find("Кант")[0]["id"]
+    if not entities.find("Kant"):
+        entities.add_name(kant, "en", "Kant")
+    statements.add(
+        entities.find("Локк")[0]["id"],
+        "belongs_to_epoch",
+        obj=entities.find("Просвещение")[0]["id"],
+        qualifiers={"membership_basis": "historians"},
+        attributions=common,
+    )
+    entities.create("term", [("ru", "Эпистемология", "primary")])
+    entities.create("place", [("ru", "Кёнигсберг", "primary")])
+
+
+def seed_epochs(entities, statements) -> None:
+    """Эпохи (add-epochs): эпоха без датировки с явным участником и нечёткий конец пролёта.
+
+    «Барокко» без датировки — в списке «без датировки» страницы эпох, Лейбниц относится
+    к нему явно. У «Научной революции» — вторая датировка с концом между 1687 и 1700 и рангом
+    «предпочтённое»: она становится основной (пролёт 1543–1694 с растушёвкой конца). Названия
+    не встречаются в текстах демо-источников — новых упоминаний нет; у Канта и Юма новых
+    утверждений нет, эталоны чтения не меняются."""
+    from philograph.knowledge.dates import FuzzyDate
+    from philograph.knowledge.statements import Attribution
+
+    common = [Attribution("common")]
+    baroque = entities.create("epoch", [("ru", "Барокко", "primary"), ("en", "Baroque", "variant")])
+    statements.add(
+        entities.find("Лейбниц")[0]["id"],
+        "belongs_to_epoch",
+        obj=baroque,
+        qualifiers={"membership_basis": "historians"},
+        attributions=common,
+    )
+    revolution = entities.find("Научная революция")[0]["id"]
+    fuzzy_end = statements.add(
+        revolution,
+        "dating",
+        value=FuzzyDate(1543, 1543, 1687, 1700, "approx", "1543 – 1687…1700").to_json(),
+        attributions=common,
+    )
+    statements.set_rank(fuzzy_end, "preferred", "seed")
+
+
+def seed_context(entities, statements) -> None:
+    """Исторический контекст (add-epoch-context): место события, связи «стимулировало».
+
+    «Славная революция» произошла в Лондоне и стимулировала «Политическую философию Локка»
+    (механизм — политический; по источникам — импорт общеизвестного факта, без абзаца:
+    в демо-текстах нет подходящей цитаты). «Выход первого тома «Энциклопедии»» стимулировал
+    «Основу общего наукоучения» — связь достроена моделью (без механизма, не проверена).
+    «Южноморский пузырь» — экономическое событие без связей. Названия не встречаются
+    в текстах демо-источников — новых упоминаний нет; у Канта, Юма и Локка новых
+    утверждений нет, эталоны чтения не меняются."""
+    from philograph.knowledge.dates import parse
+    from philograph.knowledge.statements import Attribution, Provenance
+
+    common = [Attribution("common")]
+
+    def found(name: str) -> str:
+        return entities.find(name)[0]["id"]
+
+    london = entities.create("place", [("ru", "Лондон", "primary"), ("en", "London", "primary")])
+    revolution = found("Славная революция")
+    statements.add(revolution, "happened_in", obj=london, attributions=common)
+    locke_politics = entities.create(
+        "doctrine",
+        [
+            ("ru", "Политическая философия Локка", "primary"),
+            ("en", "Locke's political philosophy", "primary"),
+        ],
+    )
+    statements.add(
+        revolution,
+        "stimulated",
+        obj=locke_politics,
+        qualifiers={"mechanism": "political"},
+        attributions=common,
+        provenance=Provenance("imported", actor="seed"),
+    )
+    statements.add(
+        found("Выход первого тома «Энциклопедии»"),
+        "stimulated",
+        obj=found("Основа общего наукоучения"),
+        attributions=common,
+        provenance=Provenance("generated"),
+    )
+    bubble = entities.create(
+        "event", [("ru", "Южноморский пузырь", "primary"), ("en", "South Sea Bubble", "primary")]
+    )
+    statements.add(bubble, "dating", value=parse("1720").to_json(), attributions=common)
+    statements.add(bubble, "event_kind", value="economic", attributions=common)
+
+
+# Места и координаты (geo-timeline): название, широта, долгота. Только для демо и e2e.
+PLACES = {
+    "Кёнигсберг": (54.71, 20.51),
+    "Лондон": (51.51, -0.13),
+    "Ла-Э": (46.97, 0.7),
+    "Амстердам": (52.37, 4.9),
+    "Стокгольм": (59.33, 18.07),
+    "Лейпциг": (51.34, 12.37),
+    "Ганновер": (52.37, 9.74),
+    "Дублин": (53.35, -6.26),
+    "Бреслау": (51.11, 17.03),
+    "Галле": (51.48, 11.97),
+    "Рамменау": (51.16, 14.13),
+    "Йена": (50.93, 11.59),
+    "Берлин": (52.52, 13.4),
+}
+# Персона: (место, вид места, время или None). Время — как у импорта: нечёткая дата.
+LIVED = {
+    "Декарт": [
+        ("Ла-Э", "birth", "1596"),
+        ("Амстердам", "activity", "1628–1649"),
+        ("Стокгольм", "death", "1650"),
+    ],
+    "Лейбниц": [
+        ("Лейпциг", "birth", "1646"),
+        ("Ганновер", "activity", "1676–1716"),
+        ("Ганновер", "death", "1716"),
+    ],
+    "Беркли": [("Дублин", "activity", "1700–1734")],
+    "Вольф": [("Бреслау", "birth", "1679"), ("Галле", "activity", "1706–1723")],
+    "Фихте": [
+        ("Рамменау", "birth", "1762"),
+        ("Йена", "activity", "1794–1799"),
+        ("Берлин", "death", "1814"),
+    ],
+}
+
+
+def seed_places(entities, statements) -> None:
+    """Глобус (add-geo-timeline): координаты мест, «жил в» с видом и временем, событие с
+    местом. Локк живёт в Лондоне по записи, достроенной моделью (полое кольцо «не
+    проверено»). У Канта и Юма новых утверждений нет — их карточки и эталоны чтения не
+    меняются, на глобусе они в «без места». Координаты Кёнигсберга меняют только карточку
+    места. Названия мест не встречаются в текстах демо-источников."""
+    from philograph.knowledge.dates import parse
+    from philograph.knowledge.statements import Attribution, Provenance
+
+    common = [Attribution("common")]
+    imported = Provenance("imported", actor="seed")
+
+    def place(name: str) -> str:
+        found = entities.find(name)
+        return found[0]["id"] if found else entities.create("place", [("ru", name, "primary")])
+
+    places = {name: place(name) for name in PLACES}
+    for name, (lat, lon) in PLACES.items():
+        statements.add(
+            places[name],
+            "coordinates",
+            value={"lat": lat, "lon": lon},
+            attributions=common,
+            provenance=imported,
+            status="sourced",
+        )
+    for person, rows in LIVED.items():
+        person_id = entities.find(person)[0]["id"]
+        for name, role, time in rows:
+            statements.add(
+                person_id,
+                "lived_in",
+                obj=places[name],
+                qualifiers={"place_role": role, "time": parse(time).to_json()},
+                attributions=common,
+                provenance=imported,
+                status="sourced",
+            )
+    statements.add(
+        entities.find("Локк")[0]["id"],
+        "lived_in",
+        obj=places["Лондон"],
+        qualifiers={"place_role": "residence", "time": parse("1689–1704").to_json()},
+        attributions=common,
+        provenance=Provenance("generated"),
+    )
+    statements.add(
+        entities.find("Смерть Декарта в Стокгольме")[0]["id"],
+        "happened_in",
+        obj=places["Стокгольм"],
+        attributions=common,
     )
 
 

@@ -46,6 +46,8 @@ PAID: tuple[tuple[str, re.Pattern[str], str], ...] = (
     ("GET", re.compile(r"^/api/knowledge/v1/map$"), "map"),
     # Проверка вида карты тоже читает всю область (assistant-map-view).
     ("POST", re.compile(r"^/api/knowledge/v1/map/view$"), "map_view"),
+    # Слой мест карты (geo-timeline) — та же область, что у карты: тот же счётчик «map».
+    ("GET", re.compile(r"^/api/knowledge/v1/map/places$"), "map"),
 )
 WITHOUT_PAGE_TOKEN = frozenset({"map", "map_view"})
 

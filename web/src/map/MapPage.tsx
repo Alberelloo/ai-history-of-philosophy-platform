@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { openCardInPanel } from "../FullCard";
 import { useT } from "../i18n";
 import { ScopeToggle, setScope, useScope } from "../scope";
 import { storage, useStored } from "../storage";
-import { Icon, Switch } from "../ui";
+import { Icon, Seg, Switch } from "../ui";
 import { DeskScene } from "./DeskScene";
 import { downloadSvg } from "./exportSvg";
 import { DENSE_MAP } from "./fixture";
@@ -11,10 +11,20 @@ import type { GEdge } from "./LinkDetails";
 import { MapCanvas } from "./MapCanvas";
 import { idleBuild, MapPanel, type BuildState, type LinkView } from "./MapPanel";
 import { canvasMeasure, loadMapFonts } from "./measure";
-import { find, index, related, visible } from "./model";
-import { OVERVIEW_HEIGHT, Overview } from "./Overview";
+import { loadGlobeFonts } from "./geo/fonts";
+import { eraOf, find, index, related, visible } from "./model";
+import { OVERVIEW_HEIGHT, Overview, YEAR_BAR_HEIGHT } from "./Overview";
 import { KNOWLEDGE_API, ndjson } from "./stream";
-import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapState } from "./types";
+import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapState, type MapView } from "./types";
+import { fetchPlaces, type GeoLayer } from "./geo/api";
+import type { GeoPanel, GeoRole, GeoWhereData } from "./geo/GeoList";
+import type { GlobeInfo } from "./geo/GlobeView";
+import { SPEEDS, useAnnouncer, usePlayback, useReducedMotion, type Speed } from "./geo/playback";
+import { globeRoles } from "./geo/selection";
+import { clampYear, defaultYear, geoModel, MAX_PERSONS, nearestYear, stayAt, visibleAt } from "./geo/timeline";
+
+// Глобус — ленивый фрагмент (d3-geo, суша Natural Earth): хронология его не грузит.
+const GlobeView = lazy(() => import("./geo/GlobeView"));
 
 // Страница графа — синхронологическая карта раздела (openspec/changes/archive/2026-11-18-synchro-map).
 // /graph — карта; /graph/<id> — карта с выбранной сущностью. Состояние (выбор, поиск,
@@ -24,6 +34,10 @@ import { emptyFilter, parseState, toQuery, type MapData, type MapLink, type MapS
 // уходит при ручной смене фильтров и линз.
 
 type Load = { status: "loading" | "ok" | "missing" | "error"; data: MapData | null };
+type GeoState = { status: "loading" | "ok" | "error"; data: GeoLayer | null };
+// Широкое окно для сцены глобуса: персона видна и после конца окна времени (бледнея),
+// поэтому люди, события и связи берутся по прочим фильтрам, а год зажат в окно.
+const ALL_TIME = { from: -1e9, to: 1e9 };
 
 // Связи «влияния» между персонами: influenced_by, его подтипы и studied_with (реестр).
 const INFLUENCE = new Set([
@@ -42,6 +56,8 @@ const EMPTY: MapData = { range: [0, 1], truncated: false, limit: 0, people: [], 
 
 // Нижний предел высоты карты: в окне 1024×576 карта и панель помещаются без прокрутки страницы.
 const MIN_HEIGHT = 300;
+// Глобус под шапкой в две строки (1024×576) с рядом года: круг уже мельче, без прокрутки.
+const MIN_GLOBE = 220;
 // Под обзорной шкалой: её отступ, нижнее поле листа (desk-sheet-body), рамка и полоска стола
 const BOTTOM_GAP = 60;
 
@@ -70,6 +86,16 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   const [size, setSize] = useState({ width: 0, height: MIN_HEIGHT });
   const widths = useRef<number[]>([]);
   const exportRef = useRef<(() => string | null) | null>(null);
+  const globe = state.view === "globe";
+  const globeRef = useRef(globe);
+  globeRef.current = globe;
+  const [geo, setGeo] = useState<GeoState>({ status: "loading", data: null });
+  const [geoRetry, setGeoRetry] = useState(0);
+  const geoDone = useRef<string | null>(null);
+  const [focus, setFocus] = useState<{ lat: number; lon: number; nonce: number } | null>(null);
+  // Страна места — ленивый модуль (словарь стран не в основном бандле): грузится с видом «Глобус».
+  const [countryOf, setCountryOf] = useState<((p: { id: string; lat: number; lon: number }) => { name: string } | null) | null>(null);
+  const reduced = useReducedMotion();
 
   // Переход по ссылке /graph/<id> на уже открытой карте (из карточки) — выбор этой сущности.
   useEffect(() => {
@@ -102,10 +128,34 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     };
   }, [fixture, textbook, onlyTextbook]);
 
+  // Слой мест — только в виде «Глобус» и один раз на область (учебник, «только учебник»):
+  // обратное переключение и повторный вход его не перезапрашивают. Ошибка — состояние вида.
+  useEffect(() => {
+    if (!globe) return;
+    const want = `${fixture ?? ""}|${textbook ?? ""}|${onlyTextbook}|${geoRetry}`;
+    if (geoDone.current === want) return;
+    const ctl = new AbortController();
+    setGeo({ status: "loading", data: null });
+    import("./geo/countries").then(
+      (m) => setCountryOf(() => m.countryOf),
+      () => undefined,
+    );
+    const got: Promise<GeoLayer | null> =
+      fixture === "dense"
+        ? import("./geo/geoFixture").then((m) => m.DENSE_GEO, () => null)
+        : fetchPlaces(textbook ?? null, onlyTextbook, ctl.signal);
+    got.then((layer) => {
+      if (ctl.signal.aborted) return;
+      if (layer) geoDone.current = want;
+      setGeo(layer ? { status: "ok", data: layer } : { status: "error", data: null });
+    });
+    return () => ctl.abort();
+  }, [globe, fixture, textbook, onlyTextbook, geoRetry]);
+
   // Шрифты карты: до загрузки ширина подписей меряется по запасному — потом раскладка заново.
   useEffect(() => {
     let live = true;
-    loadMapFonts().then(() => {
+    Promise.all([loadMapFonts(), loadGlobeFonts()]).then(() => {
       if (!live) return;
       measure.clear();
       setFontsVersion((v) => v + 1);
@@ -121,12 +171,97 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const known = new Set(base.links.map((l) => l.id));
     return { ...base, links: [...base.links, ...extra.filter((l) => !known.has(l.id))] };
   }, [load.data, extra]);
+  // Эпохи фильтра, которых нет на карте (неизвестные и без датировки), отбрасываются —
+  // адрес заменяется без них.
+  useEffect(() => {
+    if (load.status !== "ok" || !load.data) return;
+    const eras = new Set(load.data.eras.map((e) => e.id));
+    setState((s) => {
+      const kept = s.filter.epochs.filter((id) => eras.has(id));
+      return kept.length === s.filter.epochs.length ? s : { ...s, filter: { ...s.filter, epochs: kept } };
+    });
+  }, [load]);
   const vis = useMemo(() => visible(data, state.filter), [data, state.filter]);
-  const rel = useMemo(() => related(data, vis, state.sel), [data, vis, state.sel]);
+  const rel = useMemo(
+    () => related(data, vis, state.sel, state.filter.verified),
+    [data, vis, state.sel, state.filter.verified],
+  );
   const found = state.sel ? find(data, state.sel) : null;
 
-  // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются.
+  // --- глобус: сцена на год T ---
+  const gvis = useMemo(() => (globe ? visible(data, { ...state.filter, ...ALL_TIME }) : null), [globe, data, state.filter]);
+  const grel = useMemo(
+    () => (gvis ? related(data, gvis, state.sel, state.filter.verified) : null),
+    [data, gvis, state.sel, state.filter.verified],
+  );
+  const win = vis.range;
+  const selPerson = found?.type === "person" ? found.obj : null;
+  const year = clampYear(state.t ?? defaultYear(gvis?.people ?? vis.people, selPerson, win), win);
+  const winRef = useRef(win);
+  winRef.current = win;
+  const setYear = useCallback((y: number) => setState((s) => ({ ...s, t: clampYear(y, winRef.current) })), []);
+  const playback = usePlayback(win, year, setYear, reduced);
+  const model = geo.status === "ok" && geo.data ? geoModel(geo.data) : null;
+  const input = useMemo(() => (gvis ? { people: gvis.people, events: gvis.events, links: gvis.links } : null), [gvis]);
+  const scene = useMemo(() => (model && input ? visibleAt(model, input, year) : null), [model, input, year]);
+  const placeSel = model && state.sel ? (model.places.get(state.sel) ?? null) : null;
+  const roles = useMemo(() => globeRoles(model, scene, placeSel ? null : grel, placeSel?.id ?? null), [model, scene, grel, placeSel]);
+  const nearest = model && input && scene && !scene.places.length ? nearestYear(model, input, year, win) : null;
+  const peopleNow = scene ? scene.places.reduce((n, p) => n + p.people.length, 0) : 0;
+  const placesNow = scene?.places.length ?? 0;
+  const said = useAnnouncer(t.geo.announce(year, placesNow, peopleNow), year, playback.playing, scene != null);
+  const info = useMemo(() => {
+    const ix = new Map<string, GlobeInfo>();
+    for (const p of data.people) ix.set(p.id, { name: p.short || p.label, full: p.label, portrait: p.portrait ?? null });
+    for (const e of data.events) ix.set(e.id, { name: e.label, full: e.label });
+    return (id: string) => ix.get(id) ?? null;
+  }, [data]);
+  const country = useCallback(
+    (placeId: string) => {
+      const g = model?.places.get(placeId);
+      return g && countryOf ? (countryOf(g)?.name ?? null) : null;
+    },
+    [model, countryOf],
+  );
+  // «Где в <год> году»: место выбранной персоны или события в сцене года T.
+  let where: GeoWhereData | null = null;
+  if (model && scene && found?.type === "person") {
+    const sp = scene.persons.find((p) => p.id === found.obj.id);
+    const stay = sp ? stayAt(found.obj, model.byEntity.get(found.obj.id) ?? [], year) : null;
+    const g = sp ? model.places.get(sp.place) : null;
+    if (sp && stay && g) {
+      const role: GeoRole = stay.row.role == null ? "none" : stay.row.role;
+      where = { year, place: g.label, country: countryOf ? country(g.id) : undefined, role, from: stay.from, to: stay.to, after: stay.after };
+    }
+  } else if (model && scene && found?.type === "event") {
+    const se = scene.events.find((e) => e.id === found.obj.id);
+    const g = se ? model.places.get(se.place) : null;
+    if (se && g) where = { year, place: g.label, country: countryOf ? country(g.id) : undefined, role: "event", from: found.obj.year, to: found.obj.year, after: false };
+  }
+  const geoPanel: GeoPanel | undefined = globe
+    ? {
+        year,
+        status: geo.status,
+        scene,
+        unplaced: model && gvis ? model.unplaced.filter((id) => gvis.people.some((p) => p.id === id) || gvis.events.some((e) => e.id === id)) : [],
+        place: placeSel,
+        noPlace: Boolean(model && found && found.type !== "era" && found.type !== "group" && !model.byEntity.has(found.obj.id)),
+        country: countryOf ? country : null,
+        where,
+        maxPersons: MAX_PERSONS,
+        onPlace: (id) => {
+          const g = model?.places.get(id);
+          if (!g) return;
+          select(id);
+          setFocus((f) => ({ lat: g.lat, lon: g.lon, nonce: (f?.nonce ?? 0) + 1 }));
+        },
+      }
+    : undefined;
+
+  // Адрес: /graph[/<sel>]?параметры; служебные fixture и recipe сохраняются. Во время
+  // проигрывания год в адрес не пишется на каждом шаге — только по остановке.
   useEffect(() => {
+    if (playback.playing) return;
     const q = new URLSearchParams(toQuery({ ...state, sel: null }));
     if (fromAssistant) q.set("via", "assistant");
     if (fixture) q.set("fixture", fixture);
@@ -135,7 +270,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     const path = state.sel ? `/graph/${encodeURIComponent(state.sel)}` : "/graph";
     const next = `${path}${text ? `?${text}` : ""}`;
     if (window.location.pathname + window.location.search !== next) window.history.replaceState(window.history.state, "", next);
-  }, [state, fixture, recipeParam, fromAssistant]);
+  }, [state, fixture, recipeParam, fromAssistant, playback.playing]);
 
   // Ширина — по контейнеру карты (сворачивание панели, окно); высота — до низа окна.
   const remeasure = useCallback(() => {
@@ -143,7 +278,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const width = Math.round(rect.width);
-    const height = Math.max(MIN_HEIGHT, Math.floor(window.innerHeight - (rect.top + window.scrollY) - OVERVIEW_HEIGHT - BOTTOM_GAP));
+    const height = Math.max(globeRef.current ? MIN_GLOBE : MIN_HEIGHT, Math.floor(window.innerHeight - (rect.top + window.scrollY) - OVERVIEW_HEIGHT - (globeRef.current ? YEAR_BAR_HEIGHT : 0) - BOTTOM_GAP));
     // Защита от качелей: ширина карты меняет высоту страницы, высота — полосу прокрутки,
     // полоса — снова ширину. Возврат к ширине позапрошлого замера не принимаем.
     const prev = widths.current;
@@ -156,7 +291,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
   }, []);
   useLayoutEffect(() => {
     remeasure();
-  }, [remeasure, load.status, panelCollapsed]);
+  }, [remeasure, load.status, panelCollapsed, state.view]);
   useEffect(() => {
     const el = chart.current;
     if (!el) return;
@@ -167,7 +302,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
       ro.disconnect();
       window.removeEventListener("resize", remeasure);
     };
-  }, [remeasure, load.status]);
+  }, [remeasure, load.status, state.view]);
 
   // Ручная смена фильтров или линз снимает пометку ассистента: вид уже не его.
   const patch = useCallback((p: Partial<MapState>) => {
@@ -182,7 +317,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     setLink(null);
     setBuild(idleBuild());
     if (resetFilter) setFromAssistant(false);
-    setState((s) => ({ ...s, sel: id, ...(resetFilter ? { filter: { ...s.filter, from: undefined, to: undefined, groups: [], roles: [], kinds: [], ekinds: [] } } : {}) }));
+    setState((s) => ({ ...s, sel: id, ...(resetFilter ? { filter: { ...s.filter, from: undefined, to: undefined, groups: [], roles: [], kinds: [], ekinds: [], epochs: [] } } : {}) }));
   }, []);
 
   // Esc снимает выбор связи, затем выбор сущности.
@@ -309,6 +444,12 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
     [found, recipeParam, data, textbook, onlyTextbook, scope.generation],
   );
 
+  // Смена вида: выбор, поиск, фильтры и окно остаются; проигрывание останавливается.
+  function switchView(v: MapView) {
+    playback.stop();
+    setState((s) => (s.view === v ? s : { ...s, view: v }));
+  }
+
   function download() {
     const text = exportRef.current?.();
     if (text) downloadSvg(text, `map${state.sel ? `-${state.sel}` : ""}.svg`);
@@ -327,15 +468,29 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
           <header className="map-head">
             <div className="map-head__main">
               <div className="map-head__eyebrow">{t.map.eyebrow}</div>
-              <h1 className="map-head__title">{title}</h1>
+              <div className="map-head__titlerow">
+                <h1 className="map-head__title">{title}</h1>
+                <Seg<MapView>
+                  className="map-view-switch"
+                  label={t.geo.viewLabel}
+                  items={[
+                    { value: "chrono", label: t.geo.viewChrono, icon: "timeline", iconOnly: true },
+                    { value: "globe", label: t.geo.viewGlobe, icon: "globe", iconOnly: true },
+                  ]}
+                  value={state.view}
+                  onChange={switchView}
+                />
+              </div>
             </div>
             <div className="map-head__tools">
               <ScopeToggle textbook={textbook} />
               <Switch label={t.graph.extend} checked={scope.generation} onChange={(value) => setScope({ generation: value })} />
-              <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={download} disabled={!ready}>
-                <Icon name="download" small />
-                {t.graph.download}
-              </button>
+              {!globe && (
+                <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" onClick={download} disabled={!ready}>
+                  <Icon name="download" small />
+                  {t.graph.download}
+                </button>
+              )}
             </div>
           </header>
           {load.status === "error" && (
@@ -350,7 +505,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
               <div>{t.map.truncated(data.limit)}</div>
             </div>
           )}
-          {ready && state.sel && !found && (
+          {ready && state.sel && !found && !placeSel && !(globe && geo.status === "loading") && (
             <div className="pg-notice map-notice" role="status">
               <Icon name="info" />
               <div>{t.map.notOnMap}</div>
@@ -369,7 +524,58 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
           {ready && (
             <div className={panelCollapsed ? "map-workspace is-panel-collapsed" : "map-workspace"}>
               <div className="map-chart" ref={chart}>
-                {size.width > 0 && (
+                {size.width > 0 && globe && (
+                  <>
+                    <Suspense fallback={<div className="geo-stage" style={{ width: size.width, height: size.height }} aria-busy="true" />}>
+                      <GlobeView
+                        width={size.width}
+                        height={size.height}
+                        layer={geo.data}
+                        status={geo.status}
+                        scene={scene}
+                        roles={roles}
+                        year={year}
+                        summary={t.geo.summary(year, placesNow, peopleNow)}
+                        measure={measure}
+                        fontsVersion={fontsVersion}
+                        reduced={reduced}
+                        focus={focus}
+                        nearest={nearest}
+                        info={info}
+                        onSelect={(id) => select(id)}
+                        onYearStep={(d) => setYear(year + d)}
+                        onTogglePlay={playback.toggle}
+                        onRetry={() => setGeoRetry((n) => n + 1)}
+                        onToChrono={() => switchView("chrono")}
+                        onNearest={() => nearest != null && setYear(nearest)}
+                      />
+                    </Suspense>
+                    <Overview
+                      range={data.range ?? vis.range}
+                      win={vis.range}
+                      people={data.people}
+                      width={size.width}
+                      onChange={(from, to) => {
+                        setFromAssistant(false);
+                        setState((s) => ({ ...s, filter: { ...s.filter, from, to } }));
+                      }}
+                      year={{
+                        value: year,
+                        era: eraOf(data.eras, year)?.label ?? null,
+                        playing: playback.playing,
+                        speed: playback.speed,
+                        speeds: SPEEDS,
+                        onChange: setYear,
+                        onToggle: playback.toggle,
+                        onSpeed: (v) => playback.setSpeed(v as Speed),
+                      }}
+                    />
+                    <p className="geo-live" aria-live="polite" data-geo-live>
+                      {said}
+                    </p>
+                  </>
+                )}
+                {size.width > 0 && !globe && (
                   <>
                     <MapCanvas
                       data={data}
@@ -417,6 +623,7 @@ export function MapPage({ entityId, query }: { entityId?: string; query: URLSear
                 generation={scope.generation}
                 onEnableGeneration={() => setScope({ generation: true })}
                 onOpenCard={(id, label) => openCardInPanel(id, label)}
+                geo={geoPanel}
               />
             </div>
           )}

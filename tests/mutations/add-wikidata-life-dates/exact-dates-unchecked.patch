@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -324,7 +324,7 @@
+         labels = {normalize(v) for v in candidates[0]["label"].values()}
+         if not names & labels:
+             return False
+-        return not dates_conflict(entity["primary"].get("dates"), candidate_dates(candidates[0]))
++        return True
+ 
+     def suggest(
+         self, manifest: dict[str, Any], *, auto_exact: bool = False, limit: int | None = None

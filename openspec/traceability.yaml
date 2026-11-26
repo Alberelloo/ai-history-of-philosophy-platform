@@ -38,3 +38,11 @@ enforce:
   - source-catalog
   - regional-access
   - entity-portraits
+  - entity-catalog
+  - epochs
+  - epoch-context
+  - geo-timeline
+  - entity-naming
+  - person-quality
+  - entity-dating
+  - ontology-migration

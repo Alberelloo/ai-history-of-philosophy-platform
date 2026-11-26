@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -438,7 +438,7 @@
+         planned: list[tuple[str, str | None, Any, dict[str, Any]]] = [
+             ("dating", None, dating.to_json(), {}),
+         ]
+-        if candidate.get("kind"):
++        if False:
+             planned.append(("event_kind", None, candidate["kind"], {}))
+         planned.append(("belongs_to_epoch", epoch_id, None, {"membership_basis": "historians"}))
+         if place is not None:

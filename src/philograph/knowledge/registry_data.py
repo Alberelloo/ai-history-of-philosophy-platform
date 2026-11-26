@@ -64,14 +64,26 @@ QUALIFIERS = [
     ),
     ("authenticity", "Подлинность", "enum", ["authentic", "disputed", "attributed"]),
     ("strength", "Сила", "enum", ["strong", "moderate", "weak"]),
+    # вид места в биографии (geo-timeline): запись «жил в» без вида тоже допустима
+    ("place_role", "Вид места", "enum", ["birth", "death", "activity", "residence"]),
 ]
 
 INFLUENCE_ENDS = IDEAS + AGENTS + WORK
 
-# Значения-свойства из списка (названия — в web/src/i18n/ontology.{ru,en}.json, «values»).
+# Значения-свойства из списка (названия — в web/src/i18n/ontology.{ru,en}.json, «values»;
+# названия значений уточнителей — там же, «qualifiers»). Новые значения дописываются в конец:
+# в заполненную базу они дозагружаются тем же порядком.
 GROUP_KINDS = ["school", "direction", "institution", "circle"]
 PERSON_ROLES = ["philosopher", "scientist", "writer", "theologian", "ruler", "translator"]
-EVENT_KINDS = ["political", "scientific", "religious", "intellectual", "biographical"]
+EVENT_KINDS = [
+    "political",
+    "scientific",
+    "religious",
+    "intellectual",
+    "biographical",
+    "economic",
+    "social",
+]
 
 
 def rel(
@@ -90,9 +102,12 @@ def rel(
     value=None,
     values=None,
     single=False,
+    requires_attribution=False,
 ):
-    """``value`` — вид значения: ``date`` (нечёткий интервал), ``text`` или ``enum`` (значение
-    из списка ``values``); ``single`` — у сущности одно значение, второе уходит на проверку."""
+    """``value`` — вид значения: ``date`` (нечёткий интервал), ``text``, ``enum`` (значение
+    из списка ``values``) или ``geo`` (координаты ``{lat, lon}``); ``single`` — у сущности
+    одно значение, второе уходит на проверку; ``requires_attribution`` — утверждение без
+    атрибуции не записывается."""
     spec = {
         "code": code,
         "title": title,
@@ -111,6 +126,8 @@ def rel(
         spec["values"] = list(values)
     if single:
         spec["single"] = True
+    if requires_attribution:
+        spec["requires_attribution"] = True
     return spec
 
 
@@ -430,7 +447,7 @@ RELATIONS = [
         ["person"],
         ["place"],
         families=("biography",),
-        qualifiers=("time",),
+        qualifiers=("time", "place_role"),
     ),
     # роли идейного события
     rel(
@@ -507,6 +524,17 @@ RELATIONS = [
         [],
         value="enum",
         values=EVENT_KINDS,
+        families=("context",),
+    ),
+    # координаты места (geo-timeline): заполняются из Wikidata, в схему для модели не входят
+    rel(
+        "coordinates",
+        "координаты",
+        None,
+        ["place"],
+        [],
+        value="geo",
+        requires_attribution=True,
         families=("context",),
     ),
     rel(

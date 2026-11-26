@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -390,7 +390,7 @@
+             value=dating.to_json(),
+             attributions=[Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))],
+             provenance=Provenance("imported", extra={"wikidata": qid, "properties": props}),
+-            status="sourced",
++            status="generated",
+         )
+ 
+ 

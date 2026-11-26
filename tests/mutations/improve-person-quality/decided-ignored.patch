@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -98,7 +98,7 @@
+         return Verdict.of("apart:type")
+     if a.qid and b.qid:
+         return Verdict.of("apart:qid")
+-    if decided_apart:
++    if False and decided_apart:
+         return Verdict.of("apart:decided")
+     if dates_conflict(a.dates, b.dates):
+         return Verdict.of("review:dates")

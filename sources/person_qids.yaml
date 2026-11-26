@@ -1,0 +1,21 @@
+# Манифест QID персон и произведений (entity-dating, «Подтверждение QID персон и произведений»).
+#
+# Запись:
+#   entity      id сущности (постоянный)
+#   label       подпись на момент suggest, для человека
+#   type        person | work
+#   wikidata    QID (^Q\d+$) или null; ставит человек (или suggest --auto-exact)
+#   decision    pending | accepted | auto | rejected; accepted/auto — только с wikidata
+#   candidates  [{qid, label: {ru, en}, description, birth, death | published, holder?}]
+#               holder — id другой действующей сущности того же типа, у которой этот QID уже
+#               есть: пара стоит в очереди проверки duplicate (review:qid_candidate).
+#
+# Порядок работы:
+#   1. python -m philograph.knowledge.life_dates suggest            — кандидаты (сеть Wikidata)
+#   2. человек ставит wikidata и decision: accepted (или rejected)
+#   3. python -m philograph.knowledge.life_dates apply --dry-run    — отчёт без записи
+#   4. python -m philograph.knowledge.life_dates apply [--linked]   — QID, годы жизни, роли
+#   Откат: python -m philograph.knowledge.life_dates rollback <run_id>
+#
+# Записи обходятся по порядку: из двух подтверждений одного QID записывается первое.
+entities: []

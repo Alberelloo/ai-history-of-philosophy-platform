@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -278,7 +278,7 @@
+     @staticmethod
+     def _source(qid: str, prop: str, run_id: str, **extra: Any) -> dict[str, Any]:
+         return {
+-            "attributions": [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))],
++            "attributions": [Attribution("source", f"{SYSTEM}:{qid}", place=None)],
+             "provenance": Provenance(
+                 "imported", run_id=run_id, extra={"wikidata": qid, "property": prop, **extra}
+             ),

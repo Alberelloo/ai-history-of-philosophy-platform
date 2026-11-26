@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -151,7 +151,7 @@
+     """Правило поиска сущностей: NFC, нижний регистр, «ё» → «е», всё, кроме букв, цифр и
+     пробелов, — пробел; пробелы схлопываются, края обрезаются."""
+     name = unicodedata.normalize("NFC", name).lower().replace("ё", "е")
+-    name = re.sub(r"[^\w\s]|_", " ", name)
++    name = re.sub(r"[^\w\s]", " ", name)
+     return re.sub(r"\s+", " ", name).strip()
+ 
+ 

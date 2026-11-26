@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 95edbcc..5237f95 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -458,10 +458,6 @@ class Service:
+ 
+     def version(self, version_id: str) -> dict[str, Any]:
+         response = self.filling.library.get(f"internal/versions/{version_id}/paragraphs")
+-        if response.status_code == 404:
+-            raise CommandError(f"версия {version_id} не найдена в библиотеке")
+-        if response.status_code != 200:
+-            raise CommandError(f"библиотека ответила {response.status_code} на версию {version_id}")
+         data = response.json()
+         self.texts.prime(data["paragraphs"])
+         return data

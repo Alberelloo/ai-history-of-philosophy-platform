@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -118,7 +118,7 @@
+ CONFIRMED = ("accepted", "auto")
+ # Читаются только эти свойства; влияния (P737) и всё прочее — нет.
+ PROPERTIES = {"P569": "birth", "P570": "death", "P577": "published", "P106": "occupation"}
+-LANGS = ("ru", "en")
++LANGS = ("ru",)
+ 
+ 
+ # --- манифест -------------------------------------------------------------------------

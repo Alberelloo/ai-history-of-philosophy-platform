@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -221,9 +221,7 @@
+     words = label.split()
+     first = _first_letter(label)
+     if (
+-        first is not None
+-        and first.islower()
+-        and not _starts_with_particle(words[0].lstrip(_EDGE), rules.particles)
++        False
+     ):
+         return True
+     normalized = normalize(label)

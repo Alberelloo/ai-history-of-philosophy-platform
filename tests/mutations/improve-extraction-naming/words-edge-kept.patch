@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -150,7 +150,7 @@
+ 
+ 
+ def _words(text: str) -> list[str]:
+-    return [w.strip(_EDGE) for w in text.split()]
++    return text.split()
+ 
+ 
+ def _letter_script(ch: str) -> str:

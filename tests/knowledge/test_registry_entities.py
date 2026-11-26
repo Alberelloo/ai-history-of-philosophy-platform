@@ -411,3 +411,89 @@ def test_new_codes_loaded_into_existing_registry(onto):
     assert "epoch" in onto.registry.relation("dating")["subject_types"]
     onto.registry.load_defaults()
     assert onto.registry.version() == before + 1  # повторный старт ничего не меняет
+
+
+# --- add-epoch-context: экономическое и социальное события (задача 6.5) ----------------------
+
+EVENT_KINDS_ALL = [
+    "political",
+    "economic",
+    "social",
+    "scientific",
+    "religious",
+    "intellectual",
+    "biographical",
+]
+
+
+@req(
+    OR,
+    "Виды групп, роли персон и виды событий",
+    scenario="Экономическое событие в существующей базе",
+)
+def test_economic_event_in_existing_database(onto, events):
+    from sqlalchemy import func, select, update
+
+    from philograph.knowledge import schema
+
+    engine = onto.registry.engine
+    rt = schema.relation_types
+    revolution = onto.thing("event", "Славная революция", "1688")
+    onto.statements.add(
+        revolution, "event_kind", value="political", attributions=[Attribution("common")]
+    )
+    # Реестр «до изменения»: у вида события нет economic и social.
+    with engine.begin() as conn:
+        spec = conn.execute(select(rt.c.spec).where(rt.c.code == "event_kind")).scalar_one()
+        old_values = [v for v in spec["values"] if v not in ("economic", "social")]
+        conn.execute(
+            update(rt).where(rt.c.code == "event_kind").values(spec={**spec, "values": old_values})
+        )
+    onto.registry._cache = None
+    bubble = onto.thing("event", "Южноморский пузырь", "1720")
+    with engine.begin() as conn:
+        before_statements = conn.scalar(select(func.count()).select_from(schema.statements))
+    before = onto.registry.version()
+    events.clear()
+
+    onto.registry.load_defaults()  # старт сервиса
+    onto.statements.add(
+        bubble, "event_kind", value="economic", attributions=[Attribution("common")]
+    )
+
+    [row] = onto.statements.about(bubble, types=["event_kind"])
+    assert row["value"] == "economic"
+    with engine.begin() as conn:
+        after = conn.scalar(select(func.count()).select_from(schema.statements))
+    assert after == before_statements + 1  # прежние на месте, добавлен только новый вид
+    assert onto.statements.about(revolution, types=["event_kind"])[0]["value"] == "political"
+    [changed] = events.of("knowledge.registry.changed")
+    assert changed["version"] == before + 1
+    assert "дозагрузка реестра" in changed["change"] and "event_kind" in changed["change"]
+    events.assert_sequence("knowledge.registry.changed", "knowledge.statement.created")
+    assert events.where("knowledge.statement.created", type="event_kind")
+
+
+@req(OR, "Виды групп, роли персон и виды событий", invariant="все семь видов события допустимы")
+@pytest.mark.parametrize("kind", EVENT_KINDS_ALL)
+def test_all_event_kinds_accepted(onto, events, kind):
+    event = onto.thing("event", "Событие", "1720")
+    sid = onto.statements.add(event, "event_kind", value=kind, attributions=[Attribution("common")])
+    assert onto.statements.get(sid)["value"] == kind
+    assert events.where("knowledge.statement.created", type="event_kind")
+
+
+@req(
+    OR,
+    "Виды групп, роли персон и виды событий",
+    invariant="значение вне списка вида события отклоняется с перечнем допустимых",
+)
+@pytest.mark.parametrize("kind", ["culinary", "Economic", "", "экономическое"])
+def test_event_kind_outside_list(onto, events, kind):
+    event = onto.thing("event", "Событие", "1720")
+    with pytest.raises(StatementError) as refused:
+        onto.statements.add(event, "event_kind", value=kind, attributions=[Attribution("common")])
+    for allowed in EVENT_KINDS_ALL:
+        assert allowed in str(refused.value), allowed
+    assert events.where("knowledge.statement.refused", type="event_kind")
+    assert onto.statements.about(event, types=["event_kind"]) == []

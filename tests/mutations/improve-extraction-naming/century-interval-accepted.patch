@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -33,7 +33,7 @@
+ _YEARS_FORMAT = re.compile(
+     rf"^(?P<approx>{_APPROX})?{_YEAR}(?:{_DASH}{_YEAR})?(?P<era>\s+{_ERA_TEXT})?$"
+ )
+-_CENTURY_FORMAT = re.compile(rf"^{_ROMAN}\s*в\.(?P<era>\s+{_ERA_TEXT})?$")
++_CENTURY_FORMAT = re.compile(rf"^{_ROMAN}(?:{_DASH}{_ROMAN})?\s*в\.(?P<era>\s+{_ERA_TEXT})?$")
+ 
+ _ERA_IN_TEXT = re.compile(_ERA_TEXT)
+ _ERA_IN_QUOTE = re.compile(r"до\s+н\.\s?э\.|до\s+нашей\s+эры")

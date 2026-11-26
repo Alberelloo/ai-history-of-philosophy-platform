@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -39,9 +39,6 @@
+     "ru": "cyrillic",
+     "en": "latin",
+     "de": "latin",
+-    "fr": "latin",
+-    "la": "latin",
+-    "it": "latin",
+     "el": "greek",
+     "grc": "greek",
+ }

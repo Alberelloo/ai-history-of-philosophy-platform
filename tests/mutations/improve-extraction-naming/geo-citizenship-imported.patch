@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -115,6 +115,7 @@
+     "P937": Property("lived_in", "activity", "qualifiers"),
+     "P276": Property("happened_in", subjects="event"),
+     "P625": Property("coordinates", subjects="place"),
++    "P27": Property("lived_in", "citizen", subjects="person"),
+ }
+ 
+ 

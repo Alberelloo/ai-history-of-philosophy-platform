@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -77,7 +77,7 @@
+     if years:
+         first, second = years.group(2), years.group(3)
+         values = [int(first)] + ([int(second)] if second else [])
+-        if any(not 1 <= v <= MAX_YEAR for v in values):
++        if any(not 0 <= v <= MAX_YEAR for v in values):
+             return None
+         if second and not years.group("era") and values[0] > values[1]:
+             return None  # интервал нашей эры — начало не позже конца

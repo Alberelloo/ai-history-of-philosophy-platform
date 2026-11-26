@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -55,7 +55,7 @@
+ 
+ def _quote_key(text: str) -> str:
+     """Правило цитат утверждений: пробелы схлопываются, «ё» → «е», нижний регистр."""
+-    return re.sub(r"\s+", " ", text.lower().replace("ё", "е")).strip()
++    return re.sub(r"\s+", " ", text.replace("ё", "е")).strip()
+ 
+ 
+ def _roman_value(roman: str) -> int | None:

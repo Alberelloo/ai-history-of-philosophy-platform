@@ -512,3 +512,142 @@ def test_review_requires_operator(fill, clock):
     assert client.post("/v1/operator/login", json={"password": "пароль"}).status_code == 200
     assert SESSION_COOKIE in client.cookies
     assert client.get("/v1/review/queue").status_code == 200
+
+
+# --- epoch-context: «Контекст из текста» (add-epoch-context, задача 6.2) ---------------------
+
+ECX = "epoch-context"
+FROM_TEXT = "Контекст из текста"
+MECH = "Механизм влияния"
+QUOTE_1 = "Всякое знание начинается с опыта"  # дословно из абзаца 1 источника ``lib``
+
+
+def stimulated(subject, obj, mechanism=None, subject_type="event", object_type="doctrine"):
+    item = st(subject, "stimulated", obj, 1, QUOTE_1)
+    item.update(subject_type=subject_type, object_type=object_type)
+    if mechanism is not None:
+        item["qualifiers"] = {"mechanism": mechanism}
+    return item
+
+
+def first_fragment(events):
+    """Событие фрагмента с ответом модели (первый фрагмент); прочие фрагменты пусты."""
+    first, *rest = events.of("knowledge.extraction.fragment")
+    assert all((f["created"], f["dropped"]) == (0, 0) for f in rest), [f.fields for f in rest]
+    return first
+
+
+def stimulated_rows(fill):
+    return [s for s in _all(fill) if s["type"] == "stimulated"]
+
+
+@req(ECX, FROM_TEXT, scenario="Связь из фрагмента")
+def test_stimulated_from_fragment(fill, events):
+    source = fill.lib.register()
+    fill.model.replies.append(
+        {"statements": [stimulated("Французская революция", "наукоучение", "political")]}
+    )
+    fill.publish(source)
+    [row] = stimulated_rows(fill)
+    assert row["status"] == "sourced"
+    assert row["qualifiers"] == {"mechanism": "political"}
+    assert len(row["evidence"]) == 1 and row["evidence"][0]["quote"] == QUOTE_1
+    assert row["evidence"][0]["source_id"] == source
+    assert [a["who"] for a in row["attributions"]] == [source]
+    subject = fill.onto.entities.get(row["subject"])
+    obj = fill.onto.entities.get(row["object"])
+    assert (subject["type"], obj["type"]) == ("event", "doctrine")
+    [created] = events.where("knowledge.statement.created", type="stimulated")
+    assert created["statement_id"] == row["id"]
+    fragment = first_fragment(events)
+    assert (fragment["created"], fragment["dropped"]) == (1, 0)
+
+
+@req(ECX, FROM_TEXT, scenario="Механизм вне списка при извлечении")
+def test_extraction_mechanism_outside_list(fill, events):
+    source = fill.lib.register()
+    fill.model.replies.append(
+        {
+            "statements": [
+                stimulated("Французская революция", "наукоучение", "culinary"),
+                stimulated("Славная революция", "Политическая философия Локка", "political"),
+            ]
+        }
+    )
+    fill.publish(source)
+    rows = stimulated_rows(fill)
+    assert len(rows) == 1
+    assert fill.onto.entities.label(rows[0]["subject"]) == "Славная революция"
+    assert rows[0]["qualifiers"] == {"mechanism": "political"}
+    dropped = events.of("knowledge.extraction.dropped")
+    assert len(dropped) == 1 and "culinary" in dropped[0]["reason"]
+    fragment = first_fragment(events)
+    assert (fragment["created"], fragment["dropped"]) == (1, 1)
+
+
+@req(ECX, FROM_TEXT, scenario="Стимулировало от персоны")
+def test_extraction_stimulated_from_person(fill, events):
+    source = fill.lib.register()
+    fill.model.replies.append(
+        {"statements": [stimulated("Локк", "эмпиризм", subject_type="person")]}
+    )
+    fill.publish(source)
+    assert stimulated_rows(fill) == []
+    [dropped] = events.of("knowledge.extraction.dropped")
+    assert dropped["reason"].startswith("тип stimulated не подходит концам"), dropped["reason"]
+    fragment = first_fragment(events)
+    assert (fragment["created"], fragment["dropped"]) == (0, 1)
+
+
+@req(
+    ECX,
+    MECH,
+    invariant="механизм вне списка не записывается при извлечении; остальное во фрагменте "
+    "сохраняется",
+)
+@pytest.mark.parametrize("value", ["culinary", "Political", "", "political; drop", 7, None])
+def test_extraction_never_writes_bad_mechanism(fill, events, value):
+    source = fill.lib.register()
+    bad = stimulated("Французская революция", "наукоучение")
+    bad["qualifiers"] = {"mechanism": value}
+    good = st("Кант", "holds", "Всякое знание начинается с опыта", 1, QUOTE_1)
+    fill.model.replies.append({"statements": [bad, good]})
+    fill.publish(source)
+    assert stimulated_rows(fill) == []
+    assert [s["type"] for s in _all(fill)] == ["holds"]
+    assert len(events.of("knowledge.extraction.dropped")) == 1
+    fragment = first_fragment(events)
+    assert (fragment["created"], fragment["dropped"]) == (1, 1)
+
+
+@req(ECX, FROM_TEXT, invariant="«стимулировало» от персоны не записывается и при ручной записи")
+def test_manual_stimulated_from_person_refused(onto, events):
+    from philograph.knowledge.statements import StatementError
+
+    agent = onto.person("Джон Локк", "1632", "1704")
+    doctrine = onto.thing("doctrine", "Эмпиризм Локка")
+    with pytest.raises(StatementError):
+        onto.statements.add(agent, "stimulated", obj=doctrine, attributions=[Attribution("common")])
+    assert onto.statements.about(agent, types=["stimulated"]) == []
+    [refused] = events.where("knowledge.statement.refused", type="stimulated")
+    assert "person" in refused["reason"] and "stimulated" in refused["reason"]
+
+
+@req(ECX, MECH, invariant="механизм вне списка не записывается при ручной записи (refused)")
+def test_manual_mechanism_refused_event(onto, events):
+    from philograph.knowledge.statements import StatementError
+
+    event = onto.thing("event", "Славная революция", "1688")
+    doctrine = onto.thing("doctrine", "Политическая философия Локка")
+    with pytest.raises(StatementError):
+        onto.statements.add(
+            event,
+            "stimulated",
+            obj=doctrine,
+            qualifiers={"mechanism": "culinary"},
+            attributions=[Attribution("common")],
+        )
+    [refused] = events.of("knowledge.statement.refused")
+    assert refused["type"] == "stimulated"
+    assert "culinary" in refused["reason"] and "mechanism" in refused["reason"]
+    assert onto.statements.about(event, types=["stimulated"]) == []

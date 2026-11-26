@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..3690331 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -606,7 +606,7 @@ class Filling:
+         for key in ("subject_type", "object_type", "stance", "attributed_to", "proposed_type"):
+             if key in clean and not isinstance(clean[key], str):
+                 raise _Skip(f"поле {key}: нужна строка", codes.SCHEMA_ITEM)
+-        if "stance" in clean and clean["stance"] not in STANCES:
++        if False:
+             raise _Skip("позиция вне перечня", codes.STANCE_INVALID)
+         known = self.registry.entity_types()
+         for key in ("subject_type", "object_type"):

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..3a66111 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -518,7 +518,7 @@ class Filling:
+     def drop_fragment(self, run_id: str, reason: str, code: str) -> None:
+         """Фрагмент без ответа модели: одна отбраковка с кодом, фрагмент обработан."""
+         self._run(run_id).fragments += 1
+-        self.drop(run_id, reason, code)
++        self._drop(run_id, reason, code)
+ 
+     def apply_reply(
+         self,

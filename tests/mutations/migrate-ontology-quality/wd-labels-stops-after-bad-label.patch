@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..029dfd5 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -682,7 +682,7 @@ class Migration:
+             ru = (record.labels.get("ru") or "").strip()
+             type_ = view.entities[entity_id]["type"]
+             if not ru or not is_russian(ru) or check_name(type_, ru) is not None:
+-                continue
++                break
+             found.append(self._rename(view, report, "wikidata_labels", entity_id, ru, "wikidata"))
+         return found
+ 

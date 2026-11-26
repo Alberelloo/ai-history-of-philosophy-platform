@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..1bf2684 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -271,7 +271,7 @@ def ingest(
+                 if number in numbered:
+                     filling.apply_reply(window, data, source, run_id, numbered[number], schema)
+                 else:
+-                    filling.drop_fragment(run_id, "нет ответа на фрагмент", codes.REPLY_MISSING)
++                    pass
+     except BaseException as exc:
+         filling.fail_run(run_id, exc)
+         raise

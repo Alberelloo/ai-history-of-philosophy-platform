@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -704,7 +704,7 @@
+             statements=len(ids) - len(folded),
+             attributions=attributions,
+             folded=len(folded),
+-            loops=len(loops),
++            loops=0,
+         )
+         return merge_id
+ 

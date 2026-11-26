@@ -15,10 +15,13 @@
     "epoch": "Контекст эпохи",
     "when": "Дата и место",
     "effects": "На что повлияло",
+    "dating": "Датировка",
+    "members": "Относятся к эпохе",
     "parts": "Состав",
     "answers": "Ответы и сторонники",
     "arguments": "Аргументы за и против",
-    "misconceptions": "Часто считают, но…"
+    "misconceptions": "Часто считают, но…",
+    "context": "Исторический контекст"
   },
   "relations": {
     "influenced_by": {
@@ -216,6 +219,9 @@
     "event_kind": {
       "title": "вид события"
     },
+    "coordinates": {
+      "title": "координаты"
+    },
     "definition": {
       "title": "определение"
     },
@@ -243,7 +249,9 @@
       "scientific": "научное",
       "religious": "религиозное",
       "intellectual": "интеллектуальное",
-      "biographical": "биографическое"
+      "biographical": "биографическое",
+      "economic": "экономическое",
+      "social": "социальное"
     }
   },
   "recipes": {
@@ -254,5 +262,21 @@
     "answers": "Ответы на проблему",
     "conceptions": "Сравнение концепций",
     "path": "Путь между двумя"
+  },
+  "qualifiers": {
+    "mechanism": {
+      "political": "политический",
+      "economic": "экономический",
+      "social": "социальный",
+      "religious": "религиозный",
+      "scientific": "научный",
+      "institutional": "институциональный"
+    },
+    "place_role": {
+      "birth": "рождение",
+      "death": "смерть",
+      "activity": "деятельность",
+      "residence": "проживание"
+    }
   }
 }

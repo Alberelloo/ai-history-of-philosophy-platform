@@ -1,0 +1,17 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..cf5b0ab 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -1030,7 +1030,11 @@ class Migration:
+             if ours is None or ours["kind"] != "primary":
+                 return False  # переименовали после запуска: чужое изменение
+             if ours["id"] not in before:
+-                conn.execute(delete(t.names).where(t.names.c.id == ours["id"]))
++                conn.execute(
++                    delete(t.names).where(
++                        t.names.c.entity_id == entity_id, t.names.c.id.not_in(list(before))
++                    )
++                )
+             for n in before.values():
+                 conn.execute(
+                     update(t.names)

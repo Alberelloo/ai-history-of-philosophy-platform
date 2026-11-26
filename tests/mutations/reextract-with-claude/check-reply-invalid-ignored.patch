@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..75128ab 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -541,7 +541,9 @@ class Filling:
+ 
+         created = 0
+         if not isinstance(reply, dict) or not isinstance(reply.get("statements"), list):
+-            drop("ответ не объект с массивом statements", codes.REPLY_INVALID)
++            reply = {"statements": []}
++        if False:
++            drop("", codes.REPLY_INVALID)
+         else:
+             allowed = set((schema or self._schema())["x-relations"])
+             resolved: dict[str, str] = {}

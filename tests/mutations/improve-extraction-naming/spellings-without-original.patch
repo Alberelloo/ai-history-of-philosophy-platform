@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -55,7 +55,7 @@
+ def _spellings(name: str, item: dict[str, Any] | None) -> list[str]:
+     found = [name]
+     if item:
+-        found += [item.get("ru"), item.get("en"), (item.get("original") or {}).get("text")]
++        found += [item.get("ru"), item.get("en")]
+     return list(dict.fromkeys(s for s in found if s))
+ 
+ 

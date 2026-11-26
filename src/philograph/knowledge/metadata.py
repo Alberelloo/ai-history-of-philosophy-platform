@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from philograph.knowledge.naming import InvalidName
 from philograph.platform import events
 
 events.define(
@@ -39,14 +40,24 @@ class MetadataIngest:
     def handle(self, payload: dict[str, Any]) -> dict[str, int]:
         """Создаёт произведение, персон-авторов и связи цитирования; повторный вызов безопасен."""
         source_id = payload["source_id"]
-        work = self._work(payload["title"])
         created = 0
+        try:
+            work = self._work(payload["title"])
+        except InvalidName:  # название не прошло проверку: событие отказа уже в журнале
+            events.emit("knowledge.metadata.ingested", source_id=source_id, statements=0)
+            return {"statements": 0}
         for name in payload.get("authors", []):
-            person = self._person(name)
+            try:
+                person = self._person(name)
+            except InvalidName:
+                continue
             self.statements.add(work, "author", obj=person)
             created += 1
         for cited in payload.get("citations", []):
-            cited_work = self._work(cited)
+            try:
+                cited_work = self._work(cited)
+            except InvalidName:
+                continue
             self.statements.add(work, "cites", obj=cited_work)
             created += 1
         events.emit("knowledge.metadata.ingested", source_id=source_id, statements=created)

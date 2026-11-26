@@ -149,6 +149,43 @@ class Queue:
             return None
         now = self.clock.now()
         with self.engine.begin() as conn:
+            if conn.dialect.name == "sqlite":
+                # SQLite: атомарный захват одним UPDATE…RETURNING — без гонки SELECT→UPDATE
+                # между параллельными исполнителями.
+                target = (
+                    select(jobs.c.id)
+                    .where(
+                        and_(
+                            jobs.c.status == "pending",
+                            jobs.c.run_after <= now,
+                            jobs.c.kind.in_(list(self._handlers)),
+                        )
+                    )
+                    .order_by(jobs.c.id)
+                    .limit(1)
+                    .scalar_subquery()
+                )
+                row = (
+                    conn.execute(
+                        update(jobs)
+                        .where(jobs.c.id == target)
+                        .values(status="running", attempts=jobs.c.attempts + 1)
+                        .returning(
+                            jobs.c.id,
+                            jobs.c.kind,
+                            jobs.c.payload,
+                            jobs.c.attempts,
+                            jobs.c.run_id,
+                            jobs.c.request_id,
+                        )
+                    )
+                    .mappings()
+                    .first()
+                )
+                if row is None:
+                    return None
+                job = Job(row["id"], row["kind"], dict(row["payload"]), row["attempts"])
+                return job, row["run_id"], row["request_id"]
             query = (
                 select(jobs)
                 .where(

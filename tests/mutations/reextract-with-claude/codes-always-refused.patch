@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..36f827c 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -579,7 +579,7 @@ class Filling:
+             "knowledge.extraction.dropped",
+             run_id=run_id,
+             reason=reason[:300],
+-            code=code if code in codes.CODES else codes.code_for(reason),
++            code="statement_refused",
+         )
+ 
+     def _item(self, item: Any, window: list[dict[str, Any]], allowed: set[str]) -> dict[str, Any]:

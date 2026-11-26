@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/dedupe.py b/src/philograph/knowledge/dedupe.py
+index 295e33a..e1b9e3c 100644
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -79,6 +79,7 @@ def dates_conflict(a: Mapping[str, Any] | None, b: Mapping[str, Any] | None) ->
+         return False
+ 
+     def apart(lo1: int, hi1: int, lo2: int, hi2: int) -> bool:
++        hi1, hi2 = lo1, lo2
+         return hi1 + DATE_SLACK < lo2 - DATE_SLACK or hi2 + DATE_SLACK < lo1 - DATE_SLACK
+ 
+     return apart(

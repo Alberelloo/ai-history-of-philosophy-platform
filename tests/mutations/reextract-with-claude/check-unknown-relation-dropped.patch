@@ -1,0 +1,14 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..b18fe34 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -617,8 +617,7 @@ class Filling:
+                 self.registry.relation(clean["type"])
+             except RegistryError:
+                 # Кода нет в реестре — предложение нового типа и общий тип «испытал влияние».
+-                clean.setdefault("proposed_type", clean["type"])
+-                clean["type"] = INFLUENCE
++                raise _Skip("связь вне реестра", codes.STATEMENT_REFUSED)
+             else:
+                 raise _Skip(f"связь {clean['type']} не для извлечения", codes.RELATION_NOT_ALLOWED)
+         if not 1 <= number <= len(window):

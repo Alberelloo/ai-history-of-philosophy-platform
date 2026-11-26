@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -453,7 +453,7 @@
+         if event_id is not None and not missing:
+             return {"result": "exists", "event_id": event_id}
+         report.statements += len(missing)
+-        report.places_created += int(new_place)
++        report.places_created += 0
+         if dry_run:
+             return {"result": "created", "event_id": event_id, "statements": len(missing)}
+         if event_id is None:

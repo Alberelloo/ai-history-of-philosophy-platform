@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -952,7 +952,6 @@
+         # Шаг QID из манифеста — общим правилом ``LifeDates``: QID, на который ссылается
+         # проверенное утверждение или утверждение другого запуска, остаётся и идёт в ``kept``.
+         kept += self._life().rollback_externals(run_id, externals)["kept"]
+-        self._close_review(run_id)
+         summary = {
+             "run_id": run_id,
+             "actions": len(done),

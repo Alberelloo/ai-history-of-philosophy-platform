@@ -1,0 +1,22 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -111,15 +111,15 @@
+     fmt = _format(text or "")
+     if fmt is None:
+         return UNPARSED
++    era_text = bool(_ERA_IN_TEXT.search(text.lower()))
++    era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
++    if era_text != era_quote:
++        return ERA
+     in_quote = {int(n) for n in _NUMBER.findall(quote)}
+     if not fmt.numbers <= in_quote:
+         return NOT_IN_QUOTE
+     if fmt.roman is not None and not _quote_has_roman(quote, fmt.roman):
+         return NOT_IN_QUOTE
+-    era_text = bool(_ERA_IN_TEXT.search(text.lower()))
+-    era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
+-    if era_text != era_quote:
+-        return ERA
+     if is_person and fmt.single:
+         return SINGLE_YEAR
+     return parse(text)

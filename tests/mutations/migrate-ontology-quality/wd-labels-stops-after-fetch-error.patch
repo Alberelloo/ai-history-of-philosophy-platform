@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..006ac0c 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -678,7 +678,7 @@ class Migration:
+             try:
+                 record = fetch_entity(qid, self.fetch)
+             except FETCH_ERRORS:
+-                continue
++                break
+             ru = (record.labels.get("ru") or "").strip()
+             type_ = view.entities[entity_id]["type"]
+             if not ru or not is_russian(ru) or check_name(type_, ru) is not None:

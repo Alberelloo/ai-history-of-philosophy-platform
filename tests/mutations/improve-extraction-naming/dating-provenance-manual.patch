@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -275,6 +275,6 @@
+             evidence=[Evidence(paragraph["id"], spec["quote"], source_id=source_id)],
+             attributions=[Attribution("source", source_id)],
+             provenance=Provenance(
+-                "extracted", run_id=run_id, model="main", template="ontology.extract"
++                "manual", actor="x"
+             ),
+         )

@@ -150,6 +150,13 @@ def build_app(gateway: LLMGateway, health: Health | None = None) -> FastAPI:
     def budgets() -> list[dict[str, Any]]:
         return gateway.budget_status()
 
+    @router.get("/roles/{role}")
+    def role(role: str) -> dict[str, Any]:
+        try:
+            return gateway.role_info(role)
+        except UnknownRole as exc:
+            raise UserFacingError("неизвестная роль", status=404, kind="unknown_role") from exc
+
     @router.get("/spend")
     def spend(days: int = 1, group_by: str = "budget") -> list[dict[str, Any]]:
         try:

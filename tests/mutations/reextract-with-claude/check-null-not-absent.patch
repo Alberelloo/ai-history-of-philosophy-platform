@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..b31383e 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -588,7 +588,7 @@ class Filling:
+         абзац фрагмента и цитата. Отказ — ``Skip`` с кодом."""
+         if not isinstance(item, dict):
+             raise _Skip("элемент не объект", codes.SCHEMA_ITEM)
+-        clean = {k: v for k, v in item.items() if v is not None}
++        clean = dict(item)
+         # Пустое название — не вид поля, а отказ правил названий (``entity:empty``).
+         for key in ("subject", "type", "object", "quote"):
+             if not isinstance(clean.get(key), str):

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 907644d..56cfb93 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -221,8 +221,6 @@ class Entities:
+         хранится в форме ``strip`` + NFC."""
+         text = clean(text)
+         entity_id = self.resolve(entity_id)
+-        if kind == "primary":
+-            self._check(self.get(entity_id)["type"], text)
+         with self.engine.begin() as conn:
+             conn.execute(
+                 t.names.insert().values(

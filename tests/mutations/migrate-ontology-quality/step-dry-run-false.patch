@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -457,7 +457,7 @@
+                 run_id=report.run_id,
+                 step=step,
+                 actions=len(found),
+-                dry_run=dry_run,
++                dry_run=False,
+             )
+         self._verify(report, base, view)
+         report.steps["verify"] = 0

@@ -305,7 +305,7 @@ def test_migration_6_adds_mention_position(tmp_path):
         ks._mention_position(conn)
         columns = {c["name"] for c in inspect(conn).get_columns("mentions", schema=ks.SCHEMA)}
     assert "position" in columns
-    assert ks.migrations.latest() == 7
+    assert ks.migrations.latest() == 10  # reextract-with-claude: knowledge:10
 
 
 @req(EM, "Метрики упоминаний")
@@ -471,3 +471,162 @@ def test_card_of_merged_entity(mx):
     duplicate = mx.onto.person("Иммануил Кант")
     mx.onto.entities.merge(mx.ids["kant"], duplicate)
     assert mx.cards.card(duplicate)["id"] == mx.ids["kant"]
+
+
+# --- add-epochs: карточка эпохи (задача 5.4) ------------------------------------------------
+
+
+def _epoch_card_world(svc):
+    """Данные сценария «Карточка эпохи»: датировка «Просвещения» — из Wikidata (команда
+    ``apply``), Локк относится к Просвещению явно, Кант — только по датам."""
+    from philograph.knowledge.epoch_dates import EpochDates
+
+    from .wd_records import RecordFetch, dated, year
+
+    onto = svc.onto
+    enl = onto.entities.create("epoch", [("ru", "Просвещение", "primary")])
+    onto.entities.add_external(enl, "wikidata", "Q12539")
+    EpochDates(onto.statements, onto.entities).apply(
+        {"epochs": []},
+        RecordFetch({"Q12539": dated("Q12539", year(1685), year(1815))}),
+        linked=True,
+    )
+    locke = svc.world.person("Джон Локк", "1632", "1704")
+    svc.world.belongs(locke, enl)
+    kant = svc.world.person("Иммануил Кант", "1724", "1804")
+    return enl, locke, kant
+
+
+@req(EC, "Разделы карточки по типу", scenario="Карточка эпохи")
+def test_epoch_card(svc, events):
+    enl, locke, kant = _epoch_card_world(svc)
+    response, rid = svc.get(f"/v1/entities/{enl}/card")
+    assert response.status_code == 200, response.text
+    card = response.json()
+    assert [(s["code"], s["title"]) for s in card["sections"]] == [
+        ("dating", "Датировка"),
+        ("members", "Относятся к эпохе"),
+    ]
+    dating, members = card["sections"]
+    [row] = dating["rows"]
+    assert row["value"]["original"] == "1685–1815"
+    assert [a["who"] for a in row["attributions"]] == ["Wikidata"]
+    assert [(r["entity_id"], r["label"]) for r in members["rows"]] == [(locke, "Джон Локк")]
+    assert kant not in {r["entity_id"] for s in card["sections"] for r in s["rows"]}
+    [served] = events.where("knowledge.card.served", request_id=rid)
+    assert (served["entity_id"], served["type"], served["sections"], served["rows"]) == (
+        enl,
+        "epoch",
+        2,
+        2,
+    )
+
+
+@req(EC, "Разделы карточки по типу", invariant="принадлежность по датам не показывается строками")
+def test_epoch_card_without_date_membership(svc, events):
+    epoch = svc.world.thing("epoch", "Научная революция", "1543–1687")
+    descartes = svc.world.person("Рене Декарт", "1596", "1650")  # по датам — к эпохе
+    svc.world.thing("work", "Рассуждение о методе", "1637")
+    response, rid = svc.get(f"/v1/entities/{epoch}/card")
+    card = response.json()
+    assert [s["code"] for s in card["sections"]] == ["dating"]  # «Относятся» пуст — без раздела
+    assert descartes not in {r["entity_id"] for s in card["sections"] for r in s["rows"]}
+    [served] = events.where("knowledge.card.served", request_id=rid)
+    assert (served["type"], served["sections"], served["rows"]) == ("epoch", 1, 1)
+    # Вывод не стал утверждением.
+    assert [
+        s
+        for s in svc.onto.statements.about(epoch, derived=False)
+        if s["type"] == "belongs_to_epoch"
+    ] == []
+
+
+# --- add-epoch-context: раздел «Исторический контекст» (задача 6.5) --------------------------
+
+
+def _context_card_world(svc):
+    from philograph.knowledge.statements import Attribution, Evidence, Provenance
+
+    w = svc.world
+    ids = {
+        "doctrine": w.thing("doctrine", "Политическая философия Локка"),
+        "glorious": w.thing("event", "Славная революция", "1688"),
+        "newton": w.thing("event", "Выход «Начал» Ньютона", "1687"),
+    }
+    w.paragraphs["p_1"] = "Революция дала Локку повод писать о правлении."
+    ids["sourced"] = w.statements.add(
+        ids["glorious"],
+        "stimulated",
+        obj=ids["doctrine"],
+        qualifiers={"mechanism": "political"},
+        attributions=[Attribution("source", "s_textbook_n")],
+        evidence=[Evidence("p_1", "дала Локку повод", source_id="s_textbook_n")],
+        provenance=Provenance("extracted"),
+    )
+    # Сгенерированная записывается позже, но идёт второй: порядок — по статусу.
+    ids["generated"] = w.statements.add(
+        ids["newton"],
+        "stimulated",
+        obj=ids["doctrine"],
+        provenance=Provenance("generated", actor="graph"),
+    )
+    return ids
+
+
+@req(EC, "Разделы карточки по типу", scenario="Исторический контекст учения")
+def test_doctrine_historical_context(svc, events):
+    ids = _context_card_world(svc)
+    response, rid = svc.get(f"/v1/entities/{ids['doctrine']}/card")
+    assert response.status_code == 200, response.text
+    card = response.json()
+    assert [s["code"] for s in card["sections"]] == ["context"]
+    [section] = card["sections"]
+    assert section["title"] == "Исторический контекст"
+    first, second = section["rows"]
+    assert (first["statement_id"], first["label"]) == (ids["sourced"], "Славная революция")
+    assert first["qualifiers"] == {"mechanism": "political"}
+    assert first["status"] == "sourced" and first["generated"] is False
+    assert [e["paragraph_id"] for e in first["evidence"]] == ["p_1"]
+    assert (second["statement_id"], second["label"]) == (ids["generated"], "Выход «Начал» Ньютона")
+    assert second["qualifiers"] == {} and second["generated"] is True
+    assert second["status"] == "generated"
+    [served] = events.where("knowledge.card.served", request_id=rid)
+    assert (served["sections"], served["rows"]) == (1, 2)
+
+
+@req(
+    EC,
+    "Разделы карточки по типу",
+    invariant="«Исторический контекст» — у понятия, персоны, произведения и учений",
+)
+@pytest.mark.parametrize(
+    "type_", ["concept", "person", "work", "doctrine", "problem", "position", "argument"]
+)
+def test_context_section_for_types(svc, events, type_):
+    w = svc.world
+    target = w.person("Джон Локк", "1632", "1704") if type_ == "person" else w.thing(type_, "Цель")
+    event = w.thing("event", "Славная революция", "1688")
+    sid = w.relate(event, "stimulated", target, qualifiers={"mechanism": "political"})
+    response, rid = svc.get(f"/v1/entities/{target}/card")
+    assert response.status_code == 200, response.text
+    sections = {s["code"]: s for s in response.json()["sections"]}
+    assert "context" in sections, list(sections)
+    [row] = sections["context"]["rows"]
+    assert row["statement_id"] == sid and row["entity_id"] == event
+    assert row["qualifiers"] == {"mechanism": "political"}
+    assert events.where("knowledge.card.served", request_id=rid)
+
+
+@req(
+    EC,
+    "Разделы карточки по типу",
+    invariant="у события «стимулировало» — не «Исторический контекст»",
+)
+def test_event_card_has_no_context_section(svc, events):
+    w = svc.world
+    event = w.thing("event", "Славная революция", "1688")
+    w.relate(event, "stimulated", w.thing("doctrine", "Политическая философия Локка"))
+    response, rid = svc.get(f"/v1/entities/{event}/card")
+    codes = [s["code"] for s in response.json()["sections"]]
+    assert "context" not in codes and codes, codes
+    assert events.where("knowledge.card.served", request_id=rid)

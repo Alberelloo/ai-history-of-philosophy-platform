@@ -13,10 +13,21 @@ from sqlalchemy.exc import NoResultFound
 from philograph import __version__
 from philograph.knowledge.assist import STEPS, AssistantKnowledge
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.catalog import Catalog, CatalogRejected
+from philograph.knowledge.context import Context, ContextRejected
 from philograph.knowledge.entities import EntityNotFound
+from philograph.knowledge.epochs import EpochList
+from philograph.knowledge.geo import PlaceLayer
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.map import MapViews, SectionMap
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.polities import (
+    BadYear,
+    PolitiesUnavailable,
+    PolityLayer,
+    parse_year,
+    reject_year,
+)
 from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
@@ -153,6 +164,9 @@ def build_app(
     portraits: Portraits | None = None,
     actions: ActionLog | None = None,
     section_map: SectionMap | None = None,
+    catalog: Catalog | None = None,
+    place_layer: PlaceLayer | None = None,
+    polity_layer: PolityLayer | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -209,6 +223,75 @@ def build_app(
             "edges": [without_closed(edge, closed) for edge in result["edges"]],
         }
 
+    if catalog is not None:
+
+        @router.get("/catalog")
+        def catalog_list(
+            request: Request,
+            q: str | None = None,
+            types: list[str] = Query(default=[], alias="type"),
+            epoch: str | None = None,
+            textbook: str | None = None,
+            sort: str | None = None,
+            page: str | None = None,
+            limit: str | None = None,
+            lang: str | None = None,
+        ) -> dict[str, Any]:
+            """Справочник из снимка онтологии, без модели. Регион (заголовок шлюза) нужен
+            только фильтру по разделу: библиотека спрашивается лишь при ``textbook``."""
+            try:
+                return catalog.list(
+                    q=q,
+                    types=types,
+                    epoch=epoch,
+                    textbook=textbook,
+                    sort=sort,
+                    page=page,
+                    limit=limit,
+                    lang=lang,
+                    closed=lambda: region_closed(request),
+                )
+            except CatalogRejected as exc:
+                raise UserFacingError(str(exc), status=400, kind=exc.kind) from exc
+
+        epoch_list = EpochList(catalog)
+
+        @router.get("/epochs")
+        def epochs_list() -> dict[str, Any]:
+            """Эпохи по времени с нечёткими границами, источником датировки и счётчиками по
+            видам; без датировки — в ``undated``. Снимок справочника, без модели."""
+            return epoch_list.list()
+
+        context = Context(catalog)
+
+        @router.get("/context")
+        def context_of(
+            request: Request,
+            epoch: str | None = None,
+            from_: str | None = Query(default=None, alias="from"),
+            to: str | None = None,
+            kinds: str | None = None,
+            verified: str | None = None,
+            textbook: str | None = None,
+            lang: str | None = None,
+        ) -> dict[str, Any]:
+            """Исторический контекст эпохи (``epoch``) или окна времени (``from``, ``to``):
+            события со связями «стимулировало», без модели и без цитат. Подтверждения
+            и атрибуции закрытых для региона (заголовок шлюза) источников снимаются."""
+            try:
+                return context.get(
+                    epoch=epoch,
+                    from_=from_,
+                    to=to,
+                    kinds=kinds,
+                    verified=verified,
+                    textbook=textbook,
+                    lang=lang,
+                    closed=lambda: region_closed(request),
+                )
+            except ContextRejected as exc:
+                raise UserFacingError(str(exc), status=400, kind=exc.kind) from exc
+
     if section_map is not None:
 
         @router.get("/map")
@@ -216,6 +299,15 @@ def build_app(
             """Карта раздела из сохранённых утверждений, без модели. Цитат и атрибуций в ней
             нет — подробности связи клиент берёт из ``/entities/{id}/statements``."""
             return section_map.build(textbook=textbook, only_textbook=only_textbook)
+
+        # Слой мест — на той же карте и том же снимке (geo-timeline).
+        places = place_layer or PlaceLayer(section_map, section_map.snapshots)
+
+        @router.get("/map/places")
+        def map_places(textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
+            """Географический слой карты: места с координатами, размещения персон и событий
+            карты, сущности без места. Без модели и внешних запросов; цитат нет."""
+            return places.build(textbook=textbook, only_textbook=only_textbook)
 
         views = MapViews(section_map)
 
@@ -232,6 +324,30 @@ def build_app(
             return views.options(
                 body.entities[:20], textbook=body.textbook, only_textbook=body.only_textbook
             )
+
+    # Исторические границы (add-historical-polities): без артефакта — 503, глобус остаётся
+    # на современной карте.
+    polities = polity_layer or PolityLayer(None)
+
+    @router.get("/map/polities")
+    def map_polities(year: str | None = None) -> Response:
+        """Политические образования, активные на год ``year`` (Cliopatria): название,
+        статус названия, Wikidata-id, упрощённая геометрия, интервал постоянного набора
+        и атрибуция. Из артефакта сборки, без модели и внешних запросов."""
+        try:
+            value = parse_year(year)
+        except BadYear as exc:
+            reject_year()
+            raise UserFacingError(
+                "Год — целое число от −9999 до 9999", status=400, kind="bad_year"
+            ) from exc
+        try:
+            body = polities.serve(value)
+        except PolitiesUnavailable as exc:
+            raise UserFacingError(
+                "Исторические границы недоступны", status=503, kind="polities_unavailable"
+            ) from exc
+        return Response(body, media_type="application/json")
 
     if assistant is not None:
 

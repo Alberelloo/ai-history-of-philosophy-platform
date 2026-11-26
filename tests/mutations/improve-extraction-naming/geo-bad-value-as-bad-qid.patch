@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -184,7 +184,7 @@
+ def place_qid(claim: Claim) -> str:
+     value = claim.value
+     if not isinstance(value, dict) or value.get("id") is None:
+-        raise Skip("bad_value")
++        raise Skip("bad_qid")
+     try:
+         return check_qid(value["id"])
+     except WikidataError:

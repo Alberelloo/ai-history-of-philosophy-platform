@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -111,7 +111,7 @@
+     shared = (a.primaries & b.variants) | (b.primaries & a.variants)
+     if shared:
+         one_word = any(len(n.split()) == 1 for n in shared)
+-        return Verdict.of("review:single_name" if one_word else "review:variant")
++        return Verdict.of("review:variant")
+     return Verdict.of("apart:none")
+ 
+ 

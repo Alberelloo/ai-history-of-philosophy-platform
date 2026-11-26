@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..0854144 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -892,7 +892,7 @@ class Migration:
+     @staticmethod
+     def _same_name_pairs(view: View) -> list[tuple[str, str, str]]:
+         groups: dict[tuple[str, str], set[str]] = defaultdict(set)
+-        for e in view.active():
++        for e in sorted(view.entities):
+             row = view.entities[e]
+             if row["type"] in (PERSON, SOURCE):
+                 continue

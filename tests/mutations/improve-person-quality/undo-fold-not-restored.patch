@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 2e6145f..650b953 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -802,7 +802,7 @@ class Statements:
+             with self.engine.begin() as conn:
+                 conn.execute(update(t.statements).where(t.statements.c.id == sid).values(key=key))
+         survivors = []
+-        for fold in reversed(folded):
++        for fold in reversed(folded[:0]):
+             with self.engine.begin() as conn:
+                 row = {**fold["row"], "key": keys.get(fold["id"], fold["row"]["key"])}
+                 conn.execute(t.statements.insert().values(**row))

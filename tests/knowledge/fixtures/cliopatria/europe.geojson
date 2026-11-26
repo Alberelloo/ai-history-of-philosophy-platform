@@ -1,0 +1,1230 @@
+{
+"type": "FeatureCollection",
+"name": "cliopatria",
+"features": [
+{
+"type": "Feature",
+"properties": {
+"Name": "Holy Roman Empire",
+"FromYear": 962,
+"ToYear": 1500,
+"Area": 800000,
+"Type": "POLITY",
+"Wikipedia": "Holy Roman Empire",
+"Wikidata": "Q12548",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+6,
+45
+],
+[
+6.25,
+45.01
+],
+[
+6.5,
+45.0
+],
+[
+6.75,
+45.01
+],
+[
+7.0,
+45.0
+],
+[
+7.25,
+45.01
+],
+[
+7.5,
+45.0
+],
+[
+7.75,
+45.01
+],
+[
+8.0,
+45.0
+],
+[
+8.25,
+45.01
+],
+[
+8.5,
+45.0
+],
+[
+8.75,
+45.01
+],
+[
+9.0,
+45.0
+],
+[
+9.25,
+45.01
+],
+[
+9.5,
+45.0
+],
+[
+9.75,
+45.01
+],
+[
+10.0,
+45.0
+],
+[
+10.25,
+45.01
+],
+[
+10.5,
+45.0
+],
+[
+10.75,
+45.01
+],
+[
+11.0,
+45.0
+],
+[
+11.25,
+45.01
+],
+[
+11.5,
+45.0
+],
+[
+11.75,
+45.01
+],
+[
+12.0,
+45.0
+],
+[
+12.25,
+45.01
+],
+[
+12.5,
+45.0
+],
+[
+12.75,
+45.01
+],
+[
+13.0,
+45.0
+],
+[
+13.25,
+45.01
+],
+[
+13.5,
+45.0
+],
+[
+13.75,
+45.01
+],
+[
+14.0,
+45.0
+],
+[
+14.25,
+45.01
+],
+[
+14.5,
+45.0
+],
+[
+14.75,
+45.01
+],
+[
+15.0,
+45.0
+],
+[
+15.25,
+45.01
+],
+[
+15.5,
+45.0
+],
+[
+15.75,
+45.01
+],
+[
+16,
+45
+],
+[
+16,
+54
+],
+[
+6,
+54
+],
+[
+6,
+45
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Holy Roman Empire",
+"FromYear": 1501,
+"ToYear": 1648,
+"Area": 800000,
+"Type": "POLITY",
+"Wikipedia": "Holy Roman Empire",
+"Wikidata": "Q12548",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+6,
+45
+],
+[
+6.25,
+45.01
+],
+[
+6.5,
+45.0
+],
+[
+6.75,
+45.01
+],
+[
+7.0,
+45.0
+],
+[
+7.25,
+45.01
+],
+[
+7.5,
+45.0
+],
+[
+7.75,
+45.01
+],
+[
+8.0,
+45.0
+],
+[
+8.25,
+45.01
+],
+[
+8.5,
+45.0
+],
+[
+8.75,
+45.01
+],
+[
+9.0,
+45.0
+],
+[
+9.25,
+45.01
+],
+[
+9.5,
+45.0
+],
+[
+9.75,
+45.01
+],
+[
+10.0,
+45.0
+],
+[
+10.25,
+45.01
+],
+[
+10.5,
+45.0
+],
+[
+10.75,
+45.01
+],
+[
+11.0,
+45.0
+],
+[
+11.25,
+45.01
+],
+[
+11.5,
+45.0
+],
+[
+11.75,
+45.01
+],
+[
+12.0,
+45.0
+],
+[
+12.25,
+45.01
+],
+[
+12.5,
+45.0
+],
+[
+12.75,
+45.01
+],
+[
+13.0,
+45.0
+],
+[
+13.25,
+45.01
+],
+[
+13.5,
+45.0
+],
+[
+13.75,
+45.01
+],
+[
+14.0,
+45.0
+],
+[
+14.25,
+45.01
+],
+[
+14.5,
+45.0
+],
+[
+14.75,
+45.01
+],
+[
+15.0,
+45.0
+],
+[
+15.25,
+45.01
+],
+[
+15.5,
+45.0
+],
+[
+15.75,
+45.01
+],
+[
+16,
+45
+],
+[
+16,
+54
+],
+[
+6,
+54
+],
+[
+6,
+45
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Holy Roman Empire",
+"FromYear": 1649,
+"ToYear": 1806,
+"Area": 780000,
+"Type": "POLITY",
+"Wikipedia": "Holy Roman Empire",
+"Wikidata": "Q12548",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+6,
+45.5
+],
+[
+6.25,
+45.51
+],
+[
+6.5,
+45.5
+],
+[
+6.75,
+45.51
+],
+[
+7.0,
+45.5
+],
+[
+7.25,
+45.51
+],
+[
+7.5,
+45.5
+],
+[
+7.75,
+45.51
+],
+[
+8.0,
+45.5
+],
+[
+8.25,
+45.51
+],
+[
+8.5,
+45.5
+],
+[
+8.75,
+45.51
+],
+[
+9.0,
+45.5
+],
+[
+9.25,
+45.51
+],
+[
+9.5,
+45.5
+],
+[
+9.75,
+45.51
+],
+[
+10.0,
+45.5
+],
+[
+10.25,
+45.51
+],
+[
+10.5,
+45.5
+],
+[
+10.75,
+45.51
+],
+[
+11.0,
+45.5
+],
+[
+11.25,
+45.51
+],
+[
+11.5,
+45.5
+],
+[
+11.75,
+45.51
+],
+[
+12.0,
+45.5
+],
+[
+12.25,
+45.51
+],
+[
+12.5,
+45.5
+],
+[
+12.75,
+45.51
+],
+[
+13.0,
+45.5
+],
+[
+13.25,
+45.51
+],
+[
+13.5,
+45.5
+],
+[
+13.75,
+45.51
+],
+[
+14.0,
+45.5
+],
+[
+14.25,
+45.51
+],
+[
+14.5,
+45.5
+],
+[
+14.75,
+45.51
+],
+[
+15.0,
+45.5
+],
+[
+15.25,
+45.51
+],
+[
+15.5,
+45.5
+],
+[
+15.75,
+45.51
+],
+[
+16,
+45.5
+],
+[
+16,
+54
+],
+[
+6,
+54
+],
+[
+6,
+45.5
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Polish-Lithuanian Commonwealth",
+"FromYear": 1569,
+"ToYear": 1795,
+"Area": 900000,
+"Type": "POLITY",
+"Wikipedia": "Polish-Lithuanian Commonwealth",
+"Wikidata": "Q172107",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+16,
+49
+],
+[
+32,
+49
+],
+[
+32,
+57
+],
+[
+16,
+57
+],
+[
+16,
+49
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Ottoman Empire",
+"FromYear": 1299,
+"ToYear": 1922,
+"Area": 1500000,
+"Type": "POLITY",
+"Wikipedia": "Ottoman Empire",
+"Wikidata": "Q12560",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+20,
+35
+],
+[
+45,
+35
+],
+[
+45,
+42
+],
+[
+20,
+42
+],
+[
+20,
+35
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Kingdom of Prussia",
+"FromYear": 1701,
+"ToYear": 1918,
+"Area": 300000,
+"Type": "POLITY",
+"Wikipedia": "Kingdom of Prussia",
+"Wikidata": "Q27306",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+10,
+51
+],
+[
+23,
+51
+],
+[
+23,
+55.5
+],
+[
+10,
+55.5
+],
+[
+10,
+51
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Russian Empire",
+"FromYear": 1721,
+"ToYear": 1917,
+"Area": 5000000,
+"Type": "POLITY",
+"Wikipedia": "Russian Empire",
+"Wikidata": "Q34266",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+30,
+50
+],
+[
+60,
+50
+],
+[
+60,
+65
+],
+[
+30,
+65
+],
+[
+30,
+50
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Kingdom of France",
+"FromYear": 1500,
+"ToYear": 1791,
+"Area": 500000,
+"Type": "POLITY",
+"Wikipedia": "Kingdom of France",
+"Wikidata": "Q70972",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+-4,
+43
+],
+[
+7,
+43
+],
+[
+7,
+50
+],
+[
+-4,
+50
+],
+[
+-4,
+43
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Spanish Empire",
+"FromYear": 1500,
+"ToYear": 1800,
+"Area": 500000,
+"Type": "POLITY",
+"Wikipedia": "Spanish Empire",
+"Wikidata": "Q80702",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+-9,
+36
+],
+[
+3,
+36
+],
+[
+3,
+43
+],
+[
+-9,
+43
+],
+[
+-9,
+36
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Republic of Venice",
+"FromYear": 697,
+"ToYear": 1797,
+"Area": 30000,
+"Type": "POLITY",
+"Wikipedia": "Republic of Venice",
+"Wikidata": "Q4948",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+11,
+45
+],
+[
+14,
+45
+],
+[
+14,
+46.5
+],
+[
+11,
+46.5
+],
+[
+11,
+45
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Swedish Empire",
+"FromYear": 1611,
+"ToYear": 1721,
+"Area": 900000,
+"Type": "POLITY",
+"Wikipedia": "Swedish Empire",
+"Wikidata": "Q215443",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+12,
+55
+],
+[
+25,
+55
+],
+[
+25,
+68
+],
+[
+12,
+68
+],
+[
+12,
+55
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Nameless Polity",
+"FromYear": 1600,
+"ToYear": 1700,
+"Area": 20000,
+"Type": "POLITY",
+"Wikipedia": "Nameless Polity",
+"Wikidata": "",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+-8,
+52
+],
+[
+-6,
+52
+],
+[
+-6,
+54
+],
+[
+-8,
+54
+],
+[
+-8,
+52
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Untranslated Realm",
+"FromYear": 1600,
+"ToYear": 1700,
+"Area": 30000,
+"Type": "POLITY",
+"Wikipedia": "Untranslated Realm",
+"Wikidata": "Q999999901",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+25,
+44
+],
+[
+28,
+44
+],
+[
+28,
+46
+],
+[
+25,
+46
+],
+[
+25,
+44
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Bad QID Polity",
+"FromYear": 1600,
+"ToYear": 1700,
+"Area": 20000,
+"Type": "POLITY",
+"Wikipedia": "Bad QID Polity",
+"Wikidata": "12548",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+0,
+40
+],
+[
+2,
+40
+],
+[
+2,
+41
+],
+[
+0,
+41
+],
+[
+0,
+40
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Tiny City",
+"FromYear": 1600,
+"ToYear": 1700,
+"Area": 20,
+"Type": "POLITY",
+"Wikipedia": "Tiny City",
+"Wikidata": "Q999999902",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+12.3,
+41.85
+],
+[
+12.35,
+41.85
+],
+[
+12.35,
+41.9
+],
+[
+12.3,
+41.9
+],
+[
+12.3,
+41.85
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Sitelink Realm",
+"FromYear": 1640,
+"ToYear": 1700,
+"Area": 10000,
+"Type": "POLITY",
+"Wikipedia": "Sitelink Realm",
+"Wikidata": "Q999999903",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+22,
+58
+],
+[
+24,
+58
+],
+[
+24,
+59
+],
+[
+22,
+59
+],
+[
+22,
+58
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "(Ottoman Empire)",
+"FromYear": 1500,
+"ToYear": 1700,
+"Area": 1000.0,
+"Type": "RELATION",
+"Wikipedia": "(Ottoman Empire)",
+"Wikidata": "Q12560",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+26,
+44
+],
+[
+29,
+44
+],
+[
+29,
+47
+],
+[
+26,
+47
+],
+[
+26,
+44
+]
+]
+]
+}
+},
+{
+"type": "Feature",
+"properties": {
+"Name": "Broken Years",
+"FromYear": 1700,
+"ToYear": 1600,
+"Area": 1000.0,
+"Type": "POLITY",
+"Wikipedia": "Broken Years",
+"Wikidata": "Q4948",
+"SeshatID": "",
+"Components": "",
+"MemberOf": ""
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+1,
+1
+],
+[
+2,
+1
+],
+[
+2,
+2
+],
+[
+1,
+2
+],
+[
+1,
+1
+]
+]
+]
+}
+}
+]
+}

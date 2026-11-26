@@ -3,25 +3,32 @@
 Карта строится из сохранённых утверждений одним проходом по базе, без модели и без обхода
 по рецепту: ось времени — годы жизни, датировки трудов, событий и эпох. Идея ставится на год
 самого раннего датированного труда, где она высказана или рассматривается; без такого труда
-она уходит в «без даты». Членство в эпохе клиент считает по датам сам: здесь — только пролёты.
+она уходит в «без даты». Принадлежность к эпохе — общее правило ``knowledge/epochs.py``:
+у персон, трудов, идей и событий — ``epochs`` (id эпох в порядке начала), у эпох — нечёткие
+границы ``fuzzy``; клиент её заново не вычисляет.
 
-Ответ кэшируется в памяти процесса по области и отпечатку базы (число и последние записи
-утверждений, атрибуций, упоминаний, слияний, версия реестра) — пока данные не менялись,
-повторный запрос базу целиком не читает. Портреты к ответу добавляются каждый раз: их
-проверка оператором отпечаток не меняет.
+Данные берутся из общего снимка онтологии (``knowledge/snapshot.py``) без окна устарелости;
+ответ кэшируется в памяти процесса по области и отпечатку снимка (LRU на ``CACHE_KEYS``
+областей) — пока данные не менялись, повторный запрос базу целиком не читает. Портреты
+к ответу добавляются каждый раз: их проверка оператором отпечаток не меняет.
 """
 
 from __future__ import annotations
 
-from collections import defaultdict
+import threading
+from collections import OrderedDict, defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote, urlencode
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import select
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.dates import span
 from philograph.knowledge.entities import EntityNotFound
+from philograph.knowledge.epochs import fuzzy, membership
+from philograph.knowledge.snapshot import Snapshot, Snapshots
 from philograph.knowledge.statements import INFLUENCE, STRENGTH, Statements
 from philograph.platform import events
 
@@ -44,17 +51,21 @@ IDEA_KIND = {
 VALUE_TYPES = ("lifespan", "dating", "person_role", "group_kind", "event_kind", "description")
 
 
+MAX_STIMULATED = 30  # связей «стимулировало» у события на карте
+CACHE_KEYS = 32  # ответов карты в памяти: LRU по (учебник, «только учебник»)
+
+
 @dataclass(frozen=True)
 class MapSettings:
     max_entities: int = 400  # больше — остаются самые весомые, ``truncated``
 
 
 def _start(dates: dict[str, Any]) -> int:
-    return round((dates["earliest_start"] + dates["latest_start"]) / 2)
+    return span(dates)[0]
 
 
 def _end(dates: dict[str, Any]) -> int:
-    return round((dates["earliest_end"] + dates["latest_end"]) / 2)
+    return span(dates)[1]
 
 
 def _short(label: str) -> str:
@@ -63,140 +74,85 @@ def _short(label: str) -> str:
     return words[-1] if words else label
 
 
-def _best(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """Основное из нескольких: предпочтённое, затем более сильное по статусу."""
+def best_of(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Основное из нескольких: предпочтённое, затем более сильное по статусу (карта и
+    контекст эпохи — вид события)."""
     if not rows:
         return None
     return sorted(rows, key=lambda s: (s["rank"] != "preferred", -STRENGTH[s["status"]]))[0]
 
 
 class SectionMap:
-    def __init__(self, statements: Statements, settings: MapSettings | None = None) -> None:
+    def __init__(
+        self,
+        statements: Statements,
+        settings: MapSettings | None = None,
+        snapshots: Snapshots | None = None,
+    ) -> None:
         self.statements = statements
         self.registry = statements.registry
         self.engine = statements.engine
         self.settings = settings or MapSettings()
-        self._cache: dict[tuple[str | None, bool], tuple[tuple, dict[str, Any]]] = {}
+        self.snapshots = snapshots or Snapshots(statements.engine)
+        # Ключ — произвольный ``textbook`` из запроса: без предела кэш рос бы без конца.
+        self._cache: OrderedDict[tuple[str | None, bool], tuple[tuple, dict[str, Any]]] = (
+            OrderedDict()
+        )
+        self._cache_lock = threading.Lock()
 
     # --- кэш ---
-
-    def _fingerprint(self) -> tuple:
-        """Меняется при любой записи, влияющей на карту: новые и изменённые утверждения
-        (журнал), атрибуции и подтверждения, события библиотеки (снятие источника), имена,
-        слияния, упоминания и версия реестра."""
-        count = func.count
-        with self.engine.begin() as conn:
-            return tuple(
-                conn.execute(
-                    select(
-                        select(count()).select_from(t.statements).scalar_subquery(),
-                        select(func.max(t.journal.c.id)).scalar_subquery(),
-                        select(count()).select_from(t.attributions).scalar_subquery(),
-                        select(count()).select_from(t.evidence).scalar_subquery(),
-                        select(count()).select_from(t.processed).scalar_subquery(),
-                        select(count()).select_from(t.entities).scalar_subquery(),
-                        select(count()).select_from(t.names).scalar_subquery(),
-                        select(count()).select_from(t.merges).scalar_subquery(),
-                        select(func.max(t.merges.c.id)).scalar_subquery(),
-                        select(count()).select_from(t.mentions).scalar_subquery(),
-                        select(func.max(t.mentions.c.id)).scalar_subquery(),
-                        select(func.max(t.registry_versions.c.version)).scalar_subquery(),
-                    )
-                ).one()
-            )
 
     def build(self, textbook: str | None = None, only_textbook: bool = False) -> dict[str, Any]:
         """``textbook`` — выбранный учебник: пометка ``in_textbook`` у связей; с
         ``only_textbook`` область — только сущности, упомянутые или атрибутированные в нём."""
-        only_textbook = bool(only_textbook and textbook)
-        key = (textbook, only_textbook)
-        fingerprint = self._fingerprint()
-        cached = self._cache.get(key)
-        if cached is not None and cached[0] == fingerprint:
-            result = cached[1]
-        else:
-            result = self._build(textbook, only_textbook)
-            self._cache[key] = (fingerprint, result)
+        result, hit = self.result(textbook, only_textbook)
         events.emit(
             "knowledge.map.built",
             entities=len(result["people"]) + len(result["works"]) + len(result["events"]),
             links=len(result["links"]),
             truncated=result["truncated"],
-            cached=cached is not None and cached[0] == fingerprint,
+            cached=hit,
         )
         return self._with_portraits(result)
 
-    # --- чтение базы ---
-
-    def _load(self) -> tuple[dict[str, dict[str, Any]], dict[str, str], list[dict[str, Any]]]:
-        """Сущности, подписи и действующие утверждения: не отклонённые, не отвергнутые
-        (ранг «устаревшее»), не основанные только на снятом источнике — как в ``about``."""
-        with self.engine.begin() as conn:
-            entities = {
-                r["id"]: {"type": r["type"], "primary": r["primary"] or {}}
-                for r in conn.execute(
-                    select(t.entities.c.id, t.entities.c.type, t.entities.c.primary).where(
-                        t.entities.c.redirect_to.is_(None)
-                    )
-                ).mappings()
-            }
-            names: dict[str, list[dict[str, Any]]] = defaultdict(list)
-            for r in conn.execute(select(t.names).order_by(t.names.c.id)).mappings():
-                names[r["entity_id"]].append(dict(r))
-            rows = (
-                conn.execute(
-                    select(t.statements).where(
-                        and_(
-                            t.statements.c.scope == "public",
-                            t.statements.c.status != "rejected",
-                            t.statements.c.rank != "deprecated",
-                        )
-                    )
-                )
-                .mappings()
-                .all()
-            )
-            attrs: dict[str, list[dict[str, Any]]] = defaultdict(list)
-            for r in conn.execute(select(t.attributions)).mappings():
-                attrs[r["statement_id"]].append(dict(r))
-            evs: dict[str, list[dict[str, Any]]] = defaultdict(list)
-            for r in conn.execute(select(t.evidence)).mappings():
-                evs[r["statement_id"]].append(dict(r))
-        labels = {}
-        for entity_id in entities:
-            own = names.get(entity_id, [])
-            primary = [n for n in own if n["kind"] == "primary"]
-            ru = [n for n in primary if n["lang"] == "ru"]
-            pick = (ru or primary or own or [{"text": entity_id}])[0]
-            labels[entity_id] = pick["text"]
-        statements = []
-        for r in rows:
-            s = {
-                **dict(r),
-                "attributions": attrs.get(r["id"], []),
-                "evidence": evs.get(r["id"], []),
-            }
-            if s["attributions"] and all(a["hidden"] for a in s["attributions"]):
-                continue  # основано только на снятом источнике
-            if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
-                continue
-            statements.append(s)
-        return entities, labels, statements
-
-    def _textbook_entities(self, textbook: str) -> set[str]:
-        with self.engine.begin() as conn:
-            return set(
-                conn.scalars(
-                    select(t.mentions.c.entity_id).where(t.mentions.c.source_id == textbook)
-                )
-            )
+    def result(
+        self, textbook: str | None = None, only_textbook: bool = False
+    ) -> tuple[dict[str, Any], bool]:
+        """Карта области из кэша (``True`` — попадание) или собранная заново — без события
+        и без портретов. Ею пользуются производные слои карты (места, geo-timeline): та же
+        область и тот же предел, что у ``/map``. Результат не изменяют."""
+        only_textbook = bool(only_textbook and textbook)
+        key = (textbook, only_textbook)
+        # Без окна устарелости: изменение базы видно на карте сразу, как прежде.
+        snapshot, _ = self.snapshots.get(max_stale=0)
+        with self._cache_lock:
+            cached = self._cache.get(key)
+            hit = cached is not None and cached[0] == snapshot.fingerprint
+            if hit:
+                self._cache.move_to_end(key)
+        if hit:
+            result = cached[1]
+        else:
+            result = self._build(snapshot, textbook, only_textbook)
+            with self._cache_lock:
+                self._cache[key] = (snapshot.fingerprint, result)
+                self._cache.move_to_end(key)
+                while len(self._cache) > CACHE_KEYS:
+                    self._cache.popitem(last=False)
+        return result, hit
 
     # --- сборка ---
 
-    def _build(self, textbook: str | None, only_textbook: bool) -> dict[str, Any]:
-        entities, labels, statements = self._load()
+    def _build(
+        self, snapshot: Snapshot, textbook: str | None, only_textbook: bool
+    ) -> dict[str, Any]:
+        entities, labels, statements = snapshot.entities, snapshot.labels, snapshot.statements
         attributed = self.statements._attributed
         is_a = self.registry.is_a
+        epochs = membership(snapshot, self.registry)
+
+        def epochs_of(entity_id: str) -> list[str]:
+            return [epoch_id for epoch_id, _ in epochs.of(entity_id)]
 
         def category(entity_type: str) -> str | None:
             if entity_type == "person":
@@ -218,7 +174,7 @@ class SectionMap:
             [s for s in statements if attributed(s, textbook)] if only_textbook else statements
         )
         if only_textbook:
-            scope = self._textbook_entities(textbook)
+            scope = set(snapshot.mentions.get(textbook, ()))
             for s in in_scope:
                 scope.add(s["subject"])
                 if s["object"]:
@@ -253,11 +209,11 @@ class SectionMap:
             return entities[entity_id]["primary"].get("dates")
 
         def value(entity_id: str, type_: str) -> Any:
-            best = _best(values.get((entity_id, type_), []))
+            best = best_of(values.get((entity_id, type_), []))
             return best["value"] if best else None
 
         def author(work_id: str) -> str | None:
-            best = _best(authors.get(work_id, []))
+            best = best_of(authors.get(work_id, []))
             return best["object"] if best else None
 
         items: list[tuple[str, dict[str, Any]]] = []  # (раздел ответа, запись)
@@ -283,6 +239,7 @@ class SectionMap:
                             "year": _start(dates(first)),
                             "author": author(first),
                             "via": first,
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
@@ -300,6 +257,7 @@ class SectionMap:
                             "death": _end(d),
                             "precision": d["precision"],
                             "roles": roles,
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
@@ -313,17 +271,19 @@ class SectionMap:
                             "kind": "work",
                             "year": _start(d),
                             "author": author(entity_id),
+                            "epochs": epochs_of(entity_id),
                         },
                     )
                 )
             elif cat == "event":
-                event = {**base, "year": _start(d)}
+                event = {**base, "year": _start(d), "epochs": epochs_of(entity_id)}
                 kind = value(entity_id, "event_kind")
                 if kind:
                     event["kind"] = kind
                 items.append(("events", event))
             else:  # эпоха
-                items.append(("eras", {**base, "from": _start(d), "to": _end(d)}))
+                era = {**base, "from": _start(d), "to": _end(d), "fuzzy": fuzzy(d)}
+                items.append(("eras", era))
 
         # Предел: остаются самые весомые (вес — число утверждений сущности в области).
         limit = self.settings.max_entities
@@ -338,6 +298,8 @@ class SectionMap:
                 item["weight"] = weight[item["id"]]
             sections[section].append(item)
         people = {p["id"] for p in sections["people"]}
+        on_map = people | {w["id"] for w in sections["works"]}
+        self._stimulated(sections["events"], in_scope, on_map, labels)
         for work in sections["works"]:
             work.pop("via", None)
         for group in sections["groups"]:
@@ -380,6 +342,38 @@ class SectionMap:
             **sections,
             "links": sorted(links, key=lambda link: link["id"]),
         }
+
+    def _stimulated(
+        self,
+        events_: list[dict[str, Any]],
+        statements: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+        on_map: set[str],
+        labels: Mapping[str, str],
+    ) -> None:
+        """Что стимулировало событие (``stimulated: [{id, generated}]``): действующие связи
+        только к персонам, трудам и идеям, которые есть на карте после предела, не больше
+        ``MAX_STIMULATED``; проверенные и по источникам — раньше сгенерированных. Нет таких
+        связей — поля нет (как ``kind``). Линий от события нет: клиент выделяет эти сущности
+        при выборе события."""
+        kinds = self.registry.relation_subtypes("stimulated")
+        found: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+        ids = {e["id"] for e in events_}
+        for s in statements:
+            if s["type"] not in kinds or s["subject"] not in ids or s["object"] not in on_map:
+                continue
+            seen = found[s["subject"]].get(s["object"])
+            if seen is None or STRENGTH[s["status"]] > STRENGTH[seen["status"]]:
+                found[s["subject"]][s["object"]] = s
+        for event in events_:
+            rows = sorted(
+                found.get(event["id"], {}).values(),
+                key=lambda s: (-STRENGTH[s["status"]], labels.get(s["object"], ""), s["object"]),
+            )
+            if rows:  # как ``kind``: пустое поле не пишется
+                event["stimulated"] = [
+                    {"id": s["object"], "generated": s["status"] == "generated"}
+                    for s in rows[:MAX_STIMULATED]
+                ]
 
     def _with_portraits(self, result: dict[str, Any]) -> dict[str, Any]:
         """Главный подтверждённый и нескрытый портрет персоны — ссылкой, как в карточке."""

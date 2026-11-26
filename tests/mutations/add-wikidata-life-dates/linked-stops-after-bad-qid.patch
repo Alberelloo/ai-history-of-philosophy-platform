@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..c5c335f 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -453,7 +453,7 @@ class LifeDates:
+                 done.add(entity_id)
+                 if not QID.fullmatch(qid):
+                     self._skip(report, entity_id, "item", "bad_qid")
+-                    continue
++                    break
+                 self._import(report, entity_id, qid)
+         self._settle(report, confirmed, proposals, merge)
+         summary = report.to_json()

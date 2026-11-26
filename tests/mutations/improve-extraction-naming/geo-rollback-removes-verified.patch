@@ -1,0 +1,19 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -1090,7 +1090,6 @@
+             attrs = conn.execute(
+                 delete(t.attributions).where(
+                     t.attributions.c.run_id == run_id,
+-                    t.attributions.c.statement_id.not_in(verified),
+                 )
+             ).rowcount
+             evs = conn.execute(
+@@ -1099,7 +1098,7 @@
+                 )
+             ).rowcount
+             candidates = (
+-                conn.execute(select(t.statements).where(t.statements.c.status != "verified"))
++                conn.execute(select(t.statements))
+                 .mappings()
+                 .all()
+             )

@@ -1,0 +1,16 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..282ab06 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -653,6 +653,11 @@ class Statements:
+                 )
+             if row["object"] is not None and row["subject"] == row["object"]:
+                 loops.append(sid)
++                with self.engine.begin() as conn:
++                    conn.execute(delete(t.attributions).where(t.attributions.c.statement_id == sid))
++                    conn.execute(delete(t.evidence).where(t.evidence.c.statement_id == sid))
++                    conn.execute(delete(t.statements).where(t.statements.c.id == sid))
++                continue
+             key = self._key(
+                 row["subject"], row["type"], row["object"], row["value"], row["qualifiers"]
+             )

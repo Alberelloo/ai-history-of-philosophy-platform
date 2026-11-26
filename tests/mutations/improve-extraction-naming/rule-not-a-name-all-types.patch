@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -253,7 +253,7 @@
+     limits = rules.limits_for(type_)
+     if len(label.split()) > limits.max_words or len(label) > limits.max_chars:
+         return "sentence"
+-    if type_ in rules.person_types and _not_a_name(label, rules):
++    if _not_a_name(label, rules):
+         return "not_a_name"
+     if normalize(label) in rules.stopwords:
+         return "stopword"

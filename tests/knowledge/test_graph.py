@@ -337,3 +337,216 @@ def test_in_textbook_marks(gx):
         Cards(gx.onto.statements).card(gx.ids["hume"])["sections"][0]["rows"][0]["in_textbook"]
         is None
     )
+
+
+# --- epoch-context: «Достройка контекста моделью» (add-epoch-context, задача 6.4) -----------
+
+ECX = "epoch-context"
+EXTEND = "Достройка контекста моделью"
+
+
+def context_proposals(*items: dict) -> str:
+    return json.dumps({"statements": list(items)}, ensure_ascii=False)
+
+
+@pytest.fixture
+def cx(gx):
+    """«Славная революция» (1688) с одной связью «стимулировало» и «Два трактата о правлении»."""
+    onto = gx.onto
+    ids = gx.ids
+    ids["glorious"] = onto.thing("event", "Славная революция", "1688")
+    ids["treatises"] = onto.thing("work", "Два трактата о правлении", "1689")
+    ids["locke_doctrine"] = onto.thing("doctrine", "Политическая философия Локка")
+    onto.statements.add(
+        ids["glorious"],
+        "stimulated",
+        obj=ids["locke_doctrine"],
+        qualifiers={"mechanism": "political"},
+        attributions=[Attribution("common")],
+    )
+    return gx
+
+
+def stimulated_of(onto, subject, obj):
+    return [
+        s
+        for s in onto.statements.about(subject, types=["stimulated"])
+        if s["direction"] == "out" and s["object"] == obj
+    ]
+
+
+@req(ECX, EXTEND, scenario="Достроить контекст")
+def test_context_extension_drops_mechanism_and_foreign_type(cx, events):
+    cx.provider.push(
+        context_proposals(
+            {
+                "subject": "Славная революция",
+                "relation": "stimulated",
+                "object": "Два трактата о правлении",
+                "mechanism": "political",
+            },
+            {"subject": "Славная революция", "relation": "influenced_by", "object": "Локк"},
+        )
+    )
+    items = cx.build("glorious", "context")
+    graph = items[0]
+    assert graph["type"] == "graph" and graph["entity_id"] == cx.ids["glorious"]
+    assert graph["recipe"]["code"] == "context" and graph["extension"] == "pending"
+    added = [i["edge"] for i in items if i["type"] == "edge"]
+    assert len(added) == 1
+    edge = added[0]
+    assert (edge["subject"], edge["type"], edge["object"]) == (
+        cx.ids["glorious"],
+        "stimulated",
+        cx.ids["treatises"],
+    )
+    assert edge["generated"] is True and edge["qualifiers"] == {}
+    assert items[-1] == {"type": "done"}
+    request = cx.provider.calls[-1]
+    assert request.template == "graph.extend"
+    [extended] = events.of("knowledge.graph.extended")
+    assert extended["recipe"] == "context"
+    assert (extended["proposed"], extended["dropped"]) == (1, 1)
+    [dropped] = events.of("knowledge.graph.proposal_dropped")
+    assert dropped["reason"] == "outside_recipe" and dropped["relation"] == "influenced_by"
+    assert cx.queue.run_until_empty() == 1
+    [saved] = events.of("knowledge.graph.saved")
+    assert saved["statements"] == 1 and saved["recipe"] == "context"
+    [stored] = stimulated_of(cx.onto, cx.ids["glorious"], cx.ids["treatises"])
+    assert stored["qualifiers"] == {}
+    assert stored["status"] == "generated"
+    assert not [
+        s for s in cx.onto.statements.about(cx.ids["glorious"]) if s["type"] == "influenced_by"
+    ]
+
+
+@req(ECX, EXTEND, scenario="Уже достраивали")
+def test_context_extension_done_before(cx, events):
+    cx.provider.push(
+        context_proposals(
+            {
+                "subject": "Славная революция",
+                "relation": "stimulated",
+                "object": "Два трактата о правлении",
+            }
+        )
+    )
+    cx.build("glorious", "context")
+    cx.queue.run_until_empty()
+    calls = len(cx.provider.calls)
+    events.clear()
+    items = cx.build("glorious", "context")
+    assert items[0]["extension"] == "done_before"
+    assert len(cx.provider.calls) == calls  # модель не вызвана
+    assert [i["type"] for i in items] == ["graph", "done"]
+    assert events.where("knowledge.graph.built", extension="done_before", recipe="context")
+    events.assert_none("knowledge.graph.extended")
+
+
+@req(ECX, EXTEND, scenario="Связей достаточно")
+def test_context_extension_not_needed(cx, events):
+    onto, ids = cx.onto, cx.ids
+    for name in ("Деизм", "Веротерпимость", "Общественный договор", "Права человека"):
+        onto.statements.add(
+            ids["glorious"],
+            "stimulated",
+            obj=onto.thing("doctrine", name),
+            attributions=[Attribution("common")],
+        )
+    events.clear()
+    items = cx.build("glorious", "context")
+    assert len(items[0]["edges"]) == 5
+    assert items[0]["extension"] == "not_needed"
+    assert cx.provider.calls == []
+    assert events.where("knowledge.graph.built", extension="not_needed")
+    events.assert_none("knowledge.graph.extended")
+
+
+@req(ECX, EXTEND, scenario="Генерация выключена")
+def test_context_extension_disabled(cx, events):
+    items = cx.build("glorious", "context", generation=False)
+    assert items[0]["extension"] == "disabled"
+    assert cx.provider.calls == []
+    events.assert_none("knowledge.graph.extended")
+
+
+@req(ECX, EXTEND, invariant="механизм от модели всегда отбрасывается, связь сохраняется без него")
+@pytest.mark.parametrize(
+    "mechanism",
+    ["political", "economic", "culinary", {"mechanism": "political"}],
+)
+def test_model_mechanism_never_saved(cx, events, mechanism):
+    proposal = {
+        "subject": "Славная революция",
+        "relation": "stimulated",
+        "object": "Два трактата о правлении",
+        "mechanism": mechanism,
+        "qualifiers": {"mechanism": "political"},
+    }
+    cx.provider.push(context_proposals(proposal))
+    items = cx.build("glorious", "context")
+    [edge] = [i["edge"] for i in items if i["type"] == "edge"]
+    assert edge["qualifiers"] == {}
+    cx.queue.run_until_empty()
+    [stored] = stimulated_of(cx.onto, cx.ids["glorious"], cx.ids["treatises"])
+    assert stored["qualifiers"] == {} and stored["status"] == "generated"
+    assert events.one("knowledge.graph.saved")["statements"] == 1
+
+
+@req(
+    ECX,
+    EXTEND,
+    invariant="только типы семейства «контекст» и только существующие сущности",
+)
+def test_context_extension_only_context_family(cx, events):
+    cx.provider.push(
+        context_proposals(
+            {"subject": "Славная революция", "relation": "develops", "object": "Локк"},
+            {"subject": "Славная революция", "relation": "stimulated", "object": "Левиафан"},
+            {"subject": "Локк", "relation": "stimulated", "object": "Два трактата о правлении"},
+            {
+                "subject": "Славная революция",
+                "relation": "stimulated",
+                "object": "Два трактата о правлении",
+            },
+        )
+    )
+    items = cx.build("glorious", "context")
+    added = [i["edge"] for i in items if i["type"] == "edge"]
+    assert [(e["type"], e["object"]) for e in added] == [("stimulated", cx.ids["treatises"])]
+    reasons = sorted(e["reason"] for e in events.of("knowledge.graph.proposal_dropped"))
+    # тип вне рецепта, нет такой сущности, «стимулировало» от персоны (проверка записи)
+    assert len(reasons) == 3 and {"outside_recipe", "unknown_entity"} <= set(reasons)
+    assert events.one("knowledge.graph.extended")["dropped"] == 3
+
+
+@req(ECX, EXTEND, invariant="в режиме «только выбранный учебник» модель не вызывается (scope)")
+def test_context_extension_scope(cx, events):
+    items = cx.build("glorious", "context", textbook=TEXTBOOK, only_textbook=True)
+    assert items[0]["extension"] == "scope"
+    assert cx.provider.calls == []
+    events.assert_none("knowledge.graph.extended")
+
+
+@req(ECX, EXTEND, invariant="совпадающее с отклонённым не показывается и не сохраняется")
+def test_context_extension_rejected_before(cx, events):
+    rejected = cx.onto.statements.add(
+        cx.ids["glorious"],
+        "stimulated",
+        obj=cx.ids["treatises"],
+        attributions=[Attribution("common")],
+    )
+    cx.onto.statements.reject(rejected, "operator")
+    cx.provider.push(
+        context_proposals(
+            {
+                "subject": "Славная революция",
+                "relation": "stimulated",
+                "object": "Два трактата о правлении",
+            }
+        )
+    )
+    items = cx.build("glorious", "context")
+    assert [i for i in items if i["type"] == "edge"] == []
+    assert events.where("knowledge.graph.proposal_dropped", reason="rejected_before")
+    assert cx.queue.run_until_empty() == 0

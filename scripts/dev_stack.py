@@ -89,14 +89,18 @@ def start(data: Path, port: int | None = None, *, demo: bool = True) -> Stack:
         "PYTHONUTF8": "1",
         "PHILOGRAPH_DATABASE_URL": db,
         "PHILOGRAPH_FILES_ROOT": str(data / "files"),
-        "PHILOGRAPH_LLM_CONFIG": str(ROOT / "config" / "llm.demo.yaml"),
+        "PHILOGRAPH_LLM_CONFIG": os.environ.get(
+            "PHILOGRAPH_LLM_CONFIG", str(ROOT / "config" / "llm.demo.yaml")
+        ),
         "PHILOGRAPH_LLM_URL": f"http://127.0.0.1:{ports['llm']}",
         "PHILOGRAPH_LIBRARY_URL": f"http://127.0.0.1:{ports['library']}",
         "PHILOGRAPH_SEARCH_URL": f"http://127.0.0.1:{ports['search']}",
         "PHILOGRAPH_ASSISTANT_URL": f"http://127.0.0.1:{ports['assistant']}",
         "PHILOGRAPH_QDRANT_PATH": str(data / "qdrant"),
-        "PHILOGRAPH_EMBEDDING_MODEL": "demo-embeddings",
-        "PHILOGRAPH_EMBEDDING_DIMENSION": "8",
+        "PHILOGRAPH_EMBEDDING_MODEL": os.environ.get(
+            "PHILOGRAPH_EMBEDDING_MODEL", "demo-embeddings"
+        ),
+        "PHILOGRAPH_EMBEDDING_DIMENSION": os.environ.get("PHILOGRAPH_EMBEDDING_DIMENSION", "8"),
         "PHILOGRAPH_WEB_ROOT": str(ROOT / "web" / "dist"),
         "PHILOGRAPH_VISITOR_SECRET": "dev-stack",
         "PHILOGRAPH_KNOWLEDGE_SERVICE": "1",

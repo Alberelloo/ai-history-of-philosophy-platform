@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -81,9 +81,7 @@
+     def apart(lo1: int, hi1: int, lo2: int, hi2: int) -> bool:
+         return hi1 + DATE_SLACK < lo2 - DATE_SLACK or hi2 + DATE_SLACK < lo1 - DATE_SLACK
+ 
+-    return apart(
+-        a["earliest_start"], a["latest_start"], b["earliest_start"], b["latest_start"]
+-    ) or apart(a["earliest_end"], a["latest_end"], b["earliest_end"], b["latest_end"])
++    return apart(a["earliest_end"], a["latest_end"], b["earliest_end"], b["latest_end"])
+ 
+ 
+ def same_person(

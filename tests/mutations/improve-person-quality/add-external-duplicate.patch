@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -306,7 +306,7 @@
+         existing = self.by_external(system, value)
+         if existing == entity_id:
+             return False
+-        if existing is not None:
++        if False:
+             raise DuplicateEntity(existing)
+         with self.engine.begin() as conn:
+             conn.execute(

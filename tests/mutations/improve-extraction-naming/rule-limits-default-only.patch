@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -77,7 +77,7 @@
+     stopwords: frozenset[str]
+ 
+     def limits_for(self, type_: str) -> Limits:
+-        return self.limits.get(type_, self.limits["default"])
++        return self.limits["default"]
+ 
+ 
+ def _positive(value: Any, where: str) -> int:

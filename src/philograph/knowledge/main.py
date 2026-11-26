@@ -14,15 +14,19 @@ from philograph.knowledge import schema
 from philograph.knowledge.app import build_app, library_paragraphs, subscribe
 from philograph.knowledge.assist import AssistantKnowledge
 from philograph.knowledge.cards import Cards
+from philograph.knowledge.catalog import Catalog, CatalogSettings
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.filling import Filling
+from philograph.knowledge.geo import PlaceLayer
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import MapSettings, SectionMap
 from philograph.knowledge.mentions import Mentions
 from philograph.knowledge.metadata import MetadataIngest
+from philograph.knowledge.polities import PolityLayer
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.review import Review
+from philograph.knowledge.snapshot import Snapshots
 from philograph.knowledge.statements import Statements
 from philograph.operator.access import ActionLog, OperatorAuth
 from philograph.operator.access import migrations as operator_migrations
@@ -50,6 +54,10 @@ class Components:
     assistant: AssistantKnowledge
     library: ServiceClient
     section_map: SectionMap
+    snapshots: Snapshots
+    catalog: Catalog
+    place_layer: PlaceLayer
+    polity_layer: PolityLayer
 
 
 def components(env: dict[str, str]) -> Components:
@@ -72,8 +80,13 @@ def components(env: dict[str, str]) -> Components:
     health.depends_on("database", database)
     filling = None
     if env.get("PHILOGRAPH_LLM_URL"):
+        # Таймаут вызова извлечения — бюджет шлюза на все попытки роли (``GET roles/strong``);
+        # переменная — если шлюз бюджет не сообщил.
         filling = Filling(
-            statements, ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=120), library
+            statements,
+            ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=120),
+            library,
+            call_timeout=float(env.get("PHILOGRAPH_EXTRACTION_TIMEOUT_SECONDS", "1200")),
         )
     queue = Queue(engine)
     mentions = Mentions(statements, library)
@@ -99,10 +112,22 @@ def components(env: dict[str, str]) -> Components:
     password = env.get("PHILOGRAPH_OPERATOR_PASSWORD_HASH")
     auth = OperatorAuth(password) if password else None
     assistant = AssistantKnowledge(statements, mentions)
+    # Один снимок онтологии на процесс: карта (без окна устарелости) и справочник.
+    snapshots = Snapshots(engine)
     section_map = SectionMap(
         statements,
         MapSettings(max_entities=int(env.get("PHILOGRAPH_MAP_MAX_ENTITIES", "400"))),
+        snapshots,
     )
+    catalog = Catalog(
+        snapshots,
+        registry,
+        statements.entities,
+        CatalogSettings(
+            max_stale_seconds=float(env.get("PHILOGRAPH_CATALOG_MAX_STALE_SECONDS", "15"))
+        ),
+    )
+    place_layer = PlaceLayer(section_map, snapshots)
     return Components(
         statements,
         health,
@@ -117,6 +142,10 @@ def components(env: dict[str, str]) -> Components:
         assistant,
         library,
         section_map,
+        snapshots,
+        catalog,
+        place_layer,
+        PolityLayer.from_env(env),
     )
 
 
@@ -140,4 +169,7 @@ if os.environ.get("PHILOGRAPH_KNOWLEDGE_SERVICE"):
         assistant=_c.assistant,
         library=_c.library,
         section_map=_c.section_map,
+        catalog=_c.catalog,
+        place_layer=_c.place_layer,
+        polity_layer=_c.polity_layer,
     )

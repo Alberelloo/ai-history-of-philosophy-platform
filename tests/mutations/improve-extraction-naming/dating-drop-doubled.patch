@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -293,6 +293,7 @@
+                 created += 1
+             except (StatementError, RegistryError, _Skip) as exc:
+                 self._drop(run_id, str(exc))
++                self._drop(run_id, str(exc))
+                 dropped += 1
+         self._count(run_id, created=created, dropped=dropped)
+         events.emit(

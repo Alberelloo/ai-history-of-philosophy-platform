@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -758,7 +758,9 @@ class Migration:
+             else:
+                 proposed.add(n)
+                 type_ = view.entities[pack[n - 1]]["type"]
+-                if counts[n] > 1:
++                if isinstance(ru, str) and is_russian(ru) and (bad := check_name(type_, ru)):
++                    reason = f"invalid:{bad}"
++                elif counts[n] > 1:
+                     reason = "duplicate_item"
+                 elif not isinstance(ru, str) or not is_russian(ru):
+                     reason = "not_russian"

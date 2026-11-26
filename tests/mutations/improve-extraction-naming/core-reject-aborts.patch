@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -458,8 +458,7 @@
+             try:
+                 entity = self.entities.create(item["type"], [("ru", item["name"], "primary")])
+             except InvalidName as exc:
+-                rejected.append({"name": item["name"], "type": item["type"], "reason": exc.reason})
+-                continue
++                raise
+             if item.get("note"):
+                 self.statements.add(
+                     entity,

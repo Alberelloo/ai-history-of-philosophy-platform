@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -821,8 +821,8 @@
+             self._refresh_primary(entity)
+         events.emit(
+             "knowledge.entity.merge_undone",
+-            kept=m["kept"],
+-            removed=m["removed"],
++            kept=m["removed"],
++            removed=m["kept"],
+             restored=len(folded),
+         )
+         return {"restored": len(folded)}

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -84,7 +84,7 @@
+         return _Format(frozenset(values), None, single=second is None)
+     century = _CENTURY_FORMAT.match(s)
+     if century and _roman_value(century.group(1)) is not None:
+-        return _Format(frozenset(), century.group(1).upper(), single=True)
++        return _Format(frozenset(), century.group(1).upper(), single=False)
+     return None
+ 
+ 

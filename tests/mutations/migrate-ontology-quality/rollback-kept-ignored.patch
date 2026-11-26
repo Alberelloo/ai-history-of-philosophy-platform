@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -918,7 +918,7 @@
+         for item in done:
+             p, kind = item["payload"], item["kind"]
+             if kind == "rename":
+-                kept += 0 if self._undo_rename(p) else 1
++                self._undo_rename(p)
+             elif kind == "retire":
+                 with self.engine.begin() as conn:
+                     changed = conn.execute(

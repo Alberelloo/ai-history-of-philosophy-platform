@@ -27,14 +27,20 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "import-linter>=2.1", "pillow>=10", "playwright>=1.47", "pytest>=8", "ruff>=0.6", "uvicorn>=0.30",
+    "hypothesis>=6.100", "import-linter>=2.1", "pillow>=10", "playwright>=1.47", "pytest>=8",
+    "ruff>=0.6", "uvicorn>=0.30", "philograph[geo-build]",
 ]
+# Сборка исторических границ (polities_build): на пути читателя не нужна.
+geo-build = ["shapely>=2.0", "ijson>=3.3"]
 postgres = ["psycopg[binary]>=3.2"]
 s3 = ["boto3>=1.35"]  # хранилище резервных копий S3
 ocr = ["pytesseract>=0.3.10", "pillow>=10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"philograph.knowledge" = ["*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

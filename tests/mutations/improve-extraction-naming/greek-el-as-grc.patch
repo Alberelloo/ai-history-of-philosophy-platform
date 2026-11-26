@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -45,7 +45,7 @@
+     "el": "greek",
+     "grc": "greek",
+ }
+-SCRIPT_LANG = {"cyrillic": "ru", "latin": "en", "greek": "el"}
++SCRIPT_LANG = {"cyrillic": "ru", "latin": "en", "greek": "grc"}
+ 
+ 
+ class RulesError(ValueError):

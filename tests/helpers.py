@@ -87,3 +87,22 @@ def reader_context(browser, *, accepted: bool = True, **options):
     if accepted:
         context.add_init_script(_ACCEPTED)
     return context
+
+
+class HostRouter(httpx.AsyncBaseTransport):
+    """Асинхронный транспорт шлюза: запрос уходит приложению по имени хоста адреса сервиса.
+
+    Хост без приложения — ошибка теста (сеть наружу запрещена): запрос записывается в
+    ``unexpected`` и получает ``ConnectError``, как недоступный сервис.
+    """
+
+    def __init__(self, apps: dict[str, FastAPI]) -> None:
+        self.transports = {host: httpx.ASGITransport(app=app) for host, app in apps.items()}
+        self.unexpected: list[str] = []
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        transport = self.transports.get(request.url.host)
+        if transport is None:
+            self.unexpected.append(str(request.url))
+            raise httpx.ConnectError(f"сеть наружу запрещена в тесте: {request.url}")
+        return await transport.handle_async_request(request)

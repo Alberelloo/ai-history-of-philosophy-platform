@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -186,7 +186,7 @@
+     if not isinstance(value, dict) or value.get("id") is None:
+         raise Skip("bad_value")
+     try:
+-        return check_qid(value["id"])
++        return value["id"]
+     except WikidataError:
+         raise Skip("bad_qid") from None
+ 

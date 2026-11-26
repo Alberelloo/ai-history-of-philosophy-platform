@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -391,7 +391,7 @@
+             if n["kind"] == "primary" and n["normalized"]:
+                 primaries.setdefault(entity["id"], set()).add(n["normalized"])
+         pairs: set[tuple[str, str]] = set()
+-        for (type_, _), group in last_words.items():
++        for (type_, _), group in []:
+             if len(group) > MAX_LAST_WORD_GROUP:
+                 # Перебор пар группы — O(k²); большая группа пропускается не молча: событие без
+                 # названий (Р2). Совпадения полных названий ниже ищутся и для неё.

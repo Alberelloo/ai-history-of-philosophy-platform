@@ -1,0 +1,13 @@
+diff --git a/src/philograph/llm/store.py b/src/philograph/llm/store.py
+index e53e46f..cb8e582 100644
+--- a/src/philograph/llm/store.py
++++ b/src/philograph/llm/store.py
+@@ -242,8 +242,6 @@ class Store:
+                 *cols,
+                 func.sum(calls.c.cost_usd).label("cost_usd"),
+                 func.count().label("calls"),
+-                func.sum(calls.c.input_tokens).label("input_tokens"),
+-                func.sum(calls.c.output_tokens).label("output_tokens"),
+             )
+             .where(and_(calls.c.time >= first, calls.c.time < last))
+             .group_by(*cols)

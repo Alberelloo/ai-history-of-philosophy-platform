@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -136,7 +136,7 @@
+     by_name: dict[str, set[str]] = defaultdict(set)
+     for p in persons:
+         for n in p["names"]:
+-            if normalize(n["text"]):
++            if n["kind"] == "primary" and normalize(n["text"]):
+                 by_name[normalize(n["text"])].add(p["id"])
+     pairs: set[frozenset[str]] = set()
+     for p in persons:
