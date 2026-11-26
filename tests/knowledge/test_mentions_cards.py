@@ -264,12 +264,13 @@ def test_where_to_read_first_paragraph(mx):
     mx.publish()
     where = {w["chapter_title"]: w for w in mx.mentions.where_to_read(mx.ids["kant"])}
     assert where["Глава 1. Новое время"]["first_paragraph_id"] == mx.paragraph("Согласно Канту").id
-    # Карточка отдаёт то же поле.
-    card = mx.cards.card(mx.ids["kant"], generation=False)
+    # Карточка понятия отдаёт то же поле; у карточки персоны блока нет.
+    card = mx.cards.card(mx.ids["causality"], generation=False)
+    assert card["where_to_read"] == mx.mentions.where_to_read(mx.ids["causality"])
     assert {w["first_paragraph_id"] for w in card["where_to_read"]} == {
-        mx.paragraph("Согласно Канту").id,
-        None,
+        mx.paragraph("Согласно Канту").id
     }
+    assert mx.cards.card(mx.ids["kant"], generation=False)["where_to_read"] == []
 
 
 @req(EM, "Где читать")
@@ -371,7 +372,10 @@ def test_sections_by_type(mx):
     assert concept["where_to_read"]
     person = mx.cards.card(mx.ids["kant"])
     codes = [s["code"] for s in person["sections"]]
-    assert "life" in codes and "positions" in codes
+    assert "positions" in codes
+    assert "life" not in codes and "influence" not in codes  # годы — в сводке шапки
+    assert person["layout"] == "person" and person["summary"]["years"] == "1724–1804"
+    assert person["where_to_read"] == []
 
 
 @req(EC, "Природа каждой строки")
@@ -401,8 +405,10 @@ def test_no_empty_sections(mx):
     mx.publish()
     card = mx.cards.card(mx.ids["hobbes"])
     assert all(section["rows"] for section in card["sections"])
-    assert [s["code"] for s in card["sections"]] == ["life"]
-    assert card["where_to_read"][0]["count"] == 1
+    # Гоббс упомянут в тексте, но блока «Где читать» у персоны нет; годы — только в сводке.
+    assert card["sections"] == [] and card["where_to_read"] == []
+    assert card["summary"]["years"] == "1588–1679" and card["empty"] is False
+    assert mx.mentions.where_to_read(mx.ids["hobbes"])[0]["count"] == 1  # указатель доступен
 
 
 @req(EC, "Описание моделью")
@@ -511,6 +517,7 @@ def test_epoch_card(svc, events):
     [row] = dating["rows"]
     assert row["value"]["original"] == "1685–1815"
     assert [a["who"] for a in row["attributions"]] == ["Wikidata"]
+    assert card["layout"] == "epoch" and "other" not in [x["code"] for x in card["sections"]]
     assert [(r["entity_id"], r["label"]) for r in members["rows"]] == [(locke, "Джон Локк")]
     assert kant not in {r["entity_id"] for s in card["sections"] for r in s["rows"]}
     [served] = events.where("knowledge.card.served", request_id=rid)
@@ -586,12 +593,20 @@ def test_doctrine_historical_context(svc, events):
     assert (first["statement_id"], first["label"]) == (ids["sourced"], "Славная революция")
     assert first["qualifiers"] == {"mechanism": "political"}
     assert first["status"] == "sourced" and first["generated"] is False
+    assert first["mark"] == "sourced"
     assert [e["paragraph_id"] for e in first["evidence"]] == ["p_1"]
     assert (second["statement_id"], second["label"]) == (ids["generated"], "Выход «Начал» Ньютона")
     assert second["qualifiers"] == {} and second["generated"] is True
-    assert second["status"] == "generated"
+    assert second["status"] == "generated" and second["mark"] == "generated"
+    assert second["qualifiers"] == {} and card["layout"] == "entity"
+    assert card["legend"] == ["sourced", "generated"]
     [served] = events.where("knowledge.card.served", request_id=rid)
-    assert (served["sections"], served["rows"]) == (1, 2)
+    assert (served["sections"], served["rows"], served["layout"], served["inferred"]) == (
+        1,
+        2,
+        "entity",
+        0,
+    )
 
 
 @req(
@@ -630,3 +645,116 @@ def test_event_card_has_no_context_section(svc, events):
     codes = [s["code"] for s in response.json()["sections"]]
     assert "context" not in codes and codes, codes
     assert events.where("knowledge.card.served", request_id=rid)
+
+
+# --- redesign-entity-cards: «Где читать» в карточках, «Мало данных» --------------------------
+
+
+def _card_http(mx, entity_id: str, rid: str):
+    client = TestClient(build_app(mx.onto.statements, cards=mx.cards, mentions=mx.mentions))
+    return client.get(f"/v1/entities/{entity_id}/card", headers={"X-Request-Id": rid})
+
+
+def _three_chapters(mx, word: str) -> None:
+    mx.lib.files["book.txt"] = (
+        f"Глава 1. Опыт\n\nУ нас {word} впервые.\n\n"
+        f"Глава 2. Рассудок\n\nЗдесь снова {word}.\n\n"
+        f"Глава 3. Разум\n\nИ в конце {word}.\n"
+    ).encode()
+
+
+@req(EM, "Где читать", scenario="Где читать о причинности")
+def test_where_to_read_causality(mx, events):
+    _three_chapters(mx, "причинность")
+    mx.publish()
+    where = mx.mentions.where_to_read(mx.ids["causality"])
+    assert [w["chapter_title"] for w in where] == [
+        "Глава 1. Опыт",
+        "Глава 2. Рассудок",
+        "Глава 3. Разум",
+    ]
+    assert all(w["count"] == 1 and w["source_id"] == mx.source for w in where)
+    client = TestClient(build_app(mx.onto.statements, mentions=mx.mentions))
+    response = client.get(f"/v1/entities/{mx.ids['causality']}/where")
+    assert response.status_code == 200 and response.json() == where
+    # Самые насыщенные главы первыми.
+    mx.lib.files["book.txt"] = (
+        "Глава 1. А\n\nПричинность.\n\nГлава 2. Б\n\nПричинность.\n\n"
+        "Снова причинность.\n\nИ ещё причинность.\n"
+    ).encode()
+    mx.publish()
+    ranked = mx.mentions.where_to_read(mx.ids["causality"])
+    assert [(w["chapter_title"], w["count"]) for w in ranked] == [
+        ("Глава 2. Б", 3),
+        ("Глава 1. А", 1),
+    ]
+
+
+@req(EM, "Где читать", scenario="Где читать в карточке понятия")
+def test_where_to_read_in_concept_card(mx, events):
+    mx.lib.files["book.txt"] = (
+        "Глава 1. Опыт\n\nПричинность — основа науки.\n\nГлава 2. Рассудок\n\nИ причинность тоже.\n"
+    ).encode()
+    mx.publish()
+    response = _card_http(mx, mx.ids["causality"], "rid-concept")
+    assert response.status_code == 200
+    card = response.json()
+    assert [w["chapter_title"] for w in card["where_to_read"]] == [
+        "Глава 1. Опыт",
+        "Глава 2. Рассудок",
+    ]
+    first = mx.paragraph("Причинность — основа")
+    assert card["where_to_read"][0]["first_paragraph_id"] == first.id
+    [served] = events.where("knowledge.card.served", request_id="rid-concept")
+    assert served["type"] == "concept"
+
+
+@req(EM, "Где читать", scenario="Персона без «Где читать»")
+def test_person_without_where_to_read(mx, events):
+    _three_chapters(mx, "Кант")
+    mx.publish()
+    response = _card_http(mx, mx.ids["kant"], "rid-person")
+    card = response.json()
+    assert card["where_to_read"] == []
+    client = TestClient(build_app(mx.onto.statements, cards=mx.cards, mentions=mx.mentions))
+    where = client.get(f"/v1/entities/{mx.ids['kant']}/where").json()
+    assert [w["chapter_title"] for w in where] == [
+        "Глава 1. Опыт",
+        "Глава 2. Рассудок",
+        "Глава 3. Разум",
+    ]
+    [served] = events.where("knowledge.card.served", request_id="rid-person")
+    assert (served["type"], served["layout"]) == ("person", "person")
+
+
+@req(
+    EM, "Где читать", invariant="у персоны указатель не вызывается, у остальных типов блок остаётся"
+)
+@pytest.mark.parametrize(
+    "type_", ["concept", "doctrine", "term", "work", "group", "place", "event", "problem"]
+)
+def test_where_to_read_for_every_non_person_type(mx, type_):
+    entity = mx.onto.thing(type_, "Уникум")
+    mx.lib.files["book.txt"] = "Глава 1. Опыт\n\nЗдесь упомянут Уникум.\n".encode()
+    mx.publish()
+    assert mx.mentions.where_to_read(entity), type_
+    card = mx.cards.card(entity, generation=False)
+    assert [w["chapter_title"] for w in card["where_to_read"]] == ["Глава 1. Опыт"]
+    assert card["empty"] is True  # утверждений нет: «Где читать» — единственное содержимое
+
+
+@req(EC, "Пустые разделы", scenario="Мало данных")
+def test_little_data_doctrine_with_where_to_read(mx, events):
+    doctrine = mx.onto.thing("doctrine", "Эмпириокритицизм")
+    mx.lib.files["book.txt"] = (
+        "Глава 1. Опыт\n\nЭмпириокритицизм возник поздно.\n\nЭмпириокритицизм спорен.\n"
+    ).encode()
+    mx.publish()
+    response = _card_http(mx, doctrine, "rid-little")
+    card = response.json()
+    assert card["sections"] == [] and card["empty"] is True
+    assert [w["chapter_title"] for w in card["where_to_read"]] == ["Глава 1. Опыт"]
+    assert card["where_to_read"][0]["count"] == 2
+    assert card["legend"] == []
+    [served] = events.where("knowledge.card.served", request_id="rid-little")
+    assert (served["sections"], served["rows"], served["empty"]) == (0, 0, True)
