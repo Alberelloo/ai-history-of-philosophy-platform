@@ -120,3 +120,12 @@
 - Ж3, Ж8 — design «Открытые вопросы» 7 и 8 (Ж8 — задача ведущему на отдельное изменение).
 - Тест тестировщика по прежней формулировке (3.3): `test_reextract_external.py::test_replace_without_previous_and_failed_previous` ждёт, что повтор без `--replace` после `failed` разрешён; по Б2 и новой дельте — код 2. Не менял.
 - Прогон: `test_reextract_*.py` + юниты + `test_extraction_entities test_entity_dating_extraction test_entity_items_unit test_statements test_filling test_dating_unit` — 503 passed, 1 failed (тест выше). `ruff check .`, `ruff format --check .` (719), `lint-imports` (3 kept) — чисто.
+
+## 2026-11-26 — цитата без значимого текста
+
+- Дефект после Ж1: цитата «...» (или только знаки и пробелы) находилась целиком в абзаце с авторским многоточием. `quotes.check`: до поиска цитата без обрамляющих кавычек должна содержать хотя бы одну букву или цифру (`MIN_WHOLE = 1`), иначе `quote_too_short`; каждая часть при делении — тоже. Пустая цитата — `quote_not_found`. Почему 1, а не 10 — design.md, `knowledge/quotes.py` («Минимум значимого текста»): подтверждения из одного слова не должны стать потерянными.
+- Дельта: норматив «Значимый текст», сценарий «Цитата без значимого текста».
+- Тесты тестировщика, которые новое правило меняет (3.3, не менял):
+  - `test_reextract_quotes.py::test_degenerate_quotes_never_found[...]` — 9 вариантов (`...`, `…`, `[...]`, `(...)`, ` ... `, `""`, `«»`, `"..."`, `' '`): ждут код `quote_not_found`, теперь `quote_too_short` (цитата по-прежнему не находится);
+  - `test_reextract_quotes.py::test_any_substring_found_property` и `test_reextract_review.py::test_substring_with_authors_ellipsis_property` — «любая подстрока находится», а подстрока без букв и цифр (` -`) теперь отказ: генератору нужно брать подстроки со значимым текстом.
+- Прогон: `test_quotes_unit.py` — 30 passed; `test_reextract_*.py + test_quotes_unit.py` — 360 passed, 11 failed (ровно перечисленные выше). ruff чисто.

@@ -15,6 +15,10 @@ import unicodedata
 QUOTE_NOT_FOUND = "quote_not_found"
 QUOTE_TOO_SHORT = "quote_too_short"
 MIN_PART = 10  # символов после нормализации у каждой части, если частей больше одной
+# Цитата целиком: хотя бы одна буква или цифра. Выше не берём: прежнее правило принимало любую
+# подстроку, и подтверждение из одного короткого слова («Бог», «априори») при перепроверке
+# абзаца не должно стать потерянным.
+MIN_WHOLE = 1
 
 _REMOVE = dict.fromkeys(map(ord, "­́̀​⁠﻿"))
 _MAP = str.maketrans(
@@ -46,6 +50,11 @@ def _unquoted(quote: str) -> str:
     return q
 
 
+def _significant(text: str) -> int:
+    """Значимые символы: буквы и цифры (любой письменности)."""
+    return sum(ch.isalnum() for ch in text)
+
+
 def parts(quote: str) -> list[str]:
     """Части цитаты: нормализация, снятие обрамляющих кавычек, деление по многоточию."""
     return [p for p in (s.strip() for s in _ELLIPSIS.split(_unquoted(quote))) if p]
@@ -56,14 +65,18 @@ def check(quote: str, text: str | None) -> str | None:
     (многоточие автора — часть текста), и только если её нет — по частям многоточия."""
     if text is None:
         return QUOTE_NOT_FOUND
-    haystack = normalize(text)
+    if not normalize(quote):
+        return QUOTE_NOT_FOUND  # пустая цитата
     whole = _unquoted(quote)
-    if whole and whole in haystack:
+    if _significant(whole) < MIN_WHOLE:
+        return QUOTE_TOO_SHORT  # «...», «—», «, .»: подтверждать нечего
+    haystack = normalize(text)
+    if whole in haystack:
         return None
     found = parts(quote)
     if not found:
         return QUOTE_NOT_FOUND
-    if len(found) > 1 and any(len(p) < MIN_PART for p in found):
+    if len(found) > 1 and any(len(p) < MIN_PART or not _significant(p) for p in found):
         return QUOTE_TOO_SHORT
     position = 0
     for part in found:

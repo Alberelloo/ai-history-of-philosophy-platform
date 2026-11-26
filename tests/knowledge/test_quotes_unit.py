@@ -35,7 +35,7 @@ def test_found(quote):
         ("ты нашёл счастье своё… О, Заратустра", quotes.QUOTE_NOT_FOUND),  # порядок частей
         ("О… своё", quotes.QUOTE_TOO_SHORT),
         ("", quotes.QUOTE_NOT_FOUND),
-        ("…", quotes.QUOTE_NOT_FOUND),
+        ("…", quotes.QUOTE_TOO_SHORT),  # нет значимого текста
     ],
 )
 def test_refused(quote, code):
@@ -64,3 +64,14 @@ def test_author_ellipsis_found_whole():
     text = "Он сказал... и замолчал."
     assert quotes.check("сказал... и", text) is None  # целиком; по частям было бы too_short
     assert quotes.check("Он сказал… и замолчал", text) is None
+
+
+@pytest.mark.parametrize("quote", ["...", "…", " - ", ", .", "« »", "[...]", "———"])
+def test_quote_without_significant_text(quote):
+    text = "Он сказал... и замолчал — , . «» [...] ———"
+    assert quotes.check(quote, text) == quotes.QUOTE_TOO_SHORT
+
+
+@pytest.mark.parametrize("quote", ["априори", "tabula rasa", "Бог", "7"])
+def test_short_real_quotes_pass(quote):
+    assert quotes.found(quote, "Понятие априори, tabula rasa, Бог и 7 дней.")
