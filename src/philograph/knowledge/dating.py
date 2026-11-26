@@ -12,6 +12,7 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from philograph.knowledge import quotes
 from philograph.knowledge.dates import FuzzyDate, parse
 
 PARAGRAPH = "dating:paragraph"
@@ -53,9 +54,6 @@ class _Format:
     single: bool  # один год или век
 
 
-def _quote_key(text: str) -> str:
-    """Правило цитат утверждений: пробелы схлопываются, «ё» → «е», нижний регистр."""
-    return re.sub(r"\s+", " ", text.lower().replace("ё", "е")).strip()
 
 
 def _roman_value(roman: str) -> int | None:
@@ -105,8 +103,7 @@ def check(
         return PARAGRAPH
     if not 1 <= paragraph <= len(paragraphs):
         return PARAGRAPH
-    key = _quote_key(quote or "")
-    if not key or key not in _quote_key(paragraphs[paragraph - 1]):
+    if not quotes.found(quote or "", paragraphs[paragraph - 1]):  # правило цитат утверждений
         return QUOTE
     fmt = _format(text or "")
     if fmt is None:
@@ -117,7 +114,7 @@ def check(
     if fmt.roman is not None and not _quote_has_roman(quote, fmt.roman):
         return NOT_IN_QUOTE
     era_text = bool(_ERA_IN_TEXT.search(text.lower()))
-    era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
+    era_quote = bool(_ERA_IN_QUOTE.search(quotes.normalize(quote)))
     if era_text != era_quote:
         return ERA
     if is_person and fmt.single:

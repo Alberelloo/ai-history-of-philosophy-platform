@@ -8,7 +8,7 @@
 
 ## 2. Разработчик
 
-- [ ] 2.1 `knowledge/quotes.py` (нормализация, части по многоточию, `check`); `Statements._check`, перепроверка при событии библиотеки и `dating.check` — через него. Юнит-тесты `tests/knowledge/test_quotes_unit.py`.
+- [x] 2.1 `knowledge/quotes.py` (нормализация, части по многоточию, `check`); `Statements._check`, перепроверка при событии библиотеки и `dating.check` — через него. Юнит-тесты `tests/knowledge/test_quotes_unit.py`.
 - [ ] 2.2 `knowledge/extraction_codes.py` (перечень, `code_for`); `Skip(reason, code)`; `EntityItems.index(…, on_drop)`. Юнит-тесты.
 - [ ] 2.3 `schema.py`: столбцы `filling_runs` и миграция `knowledge:10`. Юнит-тест миграции на SQLite (база до `knowledge:10` → столбцы есть, старые строки целы).
 - [ ] 2.4 `llm`: `LLMGateway.role_info`, маршрут `GET /v1/roles/{role}`, токены в `spend_summary`. Юнит-тесты `tests/llm/test_role_info_unit.py`.

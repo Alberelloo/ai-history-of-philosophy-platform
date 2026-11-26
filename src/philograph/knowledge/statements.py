@@ -20,6 +20,7 @@ from typing import Any, Literal
 from sqlalchemy import Engine, and_, delete, func, or_, select, update
 from sqlalchemy.exc import NoResultFound
 
+from philograph.knowledge import quotes
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import FuzzyDate
 from philograph.knowledge.entities import Entities
@@ -158,10 +159,6 @@ class Provenance:
 
 
 ParagraphText = Callable[[str], str | None]
-
-
-def _norm_quote(text: str) -> str:
-    return re.sub(r"\s+", " ", text.replace("ё", "е")).strip().lower()
 
 
 def attributed_sources(s: dict[str, Any], who_kinds: tuple[str, ...] | None = None) -> set[str]:
@@ -326,7 +323,7 @@ class Statements:
         self._check_value(type_, value, qualifiers, attributions)
         for ev in evidence:
             text = self.paragraph_text(ev.paragraph_id)
-            if text is None or _norm_quote(ev.quote) not in _norm_quote(text):
+            if not quotes.found(ev.quote, text):
                 raise StatementError(f"цитата не найдена в абзаце {ev.paragraph_id}")
 
     def add(
@@ -1176,7 +1173,7 @@ class Statements:
                         .all()
                     )
                 for ev in rows:
-                    if text is None or _norm_quote(ev["quote"]) not in _norm_quote(text):
+                    if not quotes.found(ev["quote"], text):
                         counts["lost"] += self._lose_evidence(
                             pid, "цитата не найдена", only=ev["id"]
                         )
