@@ -563,7 +563,8 @@ class Cards:
         summary_filled = bool(
             summary and (summary["roles"] or summary["place"] or summary["years"])
         )
-        empty = not rows_all and description_row is None and not summary_filled
+        # Координаты места — тоже сведения: по ним клиент показывает страну в инфобоксе.
+        empty = not rows_all and description_row is None and not summary_filled and geo is None
         where = (
             self.mentions.where_to_read(entity_id, closed)
             if self.mentions and template.where
