@@ -381,3 +381,9 @@
 **Дефекты:** расхождений кода со спецификацией не найдено; все выжившие мутации были пробелами тестов и закрыты.
 
 Штатный прогон `scripts/mutation_check.py --change improve-person-quality --id dates-start-only` в worktree: test_dates_conflict_on_start_or_end_interval упал. Остальные мутации — тем же способом (патч в worktree от HEAD, pytest по связанным файлам).
+
+## Тестировщик — О23 (2026-11-26, коммит 0f531e4)
+
+Правило О23 (каждое множество спецификации — в генераторах целиком) проверяется тестом `tests/knowledge/test_strategies_cover_spec_sets.py`: множества переписаны из дельт руками, для каждого элемента `hypothesis.find` ищет пример в генераторе (82 passed). По этому изменению:
+- person-quality: генератор лиц `persons_with_variants` порождает `merge:name`, `merge:model_pair`, `merge:qid_confirmed`, `review:dates`, `review:decided_conflict`, `review:qid_cluster`, `review:single_name`, `review:variant`; коды решений человека и команды QID (`merge:review`, `review:qid_candidate`, `review:qid_taken`, `apart:decided/none/qid/type`) есть в сценарных тестах. Найденные пробелы закрыты: шаги 8–9 `same_person` (`review:single_name`, `review:variant`, `apart:none`) — test_person_quality::test_same_person_step_order (11 passed); `review:qid_taken` — test_life_dates::test_qid_taken_queued (`auto` и не-персона, 2 passed).
+- life-dates: `wd_times` порождает каждую строку таблицы точностей (11, 10, 9, 8, 7, 6), точность ниже 6, год 0000, оба знака; `wd_claim_values` — все три ранга; `DECISIONS` = {pending, accepted, auto, rejected}.

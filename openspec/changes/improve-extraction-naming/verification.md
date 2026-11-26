@@ -728,3 +728,38 @@
 - ревьюверу: вычитать О22 (c1a9177 и правку дельты `entity-naming`, определение «Название»).
 
 Разработчику и Lead'у возвратов нет.
+
+## Тестировщик — О22/О23 (2026-11-26, коммиты 09be57a, 0f531e4)
+
+Возврат судьи третьего круга (O1, O2-строка аудита, O5, O3-пожелание) и правило О23: каждое множество спецификации — в генераторах целиком, плюс «похожие вне множества».
+
+Генераторы (`tests/knowledge/strategies.py`):
+- римские: `ROMAN_LETTERS = "IVXLCDM"`; вид `roman` в `scripts_mix` берёт `ROMAN` (все семь букв по одной и L, XL, LX, LIV, XLIV, CD, DC, CM, MCM, MMXXIV, LXXX) или произвольное слово из `IVXLCDM`; «похожие вне множества» `ROMAN_LOOKALIKE` — строчные и смешанный регистр (l, xl, Xl, xL, Liv, Mdc, Civil, Mill);
+- знаки края слова — весь `EDGE_MARKS` слева и справа; пробельные `WHITESPACE` (пробел, таб, перевод строки, NBSP, EM SPACE, U+3000) между словами;
+- NFC ≠ NFKC: лигатуры ﬁ ﬂ (латинская буква по имени), полноширинные ａ ｂ ｋ (буква «прочая»), надстрочные ² ¹ ™ у цифр; NFC ≠ NFD — `raw_names` (NFD входа);
+- границы письменностей: U+0400/U+0450, U+052F, U+0371, U+03FF, U+1F00, U+1FF3.
+
+Новый тест `tests/knowledge/test_strategies_cover_spec_sets.py`: множества переписаны из спецификаций руками (без импорта `naming`/`dating`/`dedupe`), для каждого элемента `hypothesis.find` ищет пример в генераторе. Прогон: 82 теста (римские буквы ×7 и похожие, знаки края ×18, границы письменностей ×9, письменности и языки п. 5, пробельные ×5, NFC≠NFKC/NFD, причины ×6, данные правил, тире/маркеры ×7, причины датировки по порядку ×7, точности Wikidata ×10, ранги и решения, коды person-quality ×8, коды сценариев) — 82 passed в 217 с (последний прогон после правки шагов 8–9: test_person_scenario_codes passed). Найденные им пробелы закрыты: `review:qid_taken` (test_life_dates::test_qid_taken_queued, `auto` и не-персона), `apart:none`, `review:single_name`, `review:variant` в таблице шагов (test_person_quality::test_same_person_step_order, 11 passed).
+
+Явные `@example`: «Ли XL», «Пий XL», «Ли L», «Ли LX LIV» → `ru`; «Ли xl» → `und`; «Лии Xl» → `ru`; «Кк ﬁ» → `ru`, «К ﬁﬁ» → `en`, «Ｋａｎｔ» → `und`, «Кант Kant» → `und` (test_lang_for_any_text); `("Ли XL","en")`/«Пий LIV» (test_language_invariant_create_and_add_name); «Kant Hume», «ﬁlosoﬁa», «Ｋａｎｔ», «Kant Hume», «Декарт²», «Пий XL» (test_stored_form_strip_nfc); «ﬁ»×41/×80 → нет причины, ×81 → `sentence`, «Ｋ»×80 (test_signs_counted_after_nfc); «1724–1724», «1690–1690» (EXAMPLES test_dating_invariant).
+
+Прогоны (по одному файлу): test_entity_naming 58 passed (68 с); test_person_quality 43 passed (86 с); test_invalid_name_external 6 passed; test_entity_dating_extraction 15 passed (38 с); test_life_dates::test_qid_taken_queued 2 passed. ruff check/format чисто; traceability 415/415.
+
+Мутации — штатный `scripts/mutation_check.py --change improve-extraction-naming --id <id>` в отдельном worktree на 0f531e4:
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Язык названий сущностей | roman-without-l (O1) | test_entity_naming.py::test_lang_for_any_text | да (1 failed) |
+| Язык названий сущностей | roman-without-l (O1) | test_entity_naming.py::test_language_invariant_create_and_add_name | да (1 failed) |
+| Валидность названий сущностей | not-a-name-before-sentence (O2) | test_entity_naming.py::test_check_name_any_input | да (1 failed) |
+| Валидность названий сущностей | not-a-name-before-sentence (O2) | test_entity_naming.py::test_rejection_invariant | да (1 failed) |
+| Валидность названий сущностей | clean-nfkc (O5) | test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed) |
+| Валидность названий сущностей | clean-nfkc (O5) | test_entity_naming.py::test_signs_counted_after_nfc | да (1 failed, 3 passed) |
+| Валидность названий сущностей | stored-raw-create | test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed) |
+| Валидность названий сущностей | stored-raw-create | test_entity_naming.py::test_stored_form_via_extraction | да (1 failed) |
+| Валидность названий сущностей | stored-raw-add-name | test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed) |
+| Валидность названий сущностей | stored-raw-set-primary | test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed) |
+
+Строка аудита «Порядок: `sentence` раньше `not_a_name`» исправлена: мутация — `not-a-name-before-sentence` (меняет местами именно эти два правила).
+
+Ограничение: «цифра» для правила `number` спецификацией не уточнена (Nd или любая `isdigit`); надстрочные цифры поэтому порождаются только рядом с обычными цифрами и в `raw_names`, а не как единственный знак названия.
