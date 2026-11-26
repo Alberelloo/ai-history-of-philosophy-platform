@@ -105,7 +105,7 @@ mutations:
   - id: rollback-overwrites-later
     requirement: Откат миграции
     patch: rollback-overwrites-later.patch
-    note: откат перезаписывает последующее переименование
+    note: откат перезаписывает повторное переименование (своя строка ищется и среди вариантов; после 0b8b44e)
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_later_change_kept
   - id: a4-no-queue
