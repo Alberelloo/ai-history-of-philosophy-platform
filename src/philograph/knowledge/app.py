@@ -21,6 +21,13 @@ from philograph.knowledge.geo import PlaceLayer
 from philograph.knowledge.graph import Graphs, RecipeNotApplicable, hidden_by_region, ndjson
 from philograph.knowledge.map import MapViews, SectionMap
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.polities import (
+    BadYear,
+    PolitiesUnavailable,
+    PolityLayer,
+    parse_year,
+    reject_year,
+)
 from philograph.knowledge.portraits import PortraitNotFound, Portraits, content_type
 from philograph.knowledge.registry import RegistryError
 from philograph.knowledge.review import Review
@@ -159,6 +166,7 @@ def build_app(
     section_map: SectionMap | None = None,
     catalog: Catalog | None = None,
     place_layer: PlaceLayer | None = None,
+    polity_layer: PolityLayer | None = None,
 ) -> FastAPI:
     app = create_app("knowledge", __version__, health or Health("knowledge", __version__))
     router = APIRouter(prefix="/v1")
@@ -316,6 +324,30 @@ def build_app(
             return views.options(
                 body.entities[:20], textbook=body.textbook, only_textbook=body.only_textbook
             )
+
+    # Исторические границы (add-historical-polities): без артефакта — 503, глобус остаётся
+    # на современной карте.
+    polities = polity_layer or PolityLayer(None)
+
+    @router.get("/map/polities")
+    def map_polities(year: str | None = None) -> Response:
+        """Политические образования, активные на год ``year`` (Cliopatria): название,
+        статус названия, Wikidata-id, упрощённая геометрия, интервал постоянного набора
+        и атрибуция. Из артефакта сборки, без модели и внешних запросов."""
+        try:
+            value = parse_year(year)
+        except BadYear as exc:
+            reject_year()
+            raise UserFacingError(
+                "Год — целое число от −9999 до 9999", status=400, kind="bad_year"
+            ) from exc
+        try:
+            body = polities.serve(value)
+        except PolitiesUnavailable as exc:
+            raise UserFacingError(
+                "Исторические границы недоступны", status=503, kind="polities_unavailable"
+            ) from exc
+        return Response(body, media_type="application/json")
 
     if assistant is not None:
 

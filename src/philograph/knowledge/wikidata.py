@@ -44,6 +44,13 @@ SEARCH_URL = (
     "&limit=10&language={lang}&search={label}"
 )
 PAGE_URL = "https://www.wikidata.org/wiki/{qid}"
+# Метки и заголовки статей пачкой (add-historical-polities): только указанный язык и одна
+# вики, без запасных языков (``languagefallback`` не передаётся).
+LABELS_URL = (
+    "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json"
+    "&props=labels%7Csitelinks&languages={lang}&sitefilter={lang}wiki&ids={ids}"
+)
+LABEL_BATCH = 50  # предел ``ids`` у ``wbgetentities``
 RETRY_STATUSES = (429, 503)
 MAX_REDIRECTS = 3
 DEFAULT_RETRY_AFTER = 1.0  # секунд, если ``Retry-After`` нет или он не число
@@ -291,6 +298,57 @@ def search(label: str, lang: str, fetch: Fetch) -> list[dict[str, Any]]:
             }
         )
     return found
+
+
+def labels_url(qids: list[str], lang: str) -> str:
+    """Адрес ``wbgetentities`` на пачку QID (не больше ``LABEL_BATCH``), каждый проверен."""
+    if not LANG.fullmatch(lang) or "-" in lang:
+        raise WikidataError(f"неверный язык: {lang!r}")
+    if not qids or len(qids) > LABEL_BATCH:
+        raise WikidataError(f"пачка из {len(qids)} QID, допустимо 1…{LABEL_BATCH}")
+    return LABELS_URL.format(lang=lang, ids="%7C".join(check_qid(q) for q in qids))
+
+
+def _text(raw: Any, key: str) -> str | None:
+    value = raw.get(key) if isinstance(raw, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def labels(qids: list[str], lang: str, fetch: Fetch) -> tuple[dict[str, dict[str, Any]], int]:
+    """Метка языка ``lang`` и заголовок статьи ``<lang>wiki`` для каждого QID.
+
+    Возвращает ``({qid: {"label": str | None, "sitelink": str | None}}, число запросов)``.
+    Строки — как в ответе, без проверки: правило приёмки названия — у вызывающего.
+    Неверный QID в запрос не попадает (``check_qid`` — до запроса) и получает ``None``.
+    Запись ``missing`` — ``None``/``None``. Запись, ушедшая перенаправлением, ищется по
+    ``redirects.from``."""
+    out: dict[str, dict[str, Any]] = {}
+    valid: list[str] = []
+    for q in dict.fromkeys(qids):
+        if isinstance(q, str) and QID.fullmatch(q):
+            valid.append(q)
+        out[q] = {"label": None, "sitelink": None}
+    requests = 0
+    for i in range(0, len(valid), LABEL_BATCH):
+        batch = valid[i : i + LABEL_BATCH]
+        data = fetch(labels_url(batch, lang))
+        requests += 1
+        entities = data.get("entities")
+        if not isinstance(entities, dict):
+            raise WikidataError("ответ не по форме")
+        wanted = set(batch)
+        for key, entity in entities.items():
+            if not isinstance(entity, dict) or "missing" in entity:
+                continue
+            redirect = entity.get("redirects")
+            source = _text(redirect, "from") if isinstance(redirect, dict) else None
+            qid = source if source in wanted else key if key in wanted else None
+            if qid is None:
+                continue
+            label = (entity.get("labels") or {}).get(lang)
+            link = (entity.get("sitelinks") or {}).get(f"{lang}wiki")
+            out[qid] = {"label": _text(label, "value"), "sitelink": _text(link, "title")}
+    return out, requests
 
 
 # --- время ----------------------------------------------------------------------------

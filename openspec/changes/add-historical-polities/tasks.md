@@ -14,22 +14,22 @@
 
 ## 2. Данные и сборка (разработчик)
 
-- [ ] 2.1 `sources/cliopatria.yaml`: `zenodo.record` (24518977), `zenodo.doi`, `version` (v0.2.2), `authors`, `license: cc-by-4.0`, `download.url` (тег GitHub), `download.sha256` (заполняется в 8.1), `build.*`, `control_years`. `pyproject.toml`: extra `geo-build = ["shapely>=2.0", "ijson>=3.3"]`, подключён в `dev`
-- [ ] 2.2 `knowledge/wikidata.py`: `labels_url(qids, lang)` и `labels(qids, lang, fetch)` — пачки ≤ `LABEL_BATCH` (50), `props=labels|sitelinks`, только `ru` и `ruwiki`, без `languagefallback`, снятие одного завершающего уточнения у заголовка, `check_qid` до запроса, перенаправления (`redirects.from`), `missing`, проверка метки (1–200 символов, без управляющих). Юнит-тесты с `Fetch`-словарём
-- [ ] 2.3 Фикстуры `tests/knowledge/fixtures/cliopatria/` (в git, общий размер ≤ 200 КБ; архив собирается в тесте во временный каталог):
+- [x] 2.1 `sources/cliopatria.yaml`: `zenodo.record` (24518977), `zenodo.doi`, `version` (v0.2.2), `authors`, `license: cc-by-4.0`, `download.url` (тег GitHub), `download.sha256` (заполняется в 8.1), `build.*`, `control_years`. `pyproject.toml`: extra `geo-build = ["shapely>=2.0", "ijson>=3.3"]`, подключён в `dev`
+- [x] 2.2 `knowledge/wikidata.py`: `labels_url(qids, lang)` и `labels(qids, lang, fetch)` — пачки ≤ `LABEL_BATCH` (50), `props=labels|sitelinks`, только `ru` и `ruwiki`, без `languagefallback`, снятие одного завершающего уточнения у заголовка, `check_qid` до запроса, перенаправления (`redirects.from`), `missing`, проверка метки (1–200 символов, без управляющих). Юнит-тесты с `Fetch`-словарём
+- [x] 2.3 Фикстуры `tests/knowledge/fixtures/cliopatria/` (в git, общий размер ≤ 200 КБ; архив собирается в тесте во временный каталог):
   - `build10.geojson` — ровно 10 записей для «Сборка фикстуры»: 8 `POLITY`, 1 `RELATION`, 1 с `FromYear > ToYear`;
   - `europe.geojson` — образования сценариев слоя и глобуса: Священная Римская империя в трёх строках, Речь Посполитая, Османская империя, Королевство Пруссия, Российская империя, ещё 5–8 образований Европы и Средиземноморья на 1650 и 1800, образование без QID, с QID без метки `ru` и без `ruwiki`, с испорченным QID, маленькое образование;
   - `labels.json` — ответы `wbgetentities` (метки, sitelinks, `missing`, перенаправление, испорченные метки);
   - `manifest.yaml` — манифест фикстуры.
   Большие наборы генерируются в тесте и в git не лежат: 120 QID («Пачки запросов»), ≥ 100 интервалов («Ограниченный кэш»). 30 персон в городах Европы — данные теста `tests/web`, не фикстура Cliopatria
-- [ ] 2.4 `knowledge/polities_build.py`, команда `build`: `ijson` из `zipfile` (без распаковки на диск), фильтр `POLITY` и проверки записи, `make_valid` → `simplify(preserve_topology=True)` → отбор колец с сохранением самого большого → `orient(sign=-1)` → округление; `id` = SHA-1(`Name`)[:12]; SQLite пачками, атомарная замена; метки через кэш `labels.ru.json`, `--offline`, `--refresh-labels`; проверка SHA-256 архива; события `knowledge.polities.built` и `knowledge.polities.rejected` (`checksum_mismatch`). Юнит-тесты на фикстуре
-- [ ] 2.5 Команда `fetch`: адрес и хост из манифеста (проверка хоста кодом), временный файл, SHA-256, удаление при расхождении; `--record` печатает сумму. Юнит-тест с подменённым транспортом httpx
-- [ ] 2.6 Команда `measure` (`--all-intervals`): тела ответов той же функцией, что эндпоинт (3.1), `gzip -9`, `ru_share`, `inactive`, `full_sphere`; событие `knowledge.polities.measured`
+- [x] 2.4 `knowledge/polities_build.py`, команда `build`: `ijson` из `zipfile` (без распаковки на диск), фильтр `POLITY` и проверки записи, `make_valid` → `simplify(preserve_topology=True)` → отбор колец с сохранением самого большого → `orient(sign=-1)` → округление; `id` = SHA-1(`Name`)[:12]; SQLite пачками, атомарная замена; метки через кэш `labels.ru.json`, `--offline`, `--refresh-labels`; проверка SHA-256 архива; события `knowledge.polities.built` и `knowledge.polities.rejected` (`checksum_mismatch`). Юнит-тесты на фикстуре
+- [x] 2.5 Команда `fetch`: адрес и хост из манифеста (проверка хоста кодом), временный файл, SHA-256, удаление при расхождении; `--record` печатает сумму. Юнит-тест с подменённым транспортом httpx
+- [x] 2.6 Команда `measure` (`--all-intervals`): тела ответов той же функцией, что эндпоинт (3.1), `gzip -9`, `ru_share`, `inactive`, `full_sphere`; событие `knowledge.polities.measured`
 
 ## 3. Сервис знаний (разработчик)
 
-- [ ] 3.1 `knowledge/polities.py`: `PolityLayer` — открытие `mode=ro`, `format_version`, правило активности (единственное место), интервал `valid_from`/`valid_to`, слияние строк одного `id`, порядок по площади и `id`, тело из готовых JSON-фрагментов, LRU по интервалу (число и байты), события `knowledge.polities.served`, `knowledge.polities.unavailable` (`missing`, `format`), `knowledge.polities.rejected` (`bad_year`). Без `shapely`/`ijson`. Юнит-тесты: перебор всех лет фикстуры против наивного фильтра
-- [ ] 3.2 `knowledge/app.py`: `GET /map/polities` (год строкой, проверка −9999…9999, 400 `bad_year`, 503 `polities_unavailable`); `knowledge/main.py`: `PHILOGRAPH_POLITIES_DB`, `PHILOGRAPH_POLITIES_CACHE`, `PHILOGRAPH_POLITIES_CACHE_BYTES`. `lint-imports` чисто
+- [x] 3.1 `knowledge/polities.py`: `PolityLayer` — открытие `mode=ro`, `format_version`, правило активности (единственное место), интервал `valid_from`/`valid_to`, слияние строк одного `id`, порядок по площади и `id`, тело из готовых JSON-фрагментов, LRU по интервалу (число и байты), события `knowledge.polities.served`, `knowledge.polities.unavailable` (`missing`, `format`), `knowledge.polities.rejected` (`bad_year`). Без `shapely`/`ijson`. Юнит-тесты: перебор всех лет фикстуры против наивного фильтра
+- [x] 3.2 `knowledge/app.py`: `GET /map/polities` (год строкой, проверка −9999…9999, 400 `bad_year`, 503 `polities_unavailable`); `knowledge/main.py`: `PHILOGRAPH_POLITIES_DB`, `PHILOGRAPH_POLITIES_CACHE`, `PHILOGRAPH_POLITIES_CACHE_BYTES`. `lint-imports` чисто
 
 ## 8. Реальный артефакт и замеры H2/H3/память (разработчик; тестировщик переносит числа в `verification.md`)
 
