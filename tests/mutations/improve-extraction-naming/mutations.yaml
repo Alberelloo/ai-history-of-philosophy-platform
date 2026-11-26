@@ -1419,3 +1419,21 @@ mutations:
     note: J8-правило — русское основное найденной сущности по правилу понятия
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_rejected_russian_spelling
+  - id: geo-no-journal
+    requirement: Места и координаты из Wikidata
+    patch: geo-no-journal.patch
+    note: Д5 — без events.configure в блоке __main__ команда не пишет журнал
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_geo_enrich_journal
+  - id: epoch-dates-no-journal
+    requirement: Даты эпох из Wikidata
+    patch: epoch-dates-no-journal.patch
+    note: Д5 — без events.configure в блоке __main__ команда не пишет журнал
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_epoch_dates_journal
+  - id: epoch-context-no-journal
+    requirement: Контекстные события из Wikidata
+    patch: epoch-context-no-journal.patch
+    note: Д5 — без events.configure в блоке __main__ команда не пишет журнал
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_epoch_context_journal

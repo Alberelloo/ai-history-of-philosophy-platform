@@ -941,3 +941,15 @@
 - Получено: в stderr событий нет.
 - Красные тесты: `test_geo_enrich_journal`, `test_epoch_dates_journal`, `test_epoch_context_journal` (`tests/knowledge/test_operator_commands_journal.py`).
 - Если подключить приёмник в процессе-обёртке, все три теста зелёные. Подробно — в verification.md migrate-ontology-quality, раздел «третий возврат».
+
+## Тестировщик — Д5 исправлен (068470a), 2026-11-26
+
+На 068470a все 8 тестов `tests/knowledge/test_operator_commands_journal.py` проходят: 8 passed in 12.68s.
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Места и координаты из Wikidata | geo-no-journal | tests/knowledge/test_operator_commands_journal.py::test_geo_enrich_journal | да (1 failed, 1 warning in 1.42s) |
+| Даты эпох из Wikidata | epoch-dates-no-journal | tests/knowledge/test_operator_commands_journal.py::test_epoch_dates_journal | да (1 failed, 1 warning in 1.59s) |
+| Контекстные события из Wikidata | epoch-context-no-journal | tests/knowledge/test_operator_commands_journal.py::test_epoch_context_journal | да (1 failed, 1 warning in 1.61s) |
+
+Все патчи четырёх изменений накладываются на HEAD. `--coverage` по всем четырём изменениям чистый.
