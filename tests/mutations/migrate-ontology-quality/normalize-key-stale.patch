@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..d98a001 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -568,7 +568,7 @@
+@@ -614,7 +614,7 @@ class Migration:
                          conn.execute(
                              update(t.names)
                              .where(t.names.c.id == n["id"])
 -                            .values(text=text, normalized=key)
 +                            .values(text=text)
                          )
-                 self._record(report, action)
+                         run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
                  found.append(action)

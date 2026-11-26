@@ -573,3 +573,42 @@ mutations:
     note: О30 С4 — шаг 2 ставит в очередь пару, закрытую решением «разные»
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_pending_candidate_distinct_not_queued
+  - id: rollback-deletes-later-names
+    requirement: Откат миграции
+    patch: rollback-deletes-later-names.patch
+    note: О31 — откат переименования удаляет и названия, добавленные после запуска
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_added_name
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_name_from_later_merge
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_arbitrary_later_names
+  - id: rollback-later-not-kept
+    requirement: Откат миграции
+    patch: rollback-later-not-kept.patch
+    note: О31 — сущность с поздними названиями не считается в kept
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_added_name
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_name_from_later_merge
+  - id: unknown-run-silent
+    requirement: Откат миграции
+    patch: unknown-run-silent.patch
+    note: О31 — откат неизвестного run_id завершается кодом 0
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_unknown_run
+  - id: negative-limit-accepted
+    requirement: Миграция существующей онтологии
+    patch: negative-limit-accepted.patch
+    note: О31 — отрицательный --limit принимается
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_negative_limit_rejected
+  - id: failed-event-missing
+    requirement: Миграция существующей онтологии
+    patch: failed-event-missing.patch
+    note: О32 — при исключении нет события knowledge.migration.failed
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_failure_mid_run
+  - id: failed-no-run-id-in-stderr
+    requirement: Миграция существующей онтологии
+    patch: failed-no-run-id-in-stderr.patch
+    note: О32 — в stderr нет run_id и команды отката
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_failure_mid_run

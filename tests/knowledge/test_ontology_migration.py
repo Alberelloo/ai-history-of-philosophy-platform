@@ -1830,3 +1830,44 @@ def test_rollback_keeps_arbitrary_later_names(onto, events, spec, data):
     for e in pre.entities:
         if e not in later:
             assert after.name_set(e) == pre.name_set(e), e
+
+
+@req(
+    OM,
+    MIG,
+    invariant="Сбой посреди запуска: failed, run_id в stderr, код 1, откат по run_id ⇒ дамп (О32)",
+)
+def test_failure_mid_run(onto, events, capsys, monkeypatch, tmp_path):
+    stand(onto)
+    before = dump(onto.statements.engine)
+    original = onto.statements.merge_entities
+    calls: list[int] = []
+
+    def broken(kept, removed, **kw):  # первое слияние проходит, второе — исключение
+        if calls:
+            raise RuntimeError("Zq7Marker сбой")
+        calls.append(1)
+        return original(kept, removed, **kw)
+
+    monkeypatch.setattr(onto.statements, "merge_entities", broken)
+    capsys.readouterr()
+    code = main(
+        ["run", "--translate", "model"],
+        fetch=RecordFetch(WD),
+        llm=FakeLLM.by_label(TWO),
+        service=lambda fetch_, llm_: Migration(onto.statements, None, fetch_, llm_),
+    )
+    err = capsys.readouterr().err
+    monkeypatch.undo()
+    assert code == 1 and calls
+    assert dump(onto.statements.engine) != before  # шаги до сбоя записаны
+    [failed] = events.of("knowledge.migration.failed")
+    assert set(failed.fields) - NOISE == {"run_id", "dry_run", "error", "error_kind"}
+    assert failed["error_kind"] == "exception" and failed["dry_run"] is False
+    assert "Zq7Marker" not in json.dumps(dict(failed.fields), ensure_ascii=False, default=str)
+    run_id = failed["run_id"]
+    assert run_id in err and f"rollback {run_id}" in err
+    events.assert_none("knowledge.migration.run")
+    code, _ = cli(onto, capsys, ["rollback", run_id])
+    assert code == 0
+    assert dump(onto.statements.engine) == before

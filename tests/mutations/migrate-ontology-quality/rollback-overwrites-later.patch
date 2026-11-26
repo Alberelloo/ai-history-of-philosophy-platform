@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..9808fe7 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -973,8 +973,6 @@
-                 .all()
+@@ -1027,7 +1027,7 @@ class Migration:
              )
-             primary = [r for r in rows if r["kind"] == "primary"]
--            if not any(r["text"] == p["text"] for r in primary):
--                return False  # переименовали после запуска: чужое изменение
              before = {n["id"]: n for n in p["names_before"]}
-             for r in rows:
-                 if r["id"] not in before:
+             ours = _own_name(p, rows, before)
+-            if ours is None or ours["kind"] != "primary":
++            if ours is None:
+                 return False  # переименовали после запуска: чужое изменение
+             if ours["id"] not in before:
+                 conn.execute(delete(t.names).where(t.names.c.id == ours["id"]))

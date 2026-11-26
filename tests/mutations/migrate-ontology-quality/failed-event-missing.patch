@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..70c81e2 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -458,8 +458,8 @@ class Migration:
+         except Exception as exc:
+             # База могла остаться в промежуточном состоянии: номер запуска — в журнал и
+             # вызывающему, чтобы оператор мог откатить (``rollback <run_id>``).
+-            events.emit(
+-                "knowledge.migration.failed",
++            (lambda **_: None)(
++                name="knowledge.migration.failed",
+                 error_kind="exception",
+                 run_id=report.run_id,
+                 dry_run=dry_run,

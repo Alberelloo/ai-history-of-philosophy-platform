@@ -1,9 +1,11 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..6ad4a55 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -493,8 +493,7 @@
-         )
+@@ -539,8 +539,7 @@ class Migration:
  
      def _record(self, report: Report, action: Action) -> None:
+         """Действие без записи в базу через ``engine`` (слияние ведёт свой журнал ``merges``)."""
 -        if not report.dry_run:
 -            run_actions.record(self.engine, report.run_id, action.kind, action.to_json())
 +        return
