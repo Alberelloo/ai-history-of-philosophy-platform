@@ -57,3 +57,13 @@
 - `knowledge/external_extraction.py`: `task`/`export` (JSONL: строка `task` + строки `fragment`), `read_replies` (JSON-объект или JSONL), `ingest` (через `Filling.apply_reply`; `reply_missing`, `reply_invalid`; `--replace` — откат прежних внешних `done`-запусков версии), `report`/`write_report`, `Price`/`price_for` (тариф `knowledge/extraction_prices.yaml`, аргументы важнее), `build` (база знаний + клиент библиотеки, кэш текстов абзацев версии), `main` (коды выхода 0/2/3). События `knowledge.extraction.exported`, `knowledge.extraction.report`.
 - В дельту «Отчёт о запусках» добавлен столбец «статус» (видно `failed`).
 - Прогон: `test_external_extraction_unit.py` — 9 passed (в том числе повтор без/с `--replace`: число утверждений, подтверждений, атрибуций после `--replace` то же).
+
+## 2026-11-26 — 2.8 проверки перед передачей
+
+- `ruff check .` — чисто; `ruff format --check .` — 710 files already formatted; `lint-imports` — 3 kept, 0 broken (с `PYTHONPATH` worktree); `check_traceability.py` — 420 из 427: нет тестов у шести ADDED `ontology-extraction` и ADDED `llm-gateway` «Сведения о роли» — ждут тестировщика (3.1).
+- `pytest -q tests/knowledge` (до правки миграции): 12 failed, 1677 passed, 1 skipped (29 мин). Разбор:
+  - миграция `knowledge:10` падала на частичных схемах проверок миграций (нет `filling_runs`) — исправлено: без таблицы миграция ничего не делает;
+  - юнит-тесты `test_retired_unit.py`, `test_run_actions_unit.py` ждали, что последняя миграция 9 — ожидание дополнено `10` (это юнит-тесты миграций, не сценарии);
+  - **тесты прежнего контракта — тестировщику (3.3):** `test_mentions_cards.py::test_migration_6_adds_mention_position` (`latest() == 9`), `test_portraits.py::test_migration_7_adds_portraits_and_keeps_old_data` (`upgrade == [7, 8, 9]`), пять тестов `test_entity_dating_extraction.py` и два `test_extraction_entities.py` (см. 2.5);
+  - **не из этого изменения:** `test_epoch_dates_unit.py::test_repository_manifest_is_valid_and_unconfirmed` — проверяет `sources/epochs.yaml` (у эпох есть QID), файл в ветке не менялся — падает и на базе.
+- После правки: `test_retired_unit.py test_run_actions_unit.py test_run_metrics_migration_unit.py` — 7 passed; `test_portraits.py` и `test_mentions_cards.py` падают только на номере последней миграции.

@@ -486,7 +486,10 @@ def _run_metrics(conn: Connection) -> None:
     столбцы из метаданных в ``knowledge:2`` — здесь они пропускаются."""
     from sqlalchemy import inspect, text
 
-    columns = {c["name"] for c in inspect(conn).get_columns("filling_runs", schema=SCHEMA)}
+    inspector = inspect(conn)
+    if not inspector.has_table("filling_runs", schema=SCHEMA):
+        return  # частичная схема (проверки отдельных миграций): столбцы придут с таблицей
+    columns = {c["name"] for c in inspector.get_columns("filling_runs", schema=SCHEMA)}
     for name, kind in RUN_METRICS:
         if name not in columns:
             conn.execute(text(f"ALTER TABLE {SCHEMA}.filling_runs ADD COLUMN {name} {kind}"))
