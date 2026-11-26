@@ -5,7 +5,7 @@
  _YEAR = r"(\d{1,4})"
  _APPROX = r"(?:ок\.|около|c\.|circa)\s*"
 -_ERA_TEXT = r"до\s+н\.\s?э\."
-+_ERA_TEXT = r"до\s+н\.\s?э\.|до\s+нашей\s+эры"
++_ERA_TEXT = r"(?:до\s+н\.\s?э\.|до\s+нашей\s+эры)"
  _ROMAN = r"([ivxlcdm]+)"
  
  _YEARS_FORMAT = re.compile(

@@ -814,3 +814,27 @@
 - желательно: перенести `raw_names` в `strategies.py`.
 
 Разработчику, ревьюверу и Lead'у возвратов нет. Это последний допустимый круг цикла: решение о дальнейшем — за ведущим и владельцем.
+
+## Тестировщик — D1, D5, N11 (2026-11-26, коммиты 774b525 и следующий)
+
+Возврат судьи четвёртого круга (dfb00a3).
+- D1: в `UNPARSED` — тексты даты с маркером только цитаты («384–322 до нашей эры», «ок. 470 до нашей эры», «V в. до нашей эры», «427 ДО НАШЕЙ ЭРЫ»); @example «384–322 до нашей эры» → `dating:unparsed` (EXAMPLES). В тесте полноты `test_quote_only_era_marker_unparsed`: для каждого маркера `ERA_QUOTE − ERA_TEXT` генератор даёт текст даты с ним и причиной `dating:unparsed`.
+- D5: `_any_case` — маркер эры, «около» и «в.» в любом регистре (как есть, ВЕРХНИЙ, С заглавной, вперемешку) у годных и негодных датировок; удаление эры из цитаты для целей `era`/`not_in_quote` — без учёта регистра (`_drop_era`). @example «427–347 ДО Н. Э.» → (−426, −346) `year`, «XVIII В.» → 1701…1800 `century`. Тест полноты `test_marker_case_generated` — по каждому маркеру `ERA_TEXT ∪ APPROX ∪ {в.}`.
+- N11: `stopwords_perturbed` — «_» как разделитель и по краям; @example «some_», «_some» → `stopword`, «every_one» → нет причины (BOUNDARY_EXAMPLES); тест полноты `test_underscore_generated`.
+- `raw_names` перенесён в `strategies.py`; тест полноты больше не импортирует `test_entity_naming` (и через него `naming`): 91 passed в 224 с без предупреждения FastAPI.
+
+Прогоны: test_entity_dating_extraction 15 passed (38 с); test_entity_naming 58 passed (30 с); test_strategies_cover_spec_sets 91 passed (224 с).
+
+Побочная находка при прогоне: мой первый вариант генератора давал «Iв.» без пробела. По spec римское число века должно стоять в цитате отдельным словом, поэтому `not_in_quote` здесь верен. Вариант убран, формат «R в.» оставлен с пробелом.
+
+Мутации — штатный `mutation_check.py --id` в отдельном worktree:
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Извлечение дат | era-text-nashei (D1) | test_entity_dating_extraction.py::test_dating_check_any_input | да (1 failed) |
+| Извлечение дат | era-text-nashei (D1) | test_entity_dating_extraction.py::test_dating_invariant | да (1 failed) |
+| Извлечение дат | era-text-case (D5) | test_entity_dating_extraction.py::test_dating_check_any_input | да (1 failed) |
+| Извлечение дат | era-text-case (D5) | test_entity_dating_extraction.py::test_dating_invariant | да (1 failed) |
+| Валидность названий сущностей | normalize-keeps-underscore (N11) | test_entity_naming.py::test_check_name_any_input | да (1 failed) |
+
+Первая версия D1 (`|до\s+нашей\s+эры` без группы) оказалась эквивалентной. Из-за приоритета `|` в `(?P<era>\s+…)` она не принимала «… до нашей эры», поэтому оба теста прошли. Патч переписан с группой `(?:…|…)`: так мутант действительно принимает маркер, и он упал.
