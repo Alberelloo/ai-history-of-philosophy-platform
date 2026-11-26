@@ -3,8 +3,9 @@
 
 Оракулы (сохранность, А1–А8, ожидаемые снятия, переименования и слияния) построены из того,
 как собран вход, и из спецификации ``ontology-migration``. Модули ``naming``, ``dedupe``,
-``integrity``, ``quality_report`` оракулы не импортируют. ``naming.normalize`` вызывается только
-при сборке входа: так «старые» названия получают столбец ``normalized``, как на стенде.
+``integrity``, ``quality_report`` оракулы не импортируют. Столбец ``normalized`` «старых» названий
+считается по определению спецификации (``strategies.search_form``) или задаётся устаревшим
+(О24: названия в NFD, с пробелами по краям и с прежним ключом поиска).
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from sqlalchemy import delete, select
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import lifespan
 from philograph.knowledge.statements import Attribution, Evidence, Provenance
+from tests.knowledge.strategies import search_form
 
 # --- правила из спецификаций (entity-naming, ontology-migration) --------------------------
 
@@ -85,7 +87,10 @@ LATIN_CONCEPTS = (
     ("mind", "Ум"),
     ("intuition", "Интуиция"),
 )
-RU_PERSONS = ("Кант", "Декарт", "Спиноза", "Платон", "Аристотель", "Гегель", "Фихте", "Паскаль")
+RU_PERSONS = (
+    "Кант", "Декарт", "Спиноза", "Платон", "Аристотель", "Гегель", "Фихте", "Паскаль",
+    "Йоганн", "Шлейермахер",  # й, ё: NFD ≠ NFC (О24)
+)  # fmt: skip
 RU_CONCEPTS = ("Априори", "Душа", "Материя", "Форма")
 RU_POSITIONS = ("Эмпиризм", "Рационализм")
 SOURCES = ("s_a", "s_b")
@@ -103,27 +108,57 @@ RELATIONS = {
 }
 
 
+def name_form(text: str) -> str:
+    """«Название» (entity-naming): ``strip()`` и NFC — форма хранения (О22, О24)."""
+    return unicodedata.normalize("NFC", text.strip())
+
+
+PADS = hst.sampled_from(["", " ", "  ", "\t", "\u00a0", "\u2003"])
+
+
+def old_form(text: str, nfd: bool, left: str, right: str) -> tuple[str, str]:
+    """«Старое» название до О22: NFD и пробелы по краям; ключ поиска прежнего правила —
+    нижний регистр сырого текста (без NFC и обрезки), то есть устаревший."""
+    raw = left + (unicodedata.normalize("NFD", text) if nfd else text) + right
+    return raw, raw.lower()
+
+
+def name_forms_broken(state) -> list[tuple[str, str]]:
+    """Инвариант О24: у действующей сущности текст = strip+NFC, ``normalized`` = нормализация
+    текста по определению спецификации."""
+    return [
+        (e, n["text"])
+        for e in state.active()
+        for n in state.names.get(e, [])
+        if n["text"] != name_form(n["text"]) or n["normalized"] != search_form(n["text"])
+    ]
+
+
 def reason_of(type_: str, label: str) -> str | None:
     """Причина правила названий для названий пулов (по построению входа)."""
-    return GARBAGE.get((type_, label))
+    return GARBAGE.get((type_, name_form(label)), GARBAGE.get((type_, label)))
 
 
 # --- сборка «старой» онтологии ------------------------------------------------------------
 
 
-def raw_entity(onto, type_: str, names: list[tuple[str, str, str]], qid: str | None = None) -> str:
-    """Сущность «старых данных» в обход правила названий — как на стенде до миграции."""
-    from philograph.knowledge.naming import normalize  # только сборка входа
+def raw_entity(onto, type_: str, names: list[tuple], qid: str | None = None) -> str:
+    """Сущность «старых данных» в обход правила названий — как на стенде до миграции.
 
+    Название — ``(lang, text, kind)`` или ``(lang, text, kind, normalized)`` с устаревшим ключом."""
     entity_id = f"e_{uuid.uuid4().hex[:12]}"
     with onto.entities.engine.begin() as conn:
         conn.execute(
             t.entities.insert().values(id=entity_id, type=type_, primary={}, redirect_to=None)
         )
-        for lang, text, kind in names:
+        for lang, text, kind, *stale in names:
             conn.execute(
                 t.names.insert().values(
-                    entity_id=entity_id, lang=lang, text=text, normalized=normalize(text), kind=kind
+                    entity_id=entity_id,
+                    lang=lang,
+                    text=text,
+                    normalized=stale[0] if stale else search_form(text),
+                    kind=kind,
                 )
             )
         if qid:
@@ -355,8 +390,6 @@ def losses(before: State, after: State) -> tuple[list[str], list[tuple]]:
         if not ok:
             lost.append(sid)
             continue
-        if s["status"] == "verified" and not any(x["status"] == "verified" for x in ok):
-            lost.append(sid)
         for a in before.attributions.get(sid, []):
             who = after.resolve(a["who"]) if a["who_kind"] == "entity" else a["who"]
             if a["who_kind"] == "entity" and after.retired(who):
@@ -374,6 +407,35 @@ def losses(before: State, after: State) -> tuple[list[str], list[tuple]]:
             if want not in have:
                 lost_attrs.append((sid, want))
     return lost, lost_attrs
+
+
+def verified_dropped(before: State, after: State) -> list[str]:
+    """«Проверенное человеком не трогается»: проверенное утверждение (конец не снят, не петля)
+    после запуска — проверенное, само или его цель свёртки. Не входит в определение потери
+    (там только «нет / не действующее / подменено»), поэтому отдельно от ``losses``."""
+    dropped = []
+    for sid, s in before.statements.items():
+        if s["status"] != "verified":
+            continue
+        subj, obj = after.resolve(s["subject"]), after.resolve(s["object"])
+        if after.retired(subj) or after.retired(obj) or (obj is not None and subj == obj):
+            continue
+        want = (s["type"], ends(s["type"], subj, obj), json.dumps(s["value"], sort_keys=True))
+        same = after.statements.get(sid)
+        if same is not None and same["status"] == "verified":
+            continue
+        if not any(
+            x["status"] == "verified"
+            and (
+                x["type"],
+                ends(x["type"], x["subject"], x["object"]),
+                json.dumps(x["value"], sort_keys=True),
+            )
+            == want
+            for x in after.statements.values()
+        ):
+            dropped.append(sid)
+    return dropped
 
 
 # --- А1–А8 по формулам спецификации -------------------------------------------------------
@@ -400,10 +462,12 @@ def a3(state: State) -> int:
 
 def a4_pairs(state: State) -> set[frozenset]:
     p = set(persons(state))
+    # «нормализованное название» — по правилу, а не по хранимому столбцу (он может устареть)
     primary = {
-        i: {n["normalized"] for n in state.names.get(i, []) if n["kind"] == "primary"} for i in p
+        i: {search_form(n["text"]) for n in state.names.get(i, []) if n["kind"] == "primary"} - {""}
+        for i in p
     }
-    every = {i: {n["normalized"] for n in state.names.get(i, [])} for i in p}
+    every = {i: {search_form(n["text"]) for n in state.names.get(i, [])} - {""} for i in p}
     names = {frozenset((a, b)) for a in p for b in p if a != b and primary[a] & every[b]}
     queue, distinct = set(), set()
     for item in state.review:
@@ -803,6 +867,17 @@ def ontologies(draw, *, manifest: bool = True) -> dict[str, Any]:
     spec["portraits"] = (
         draw(hst.lists(hst.sampled_from(p_keys), max_size=2, unique=True)) if p_keys else []
     )
+    # О24: «старые» названия — NFD, пробелы по краям, устаревший ключ поиска
+    plain = [e["key"] for e in spec["entities"] if e["type"] != "source"]
+    spec["decorate"] = (
+        draw(
+            hst.dictionaries(
+                hst.sampled_from(plain), hst.tuples(hst.booleans(), PADS, PADS), max_size=4
+            )
+        )
+        if plain
+        else {}
+    )
     return spec
 
 
@@ -811,8 +886,15 @@ def build(onto, spec: dict[str, Any]) -> World:
     from tests.knowledge.wd_records import record
 
     w = World()
+    decorate = spec.get("decorate", {})
     for e in spec["entities"]:
-        eid = raw_entity(onto, e["type"], e["names"], e.get("qid"))
+        names = e["names"]
+        if e["key"] in decorate:
+            names = [
+                (lang, *old_form(text, *decorate[e["key"]]), kind) for lang, text, kind in names
+            ]
+            names = [(lang, text, kind, stale) for lang, text, stale, kind in names]
+        eid = raw_entity(onto, e["type"], names, e.get("qid"))
         w.ids[e["key"]], w.types[e["key"]] = eid, e["type"]
         if e.get("garbage"):
             w.garbage[e["key"]] = e["garbage"]
@@ -861,7 +943,12 @@ def build(onto, spec: dict[str, Any]) -> World:
 
 def name_texts(spec: dict[str, Any]) -> set[str]:
     """Тексты названий входа, которые сторожат журнал (не короче 4 знаков)."""
-    out = {text for e in spec["entities"] for _l, text, _k in e["names"] if len(text.strip()) >= 4}
+    out = {
+        name_form(text)
+        for e in spec["entities"]
+        for _l, text, _k in e["names"]
+        if len(text.strip()) >= 4
+    }
     out |= {v for v in spec["llm"].values() if len(v) >= 4}
     return out
 
@@ -919,6 +1006,7 @@ SYMPTOMS_SPEC: dict[str, Any] = {
         _e("p:Гомер", "person", "Гомер", "ru", qid="Q6691"),
         _e("p:Омир", "person", "Гомер", "ru") | {"names": [("ru", "Омир", "primary")]},
         _e("p:Сократ", "person", "Сократ", "ru"),
+        _e("p:Йоганн", "person", "Йоганн", "ru"),
         _e("s:A Treatise of Human Nature", "source", "A Treatise of Human Nature"),
         _e("s:3.1", "source", "3.1"),
     ],
@@ -927,6 +1015,13 @@ SYMPTOMS_SPEC: dict[str, Any] = {
         "Q913": {"P569": ("-0469-00-00T00:00:00Z", 9), "P570": ("-0399-00-00T00:00:00Z", 9)}
     },
     "llm": {"causality": "Причинность"},
+    # О24: NFD, пробелы и NBSP по краям, устаревший ключ поиска — у слитых и у одиночки
+    "decorate": {
+        "p:Йоганн": (True, " ", "\t"),
+        "p:Юм": (False, "", "\u00a0"),
+        "p:Berkeley#1": (True, "  ", ""),
+        "c:causality": (False, "\u2003", " "),
+    },
     "manifest": [
         {"key": "p:Омир", "qid": "Q6691", "decision": "accepted", "holder": "p:Гомер"},
         {"key": "p:Сократ", "qid": "Q913", "decision": "accepted", "holder": None},

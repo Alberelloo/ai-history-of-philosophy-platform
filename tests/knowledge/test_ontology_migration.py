@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -46,13 +47,17 @@ from .migration_world import (
     event_values,
     is_ru,
     losses,
+    name_forms_broken,
     name_texts,
+    old_form,
     ontologies,
     raw_entity,
     reason_of,
     shown,
+    verified_dropped,
     wipe,
 )
+from .strategies import sentinel
 from .wd_records import RecordFetch, record
 
 req = pytest.mark.req
@@ -90,6 +95,16 @@ KEYS = {
     "knowledge.quality.measured": {f"a{i}" for i in range(1, 9)} | {"passed", "failed"},
 }
 MARKER = "Zq7Marker"
+SPEC_STEPS = (  # «Миграция существующей онтологии», шаги 1–8 по порядку (О24)
+    "normalize_names",
+    "manifest_qids",
+    "lang_fix",
+    "retire",
+    "wikidata_labels",
+    "translate",
+    "dedupe",
+    "verify",
+)
 HUMAN = ("Q5",)
 WD = {
     "Q41568": record("Q41568", ru="Юм", en="Hume", classes=HUMAN),
@@ -304,7 +319,10 @@ def test_stand_synthetic(onto, events, capsys, tmp_path):
     assert report["statements"]["dropped_garbage"] == 3
     assert report["a1"]["after"] > report["a1"]["before"]
     # журнал
-    assert sorted(e["step"] for e in events.of("knowledge.migration.step")) == sorted(STEPS)
+    # по одному step на каждый шаг спецификации, в её порядке (О24: восемь шагов; текст
+    # сценария стенда всё ещё говорит «семи» — расхождение отмечено в verification.md)
+    assert [e["step"] for e in events.of("knowledge.migration.step")] == list(SPEC_STEPS)
+    assert tuple(STEPS) == SPEC_STEPS
     assert len(events.of("knowledge.entity.retired")) == 7
     merged = sorted(e["reason"] for e in events.of("knowledge.entity.merged"))
     assert merged == ["merge:name", "merge:name", "merge:name", "merge:qid_confirmed"]
@@ -497,6 +515,43 @@ def _expect_run(world, after: State) -> None:
         assert len({after.resolve(world.ids[k]) for k in cluster}) == 1, cluster
     for e in after.active():  # ни одна действующая (кроме источников) не даёт причины
         assert reason_of(after.entities[e]["type"], after.label(e)) is None
+    assert name_forms_broken(after) == []  # О24: текст strip+NFC, normalized по правилу
+
+
+@req(OM, MIG, scenario="Форма названий")
+def test_name_form(onto, events, clock):
+    token = sentinel()
+    nfd = unicodedata.normalize("NFD", "Йоганн")
+    assert nfd != "Йоганн"
+    raw, stale = old_form("Йоганн", True, "", "")
+    johann = raw_entity(onto, "person", [("ru", raw, "primary", stale)])
+    padded = raw_entity(onto, "person", [("ru", " Кант ", "primary", " кант ")])
+    kant = raw_entity(onto, "person", [("ru", "Кант", "primary")])
+    other = raw_entity(onto, "person", [("ru", f"Фихте {token}", "primary")])
+    surface = Surface(onto, clock)
+    assert johann not in surface.find("Йоганн").text
+    assert padded not in surface.find("Кант").text
+    before = dump(onto.statements.engine)
+    report = migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert [n["text"] for n in after.names[johann]] == ["Йоганн"]
+    assert after.names[johann][0]["normalized"] == "йоганн"  # NFC, нижний регистр
+    assert johann in Surface(onto, clock).find("Йоганн").text
+    assert after.resolve(padded) == after.resolve(kant)
+    assert {n["text"] for n in after.names[padded]} == {"Кант"}
+    assert report.to_json()["names_normalized"] == 2
+    [step] = events.where("knowledge.migration.step", step="normalize_names")
+    assert step["actions"] == 2 and step["dry_run"] is False
+    [merged] = events.of("knowledge.entity.merged")
+    assert merged["reason"] == "merge:name"
+    assert {merged["kept"], merged["removed"]} == {padded, kant}
+    assert name_forms_broken(after) == []
+    assert other in after.active()
+    for e in events.items:  # тексты названий в событиях не появляются
+        assert token not in json.dumps(e.fields, ensure_ascii=False, default=str), e.name
+    check_keys(events)
+    Migration(onto.statements, None, RecordFetch(WD), None).rollback(report.run_id)
+    assert dump(onto.statements.engine) == before
 
 
 @req(OM, MIG, scenario="Инвариант миграции")
@@ -514,11 +569,16 @@ def test_migration_invariant(onto, events, spec):
     plan = Migration(onto.statements, None, fetch, llm).plan(manifest=world.manifest)
     assert dump(engine) == before_dump and llm.calls == []  # оракул 1
     off = Migration(onto.statements, None, fetch, None).run(manifest=world.manifest)
-    recorded = [a["payload"] for a in run_actions.actions(engine, off.run_id)]
+    # Оракул 2: вид, сущность и значения; ``step`` — служебная метка строки журнала (запись
+    # QID шага manifest_qids идёт правилом команды QID без неё), ``names_before`` — поле отката.
+    service = {"step", "names_before"}
     recorded = [
-        {k: v for k, v in a.items() if k != "names_before"} for a in recorded if "step" in a
+        {k: v for k, v in a["payload"].items() if k not in service}
+        for a in run_actions.actions(engine, off.run_id)
     ]
-    assert [a.to_json() for a in plan.actions] == recorded  # оракул 2
+    assert [{k: v for k, v in a.to_json().items() if k not in service} for a in plan.actions] == (
+        recorded
+    )
     mid = State.read(engine)
     planned_retired = {a.payload["entity"] for a in plan.actions if a.step == "retire"}
     assert planned_retired == {e for e in mid.entities if mid.retired(e)}  # оракул 3
@@ -542,6 +602,8 @@ def test_migration_invariant(onto, events, spec):
     for text_ in name_texts(spec):
         assert text_ not in blob, text_
     check_keys(events)
+    # «Проверенное человеком не трогается» на любых онтологиях — последним (Д2-mig).
+    assert verified_dropped(before, mid) == [] and verified_dropped(before, after) == []
 
 
 # =========================== Снятие =======================================================
@@ -637,7 +699,8 @@ def test_retire_invariant(onto, events, clock, spec):
         } == counts
     retired = {e for e in after.entities if after.retired(e)}
     assert retired == {world.ids[k] for k in world.garbage}
-    blob = shown(Surface(onto, clock), after)
+    surface = Surface(onto, clock)
+    blob = shown(surface, after)
     for e in retired:
         assert e not in blob, e
     for sid in _hidden_statements(after):
@@ -645,7 +708,7 @@ def test_retire_invariant(onto, events, clock, spec):
     for e in retired:  # поиск по названию
         label = after.label(e)
         if label.strip():
-            assert e not in Surface(onto, clock).find(label).text
+            assert e not in surface.find(label).text
 
 
 # =========================== Перевод ======================================================

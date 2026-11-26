@@ -45,3 +45,4 @@ enforce:
   - entity-naming
   - person-quality
   - entity-dating
+  - ontology-migration
