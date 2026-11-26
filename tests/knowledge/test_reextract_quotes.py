@@ -113,7 +113,16 @@ def test_soft_hyphen_and_accent(stand, events):
     [
         (stmt("Иероним", "holds", "Тезис", 1, "Иероним спорил с Августином"), "quote_not_found"),
         (stmt("Иероним", "holds", "Тезис", 9, "Кант писал"), "paragraph_out_of_window"),
-        (stmt("Иероним", "holds", "Тезис", 1, "Кант писал… спорил", ), "quote_too_short"),
+        (
+            stmt(
+                "Иероним",
+                "holds",
+                "Тезис",
+                1,
+                "Кант писал… спорил",
+            ),
+            "quote_too_short",
+        ),
     ],
 )
 def test_no_orphans(stand, events, statement, expected_code):
@@ -169,7 +178,9 @@ CASES = [
 
 
 @pytest.mark.parametrize(("label", "quote", "ok"), CASES, ids=[c[0] for c in CASES])
-@req(EO, QUOTE, invariant="Одна функция сверки: извлечение, Statements.add, перепроверка, датировка")
+@req(
+    EO, QUOTE, invariant="Одна функция сверки: извлечение, Statements.add, перепроверка, датировка"
+)
 def test_one_check_everywhere(stand, onto, events, label, quote, ok):
     expected = None if ok else (codes.QUOTE_TOO_SHORT if label.startswith("слишком") else "nf")
     # функция сверки
@@ -188,7 +199,10 @@ def test_one_check_everywhere(stand, onto, events, label, quote, ok):
             expected if expected != "nf" else "quote_not_found"
         )
     # 2. Statements.add
-    zar, happy = onto.person(f"Зар {label}"), onto.entities.create("position", [("ru", f"Сч {label}", "primary")])
+    zar, happy = (
+        onto.person(f"Зар {label}"),
+        onto.entities.create("position", [("ru", f"Сч {label}", "primary")]),
+    )
     try:
         onto.statements.add(
             zar,
@@ -326,7 +340,7 @@ def typographic(text: str, rnd: random.Random) -> str:
         if ch == "-":
             out.append(rnd.choice(DASHES + "-"))
         elif ch == " ":
-            out.append(rnd.choice(SPACES + [" "]))
+            out.append(rnd.choice([*SPACES, " "]))
         elif ch == "е":
             out.append(rnd.choice("её"))
         elif ch.islower() and rnd.random() < 0.2:
@@ -364,7 +378,9 @@ def test_any_substring_found_property(ws, seed, data):
     assert quotes.check(typographic(sub, rnd), text) is None
     assert quotes.check(sub, typographic(text, rnd)) is None
     # внешние кавычки любых видов
-    left, right = rnd.choice([('"', '"'), ("«", "»"), ("„", "“"), ("“", "”"), ("'", "'"), ("‘", "’")])
+    left, right = rnd.choice(
+        [('"', '"'), ("«", "»"), ("„", "“"), ("“", "”"), ("'", "'"), ("‘", "’")]
+    )
     assert quotes.check(left + sub + right, text) is None
     # тот же текст в разложенной (NFD) форме
     import unicodedata
@@ -426,7 +442,7 @@ HOSTILE = [
     "…",
     "[...]",
     "(...)",
-    ' ... ',
+    " ... ",
     '""',
     "«»",
     '"..."',
@@ -463,7 +479,11 @@ def test_overlapping_parts_rejected():
     assert quotes.check("abcdefghij…efghijklmnop", text) == "quote_not_found"
 
 
-@req(EO, QUOTE, invariant="Единственная часть короче 10 знаков допустима (минимум — только при многоточии)")
+@req(
+    EO,
+    QUOTE,
+    invariant="Единственная часть короче 10 знаков допустима (минимум — только при многоточии)",
+)
 def test_single_short_part_allowed():
     assert quotes.check("что", "Он знает, что есть истина") is None
     assert quotes.check("…что…", "Он знает, что есть истина") is None  # одна часть
@@ -497,7 +517,14 @@ def test_checks_precede_entity_resolution(stand, events):
         [text],
         {
             "statements": [
-                stmt("Кант", "holds", "Опыт", 1, "нет такой цитаты в абзаце", subject_type="character"),
+                stmt(
+                    "Кант",
+                    "holds",
+                    "Опыт",
+                    1,
+                    "нет такой цитаты в абзаце",
+                    subject_type="character",
+                ),
                 stmt("Кант", "holds", "Опыт", 5, "нет такой цитаты в абзаце"),
                 stmt("Кант", "holds", "Опыт", 1, "нет такой цитаты в абзаце"),
             ]

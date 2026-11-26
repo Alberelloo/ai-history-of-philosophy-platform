@@ -67,7 +67,9 @@ def assert_event_keys(events) -> None:
 
 def check_run_accounting(stand, events, run_id: str | None = None) -> dict[str, Any]:
     """dropped = Σ drop_reasons = число событий с run_id запуска; события — по кодам."""
-    row = one_run(stand) if run_id is None else next(r for r in runs(stand) if r["run_id"] == run_id)
+    row = (
+        one_run(stand) if run_id is None else next(r for r in runs(stand) if r["run_id"] == run_id)
+    )
     mine = [e for e in events.of(DROPPED) if e["run_id"] == row["run_id"]]
     assert row["dropped"] == sum((row["drop_reasons"] or {}).values()) == len(mine)
     counted: dict[str, int] = {}

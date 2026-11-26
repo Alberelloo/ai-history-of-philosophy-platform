@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import itertools
 import re
 
 import pytest
@@ -200,7 +201,7 @@ def test_fragment_rules_property(stand, lengths, goal, size):
             # кроме последнего в главе: длина впервые достигла цели или абзацев `size`
             assert (total >= goal and before < goal) or len(w) == size
     # перекрытие: следующий начинается с последнего, если в предыдущем больше одного
-    for prev, nxt in zip(got, got[1:], strict=False):
+    for prev, nxt in itertools.pairwise(got):
         if prev[0]["chapter_id"] != nxt[0]["chapter_id"]:
             continue
         expected = prev[-1]["id"] if len(prev) > 1 else None
@@ -224,9 +225,7 @@ def test_changed_filters_fragments_property(stand, lengths, goal, size, data):
     stand.filling.fragment_size = size
     everything = stand.filling.fragments(paragraphs, None)
     changed = set(
-        data.draw(
-            st.lists(st.sampled_from([p["id"] for p in paragraphs]), max_size=6, unique=True)
-        )
+        data.draw(st.lists(st.sampled_from([p["id"] for p in paragraphs]), max_size=6, unique=True))
     )
     got = stand.filling.fragments(paragraphs, changed)
     all_ids = [[p["id"] for p in w] for w in everything]
