@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -561,7 +561,7 @@
+         try:
+             stored = self.statements.check_value(type_, value, {}, attributions, emit=True)
+             if self.statements.find(entity_id, type_, value=stored, qualifiers={}):
+-                return False
++                return True
+             if not report.dry_run:
+                 self.statements.add(
+                     entity_id,

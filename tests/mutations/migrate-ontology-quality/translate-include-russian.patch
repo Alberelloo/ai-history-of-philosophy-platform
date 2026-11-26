@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..23bfb8e 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -757,7 +757,7 @@ class Migration:
+     def _step_translate(
+         self, view: View, report: Report, *, translate, batch, limit, estimate, **_: Any
+     ) -> list[Action]:
+-        todo = self._not_russian(view)
++        todo = [e for e in view.active() if view.entities[e]["type"] != SOURCE]
+         if limit is not None:
+             todo = todo[:limit]
+         report.to_translate = len(todo)

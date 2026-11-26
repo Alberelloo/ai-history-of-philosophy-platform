@@ -466,6 +466,23 @@ def test_fetch_failed_and_duplicate_qid(op, onto, events):
     assert [four(d["value"]) for d in datings(onto, mid)] == [(1400, 1400, 1600, 1600)]
 
 
+@req(
+    EP,
+    FROM_WD,
+    invariant="added: сущность получает внешний идентификатор Wikidata, если его не было",
+)
+def test_added_from_manifest_gets_external_id(op, onto, events):
+    mid = epoch(onto, "Возрождение")
+    assert onto.entities.externals("wikidata") == {}
+    fetch = RecordFetch({"Q900003": dated("Q900003", year(1400), year(1600))})
+    op.manifest(entry("Возрождение", wikidata="Q900003"))
+    code, report, _ = op.run(fetch, "apply")
+    assert code == 0
+    assert [e["result"] for e in report["epochs"]] == ["added"]
+    assert onto.entities.by_external("wikidata", "Q900003") == mid
+    assert [four(d["value"]) for d in datings(onto, mid)] == [(1400, 1400, 1600, 1600)]
+
+
 def mixed_world(onto) -> dict:
     """По одной эпохе на каждый ``result`` таблицы требования."""
     added = epoch(onto, "Просвещение")

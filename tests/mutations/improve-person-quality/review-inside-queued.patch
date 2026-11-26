@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -225,7 +225,7 @@
+     for p, v in verdicts.items():
+         if v.kind == "review" and p not in review:
+             mapped = pair_key(merged_with.get(p[0], p[0]), merged_with.get(p[1], p[1]))
+-            if mapped[0] == mapped[1] or mapped in decided:
++            if mapped in decided:
+                 continue  # обе стороны слиты в одну сущность или человек решил «разные»
+             review.setdefault(mapped, v.reason)
+         elif v.kind == "apart":

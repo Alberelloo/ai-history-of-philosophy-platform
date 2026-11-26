@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -702,7 +702,7 @@
+             if reply is not None:
+                 self._check(report, 1, packs[0], view, reply)  # счёт причин; не записывается
+             return []
+-        if translate != "model" or self.llm is None or report.dry_run:
++        if self.llm is None or report.dry_run:
+             return []
+         found = []
+         for number, pack in enumerate(packs, start=1):

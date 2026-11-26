@@ -81,6 +81,17 @@ def fingerprint(engine: Engine) -> tuple:
     имена, слияния, упоминания, внешние идентификаторы и версия реестра."""
     count = func.count
     with engine.begin() as conn:
+        extra = [
+            # Переименование и язык меняют подпись без новых строк: число основных русских.
+            select(count())
+            .select_from(t.names)
+            .where(and_(t.names.c.kind == "primary", t.names.c.lang == "ru"))
+            .scalar_subquery()
+        ]
+        if t.has_retired(conn):  # снятие — обновление строки сущности
+            extra.append(
+                select(count()).select_from(t.entities).where(t.retired()).scalar_subquery()
+            )
         return tuple(
             conn.execute(
                 select(
@@ -97,9 +108,19 @@ def fingerprint(engine: Engine) -> tuple:
                     select(func.max(t.mentions.c.id)).scalar_subquery(),
                     select(func.max(t.registry_versions.c.version)).scalar_subquery(),
                     select(count()).select_from(t.external_ids).scalar_subquery(),
+                    *extra,
                 )
             ).one()
         )
+
+
+def label_of(names: list[Mapping[str, Any]], default: str = "") -> str:
+    """Подпись сущности: основное русское, иначе первое основное, иначе первое любое
+    (названия — по порядку записи). Одно правило для снимка, миграции и замера."""
+    primary = [n for n in names if n["kind"] == "primary"]
+    ru = [n for n in primary if n["lang"] == "ru"]
+    pick = (ru or primary or list(names) or [{"text": default}])[0]
+    return pick["text"]
 
 
 def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
@@ -110,7 +131,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             r["id"]: {"type": r["type"], "primary": r["primary"] or {}}
             for r in conn.execute(
                 select(t.entities.c.id, t.entities.c.type, t.entities.c.primary).where(
-                    t.entities.c.redirect_to.is_(None)
+                    t.active_in(conn)
                 )
             ).mappings()
         }
@@ -130,6 +151,7 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
             .mappings()
             .all()
         )
+        retired = t.retired_ids(conn)
         attrs: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for r in conn.execute(select(t.attributions)).mappings():
             attrs[r["statement_id"]].append(dict(r))
@@ -140,7 +162,8 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
         for source_id, entity_id in conn.execute(
             select(t.mentions.c.source_id, t.mentions.c.entity_id)
         ):
-            mentioned[source_id].add(entity_id)
+            if entity_id in entities:  # только действующие (не слитые и не снятые)
+                mentioned[source_id].add(entity_id)
         library: dict[str, str] = {}
         wikidata: dict[str, str] = {}
         for entity_id, system, value in conn.execute(
@@ -152,24 +175,20 @@ def load(engine: Engine, stamp: tuple, built_at: datetime) -> Snapshot:
                 library[value] = entity_id
             else:
                 wikidata.setdefault(entity_id, value)
-    labels = {}
-    for entity_id in entities:
-        own = names.get(entity_id, [])
-        primary = [n for n in own if n["kind"] == "primary"]
-        ru = [n for n in primary if n["lang"] == "ru"]
-        pick = (ru or primary or own or [{"text": entity_id}])[0]
-        labels[entity_id] = pick["text"]
+    labels = {entity_id: label_of(names.get(entity_id, []), entity_id) for entity_id in entities}
     statements = []
     for r in rows:
-        s = {
-            **dict(r),
-            "attributions": attrs.get(r["id"], []),
-            "evidence": evs.get(r["id"], []),
-        }
-        if s["attributions"] and all(a["hidden"] for a in s["attributions"]):
-            continue  # основано только на снятом источнике
+        own = attrs.get(r["id"], [])
+        # Атрибуция с автором — снятой сущностью не показывается; утверждение, у которого
+        # не осталось видимых атрибуций, — тоже (как «только снятый источник»).
+        shown = [a for a in own if not (a["who_kind"] == "entity" and a["who"] in retired)]
+        s = {**dict(r), "attributions": shown, "evidence": evs.get(r["id"], [])}
+        if own and all(a["hidden"] for a in shown):
+            continue  # основано только на снятом источнике или снятом авторе
         if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
             continue
+        if s["object"] is not None and s["object"] == s["subject"]:
+            continue  # петля после слияния двух концов: хранится, но не показывается
         statements.append(s)
     return Snapshot(
         entities=entities,

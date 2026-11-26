@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -279,7 +279,7 @@
+             ids = list(
+                 dict.fromkeys(
+                     conn.scalars(
+-                        select(t.names.c.entity_id).where(t.names.c.normalized == normalize(name))
++                        select(t.names.c.entity_id).where(t.names.c.normalized == normalize(name)).where(t.names.c.kind == "primary")
+                     )
+                 )
+             )

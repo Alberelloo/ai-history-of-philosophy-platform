@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -301,7 +301,7 @@
+     if original.get("text"):
+         spellings.append((original["text"], original.get("lang")))
+     ru = item.get("ru")
+-    if ru and is_russian(ru) and check_name(type_, ru) is None:
++    if ru and check_name(type_, ru) is None:
+         names = [(lang_for(ru, "ru"), ru, "primary")]
+     else:
+         names = [(lang_for(item["name"]), item["name"], "primary")]

@@ -1,0 +1,10 @@
+diff --git a/src/philograph/knowledge/epoch_dates.py b/src/philograph/knowledge/epoch_dates.py
+index 9a1a133..6d72b73 100644
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -518,5 +518,4 @@ if __name__ == "__main__":
+     # идут в stderr. Вызов main() из тестов оставляет приёмник фикстуры как есть.
+     if hasattr(sys.stderr, "reconfigure"):
+         sys.stderr.reconfigure(encoding="utf-8")
+-    events.configure(sinks=[events.json_sink(sys.stderr)])
+     sys.exit(main())

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -529,7 +529,7 @@
+                 .where(t.mentions.c.id.in_(moved.get("mentions", [])))
+                 .values(entity_id=m["removed"])
+             )
+-            for system, value in moved.get("externals", []):
++            for system, value in []:
+                 conn.execute(
+                     update(t.external_ids)
+                     .where(and_(t.external_ids.c.system == system, t.external_ids.c.value == value))

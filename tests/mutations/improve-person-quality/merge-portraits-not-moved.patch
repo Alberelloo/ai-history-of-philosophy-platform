@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -456,7 +456,7 @@
+                     t.portraits.c.entity_id == removed
+                 )
+             ).all()
+-            moved_portraits = [pid for pid, phash in portraits if phash not in kept_phash]
++            moved_portraits = []
+             portraits_kept = [pid for pid, phash in portraits if phash in kept_phash]
+             conn.execute(
+                 update(t.names).where(t.names.c.entity_id == removed).values(entity_id=kept)

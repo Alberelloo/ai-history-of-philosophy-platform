@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -137,8 +137,6 @@
+                 resolved[name] = kept
+                 self._russian_primary(self.entities.get(kept), item)
+                 return kept
+-        if len(found) > 1:
+-            return self._ambiguous(name, found, resolved)
+         if not type_:
+             raise Skip(ENTITY_NO_TYPE)
+         names = names_for(type_, item) if item else [("ru", name, "primary")]

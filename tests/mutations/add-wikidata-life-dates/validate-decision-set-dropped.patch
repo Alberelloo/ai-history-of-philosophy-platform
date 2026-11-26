@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -147,7 +147,7 @@
+         if qid is not None and not (isinstance(qid, str) and QID.fullmatch(qid)):
+             problems.append(f"{where}: wikidata не по шаблону Q<число>")
+         decision = entry.get("decision", "pending")
+-        if decision not in DECISIONS:
++        if False:
+             problems.append(f"{where}: decision не из {', '.join(DECISIONS)}")
+         elif decision in CONFIRMED and qid is None:
+             problems.append(f"{where}: decision {decision} без wikidata")

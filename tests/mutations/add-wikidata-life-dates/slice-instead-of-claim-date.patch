@@ -1,0 +1,15 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -186,7 +186,11 @@
+     ``no_dates``."""
+     props = ("P569", "P570") if kind == PERSON else ("P577",)
+     claims = {p: record.best(p) for p in props}
+-    found = {p: claim_date(c) for p, c in claims.items()}
++    found = {
++        p: claim_date(c)
++        and FuzzyDate(*[int(c.value['time'][1:5])] * 4, 'year', c.value['time'][1:5])
++        for p, c in claims.items()
++    }
+     for p in props:
+         if claims[p] is not None and found[p] is None:
+             raise Skip(p, "bad_value")

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -377,7 +377,7 @@
+             "knowledge.life_dates.suggested",
+             entities=processed,
+             candidates=candidates_total,
+-            auto=auto,
++            auto=0,
+         )
+         return result
+ 

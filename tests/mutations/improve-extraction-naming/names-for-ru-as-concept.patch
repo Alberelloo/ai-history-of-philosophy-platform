@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/naming.py b/src/philograph/knowledge/naming.py
+index 22b9a5d..685f8c0 100644
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -307,7 +307,7 @@ def names_for(type_: str, item: dict[str, Any]) -> list[tuple[str, str, str]]:
+     if original.get("text"):
+         spellings.append((original["text"], original.get("lang")))
+     ru = item.get("ru")
+-    if ru and is_russian(ru) and check_name(type_, ru) is None:
++    if ru and is_russian(ru) and check_name("concept", ru) is None:
+         names = [(lang_for(ru, "ru"), ru, "primary")]
+     else:
+         names = [(lang_for(item["name"]), item["name"], "primary")]

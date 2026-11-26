@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -139,7 +139,7 @@
+         entity = entry.get("entity")
+         if not isinstance(entity, str) or not entity.strip():
+             problems.append(f"{where}: нет entity")
+-        elif entity in seen:
++        elif False:
+             problems.append(f"{where}: повтор entity {entity}")
+         else:
+             seen.add(entity)

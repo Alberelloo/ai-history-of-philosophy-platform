@@ -1,0 +1,781 @@
+# Verification
+
+## Итог: требование → доказывающий тест (HEAD 09087b9)
+
+Сводка на текущий HEAD. Тесты — по маркерам `@pytest.mark.req` (собраны из `tests/` разбором AST, имена сверены с файлами). Мутации — по `expect_fail` в `tests/mutations/improve-person-quality/mutations.yaml`: каждая проверена `mutation_check.py --id`, все патчи накладываются на HEAD. Инвариант — property-тест (`@given`) или тест сценария «Инвариант …». Нормативные фразы — тесты с `invariant=` в маркере. История кругов — ниже, в разделах ролей.
+
+### ontology-entities / Поиск дублей
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любой онтологии каждая пара одного типа, у которой основное название одной совпадает с каким-либо названием другой, попадает в кандидаты. Пара разных типов не попадает никогда. | `test_candidates_invariant` | candidates-primary-only, candidates-no-type |
+| Сценарий «Кандидаты» | `test_candidates`, `test_candidates_need_equal_dates_for_last_word` | candidates-primary-only, candidates-dates-ignored, candidates-last-word-dropped |
+| Сценарий «Основное название на разных записях» | `test_primary_on_different_records` | — |
+| Сценарий «Разные типы» | `test_different_types` | candidates-no-type |
+| Нормативные фразы (тестов: 1) | `test_last_word_group_cap` | capped-event-leaks-name, capped-group-aborts, capped-group-stops-scan |
+| Требование целиком | файлы: `tests/knowledge/test_entity_merge.py`, `tests/knowledge/test_registry_entities.py`; маркеров 7 | все 10: candidates-primary-only, candidates-no-type, group-cap-silent, group-cap-off, candidates-ignore-variants, candidates-dates-ignored, candidates-last-word-dropped, capped-event-leaks-name, capped-group-aborts, capped-group-stops-scan |
+| (мутации, которые роняют тесты других требований) | — | group-cap-silent, group-cap-off, candidates-ignore-variants |
+
+### ontology-entities / Слияние с перенаправлением
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любой онтологии и любой пары после слияния не потеряно: - ни одно утверждение по содержанию: концы с учётом перенаправлений, тип, значение, уточнители; петли учитываются отдельно; - ни одна атрибуция, кроме точног… | `test_preservation_and_undo` | kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown, merge-object-not-moved, merge-mentions-not-moved, merge-names-not-moved, merge-portraits-same-phash-moved, merge-portraits-not-moved, merge-russian-not-preferred, undo-mentions-not-restored, undo-portraits-not-restored, undo-attributions-not-restored, fold-consensus-kept, who-consensus-kept, merge-primary-stale, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing, loop-deleted, undo-fold-not-restored, undo-evidence-not-restored, undo-consensus-stale, undo-primary-stale, merge-repeat-name-kept, merge-verified-folded, undo-dropped-names-lost |
+| Сценарий «Старая ссылка» | `test_old_link` | merge-redirect-missing |
+| Сценарий «Отмена» | `test_undo` | undo-names-kinds-not-restored, undo-subject-not-restored, undo-redirect-kept, undo-event-kept-removed-swapped, undo-fold-not-restored |
+| Сценарий «Повтор сворачивается» | `test_repeat_folds` | key-not-recomputed, merge-subject-not-moved, merged-folded-zero, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing |
+| Сценарий «Атрибуция автору переносится» | `test_author_attribution_moves` | author-attribution-stays, merged-attributions-zero |
+| Сценарий «Петля» | `test_loop` | loop-shown, merged-loops-zero, loop-deleted |
+| Сценарий «Отмена со свёрткой и QID» | `test_undo_with_fold_and_qid` | undo-without-externals, undo-event-restored-zero, fold-attributions-dropped, fold-evidence-dropped, undo-fold-not-restored, undo-evidence-not-restored |
+| Нормативные фразы (тестов: 1) | `test_external_rows_move_to_kept` | merge-externals-not-moved |
+| Требование целиком | файлы: `tests/knowledge/test_entity_merge.py`, `tests/knowledge/test_registry_entities.py`; маркеров 15 | все 40: kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown, merge-subject-not-moved, merge-object-not-moved, merge-externals-not-moved, merge-mentions-not-moved, merge-names-not-moved, merge-portraits-same-phash-moved, merge-portraits-not-moved, merge-redirect-missing, merge-russian-not-preferred, undo-names-kinds-not-restored, undo-subject-not-restored, undo-mentions-not-restored, undo-portraits-not-restored, undo-attributions-not-restored, undo-redirect-kept, undo-event-restored-zero, undo-event-kept-removed-swapped, merged-statements-count, merged-attributions-zero, merged-folded-zero, merged-loops-zero, fold-consensus-kept, who-consensus-kept, merge-primary-stale, fold-attributions-dropped, fold-evidence-dropped, fold-redirect-missing, loop-deleted, undo-fold-not-restored, undo-evidence-not-restored, undo-consensus-stale, undo-primary-stale, merge-repeat-name-kept, merge-verified-folded, undo-dropped-names-lost |
+| (мутации, которые роняют тесты других требований) | — | merged-statements-count |
+
+### person-quality / Качество персон
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого ответа модели ни у одной персоны, созданной запуском, основное название не даёт причины отказа правила названий. Каждое отклонённое предложение персоны даёт ровно одно событие `knowledge.entity.rejected` с … | `test_person_quality_invariant`, `test_person_rule_any_input` | person-not-a-name, person-empty-as-number, person-stopword-skipped, person-sentence-unchecked |
+| Сценарий «Мусорная персона» | `test_garbage_person` | person-not-a-name |
+| Сценарий «Склейка» | `test_glued` | person-not-a-name |
+| Сценарий «Определение персоны в промпте» | `test_person_definition_in_prompt` | prompt-no-person-def |
+| Требование целиком | файлы: `tests/knowledge/test_person_quality.py`; маркеров 6 | все 5: person-not-a-name, prompt-no-person-def, person-empty-as-number, person-stopword-skipped, person-sentence-unchecked |
+
+### person-quality / Слияние вариантов персоны
+
+| Что | Доказывающие тесты | Мутации, которые роняют (id) |
+|---|---|---|
+| Инвариант: для любого набора персон и любого порядка обхода: - слиты ровно компоненты, допустимые по правилу; - ни одна пара с разными QID не оказалась в одной сущности; - у каждой оставшейся не больше одного QID и ровно одно ос… | `test_plan_partition_any_order`, `test_merge_invariant_two_orders` | component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant, component-dates-ignored, type-rule-dropped, model-pair-ignored, review-inside-queued, dates-slack-zero, dates-slack-three, dates-start-only, dates-end-only, kept-counts-ignored, kept-id-tiebreak-reversed, dates-interval-ignored, reason-decided-before-dates, reason-decided-before-qid, component-verdicts-candidates-only |
+| Сценарий «Слияние вариантов» | `test_variants_merge_by_model_pair` | kept-qid-ignored |
+| Сценарий «Общее основное название» | `test_common_primary_name` | single-word-primary-review, step-name-merge-dropped |
+| Сценарий «QID подтверждён человеком для другой» | `test_qid_confirmed_for_other` | qid-confirmed-ignored |
+| Сценарий «Транслитерация» | `test_transliteration_with_decision` | qid-confirmed-ignored, step-qid-dropped |
+| Сценарий «Транслитерация без решения человека» | `test_transliteration_pending` | — |
+| Сценарий «Решение «разные» и третья запись» | `test_decided_apart_and_third` | decided-ignored, decided-as-qid-cluster |
+| Сценарий «Слияние по решению человека» | `test_merge_by_human_decision` | merge-review-reason |
+| Сценарий «Тёзки» | `test_namesakes` | decided-ignored |
+| Сценарий «Разные QID» | `test_different_qids` | — |
+| Сценарий «Транзитивная компонента с двумя QID» | `test_transitive_component_two_qids` | component-qids-unchecked |
+| Сценарий «Противоречащие даты» | `test_conflicting_dates` | dates-unchecked |
+| Сценарий «Даты у одной стороны» | `test_dates_on_one_side` | — |
+| Сценарий «Совпал только вариант» | `test_only_variant_matched` | variant-merges, single-word-variant |
+| Нормативные фразы (тестов: 14) | `test_date_chain_component`, `test_person_scenario_codes`, `test_dates_conflict_on_start_or_end_interval`, `test_decided_pair_not_requeued_after_merge_mapping`, `test_component_reason_priority_qid_cluster_over_dates`, `test_redirected_person_not_loaded`, `test_link_counts_subject_object_author`, `test_same_person_step_order`, `test_external_id_unique`, `test_person_codes_generated`, `test_person_codes_partition`, `test_component_reason_combos_generated`, `test_person_date_shapes_generated`, `test_person_date_one_side_generated` | component-dates-ignored, dates-start-only, dates-end-only, cluster-reason-dates-first, decided-pair-requeued, load-persons-inactive, link-counts-no-authors, link-counts-no-object, dates-one-side-conflict, dates-after-confirmed, decided-before-qid, model-pair-before-name, external-not-unique, add-external-duplicate, dates-interval-ignored |
+| Требование целиком | файлы: `tests/knowledge/test_person_quality.py`, `tests/knowledge/test_strategies_cover_spec_sets.py`; маркеров 30 | все 40: component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant, merge-review-reason, component-dates-ignored, type-rule-dropped, model-pair-ignored, review-inside-queued, step-qid-dropped, step-name-merge-dropped, step-none-as-review, dates-slack-zero, dates-slack-three, dates-start-only, dates-end-only, kept-qid-ignored, kept-counts-ignored, kept-id-tiebreak-reversed, cluster-reason-dates-first, decided-pair-requeued, propose-repeats, load-persons-inactive, link-counts-no-authors, link-counts-no-object, dates-one-side-conflict, dates-after-confirmed, decided-before-qid, model-pair-before-name, external-not-unique, add-external-duplicate, dates-interval-ignored, reason-decided-before-dates, reason-decided-before-qid, component-verdicts-candidates-only |
+| (мутации, которые роняют тесты других требований) | — | step-none-as-review, propose-repeats |
+
+
+## Тестировщик — 2026-11-25, тесты на коммите 3aa55a9 и следующем (ветка claude/ontology-extraction)
+
+Тесты написаны от дельт `specs/person-quality`, `specs/ontology-entities` и design.md; продуктовый код читался только для точек входа (сигнатуры) и, после коммита тестов, для патчей мутаций. Инфраструктура общая с `improve-extraction-naming` 3.1 (профили `ci`/`pure`/`heavy`, `dump.py`, стенд извлечения, запрет сети, `mutation_check.py`).
+
+Стратегии (3.1, `tests/knowledge/strategies.py`, без импорта `dedupe`/`naming`):
+- `not_persons` — отклоняемые предложения персон с ожидаемой причиной (строчные описания, «the … of …», склейки → `not_a_name`; обращения и группы с заглавной → `stopword`; длинные → `sentence`; стоп-слово длиннее предела персоны → `sentence` по порядку правил);
+- `persons_with_variants` — «лица» и ожидаемый итог: `plain` (1–4 записи, общее основное, QID у одной или нет, даты равные / в допуске ±2 (сдвиг 0–4) / у одной стороны), `two_qids` (транзитивная через запись без QID), `dates` (сдвиг ≥ 5 → `review:dates`), `qids_distinct`, `confirmed` (ru/en без общего написания + подтверждение), `decided`, `decided3`, `variant_single`, `variant_multi`; ожидаемая оставшаяся — `expected_kept` (QID, затем ссылки, затем меньший id);
+- `ontology_with_duplicates` — 5–30 сущностей, пара K/R, повторы K/R (в том числе с той же атрибуцией), петли R→K, атрибуции на R, подтверждения, упоминания, портреты с общим признаком, QID у одной стороны;
+- `ontology_names` + `expected_candidates` — сущности разных типов с названиями из малого пула.
+
+Явные `@example`: «Hume»(Q1)/«Hume»/«Hume»(Q2) (`TRANSITIVE`), даты на границе допуска (сдвиг 4 → слияние, 5 → `review:dates`, `BOUNDARY_DATES`), точный повтор атрибуции и QID у удалённой (`EXACT_REPEAT`), «Фрэнсис Бэкон»/«Бэкон»/произведение «Бэкон», регистр «Berkeley»/«berkeley»; разные QID «Бэкон» и петля — в сценариях.
+
+### Требование → тесты → мутация
+
+| Требование | Сценарные | Property / нормативные | Мутация | Упал |
+|---|---|---|---|---|
+| person-quality «Качество персон» | test_person_quality.py: test_garbage_person, test_glued, test_person_definition_in_prompt | test_person_rule_any_input (pure 400), test_person_quality_invariant (ci, через извлечение + 9 @example) | person-not-a-name, prompt-no-person-def | да ×5 |
+| person-quality «Слияние вариантов персоны» | test_variants_merge_by_model_pair, test_common_primary_name, test_qid_confirmed_for_other, test_transliteration_with_decision, test_transliteration_pending, test_decided_apart_and_third, test_namesakes, test_different_qids, test_transitive_component_two_qids (3 порядка), test_conflicting_dates, test_dates_on_one_side, test_only_variant_matched | test_plan_partition_any_order (pure 400, две перестановки), test_merge_invariant_two_orders (heavy, через базу, две перестановки) | component-qids-unchecked, dates-unchecked, variant-merges, kept-input-order, qid-confirmed-ignored, single-word-primary-review, decided-ignored, decided-as-qid-cluster, single-word-variant | да ×23 |
+| ontology-entities «Поиск дублей» (MODIFIED) | test_entity_merge.py: test_candidates, test_primary_on_different_records, test_different_types | test_candidates_invariant (ci) | candidates-primary-only, candidates-no-type | да ×4 |
+| ontology-entities «Слияние с перенаправлением» (MODIFIED) | test_old_link, test_undo, test_repeat_folds, test_author_attribution_moves, test_loop, test_undo_with_fold_and_qid | test_preservation_and_undo (heavy: содержание без петель, атрибуции, подтверждения, одно основное, внешние, упоминания, портреты; отмена ⇒ `dump` равен исходному) | kept-primary-stays, author-attribution-stays, key-not-recomputed, undo-without-externals, loop-shown | да ×10 |
+
+Вывод в тестах: база (сущности, перенаправления `resolve`, названия и их вид, внешние, утверждения через `get` по старым id, упоминания, портреты), `GET /v1/entities/{id}` и `/card` по старому id, `/v1/entities/{id}/statements`, карта (`SectionMap`), очередь `duplicate` (`Review.queue`), перехваченный запрос к шлюзу (`ontology.extract`, системный текст). События — точное множество ключей (`merged`: kept, removed, reason, statements, attributions, folded, loops; `merge_undone`: kept, removed, restored; `rejected`: type, label, reason) без полей контекста. Сторожевой токен — в тестах извлечения (`no_token`).
+
+Выдержки событий (сырые, id сокращены):
+
+    knowledge.entity.rejected {'run_id': 'fill_…', 'type': 'person', 'label': 'children', 'reason': 'not_a_name'}
+    knowledge.extraction.dropped {'run_id': 'fill_…', 'reason': 'название «children» (person) отклонено: not_a_name'}
+    knowledge.entity.merged {'run_id': 'fill_…', 'kept': 'e_…', 'removed': 'e_…', 'reason': 'merge:model_pair', 'statements': 1, 'attributions': 0, 'folded': 0, 'loops': 0}
+    knowledge.entity.merge_proposed {'kept': 'e_…', 'removed': 'e_…', 'reason': 'review:decided_conflict'}
+    knowledge.life_dates.skipped {'entity': 'e_…', 'property': 'wikidata', 'reason': 'qid_taken'}
+    knowledge.entity.merged {'kept': 'e_…', 'removed': 'e_…', 'reason': 'merge:qid_confirmed', 'statements': 1, 'attributions': 0, 'folded': 0, 'loops': 0}
+    knowledge.entity.merge_undone {'kept': 'e_…', 'removed': 'e_…', 'restored': 1}
+    knowledge.entity.merged {'kept': 'e_…', 'removed': 'e_…', 'reason': 'merge:review', 'statements': 1, 'attributions': 0, 'folded': 0, 'loops': 1}
+
+### Сырые итоги (по одному файлу, SQLite, 1 ГБ RAM)
+
+    test_person_quality.py      20 passed in 97.73s (рабочее дерево); 21 passed in 119.61s (worktree на 2a886ef, с test_person_rule_any_input)
+      38.92s test_merge_invariant_two_orders · 24.47s test_person_quality_invariant · 8.33s test_plan_partition_any_order
+    test_entity_merge.py        11 passed in 82.92s; 11 passed in 62.46s (worktree на 2a886ef)
+      50.41s test_preservation_and_undo · 13.51s test_candidates_invariant
+    test_registry_entities.py   33 passed, 1 skipped in 32.23s (3.6: test_merge_redirect_and_undo, test_duplicate_candidates без правки ожиданий)
+    test_entity_naming.py       35 passed in 36.60s · test_entity_dating_extraction.py 14 passed in 57.70s
+    test_mutation_coverage.py   2 passed · check_traceability: 407 из 407 · lint-imports: 3 kept, 0 broken
+    ruff check / format --check (мои файлы): чисто
+
+### Мутации (`scripts/mutation_check.py --change improve-person-quality`, отдельный worktree на 3aa55a9)
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Качество персон | person-not-a-name | tests/knowledge/test_person_quality.py::test_garbage_person | да (1 failed, 1 warning in 5.96s) |
+| Качество персон | person-not-a-name | tests/knowledge/test_person_quality.py::test_glued | да (1 failed, 1 warning in 5.33s) |
+| Качество персон | person-not-a-name | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1 failed, 1 warning in 16.80s) |
+| Качество персон | prompt-no-person-def | tests/knowledge/test_person_quality.py::test_person_definition_in_prompt | да (1 failed, 1 warning in 3.47s) |
+| Слияние вариантов персоны | component-qids-unchecked | tests/knowledge/test_person_quality.py::test_transitive_component_two_qids | да (1 failed, 1 warning in 3.35s) |
+| Слияние вариантов персоны | component-qids-unchecked | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 4.58s) |
+| Слияние вариантов персоны | component-qids-unchecked | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 11.13s) |
+| Слияние вариантов персоны | dates-unchecked | tests/knowledge/test_person_quality.py::test_conflicting_dates | да (1 failed, 1 warning in 5.68s) |
+| Слияние вариантов персоны | dates-unchecked | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 4.50s) |
+| Слияние вариантов персоны | dates-unchecked | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 8.83s) |
+| Слияние вариантов персоны | variant-merges | tests/knowledge/test_person_quality.py::test_only_variant_matched | да (1 failed, 1 warning in 1.81s) |
+| Слияние вариантов персоны | variant-merges | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 3.10s) |
+| Слияние вариантов персоны | kept-input-order | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 3.67s) |
+| Слияние вариантов персоны | kept-input-order | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 7.17s) |
+| Слияние вариантов персоны | qid-confirmed-ignored | tests/knowledge/test_person_quality.py::test_transliteration_with_decision | да (1 failed, 1 warning in 2.95s) |
+| Слияние вариантов персоны | qid-confirmed-ignored | tests/knowledge/test_person_quality.py::test_qid_confirmed_for_other | да (1 failed, 1 warning in 2.62s) |
+| Слияние вариантов персоны | qid-confirmed-ignored | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 7.34s) |
+| Слияние вариантов персоны | single-word-primary-review | tests/knowledge/test_person_quality.py::test_common_primary_name | да (1 failed, 1 warning in 2.33s) |
+| Слияние вариантов персоны | single-word-primary-review | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 1.15s) |
+| Слияние вариантов персоны | single-word-primary-review | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.86s) |
+| Слияние вариантов персоны | decided-ignored | tests/knowledge/test_person_quality.py::test_namesakes | да (1 failed, 1 warning in 1.94s) |
+| Слияние вариантов персоны | decided-ignored | tests/knowledge/test_person_quality.py::test_decided_apart_and_third | да (1 failed, 1 warning in 2.46s) |
+| Слияние вариантов персоны | decided-ignored | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 3.24s) |
+| Слияние вариантов персоны | decided-as-qid-cluster | tests/knowledge/test_person_quality.py::test_decided_apart_and_third | да (1 failed, 1 warning in 4.36s) |
+| Слияние вариантов персоны | decided-as-qid-cluster | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 1.56s) |
+| Слияние вариантов персоны | single-word-variant | tests/knowledge/test_person_quality.py::test_only_variant_matched | да (1 failed, 1 warning in 1.63s) |
+| Слияние вариантов персоны | single-word-variant | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 12.84s) |
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair | да (1 failed, 1 warning in 2.94s) |
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.37s) |
+| Поиск дублей | candidates-primary-only | tests/knowledge/test_entity_merge.py::test_candidates | да (1 failed, 1 warning in 1.58s) |
+| Поиск дублей | candidates-primary-only | tests/knowledge/test_entity_merge.py::test_candidates_invariant | да (1 failed, 1 warning in 2.44s) |
+| Поиск дублей | candidates-no-type | tests/knowledge/test_entity_merge.py::test_different_types | да (1 failed, 1 warning in 1.18s) |
+| Поиск дублей | candidates-no-type | tests/knowledge/test_entity_merge.py::test_candidates_invariant | да (1 failed, 1 warning in 3.19s) |
+| Слияние с перенаправлением | author-attribution-stays | tests/knowledge/test_entity_merge.py::test_author_attribution_moves | да (1 failed, 1 warning in 2.51s) |
+| Слияние с перенаправлением | author-attribution-stays | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.72s) |
+| Слияние с перенаправлением | key-not-recomputed | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 1.52s) |
+| Слияние с перенаправлением | key-not-recomputed | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 2.27s) |
+| Слияние с перенаправлением | undo-without-externals | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 2.03s) |
+| Слияние с перенаправлением | undo-without-externals | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 2.55s) |
+| Слияние с перенаправлением | loop-shown | tests/knowledge/test_entity_merge.py::test_loop | да (1 failed, 1 warning in 3.54s) |
+| Слияние с перенаправлением | loop-shown | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.04s) |
+
+Дозапуск `--id person-not-a-name` на 2a886ef: и `test_person_rule_any_input` — да (1 failed, 1.92 s).
+
+Итого: 18 мутаций, 42 ожидаемых падения — упали все 42 (rc=0), время 7 мин 42 с. Требований 4, у каждого ≥ 2 мутации; `--coverage improve-person-quality`: «мутации есть у всех 4 требований».
+
+### Дефекты
+
+Расхождений вывода со спецификацией в покрытых сценариях и инвариантах не найдено.
+
+### Наблюдения
+
+- `knowledge.extraction.dropped` для утверждения с отклонённой персоной несёт `reason` текстом с названием: `'название «children» (person) отклонено: not_a_name'`. Спецификация `person-quality` формат причины не задаёт; в design `improve-extraction-naming` (таблица событий) причины `dropped` — коды (`dating:<код>`, `entity:type`). Название в журнале и так есть в `rejected.label` (≤ 80 знаков); здесь оно без обрезки.
+- `Statements.add` с тем же ключом и той же атрибуцией добавляет атрибуцию второй раз (`[('source','s_a','asserts')] × 2` на одном утверждении) — до слияния, вне этой дельты (`ontology-statements`). Поэтому в инварианте сохранения атрибуции сравниваются множеством; «точный повтор» спецификация и так разрешает терять.
+- «Отмена» — оператором: HTTP-маршрута отмены нет, тесты вызывают `Statements.undo_merge` (путь оператора и миграции).
+- Решение «разные» в тестах ставится как в жизни: пункт `duplicate` (через `dedupe.propose`) закрыт `Review.resolve_duplicate(item, False, …)`.
+- Сценарий «Даты у одной стороны»: оставшаяся по правилу — та, у которой больше ссылок (утверждение `lifespan`), даты 1685–1753 у неё.
+
+### Не покрыто / непроверяемое
+
+- «Персоны, созданные до этого изменения, приводит миграция» — путь `migrate-ontology-quality`, не здесь.
+- `merge:review` (человек «слить» в очереди) — только через `resolve_duplicate` в юнит-тестах разработчика; сценария в дельте нет.
+- Полный `pytest` не запускался (1 ГБ RAM), только файлы выше по одному.
+
+## Тестировщик — перепроверка после О17/О18 (2026-11-25, тесты на ea6321d)
+
+- «Слияние по решению человека» (О17): `test_merge_by_human_decision` — `resolve_duplicate(merge=True)`: одна персона, названия `{primary «Бэкон», variant «Фрэнсис Бэкон»}`, утверждение второй при первой, `/v1/entities/<вторая>` отдаёт первую, очередь пуста, `knowledge.entity.merged` `(kept, removed, "merge:review")`, `knowledge.review.decided` `decision="merge"`.
+- `dropped.reason` кодом: `test_garbage_not_a_person` / `test_glued_...` / инвариант качества — `["entity:<причина>"]`.
+- Пустое название персоны: из `_person_cases` убран фильтр `empty`; `@example` `(person, "")`, `(person, "   ")` → `empty` (зонд: `""`, `"   "`, `"\t"` → `knowledge.entity.rejected {type: person, label: "", reason: empty}` и `dropped entity:empty`).
+- Предел группы дублей (О18, ontology-entities «Поиск дублей»): `test_last_word_group_cap[200|201]` — 200 сущностей «… Локк» (из них две «Джон Локк»): пара по последнему слову есть, события нет; 201: пары по последнему слову нет, `duplicate_group_capped` ровно `{type, size, limit}` = `(person, 201, 200)`, без названий; совпадение полного названия найдено в обоих случаях.
+
+Сырые прогоны: test_person_quality 22 passed in 159.27s · test_entity_merge 13 passed in 89.64s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | merge-review-reason | test_person_quality::test_merge_by_human_decision | да (на 2cc4f44) |
+| Поиск дублей | group-cap-silent | test_entity_merge::test_last_word_group_cap[201] | да |
+| Поиск дублей | group-cap-off | test_entity_merge::test_last_word_group_cap[201] | да |
+| Качество персон | person-empty-as-number | test_person_quality::test_person_quality_invariant | да |
+
+Дефектов нет.
+
+## Судья — 2026-11-25, коммит 172787d (тесты изменения — на 01dc7ca; между ними в src только `integrity.py` другого изменения)
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | Мусорная персона, Склейка, Определение в промпте, Инвариант качества (ci + pure) | 22 passed (файл), мутации person-not-a-name, prompt-no-person-def, person-empty-as-number — упали | test_person_quality.py 22 passed in 274.80s | — (покрыто стендом извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 13 сценариев + test_plan_partition_any_order, test_merge_invariant_two_orders | все мутации упали | passed; component-qids-unchecked — упали все 3 теста; **моя J1 — не упал ни один** | онтология судьи: Berkeley×3 → одна (2× `merged` `merge:name`); Бэкон/Бэкон с решением «разные» — обе остаются, пункта нет; Омир → Гомер (`life_dates.skipped qid_taken`, `merged merge:qid_confirmed`), QID Q6691 у Гомера; Locke/Локк(вариант Locke) — `merge_proposed review:single_name` (по правилу, шаг 8) | **не подтверждено** (ветка компоненты `review:dates`) |
+| ontology-entities «Поиск дублей» (MODIFIED) | Кандидаты, Основное на разных записях, Разные типы, test_candidates_invariant, test_last_word_group_cap | passed, мутации упали | test_entity_merge.py 13 passed in 56.92s | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» (MODIFIED) | Старая ссылка, Отмена, Повтор, Атрибуция автору, Петля, Отмена со свёрткой и QID, test_preservation_and_undo | passed, мутации упали | passed; undo-without-externals, author-attribution-stays — упали; моя J2 (отмена не возвращает `attributions.who`) — упал test_preservation_and_undo | Locke(Q9353)/Локк слиты человеком (`merged merge:review`, `review.decided merge`): QID у оставшейся; отмена — QID снова у Locke, основное «Locke»; после отмены всех 4 слияний `dump` равен исходному (0 различающихся таблиц), `merge_undone` ×4 | подтверждено |
+
+Прежние: test_registry_entities 33 passed, 1 skipped (PostgreSQL-гонка) · test_statements 19 passed · test_snapshot 6 passed · test_filling 30 passed; правок ожиданий в них нет (`git diff origin/claude/embedding-docker...HEAD` пуст по этим файлам).
+`ruff check` / `ruff format --check` по файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 410 из 410, `person-quality` в `enforce`; `mutation_check.py --coverage improve-person-quality` — все 4 требования. Правка файла Lead'а `prompts/__init__.py` — только текст `ontology.extract` (плюс блок `language` и `translate_names` — от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу собранной в памяти онтологии (`Dedupe.run`, `LifeDates.apply`, `Review.resolve_duplicate`, `Statements.undo_merge`).
+
+Мутации (отдельный worktree, удалён; `git diff -- src` пуст):
+- component-qids-unchecked, undo-without-externals, author-attribution-stays (из списка) — упали все ожидаемые тесты;
+- **J1 (моя):** в `dedupe.plan` из условия отказа компоненты убрано `review:dates` (`kinds & {"apart:qid", "apart:decided"}`). Под мутацией `plan` сливает «Berkeley» 1685–1753, «Berkeley» без дат и «Berkeley» 1885–1953 в одну сущность (без мутации — три пункта `review:dates`, по спецификации). **Не упали** test_plan_partition_any_order (1 passed) и test_merge_invariant_two_orders (1 passed); сценарного теста на эту ветку нет;
+- J2 (моя): `undo_merge` не возвращает `attributions.who` — упал test_preservation_and_undo.
+
+Подгонка: признаков не найдено (оракулы не импортируют `dedupe`/`naming`, `@example` на границы дат 4/5 и транзитивные QID есть, skip/xfail нет). Но стратегия `persons_with_variants` строит лица только изолированными видами: противоречие дат — лишь в паре из двух записей, поэтому правило спецификации «компонента, у какой-либо пары которой `review:dates`, не сливается» (транзитивная цепочка через запись без дат) входом не порождается и не проверено ничем. Инвариант «слиты ровно компоненты, допустимые по правилу» доказан не для любых входов. Код ведёт себя по спецификации (проверено вручную), дефект — в покрытии.
+
+Вердикт: **не принято** — вернуть тестировщику: (1) в `persons_with_variants` вид лица «цепочка дат»: ≥ 3 записи с общим основным, крайние с противоречащими датами, между ними запись без дат — ожидание: слияний нет, все пары лица в очереди с `review:dates`; явный `@example` этой границы; (2) сценарный или нормативный тест на эту ветку; (3) мутацию J1 (`review:dates` убрано из условия отказа компоненты) — в `mutations.yaml` с ожидаемым падением обоих property-тестов; перепрогон `--id` и строка в таблице. Разработчику возвращать нечего.
+
+## Тестировщик — возврат судьи (J1), 2026-11-25
+
+- `persons_with_variants`: новый вид лица `date_chain`. Это три записи с общим основным названием: крайние с противоречащими датами (сдвиг 5–200 лет), средняя без дат. Ожидание: слияний нет, все три пары в очереди с `review:dates`. Явный `@example(DATE_CHAIN)` («Berkeley» 1685–1753 / без дат / 1885–1953) стоит в `test_plan_partition_any_order` и `test_merge_invariant_two_orders`.
+- Нормативный тест `test_date_chain_component`: `Dedupe.run` на этой тройке. Три персоны остаются, `merged` нет, очередь = три пары, `merge_proposed` только с `review:dates`.
+- Прогон: `-k "date_chain or plan_partition or merge_invariant_two_orders"` — 3 passed in 38.75s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | component-dates-ignored (J1) | test_date_chain_component | да |
+| Слияние вариантов персоны | component-dates-ignored (J1) | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | component-dates-ignored (J1) | test_merge_invariant_two_orders | да |
+
+Ветви правила «Слияние вариантов» и виды генератора `persons_with_variants`:
+
+| Ветвь | Вид генератора |
+|---|---|
+| 1 `apart:type` | `mixed_type`: пара модели «персона — понятие с тем же названием» → понятие не сливается, две персоны сливаются `merge:name`. Мутация type-rule-dropped |
+| 2 `apart:qid` | `qids_distinct`; в компоненте — `two_qids` (пара 0–2) |
+| 3 `apart:decided` | `decided`, `decided3` |
+| 4 `review:dates` | `dates` (пара); в компоненте — `date_chain` (новый) |
+| 5 `merge:qid_confirmed` | `confirmed` |
+| 6 `merge:name` | `plain` (1–4 записи, регистр, даты в допуске и с одной стороны) |
+| 7 `merge:model_pair` | `model_pair`: пары модели в `case["model"]` → `plan(pairs_by_model=…)` сливает. В `Dedupe.run` пар модели нет — ожидание: ни слияния, ни очереди. Мутация model-pair-ignored |
+| 8 `review:single_name` / `review:variant` | `variant_single` / `variant_multi` |
+| 9 `apart:none` | разные лица (уникальный хвост названия) |
+| компонента: два QID → `review:qid_cluster` | `two_qids` |
+| компонента: решение «разные» — единственная преграда → `review:decided_conflict` | `decided3` |
+| пара без других рёбер, кроме решённой, — не в очередь | `decided` |
+| пара `review:*` внутри сливаемой компоненты — не в очередь | `review_inside`: B и C подтверждены для QID A; основное B = вариант C (`review:single_name`) → слита вся тройка, очереди нет. Мутация review-inside-queued |
+
+Явные `@example`: `MODEL_PAIR` (Hume/Хьюм по модели; Substance — две персоны и понятие) и `REVIEW_INSIDE` (Homer Q6691, Омир, «Гомерос» с вариантом «Омир») — в обоих property-тестах. Прогон `-k "date_chain or plan_partition or merge_invariant_two_orders"` — 3 passed in 37.90s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | type-rule-dropped | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | model-pair-ignored | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | review-inside-queued | test_plan_partition_any_order | да |
+| Слияние вариантов персоны | review-inside-queued | test_merge_invariant_two_orders | да |
+
+`apart:type` и `merge:model_pair` проверяются только чистым `plan`: `Dedupe.run` по базе берёт одни персоны и не принимает пар модели. Это видно из сигнатуры `run(confirmed, scope)`.
+
+## Тестировщик — аудит пунктов (О21)
+
+Систематический аудит покрытия (О21): строка «пункт → вид генератора → @example → мутация» на каждый нормативный пункт дельт `person-quality` и `ontology-entities`. Строк в таблице: 86. Мутации аудита — патчи от HEAD в `tests/mutations/improve-person-quality/`, всего в каталоге 76 (новых 50, все падают).
+
+**Пробелы, найденные аудитом, и чем закрыты.**
+- Виды генератора `date_chain`, `model_pair`, `mixed_type`, `review_inside` и мутации `component-dates-ignored`, `type-rule-dropped`, `model-pair-ignored`, `review-inside-queued` — уже были (внесены в таблицу).
+- Выжили мутации, закрыты новыми тестами в `test_person_quality.py` и `test_entity_merge.py`: `dates-start-only`/`dates-end-only` (`test_dates_conflict_on_start_or_end_interval`: расхождение только начала, только конца, границы допуска 4 и 5 лет), `cluster-reason-dates-first` (`test_component_reason_priority_qid_cluster_over_dates`), `decided-pair-requeued` (`test_decided_pair_not_requeued_after_merge_mapping`), `load-persons-inactive` (`test_redirected_person_not_loaded`), `link-counts-no-authors`/`link-counts-no-object` (`test_link_counts_subject_object_author`), `merge-externals-not-moved` (`test_external_rows_move_to_kept`: через API `externals()` перенос не виден, потому что чтение разыменовывает перенаправление), `undo-event-*` (поле `restored`, `kept`/`removed`), порядок шагов правила (`test_same_person_step_order`: пары 2/3, 3/4, 4/5, 5/6, 6/7, 7/8, 1/всё), `external-not-unique` и `add-external-duplicate` (`test_external_id_unique`), `candidates-dates-ignored` (`test_candidates_need_equal_dates_for_last_word`).
+- Эквивалентные или ненормативные мутации, снятые: `decided-edges-queued` (проверка `p not in decided` избыточна: пара с решением «разные» получает вердикт `apart:decided`, а не `merge:*`), `components-order-dependent` (корень союза-объединения не влияет на разбиение), `variants-include-primary` (пересечение основных названий перехватывает шаг 6), `apart-count-wrong` и `merge-reason-rank` (счётчик `apart` и выбор причины слияния составной компоненты спецификацией не заданы).
+Обозначения: PQ = `tests/knowledge/test_person_quality.py`, EM = `test_entity_merge.py`, DU = `test_dedupe_unit.py`, PM = `test_person_merge_unit.py`. Генераторы — `tests/knowledge/strategies.py` (S.): `persons_with_variants` (виды лица FACE_KINDS: plain[dated none/equal/within/one_side], two_qids, dates, date_chain, model_pair, mixed_type, review_inside, qids_distinct, confirmed, decided, decided3, variant_single, variant_multi), `not_persons`, `ontology_with_duplicates`, `ontology_names`. Мутации — `tests/mutations/improve-person-quality/<id>.patch`.
+
+### person-quality / Качество персон
+
+| Пункт | Вид генератора | @example | Мутация |
+|---|---|---|---|
+| Персона — только названное по имени лицо | S.not_persons + S.proper_names (имена с частицами) | PQ::test_person_quality_invariant, test_person_rule_any_input | person-not-a-name |
+| Не персона: местоимения и служебные слова (`some`) | S.not_persons (stopwords_perturbed) | PQ::test_person_rule_any_input (@example «Some») (фактически роняет: test_person_quality_invariant) | person-stopword-skipped |
+| Не персона: обращения (`your Lordship`) | S.not_persons (stopwords_perturbed) | PQ::test_person_rule_any_input @example «Your Lordship» (фактически роняет: test_person_quality_invariant) | person-stopword-skipped |
+| Не персона: роли и описания (`поэт`, `blind mathematician`, `the author of …`) | S.not_persons (not_names lower/pattern) | PQ::test_garbage_person, test_person_rule_any_input | person-not-a-name |
+| Не персона: группы (`children`, `logicians`) | S.not_persons (stopwords_perturbed) | PQ::test_garbage_person (`children`) (фактически роняет: test_person_quality_invariant) | person-stopword-skipped |
+| Не персона: неодушевлённые, длинные фразы | S.not_persons (long_phrases) | PQ::test_person_rule_any_input (фактически роняет: test_person_quality_invariant) | person-sentence-unchecked |
+| Не персона: склейка двух имён | S.not_persons (not_names glue) | PQ::test_glued | person-not-a-name |
+| Пустое название персоны — причина `empty`, не `number` | S.not_persons/blank | PQ::test_person_rule_any_input (фактически роняет: test_person_quality_invariant) | person-empty-as-number |
+| Отказ — `knowledge.entity.rejected` с `type="person"` | S.not_persons | PQ::test_garbage_person, test_person_quality_invariant | person-not-a-name |
+| Утверждение с отклонённой персоной отброшено, `dropped` с кодом `entity:<причина>` | S.not_persons | PQ::test_person_quality_invariant | improve-extraction-naming/dropped-reason-text (общий путь `entity_items`; в этом каталоге — person-not-a-name) |
+| Промпт определяет персону и даёт отрицательные примеры «your Lordship», «blind mathematician», «children» | сценарный стенд (шаблон из перехвата) | PQ::test_person_definition_in_prompt | prompt-no-person-def |
+| Инвариант: основное созданных персон не даёт причины; ровно одно `rejected` на отказ; создано = числу `created` | S.not_persons ∪ S.proper_names | PQ::test_person_quality_invariant | person-not-a-name, person-empty-as-number |
+| Сценарии «Мусорная персона», «Склейка», «Определение в промпте», «Инвариант качества» | сценарные | PQ::test_garbage_person, test_glued, test_person_definition_in_prompt, test_person_quality_invariant | person-not-a-name, prompt-no-person-def |
+| Персоны до изменения приводит миграция | вне изменения (`ontology-migration`) | — | — (не пункт этого изменения: нормативно отнесён к ontology-migration, его тесты — tests/knowledge/test_ontology_migration.py) |
+
+### person-quality / Слияние вариантов персоны
+
+| Пункт | Вид генератора | @example | Мутация |
+|---|---|---|---|
+| Одно лицо в разных написаниях — одна сущность | S.persons_with_variants plain (n≥2) | PQ::test_merge_invariant_two_orders; test_common_primary_name | step-name-merge-dropped |
+| Внешний QID уникален | S.persons_with_variants two_qids | EM::test_candidates…; PQ::test_different_qids (фактически роняет: test_external_id_unique) | external-not-unique |
+| Даты противоречат: допуск 2 года | S.persons_with_variants dates (gap 5…200), plain within (сдвиг 0…4) | PQ::test_conflicting_dates, test_plan_partition_any_order | dates-slack-zero, dates-slack-three |
+| Даты противоречат: интервалы начала | S.persons_with_variants dates_any (S.life_bounds: независимые сдвиги начала и конца ±12, ширина интервала 0/1/3/5/9/99; ожидание по S.dates_conflict_spec) — исправлено в О25 | PQ::DATE_INTERVALS (только начало врозь; зазор начала 4 и 5 при интервале) в test_plan_partition_any_order и test_merge_invariant_two_orders; test_dates_conflict_on_start_or_end_interval | dates-end-only, dates-interval-ignored |
+| Даты противоречат: интервалы конца | S.persons_with_variants dates_any — исправлено в О25 | PQ::DATE_INTERVALS (только конец врозь; зазор конца 4 и 5 при интервале); test_dates_conflict_on_start_or_end_interval | dates-start-only, dates-interval-ignored |
+| Даты противоречат: интервал неопределённости `[earliest − 2, latest + 2]` (earliest ≠ latest) | S.persons_with_variants dates_any — добавлено в О25 | PQ::DATE_INTERVALS (Reid/Рид, Hume/Юм) | dates-interval-ignored |
+| Даты у одной стороны — не противоречие | S.persons_with_variants plain one_side | PQ::test_dates_on_one_side (фактически роняет: test_date_chain_component) | dates-one-side-conflict |
+| Преграда компоненты на паре без общего названия (компонента через merge:qid_confirmed / merge:model_pair) | @example HIDDEN_BARRIER (Hume a, Hume b, Юм c; b–c QID подтверждён, a–c «разные»), HIDDEN_BARRIER_MODEL (b–c пара модели) | PQ::test_plan_partition_any_order (оба), test_merge_invariant_two_orders (HIDDEN_BARRIER) | component-verdicts-candidates-only (M4) |
+| Причина отказа компоненты: порядок qid_cluster → dates → decided_conflict, все сочетания | S.persons_with_variants reasons_mix (О26) | PQ::DATES_AND_DECIDED (пример судьи) в test_plan_partition_any_order, test_merge_invariant_two_orders; test_component_reason_combos_generated (cover) | reason-decided-before-dates (J3-1), reason-decided-before-qid, cluster-reason-dates-first |
+| Шаг 1 `apart:type` | S.persons_with_variants mixed_type | PQ::test_merge_invariant_two_orders; PM (фактически роняет: test_plan_partition_any_order) | type-rule-dropped |
+| Шаг 2 `apart:qid` | S.persons_with_variants qids_distinct | PQ::test_different_qids (фактически роняет: test_transliteration_with_decision) | step-qid-dropped |
+| Шаг 3 `apart:decided` | S.persons_with_variants decided, decided3 | PQ::test_namesakes, test_decided_apart_and_third | decided-ignored |
+| Шаг 4 `review:dates` | S.persons_with_variants dates, date_chain | PQ::test_conflicting_dates, test_date_chain_component | dates-unchecked |
+| Шаг 5 `merge:qid_confirmed` | S.persons_with_variants confirmed | PQ::test_qid_confirmed_for_other, test_transliteration_with_decision | qid-confirmed-ignored |
+| Шаг 6 `merge:name` (в т. ч. однословное) | S.persons_with_variants plain | PQ::test_common_primary_name | step-name-merge-dropped, single-word-primary-review |
+| Шаг 7 `merge:model_pair` | S.persons_with_variants model_pair | PQ::test_variants_merge_by_model_pair (фактически роняет: test_plan_partition_any_order) | model-pair-ignored |
+| Шаг 8 `review:single_name` / `review:variant` | S.persons_with_variants variant_single, variant_multi | PQ::test_only_variant_matched | single-word-variant, variant-merges |
+| Шаг 9 `apart:none` | S.persons_with_variants (лица без общих названий) | PQ::test_plan_partition_any_order (фактически роняет: test_same_person) | step-none-as-review |
+| Порядок шагов 2 и 3 (QID раньше решения) | S.persons_with_variants decided + qids | PQ::test_plan_partition_any_order (фактически роняет: test_same_person_step_order) | decided-before-qid |
+| Порядок шагов 4 и 5 (даты раньше подтверждения) | S.persons_with_variants confirmed + dates | PQ::test_plan_partition_any_order (фактически роняет: test_same_person_step_order) | dates-after-confirmed |
+| Порядок шагов 6 и 7 (название раньше пары модели) | S.persons_with_variants plain + model | PQ::test_plan_partition_any_order (фактически роняет: test_same_person_step_order) | model-pair-before-name |
+| Компонента: ≥ 2 QID или `apart:qid` → нет слияния, `review:qid_cluster` | S.persons_with_variants two_qids | PQ::test_transitive_component_two_qids | component-qids-unchecked |
+| Компонента: `review:dates` → нет слияния | S.persons_with_variants date_chain | PQ::test_date_chain_component | component-dates-ignored |
+| Компонента: причина `review:dates` при противоречии дат (не qid_cluster) | S.persons_with_variants date_chain | PQ::test_date_chain_component (фактически роняет: test_component_reason_priority_qid_cluster_over_dates) | cluster-reason-dates-first |
+| Компонента: `review:decided_conflict` | S.persons_with_variants decided3 | PQ::test_decided_apart_and_third | decided-as-qid-cluster |
+| Пара «разные» в очередь не ставится | S.persons_with_variants decided, decided3 | PQ::test_namesakes | decided-ignored |
+| Решённая пара повторно не ставится (через слитую компоненту) | S.persons_with_variants decided | PQ::test_decided_apart_and_third (фактически роняет: test_decided_pair_not_requeued_after_merge_mapping) | decided-pair-requeued |
+| `review:*` внутри сливаемой компоненты не ставится | S.persons_with_variants review_inside | PQ::test_merge_invariant_two_orders | review-inside-queued |
+| Пара в очереди — без повтора | S.persons_with_variants (двойной запуск) | PQ::test_merge_invariant_two_orders (один `merge_proposed` на пару) (фактически роняет: test_dedupe_run_merges_and_proposes) | propose-repeats |
+| Итог не зависит от порядка входа | S.persons_with_variants (две перестановки) | PQ::test_plan_partition_any_order, test_merge_invariant_two_orders | kept-input-order |
+| Оставшаяся: с QID | S.persons_with_variants plain (with_qid) | PQ::test_variants_merge_by_model_pair | kept-qid-ignored |
+| Оставшаяся: больше ссылок (субъект, объект, автор-атрибуция) | S.persons_with_variants + утверждения теста | PQ::test_merge_invariant_two_orders | kept-counts-ignored, link-counts-no-object, link-counts-no-authors |
+| Оставшаяся: меньший идентификатор | S.persons_with_variants plain | PQ::test_plan_partition_any_order | kept-id-tiebreak-reversed |
+| Только действующие персоны участвуют | S.persons_with_variants + перенаправленные | PQ::test_merge_invariant_two_orders (фактически роняет: test_redirected_person_not_loaded) | load-persons-inactive |
+| QID сохраняется | S.persons_with_variants plain (with_qid) | PQ::test_variants_merge_by_model_pair (фактически роняет: test_external_rows_move_to_kept) | merge-externals-not-moved |
+| Одно основное, русское если есть у любой стороны | S.persons_with_variants plain (ru/en) | PQ::test_merge_invariant_two_orders (фактически роняет: test_preservation_and_undo, test_variants_merge_by_model_pair) | merge-russian-not-preferred, kept-primary-stays |
+| Виды названий — в запись слияния (для отмены) | S.ontology_with_duplicates | EM::test_preservation_and_undo (фактически роняет: test_undo) | undo-names-kinds-not-restored |
+| Утверждения и атрибуции переносятся | S.ontology_with_duplicates | EM::test_preservation_and_undo | merge-subject-not-moved, merge-object-not-moved, author-attribution-stays |
+| Журнал `merged.reason` ∈ {merge:qid_confirmed, merge:name, merge:model_pair, merge:review} | S.persons_with_variants (reason по виду) | PQ::test_merge_invariant_two_orders; test_merge_by_human_decision | merge-review-reason |
+| `merge_proposed.reason` ∈ review:* | S.persons_with_variants (queue) | PQ::test_merge_invariant_two_orders | review-inside-queued |
+| Транслитерации: через решение человека; без решения — очередь | сценарные (Гомер/Омир) | PQ::test_transliteration_with_decision, test_transliteration_pending | qid-confirmed-ignored |
+| Инвариант: разбиение по правилу, одинаково в двух перестановках | S.persons_with_variants | PQ::test_merge_invariant_two_orders | kept-input-order, component-qids-unchecked |
+| Инвариант: ни одна пара с разными QID не слита; ≤ 1 QID и одно основное на язык | S.persons_with_variants two_qids, qids_distinct | PQ::test_merge_invariant_two_orders | component-qids-unchecked |
+| Инвариант: на каждое слияние одно `merged`, на пару — одно `merge_proposed` | S.persons_with_variants | PQ::test_merge_invariant_two_orders (фактически роняет: test_dedupe_run_merges_and_proposes) | propose-repeats |
+| Сценарии «Слияние вариантов», «Общее название», «QID подтверждён», «Транслитерация(±)», «Решение разные + третья», «Слияние по решению человека», «Тёзки», «Разные QID», «Транзитивная компонента», «Противоречащие даты», «Даты у одной стороны», «Совпал только вариант» | сценарные | PQ::test_variants_merge_by_model_pair … test_only_variant_matched | model-pair-ignored, step-name-merge-dropped, qid-confirmed-ignored, decided-ignored, component-qids-unchecked, dates-unchecked, single-word-variant |
+
+### ontology-entities / Поиск дублей
+
+| Пункт | Вид генератора | @example | Мутация |
+|---|---|---|---|
+| Кандидаты по последнему слову названия и датам | S.ontology_names | EM::test_candidates (Дж. Локк/Джон Локк) | candidates-last-word-dropped, candidates-dates-ignored |
+| Кандидаты: основное одной = любое название другой | S.ontology_names / S.ontology_with_duplicates | EM::test_candidates_invariant, test_primary_on_different_records | candidates-primary-only |
+| Кандидаты одного типа, разные типы — никогда | S.ontology_names | EM::test_different_types, test_candidates_invariant | candidates-no-type |
+| Группа «тип + последнее слово» ≤ 200 перебирается | параметр size теста (200 / 201) | EM::test_last_word_group_cap | group-cap-off |
+| Большая группа не перебирается, событие `duplicate_group_capped` | параметр size (201+) | EM::test_last_word_group_cap | group-cap-silent |
+| Событие без названий (`type`, `size`, `limit`) | параметр size | EM::test_last_word_group_cap (сверка полей) | capped-event-leaks-name |
+| Совпадения основного с названием ищутся и в большой группе | параметр size (201+) + общее основное | EM::test_last_word_group_cap | capped-group-aborts |
+| Основное название на разных записях → пункты `duplicate` по парам | сценарный (три «Berkeley») | EM::test_primary_on_different_records (фактически роняет: test_candidates, test_candidates_invariant) | candidates-primary-only |
+| Большая группа не прекращает перебор остальных групп | сценарный: группы до и после большой | EM::test_last_word_group_cap[201] | capped-group-stops-scan (J3-3) |
+
+### ontology-entities / Слияние с перенаправлением
+
+| Пункт | Вид генератора | @example | Мутация |
+|---|---|---|---|
+| Переносятся названия | S.ontology_with_duplicates | EM::test_preservation_and_undo | merge-names-not-moved |
+| Переносятся утверждения (субъект) | S.ontology_with_duplicates | EM::test_preservation_and_undo (фактически роняет: test_repeat_folds) | merge-subject-not-moved |
+| Переносятся утверждения (объект) | S.ontology_with_duplicates | EM::test_preservation_and_undo | merge-object-not-moved |
+| Переносятся атрибуции автора позиции | S.ontology_with_duplicates (kind rel/holds) | EM::test_author_attribution_moves | author-attribution-stays |
+| Переносятся внешние идентификаторы | S.ontology_with_duplicates (QID у одной стороны) | EM::test_undo_with_fold_and_qid (фактически роняет: test_external_rows_move_to_kept) | merge-externals-not-moved |
+| Переносятся упоминания | S.ontology_with_duplicates (mentions) | EM::test_preservation_and_undo | merge-mentions-not-moved |
+| Переносятся портреты; с тем же признаком остаётся за удалённой | S.ontology_with_duplicates (portraits одинаковый phash) | EM::test_preservation_and_undo | merge-portraits-not-moved, merge-portraits-same-phash-moved |
+| Названия: одно основное, русское если есть у любой | S.ontology_with_duplicates | EM::test_preservation_and_undo; пример «Locke»←«Локк» | merge-russian-not-preferred, kept-primary-stays |
+| Прочие бывшие основные — варианты; виды — в запись слияния | S.ontology_with_duplicates | EM::test_preservation_and_undo | kept-primary-stays, undo-names-kinds-not-restored |
+| Ключи перенесённых пересчитываются, повтор сворачивается | S.ontology_with_duplicates (repeats) | EM::test_repeat_folds | key-not-recomputed |
+| Свёртка: атрибуции и подтверждения повтора переносятся | S.ontology_with_duplicates (repeats) | EM::test_repeat_folds, test_preservation_and_undo | fold-attributions-dropped, fold-evidence-dropped (О25) |
+| Свёртка: согласие пересчитывается | S.ontology_with_duplicates (repeats, позиции asserts/disputes/mentions, 3 источника + персоны) — О25 | EM::FOLD_DISPUTED (2 «утверждает» + 1 «оспаривает» ⇒ disputed) в test_preservation_and_undo | fold-consensus-kept (J-A) |
+| Перенос атрибуции-автора: согласие пересчитывается | S.ontology_with_duplicates (утверждения третьих лиц с авторами K и R) — О25 | EM::WHO_COLLAPSE в test_preservation_and_undo | who-consensus-kept |
+| Ссылка по id свёрнутого отдаёт оставшееся | S.ontology_with_duplicates | EM::test_repeat_folds | key-not-recomputed, fold-redirect-missing (О25) |
+| Петля остаётся в базе, не показывается, считается как петля | S.ontology_with_duplicates (loops) | EM::test_loop | loop-shown, merged-loops-zero, loop-deleted (О25) |
+| Копия основных значений оставшейся пересчитывается | S.ontology_with_duplicates (lifespan чаще у удалённой, description) — О25 | EM::PRIMARY_FROM_REMOVED в test_preservation_and_undo; PM::test_merge_updates_primary_dates | merge-primary-stale (J-E) |
+| Перенаправление: старый id отдаёт оставшуюся | S.ontology_with_duplicates | EM::test_old_link | merge-redirect-missing |
+| Отмена: названия и их вид | S.ontology_with_duplicates | EM::test_preservation_and_undo (фактически роняет: test_undo) | undo-names-kinds-not-restored |
+| Отмена: утверждения, включая свёрнутые, с прежними id | S.ontology_with_duplicates | EM::test_undo_with_fold_and_qid | undo-subject-not-restored |
+| Отмена: свёрнутые утверждения с прежними id | S.ontology_with_duplicates (repeats) | EM::test_undo_with_fold_and_qid | undo-fold-not-restored (О25) |
+| Отмена: атрибуции и подтверждения | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-attributions-not-restored, undo-evidence-not-restored (О25) |
+| Отмена: согласие и копии основных значений обеих — как до слияния (дамп) | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-consensus-stale, undo-primary-stale (О25) |
+| Отмена: QID возвращается удалённой | сценарный (Hume Q41568) | EM::test_undo_with_fold_and_qid | undo-without-externals |
+| Отмена: упоминания и портреты | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-mentions-not-restored, undo-portraits-not-restored |
+| Отмена снимает перенаправление | S.ontology_with_duplicates | EM::test_undo | undo-redirect-kept |
+| `merged` с полями `kept, removed, reason, statements, attributions, folded, loops` | S.ontology_with_duplicates | EM::test_repeat_folds (folded=1), test_author_attribution_moves (attributions≥1), test_loop (loops=1) | merged-statements-count, merged-attributions-zero, merged-folded-zero, merged-loops-zero |
+| `merge_undone` с `kept, removed, restored` | сценарный | EM::test_undo_with_fold_and_qid (restored=1) | undo-event-restored-zero, undo-event-kept-removed-swapped |
+| Инвариант: не потеряно утверждение/атрибуция/подтверждение; отмена ⇒ дамп равен исходному | S.ontology_with_duplicates (5–30 сущностей) | EM::test_preservation_and_undo | merge-subject-not-moved, merge-object-not-moved, undo-subject-not-restored, key-not-recomputed |
+
+
+
+Прогоны мутаций аудита (требование | мутация | тест | упал):
+
+| Требование | Мутация | Тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | step-qid-dropped | tests/knowledge/test_person_quality.py::test_transliteration_with_decision | да (1) |
+| Слияние вариантов персоны | step-name-merge-dropped | tests/knowledge/test_person_quality.py::test_common_primary_name | да (1) |
+| Слияние вариантов персоны | step-none-as-review | tests/knowledge/test_dedupe_unit.py::test_same_person | да (1) |
+| Слияние вариантов персоны | dates-slack-zero | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1) |
+| Слияние вариантов персоны | dates-slack-three | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1) |
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1) |
+| Слияние вариантов персоны | kept-qid-ignored | tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair | да (1) |
+| Слияние вариантов персоны | kept-counts-ignored | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1) |
+| Слияние вариантов персоны | kept-id-tiebreak-reversed | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1) |
+| Слияние вариантов персоны | cluster-reason-dates-first | tests/knowledge/test_person_quality.py::test_component_reason_priority_qid_cluster_over_dates | да (1) |
+| Слияние вариантов персоны | decided-pair-requeued | tests/knowledge/test_person_quality.py::test_decided_pair_not_requeued_after_merge_mapping | да (1) |
+| Слияние вариантов персоны | propose-repeats | tests/knowledge/test_dedupe_unit.py::test_dedupe_run_merges_and_proposes | да (1) |
+| Слияние вариантов персоны | load-persons-inactive | tests/knowledge/test_person_quality.py::test_redirected_person_not_loaded | да (1) |
+| Слияние вариантов персоны | link-counts-no-authors | tests/knowledge/test_person_quality.py::test_link_counts_subject_object_author | да (1) |
+| Слияние вариантов персоны | link-counts-no-object | tests/knowledge/test_person_quality.py::test_link_counts_subject_object_author | да (1) |
+| Поиск дублей | candidates-ignore-variants | tests/knowledge/test_person_quality.py::test_only_variant_matched | да (1) |
+| Слияние с перенаправлением | merge-subject-not-moved | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1) |
+| Слияние с перенаправлением | merge-object-not-moved | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | merge-externals-not-moved | tests/knowledge/test_entity_merge.py::test_external_rows_move_to_kept | да (1) |
+| Слияние с перенаправлением | merge-mentions-not-moved | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | merge-names-not-moved | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | merge-portraits-same-phash-moved | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | merge-portraits-not-moved | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | merge-redirect-missing | tests/knowledge/test_entity_merge.py::test_old_link | да (1) |
+| Слияние с перенаправлением | merge-russian-not-preferred | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | undo-names-kinds-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1) |
+| Слияние с перенаправлением | undo-subject-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1) |
+| Слияние с перенаправлением | undo-mentions-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | undo-portraits-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | undo-attributions-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1) |
+| Слияние с перенаправлением | undo-redirect-kept | tests/knowledge/test_entity_merge.py::test_undo | да (1) |
+| Слияние с перенаправлением | undo-event-restored-zero | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1) |
+| Слияние с перенаправлением | undo-event-kept-removed-swapped | tests/knowledge/test_entity_merge.py::test_undo | да (1) |
+| Слияние с перенаправлением | merged-statements-count | tests/knowledge/test_person_merge_unit.py::test_merge_entities_folds_repeat_and_undo_restores | да (1) |
+| Слияние с перенаправлением | merged-attributions-zero | tests/knowledge/test_entity_merge.py::test_author_attribution_moves | да (1) |
+| Слияние с перенаправлением | merged-folded-zero | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1) |
+| Слияние с перенаправлением | merged-loops-zero | tests/knowledge/test_entity_merge.py::test_loop | да (1) |
+| Качество персон | person-stopword-skipped | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1) |
+| Качество персон | person-sentence-unchecked | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1) |
+| Слияние вариантов персоны | dates-one-side-conflict | tests/knowledge/test_person_quality.py::test_date_chain_component | да (1) |
+| Слияние вариантов персоны | dates-after-confirmed | tests/knowledge/test_person_quality.py::test_same_person_step_order | да (1) |
+| Слияние вариантов персоны | decided-before-qid | tests/knowledge/test_person_quality.py::test_same_person_step_order | да (1) |
+| Слияние вариантов персоны | model-pair-before-name | tests/knowledge/test_person_quality.py::test_same_person_step_order | да (1) |
+| Слияние вариантов персоны | external-not-unique | tests/knowledge/test_person_quality.py::test_external_id_unique | да (1) |
+| Слияние вариантов персоны | add-external-duplicate | tests/knowledge/test_person_quality.py::test_external_id_unique | да (1) |
+| Поиск дублей | candidates-dates-ignored | tests/knowledge/test_entity_merge.py::test_candidates_need_equal_dates_for_last_word | да (1) |
+| Поиск дублей | candidates-last-word-dropped | tests/knowledge/test_entity_merge.py::test_candidates | да (1) |
+| Поиск дублей | capped-event-leaks-name | tests/knowledge/test_entity_merge.py::test_last_word_group_cap | да (1) |
+| Поиск дублей | capped-group-aborts | tests/knowledge/test_entity_merge.py::test_last_word_group_cap | да (1) |
+| — | merge-reason-rank | — | НЕТ (20 passed, 1 warning in 67.08s (0:01:07)) |
+| — | decided-edges-queued | — | НЕТ (49 passed, 1 warning in 47.81s) |
+| — | components-order-dependent | — | НЕТ (49 passed, 1 warning in 120.58s (0:02:00)) |
+| — | variants-include-primary | — | НЕТ (49 passed, 1 warning in 93.12s (0:01:33)) |
+| — | apart-count-wrong | — | НЕТ (49 passed, 1 warning in 93.84s (0:01:33)) |
+| — | merge-kinds-not-recorded | — | НЕТ (не прогнан) |
+
+**Не покрыто:**
+- «Персоны, созданные до изменения, приводит миграция» — пункт `ontology-migration` (тесты `test_ontology_migration.py` и мутации `migrate-ontology-quality`), здесь не дублируется.
+- Причины `review:qid_candidate`/`review:qid_taken` ставит команда QID — покрыты в `add-wikidata-life-dates` (`holder-not-queued`, `suggest-decided-apart-requeued`).
+- «Кандидаты по внешним идентификаторам» (ontology-entities): внешний идентификатор уникален, поиск по нему тождественен поиску по названию; отдельной ветки кода нет.
+
+**Дефекты:** расхождений кода со спецификацией не найдено; все выжившие мутации были пробелами тестов и закрыты.
+
+Штатный прогон `scripts/mutation_check.py --change improve-person-quality --id dates-start-only` в worktree: test_dates_conflict_on_start_or_end_interval упал. Остальные мутации — тем же способом (патч в worktree от HEAD, pytest по связанным файлам).
+
+## Тестировщик — О23 (2026-11-26, коммит 0f531e4)
+
+Правило О23 (каждое множество спецификации — в генераторах целиком) проверяется тестом `tests/knowledge/test_strategies_cover_spec_sets.py`: множества переписаны из дельт руками, для каждого элемента `hypothesis.find` ищет пример в генераторе (82 passed). По этому изменению:
+- person-quality: генератор лиц `persons_with_variants` порождает `merge:name`, `merge:model_pair`, `merge:qid_confirmed`, `review:dates`, `review:decided_conflict`, `review:qid_cluster`, `review:single_name`, `review:variant`; коды решений человека и команды QID (`merge:review`, `review:qid_candidate`, `review:qid_taken`, `apart:decided/none/qid/type`) есть в сценарных тестах. Найденные пробелы закрыты: шаги 8–9 `same_person` (`review:single_name`, `review:variant`, `apart:none`) — test_person_quality::test_same_person_step_order (11 passed); `review:qid_taken` — test_life_dates::test_qid_taken_queued (`auto` и не-персона, 2 passed).
+- life-dates: `wd_times` порождает каждую строку таблицы точностей (11, 10, 9, 8, 7, 6), точность ниже 6, год 0000, оба знака; `wd_claim_values` — все три ранга; `DECISIONS` = {pending, accepted, auto, rejected}.
+
+## Судья — повторно, 2026-11-26, коммит 4550a9d (после прогонов в ветку пришли d94f8e2 и др. — только тесты других изменений и перенос `raw_names` в `strategies.py`; часть `person-quality` в `strategies.py` и `src` не менялись)
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant, test_person_rule_any_input | passed, мутации упали | test_person_quality.py 46 passed in 92.92s; моя J-D (проверка склейки по союзу убрана) — упали test_glued, test_person_quality_invariant, test_person_rule_any_input | — (стенд извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 14 сценариев, test_plan_partition_any_order, test_merge_invariant_two_orders, test_date_chain_component | passed, мутации упали | passed; `--id` component-dates-ignored (J1), cluster-reason-dates-first, decided-as-qid-cluster — упали все ожидаемые; **dates-start-only и моя J-B (интервал неопределённости дат не учитывается) — оба property-теста проходят** (4 passed / 5 passed), роняет только параметризованный test_dates_conflict_on_start_or_end_interval | одна онтология судьи: Berkeley×3 → одна (2× `merged merge:name`); Бэкон×3 с решением «разные» по 1–2 — слияний нет, 2× `merge_proposed review:decided_conflict`, пары 1–2 в очереди нет; цепочка «Беркли Цепь» 1685–1753 / без дат / 1885–1953 — слияний нет, 3× `review:dates`; Омир → Гомер уже в `LifeDates.apply` (`life_dates.skipped qid_taken`, `merged merge:qid_confirmed`), Q6691 у Гомера, `/v1/entities/<Омир>` отдаёт Гомера; Locke(Q9353)/Локк по элементу модели — `merged merge:model_pair statements=1`, основное «Локк», вариант «Locke» | J1 закрыт; пробел в генераторе дат (см. ниже) |
+| ontology-entities «Поиск дублей» | 3 сценария, test_candidates_invariant, test_last_word_group_cap | passed | test_entity_merge.py 15 passed in 69.91s; моя J-C (первое слово вместо последнего) — упали test_candidates, test_last_word_group_cap[200/201] | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed; `--id` undo-without-externals, merge-russian-not-preferred — упали; **моя J-A (в `_fold` не пересчитывается согласие) — не упал ни один тест** (test_entity_merge, test_person_merge_unit, test_statements: 41 passed); **моя J-E (`_refresh_primary(kept)` после слияния убран) — роняет только test_person_merge_unit::test_merge_updates_primary_dates без маркера `req`**, тесты тестировщика (68 в трёх файлах) проходят | отмена трёх слияний (Омир и два Berkeley) — дамп равен дампу до `apply` (0 различающихся таблиц), `merge_undone` ×3; отмена Locke/Локк — Q9353 у Locke, основное «Locke», «Локк» снова основное у своей | **не подтверждено** (согласие, копия основных значений) |
+
+Прежние: test_registry_entities 33 passed, 1 skipped · test_statements 19 passed · test_snapshot 6 passed; `git diff origin/claude/embedding-docker...HEAD` по ним пуст. test_strategies_cover_spec_sets 91 passed in 318.27s.
+`ruff check` / `ruff format --check` по 13 файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования. Файл Lead'а `prompts/__init__.py` — только текст `ontology.extract` (и блок `language`, `translate_names` от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу собранной онтологии (`LifeDates.apply`, `Dedupe.run`, стенд извлечения, `Statements.undo_merge`, `GET /v1/entities/{id}`). Мутации — в отдельном worktree, удалён; `git diff -- src` пуст.
+
+**Неэквивалентность J-A** (зонд): «Юм» — «испытал влияние Локка» с `asserts` s_a (`prevailing`), «Hume» — то же с `disputes` s_b; после слияния «Hume» в «Юм» у свёрнутого утверждения атрибуции `asserts s_a`, `disputes s_b`. Без мутации согласие `disputed`, под мутацией остаётся `prevailing`. Пункт спецификации «согласие пересчитывается» нарушен, а тесты этого не видят.
+
+**Тест полноты стратегий.** Множества кодов сверены со спецификацией: `merge:*` 4 (3 в генераторе плюс `merge:review`), `review:*` 7 (5 плюс `qid_candidate` и `qid_taken`), `apart:*` 4. Все 9 вердиктов правила `same_person` перечислены. Проверяемый код тест не импортирует: на HEAD `raw_names` взят из `strategies`. Но допуска и определения дат для `person-quality` в тесте нет. Генератор `persons_with_variants` даёт только точные годы и одинаковый сдвиг начала и конца, поэтому расхождение только начала, только конца и интервалы неопределённости входом не порождаются. Строки аудита «Даты противоречат: интервалы начала / конца» указывают вид `S.persons_with_variants dates`, а он такого входа не даёт. Кроме того, `test_person_scenario_codes` проверяет коды `apart:*` по тексту исходников и без маркера `req`.
+
+**Аудит пунктов.** Выбраны 8 нормативных пунктов:
+- найдены 6: «ровно одно `rejected` на отказ», «`dropped` с кодом», «интервалы начала», «решённая пара не в очередь», «группа ≤ 200», «отмена: QID удалённой»;
+- **нет строк** у двух пунктов «Слияния с перенаправлением»: «согласие пересчитывается» и «Копия основных значений оставшейся SHALL пересчитываться». У обоих есть выжившая мутация (J-A, J-E).
+
+Подгонка: признаков не найдено. Ожидания не правились, skip/xfail нет, оракулы не берут ответ из `dedupe`/`naming`. Найденное — пробелы покрытия, дефектов кода нет.
+
+Вердикт: **не принято** — вернуть тестировщику:
+1. «Согласие пересчитывается» при свёртке и при переносе атрибуции-автора. Нужны:
+   - в `ontology_with_duplicates` позиции `disputes` и ≥ 3 источника;
+   - в `test_preservation_and_undo` сверка согласия оставшегося с ожидаемым по атрибуциям;
+   - мутация J-A (без `_recompute_consensus` в `_fold`) и аналог для `attributions_who` — в `mutations.yaml`;
+   - строки аудита.
+2. «Копия основных значений пересчитывается». Нужны:
+   - property или сценарий, где даты есть только у удалённой (оставшаяся — по QID или ссылкам), с ожиданием `primary.dates` оставшейся;
+   - мутация J-E в `mutations.yaml`;
+   - строка аудита.
+3. Определение «Даты противоречат» в генераторе лиц. Нужны:
+   - виды с расхождением только начала, только конца и с интервалами неопределённости (earliest ≠ latest) по обе стороны границы допуска;
+   - `@example` границ;
+   - `dates-start-only`, `dates-end-only` и J-B с ожиданием падения обоих property-тестов;
+   - проверка допуска и обоих интервалов в `test_strategies_cover_spec_sets.py`;
+   - исправленные строки аудита.
+
+Разработчику возвращать нечего.
+
+## Тестировщик — возврат судьи повторно (О25), 2026-11-26, тесты на 0f07c24
+
+Закрыты 4 пункта вердикта ee206fa, а также пройдены все MODIFIED-требования `ontology-entities`. Для каждого следствия («переносится», «пересчитывается», «возвращается») — своя проверка и мутация.
+
+1. **«Согласие пересчитывается».**
+   - В `S.ontology_with_duplicates`:
+     - позиции атрибуций — ровно из спецификации `ontology-statements` «Атрибуция»: `asserts`/`disputes`/`mentions`. Прежнее `supports` не позиция спецификации, оно заменено;
+     - до 5 атрибуций; 3 источника и персоны как независимые авторы;
+     - новый блок: утверждения третьих лиц с авторами K и R и добавками `asserts s_a + disputes s_b` / `asserts s_a` / `disputes s_c`.
+   - В `test_preservation_and_undo` два независимых оракула:
+     - (а) сценарий «Спорное»: если у оставшегося утверждения независимых «утверждает» 2 и «оспаривает» 1, то `consensus == "disputed"`;
+     - (б) после отмены то же множество атрибуций записывается у новой сущности «Эталон согласия» и даёт то же согласие, что у оставшегося после слияния.
+   - `@example`:
+     - `FOLD_DISPUTED` — свёртка: K: s_a, s_c «утверждает»; R: s_b «оспаривает»;
+     - `WHO_COLLAPSE` — авторы K, R, s_a «утверждает», s_b «оспаривает»: 3:1 ⇒ после переноса 2:1.
+2. **«Копия основных значений оставшейся пересчитывается».**
+   - Генератор даёт `lifespan` (чаще у удалённой) и `description`.
+   - Проверка: `primary.dates` и `primary.description` оставшейся равны значению одного из её действующих утверждений этого типа. Если таких утверждений нет, ключа нет.
+   - `@example(PRIMARY_FROM_REMOVED)`: годы жизни и описание только у удалённой, QID у оставшейся. Маркер `req` есть.
+3. **«Даты противоречат».**
+   - Новый вид лица `dates_any` и стратегия `S.life_bounds`:
+     - независимые несимметричные сдвиги начала и конца ±12;
+     - ширина интервала неопределённости 0/1/3/5/9/99 («ок.», десятилетие, век);
+     - вторая сторона может быть без дат.
+   - Ожидание считает `S.dates_conflict_spec` по формуле спецификации (допуск 2) и не импортирует `dedupe`.
+   - `@example(DATE_INTERVALS)` в обоих property-тестах. Случаи:
+     - расходится только начало; расходится только конец;
+     - зазор начала 4 / 5 при интервале; зазор конца 4 / 5 при интервале;
+     - даты у одной стороны.
+   - В `test_strategies_cover_spec_sets.py`:
+     - `test_person_date_shapes_generated` — 7 форм; при каждой находке сверяет ожидание лица с допуском 2;
+     - `test_person_date_one_side_generated` — проверяет `DATE_SLACK_SPEC == 2`.
+4. **`test_person_scenario_codes`** перенесён в `test_person_quality.py` и проверяет поведение, маркер `req` есть:
+   - `apart:type/qid/decided/none` — через `dedupe.same_person` на входах шагов 1, 2, 3, 9 (шаг 2 вместе с решением «разные», шаг 1 вместе с парой модели);
+   - `merge:review` — `resolve_duplicate`, событие `merged` с `reason`;
+   - `review:qid_candidate` — `LifeDates.suggest` и `Dedupe.run`;
+   - `review:qid_taken` — `LifeDates.apply` с `auto`: `merge_proposed`, нет `merged`, обе сущности на месте.
+   - Новый `test_person_codes_partition`: сгенерированные коды ∪ коды поведения = множества `merge:*` (4), `review:*` (7), `apart:*` (4) из спецификации; пересечения нет.
+
+**Проход MODIFIED `ontology-entities`.** Найдены и закрыты мутациями следствия без своей мутации:
+- свёртка переносит атрибуции и подтверждения: `fold-attributions-dropped`, `fold-evidence-dropped`;
+- id свёрнутого отдаёт оставшееся: `fold-redirect-missing` (раньше закрывал только `key-not-recomputed`);
+- петля остаётся в базе: `loop-deleted`;
+- отмена возвращает свёрнутые утверждения: `undo-fold-not-restored`;
+- отмена возвращает подтверждения: `undo-evidence-not-restored`;
+- отмена пересчитывает согласие и копии основных значений обеих сторон: `undo-consensus-stale`, `undo-primary-stale`.
+
+Прочие следствия уже имели мутации (таблица аудита О21, строки дополнены).
+
+### Сырые прогоны (SQLite, по одному pytest)
+
+- `pytest tests/knowledge/test_person_quality.py tests/knowledge/test_entity_merge.py` — 68 passed in 71.68s
+- `pytest tests/knowledge/test_strategies_cover_spec_sets.py -k person` — 17 passed, 82 deselected in 25.94s
+- `ruff check tests/knowledge/` — чисто; `ruff format --check` по 4 файлам — чисто; `check_traceability.py` — 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования (мутаций 88)
+
+### Мутации, `scripts/mutation_check.py --change improve-person-quality --id <id>` на 0f07c24
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 1 warning in 0.36s) |
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.76s) |
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 2.90s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 1 passed, 1 warning in 0.32s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.47s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 3.02s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 6 passed, 1 warning in 0.30s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.50s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 2.81s) |
+| Слияние с перенаправлением | fold-consensus-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.80s) |
+| Слияние с перенаправлением | who-consensus-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.90s) |
+| Слияние с перенаправлением | merge-primary-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.80s) |
+| Слияние с перенаправлением | merge-primary-stale | tests/knowledge/test_person_merge_unit.py::test_merge_updates_primary_dates | да (1 failed in 0.42s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.67s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.81s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.97s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.66s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.68s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.99s) |
+| Слияние с перенаправлением | fold-redirect-missing | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.68s) |
+| Слияние с перенаправлением | fold-redirect-missing | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.71s) |
+| Слияние с перенаправлением | loop-deleted | tests/knowledge/test_entity_merge.py::test_loop | да (1 failed, 1 warning in 0.70s) |
+| Слияние с перенаправлением | loop-deleted | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.89s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 0.73s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.66s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.71s) |
+| Слияние с перенаправлением | undo-evidence-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.71s) |
+| Слияние с перенаправлением | undo-evidence-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.96s) |
+| Слияние с перенаправлением | undo-consensus-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.83s) |
+| Слияние с перенаправлением | undo-primary-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.62s) |
+
+**Без `@example`** (зонд в worktree: строки `@example` нового вида удалены, генератор один):
+- `fold-consensus-kept` — test_preservation_and_undo упал (316 s, Hypothesis нашёл 2 разных падения);
+- `who-consensus-kept` — до блока «авторы K и R» проходил (1 passed in 20.66s); после — упал (56.69s);
+- `merge-primary-stale` — упал;
+- `dates-start-only` — оба property-теста упали;
+- `dates-end-only` и `dates-interval-ignored` — test_plan_partition_any_order упал (профиль pure, 400 примеров). test_merge_invariant_two_orders (профиль heavy, 25 примеров) без `@example` проходит: вид `dates_any` — 2 из 22 видов лица. С `@example(DATE_INTERVALS)` падают оба.
+
+**Наблюдение.** В тестах `test_author_attribution_moves` (EM) позиция `supports` осталась: её нет в спецификации «Атрибуция», но сценарий проверяет только перенос «с той же позицией». Код позицию не проверяет.
+
+## Судья — третий круг, 2026-11-26, коммит f8b6e3f
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant, test_person_rule_any_input | passed, мутации упали | test_person_quality.py 53 passed in 65.75s; своя J3-2 (склейка ищется только при союзе вторым словом) — упал test_person_quality_invariant | — (стенд извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 14 сценариев, test_plan_partition_any_order, test_merge_invariant_two_orders, test_person_scenario_codes | passed, мутации упали | passed; `--id` component-qids-unchecked, dates-interval-ignored — упали все ожидаемые (3 и 3); **своя J3-1 (при `review:dates` и `apart:decided` в одной компоненте причина `review:decided_conflict` вместо `review:dates`) — не упал ни один тест** (test_person_quality + test_dedupe_unit: 72 passed) | онтология судьи: Spinoza(Q35802)×Spinoza(1632–1677) → `merged merge:name`, оставшаяся с QID, `primary.dates` 1632–1677 (даты были только у удалённой); Декарт 1596–1650 × 1696–1750 → `merge_proposed review:dates`, пункт `duplicate`, обе на месте; Гоббс Q37621 × Q999001 — ни слияния, ни очереди (`apart`=1) | **не подтверждено** (приоритет причин компоненты) |
+| ontology-entities «Поиск дублей» | 3 сценария, test_candidates_invariant, test_last_word_group_cap | passed | test_entity_merge.py 15 passed in 62.21s; **своя J3-3 (`continue` → `break` после события `duplicate_group_capped`: группы, идущие после большой, не перебираются) — 15 passed** | — | **не подтверждено** (перебор прочих групп при большой) |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed; `--id` undo-without-externals (2), fold-consensus-kept, merge-primary-stale (2) — упали; своя J3-4 (свёртка считает повтором атрибуцию того же автора с другой позицией) — упал test_preservation_and_undo | Leibniz → Лейбниц: `merged` folded=1, attributions=1; у оставшегося s_a, s_c «утверждает», s_b «оспаривает», согласие `disputed` (до — `prevailing`); основное «Лейбниц», вариант «Leibniz»; `GET /v1/entities/<Leibniz>` → 200, Лейбниц; отмена — `merge_undone restored=1`, дамп таблиц равен дампу до слияния (0 различий), свёрнутое снова со своим id и субъектом, согласие `prevailing` | подтверждено |
+
+Замечания прежних судей: J1 (цепочка дат) — test_date_chain_component, мутация component-dates-ignored в списке; J-A — fold-consensus-kept и who-consensus-kept в `mutations.yaml`, своим прогоном fold-consensus-kept упал; J-E — merge-primary-stale роняет test_preservation_and_undo (маркер `req` есть); интервалы дат — `S.life_bounds`/`dates_any`, оракул `S.dates_conflict_spec` по формуле спецификации, dates-interval-ignored роняет оба property-теста; `test_person_scenario_codes` проверяет коды поведением (`same_person`, `resolve_duplicate`, `LifeDates.suggest`/`apply`), маркер `req` есть. Закрыты.
+
+Тест полноты стратегий: множества `merge:*` (4), `review:*` (7), `apart:*` (4) и допуск 2 совпадают с дельтой (сверено построчно); переписаны в тест руками, а не читаются из файла спецификации. `src` тест не импортирует (`strategies` и `test_person_quality.SCENARIO_CODES`), `strategies.py` не импортирует `philograph`. 99 passed in 133.78s.
+
+Аудит пунктов (8 выбранных): найдены строки у «`dropped` с кодом», «оставшаяся — меньший id», «разные типы — никогда», «портрет с тем же признаком — за удалённой», «точный повтор атрибуции» (J3-4 подтверждает). **Строк нет** у двух пунктов: «иначе `review:dates` при противоречащих датах; иначе `review:decided_conflict`» (есть только строка qid_cluster/dates) и «большая группа не перебирается» в смысле «прочие группы перебираются» (строка есть, но проверяет только саму большую группу). По обоим выжила моя мутация.
+
+Неэквивалентность (зонд в worktree, `plan` и `duplicate_candidates` напрямую):
+- J3-1: «Бэкон» a (1561–1626), b, d (без дат), c (1214–1292), решение «разные» по c–d. Без мутации рёбра a–b, a–d, b–c, b–d — `review:dates`; с мутацией — `review:decided_conflict`. Спецификация требует `review:dates`.
+- J3-3: 201 «… Локк» и затем «Пётр Юм»/«Иван Юм» без дат. Без мутации пара Юмов в кандидатах; с мутацией её нет. Спецификация не перебирает только большую группу.
+
+Прежние: test_registry_entities 33 passed, 1 skipped · test_statements 19 passed · test_snapshot 6 passed.
+`ruff check` и `ruff format --check` по 14 файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования. `prompts/__init__.py` — только текст шаблонов (`ontology.extract`, плюс `language` и `translate_names` от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу своей онтологии. Мутации — в отдельном worktree, удалён; `git diff -- src` пуст.
+
+Подгонка: не найдена. Ожидания не правились, skip/xfail нет, оракулы дат и согласия не берут ответ из `dedupe`.
+
+Вердикт: **не принято** — вернуть тестировщику:
+1. Приоритет причин компоненты `review:dates` над `review:decided_conflict`. Нужны: вид генератора лиц (или `@example`) с компонентой, где есть и противоречие дат, и решение «разные»; мутация J3-1 в `mutations.yaml`; строка аудита.
+2. «Поиск дублей»: большая группа не мешает перебору остальных групп. Нужны: в test_last_word_group_cap (или property) малая группа с парой по последнему слову и датам рядом с большой, в любом порядке создания; мутация J3-3 в `mutations.yaml`; уточнённая строка аудита.
+
+Разработчику возвращать нечего: оба зонда на текущем коде дают поведение по спецификации.
+
+## Тестировщик — третий возврат судьи (О26), 2026-11-26, тесты на a126568 и 1978deb
+
+1. **Порядок причин компоненты — все сочетания.** В `S.persons_with_variants` новый вид лица `reasons_mix`.
+   - Компонента одного названия; в ней любое непустое сочетание преград, чаще ≥ 2:
+     - пара с двумя QID;
+     - пара с противоречащими датами;
+     - пара с решением «разные».
+   - Записи без QID, дат и решений связывают преграды рёбрами `merge:name`.
+   - Ожидание по порядку спецификации (`COMPONENT_REASONS`):
+     - рёбра `merge:*` уходят в очередь с причиной первой по порядку преграды;
+     - пара с противоречием дат идёт со своей `review:dates`;
+     - пары `apart:*` в очередь не идут.
+   - `@example(DATES_AND_DECIDED)` — пример судьи «Бэкон»: a 1561–1626, b и d без дат, c 1214–1292, «разные» c–d. Пример стоит в `test_plan_partition_any_order` и в `test_merge_invariant_two_orders`.
+   - `test_component_reason_combos_generated` проверяет, что генератор даёт все 7 сочетаний и что при каждой находке побеждает первая по порядку причина.
+   - Мутации, обе падают на обоих property-тестах:
+     - `reason-decided-before-dates` (J3-1);
+     - `reason-decided-before-qid` — пара qid/decided. Пару qid/dates уже закрывала `cluster-reason-dates-first`.
+2. **Поиск дублей: большая группа не прекращает перебор.**
+   - В `test_last_word_group_cap` [200/201] малые группы последнего слова создаются до большой («Кант») и после неё («Юм», «Беркли»). Их пары должны быть в кандидатах.
+   - Мутация `capped-group-stops-scan` (J3-3, `continue` → `break`) роняет `[201]`.
+3. **Общее правило «все пары порядка».**
+   - naming:
+     - `test_rule_order_pairs` — 6 возможных пар правил 1–5;
+     - `test_rule_order_pairs_complete` — 6 невозможных пар, с обоснованием по определениям и данным стоп-списка.
+   - dating:
+     - `test_dating_check_order_pairs` — 14 пар проверок 1–6;
+     - невозможна одна пара: `unparsed`/`single_year`, одиночный год определён только через формат;
+     - новые мутации: `check-order-unparsed-paragraph`, `-era-quote`, `-era-unparsed`, `-single-numbers`, `-numbers-quote`.
+   - life-dates: `@example` с шагами 2 и 3 сразу (другой QID и занятый QID ⇒ `qid_conflict`); мутация `taken-before-conflict`.
+   - Перевод миграции: `test_reply_check_order_pairs` — 6 пар `unknown`/`duplicate`/`not_russian`/`invalid`; мутации `reply-*` (yaml миграции — вместе с цепочкой мутаций).
+4. **Общее правило «элементы после пропуска».**
+   - Прогон «`continue` → `break`» на каждом цикле. Сайтов: `dedupe` 1, `naming` 3, `life_dates` 14, `ontology_migrate` 15.
+   - Выжившие и что их закрывает:
+     - naming `names_for` после отклонённого написания: новый случай `test_primary_choice_by_item[item4]`;
+     - life-dates `suggest` после кандидата без держателя и после держателя другого типа: `test_candidate_holder_after_skipped`;
+     - `apply` после `refused`: `test_refused_then_applied`;
+     - `apply` после `qid_taken`: `@example` в `test_qid_confirmation_invariant`;
+     - обход связанных после «уже в манифесте», «тип без дат» и `bad_qid`: `test_linked_after_skips`.
+   - Мутации добавлены в yaml: `names-for-stops-after-rejected`, `suggest-stops-after-*`, `apply-stops-after-*`, `linked-stops-after-*`.
+   - Эквивалентны по спецификации:
+     - `validate` L138/L157: форма манифеста уже ошибочна, код 2 тот же;
+     - `_search` L308: поведение при сбое поиска для `suggest` спецификацией не задано;
+     - `_import` L523: отказ реестра роли персоны недостижим, все роли таблицы допустимы.
+   - `ontology_migrate` — в журнале миграции.
+5. **Устаревшие патчи.** После О22 код `naming` поменялся, и 12 патчей перестали накладываться:
+   - `add-name-unchecked`, `create-lang-given`, `create-unchecked`, `rejected-extra-field`, `reject-label-raw`, `rule-empty-as-number`, `rule-exempt-ignored`, `rule-no-nfc`, `rule-no-strip`, `rule-sentence-before-number`, `set-primary-unchecked`;
+   - `person-empty-as-number` (person-quality).
+
+   Все сняты заново от HEAD, все падают. `reject-label-raw`: create и add_name теперь чистят название до `reject`, поэтому прежние ожидаемые тесты этот путь не проходят. Добавлен путь отказа варианта модели — `test_rejected_variant_label_after_strip`. Вне моих изменений не накладывается `add-wikidata-life-dates/rollback-removes-verified.patch`, сообщаю, не правил.
+
+### Сырые прогоны
+
+- `pytest test_person_quality.py test_entity_merge.py` — 68 passed in 70.19s; `test_strategies_cover_spec_sets.py -k "person or component"` — 24 passed in 32.20s
+- `-k order_pairs` (naming + migration) — 13 passed in 2.39s; dating `-k order_pairs` — 15 passed in 0.54s; `test_rejected_variant_label_after_strip` — 3 passed
+- база прогона «после пропуска» на новых тестах (worktree): `test_entity_naming.py` 66 passed; `test_life_dates.py` 44 passed in 104.36s
+- `ruff check`/`format --check tests/knowledge/` — чисто; `check_traceability.py` — 415 из 415
+
+### Мутации, `scripts/mutation_check.py --change improve-person-quality --id <id>`
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | reason-decided-before-dates | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.67s) |
+| Слияние вариантов персоны | reason-decided-before-dates | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.14s) |
+| Слияние вариантов персоны | reason-decided-before-qid | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.52s) |
+| Слияние вариантов персоны | reason-decided-before-qid | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.08s) |
+| Поиск дублей | capped-group-stops-scan | tests/knowledge/test_entity_merge.py::test_last_word_group_cap | да (1 failed, 1 passed, 1 warning in 3.94s) |
+| Качество персон | person-empty-as-number | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1 failed, 1 warning in 2.56s) |
+
+## Судья — четвёртый круг, 2026-11-26, коммит 49a76fb
+
+Проверено в отдельном worktree от 49a76fb (`PYTHONPATH` на его `src`). `src` с третьего круга (f8b6e3f) не менялся; между 49a76fb и текущей вершиной ветки в `src` только `ontology_migrate.py` другого изменения.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant | passed, person-empty-as-number упала | test_person_quality.py + test_entity_merge.py: 68 passed in 146.88s | — (стенд не поднимался) | подтверждено |
+| person-quality «Слияние вариантов персоны» | test_plan_partition_any_order, test_merge_invariant_two_orders, reasons_mix | passed, reason-decided-before-* упали | `--id reason-decided-before-dates` — упали оба теста; своя M13 (в заблокированной компоненте в очередь идут все пары, не только `merge:*`) — упал; **своя M4 (в `plan` пары компоненты берутся только из пар-кандидатов, без вердикта для прочих пар: `inner = {p: verdicts[p] … if p in verdicts}`) — test_person_quality.py 53 passed** | зонд `plan`: «Hume» a, «Hume» b, «Юм» c, пара модели b–c. С решением «разные» по a–c: без мутации слияний нет, очередь a–b, b–c `review:decided_conflict`; с мутацией a, b, c слиты (`merge:name`), включая пару с решением «разные». С датами a 1711–1776, c 1911–1976 — то же: с мутацией слиты лица с противоречащими датами | **не подтверждено** |
+| ontology-entities «Поиск дублей» | test_last_word_group_cap, test_candidates_invariant | passed, capped-group-stops-scan упала | `--id capped-group-stops-scan` — упал [201]; своя M11 (группы последнего слова без типа) — упал test_entity_merge.py | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed (в составе 68) | — | подтверждено (src не менялся с третьего круга) |
+
+Замечания третьего круга J3-1, J3-3 закрыты: пример судьи стоит `@example` в обоих property-тестах, мутации в `mutations.yaml` и падают.
+`check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования; `ruff check` по `tests/knowledge` и `src/philograph/knowledge` чисто. Полный pytest и стенд не запускались (1 ГБ ОЗУ, указание ведущего).
+Неточность журнала: строка аудита О26 ссылается на `test_component_reason_combos_generated (cover)`, такого теста нет; есть `test_component_reason_combos_generated`.
+
+Подгонка: не найдена (ожидания не правились, skip/xfail нет, пример судьи проверяется, а не обходится).
+
+Вердикт: **не принято** — вернуть тестировщику: инвариант «если у какой-либо пары компоненты вердикт `apart:decided`/`review:dates`/`apart:qid` — слияний нет» не проверен для пар компоненты, которые не являются кандидатами по названию (компонента связана рёбрами `merge:model_pair` или `merge:qid_confirmed`, преграда — на паре без общего названия). Нужны: вид генератора лиц (или `@example`) с такой компонентой — и с решением «разные», и с противоречием дат на паре без общего названия; мутация M4 в `mutations.yaml`; строка аудита. Разработчику возвращать нечего: зонд на текущем коде даёт поведение по спецификации.
+
+## Тестировщик — M4 четвёртого судьи, 2026-11-26
+
+- `@example(HIDDEN_BARRIER)`: «Hume» a, «Hume» b, «Юм» c с QID; b подтверждён для QID c (`merge:qid_confirmed`), по a–c решение «разные». Пример стоит в обоих property-тестах.
+- `@example(HIDDEN_BARRIER_MODEL)`: b–c — пара модели (`merge:model_pair`). Только в `test_plan_partition_any_order`: на стенде пар модели нет.
+- Ожидание: слияний нет; a–b и b–c уходят в очередь с `review:decided_conflict`; a–c в очередь не идёт.
+- Прогон: `-k "plan_partition_any_order or merge_invariant_two_orders"` — 2 passed in 33.67s.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 1.57s) |
+| Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 7.39s) |
+
+## Тестировщик — О28 (правка слияния после Д1-mig, Д2-mig, коммит 1923675), 2026-11-26
+
+В `test_preservation_and_undo` добавлены инварианты:
+- у оставшейся нет двух названий с одинаковыми (язык, normalized); `normalized` — оракул по правилу «Поиск дублей», модуль не импортируется;
+- группа содержания, в которой было проверенное утверждение, после слияния остаётся проверенной;
+- отмена восстанавливает дамп, включая отброшенные повторы названий (дамп таблицы `names` с id).
+
+Как изменились генератор и примеры:
+- `S.ontology_with_duplicates`: точный повтор «Давид Юм» у обеих сторон; около четверти утверждений подтверждает человек (`confirm`).
+- `@example(VERIFIED_REMOVED)`, `@example(VERIFIED_KEPT)`: повтор «Давид Юм» / «Давид  Юм» и проверенное утверждение, совпавшее с непроверенным, на удалённой и на оставшейся.
+- Прежняя проверка «все тексты названий сохранены» ослаблена до «все ключи (язык, normalized) сохранены».
+
+**Расхождение со спецификацией, решать человеку.** Дельта ontology-entities «Слияние с перенаправлением» говорит «названия переносятся». Что точный повтор остаётся одной строкой, в спецификации не сказано, а перенос проверенного в спецификации есть только в виде инварианта «ни одно подтверждение не потеряно». Нормативную фразу нужно добавить в дельту.
+
+Прогоны:
+- `-k preservation_and_undo` — 1 passed in 40.95s;
+- migration `-k "stand_synthetic or verified_untouched"` — 2 passed in 5.35s, бывшие red-тесты Д1-mig и Д2-mig.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | merge-repeat-name-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.81s) |
+| Слияние с перенаправлением | merge-verified-folded | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 220.50s (0:03:40)) |
+| Слияние с перенаправлением | undo-dropped-names-lost | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 2.94s) |
+
+Первый прогон `merge-verified-folded` поймал мутанта за 220 s, но не на явном примере. Утверждение без подтверждения, записанное вручную, сразу получает «проверено». Поэтому в обоих примерах оба утверждения были проверенными, и потерю статуса нельзя было увидеть.
+Исправлено: примерам даны подтверждения, то есть статус «по источникам», а проверенным утверждение делает только `confirm`. Только явные примеры под мутантом: 1 failed in 4.57s. Повторный `--id`:
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | merge-verified-folded | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.34s) |
+
+После исправления `-k preservation_and_undo` — 1 passed in 35.22s.
+
+
+### Патчи, снятые заново после 1923675 (правка слияния), `--id`
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair | да (1 failed, 1 warning in 4.82s) |
+| Слияние с перенаправлением | kept-primary-stays | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.96s) |
+| Слияние с перенаправлением | merge-russian-not-preferred | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 3.54s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.85s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 1.72s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.63s) |
+| Слияние с перенаправлением | undo-names-kinds-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.67s) |
+| Слияние с перенаправлением | undo-subject-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 1.88s) |

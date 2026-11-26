@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -112,7 +112,7 @@
+ PROPERTIES: dict[str, Property] = {
+     "P19": Property("lived_in", "birth", "P569"),
+     "P20": Property("lived_in", "death", "P570"),
+-    "P937": Property("lived_in", "activity", "qualifiers"),
++    "P937": Property("lived_in", "activity"),
+     "P276": Property("happened_in", subjects="event"),
+     "P625": Property("coordinates", subjects="place"),
+ }

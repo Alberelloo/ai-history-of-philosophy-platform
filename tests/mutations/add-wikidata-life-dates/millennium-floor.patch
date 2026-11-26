@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/wikidata.py
++++ b/src/philograph/knowledge/wikidata.py
+@@ -315,7 +315,7 @@
+         a, b = _astro((n - 1) * 100 + 1, bce), _astro(n * 100, bce)
+         return min(a, b), max(a, b), "century"
+     if precision == 6:  # тысячелетие
+-        m = math.ceil(year / 1000)
++        m = year // 1000
+         a, b = _astro((m - 1) * 1000 + 1, bce), _astro(m * 1000, bce)
+         return min(a, b), max(a, b), "approx"
+     return None

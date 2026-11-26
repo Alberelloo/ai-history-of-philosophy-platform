@@ -1,0 +1,18 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -105,12 +105,12 @@
+         return PARAGRAPH
+     if not 1 <= paragraph <= len(paragraphs):
+         return PARAGRAPH
++    fmt = _format(text or "")
++    if fmt is None:
++        return UNPARSED
+     key = _quote_key(quote or "")
+     if not key or key not in _quote_key(paragraphs[paragraph - 1]):
+         return QUOTE
+-    fmt = _format(text or "")
+-    if fmt is None:
+-        return UNPARSED
+     in_quote = {int(n) for n in _NUMBER.findall(quote)}
+     if not fmt.numbers <= in_quote:
+         return NOT_IN_QUOTE

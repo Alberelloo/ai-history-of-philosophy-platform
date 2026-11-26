@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -703,7 +703,7 @@
+             reason=reason,
+             statements=len(ids) - len(folded),
+             attributions=attributions,
+-            folded=len(folded),
++            folded=0,
+             loops=len(loops),
+         )
+         return merge_id

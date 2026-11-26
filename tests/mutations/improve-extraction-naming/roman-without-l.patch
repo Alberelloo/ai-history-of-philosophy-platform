@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -31,7 +31,7 @@
+ LABEL_LIMIT = 80
+ 
+ _EDGE = ".,;:!?()[]«»\"'„“”"
+-_ROMAN_WORD = re.compile(r"^[IVXLCDM]+$")
++_ROMAN_WORD = re.compile(r"^[IVXCDM]+$")
+ _APOSTROPHES = ("-", "'", "’")
+ 
+ # Письменность языка: язык, переданный вызывающим, сохраняется только при совпадении.

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -61,7 +61,7 @@
+ 
+ 
+ CRITERIA = (
+-    Criterion(1, "доля русских названий (кроме источников)", 0.90, operator.ge, "≥"),
++    Criterion(1, "доля русских названий (кроме источников)", 0.90, operator.gt, "≥"),
+     Criterion(2, "названия-номера (кроме источников)", 0, operator.eq, "="),
+     Criterion(3, "персоны с названием не по правилу", 0, operator.eq, "="),
+     Criterion(4, "пары возможных дублей персон", 0, operator.eq, "="),

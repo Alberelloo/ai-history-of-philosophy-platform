@@ -1,0 +1,28 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -422,7 +422,7 @@
+         if place_id is not None and not self._of_type(place_id, PLACE):
+             return {"result": "duplicate_qid"}  # QID места занят не местом: решает человек
+         # Названия новых сущностей — до записи: кандидат не пишется наполовину.
+-        new = ([(EVENT, names)] if event_id is None else []) + (
++        new = [] + (
+             [(PLACE, _names(place.get("label") or {}, {}, place["qid"]))] if new_place else []
+         )
+         for type_, new_names in new:
+@@ -456,11 +456,14 @@
+         report.places_created += int(new_place)
+         if dry_run:
+             return {"result": "created", "event_id": event_id, "statements": len(missing)}
+-        if event_id is None:
+-            event_id = self.entities.create(EVENT, names, external={SYSTEM: qid})
+         if new_place:
+             place_names = _names(place.get("label") or {}, {}, place["qid"])
+             place_id = self.entities.create(PLACE, place_names, external={SYSTEM: place["qid"]})
++        if event_id is None:
++            try:
++                event_id = self.entities.create(EVENT, names, external={SYSTEM: qid})
++            except Exception:
++                return {"result": "invalid_name"}
+         for type_, obj, value, qualifiers in missing:
+             self.statements.add(
+                 event_id,

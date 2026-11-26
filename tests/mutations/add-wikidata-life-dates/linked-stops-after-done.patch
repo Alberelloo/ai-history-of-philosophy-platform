@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..fab3a42 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -445,7 +445,7 @@ class LifeDates:
+                 if limit is not None and report.entities >= limit:
+                     break
+                 if entity_id in done:
+-                    continue
++                    break
+                 kinds = self.entities.types([entity_id])
+                 if self._kind(kinds.get(entity_id, "")) is None:
+                     continue

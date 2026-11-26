@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -97,8 +97,6 @@
+     """Вердикт по паре — шаги 1–9 правила спецификации, первый сработавший."""
+     if a.type != PERSON or b.type != PERSON:
+         return Verdict.of("apart:type")
+-    if a.qid and b.qid:
+-        return Verdict.of("apart:qid")
+     if decided_apart:
+         return Verdict.of("apart:decided")
+     if dates_conflict(a.dates, b.dates):

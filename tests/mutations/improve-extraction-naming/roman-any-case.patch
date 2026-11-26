@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -167,7 +167,7 @@
+ def _script_counts(text: str) -> dict[str, int]:
+     counts: dict[str, int] = {}
+     for word in _words(text):
+-        if _ROMAN_WORD.match(word):
++        if _ROMAN_WORD.match(word.upper()):
+             continue
+         for ch in word:
+             if unicodedata.category(ch).startswith("L"):

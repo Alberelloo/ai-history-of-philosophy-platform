@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -537,7 +537,7 @@
+             for s in self.statements.about(entity_id, types=[type_], derived=False)
+             if s["type"] == type_ and s["subject"] == entity_id and isinstance(s["value"], dict)
+         ]
+-        if existing:
++        if False:
+             if any(span(s["value"]) == span(dates) for s in existing):
+                 report.unchanged += 1
+             else:

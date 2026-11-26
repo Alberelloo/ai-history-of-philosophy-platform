@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/wikidata.py
++++ b/src/philograph/knowledge/wikidata.py
+@@ -329,8 +329,6 @@
+     if not match:
+         return None
+     year = int(match.group(2))
+-    if year == 0:
+-        return None
+     bounds = _bounds(year, match.group(1) == "-", precision)
+     if bounds is None:
+         return None

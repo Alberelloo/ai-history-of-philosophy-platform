@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/snapshot.py
++++ b/src/philograph/knowledge/snapshot.py
+@@ -131,7 +131,7 @@
+             r["id"]: {"type": r["type"], "primary": r["primary"] or {}}
+             for r in conn.execute(
+                 select(t.entities.c.id, t.entities.c.type, t.entities.c.primary).where(
+-                    t.active_in(conn)
++                    t.entities.c.redirect_to.is_(None)
+                 )
+             ).mappings()
+         }

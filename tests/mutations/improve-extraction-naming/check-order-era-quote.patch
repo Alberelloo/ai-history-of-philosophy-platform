@@ -1,0 +1,26 @@
+diff --git a/src/philograph/knowledge/dating.py b/src/philograph/knowledge/dating.py
+index d1b27ad..41c494b 100644
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -105,6 +105,10 @@ def check(
+         return PARAGRAPH
+     if not 1 <= paragraph <= len(paragraphs):
+         return PARAGRAPH
++    era_text = bool(_ERA_IN_TEXT.search(text.lower()))
++    era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
++    if era_text != era_quote:
++        return ERA
+     key = _quote_key(quote or "")
+     if not key or key not in _quote_key(paragraphs[paragraph - 1]):
+         return QUOTE
+@@ -116,10 +120,6 @@ def check(
+         return NOT_IN_QUOTE
+     if fmt.roman is not None and not _quote_has_roman(quote, fmt.roman):
+         return NOT_IN_QUOTE
+-    era_text = bool(_ERA_IN_TEXT.search(text.lower()))
+-    era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
+-    if era_text != era_quote:
+-        return ERA
+     if is_person and fmt.single:
+         return SINGLE_YEAR
+     return parse(text)

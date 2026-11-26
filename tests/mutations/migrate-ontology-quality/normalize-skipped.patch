@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -549,7 +549,7 @@
+             for n in view.entities[entity_id]["names"]:
+                 text = clean(n["text"])
+                 key = normalize(text)
+-                if text == n["text"] and key == n["normalized"]:
++                if True:
+                     continue
+                 action = Action(
+                     "normalize_names",

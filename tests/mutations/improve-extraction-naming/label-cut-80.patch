@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -262,7 +262,7 @@
+ 
+ def event_label(label: str) -> str:
+     """Название для журнала: не длиннее 80 знаков, длиннее — 79 знаков и «…»."""
+-    return label if len(label) <= LABEL_LIMIT else label[: LABEL_LIMIT - 1] + "…"
++    return label if len(label) <= LABEL_LIMIT else label[:LABEL_LIMIT] + "…"
+ 
+ 
+ def reject(type_: str, label: str, reason: str) -> InvalidName:

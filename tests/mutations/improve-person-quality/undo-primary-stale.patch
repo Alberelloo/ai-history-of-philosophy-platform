@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..b94b666 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -817,7 +817,7 @@ class Statements:
+                 exists = conn.scalar(select(t.statements.c.id).where(t.statements.c.id == sid))
+             if exists:
+                 self._recompute_consensus(sid)
+-        for entity in (m["kept"], m["removed"]):
++        for entity in ():
+             self._refresh_primary(entity)
+         events.emit(
+             "knowledge.entity.merge_undone",

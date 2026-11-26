@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -185,7 +185,7 @@
+         2: sum(check_name(e["type"], e["label"]) == "number" for e in named),
+         3: sum(check_name(PERSON, p["label"]) is not None for p in persons),
+         4: len(a4_pairs(persons, engine)),
+-        5: sum(p["dates"] is not None for p in persons),
++        5: sum(p["dates"] is not None for p in entities),
+         6: a6(engine),
+         7: sum(check_name(i["type"], i["label"]) is not None for i in catalog_items(engine)),
+         8: None,

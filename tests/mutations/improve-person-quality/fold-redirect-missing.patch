@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..128eaf9 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -854,7 +854,7 @@ class Statements:
+             if row is not None:
+                 break
+             seen.add(statement_id)
+-            into = self.folded_into(statement_id)
++            into = None
+             if into is None or into in seen:
+                 raise NoResultFound(f"утверждение {statement_id} не найдено")
+             statement_id = into

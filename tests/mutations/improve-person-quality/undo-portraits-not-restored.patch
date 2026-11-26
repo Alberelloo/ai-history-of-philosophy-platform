@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -557,7 +557,7 @@
+                     .where(t.attributions.c.id.in_(moved["attributions_who"]))
+                     .values(who=m["removed"])
+                 )
+-            if moved.get("portraits"):
++            if False:
+                 conn.execute(
+                     update(t.portraits)
+                     .where(t.portraits.c.id.in_(moved["portraits"]))

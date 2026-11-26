@@ -1,0 +1,22 @@
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -948,7 +948,7 @@
+             }
+             if own and not s["attributions"]:
+                 continue  # единственный автор — снятая сущность
+-            if s["object"] is not None and s["object"] == s["subject"]:
++            if False and s["object"] is not None and s["object"] == s["subject"]:
+                 continue  # петля после слияния: хранится, не показывается
+             if s["rank"] == "deprecated" and not include_deprecated:
+                 continue
+--- a/src/philograph/knowledge/snapshot.py
++++ b/src/philograph/knowledge/snapshot.py
+@@ -176,7 +176,7 @@
+             continue  # основано только на снятом источнике или снятом авторе
+         if s["subject"] not in entities or (s["object"] and s["object"] not in entities):
+             continue
+-        if s["object"] is not None and s["object"] == s["subject"]:
++        if False and s["object"] is not None and s["object"] == s["subject"]:
+             continue  # петля после слияния двух концов: хранится, но не показывается
+         statements.append(s)
+     return Snapshot(

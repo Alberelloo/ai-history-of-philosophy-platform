@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -205,7 +205,7 @@
+             else:
+                 # Единственная преграда — решение «разные» по другой паре компоненты: сама
+                 # решённая пара в очередь не идёт, нерешённые рёбра — с собственной причиной.
+-                reason = "review:decided_conflict"
++                reason = "review:qid_cluster"
+             for p, v in inner.items():
+                 if v.kind == "merge" and p not in decided:
+                     review[p] = reason

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -113,7 +113,7 @@
+     if shared:
+         one_word = any(len(n.split()) == 1 for n in shared)
+         return Verdict.of("review:single_name" if one_word else "review:variant")
+-    return Verdict.of("apart:none")
++    return Verdict.of("review:variant")
+ 
+ 
+ def choose_kept(component: Iterable[Entity], counts: Mapping[str, int]) -> str:

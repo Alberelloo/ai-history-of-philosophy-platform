@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -273,7 +273,7 @@
+             relation,
+             value=result.to_json(),
+             evidence=[Evidence(paragraph["id"], spec["quote"], source_id=source_id)],
+-            attributions=[Attribution("source", source_id)],
++            attributions=[Attribution("common")],
+             provenance=Provenance(
+                 "extracted", run_id=run_id, model="main", template="ontology.extract"
+             ),

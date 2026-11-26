@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..504ddcf 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -448,7 +448,7 @@ class LifeDates:
+                     continue
+                 kinds = self.entities.types([entity_id])
+                 if self._kind(kinds.get(entity_id, "")) is None:
+-                    continue
++                    break
+                 report.entities += 1
+                 done.add(entity_id)
+                 if not QID.fullmatch(qid):

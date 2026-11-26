@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -161,7 +161,7 @@
+ def a6(engine: Engine) -> int:
+     section_map, _ = _services(engine)
+     result, _ = section_map.result(textbook=None)
+-    return sum(PHILOSOPHER in (p.get("roles") or []) for p in result["people"])
++    return len(result["people"])
+ 
+ 
+ def catalog_items(engine: Engine) -> list[dict[str, Any]]:

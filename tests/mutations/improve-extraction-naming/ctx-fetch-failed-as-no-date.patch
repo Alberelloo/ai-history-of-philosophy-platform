@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -408,7 +408,7 @@
+         try:
+             record = fetch_entity(qid, fetch)
+         except FETCH_ERRORS:
+-            return {"result": "fetch_failed"}
++            return {"result": "no_date"}
+         dating = event_dating(raw_dates(record))
+         if dating is None:
+             return {"result": "no_date"}

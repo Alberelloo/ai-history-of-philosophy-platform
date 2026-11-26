@@ -253,7 +253,7 @@ class Review:
         row = self._close(item_id, {"merge": merge})
         if merge:
             kept, removed = row["payload"]["pair"]
-            self.entities.merge(kept, removed)
+            self.statements.merge_entities(kept, removed, reason="merge:review")
         self.actions.record(actor, "merge" if merge else "keep_apart", str(item_id))
         events.emit(
             "knowledge.review.decided",

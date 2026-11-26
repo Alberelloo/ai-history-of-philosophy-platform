@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dates.py
++++ b/src/philograph/knowledge/dates.py
+@@ -72,7 +72,7 @@
+     if len(years) >= 2:  # интервал «1739–1740»
+         a, b = _astro(years[0], bce), _astro(years[1], bce)
+         start, end = min(a, b), max(a, b)
+-        slack = 5 if approx else 0
++        slack = 10 if approx else 0
+         return FuzzyDate(
+             start - slack,
+             start + slack,

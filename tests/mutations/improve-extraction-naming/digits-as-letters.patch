@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -170,7 +170,7 @@
+         if _ROMAN_WORD.match(word):
+             continue
+         for ch in word:
+-            if unicodedata.category(ch).startswith("L"):
++            if unicodedata.category(ch)[0] in "LN":
+                 script = _letter_script(ch)
+                 counts[script] = counts.get(script, 0) + 1
+     return counts

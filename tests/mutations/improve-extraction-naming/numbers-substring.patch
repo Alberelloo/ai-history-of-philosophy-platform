@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -110,7 +110,7 @@
+     if fmt is None:
+         return UNPARSED
+     in_quote = {int(n) for n in _NUMBER.findall(quote)}
+-    if not fmt.numbers <= in_quote:
++    if not all(str(n) in quote for n in fmt.numbers):
+         return NOT_IN_QUOTE
+     if fmt.roman is not None and not _quote_has_roman(quote, fmt.roman):
+         return NOT_IN_QUOTE

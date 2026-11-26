@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -148,7 +148,7 @@
+     by_name: dict[tuple[str, str], set[str]] = defaultdict(set)
+     items = list(entities)
+     for e in items:
+-        for n in e.all_names:
++        for n in e.primaries:
+             by_name[(e.type, n)].add(e.id)
+     pairs = set()
+     for e in items:

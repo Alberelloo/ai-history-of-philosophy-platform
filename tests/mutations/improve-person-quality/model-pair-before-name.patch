@@ -1,0 +1,15 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -105,10 +105,10 @@
+         return Verdict.of("review:dates")
+     if qid_confirmed:
+         return Verdict.of("merge:qid_confirmed")
++    if paired_by_model:
++        return Verdict.of("merge:model_pair")
+     if a.primaries & b.primaries:
+         return Verdict.of("merge:name")
+-    if paired_by_model:
+-        return Verdict.of("merge:model_pair")
+     shared = (a.primaries & b.variants) | (b.primaries & a.variants)
+     if shared:
+         one_word = any(len(n.split()) == 1 for n in shared)

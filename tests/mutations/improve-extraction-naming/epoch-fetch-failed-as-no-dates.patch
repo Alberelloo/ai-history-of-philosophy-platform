@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -351,7 +351,7 @@
+         try:
+             record = fetch_entity(qid, fetch)
+         except FETCH_ERRORS:
+-            return "fetch_failed"
++            return "no_dates"
+         found = epoch_dating(record)
+         return "no_dates" if found is None else found
+ 

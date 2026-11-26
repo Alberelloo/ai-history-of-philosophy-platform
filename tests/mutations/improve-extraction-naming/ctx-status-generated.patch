@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -470,7 +470,7 @@
+                 qualifiers=qualifiers,
+                 attributions=attribution,
+                 provenance=provenance,
+-                status="sourced",
++                status="generated",
+             )
+         return {"result": "created", "event_id": event_id, "statements": len(missing)}
+ 

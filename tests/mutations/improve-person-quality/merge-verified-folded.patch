@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 2e6145f..b484be7 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -668,7 +668,7 @@ class Statements:
+                         )
+                     )
+                 )
+-            if survivor is not None and row["status"] == "verified":
++            if survivor is not None and row["status"] == "verified" and False:
+                 # Проверенное человеком не сворачивается в непроверенное: повтор уходит в него,
+                 # проверенное сохраняет идентификатор и статус и берёт пересчитанный ключ.
+                 with self.engine.begin() as conn:

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -144,7 +144,7 @@
+ def clean(text: str) -> str:
+     """*Название* по определению ``entity-naming``: ``strip`` и NFC. Так оно хранится и
+     проверяется (О22)."""
+-    return unicodedata.normalize("NFC", text.strip())
++    return unicodedata.normalize("NFKC", text.strip())
+ 
+ 
+ def normalize(name: str) -> str:

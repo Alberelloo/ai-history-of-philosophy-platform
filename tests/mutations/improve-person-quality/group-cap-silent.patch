@@ -1,0 +1,15 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -395,12 +395,6 @@
+             if len(group) > MAX_LAST_WORD_GROUP:
+                 # Перебор пар группы — O(k²); большая группа пропускается не молча: событие без
+                 # названий (Р2). Совпадения полных названий ниже ищутся и для неё.
+-                events.emit(
+-                    "knowledge.entity.duplicate_group_capped",
+-                    type=type_,
+-                    size=len(group),
+-                    limit=MAX_LAST_WORD_GROUP,
+-                )
+                 continue
+             for a, b in combinations(sorted(group, key=position.get), 2):
+                 if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):

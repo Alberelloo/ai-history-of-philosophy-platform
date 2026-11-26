@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -146,8 +146,8 @@
+                     if other != p["id"]:
+                         pairs.add(frozenset((p["id"], other)))
+     open_, distinct = duplicate_items(engine)
+-    pairs |= {frozenset(pair) for pair in open_ if set(pair) <= ids and pair[0] != pair[1]}
+-    return pairs - {frozenset(pair) for pair in distinct}
++    both = [*pairs, *(frozenset(pair) for pair in open_ if set(pair) <= ids and pair[0] != pair[1])]
++    return [p for p in both if p not in {frozenset(pair) for pair in distinct}]
+ 
+ 
+ def _services(engine: Engine) -> tuple[SectionMap, Catalog]:

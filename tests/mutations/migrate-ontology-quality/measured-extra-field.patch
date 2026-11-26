@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -213,6 +213,7 @@
+         **{f"a{n}": values[n] for n in range(1, 9)},
+         passed=not failed,
+         failed=failed,
++        rows=len(rows),
+     )
+     return result
+ 

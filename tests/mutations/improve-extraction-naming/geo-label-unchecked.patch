@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -375,7 +375,7 @@
+             return
+         if place_record is not None:
+             bad = invalid_primary(PLACE, _names(place_record))
+-            if bad is not None:  # подпись места не прошла правило названий
++            if False and bad is not None:  # подпись места не прошла правило названий
+                 reject(PLACE, *bad)
+                 self._skip(report, entity_id, prop, "refused")
+                 return

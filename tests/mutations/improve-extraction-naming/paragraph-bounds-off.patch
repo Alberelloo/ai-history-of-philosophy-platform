@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -103,7 +103,7 @@
+     """Датировка или причина отказа — первая несработавшая проверка по порядку требования."""
+     if isinstance(paragraph, bool) or not isinstance(paragraph, int):
+         return PARAGRAPH
+-    if not 1 <= paragraph <= len(paragraphs):
++    if not 0 <= paragraph <= len(paragraphs):
+         return PARAGRAPH
+     key = _quote_key(quote or "")
+     if not key or key not in _quote_key(paragraphs[paragraph - 1]):

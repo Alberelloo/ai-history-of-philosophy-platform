@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -557,7 +557,7 @@
+         self, report: Report, entity_id: str, type_: str, value: Any, qid: str, prop: str
+     ) -> bool:
+         """Новое утверждение (``True``) или уже было (``False``); отказ — ``Skip(refused)``."""
+-        attributions = [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))]
++        attributions = [Attribution("source", f"{SYSTEM}:{qid}", place=None)]
+         try:
+             stored = self.statements.check_value(type_, value, {}, attributions, emit=True)
+             if self.statements.find(entity_id, type_, value=stored, qualifiers={}):

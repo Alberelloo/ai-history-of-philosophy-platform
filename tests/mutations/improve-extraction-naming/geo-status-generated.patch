@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -282,7 +282,7 @@
+             "provenance": Provenance(
+                 "imported", run_id=run_id, extra={"wikidata": qid, "property": prop, **extra}
+             ),
+-            "status": "sourced",
++            "status": "generated",
+         }
+ 
+     def _write(

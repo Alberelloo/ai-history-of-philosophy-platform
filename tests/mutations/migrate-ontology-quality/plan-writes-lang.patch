@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -587,7 +587,7 @@
+                     "lang",
+                     {"entity": entity_id, "name_id": n["id"], "old_lang": n["lang"], "lang": lang},
+                 )
+-                if not report.dry_run:
++                if True:
+                     with self.engine.begin() as conn:
+                         conn.execute(
+                             update(t.names).where(t.names.c.id == n["id"]).values(lang=lang)

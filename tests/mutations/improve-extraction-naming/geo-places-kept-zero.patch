@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -421,7 +421,7 @@
+             if p.get("run_id") == run_id and (p.get("extra") or {}).get("created_place")
+         }
+         removed = self.statements.rollback_run(run_id)["statements"]
+-        summary = {"run_id": run_id, "statements": removed, "places_kept": len(kept)}
++        summary = {"run_id": run_id, "statements": removed, "places_kept": 0}
+         events.emit("knowledge.geo.rolled_back", **summary)
+         return summary
+ 

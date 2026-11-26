@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -716,7 +716,7 @@
+ 
+     def _ask(self, report: Report, number: int, pack: list[str], view: View) -> list | None:
+         items = [
+-            {"n": i, "type": view.entities[e]["type"], "label": view.label(e)}
++            {"n": i, "id": e, "type": view.entities[e]["type"], "label": view.label(e)}
+             for i, e in enumerate(pack, start=1)
+         ]
+         assert self.llm is not None

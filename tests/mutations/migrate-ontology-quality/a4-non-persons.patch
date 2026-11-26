@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -146,7 +146,7 @@
+                     if other != p["id"]:
+                         pairs.add(frozenset((p["id"], other)))
+     open_, distinct = duplicate_items(engine)
+-    pairs |= {frozenset(pair) for pair in open_ if set(pair) <= ids and pair[0] != pair[1]}
++    pairs |= {frozenset(pair) for pair in open_ if pair[0] != pair[1]}
+     return pairs - {frozenset(pair) for pair in distinct}
+ 
+ 

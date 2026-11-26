@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -368,7 +368,7 @@
+                 and self.registry.is_a(o_type, spec["object_types"])
+             ):
+                 return current
+-            current = spec.get("parent")
++            current = None
+         raise _Skip(f"тип {relation} не подходит концам {s_type} → {o_type}")
+ 
+     def _resolve(

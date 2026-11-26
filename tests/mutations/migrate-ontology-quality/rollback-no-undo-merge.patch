@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..613de71 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -961,7 +961,7 @@ class Migration:
+             raise UnknownRun(run_id)
+         merges_undone = 0
+         for merge_id, _moved in mine:
+-            self.statements.undo_merge(merge_id)
++            pass
+             merges_undone += 1
+         restored = kept = 0
+         externals: list[dict[str, Any]] = []

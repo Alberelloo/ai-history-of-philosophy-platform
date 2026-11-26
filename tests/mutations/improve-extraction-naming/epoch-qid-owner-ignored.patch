@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -322,7 +322,7 @@
+         owner = self.entities.by_external(SYSTEM, qid)
+         if epoch_id is None and owner is not None and self._is_epoch(owner):
+             epoch_id = owner  # та же эпоха под другим названием — по подтверждённому QID
+-        if owner is not None and owner != epoch_id:
++        if False:
+             return {"epoch_id": epoch_id, "label": ru, "qid": qid, "result": "duplicate_qid"}
+         if epoch_id is not None:
+             return self._date(epoch_id, ru, qid, fetch, dry_run)

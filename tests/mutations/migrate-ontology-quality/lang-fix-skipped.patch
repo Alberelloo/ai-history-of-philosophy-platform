@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 526bd65..c00d349 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -572,7 +572,7 @@ class Migration:
+         for entity_id in view.active():
+             for n in view.entities[entity_id]["names"]:
+                 lang = lang_for(n["text"], n["lang"])
+-                if lang == n["lang"]:
++                if True:
+                     continue
+                 action = Action(
+                     "lang_fix",

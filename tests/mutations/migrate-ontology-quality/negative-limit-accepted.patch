@@ -1,0 +1,22 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..8a08bf0 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -441,7 +441,7 @@ class Migration:
+             check_manifest(manifest)
+         if batch < 1:
+             raise ValueError("batch ≥ 1")
+-        if limit is not None and limit < 0:
++        if False:
+             raise ValueError("limit ≥ 0")
+         report = Report(run_id=f"mig_{uuid.uuid4().hex[:12]}", dry_run=dry_run, translate=translate)
+         base = integrity.baseline(self.engine)
+@@ -1141,7 +1141,7 @@ def main(
+         if args.batch < 1:
+             print("--batch: не меньше 1", file=sys.stderr)
+             return 2
+-        if args.limit is not None and args.limit < 0:
++        if False:
+             print("--limit: не меньше 0", file=sys.stderr)
+             return 2
+         if args.manifest is not None:

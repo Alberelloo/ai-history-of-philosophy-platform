@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -178,7 +178,7 @@
+ 
+ def measure(engine: Engine, baseline: integrity.Baseline | None = None) -> dict[str, Any]:
+     entities = _entities(engine)
+-    named = [e for e in entities if e["type"] != SOURCE]
++    named = list(entities)
+     persons = [e for e in entities if e["type"] == PERSON]
+     values: dict[int, float | None] = {
+         1: round(sum(is_russian(e["label"]) for e in named) / len(named), 4) if named else 1.0,

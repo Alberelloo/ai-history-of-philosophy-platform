@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -118,8 +118,8 @@
+         return NOT_IN_QUOTE
+     era_text = bool(_ERA_IN_TEXT.search(text.lower()))
+     era_quote = bool(_ERA_IN_QUOTE.search(_quote_key(quote)))
++    if is_person and fmt.single:
++        return SINGLE_YEAR
+     if era_text != era_quote:
+         return ERA
+-    if is_person and fmt.single:
+-        return SINGLE_YEAR
+     return parse(text)

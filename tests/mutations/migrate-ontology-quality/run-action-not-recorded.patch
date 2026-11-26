@@ -1,0 +1,50 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..7144dbc 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -558,8 +558,7 @@ class Migration:
+ 
+     def _record(self, report: Report, action: Action) -> None:
+         """Действие без записи в базу через ``engine`` (слияние ведёт свой журнал ``merges``)."""
+-        if not report.dry_run:
+-            run_actions.record(self.engine, report.run_id, action.kind, action.to_json())
++        return
+ 
+     # --- шаги ---
+ 
+@@ -635,7 +634,7 @@ class Migration:
+                             .where(t.names.c.id == n["id"])
+                             .values(text=text, normalized=key)
+                         )
+-                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                        (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 found.append(action)
+         report.names_normalized = len(found)
+         return found
+@@ -657,7 +656,7 @@ class Migration:
+                         conn.execute(
+                             update(t.names).where(t.names.c.id == n["id"]).values(lang=lang)
+                         )
+-                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                        (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 found.append(action)
+         report.lang_fixed = len(found)
+         return found
+@@ -682,7 +681,7 @@ class Migration:
+                         .where(t.entities.c.id == entity_id)
+                         .values(retired_run=report.run_id, retired_reason=reason)
+                     )
+-                    run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
++                    (lambda *a, **k: 0)(conn, report.run_id, action.kind, action.to_json())
+                 events.emit(
+                     "knowledge.entity.retired",
+                     entity_id=entity_id,
+@@ -721,7 +720,7 @@ class Migration:
+                     ).mappings()
+                 ]
+                 renamed = self.entities.rename_in(conn, entity_id, "ru", text)
+-                run_actions.record_in(
++                (lambda *a, **k: 0)(
+                     conn,
+                     report.run_id,
+                     action.kind,

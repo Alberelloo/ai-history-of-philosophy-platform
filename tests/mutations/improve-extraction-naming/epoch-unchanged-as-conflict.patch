@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -374,7 +374,7 @@
+             same = _bounds(main) == _bounds(dating.to_json())
+             if not same:
+                 item["existing"] = main
+-            return {**item, "result": "unchanged" if same else "conflict"}
++            return {**item, "result": "conflict"}
+         if not dry_run:
+             try:
+                 self.entities.add_external(epoch_id, SYSTEM, qid)

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -125,7 +125,7 @@
+             resolved[name] = self.entities.create(type_, names)
+         except InvalidName as exc:
+             # Только код: название уже в ``knowledge.entity.rejected`` с обрезкой (О17).
+-            raise Skip(f"entity:{exc.reason}") from exc
++            raise Skip(str(exc)) from exc
+         self.created.append(resolved[name])
+         return resolved[name]
+ 

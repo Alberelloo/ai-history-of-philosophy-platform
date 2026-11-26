@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -26,7 +26,7 @@
+ 
+ _DASH = r"\s*[-–—]\s*"
+ _YEAR = r"(\d{1,4})"
+-_APPROX = r"(?:ок\.|около|c\.|circa)\s*"
++_APPROX = r"(?:ок\.|около)\s*"
+ _ERA_TEXT = r"до\s+н\.\s?э\."
+ _ROMAN = r"([ivxlcdm]+)"
+ 

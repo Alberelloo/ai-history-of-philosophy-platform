@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -384,7 +384,7 @@
+         for i, entry in enumerate(manifest.get("epochs") or []):
+             for candidate in entry.get("candidates") or []:
+                 item = {"qid": candidate["qid"]}
+-                if candidate["decision"] != "accepted":
++                if candidate["decision"] == "pending":
+                     item["result"] = candidate["decision"]
+                 else:
+                     item.update(self._accepted(entry, epochs[i], candidate, fetch, dry_run, report))

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/dedupe.py b/src/philograph/knowledge/dedupe.py
+index 295e33a..3dd8df6 100644
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -201,6 +201,8 @@ def plan(
+         if len(qids) >= 2 or kinds & {"apart:qid", "apart:decided", "review:dates"}:
+             if len(qids) >= 2 or "apart:qid" in kinds:
+                 reason = "review:qid_cluster"
++            elif "apart:decided" in kinds:
++                reason = "review:decided_conflict"
+             elif "review:dates" in kinds:
+                 reason = "review:dates"
+             else:

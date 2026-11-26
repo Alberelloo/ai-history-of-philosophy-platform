@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dates.py
++++ b/src/philograph/knowledge/dates.py
+@@ -65,7 +65,7 @@
+             start, end = _astro(n * 100, True), _astro((n - 1) * 100 + 1, True)
+         else:
+             start, end = (n - 1) * 100 + 1, n * 100
+-        return FuzzyDate(start, end, start, end, "century", original)
++        return FuzzyDate(start, end, start, end, "year", original)
+     years = [int(y) for y in re.findall(r"\d{1,4}", s)]
+     if not years:
+         raise ValueError(f"не дата: {original}")

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import weakref
+from typing import Any
 
 from sqlalchemy import (
     JSON,
@@ -16,6 +18,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    and_,
     select,
     text,
     update,
@@ -88,6 +91,8 @@ entities = Table(
     Column("type", String(50), nullable=False, index=True),
     Column("primary", JSON, nullable=False),  # копия основных значений: даты, описание
     Column("redirect_to", String(40)),
+    Column("retired_run", String(64)),  # запуск миграции, снявший сущность (knowledge:9)
+    Column("retired_reason", String(20)),  # причина правила названий
     schema=SCHEMA,
 )
 names = Table(
@@ -378,3 +383,76 @@ portraits = Table(
     schema=SCHEMA,
 )
 migrations.add(7, "портреты персон")(migrations.create_tables("portraits"))
+
+# --- журнал действий запуска вне утверждений ---
+# Что команда оператора изменила помимо утверждений (внешний QID, переименование, снятие):
+# откат запуска читает его в обратном порядке ``seq``.
+run_actions = Table(
+    "run_actions",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("run_id", String(40), nullable=False, index=True),
+    Column("seq", Integer, nullable=False),
+    Column("kind", String(30), nullable=False),  # external | …
+    Column("payload", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    schema=SCHEMA,
+)
+migrations.add(8, "журнал действий запуска")(migrations.create_tables("run_actions"))
+
+
+def active(entities: Table = entities) -> Any:
+    """Условие «действующая сущность»: не перенаправлена слиянием и не снята миграцией.
+    Одно на всех потребителей (снимок, упоминания, поиск, дубли, внешние id)."""
+    return and_(entities.c.redirect_to.is_(None), entities.c.retired_run.is_(None))
+
+
+def retired(entities: Table = entities) -> Any:
+    """Условие «снята миграцией»."""
+    return entities.c.retired_run.is_not(None)
+
+
+# Движки, у которых столбец снятия уже найден. Слабые ссылки: ``id`` движка после сборки
+# мусора может достаться другому. «Нет» не запоминается: та же база может пройти миграцию
+# до ``knowledge:9`` в этом же процессе, а столбец, раз появившись, не исчезает.
+_HAS_RETIRED: weakref.WeakSet[Any] = weakref.WeakSet()
+
+
+def has_retired(conn: Connection) -> bool:
+    """Есть ли столбец снятия (схема ``knowledge:9``). Замер на чтение работает и на базе
+    до миграции: там снятых нет. Проверка схемы кэшируется на движок."""
+    engine = conn.engine
+    if engine in _HAS_RETIRED:
+        return True
+    from sqlalchemy import inspect
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    if "retired_run" in columns:
+        _HAS_RETIRED.add(engine)
+        return True
+    return False
+
+
+def active_in(conn: Connection) -> Any:
+    """``active()`` для этой базы; на схеме до ``knowledge:9`` — только «не перенаправлена»."""
+    return active() if has_retired(conn) else entities.c.redirect_to.is_(None)
+
+
+def retired_ids(conn: Connection) -> set[str]:
+    """Снятые сущности базы (на схеме до ``knowledge:9`` — пусто)."""
+    if not has_retired(conn):
+        return set()
+    return set(conn.scalars(select(entities.c.id).where(retired())))
+
+
+def _retired_columns(conn: Connection) -> None:
+    """Столбцы снятия: старые строки — действующие (``NULL``)."""
+    from sqlalchemy import inspect, text
+
+    columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=SCHEMA)}
+    for name in ("retired_run VARCHAR(64)", "retired_reason VARCHAR(20)"):
+        if name.split()[0] not in columns:
+            conn.execute(text(f"ALTER TABLE {SCHEMA}.entities ADD COLUMN {name}"))
+
+
+migrations.add(9, "снятие мусорных сущностей")(_retired_columns)

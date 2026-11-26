@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/wikidata.py
++++ b/src/philograph/knowledge/wikidata.py
+@@ -304,7 +304,7 @@
+ 
+ def _bounds(year: int, bce: bool, precision: int) -> tuple[int, int, str] | None:
+     """Самый ранний и самый поздний год (астрономический счёт) и точность ``FuzzyDate``."""
+-    if precision >= 9:
++    if precision >= 9 or precision == 7:
+         y = _astro(year, bce)
+         return y, y, "year"
+     if precision == 8:  # десятилетие: «1680» — 1680–1689
