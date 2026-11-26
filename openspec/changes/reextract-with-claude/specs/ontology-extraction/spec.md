@@ -137,7 +137,7 @@
 Шлюзу при извлечении SHALL уходить мягкая схема вывода: корень — объект с обязательным массивом `statements`; элемент `statements` — объект с обязательными полями `subject`, `type`, `object`, `paragraph`, `quote`; необязательный массив `entities` из объектов с обязательными `name` и `type` и перечнем полей `ru`, `en`, `original`, `dating`. В мягкой схеме MUST NOT быть перечней (`enum`) и типов у полей элемента. Схема, собранная из реестра (типы связей, концов и сущностей), SHALL оставаться контрактом проверки и передаваться модели в данных (`relations`, `entity_types`).
 
 Сервер знаний SHALL проверять каждый элемент отдельно и по порядку:
-1. элемент не объект, обязательное поле отсутствует или не того вида (`subject`, `object`, `type`, `quote` — непустые строки; `paragraph` — целое; `qualifiers` — объект; `attributed_to`, `proposed_type` — строки) → `schema_item`;
+1. элемент не объект, обязательное поле отсутствует или не того вида (`subject`, `object`, `quote` — строки, пустое название отклоняют правила названий — `entity_invalid`, пустая цитата — `quote_not_found`; `type` — непустая строка; `paragraph` — целое; `qualifiers` — объект; `attributed_to`, `proposed_type` — строки) → `schema_item`;
 2. `null` в необязательном поле (`subject_type`, `object_type`, `qualifiers`, `stance`, `attributed_to`, `proposed_type`; у элемента `entities` — `ru`, `en`, `original`, `dating`) — поле отсутствует;
 3. `paragraph` строкой из цифр (с пробелами по краям) — то же число;
 4. `stance` вне `asserts`, `disputes`, `mentions` → `stance_invalid`;
@@ -146,7 +146,7 @@
 7. абзац вне фрагмента → `paragraph_out_of_window`; цитата → `quote_not_found`/`quote_too_short`;
 8. привязка сущностей и запись (`entity_*`, `type_mismatch`, `qualifier_invalid`, `statement_refused`).
 
-Ответ, который не объект или в котором `statements` не массив, → одна отбраковка фрагмента `reply_invalid`.
+Ответ, который не объект или в котором `statements` не массив, → одна отбраковка фрагмента `reply_invalid`. Обязательные поля мягкой схемы проверяет и шлюз: ответ шлюза, где у элемента нет обязательного поля, отвергается шлюзом (`model_schema`); у внешнего извлекателя такой элемент — `schema_item`.
 
 Нормативно:
 - отказ одного элемента MUST NOT отменять запись остальных элементов того же ответа;
@@ -155,7 +155,7 @@
 
 #### Scenario: Отклонения в одном ответе
 
-- **WHEN** ответ содержит пять утверждений: с `attributed_to: null`, с `paragraph: "1"`, с типом связи `rejects` вне реестра, с `subject_type: "character"` и одно без `quote`
+- **WHEN** ответ содержит пять утверждений: с `attributed_to: null`, с `paragraph: "1"`, с типом связи `rejects` вне реестра, с `subject_type: "character"` и одно с `quote: 7` (число)
 - **THEN** записаны три утверждения: первое — с атрибуцией учебнику, второе — с подтверждением из абзаца 1, третье — с типом «испытал влияние» и предложением `rejects` в очереди проверки
 - **AND** в журнале два `knowledge.extraction.dropped`: `code="entity_type"` и `code="schema_item"`; `knowledge.extraction.fragment` с `created=3`, `dropped=2`
 

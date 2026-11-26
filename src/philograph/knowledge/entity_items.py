@@ -266,6 +266,7 @@ class EntityItems:
         window: list[dict[str, Any]],
         source_id: str,
         run_id: str,
+        model: str | None = None,
     ) -> str:
         """Датировка элемента ``entities``: привязка (или создание) сущности и ``date``.
         Сущность не определена — название отклонено, неоднозначно, без типа, в том числе уже
@@ -276,7 +277,7 @@ class EntityItems:
             entity_id = self.resolve(name, item["type"], item, resolved)
         except Skip as exc:
             raise Skip(dating.UNRESOLVED) from exc
-        return self.date(entity_id, item, window, source_id, run_id)
+        return self.date(entity_id, item, window, source_id, run_id, model)
 
     def date(
         self,
@@ -285,6 +286,7 @@ class EntityItems:
         window: list[dict[str, Any]],
         source_id: str,
         run_id: str,
+        model: str | None = None,
     ) -> str:
         """Проверенная датировка элемента — утверждение ``lifespan`` (персона) или ``dating``.
         Отказ — ``Skip`` с причиной ``dating:<код>``."""
@@ -311,6 +313,6 @@ class EntityItems:
             evidence=[Evidence(paragraph["id"], spec["quote"], source_id=source_id)],
             attributions=[Attribution("source", source_id)],
             provenance=Provenance(
-                "extracted", run_id=run_id, model="main", template="ontology.extract"
+                "extracted", run_id=run_id, model=model, template="ontology.extract"
             ),
         )
