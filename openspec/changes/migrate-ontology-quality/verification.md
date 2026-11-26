@@ -22,10 +22,10 @@
 | Д2-mig | «Проверенное человеком не трогается» | проверенное утверждение сворачивалось в непроверенный повтор и становилось «по источникам» (test_verified_untouched:474, оракул `verified_dropped`) | исправлен в 1923675, тест зелёный |
 | Д3-mig | шаг `lang_fix`: язык по правилу `entity-naming`, у названия без письменности — `und` | у источника «3.1» оставался `en` (test_lang_fix_no_script) | исправлен в bf2d84f, тест зелёный |
 | С1 | сценарий «Русское стоп-слово от модели» на «every» | «every» снимается шагом `retire` раньше перевода, до модели оно не доходит | спецификация исправлена в 312ff2e (О27, «universality»), тест обновлён (2c458ec) |
-| С2 | текст спецификации «семи шагов» | шагов восемь (после О24 добавлен `normalize_names`) | ведущему: поправить текст |
-| С3 | шаг 7: «совпадения основных названий у не-персон одного типа уходят в очередь» | код не ставит в очередь и источники (`_same_name_pairs` пропускает `person` и `source`), а спецификация исключения для источников не делает | решать человеку: либо дописать «кроме источников», либо дефект. Теста нет, ждёт решения |
-| С4 | шаг 2: в очередь, «если открытого пункта по паре нет» | код не ставит и пару, закрытую решением «разные» | так же, как С3. Мутацию `qid-candidate-requeued` по этой причине не считаю: снятие обеих проверок спецификация не различает, потому что открытую пару повторно не ставит и сам `dedupe.propose` |
-| С5 | бюджет property-слоя всех четырёх изменений ≤ 3 мин (tasks 3.8) | только миграция: retire 63 s + quality 40 s + migration 24 s + rollback 20 s + translation 6.5 s ≈ 153 s | на машине с 1 ГБ RAM бюджет превышен вместе с остальными изменениями (замеры есть в их `verification.md`) |
+| С2 | текст спецификации «семи шагов» | шагов восемь | решено в О30 (dd1ecc7): «восьми шагов» |
+| С3 | шаг 7: источники в очередь `review:same_name` не ставятся? | спецификация не исключала источники | решено в О30: источники не ставятся, остальные не-персоны ставятся. Тест test_same_name_sources_not_queued, мутация same-name-includes-source |
+| С4 | шаг 2: пару, закрытую «разные», не ставить? | спецификация говорила только про открытый пункт | решено в О30: не ставится. Тест test_pending_candidate_distinct_not_queued, мутация manifest-candidate-ignores-distinct. `qid-candidate-requeued` остаётся эквивалентным в части открытой пары |
+| С5 | бюджет property-слоя ≤ 3 мин | считается на каждое изменение (О30) | миграция: property-слой ≈ 153 s (retire 63,09 + quality 39,65 + migration 24,19 + rollback 19,89 + translation 6,48), весь файл 214,59 s; в бюджете |
 | С6 | — | у строки журнала действий `manifest_qids` нет поля `step` (`run_actions`, test_dry_run отфильтровывает их через `"step" in a`) | наблюдение, спецификация поля не требует |
 
 ### Эквивалентные мутанты (в yaml не вошли)
@@ -328,3 +328,13 @@
 | Код выхода 0/1/2 | — | OM::test_without_baseline, test_quality_invariant | exit-always-zero ← quality_before_after, quality_invariant, transliteration_pending, without_baseline |
 | `measured` ровно a1…a8, passed, failed | — | OM check_keys | measured-extra-field ← a4_primary_in_variants, a4_union_and_distinct, a6_a7_match_api, acceptance_symptoms, old_schema, quality_before_after, quality_invariant, read_only, transliteration_pending, without_baseline |
 | Таблица из восьми строк с порогами | — | OM::test_thresholds_at_boundary (О29: 4 столбца, пороги) | table-no-threshold ← thresholds_at_boundary |
+
+
+### О30, `--id` (тесты на коммите с С3/С4)
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Миграция существующей онтологии | same-name-includes-source | tests/knowledge/test_ontology_migration.py::test_same_name_sources_not_queued | да (1 failed, 1 warning in 0.86s) |
+| Миграция существующей онтологии | manifest-candidate-ignores-distinct | tests/knowledge/test_ontology_migration.py::test_pending_candidate_distinct_not_queued | да (1 failed, 1 warning in 3.48s) |
+
+Итого мутаций 83, `--coverage` — чисто.
