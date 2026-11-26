@@ -234,6 +234,7 @@
 | Даты противоречат: интервалы конца | S.persons_with_variants dates_any — исправлено в О25 | PQ::DATE_INTERVALS (только конец врозь; зазор конца 4 и 5 при интервале); test_dates_conflict_on_start_or_end_interval | dates-start-only, dates-interval-ignored |
 | Даты противоречат: интервал неопределённости `[earliest − 2, latest + 2]` (earliest ≠ latest) | S.persons_with_variants dates_any — добавлено в О25 | PQ::DATE_INTERVALS (Reid/Рид, Hume/Юм) | dates-interval-ignored |
 | Даты у одной стороны — не противоречие | S.persons_with_variants plain one_side | PQ::test_dates_on_one_side (фактически роняет: test_date_chain_component) | dates-one-side-conflict |
+| Причина отказа компоненты: порядок qid_cluster → dates → decided_conflict, все сочетания | S.persons_with_variants reasons_mix (О26) | PQ::DATES_AND_DECIDED (пример судьи) в test_plan_partition_any_order, test_merge_invariant_two_orders; test_component_priority (cover) | reason-decided-before-dates (J3-1), reason-decided-before-qid, cluster-reason-dates-first |
 | Шаг 1 `apart:type` | S.persons_with_variants mixed_type | PQ::test_merge_invariant_two_orders; PM (фактически роняет: test_plan_partition_any_order) | type-rule-dropped |
 | Шаг 2 `apart:qid` | S.persons_with_variants qids_distinct | PQ::test_different_qids (фактически роняет: test_transliteration_with_decision) | step-qid-dropped |
 | Шаг 3 `apart:decided` | S.persons_with_variants decided, decided3 | PQ::test_namesakes, test_decided_apart_and_third | decided-ignored |
@@ -283,6 +284,7 @@
 | Событие без названий (`type`, `size`, `limit`) | параметр size | EM::test_last_word_group_cap (сверка полей) | capped-event-leaks-name |
 | Совпадения основного с названием ищутся и в большой группе | параметр size (201+) + общее основное | EM::test_last_word_group_cap | capped-group-aborts |
 | Основное название на разных записях → пункты `duplicate` по парам | сценарный (три «Berkeley») | EM::test_primary_on_different_records (фактически роняет: test_candidates, test_candidates_invariant) | candidates-primary-only |
+| Большая группа не прекращает перебор остальных групп | сценарный: группы до и после большой | EM::test_last_word_group_cap[201] | capped-group-stops-scan (J3-3) |
 
 ### ontology-entities / Слияние с перенаправлением
 
