@@ -636,3 +636,22 @@
 | Слияние вариантов персоны | reason-decided-before-qid | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.08s) |
 | Поиск дублей | capped-group-stops-scan | tests/knowledge/test_entity_merge.py::test_last_word_group_cap | да (1 failed, 1 passed, 1 warning in 3.94s) |
 | Качество персон | person-empty-as-number | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1 failed, 1 warning in 2.56s) |
+
+## Судья — четвёртый круг, 2026-11-26, коммит 49a76fb
+
+Проверено в отдельном worktree от 49a76fb (`PYTHONPATH` на его `src`). `src` с третьего круга (f8b6e3f) не менялся; между 49a76fb и текущей вершиной ветки в `src` только `ontology_migrate.py` другого изменения.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant | passed, person-empty-as-number упала | test_person_quality.py + test_entity_merge.py: 68 passed in 146.88s | — (стенд не поднимался) | подтверждено |
+| person-quality «Слияние вариантов персоны» | test_plan_partition_any_order, test_merge_invariant_two_orders, reasons_mix | passed, reason-decided-before-* упали | `--id reason-decided-before-dates` — упали оба теста; своя M13 (в заблокированной компоненте в очередь идут все пары, не только `merge:*`) — упал; **своя M4 (в `plan` пары компоненты берутся только из пар-кандидатов, без вердикта для прочих пар: `inner = {p: verdicts[p] … if p in verdicts}`) — test_person_quality.py 53 passed** | зонд `plan`: «Hume» a, «Hume» b, «Юм» c, пара модели b–c. С решением «разные» по a–c: без мутации слияний нет, очередь a–b, b–c `review:decided_conflict`; с мутацией a, b, c слиты (`merge:name`), включая пару с решением «разные». С датами a 1711–1776, c 1911–1976 — то же: с мутацией слиты лица с противоречащими датами | **не подтверждено** |
+| ontology-entities «Поиск дублей» | test_last_word_group_cap, test_candidates_invariant | passed, capped-group-stops-scan упала | `--id capped-group-stops-scan` — упал [201]; своя M11 (группы последнего слова без типа) — упал test_entity_merge.py | — | подтверждено |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed (в составе 68) | — | подтверждено (src не менялся с третьего круга) |
+
+Замечания третьего круга J3-1, J3-3 закрыты: пример судьи стоит `@example` в обоих property-тестах, мутации в `mutations.yaml` и падают.
+`check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования; `ruff check` по `tests/knowledge` и `src/philograph/knowledge` чисто. Полный pytest и стенд не запускались (1 ГБ ОЗУ, указание ведущего).
+Неточность журнала: строка аудита О26 ссылается на `test_component_priority (cover)`, такого теста нет; есть `test_component_reason_combos_generated`.
+
+Подгонка: не найдена (ожидания не правились, skip/xfail нет, пример судьи проверяется, а не обходится).
+
+Вердикт: **не принято** — вернуть тестировщику: инвариант «если у какой-либо пары компоненты вердикт `apart:decided`/`review:dates`/`apart:qid` — слияний нет» не проверен для пар компоненты, которые не являются кандидатами по названию (компонента связана рёбрами `merge:model_pair` или `merge:qid_confirmed`, преграда — на паре без общего названия). Нужны: вид генератора лиц (или `@example`) с такой компонентой — и с решением «разные», и с противоречием дат на паре без общего названия; мутация M4 в `mutations.yaml`; строка аудита. Разработчику возвращать нечего: зонд на текущем коде даёт поведение по спецификации.
