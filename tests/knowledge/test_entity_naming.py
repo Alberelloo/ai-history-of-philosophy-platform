@@ -10,11 +10,12 @@
 
 from __future__ import annotations
 
+import unicodedata
 from pathlib import Path
 
 import pytest
 import yaml
-from hypothesis import HealthCheck, example, given, settings
+from hypothesis import HealthCheck, assume, example, given, settings
 from hypothesis import strategies as hs
 from sqlalchemy import insert, select
 
@@ -968,3 +969,77 @@ def test_strategies_oracle_independent():
             imported |= {a.name for a in node.names}
     banned = {"naming", "dating", "dates", "entity_items", "dedupe"}
     assert not {m for m in imported if any(b in m.split(".") for b in banned)}, imported
+
+
+# --- О22: хранимая форма названия — strip + NFC на любом пути записи --------------------
+
+_PAD = hs.sampled_from(["", " ", "  ", "\t", "\n", "  ", " "])
+_STORED_POOL = ["Пётр Абеляр", "Йозеф Шумпетер", "Ἀριστοτέλης", "Renée Descartes", "Декарт"]
+
+
+@hs.composite
+def raw_names(draw, pool: bool = False) -> str:
+    """Вход записи: пробелы по краям, NFD или NFC, смешанные письменности (``scripts_mix``)."""
+    text = draw(hs.sampled_from(_STORED_POOL)) if pool else draw(scripts_mix())[0][0]
+    form = draw(hs.sampled_from(["NFC", "NFD", "NFKD"]))
+    if form != "NFKD":  # NFKD меняет совместимые знаки — не тот же текст; только NFD/NFC
+        text = unicodedata.normalize(form, text)
+    return draw(_PAD) + text + draw(_PAD)
+
+
+def _stored(onto, entity_id) -> dict[str, str]:
+    return {n["kind"]: n["text"] for n in onto.entities.get(entity_id)["names"]} | {
+        "all": sorted(n["text"] for n in onto.entities.get(entity_id)["names"])
+    }
+
+
+@req(NM, VALID, invariant="Название хранится в форме strip+NFC на любом пути записи (О22)")
+@DB_SETTINGS
+@given(main=raw_names(), variant=raw_names(), primary=raw_names(pool=True))
+@example(main=" Декарт ", variant="\tLocke\n", primary=" Пётр Абеляр ")
+@example(
+    main=unicodedata.normalize("NFD", "Ἀριστοτέλης"),
+    variant=unicodedata.normalize("NFD", " Renée Descartes"),
+    primary=unicodedata.normalize("NFD", "Йозеф Шумпетер") + " ",
+)
+@example(main="Kant-Кант ", variant=" Людовик XIV", primary="Декарт")
+def test_stored_form_strip_nfc(onto, events, main, variant, primary):
+    try:
+        entity = onto.entities.create("concept", [("ru", main, "primary")])
+    except InvalidName:
+        assume(False)
+    [created] = onto.entities.get(entity)["names"]
+    assert created["text"] == name_of(main), (main, created["text"])
+    onto.entities.add_name(entity, "ru", variant)
+    texts = {n["text"] for n in onto.entities.get(entity)["names"]}
+    assert texts == {name_of(main), name_of(variant)}, (main, variant, texts)
+    onto.entities.set_primary_name(entity, "ru", primary)
+    rows = onto.entities.get(entity)["names"]
+    assert [n["text"] for n in rows if n["kind"] == "primary"] == [name_of(primary)]
+    assert {n["text"] for n in rows} == {name_of(main), name_of(variant), name_of(primary)}
+
+
+@req(NM, VALID, invariant="Название хранится в форме strip+NFC и через извлечение (О22)")
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "  Пётр Абеляр ",
+        unicodedata.normalize("NFD", "Пётр Абеляр"),
+        "\t" + unicodedata.normalize("NFD", "Йозеф Шумпетер") + " ",
+    ],
+)
+def test_stored_form_via_extraction(stand, onto, events, raw):
+    name = name_of(raw)
+    stand.extract(
+        [f"{name} учил о мире идей."],
+        {
+            "statements": [st(raw, "holds", "Учение об идеях", 1, f"{name} учил о мире идей")],
+            "entities": [{"name": raw, "type": "person", "ru": raw}],
+        },
+    )
+    [entity] = by_text(onto, name)
+    stored = {n["text"] for n in onto.entities.get(entity)["names"]}
+    assert stored == {name}, (raw, stored)
+    with onto.statements.engine.begin() as conn:
+        texts = list(conn.scalars(select(t.names.c.text)))
+    assert all(x == name_of(x) for x in texts), texts

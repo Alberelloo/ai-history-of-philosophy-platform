@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -238,7 +238,6 @@
+         """Новое основное название той же сущности: прежние основные становятся вариантами
+         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
+         Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+-        text = clean(text)
+         entity = self.get(entity_id)
+         self._check(entity["type"], text)
+         lang = lang_for(text, lang)

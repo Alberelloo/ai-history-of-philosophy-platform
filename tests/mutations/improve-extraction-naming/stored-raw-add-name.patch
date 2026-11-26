@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -219,7 +219,6 @@
+     def add_name(self, entity_id: str, lang: str, text: str, kind: str = "variant") -> None:
+         """Язык — по письменности; основное название проверяется, как в ``create``. Текст
+         хранится в форме ``strip`` + NFC."""
+-        text = clean(text)
+         entity_id = self.resolve(entity_id)
+         if kind == "primary":
+             self._check(self.get(entity_id)["type"], text)

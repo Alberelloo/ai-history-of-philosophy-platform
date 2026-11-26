@@ -1276,3 +1276,22 @@ mutations:
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
       - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: stored-raw-create
+    requirement: Валидность названий сущностей
+    patch: stored-raw-create.patch
+    note: О22 — create хранит сырой текст (без strip+NFC)
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
+      - tests/knowledge/test_entity_naming.py::test_stored_form_via_extraction
+  - id: stored-raw-add-name
+    requirement: Валидность названий сущностей
+    patch: stored-raw-add-name.patch
+    note: О22 — add_name хранит сырой текст
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
+  - id: stored-raw-set-primary
+    requirement: Валидность названий сущностей
+    patch: stored-raw-set-primary.patch
+    note: О22 — set_primary_name хранит сырой текст
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
