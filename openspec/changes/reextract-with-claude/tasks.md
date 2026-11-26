@@ -9,7 +9,7 @@
 ## 2. Разработчик
 
 - [x] 2.1 `knowledge/quotes.py` (нормализация, части по многоточию, `check`); `Statements._check`, перепроверка при событии библиотеки и `dating.check` — через него. Юнит-тесты `tests/knowledge/test_quotes_unit.py`.
-- [ ] 2.2 `knowledge/extraction_codes.py` (перечень, `code_for`); `Skip(reason, code)`; `EntityItems.index(…, on_drop)`. Юнит-тесты.
+- [x] 2.2 `knowledge/extraction_codes.py` (перечень, `code_for`); `Skip(reason, code)`; `EntityItems.index(…, on_drop)`. Юнит-тесты.
 - [ ] 2.3 `schema.py`: столбцы `filling_runs` и миграция `knowledge:10`. Юнит-тест миграции на SQLite (база до `knowledge:10` → столбцы есть, старые строки целы).
 - [ ] 2.4 `llm`: `LLMGateway.role_info`, маршрут `GET /v1/roles/{role}`, токены в `spend_summary`. Юнит-тесты `tests/llm/test_role_info_unit.py`.
 - [ ] 2.5 `filling.py`: мягкая схема шлюзу, `_item` (поштучная проверка), `apply_reply`, проверки абзаца и цитаты до сущностей, `_drop` с кодом и счётом, ветка «не 200» считается, коды отказов шлюза, таймаут по бюджету роли, модель роли в запуске и `Provenance`, метрики, `fail_run` и `knowledge.run.failed`, фрагменты по объёму; `main.py` — `PHILOGRAPH_EXTRACTION_TIMEOUT_SECONDS`. Юнит-тесты `tests/knowledge/test_reply_items_unit.py`, `test_fragments_unit.py`, `test_run_lifecycle_unit.py`.

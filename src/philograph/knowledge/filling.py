@@ -15,6 +15,7 @@ from typing import Any
 
 from sqlalchemy import select, update
 
+from philograph.knowledge import extraction_codes
 from philograph.knowledge import schema as t
 from philograph.knowledge.dates import interval
 from philograph.knowledge.entity_items import EntityItems
@@ -307,7 +308,12 @@ class Filling:
         )
 
     def _drop(self, run_id: str, reason: str) -> None:
-        events.emit("knowledge.extraction.dropped", run_id=run_id, reason=reason[:300])
+        events.emit(
+            "knowledge.extraction.dropped",
+            run_id=run_id,
+            reason=reason[:300],
+            code=extraction_codes.code_for(reason),
+        )
 
     def _store(
         self,

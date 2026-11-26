@@ -23,3 +23,8 @@
 - `knowledge/quotes.py`: `normalize`, `parts`, `check`, `found`. `Statements._check`, перепроверка изменённого абзаца и `dating.check` — через него; `_norm_quote` и `dating._quote_key` удалены.
 - Последствие: патчи мутаций `tests/mutations/improve-extraction-naming/quote-*.patch` и `check-order-*.patch` ссылаются на удалённый `dating._quote_key` и больше не применяются (изменение влито). Режим `--coverage` патчи не применяет; полный `--change improve-extraction-naming` потребует обновления патчей — тестировщику.
 - Прогон: `pytest -q tests/knowledge/test_quotes_unit.py` — 18 passed; `test_dating_unit.py test_statements.py test_entity_dating_extraction.py test_filling.py` — 114 passed.
+
+## 2026-11-26 — 2.2 коды причин
+
+- `knowledge/extraction_codes.py`: перечень `CODES`, `code_for`. `Skip(reason, code)`; `EntityItems.index(…, on_drop)` — `null` в необязательных полях элемента как отсутствие, не-список `entities` — пусто. Событие `knowledge.extraction.dropped` — обязательный `code`. Временная точка в `Filling._drop` (`code_for`) — до 2.5.
+- Прогон: `test_extraction_codes_map_unit.py test_extraction_codes_unit.py test_entity_items_unit.py` — 36 passed.
