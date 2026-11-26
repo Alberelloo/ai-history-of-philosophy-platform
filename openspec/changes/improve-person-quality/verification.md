@@ -535,3 +535,34 @@
 - `dates-end-only` и `dates-interval-ignored` — test_plan_partition_any_order упал (профиль pure, 400 примеров). test_merge_invariant_two_orders (профиль heavy, 25 примеров) без `@example` проходит: вид `dates_any` — 2 из 22 видов лица. С `@example(DATE_INTERVALS)` падают оба.
 
 **Наблюдение.** В тестах `test_author_attribution_moves` (EM) позиция `supports` осталась: её нет в спецификации «Атрибуция», но сценарий проверяет только перенос «с той же позицией». Код позицию не проверяет.
+
+## Судья — третий круг, 2026-11-26, коммит f8b6e3f
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| person-quality «Качество персон» | 4 сценария, test_person_quality_invariant, test_person_rule_any_input | passed, мутации упали | test_person_quality.py 53 passed in 65.75s; своя J3-2 (склейка ищется только при союзе вторым словом) — упал test_person_quality_invariant | — (стенд извлечения в тестах) | подтверждено |
+| person-quality «Слияние вариантов персоны» | 14 сценариев, test_plan_partition_any_order, test_merge_invariant_two_orders, test_person_scenario_codes | passed, мутации упали | passed; `--id` component-qids-unchecked, dates-interval-ignored — упали все ожидаемые (3 и 3); **своя J3-1 (при `review:dates` и `apart:decided` в одной компоненте причина `review:decided_conflict` вместо `review:dates`) — не упал ни один тест** (test_person_quality + test_dedupe_unit: 72 passed) | онтология судьи: Spinoza(Q35802)×Spinoza(1632–1677) → `merged merge:name`, оставшаяся с QID, `primary.dates` 1632–1677 (даты были только у удалённой); Декарт 1596–1650 × 1696–1750 → `merge_proposed review:dates`, пункт `duplicate`, обе на месте; Гоббс Q37621 × Q999001 — ни слияния, ни очереди (`apart`=1) | **не подтверждено** (приоритет причин компоненты) |
+| ontology-entities «Поиск дублей» | 3 сценария, test_candidates_invariant, test_last_word_group_cap | passed | test_entity_merge.py 15 passed in 62.21s; **своя J3-3 (`continue` → `break` после события `duplicate_group_capped`: группы, идущие после большой, не перебираются) — 15 passed** | — | **не подтверждено** (перебор прочих групп при большой) |
+| ontology-entities «Слияние с перенаправлением» | 7 сценариев, test_preservation_and_undo | passed | passed; `--id` undo-without-externals (2), fold-consensus-kept, merge-primary-stale (2) — упали; своя J3-4 (свёртка считает повтором атрибуцию того же автора с другой позицией) — упал test_preservation_and_undo | Leibniz → Лейбниц: `merged` folded=1, attributions=1; у оставшегося s_a, s_c «утверждает», s_b «оспаривает», согласие `disputed` (до — `prevailing`); основное «Лейбниц», вариант «Leibniz»; `GET /v1/entities/<Leibniz>` → 200, Лейбниц; отмена — `merge_undone restored=1`, дамп таблиц равен дампу до слияния (0 различий), свёрнутое снова со своим id и субъектом, согласие `prevailing` | подтверждено |
+
+Замечания прежних судей: J1 (цепочка дат) — test_date_chain_component, мутация component-dates-ignored в списке; J-A — fold-consensus-kept и who-consensus-kept в `mutations.yaml`, своим прогоном fold-consensus-kept упал; J-E — merge-primary-stale роняет test_preservation_and_undo (маркер `req` есть); интервалы дат — `S.life_bounds`/`dates_any`, оракул `S.dates_conflict_spec` по формуле спецификации, dates-interval-ignored роняет оба property-теста; `test_person_scenario_codes` проверяет коды поведением (`same_person`, `resolve_duplicate`, `LifeDates.suggest`/`apply`), маркер `req` есть. Закрыты.
+
+Тест полноты стратегий: множества `merge:*` (4), `review:*` (7), `apart:*` (4) и допуск 2 совпадают с дельтой (сверено построчно); переписаны в тест руками, а не читаются из файла спецификации. `src` тест не импортирует (`strategies` и `test_person_quality.SCENARIO_CODES`), `strategies.py` не импортирует `philograph`. 99 passed in 133.78s.
+
+Аудит пунктов (8 выбранных): найдены строки у «`dropped` с кодом», «оставшаяся — меньший id», «разные типы — никогда», «портрет с тем же признаком — за удалённой», «точный повтор атрибуции» (J3-4 подтверждает). **Строк нет** у двух пунктов: «иначе `review:dates` при противоречащих датах; иначе `review:decided_conflict`» (есть только строка qid_cluster/dates) и «большая группа не перебирается» в смысле «прочие группы перебираются» (строка есть, но проверяет только саму большую группу). По обоим выжила моя мутация.
+
+Неэквивалентность (зонд в worktree, `plan` и `duplicate_candidates` напрямую):
+- J3-1: «Бэкон» a (1561–1626), b, d (без дат), c (1214–1292), решение «разные» по c–d. Без мутации рёбра a–b, a–d, b–c, b–d — `review:dates`; с мутацией — `review:decided_conflict`. Спецификация требует `review:dates`.
+- J3-3: 201 «… Локк» и затем «Пётр Юм»/«Иван Юм» без дат. Без мутации пара Юмов в кандидатах; с мутацией её нет. Спецификация не перебирает только большую группу.
+
+Прежние: test_registry_entities 33 passed, 1 skipped · test_statements 19 passed · test_snapshot 6 passed.
+`ruff check` и `ruff format --check` по 14 файлам изменения — чисто; `lint-imports` 3 kept, 0 broken; `check_traceability.py` 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования. `prompts/__init__.py` — только текст шаблонов (`ontology.extract`, плюс `language` и `translate_names` от `improve-extraction-naming`).
+Полный `pytest` и стенд не запускались (1 ГБ RAM, указание ведущего); вывод системы — по базе и журналу своей онтологии. Мутации — в отдельном worktree, удалён; `git diff -- src` пуст.
+
+Подгонка: не найдена. Ожидания не правились, skip/xfail нет, оракулы дат и согласия не берут ответ из `dedupe`.
+
+Вердикт: **не принято** — вернуть тестировщику:
+1. Приоритет причин компоненты `review:dates` над `review:decided_conflict`. Нужны: вид генератора лиц (или `@example`) с компонентой, где есть и противоречие дат, и решение «разные»; мутация J3-1 в `mutations.yaml`; строка аудита.
+2. «Поиск дублей»: большая группа не мешает перебору остальных групп. Нужны: в test_last_word_group_cap (или property) малая группа с парой по последнему слову и датам рядом с большой, в любом порядке создания; мутация J3-3 в `mutations.yaml`; уточнённая строка аудита.
+
+Разработчику возвращать нечего: оба зонда на текущем коде дают поведение по спецификации.
