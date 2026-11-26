@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 2f813ef..d143dd5 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -617,7 +617,7 @@ def merge_names(
+     result: dict[str, list[str | None]] = {"kept": [], "removed": []}
+     for side, n in sides:
+         key = (n["lang"], n["normalized"])
+-        if key in owner and owner[key] != side:
++        if False:
+             result[side].append(None)
+         elif n["kind"] == "primary" and n is not chosen:
+             result[side].append("variant")

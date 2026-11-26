@@ -1268,6 +1268,9 @@ def ontology_with_duplicates(draw) -> dict[str, Any]:
         entities[0]["names"].append(("en", "David Hume", "variant"))
     if draw(st.booleans()):
         entities[1]["names"].append(("ru", "Давид Юм", "variant"))
+    if draw(st.booleans()):
+        # точный повтор (язык, normalized) у обеих сторон (О28): после слияния — одна строка
+        entities[0]["names"].append(("ru", "Давид Юм", "variant"))
     entities += [
         {"type": "person", "names": [("ru", f"Персона {i}", "primary")]}
         for i in range(2, n_persons)
@@ -1297,6 +1300,8 @@ def ontology_with_duplicates(draw) -> dict[str, Any]:
             "value": value,
             "attributions": draw(st.lists(attribution, min_size=1, max_size=5, unique=True)),
             "evidence": draw(st.lists(evidence, max_size=2, unique=True)),
+            # проверено человеком (О28): проверенное при слиянии не теряет статус
+            "verified": draw(st.sampled_from([False, False, False, True])),
         }
 
     statements = []

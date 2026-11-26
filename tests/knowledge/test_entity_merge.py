@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import json
+import unicodedata
 from datetime import UTC, datetime
 
 import pytest
@@ -27,7 +28,7 @@ from philograph.operator.access import ActionLog
 
 from ..conftest import PROFILES
 from .dump import dump
-from .strategies import expected_candidates, ontology_names, ontology_with_duplicates
+from .strategies import SOURCES, expected_candidates, ontology_names, ontology_with_duplicates
 
 req = pytest.mark.req
 OE = "ontology-entities"
@@ -366,6 +367,8 @@ def _build(onto, case) -> tuple[list[str], dict[int, list[str]]]:
                 evidence=evidence,
             )
         ]
+        if s.get("verified"):
+            onto.statements.confirm(created[n][0], "operator")
     for k, side in enumerate(case["mentions"]):
         mention(onto, ids[side], 10 * k)
     for side, phash in case["portraits"]:
@@ -495,6 +498,41 @@ PRIMARY_FROM_REMOVED = {
     "portraits": [],
 }
 
+
+def _norm_spec(text: str) -> str:
+    """Правило поиска ontology-entities: NFC, нижний регистр, «ё» → «е», всё, кроме букв,
+    цифр и пробелов, — пробел; пробелы схлопываются, края обрезаются (оракул, О28)."""
+    low = unicodedata.normalize("NFC", text).lower().replace("ё", "е")
+    return " ".join("".join(c if c.isalnum() or c.isspace() else " " for c in low).split())
+
+
+# О28: точный повтор названия у обеих сторон и проверенное утверждение, совпавшее
+# с непроверенным повтором, — на удалённой (VERIFIED_REMOVED) и на оставшейся (VERIFIED_KEPT).
+def _repeat_names():
+    persons = _three_persons()
+    persons[0]["names"] = [("en", "Hume", "primary"), ("ru", "Давид Юм", "variant")]
+    persons[1]["names"] = [("ru", "Юм", "primary"), ("ru", "Давид  Юм", "variant")]
+    return persons
+
+
+def _verified_case(side):
+    # с подтверждением утверждение «по источникам»; проверенным его делает человек (confirm)
+    sts = [_st(0, 2, [("source", "s_a", "asserts")]), _st(1, 2, [("source", "s_b", "asserts")])]
+    sts[0]["evidence"] = [("p1", SOURCES[0])]
+    sts[1]["evidence"] = [("p2", SOURCES[1])]
+    sts[side]["verified"] = True
+    return {
+        "entities": _repeat_names(),
+        "qid_side": None,
+        "statements": sts,
+        "mentions": [],
+        "portraits": [],
+    }
+
+
+VERIFIED_REMOVED = _verified_case(1)
+VERIFIED_KEPT = _verified_case(0)
+
 PRIMARY_KEYS = {"lifespan": "dates", "description": "description"}  # ontology-entities
 
 
@@ -509,12 +547,17 @@ def _independent(attributions) -> tuple[set, set]:
 @req(OE, MERGE, invariant="Не потеряно утверждение, атрибуция, подтверждение; отмена ⇒ дамп")
 @req(OE, MERGE, invariant="Согласие пересчитывается при свёртке и переносе атрибуции-автора")
 @req(OE, MERGE, invariant="Копия основных значений оставшейся пересчитывается")
+@req(OE, MERGE, invariant="После слияния нет двух названий с одинаковыми (язык, normalized)")
+@req(OE, MERGE, invariant="Проверенное утверждение не теряет статус при слиянии")
+@req(OE, MERGE, invariant="Отмена слияния возвращает отброшенные повторы названий")
 @HEAVY
 @given(ontology_with_duplicates())
 @example(EXACT_REPEAT)
 @example(FOLD_DISPUTED)
 @example(WHO_COLLAPSE)
 @example(PRIMARY_FROM_REMOVED)
+@example(VERIFIED_REMOVED)
+@example(VERIFIED_KEPT)
 def test_preservation_and_undo(onto, events, case):
     wipe(onto)
     ids, created = _build(onto, case)
@@ -540,13 +583,19 @@ def test_preservation_and_undo(onto, events, case):
         g["evidence"] |= set(s["evidence"])
         g["ids"].add(created[n][0])
     kept_phash = {p for side, p in case["portraits"] if side == 0}
+    verified_ids = {
+        created[n][0] for n, st_ in enumerate(case["statements"]) if st_.get("verified")
+    }
     before = dump(onto.statements.engine)
     had_ru = any(
         lang == "ru" and kind == "primary"
         for e in case["entities"][:2]
         for lang, _text, kind in e["names"]
     )
-    all_names = {(lang, text) for e in case["entities"][:2] for lang, text, _k in e["names"]}
+    # названия переносятся; точный повтор (язык, normalized) остаётся одной строкой (О28)
+    all_names = {
+        (lang, _norm_spec(text)) for e in case["entities"][:2] for lang, text, _k in e["names"]
+    }
     events.clear()
 
     merge_id = onto.statements.merge_entities(kept, removed)
@@ -580,6 +629,13 @@ def test_preservation_and_undo(onto, events, case):
         if (len(asserts), len(disputes)) == (2, 1):
             assert got["consensus"] == "disputed", content
         consensus_after[content] = (got["consensus"], sorted(g["attributions"], key=str))
+    # О28: проверенное человеком не теряет статус (группа с проверенным — проверенная)
+    for content, g in groups.items():
+        if any(i in verified_ids for i in g["ids"]):
+            assert onto.statements.get(survivors[content]["id"])["status"] == "verified", content
+    # О28: у оставшейся нет двух названий с одинаковыми (язык, normalized)
+    kept_names = [(n["lang"], _norm_spec(n["text"])) for n in onto.entities.get(kept)["names"]]
+    assert len(kept_names) == len(set(kept_names)), kept_names
     # копия основных значений оставшейся = значение одного из её действующих утверждений
     primary = onto.entities.get(kept)["primary"]
     for type_, key in PRIMARY_KEYS.items():
@@ -602,7 +658,7 @@ def test_preservation_and_undo(onto, events, case):
     primaries = [n for n in onto.entities.get(kept)["names"] if n["kind"] == "primary"]
     assert len(primaries) == 1
     assert (primaries[0]["lang"] == "ru") == had_ru
-    assert {(lang, text) for lang, text, _ in names(onto, kept)} >= all_names
+    assert {(lang, _norm_spec(text)) for lang, text, _ in names(onto, kept)} == all_names
     if case["qid_side"] is not None:
         assert onto.entities.externals("wikidata") == {kept: "Q41568"}
     with onto.statements.engine.begin() as conn:

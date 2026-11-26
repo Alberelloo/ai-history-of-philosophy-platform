@@ -668,3 +668,37 @@
 |---|---|---|---|
 | Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 1.57s) |
 | Слияние вариантов персоны | component-verdicts-candidates-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 7.39s) |
+
+## Тестировщик — О28 (правка слияния после Д1-mig, Д2-mig, коммит 1923675), 2026-11-26
+
+В `test_preservation_and_undo` добавлены инварианты:
+- у оставшейся нет двух названий с одинаковыми (язык, normalized); `normalized` — оракул по правилу «Поиск дублей», модуль не импортируется;
+- группа содержания, в которой было проверенное утверждение, после слияния остаётся проверенной;
+- отмена восстанавливает дамп, включая отброшенные повторы названий (дамп таблицы `names` с id).
+
+Как изменились генератор и примеры:
+- `S.ontology_with_duplicates`: точный повтор «Давид Юм» у обеих сторон; около четверти утверждений подтверждает человек (`confirm`).
+- `@example(VERIFIED_REMOVED)`, `@example(VERIFIED_KEPT)`: повтор «Давид Юм» / «Давид  Юм» и проверенное утверждение, совпавшее с непроверенным, на удалённой и на оставшейся.
+- Прежняя проверка «все тексты названий сохранены» ослаблена до «все ключи (язык, normalized) сохранены».
+
+**Расхождение со спецификацией, решать человеку.** Дельта ontology-entities «Слияние с перенаправлением» говорит «названия переносятся». Что точный повтор остаётся одной строкой, в спецификации не сказано, а перенос проверенного в спецификации есть только в виде инварианта «ни одно подтверждение не потеряно». Нормативную фразу нужно добавить в дельту.
+
+Прогоны:
+- `-k preservation_and_undo` — 1 passed in 40.95s;
+- migration `-k "stand_synthetic or verified_untouched"` — 2 passed in 5.35s, бывшие red-тесты Д1-mig и Д2-mig.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | merge-repeat-name-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.81s) |
+| Слияние с перенаправлением | merge-verified-folded | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 220.50s (0:03:40)) |
+| Слияние с перенаправлением | undo-dropped-names-lost | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 2.94s) |
+
+Первый прогон `merge-verified-folded` поймал мутанта за 220 s, но не на явном примере. Утверждение без подтверждения, записанное вручную, сразу получает «проверено». Поэтому в обоих примерах оба утверждения были проверенными, и потерю статуса нельзя было увидеть.
+Исправлено: примерам даны подтверждения, то есть статус «по источникам», а проверенным утверждение делает только `confirm`. Только явные примеры под мутантом: 1 failed in 4.57s. Повторный `--id`:
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние с перенаправлением | merge-verified-folded | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 4.34s) |
+
+После исправления `-k preservation_and_undo` — 1 passed in 35.22s.
+
