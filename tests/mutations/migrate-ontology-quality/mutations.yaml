@@ -640,3 +640,15 @@ mutations:
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_same_key_rename
       - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_arbitrary_later_names
+  - id: wd-labels-include-source
+    requirement: Перевод названий
+    patch: wd-labels-include-source.patch
+    note: О33 — шаг 5 (подписи Wikidata) берёт и источники
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_sources_not_translated
+  - id: translate-include-source
+    requirement: Перевод названий
+    patch: translate-include-source.patch
+    note: О33 — шаг 6 (модель) берёт и источники
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_sources_not_translated

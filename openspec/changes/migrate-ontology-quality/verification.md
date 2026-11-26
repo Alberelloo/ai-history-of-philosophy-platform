@@ -443,6 +443,22 @@
 | Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_name_form | да (1 failed, 1 warning in 1.13s) |
 | Миграция существующей онтологии | verify-no-abort | tests/knowledge/test_ontology_migration.py::test_loss_aborts | да (1 failed, 1 warning in 2.83s) |
 
+## Тестировщик — О33 (С7), 2026-11-26, код и спецификация fa8f9e7
+
+`test_sources_not_translated` проверяет одно:
+- источник с QID и английским названием (ru-подпись в Wikidata есть) не переименован;
+- источник без QID не переименован и не отправлен модели;
+- понятие с QID переименовано из Wikidata;
+- понятие без QID переименовано моделью и есть среди элементов запроса;
+- у источников нет `knowledge.entity.renamed`.
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Перевод названий | wd-labels-include-source | tests/knowledge/test_ontology_migration.py::test_sources_not_translated | да (1 failed, 1 warning in 0.84s) |
+| Перевод названий | translate-include-source | tests/knowledge/test_ontology_migration.py::test_sources_not_translated | да (1 failed, 1 warning in 0.72s) |
+
+С7 закрыт. `git apply --check` для всех `tests/mutations/*/*.patch` на HEAD — 0 ненакладывающихся, `--coverage` чистый.
+
 ## Судья — 2026-11-26, коммит 745dbe0
 
 Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.
