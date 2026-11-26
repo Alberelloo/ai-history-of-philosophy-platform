@@ -28,7 +28,7 @@ import re
 import sqlite3
 import threading
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -232,7 +232,9 @@ def _bbox(polygons: list[list[list[list[float]]]]) -> tuple[float, float, float,
 
 
 def _in_ring(lon: float, lat: float, ring: list[list[float]]) -> bool:
-    """Лучевой алгоритм на плоскости lon/lat (у границ через антимеридиан возможна ошибка)."""
+    """Лучевой алгоритм на плоскости lon/lat. Верен, только если кольца разрезаны по ±180°
+    (RFC 7946): это проверяет сборка артефакта (``polities_build``, ребро со скачком долготы
+    больше 180° — ошибка сборки)."""
     inside = False
     j = len(ring) - 1
     for i in range(len(ring)):
@@ -257,12 +259,16 @@ def contains(polygons: list[list[list[list[float]]]], lon: float, lat: float) ->
 
 @dataclass(frozen=True)
 class Located:
-    """Рамки строк интервала: геометрия разбирается заново только у строк, чья рамка
-    содержит точку."""
+    """Рамки строк интервала. Геометрия строки разбирается один раз на запись кэша — когда
+    её рамка впервые содержит точку; разобранное хранится в ``parsed`` (только кандидаты,
+    а не весь интервал, чтобы не держать в памяти все многоугольники)."""
 
     valid_from: int
     valid_to: int
     rows: tuple[tuple[tuple[float, float, float, float], str, str, str, float, str], ...]
+    parsed: dict[int, list[list[list[list[float]]]]] = field(
+        default_factory=dict, compare=False, repr=False
+    )
 
 
 def build_index(conn: sqlite3.Connection, year: int) -> Located:
@@ -283,10 +289,13 @@ def locate(index: Located, lat: float, lon: float) -> dict[str, Any] | None:
     """Образование, чей многоугольник содержит точку; из нескольких — меньшее по площади
     (более частное). Строки одного ``id`` — одно образование, площадь — их сумма."""
     hits: dict[str, dict[str, Any]] = {}
-    for (x0, y0, x1, y1), pid, name, status, area, geometry in index.rows:
+    for n, ((x0, y0, x1, y1), pid, name, status, area, geometry) in enumerate(index.rows):
         if not (x0 <= lon <= x1 and y0 <= lat <= y1):
             continue
-        if contains(_rings(json.loads(geometry)), lon, lat):
+        polygons = index.parsed.get(n)
+        if polygons is None:
+            polygons = index.parsed.setdefault(n, _rings(json.loads(geometry)))
+        if contains(polygons, lon, lat):
             hit = hits.setdefault(
                 pid, {"id": pid, "name": name, "name_status": status, "area": 0.0}
             )
@@ -388,27 +397,36 @@ class PolityLayer:
             return None
         sig = self._signature()
         with self._lock:
-            index = next(
+            key = next(
                 (
-                    v
+                    k
                     for k, v in self._index.items()
                     if k[0] == sig and v.valid_from <= year <= v.valid_to
                 ),
                 None,
             )
-        if index is None:
-            conn = open_artifact(self.path) if self.path is not None else None
-            if conn is None:
-                raise PolitiesUnavailable("missing")
-            try:
-                index = build_index(conn, year)
-            finally:
-                conn.close()
-            with self._lock:
-                self._index[(sig, index.valid_from, index.valid_to)] = index
-                while len(self._index) > INDEX_CACHE:
-                    self._index.popitem(last=False)
-        return locate(index, lat, lon)
+            index = None
+            if key is not None:
+                self._index.move_to_end(key)  # вытеснение по давности использования (LRU)
+                index = self._index[key]
+        # Повреждённый артефакт (нет таблицы, битая геометрия) — как недоступный слой:
+        # карточка получает ``polity = unavailable`` и запасной путь «ныне …», а не 500.
+        try:
+            if index is None:
+                conn = open_artifact(self.path) if self.path is not None else None
+                if conn is None:
+                    raise PolitiesUnavailable("missing")
+                try:
+                    index = build_index(conn, year)
+                finally:
+                    conn.close()
+                with self._lock:
+                    self._index[(sig, index.valid_from, index.valid_to)] = index
+                    while len(self._index) > INDEX_CACHE:
+                        self._index.popitem(last=False)
+            return locate(index, lat, lon)
+        except (sqlite3.DatabaseError, ValueError, KeyError, TypeError, IndexError) as exc:
+            raise PolitiesUnavailable("format") from exc
 
     def serve(self, year: int) -> bytes:
         """Тело ответа на год; события ``served`` или ``unavailable``."""

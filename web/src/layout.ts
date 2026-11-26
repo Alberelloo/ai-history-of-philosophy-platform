@@ -41,8 +41,6 @@ const GAP_FIELD = 2.5; // текст → поле (40px)
 const OFF_MIN = 2; // внешний отступ (32px)
 const TEXT_MIN_CH = 62;
 const TEXT_MAX_CH = 68;
-// Минимальная свободная ширина A, при которой закреплённая навигация не сворачивается.
-const PIN_A_MIN = 46.5; // 744px
 
 // Сколько свободной ширины нужно каждой раскладке (px), по порядку K1–K4.
 function needs(root: number, ch: number): [number, number, number, number] {
@@ -56,12 +54,14 @@ function needs(root: number, ch: number): [number, number, number, number] {
 }
 
 // Навигация с учётом временного сворачивания: оно решается при наименьшей панели (28rem),
-// иначе правило зависело бы от ширины, которую само определяет.
+// иначе правило зависело бы от ширины, которую само определяет. Порог — потребность K4
+// (самой узкой раскладки): если при закреплённой навигации ей не хватает места, колонка
+// стала бы уже 62ch, поэтому навигация временно сворачивается.
 function navigation(m: LayoutMetrics): { navW: number; tempCollapse: boolean } {
   const wide = m.width >= 1280;
   let navPinned = m.pinned && wide;
   const tempCollapse =
-    navPinned && m.panelOpen && m.width - NAV_PINNED * m.root - PANEL * m.root < PIN_A_MIN * m.root;
+    navPinned && m.panelOpen && m.width - NAV_PINNED * m.root - PANEL * m.root < needs(m.root, m.ch)[3];
   if (tempCollapse) navPinned = false;
   return { navW: navPinned ? NAV_PINNED * m.root : NAV_COLLAPSED * m.root, tempCollapse };
 }

@@ -367,6 +367,22 @@ def polygons_of(geometry: dict[str, Any]) -> list[Any]:
     return list(geometry["coordinates"])
 
 
+def check_antimeridian(geometry: dict[str, Any], name: str) -> None:
+    """Кольца должны быть разрезаны по ±180° (RFC 7946): на этом держится лучевой алгоритм
+    ``polities._in_ring`` на плоскости lon/lat. Ребро со скачком долготы больше 180° или
+    долгота за ±180° — ошибка сборки, а не молча неверный поиск образования в точке."""
+    for polygon in polygons_of(geometry):
+        for ring in polygon:
+            for i, point in enumerate(ring):
+                if abs(point[0]) > 180:
+                    raise BuildError(f"{name}: долгота {point[0]} за пределами ±180°")
+                if i and abs(point[0] - ring[i - 1][0]) > 180:
+                    raise BuildError(
+                        f"{name}: ребро пересекает антимеридиан ({ring[i - 1][0]} → {point[0]}),"
+                        " кольцо не разрезано по ±180°"
+                    )
+
+
 # --- сборка ----------------------------------------------------------------------------
 
 
@@ -470,6 +486,7 @@ def build(
             except (ValueError, TypeError, shapely_errors()):
                 report["skipped_invalid"] += 1
                 continue
+            check_antimeridian(simple, name)
             report["vertices_in"] += _count(geometry.get("coordinates") or [])
             report["vertices_out"] += vout
             report["tiny_kept"] += int(tiny)

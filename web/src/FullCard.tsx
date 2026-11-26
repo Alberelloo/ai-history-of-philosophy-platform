@@ -348,6 +348,24 @@ function useModernCountry(geo: Geo | null | undefined, skip: boolean): string | 
   return name;
 }
 
+// Часть сводки персоны, взятая из утверждения (роль, основное место), помечается так же,
+// как строка: метка по отметке, подробности по нажатию, `data-unverified` у сгенерированного.
+// Иначе легенда объясняла бы метку, которой в карточке не видно.
+function SummaryPart({ row, children }: { row: Row; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span
+      className="card-summary-part"
+      data-mark={markOf(row)}
+      data-unverified={row.generated ? "true" : undefined}
+    >
+      {children}
+      <MarkButton row={row} open={open} onToggle={() => setOpen((v) => !v)} />
+      <RowDetails row={row} open={open} />
+    </span>
+  );
+}
+
 function PersonSummary({ card }: { card: Card }) {
   const t = useT();
   const summary = card.summary;
@@ -359,23 +377,31 @@ function PersonSummary({ card }: { card: Card }) {
   if (summary.roles.length > 0)
     parts.push(
       <span key="role" data-summary="role">
-        {summary.roles.map((r) => value(t, r)).join(", ")}
+        {summary.roles.map((r, i) => (
+          <span key={r.statement_id}>
+            {i > 0 && ", "}
+            <SummaryPart row={r}>{value(t, r)}</SummaryPart>
+          </span>
+        ))}
       </span>,
     );
   if (place)
     parts.push(
-      <span key="place" data-summary="place">
-        {place.entity_id ? (
-          <button
-            className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
-            onClick={() => openCardInPanel(place.entity_id!, place.label ?? place.entity_id!)}
-          >
-            {place.label}
-          </button>
-        ) : (
-          value(t, place)
-        )}
-      </span>,
+      // Метка — рядом с `[data-summary=place]`, а не внутри: в нём только само место.
+      <SummaryPart key="place" row={place}>
+        <span data-summary="place">
+          {place.entity_id ? (
+            <button
+              className="pg-btn pg-btn--ghost pg-btn--sm card-row__entity"
+              onClick={() => openCardInPanel(place.entity_id!, place.label ?? place.entity_id!)}
+            >
+              {place.label}
+            </button>
+          ) : (
+            value(t, place)
+          )}
+        </span>
+      </SummaryPart>,
     );
   if (polity)
     parts.push(
