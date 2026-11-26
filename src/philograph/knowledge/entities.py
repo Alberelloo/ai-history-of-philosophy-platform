@@ -6,16 +6,30 @@
 
 from __future__ import annotations
 
-import re
 import uuid
 from itertools import combinations
 from typing import Any
 
-from sqlalchemy import Engine, and_, select, update
+from sqlalchemy import Connection, Engine, and_, delete, select, update
 
 from philograph.knowledge import schema as t
+from philograph.knowledge.naming import (
+    InvalidName,
+    check_name,
+    clean,
+    is_russian,
+    lang_for,
+    normalize,
+    reject,
+)
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.platform import events
+
+__all__ = ["DuplicateEntity", "Entities", "EntityNotFound", "InvalidName", "normalize"]
+
+# Предел группы «тип + последнее слово названия» в ``duplicate_candidates``: пары группы
+# перебираются все, k² растёт быстро. Больше предела — событие ``duplicate_group_capped``.
+MAX_LAST_WORD_GROUP = 200
 
 events.define(
     "knowledge.entity.created", "info", "Создана сущность онтологии", required=("entity_id", "type")
@@ -25,12 +39,26 @@ events.define(
     "info",
     "Сущности слиты с перенаправлением",
     required=("kept", "removed"),
+    optional=("reason", "statements", "attributions", "folded", "loops"),
+)
+events.define(
+    "knowledge.entity.duplicate_group_capped",
+    "warning",
+    "Группа по последнему слову больше предела — её пары не перебираются",
+    required=("type", "size", "limit"),
+)
+events.define(
+    "knowledge.entity.renamed",
+    "info",
+    "Сменилось основное название сущности",
+    required=("entity_id", "lang", "previous_lang"),
 )
 events.define(
     "knowledge.entity.merge_undone",
     "info",
     "Слияние сущностей отменено",
     required=("kept", "removed"),
+    optional=("restored",),
 )
 
 
@@ -46,12 +74,6 @@ class EntityNotFound(Exception):
         self.entity_id = entity_id
 
 
-def normalize(name: str) -> str:
-    name = name.lower().replace("ё", "е")
-    name = re.sub(r"[^\w\s]", " ", name)
-    return re.sub(r"\s+", " ", name).strip()
-
-
 class Entities:
     def __init__(self, engine: Engine, registry: OntologyRegistry) -> None:
         self.engine = engine
@@ -65,8 +87,16 @@ class Entities:
         external: dict[str, str] | None = None,
         entity_id: str | None = None,
     ) -> str:
-        """``names``: (язык, текст, вид: primary | variant | original)."""
+        """``names``: (язык, текст, вид: primary | variant | original).
+
+        Язык каждого названия ставится по письменности (``naming.lang_for``): переданный
+        сохраняется, только если совпадает с ней. Основное название проверяется правилом
+        названий; отказ — событие ``knowledge.entity.rejected`` и ``InvalidName``."""
         self.registry.entity_type(type_)
+        names = [(lang_for(clean(text), lang), clean(text), kind) for lang, text, kind in names]
+        for _, text, kind in names:
+            if kind == "primary":
+                self._check(type_, text)
         for system, value in (external or {}).items():
             with self.engine.begin() as conn:
                 existing = conn.scalar(
@@ -130,7 +160,7 @@ class Entities:
                 .mappings()
                 .all()
             )
-        return {
+        entity = {
             "id": row["id"],
             "type": row["type"],
             "primary": dict(row["primary"]),
@@ -138,6 +168,11 @@ class Entities:
                 {"lang": n["lang"], "text": n["text"], "kind": n["kind"]} for n in names_rows
             ],
         }
+        if row.get("retired_run"):
+            # Снятая миграцией: внутренние вызовы по концам утверждений не ломаются, а
+            # показывающие пути проверяют это поле (``schema.active``).
+            entity["retired"] = {"run_id": row["retired_run"], "reason": row["retired_reason"]}
+        return entity
 
     def label(self, entity_id: str, lang: str = "ru") -> str:
         names = self.get(entity_id)["names"]
@@ -165,25 +200,85 @@ class Entities:
         return {eid: by_id[rid] for eid, rid in resolved.items() if rid in by_id}
 
     def set_primary(self, entity_id: str, key: str, value: Any) -> None:
+        """Копия основного значения; ``None`` — копии больше нет (ключ снимается)."""
         entity = self.get(entity_id)
+        primary = {**entity["primary"], key: value}
+        if value is None:
+            del primary[key]
         with self.engine.begin() as conn:
             conn.execute(
-                update(t.entities)
-                .where(t.entities.c.id == entity["id"])
-                .values(primary={**entity["primary"], key: value})
+                update(t.entities).where(t.entities.c.id == entity["id"]).values(primary=primary)
             )
 
+    @staticmethod
+    def _check(type_: str, text: str) -> None:
+        reason = check_name(type_, text)
+        if reason is not None:
+            raise reject(type_, text, reason)
+
     def add_name(self, entity_id: str, lang: str, text: str, kind: str = "variant") -> None:
+        """Язык — по письменности; основное название проверяется, как в ``create``. Текст
+        хранится в форме ``strip`` + NFC."""
+        text = clean(text)
+        entity_id = self.resolve(entity_id)
+        if kind == "primary":
+            self._check(self.get(entity_id)["type"], text)
         with self.engine.begin() as conn:
             conn.execute(
                 t.names.insert().values(
-                    entity_id=self.resolve(entity_id),
-                    lang=lang,
+                    entity_id=entity_id,
+                    lang=lang_for(text, lang),
                     text=text,
                     normalized=normalize(text),
                     kind=kind,
                 )
             )
+
+    def set_primary_name(self, entity_id: str, lang: str, text: str) -> None:
+        """Новое основное название той же сущности: прежние основные становятся вариантами
+        (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
+        Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC.
+        Своя транзакция; событие ``knowledge.entity.renamed`` — после её коммита."""
+        with self.engine.begin() as conn:
+            renamed = self.rename_in(conn, entity_id, lang, text)
+        events.emit("knowledge.entity.renamed", **renamed)
+
+    def rename_in(self, conn: Connection, entity_id: str, lang: str, text: str) -> dict[str, Any]:
+        """``set_primary_name`` в транзакции вызывающего (запись вместе с журналом действий
+        запуска) без события: возвращает его поля, вызывающий пишет ``knowledge.entity.renamed``
+        после коммита, чтобы откаченная запись не оставила события."""
+        text = clean(text)
+        entity = self.get(entity_id)
+        self._check(entity["type"], text)
+        lang = lang_for(text, lang)
+        key = normalize(text)
+        rows = (
+            conn.execute(select(t.names).where(t.names.c.entity_id == entity["id"]))
+            .mappings()
+            .all()
+        )
+        previous = [r for r in rows if r["kind"] == "primary"]
+        for row in previous:
+            conn.execute(
+                update(t.names)
+                .where(t.names.c.id == row["id"])
+                .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
+            )
+        same = next((r for r in rows if r["normalized"] == key), None)
+        if same is not None:
+            conn.execute(
+                update(t.names)
+                .where(t.names.c.id == same["id"])
+                .values(kind="primary", lang=lang, text=text)
+            )
+        else:
+            conn.execute(
+                t.names.insert().values(
+                    entity_id=entity["id"], lang=lang, text=text, normalized=key, kind="primary"
+                )
+            )
+        previous_lang = lang_for(previous[0]["text"], previous[0]["lang"]) if previous else None
+        return {"entity_id": entity["id"], "lang": lang, "previous_lang": previous_lang}
 
     def find(self, name: str) -> list[dict[str, Any]]:
         """Все сущности с таким названием или вариантом: выбор не делается молча."""
@@ -198,7 +293,7 @@ class Entities:
         candidates = []
         for entity_id in ids:
             entity = self.get(entity_id)
-            if entity["id"] == entity_id:
+            if entity["id"] == entity_id and "retired" not in entity:
                 candidates.append(entity)
         return candidates
 
@@ -226,6 +321,35 @@ class Entities:
             )
         return True
 
+    def remove_external(self, entity_id: str, system: str, value: str) -> bool:
+        """Снять внешний идентификатор (откат запуска). ``True`` — снят, ``False`` — его не
+        было у этой сущности."""
+        entity_id = self.resolve(entity_id)
+        with self.engine.begin() as conn:
+            return bool(
+                conn.execute(
+                    delete(t.external_ids).where(
+                        and_(
+                            t.external_ids.c.entity_id == entity_id,
+                            t.external_ids.c.system == system,
+                            t.external_ids.c.value == value,
+                        )
+                    )
+                ).rowcount
+            )
+
+    def external_of(self, entity_id: str, system: str) -> str | None:
+        """Внешний идентификатор системы у сущности (после перенаправлений)."""
+        entity_id = self.resolve(entity_id)
+        with self.engine.begin() as conn:
+            return conn.scalar(
+                select(t.external_ids.c.value)
+                .where(
+                    and_(t.external_ids.c.entity_id == entity_id, t.external_ids.c.system == system)
+                )
+                .order_by(t.external_ids.c.value)
+            )
+
     def externals(self, system: str) -> dict[str, str]:
         """Сущность → значение внешнего идентификатора системы (по действующим сущностям)."""
         with self.engine.begin() as conn:
@@ -234,9 +358,12 @@ class Entities:
                 .where(t.external_ids.c.system == system)
                 .order_by(t.external_ids.c.value)
             ).all()
+            retired = t.retired_ids(conn)
         found: dict[str, str] = {}
         for entity_id, value in rows:
-            found.setdefault(self.resolve(entity_id), value)
+            entity_id = self.resolve(entity_id)
+            if entity_id not in retired:
+                found.setdefault(entity_id, value)
         return found
 
     def source_entity(self, source_id: str, title: str) -> str:
@@ -249,42 +376,105 @@ class Entities:
     # --- дубли ---
 
     def duplicate_candidates(self) -> list[tuple[str, str]]:
-        """Кандидаты: одинаковый тип, совпадает последнее слово названия и основные даты."""
+        """Кандидаты в дубли одного типа — по индексу названий, без перебора всех пар:
+        совпадает последнее слово названия и основные даты, или основное название одной
+        совпадает с любым названием другой."""
         with self.engine.begin() as conn:
-            rows = (
-                conn.execute(select(t.entities).where(t.entities.c.redirect_to.is_(None)))
+            rows = conn.execute(select(t.entities).where(t.active())).mappings().all()
+            all_names = conn.execute(select(t.names)).mappings().all()
+        position = {r["id"]: i for i, r in enumerate(rows)}
+        by_id = {r["id"]: r for r in rows}
+        last_words: dict[tuple[str, str], set[str]] = {}
+        full: dict[tuple[str, str], set[str]] = {}
+        primaries: dict[str, set[str]] = {}
+        for n in all_names:
+            entity = by_id.get(n["entity_id"])
+            if entity is None:
+                continue
+            words = n["normalized"].split()
+            last = words[-1] if words else ""
+            last_words.setdefault((entity["type"], last), set()).add(entity["id"])
+            full.setdefault((entity["type"], n["normalized"]), set()).add(entity["id"])
+            if n["kind"] == "primary" and n["normalized"]:
+                primaries.setdefault(entity["id"], set()).add(n["normalized"])
+        pairs: set[tuple[str, str]] = set()
+        for (type_, _), group in last_words.items():
+            if len(group) > MAX_LAST_WORD_GROUP:
+                # Перебор пар группы — O(k²); большая группа пропускается не молча: событие без
+                # названий (Р2). Совпадения полных названий ниже ищутся и для неё.
+                events.emit(
+                    "knowledge.entity.duplicate_group_capped",
+                    type=type_,
+                    size=len(group),
+                    limit=MAX_LAST_WORD_GROUP,
+                )
+                continue
+            for a, b in combinations(sorted(group, key=position.get), 2):
+                if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):
+                    pairs.add((a, b))
+        for entity_id, names in primaries.items():
+            for name in names:
+                for other in full.get((by_id[entity_id]["type"], name), ()):
+                    if other != entity_id:
+                        a, b = sorted((entity_id, other), key=position.get)
+                        pairs.add((a, b))
+        return sorted(pairs, key=lambda p: (position[p[0]], position[p[1]]))
+
+    def merge(self, kept: str, removed: str, *, emit: bool = True) -> int:
+        """Переносит названия, утверждения, внешние идентификаторы, упоминания, атрибуции-автора
+        и портреты; старый идентификатор становится перенаправлением. Всё перенесённое пишется
+        в ``merges.moved`` для отмены. Ключи утверждений и свёртку повторов пересчитывает
+        ``Statements.merge_entities``."""
+        kept, removed = self.resolve(kept), self.resolve(removed)
+        with self.engine.begin() as conn:
+            all_names = (
+                conn.execute(select(t.names).where(t.names.c.entity_id.in_([kept, removed])))
                 .mappings()
                 .all()
             )
-            all_names = conn.execute(select(t.names)).mappings().all()
-        names_of: dict[str, set[str]] = {}
-        for n in all_names:
-            names_of.setdefault(n["entity_id"], set()).add(
-                n["normalized"].split()[-1] if n["normalized"] else ""
+            own = sorted((n for n in all_names if n["entity_id"] == kept), key=lambda n: n["id"])
+            other = sorted(
+                (n for n in all_names if n["entity_id"] == removed), key=lambda n: n["id"]
             )
-        pairs = []
-        for a, b in combinations(rows, 2):
-            if a["type"] != b["type"]:
-                continue
-            same_name = names_of.get(a["id"], set()) & names_of.get(b["id"], set())
-            dates_a, dates_b = a["primary"].get("dates"), b["primary"].get("dates")
-            if same_name and (dates_a == dates_b):
-                pairs.append((a["id"], b["id"]))
-        return pairs
-
-    def merge(self, kept: str, removed: str) -> int:
-        """Переносит названия и утверждения, старый идентификатор становится перенаправлением."""
-        kept, removed = self.resolve(kept), self.resolve(removed)
-        with self.engine.begin() as conn:
-            moved_names = list(
-                conn.scalars(select(t.names.c.id).where(t.names.c.entity_id == removed))
-            )
+            kept_kinds, removed_kinds = merge_names(own, other)
+            pairs = list(zip([*own, *other], [*kept_kinds, *removed_kinds], strict=True))
+            kinds = {n["id"]: kind for n, kind in pairs if kind is not None and kind != n["kind"]}
+            dropped = [dict(n) for n, kind in pairs if kind is None]
+            for name_id, kind in kinds.items():
+                conn.execute(update(t.names).where(t.names.c.id == name_id).values(kind=kind))
+            if dropped:
+                conn.execute(delete(t.names).where(t.names.c.id.in_([n["id"] for n in dropped])))
+            gone = {n["id"] for n in dropped}
+            moved_names = [n["id"] for n in other if n["id"] not in gone]
             moved_subject = list(
                 conn.scalars(select(t.statements.c.id).where(t.statements.c.subject == removed))
             )
             moved_object = list(
                 conn.scalars(select(t.statements.c.id).where(t.statements.c.object == removed))
             )
+            moved_externals = [
+                [r.system, r.value]
+                for r in conn.execute(
+                    select(t.external_ids).where(t.external_ids.c.entity_id == removed)
+                )
+            ]
+            moved_who = list(
+                conn.scalars(
+                    select(t.attributions.c.id).where(
+                        and_(t.attributions.c.who_kind == "entity", t.attributions.c.who == removed)
+                    )
+                )
+            )
+            kept_phash = set(
+                conn.scalars(select(t.portraits.c.phash).where(t.portraits.c.entity_id == kept))
+            )
+            portraits = conn.execute(
+                select(t.portraits.c.id, t.portraits.c.phash).where(
+                    t.portraits.c.entity_id == removed
+                )
+            ).all()
+            moved_portraits = [pid for pid, phash in portraits if phash not in kept_phash]
+            portraits_kept = [pid for pid, phash in portraits if phash in kept_phash]
             conn.execute(
                 update(t.names).where(t.names.c.entity_id == removed).values(entity_id=kept)
             )
@@ -305,6 +495,21 @@ class Entities:
             conn.execute(
                 update(t.mentions).where(t.mentions.c.entity_id == removed).values(entity_id=kept)
             )
+            if moved_who:
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id.in_(moved_who))
+                    .values(who=kept)
+                )
+            if moved_portraits:
+                conn.execute(
+                    update(t.portraits)
+                    .where(t.portraits.c.id.in_(moved_portraits))
+                    .values(entity_id=kept)
+                )
+            conn.execute(
+                t.graph_extensions.delete().where(t.graph_extensions.c.entity_id == removed)
+            )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == removed).values(redirect_to=kept)
             )
@@ -318,13 +523,21 @@ class Entities:
                         "subject": moved_subject,
                         "object": moved_object,
                         "mentions": moved_mentions,
+                        "kinds": {str(n["id"]): n["kind"] for n in all_names if n["id"] in kinds},
+                        "names_dropped": dropped,
+                        "externals": moved_externals,
+                        "attributions_who": moved_who,
+                        "portraits": moved_portraits,
+                        "portraits_kept": portraits_kept,
                     },
                 )
             ).inserted_primary_key[0]
-        events.emit("knowledge.entity.merged", kept=kept, removed=removed)
+        if emit:
+            events.emit("knowledge.entity.merged", kept=kept, removed=removed)
         return merge_id
 
-    def undo_merge(self, merge_id: int) -> None:
+    def undo_merge(self, merge_id: int, *, emit: bool = True) -> dict[str, Any]:
+        """Возвращает перенесённое удалённой сущности; записи старого формата — с умолчаниями."""
         with self.engine.begin() as conn:
             m = conn.execute(select(t.merges).where(t.merges.c.id == merge_id)).mappings().one()
             moved = m["moved"]
@@ -333,6 +546,10 @@ class Entities:
                 .where(t.names.c.id.in_(moved["names"]))
                 .values(entity_id=m["removed"])
             )
+            for name_id, kind in (moved.get("kinds") or {}).items():
+                conn.execute(update(t.names).where(t.names.c.id == int(name_id)).values(kind=kind))
+            for row in moved.get("names_dropped") or []:
+                conn.execute(t.names.insert().values(**row))
             conn.execute(
                 update(t.statements)
                 .where(t.statements.c.id.in_(moved["subject"]))
@@ -348,8 +565,65 @@ class Entities:
                 .where(t.mentions.c.id.in_(moved.get("mentions", [])))
                 .values(entity_id=m["removed"])
             )
+            for system, value in moved.get("externals", []):
+                conn.execute(
+                    update(t.external_ids)
+                    .where(and_(t.external_ids.c.system == system, t.external_ids.c.value == value))
+                    .values(entity_id=m["removed"])
+                )
+            if moved.get("attributions_who"):
+                conn.execute(
+                    update(t.attributions)
+                    .where(t.attributions.c.id.in_(moved["attributions_who"]))
+                    .values(who=m["removed"])
+                )
+            if moved.get("portraits"):
+                conn.execute(
+                    update(t.portraits)
+                    .where(t.portraits.c.id.in_(moved["portraits"]))
+                    .values(entity_id=m["removed"])
+                )
             conn.execute(
                 update(t.entities).where(t.entities.c.id == m["removed"]).values(redirect_to=None)
             )
             conn.execute(update(t.merges).where(t.merges.c.id == merge_id).values(undone=True))
-        events.emit("knowledge.entity.merge_undone", kept=m["kept"], removed=m["removed"])
+        if emit:
+            events.emit("knowledge.entity.merge_undone", kept=m["kept"], removed=m["removed"])
+        return dict(m)
+
+
+def merge_names(
+    kept: list[dict[str, Any]], removed: list[dict[str, Any]]
+) -> tuple[list[str | None], list[str | None]]:
+    """Виды названий обеих сторон после слияния (по позициям списков; ``None`` — убрать).
+
+    Ровно одно основное — русское основное любой из сторон (сначала оставшейся), иначе
+    основное оставшейся (иначе удалённой); прочие бывшие основные — варианты. Точный повтор
+    ``(язык, normalized)`` между сторонами остаётся одной строкой: у основного, если оно в
+    повторе, иначе у оставшейся; строки другой стороны убираются. Повторы внутри одной
+    стороны слияние не трогает."""
+    sides = [("kept", n) for n in kept] + [("removed", n) for n in removed]
+    primaries = [n for _, n in sides if n["kind"] == "primary"]
+    chosen = next((n for n in primaries if is_russian(n["text"])), None)
+    if chosen is None and primaries:
+        chosen = primaries[0]
+    keys = {
+        side: {(n["lang"], n["normalized"]) for s, n in sides if s == side}
+        for side in ("kept", "removed")
+    }
+    shared = keys["kept"] & keys["removed"]
+    owner = {k: "kept" for k in shared}
+    if chosen is not None:
+        chosen_side = "kept" if any(n is chosen for n in kept) else "removed"
+        if (chosen["lang"], chosen["normalized"]) in shared:
+            owner[(chosen["lang"], chosen["normalized"])] = chosen_side
+    result: dict[str, list[str | None]] = {"kept": [], "removed": []}
+    for side, n in sides:
+        key = (n["lang"], n["normalized"])
+        if key in owner and owner[key] != side:
+            result[side].append(None)
+        elif n["kind"] == "primary" and n is not chosen:
+            result[side].append("variant")
+        else:
+            result[side].append(n["kind"])
+    return result["kept"], result["removed"]

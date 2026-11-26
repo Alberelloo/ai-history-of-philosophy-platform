@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -89,7 +89,7 @@
+ 
+ 
+ def _quote_has_roman(quote: str, roman: str) -> bool:
+-    return any(word.strip(_EDGE).upper() == roman for word in quote.split())
++    return roman in quote.upper()
+ 
+ 
+ def check(

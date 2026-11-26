@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -564,7 +564,7 @@
+                     .values(entity_id=m["removed"])
+                 )
+             conn.execute(
+-                update(t.entities).where(t.entities.c.id == m["removed"]).values(redirect_to=None)
++                update(t.entities).where(t.entities.c.id == m["removed"]).values(redirect_to=m["kept"])
+             )
+             conn.execute(update(t.merges).where(t.merges.c.id == merge_id).values(undone=True))
+         if emit:

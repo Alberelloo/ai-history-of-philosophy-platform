@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 526bd65..3e5f960 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -818,7 +818,7 @@ class Migration:
+         groups: dict[tuple[str, str], set[str]] = defaultdict(set)
+         for e in view.active():
+             row = view.entities[e]
+-            if row["type"] in (PERSON, SOURCE):
++            if row["type"] == PERSON:
+                 continue
+             for n in row["names"]:
+                 if n["kind"] == "primary" and normalize(n["text"]):

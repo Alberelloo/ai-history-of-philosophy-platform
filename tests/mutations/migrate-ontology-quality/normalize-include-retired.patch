@@ -1,0 +1,18 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index e179585..f5c5207 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -637,6 +637,13 @@ class Migration:
+                         )
+                         run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
+                 found.append(action)
++        if not report.dry_run:  # мутант: и названия сущностей вне View (снятых прошлым запуском)
++            with self.engine.begin() as _conn:
++                for _r in _conn.execute(select(t.names)).mappings().all():
++                    if _r["entity_id"] not in view.entities:
++                        _conn.execute(
++                            update(t.names).where(t.names.c.id == _r["id"]).values(text=clean(_r["text"]), normalized=normalize(clean(_r["text"])))
++                        )
+         report.names_normalized = len(found)
+         return found
+ 

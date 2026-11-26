@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -190,7 +190,7 @@
+     """Язык названия: переданный — если его письменность совпадает с письменностью текста,
+     иначе язык по письменности (кириллица — ru, латиница — en, греческая — el, иначе und)."""
+     script = script_of(text)
+-    if given is not None and script is not None and LANG_SCRIPT.get(given) == script:
++    if given is not None:
+         return given
+     return SCRIPT_LANG.get(script or "", "und")
+ 

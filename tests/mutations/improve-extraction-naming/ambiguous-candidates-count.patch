@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -204,7 +204,7 @@
+                     payload={"name": name, "candidates": [c["id"] for c in candidates]},
+                 )
+             )
+-        events.emit("knowledge.extraction.ambiguous", name=name, candidates=len(candidates))
++        events.emit("knowledge.extraction.ambiguous", name=name, candidates=1)
+         raise Skip(ENTITY_AMBIGUOUS)
+ 
+     def _russian_primary(self, entity: dict[str, Any], item: dict[str, Any]) -> None:

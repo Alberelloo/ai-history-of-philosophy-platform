@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..422405b 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -743,9 +743,7 @@ class Statements:
+                     moved_attrs.append(a["id"])
+             if moved_attrs:
+                 conn.execute(
+-                    update(t.attributions)
+-                    .where(t.attributions.c.id.in_(moved_attrs))
+-                    .values(statement_id=survivor)
++                    delete(t.attributions).where(t.attributions.c.id.in_(moved_attrs))
+                 )
+             if skipped:
+                 conn.execute(

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -539,7 +539,7 @@
+         ]
+         if existing:
+             if any(span(s["value"]) == span(dates) for s in existing):
+-                report.unchanged += 1
++                self._skip(report, entity_id, prop.split(",")[0], "conflict")
+             else:
+                 self._skip(report, entity_id, prop.split(",")[0], "conflict")
+             return

@@ -51,6 +51,28 @@ LANG = re.compile(r"^[a-z]{2,3}(-[a-z]+)?$")
 
 Fetch = Callable[[str], dict[str, Any]]
 
+HUMAN = "Q5"  # класс «человек» (P31) — кандидат QID персоны
+INSTANCE_OF = "P31"
+
+# Род занятий (P106) → роль персоны. Чего нет в таблице, не записывается.
+WIKIDATA_ROLES = {
+    "Q4964182": "philosopher",  # философ
+    "Q170790": "scientist",  # математик
+    "Q169470": "scientist",  # физик
+    "Q11063": "scientist",  # астроном
+    "Q18805": "scientist",  # естествоиспытатель
+    "Q901": "scientist",  # учёный
+    "Q36180": "writer",  # писатель
+    "Q49757": "writer",  # поэт
+    "Q11774202": "writer",  # эссеист
+    "Q1234713": "theologian",  # богослов
+    "Q42603": "theologian",  # священник
+    "Q250867": "theologian",  # католический священник
+    "Q116": "ruler",  # монарх
+    "Q82955": "ruler",  # политик
+    "Q333634": "translator",  # переводчик
+}
+
 
 class WikidataError(Exception):
     """Неверный идентификатор, сбой загрузки или ответ не по форме."""
@@ -315,6 +337,18 @@ def wikidata_time(value: str, precision: int) -> FuzzyDate | None:
     lo, hi, kind = bounds
     draft = FuzzyDate(lo, hi, lo, hi, kind, "")
     return FuzzyDate(lo, hi, lo, hi, kind, _render(draft))
+
+
+SIMPLE_TIME = re.compile(r"^([+-]\d+-\d{2}-\d{2})(T\d{2}:\d{2}:\d{2}Z)?$")
+
+
+def simple_time(value: Any) -> FuzzyDate | None:
+    """Время упрощённой записи (``"+1724-04-22"`` или полное ``"-0427-00-00T00:00:00Z"``) —
+    то же правило, что ``wikidata_time`` с точностью «год»: точности в упрощённой записи нет."""
+    match = SIMPLE_TIME.fullmatch(value) if isinstance(value, str) else None
+    if match is None:
+        return None
+    return wikidata_time(f"{match.group(1)}T00:00:00Z", 9)
 
 
 def claim_date(claim: Claim | None) -> FuzzyDate | None:

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..843cf58 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -684,7 +684,7 @@ class Statements:
+                     select(t.attributions.c.statement_id).where(t.attributions.c.id == sid)
+                 )
+             if owner is not None:
+-                self._recompute_consensus(owner)
++                pass
+         moved = {
+             **moved,
+             "keys": keys,

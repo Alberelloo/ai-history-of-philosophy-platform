@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -930,7 +930,7 @@
+                     ).rowcount
+                 if changed:
+                     restored += 1
+-                    events.emit("knowledge.entity.restored", entity_id=p["entity"], run_id=run_id)
++                    pass
+             elif kind == "name_text":
+                 # Прежние текст и ключ; если текст с тех пор сменили — чужое изменение.
+                 with self.engine.begin() as conn:

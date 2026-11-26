@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -149,7 +149,7 @@
+         decision = entry.get("decision", "pending")
+         if decision not in DECISIONS:
+             problems.append(f"{where}: decision не из {', '.join(DECISIONS)}")
+-        elif decision in CONFIRMED and qid is None:
++        elif False:
+             problems.append(f"{where}: decision {decision} без wikidata")
+         candidates = entry.get("candidates") or []
+         if not isinstance(candidates, list):

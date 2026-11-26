@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -224,7 +224,7 @@
+             conn.execute(
+                 t.names.insert().values(
+                     entity_id=entity_id,
+-                    lang=lang_for(text, lang),
++                    lang=lang,
+                     text=text,
+                     normalized=normalize(text),
+                     kind=kind,

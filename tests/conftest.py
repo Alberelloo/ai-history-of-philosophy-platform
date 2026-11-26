@@ -9,8 +9,33 @@ from typing import Any
 import pytest
 
 from philograph.platform import events as ev
+
+try:  # hypothesis — dev-зависимость; без неё property-тесты не собираются, остальные идут
+    from hypothesis import settings as _hsettings
+except ImportError:  # pragma: no cover
+    _hsettings = None
 from philograph.platform.clock import ManualClock
 from philograph.platform.db import make_engine
+
+# Профили property-тестов (design.md improve-extraction-naming, «Тестовая инфраструктура»):
+# ``ci`` — тесты с базой через сервис, ``pure`` — чистые функции, ``heavy`` — миграция,
+# откат и слияние на онтологиях из генератора. Везде детерминированно и без базы примеров.
+# Профиль выбирается переменной ``HYPOTHESIS_PROFILE``, по умолчанию ``ci``; чистые и тяжёлые
+# тесты берут свой профиль декоратором ``@settings(parent=PROFILES["pure"])``.
+HYPOTHESIS_EXAMPLES = {"ci": 60, "pure": 400, "heavy": 25}
+PROFILES: dict[str, Any] = {}
+if _hsettings is not None:
+    for _name, _count in HYPOTHESIS_EXAMPLES.items():
+        _hsettings.register_profile(
+            _name,
+            max_examples=_count,
+            derandomize=True,
+            deadline=None,
+            database=None,
+            print_blob=True,
+        )
+        PROFILES[_name] = _hsettings.get_profile(_name)
+    _hsettings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "ci"))
 
 
 class EventLog:

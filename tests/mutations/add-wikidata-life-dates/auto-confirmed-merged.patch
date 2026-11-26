@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -426,7 +426,7 @@
+                 if holder is not None and holder != entity_id:
+                     self._skip(report, entity_id, SYSTEM, "qid_taken")
+                     pair = (entity_id, holder)
+-                    (confirmed if entry["decision"] == "accepted" else proposals).append(pair)
++                    confirmed.append(pair)
+                     continue
+                 if not dry_run:
+                     self.entities.add_external(entity_id, SYSTEM, qid)

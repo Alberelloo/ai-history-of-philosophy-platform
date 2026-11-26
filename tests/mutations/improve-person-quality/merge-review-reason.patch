@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/review.py
++++ b/src/philograph/knowledge/review.py
+@@ -253,7 +253,7 @@
+         row = self._close(item_id, {"merge": merge})
+         if merge:
+             kept, removed = row["payload"]["pair"]
+-            self.statements.merge_entities(kept, removed, reason="merge:review")
++            self.statements.merge_entities(kept, removed, reason="merge:name")
+         self.actions.record(actor, "merge" if merge else "keep_apart", str(item_id))
+         events.emit(
+             "knowledge.review.decided",

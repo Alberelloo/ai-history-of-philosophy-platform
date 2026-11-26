@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -456,6 +456,7 @@
+                 "knowledge.migration.step",
+                 run_id=report.run_id,
+                 step=step,
++                labels=[view.label(e) for e in view.active()[:3]],
+                 actions=len(found),
+                 dry_run=dry_run,
+             )

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -551,7 +551,7 @@
+                     .where(and_(t.external_ids.c.system == system, t.external_ids.c.value == value))
+                     .values(entity_id=m["removed"])
+                 )
+-            if moved.get("attributions_who"):
++            if False:
+                 conn.execute(
+                     update(t.attributions)
+                     .where(t.attributions.c.id.in_(moved["attributions_who"]))

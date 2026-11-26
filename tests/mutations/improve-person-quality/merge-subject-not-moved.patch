@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -462,9 +462,6 @@
+                 update(t.names).where(t.names.c.entity_id == removed).values(entity_id=kept)
+             )
+             conn.execute(
+-                update(t.statements).where(t.statements.c.subject == removed).values(subject=kept)
+-            )
+-            conn.execute(
+                 update(t.statements).where(t.statements.c.object == removed).values(object=kept)
+             )
+             conn.execute(

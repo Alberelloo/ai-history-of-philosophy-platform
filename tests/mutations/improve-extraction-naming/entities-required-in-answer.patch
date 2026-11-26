@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -277,7 +277,7 @@
+         created = dropped = 0
+         resolved: dict[str, str] = {}
+         value = response.json()["value"]
+-        index = self.items.index(value.get("entities"), run_id)
++        index = self.items.index(value["entities"], run_id)
+         for item in value["statements"]:
+             try:
+                 self._store(item, window, data, source, run_id, resolved, index)

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -43,7 +43,7 @@
+ _ROMAN_CANON = re.compile(r"^(X{0,2})(IX|IV|V?I{0,3})$")
+ _EDGE = ".,;:!?()[]«»\"'„“”"
+ MAX_YEAR = 2100
+-MAX_CENTURY = 21
++MAX_CENTURY = 22
+ 
+ 
+ @dataclass(frozen=True)

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -75,7 +75,7 @@
+ def dates_conflict(a: Mapping[str, Any] | None, b: Mapping[str, Any] | None) -> bool:
+     """Даты противоречат, если у обеих есть и при допуске не пересекаются интервалы начала
+     или интервалы конца. Даты у одной стороны — не противоречие."""
+-    if not a or not b:
++    if not a and not b:
+         return False
+ 
+     def apart(lo1: int, hi1: int, lo2: int, hi2: int) -> bool:

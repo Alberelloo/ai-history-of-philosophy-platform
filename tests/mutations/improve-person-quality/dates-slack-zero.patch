@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -21,7 +21,7 @@
+ from philograph.knowledge.naming import normalize
+ from philograph.platform import events
+ 
+-DATE_SLACK = 2  # допуск дат, лет, на краях интервалов неопределённости
++DATE_SLACK = 0  # допуск дат, лет, на краях интервалов неопределённости
+ QID = "wikidata"
+ PERSON = "person"
+ 

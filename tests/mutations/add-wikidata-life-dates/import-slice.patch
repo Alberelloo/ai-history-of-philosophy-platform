@@ -1,0 +1,14 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -497,7 +497,10 @@
+         claims = record["claims"]
+         # Время — общим правилом ``wikidata.simple_time`` (знак — эра), годы жизни — только
+         # при обеих датах; одна — событие ``partial``.
+-        born, died = (simple_time((claims.get(p) or [None])[0]) for p in ("P569", "P570"))
++        born, died = (
++            simple_time("+" + v[1:5] + "-00-00") if (v := (claims.get(p) or [None])[0]) else None
++            for p in ("P569", "P570")
++        )
+         if (born is None) != (died is None):
+             events.emit(
+                 "knowledge.import.skipped",

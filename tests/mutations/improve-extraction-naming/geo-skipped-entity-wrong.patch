@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -273,7 +273,7 @@
+             report.failed += 1
+         else:
+             report.skipped += 1
+-        events.emit("knowledge.geo.skipped", entity=entity_id, property=prop, reason=reason)
++        events.emit("knowledge.geo.skipped", entity=prop, property=prop, reason=reason)
+ 
+     @staticmethod
+     def _source(qid: str, prop: str, run_id: str, **extra: Any) -> dict[str, Any]:

@@ -1,0 +1,49 @@
+# Правила названий сущностей онтологии (спецификация entity-naming, «Валидность названий»).
+# Это данные: пополнение стоп-списка, частиц и пределов не требует правки кода.
+# Форма проверяется при загрузке (naming.load_rules): ошибка — отказ запуска сервиса.
+version: 1
+
+# Типы, названия которых правило не проверяет (язык по письменности ставится всем).
+exempt: [source]
+
+# Пределы длины: слов (str.split) и знаков (кодовых точек) — причина `sentence`.
+limits:
+  default: {max_words: 6, max_chars: 80}
+  work: {max_words: 12, max_chars: 160}
+  event: {max_words: 12, max_chars: 160}
+  idea_event: {max_words: 12, max_chars: 160}
+  phenomenon: {max_words: 12, max_chars: 160}
+
+# Причина `not_a_name` — только для этих типов.
+person:
+  types: [person]
+  # Частица имени: первое слово целиком или перед «-», «'», «’» (без учёта регистра).
+  particles: [de, d, da, del, della, di, du, van, von, der, ibn, al,
+              де, д, да, дель, делла, ди, дю, ван, фон, дер, ибн, аль, эль]
+  # Шаблоны по нормализованному названию, без учёта регистра.
+  patterns:
+    - '^author of '
+    - '^the author '
+    - '^the \w+( \w+)* of\b'
+  # Союз между двумя словами с заглавной буквы — склейка двух имён.
+  conjunctions: [and, и, "&"]
+
+# Причина `stopword`: служебные слова, местоимения, обращения и роли (спека владельца П2–П4).
+stopwords:
+  - some
+  - every
+  - this author
+  - the author above mentioned
+  - your Lordship
+  - children
+  - logicians
+  - ordinary mind
+  - the perceptive
+  - blind man
+  - blind mathematician
+  - modern philosopher
+  - anatomist of the mind
+  - the mathematical arguer
+  - поэт
+  - мальчик
+  - тот, кто чувствует

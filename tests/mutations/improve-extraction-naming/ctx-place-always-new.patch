@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -418,7 +418,7 @@
+         names = _names(candidate.get("label") or {}, _labels(record), qid)
+         place = candidate.get("place")
+         place_id = self.entities.by_external(SYSTEM, place["qid"]) if place else None
+-        new_place = place is not None and place_id is None
++        new_place = place is not None
+         if place_id is not None and not self._of_type(place_id, PLACE):
+             return {"result": "duplicate_qid"}  # QID места занят не местом: решает человек
+         # Названия новых сущностей — до записи: кандидат не пишется наполовину.

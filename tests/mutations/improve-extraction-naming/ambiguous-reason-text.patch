@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -205,7 +205,7 @@
+                 )
+             )
+         events.emit("knowledge.extraction.ambiguous", name=name, candidates=len(candidates))
+-        raise Skip(ENTITY_AMBIGUOUS)
++        raise Skip(f"ambiguous link: {name}")
+ 
+     def _russian_primary(self, entity: dict[str, Any], item: dict[str, Any]) -> None:
+         """У найденной сущности нет русского основного, а элемент дал русское написание,

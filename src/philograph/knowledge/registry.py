@@ -176,6 +176,10 @@ class OntologyRegistry:
 
     # --- типы сущностей ---
 
+    def entity_types(self) -> set[str]:
+        """Коды всех типов сущностей реестра."""
+        return set(self._load()["entity_types"])
+
     def entity_type(self, code: str) -> dict[str, Any]:
         try:
             return self._load()["entity_types"][code]

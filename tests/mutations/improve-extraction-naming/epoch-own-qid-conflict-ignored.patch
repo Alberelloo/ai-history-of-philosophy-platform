@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -314,7 +314,7 @@
+         own = known.get(epoch_id) if epoch_id is not None else None
+         if qid is None:
+             qid = own
+-        elif own is not None and own != qid:
++        elif False:
+             # У эпохи уже другой QID: второй не записывается, решает человек.
+             return {"epoch_id": epoch_id, "label": ru, "qid": qid, "result": "duplicate_qid"}
+         if qid is None:

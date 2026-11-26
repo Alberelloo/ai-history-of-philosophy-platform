@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -144,7 +144,7 @@
+         else:
+             seen.add(entity)
+         qid = entry.get("wikidata")
+-        if qid is not None and not (isinstance(qid, str) and QID.fullmatch(qid)):
++        if False:
+             problems.append(f"{where}: wikidata не по шаблону Q<число>")
+         decision = entry.get("decision", "pending")
+         if decision not in DECISIONS:

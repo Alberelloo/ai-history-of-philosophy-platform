@@ -1,0 +1,14 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -195,8 +195,9 @@
+     if kind != PERSON:
+         return found["P577"]  # type: ignore[return-value]
+     birth, death = found["P569"], found["P570"]
+-    if birth is None or death is None:
+-        raise Skip("P569" if birth is None else "P570", "partial")
++    if birth is None and death is None:
++        raise Skip("P569", "partial")
++    birth, death = birth or death, death or birth
+     return interval(birth, death, format_original(birth, death))
+ 
+ 

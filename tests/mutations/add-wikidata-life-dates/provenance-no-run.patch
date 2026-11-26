@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -571,7 +571,6 @@
+                     attributions=attributions,
+                     provenance=Provenance(
+                         "imported",
+-                        run_id=report.run_id,
+                         extra={"wikidata": qid, "property": prop},
+                     ),
+                     status="sourced",

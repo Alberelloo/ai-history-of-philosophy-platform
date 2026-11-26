@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dates.py
++++ b/src/philograph/knowledge/dates.py
+@@ -82,7 +82,7 @@
+             original,
+         )
+     year = _astro(years[0], bce)
+-    slack = 10 if approx else 0
++    slack = 5 if approx else 0
+     return FuzzyDate(
+         year - slack,
+         year + slack,

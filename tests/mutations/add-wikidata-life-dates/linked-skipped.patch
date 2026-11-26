@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -440,7 +440,7 @@
+                 planned[qid], planned_own[entity_id] = entity_id, qid
+                 report.externals += 1
+             self._import(report, entity_id, qid)
+-        if linked:
++        if False:
+             for entity_id, qid in sorted(self.entities.externals(SYSTEM).items()):
+                 if limit is not None and report.entities >= limit:
+                     break

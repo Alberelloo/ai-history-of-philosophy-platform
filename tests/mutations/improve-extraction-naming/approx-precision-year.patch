@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dates.py
++++ b/src/philograph/knowledge/dates.py
+@@ -88,7 +88,7 @@
+         year + slack,
+         year - slack,
+         year + slack,
+-        "approx" if approx else "year",
++        "year",
+         original,
+     )
+ 

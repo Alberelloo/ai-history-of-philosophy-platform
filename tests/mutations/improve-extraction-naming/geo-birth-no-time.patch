@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -110,7 +110,7 @@
+ 
+ # Прочие свойства не читаются: влияния (P737), гражданство (P27) и всё остальное.
+ PROPERTIES: dict[str, Property] = {
+-    "P19": Property("lived_in", "birth", "P569"),
++    "P19": Property("lived_in", "birth"),
+     "P20": Property("lived_in", "death", "P570"),
+     "P937": Property("lived_in", "activity", "qualifiers"),
+     "P276": Property("happened_in", subjects="event"),

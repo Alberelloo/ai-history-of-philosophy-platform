@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -231,7 +231,7 @@
+         return True
+     stripped = _words(label)
+     for i in range(1, len(stripped) - 1):
+-        if stripped[i].lower() in rules.conjunctions:
++        if False:
+             left, right = _first_letter(stripped[i - 1]), _first_letter(stripped[i + 1])
+             if left and right and left.isupper() and right.isupper():
+                 return True

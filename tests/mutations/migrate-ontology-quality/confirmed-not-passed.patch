@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -508,7 +508,7 @@
+             return []
+         life = self._life()
+         result = life.apply(manifest, dry_run=report.dry_run, run_id=report.run_id, merge=False)
+-        confirmed.extend(result.confirmed)
++        _ = result.confirmed
+         report.externals = result.externals
+         found = [Action("manifest_qids", "external", dict(x)) for x in result.externals_list]
+         # Записи без решения, у кандидата которых есть держатель, — в очередь.

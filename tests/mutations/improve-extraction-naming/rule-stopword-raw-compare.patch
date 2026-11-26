@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -255,7 +255,7 @@
+         return "sentence"
+     if type_ in rules.person_types and _not_a_name(label, rules):
+         return "not_a_name"
+-    if normalize(label) in rules.stopwords:
++    if label.lower() in rules.stopwords:
+         return "stopword"
+     return None
+ 

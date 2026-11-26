@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index c7344ef..7dafbe3 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -249,7 +249,6 @@ class Entities:
+         после коммита, чтобы откаченная запись не оставила события."""
+         text = clean(text)
+         entity = self.get(entity_id)
+-        self._check(entity["type"], text)
+         lang = lang_for(text, lang)
+         key = normalize(text)
+         rows = (

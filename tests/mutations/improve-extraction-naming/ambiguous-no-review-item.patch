@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -198,7 +198,7 @@
+         with self.statements.engine.begin() as conn:
+             conn.execute(
+                 t.review_items.insert().values(
+-                    kind="ambiguous_link",
++                    kind="duplicate",
+                     status="open",
+                     resolution=None,
+                     payload={"name": name, "candidates": [c["id"] for c in candidates]},

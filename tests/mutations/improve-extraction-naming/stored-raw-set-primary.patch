@@ -1,0 +1,12 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index c7344ef..cbc592f 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -247,7 +247,6 @@ class Entities:
+         """``set_primary_name`` в транзакции вызывающего (запись вместе с журналом действий
+         запуска) без события: возвращает его поля, вызывающий пишет ``knowledge.entity.renamed``
+         после коммита, чтобы откаченная запись не оставила события."""
+-        text = clean(text)
+         entity = self.get(entity_id)
+         self._check(entity["type"], text)
+         lang = lang_for(text, lang)

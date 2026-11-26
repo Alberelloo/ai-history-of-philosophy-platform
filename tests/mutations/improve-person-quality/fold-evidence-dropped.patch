@@ -1,0 +1,17 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..16cd7bb 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -757,11 +757,7 @@ class Statements:
+                 conn.scalars(select(t.evidence.c.id).where(t.evidence.c.statement_id == sid))
+             )
+             if evidence:
+-                conn.execute(
+-                    update(t.evidence)
+-                    .where(t.evidence.c.id.in_(evidence))
+-                    .values(statement_id=survivor)
+-                )
++                conn.execute(delete(t.evidence).where(t.evidence.c.id.in_(evidence)))
+             conn.execute(delete(t.statements).where(t.statements.c.id == sid))
+         self._recompute_consensus(survivor)
+         self._journal(survivor, "system", {"folded": sid, "reason": "свёрнуто при слиянии"})

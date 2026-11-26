@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -192,7 +192,7 @@
+     }
+     if baseline is not None:
+         lost = integrity.compare(baseline, engine)
+-        values[8] = len(lost["lost"]) + len(lost["lost_attributions"])
++        values[8] = len(lost["lost"])
+     rows = []
+     for c in CRITERIA:
+         value = values[c.number]

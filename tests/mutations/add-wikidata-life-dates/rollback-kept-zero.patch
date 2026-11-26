@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -618,7 +618,7 @@
+             if (a["entity"], a["qid"]) in kept:
+                 continue
+             count += int(self.entities.remove_external(a["entity"], SYSTEM, a["qid"]))
+-        return {"statements": removed, "externals": count, "kept": len(kept)}
++        return {"statements": removed, "externals": count, "kept": 0}
+ 
+     def _referenced(self, entity_id: str, qid: str, run_id: str) -> bool:
+         entity_id = self.entities.resolve(entity_id)

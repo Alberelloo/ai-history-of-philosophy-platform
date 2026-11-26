@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -278,7 +278,7 @@
+     ids = list(ids)
+     counts: dict[str, int] = defaultdict(int)
+     with engine.begin() as conn:
+-        for column in (t.statements.c.subject, t.statements.c.object):
++        for column in (t.statements.c.subject,):
+             for entity_id, n in conn.execute(
+                 select(column, func.count()).where(column.in_(ids)).group_by(column)
+             ):

@@ -1,0 +1,15 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..2da425f 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -418,6 +418,10 @@ class LifeDates:
+             report.entities += 1
+             done.add(entity_id)
+             own = planned_own.get(entity_id) or self.entities.external_of(entity_id, SYSTEM)
++            taken = planned.get(qid) or self.entities.by_external(SYSTEM, qid)
++            if taken is not None and taken != entity_id:
++                self._skip(report, entity_id, SYSTEM, "qid_taken")
++                continue
+             if own is not None and own != qid:
+                 self._skip(report, entity_id, SYSTEM, "qid_conflict")
+                 continue

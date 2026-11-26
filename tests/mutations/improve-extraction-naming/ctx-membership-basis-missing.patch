@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -440,7 +440,7 @@
+         ]
+         if candidate.get("kind"):
+             planned.append(("event_kind", None, candidate["kind"], {}))
+-        planned.append(("belongs_to_epoch", epoch_id, None, {"membership_basis": "historians"}))
++        planned.append(("belongs_to_epoch", epoch_id, None, {}))
+         if place is not None:
+             planned.append(("happened_in", place_id, None, {}))
+         missing = [

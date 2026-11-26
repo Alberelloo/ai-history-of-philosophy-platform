@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -937,7 +937,7 @@
+                     changed = conn.execute(
+                         update(t.names)
+                         .where(and_(t.names.c.id == p["name_id"], t.names.c.text == p["text"]))
+-                        .values(text=p["old_text"], normalized=p["old_normalized"])
++                        .values(normalized=p["old_normalized"])
+                     ).rowcount
+                 kept += 0 if changed else 1
+             elif kind == "lang":

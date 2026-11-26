@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..c43d9dc 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -602,7 +602,7 @@ class Migration:
+         for entity_id in view.active():
+             type_ = view.entities[entity_id]["type"]
+             if type_ == SOURCE:
+-                continue
++                break
+             label = view.label(entity_id)
+             reason = check_name(type_, label)
+             if reason is None:

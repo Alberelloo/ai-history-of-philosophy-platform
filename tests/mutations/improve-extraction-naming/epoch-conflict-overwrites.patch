@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -374,6 +374,8 @@
+             same = _bounds(main) == _bounds(dating.to_json())
+             if not same:
+                 item["existing"] = main
++                if not dry_run:
++                    self._write(epoch_id, qid, dating, props)
+             return {**item, "result": "unchanged" if same else "conflict"}
+         if not dry_run:
+             try:

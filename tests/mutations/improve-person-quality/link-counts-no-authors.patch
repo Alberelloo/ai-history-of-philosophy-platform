@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -285,7 +285,7 @@
+                 counts[entity_id] += n
+         for entity_id, n in conn.execute(
+             select(t.attributions.c.who, func.count())
+-            .where(t.attributions.c.who_kind == "entity")
++            .where(t.attributions.c.who_kind == "none")
+             .where(t.attributions.c.who.in_(ids))
+             .group_by(t.attributions.c.who)
+         ):

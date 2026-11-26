@@ -1,0 +1,421 @@
+# Мутации add-wikidata-life-dates (tasks.md 3.4): на каждое требование дельт — одна и больше.
+# expect_fail — тесты, каждый из которых должен упасть под мутацией. Патчи — от HEAD.
+mutations:
+  - id: slice-instead-of-claim-date
+    requirement: Даты жизни из Wikidata
+    patch: slice-instead-of-claim-date.patch
+    note: год берётся срезом строки [1:5] вместо claim_date (знак эры и точность теряются)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: century-as-year
+    requirement: Даты жизни из Wikidata
+    patch: century-as-year.patch
+    note: точность 7 (век) разбирается как год
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_decade_century
+      - tests/knowledge/test_life_dates.py::test_time_rule_any_value
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: existing-overwritten
+    requirement: Даты жизни из Wikidata
+    patch: existing-overwritten.patch
+    note: существующая дата не проверяется — пишется новая
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_existing_dates
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: rollback-removes-verified
+    requirement: Даты жизни из Wikidata
+    patch: rollback-removes-verified.patch
+    note: откат удаляет и проверенные утверждения запуска вместе с их атрибуциями и подтверждениями (патч снят заново от HEAD, О26)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified_and_qid
+  - id: qid-on-pending
+    requirement: Подтверждение QID персон и произведений
+    patch: qid-on-pending.patch
+    note: QID записывается при любом решении, в том числе pending/rejected
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: auto-without-flag
+    requirement: Подтверждение QID персон и произведений
+    patch: auto-without-flag.patch
+    note: auto ставится без флага --auto-exact
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidates_for_person
+      - tests/knowledge/test_life_dates.py::test_suggest_auto_invariant
+  - id: qid-taken-not-merged
+    requirement: Подтверждение QID персон и произведений
+    patch: qid-taken-not-merged.patch
+    note: пара qid_taken с accepted не передаётся слиянию вариантов (только в очередь)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_taken
+  - id: own-qid-overwritten
+    requirement: Подтверждение QID персон и произведений
+    patch: own-qid-overwritten.patch
+    note: у сущности другой QID — проверка qid_conflict убрана
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_entity_has_other_qid
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: holder-not-queued
+    requirement: Подтверждение QID персон и произведений
+    patch: holder-not-queued.patch
+    note: suggest не ставит пару с кандидатом-держателем в очередь duplicate
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_held_by_other
+  - id: import-slice
+    requirement: Импорт из Wikidata
+    patch: import-slice.patch
+    note: import_wikidata берёт год срезом [1:5] (знак эры теряется)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_import_bce
+      - tests/knowledge/test_life_dates.py::test_import_invariant
+
+  # --- аудит пунктов (О21): мутации по каждому нормативному пункту ---
+  - id: prec-9-only
+    requirement: Даты жизни из Wikidata
+    patch: prec-9-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_kant_with_days
+  - id: decade-plus-10
+    requirement: Даты жизни из Wikidata
+    patch: decade-plus-10.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_decade_century
+  - id: century-floor
+    requirement: Даты жизни из Wikidata
+    patch: century-floor.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_decade_century
+  - id: millennium-floor
+    requirement: Даты жизни из Wikidata
+    patch: millennium-floor.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: millennium-precision-century
+    requirement: Даты жизни из Wikidata
+    patch: millennium-precision-century.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: prec-5-accepted
+    requirement: Даты жизни из Wikidata
+    patch: prec-5-accepted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_year_zero_and_low_precision
+  - id: year-zero-accepted
+    requirement: Даты жизни из Wikidata
+    patch: year-zero-accepted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_year_zero_and_low_precision
+  - id: sign-inverted
+    requirement: Даты жизни из Wikidata
+    patch: sign-inverted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+  - id: best-normal-first
+    requirement: Даты жизни из Wikidata
+    patch: best-normal-first.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: best-takes-deprecated
+    requirement: Даты жизни из Wikidata
+    patch: best-takes-deprecated.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: bad-value-as-partial
+    requirement: Даты жизни из Wikidata
+    patch: bad-value-as-partial.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_year_zero_and_low_precision
+  - id: no-dates-as-partial
+    requirement: Даты жизни из Wikidata
+    patch: no-dates-as-partial.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: partial-accepted
+    requirement: Даты жизни из Wikidata
+    patch: partial-accepted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_one_date
+  - id: unchanged-as-conflict
+    requirement: Даты жизни из Wikidata
+    patch: unchanged-as-conflict.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_existing_dates
+  - id: conflict-not-counted
+    requirement: Даты жизни из Wikidata
+    patch: conflict-not-counted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_existing_dates
+  - id: skipped-event-entity-wrong
+    requirement: Даты жизни из Wikidata
+    patch: skipped-event-entity-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_year_zero_and_low_precision
+  - id: roles-outside-table
+    requirement: Даты жизни из Wikidata
+    patch: roles-outside-table.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: attribution-no-link
+    requirement: Даты жизни из Wikidata
+    patch: attribution-no-link.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+  - id: status-generated
+    requirement: Даты жизни из Wikidata
+    patch: status-generated.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+  - id: provenance-no-run
+    requirement: Даты жизни из Wikidata
+    patch: provenance-no-run.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+  - id: dry-run-writes
+    requirement: Даты жизни из Wikidata
+    patch: dry-run-writes.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_dry_run_and_rollback_cli
+  - id: rerun-recounts
+    requirement: Даты жизни из Wikidata
+    patch: rerun-recounts.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_life_dates_invariant
+  - id: rollback-externals-kept
+    requirement: Даты жизни из Wikidata
+    patch: rollback-externals-kept.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_dry_run_and_rollback_cli
+  - id: rollback-kept-zero
+    requirement: Даты жизни из Wikidata
+    patch: rollback-kept-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified
+  - id: referenced-ignored
+    requirement: Даты жизни из Wikidata
+    patch: referenced-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified
+  - id: suggest-person-class-unchecked
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-person-class-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidates_for_person
+  - id: suggest-work-needs-no-date
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-work-needs-no-date.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_work_candidate_needs_publication_date
+  - id: exact-multi-candidates
+    requirement: Подтверждение QID персон и произведений
+    patch: exact-multi-candidates.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_two_candidates
+  - id: exact-label-unchecked
+    requirement: Подтверждение QID персон и произведений
+    patch: exact-label-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_suggest_auto_invariant
+  - id: exact-dates-unchecked
+    requirement: Подтверждение QID персон и произведений
+    patch: exact-dates-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_auto_exact_needs_compatible_dates
+  - id: suggest-only-primary-name
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-only-primary-name.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_suggest_searches_variants
+  - id: suggest-single-lang
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-single-lang.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidates_for_person
+  - id: suggest-decided-reprocessed
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-decided-reprocessed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_suggest_keeps_human_decision
+  - id: suggest-holder-any-type
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-holder-any-type.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_holder_of_other_kind_ignored
+  - id: suggest-decided-apart-requeued
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-decided-apart-requeued.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_holder_pair_decided_apart_not_requeued
+  - id: suggested-event-auto-zero
+    requirement: Подтверждение QID персон и произведений
+    patch: suggested-event-auto-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_exact_with_flag
+  - id: validate-entity-unique-dropped
+    requirement: Подтверждение QID персон и произведений
+    patch: validate-entity-unique-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_bad_manifest_forms
+  - id: validate-qid-shape-dropped
+    requirement: Подтверждение QID персон и произведений
+    patch: validate-qid-shape-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_bad_manifest_forms
+  - id: validate-decision-set-dropped
+    requirement: Подтверждение QID персон и произведений
+    patch: validate-decision-set-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_bad_manifest_forms
+  - id: validate-accepted-needs-qid-dropped
+    requirement: Подтверждение QID персон и произведений
+    patch: validate-accepted-needs-qid-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_bad_manifest
+  - id: qid-taken-not-skipped
+    requirement: Подтверждение QID персон и произведений
+    patch: qid-taken-not-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_taken
+  - id: same-qid-conflict
+    requirement: Подтверждение QID персон и произведений
+    patch: same-qid-conflict.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: auto-confirmed-merged
+    requirement: Подтверждение QID персон и произведений
+    patch: auto-confirmed-merged.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates_unit.py::test_qid_rules_conflict_taken_twice
+  - id: linked-skipped
+    requirement: Даты жизни из Wikidata
+    patch: linked-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_person_with_qid
+  - id: linked-bad-qid-passed
+    requirement: Даты жизни из Wikidata
+    patch: linked-bad-qid-passed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_bad_qid_skipped_without_fetch
+  - id: fetch-failed-as-skipped
+    requirement: Даты жизни из Wikidata
+    patch: fetch-failed-as-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_fetch_failed_counted_as_failed
+  - id: work-as-lifespan
+    requirement: Даты жизни из Wikidata
+    patch: work-as-lifespan.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_work_year
+  - id: import-skipped-event-missing
+    requirement: Импорт из Wikidata
+    patch: import-skipped-event-missing.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_influence_not_imported
+  - id: import-partial-event-missing
+    requirement: Импорт из Wikidata
+    patch: import-partial-event-missing.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_import_one_date
+  - id: taken-before-conflict
+    requirement: Подтверждение QID персон и произведений
+    patch: taken-before-conflict.patch
+    note: О26 — проверка «QID занят» раньше «у сущности другой QID» (пара шагов 2 и 3)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: suggest-stops-after-free-candidate
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-stops-after-free-candidate.patch
+    note: О26 — кандидат без держателя прекращает обход кандидатов (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped
+  - id: suggest-stops-after-other-type-holder
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-stops-after-other-type-holder.patch
+    note: О26 — держатель другого типа прекращает обход кандидатов (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped
+  - id: apply-stops-after-refused
+    requirement: Подтверждение QID персон и произведений
+    patch: apply-stops-after-refused.patch
+    note: О26 — после refused записи манифеста не обходятся (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_refused_then_applied
+  - id: apply-stops-after-taken
+    requirement: Подтверждение QID персон и произведений
+    patch: apply-stops-after-taken.patch
+    note: О26 — после qid_taken записи манифеста не обходятся (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: linked-stops-after-done
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-done.patch
+    note: О26 — обход связанных прекращается на сущности из манифеста (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: linked-stops-after-kind
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-kind.patch
+    note: О26 — обход связанных прекращается на типе без дат (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: linked-stops-after-bad-qid
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-bad-qid.patch
+    note: О26 — обход связанных прекращается после bad_qid (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: life-dates-no-journal
+    requirement: Даты жизни из Wikidata
+    patch: life-dates-no-journal.patch
+    note: Д4-mig — life_dates без events.configure в блоке __main__
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_life_dates_journal

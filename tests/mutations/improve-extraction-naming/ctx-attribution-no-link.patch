@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -430,7 +430,7 @@
+             if bad is not None:
+                 reject(type_, *bad)
+                 return {"result": "invalid_name"}
+-        attribution = [Attribution("source", f"{SYSTEM}:{qid}", place=page_url(qid))]
++        attribution = [Attribution("source", f"{SYSTEM}:{qid}", place=None)]
+         provenance = Provenance(
+             "imported", extra={"wikidata": qid, "from": SIGNIFICANT_EVENT, "epoch": entry["qid"]}
+         )

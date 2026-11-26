@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entity_items.py b/src/philograph/knowledge/entity_items.py
+index a2753ce..1185f59 100644
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -213,7 +213,7 @@ class EntityItems:
+         ru = item.get("ru")
+         if not ru or any(n["kind"] == "primary" and is_russian(n["text"]) for n in entity["names"]):
+             return
+-        reason = check_name(entity["type"], ru)
++        reason = check_name("concept", ru)
+         if reason is not None:
+             reject(entity["type"], ru, reason)
+             return

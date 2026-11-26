@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index c7344ef..af63097 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -278,7 +278,7 @@ class Entities:
+                 )
+             )
+         previous_lang = lang_for(previous[0]["text"], previous[0]["lang"]) if previous else None
+-        return {"entity_id": entity["id"], "lang": lang, "previous_lang": previous_lang}
++        return {"entity_id": entity["id"], "lang": lang, "previous_lang": lang}
+ 
+     def find(self, name: str) -> list[dict[str, Any]]:
+         """Все сущности с таким названием или вариантом: выбор не делается молча."""

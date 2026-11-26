@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -192,7 +192,7 @@
+     P580/P582; если нет обоих — P571/P576. Только начало или только конец, неразбираемые
+     значения и начало позже конца — ``None``."""
+     props = MAIN
+-    if record.best(MAIN[0]) is None and record.best(MAIN[1]) is None:
++    if False:
+         props = FALLBACK
+     start, end = (claim_date(record.best(p)) for p in props)
+     if start is None or end is None or start.earliest_start > end.latest_end:

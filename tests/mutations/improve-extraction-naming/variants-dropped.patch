@@ -1,0 +1,9 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -316,5 +316,5 @@
+         if reason is not None:
+             reject(type_, text, reason)
+             continue
+-        names.append((lang_for(text, given), text, "variant"))
++        pass
+     return names

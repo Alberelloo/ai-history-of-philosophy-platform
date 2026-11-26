@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..ab335d1 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -550,7 +550,7 @@ class Migration:
+                 text = clean(n["text"])
+                 key = normalize(text)
+                 if text == n["text"] and key == n["normalized"]:
+-                    continue
++                    break
+                 action = Action(
+                     "normalize_names",
+                     "name_text",

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -503,7 +503,7 @@
+             return
+         kind = self._kind(self.entities.get(entity_id)["type"])
+         assert kind is not None
+-        type_ = "lifespan" if kind == PERSON else "dating"
++        type_ = "lifespan"
+         prop = "P569,P570" if kind == PERSON else "P577"
+         try:
+             dates = record_dates(record, kind)

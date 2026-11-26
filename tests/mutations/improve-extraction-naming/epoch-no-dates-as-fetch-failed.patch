@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -353,7 +353,7 @@
+         except FETCH_ERRORS:
+             return "fetch_failed"
+         found = epoch_dating(record)
+-        return "no_dates" if found is None else found
++        return "fetch_failed" if found is None else found
+ 
+     @staticmethod
+     def _dating_json(dating: FuzzyDate, props: list[str]) -> dict[str, Any]:

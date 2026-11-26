@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -239,7 +239,7 @@
+         try:
+             entity_id = self.resolve(name, item["type"], item, resolved)
+         except Skip as exc:
+-            raise Skip(dating.UNRESOLVED) from exc
++            raise
+         return self.date(entity_id, item, window, source_id, run_id)
+ 
+     def date(

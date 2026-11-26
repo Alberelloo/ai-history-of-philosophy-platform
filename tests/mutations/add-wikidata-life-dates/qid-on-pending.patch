@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -405,7 +405,7 @@
+         proposals: list[tuple[str, str]] = []
+         done: set[str] = set()
+         for entry in manifest["entities"]:
+-            if entry.get("decision") not in CONFIRMED or not entry.get("wikidata"):
++            if not entry.get("wikidata"):
+                 continue
+             if limit is not None and report.entities >= limit:
+                 break

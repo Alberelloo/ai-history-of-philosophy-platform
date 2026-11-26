@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -128,6 +128,7 @@
+                     t.external_ids.insert().values(entity_id=entity_id, system=system, value=value)
+                 )
+         events.emit("knowledge.entity.created", entity_id=entity_id, type=type_)
++        events.emit("knowledge.entity.created", entity_id=entity_id, type=type_)
+         return entity_id
+ 
+     def resolve(self, entity_id: str) -> str:

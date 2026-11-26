@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/integrity.py b/src/philograph/knowledge/integrity.py
+index 8e16274..0bbe7bf 100644
+--- a/src/philograph/knowledge/integrity.py
++++ b/src/philograph/knowledge/integrity.py
+@@ -178,7 +178,7 @@ def compare(base: Baseline, engine: Any) -> dict[str, Any]:
+             who_now = resolve(who) if kind == "entity" else who
+             if kind == "entity" and who_now in retired:
+                 continue  # автор снят — не потеря
+-            if (kind, who_now, stance) not in have:
++            if (kind, who_now) not in {(k, w) for k, w, _s in have}:
+                 lost_attributions.append([sid, kind, who, stance])
+     return {
+         "lost": lost,

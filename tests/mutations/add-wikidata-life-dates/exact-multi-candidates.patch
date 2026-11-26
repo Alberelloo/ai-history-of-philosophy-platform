@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -318,7 +318,7 @@
+     def _exact(entity: dict[str, Any], candidates: list[dict[str, Any]]) -> bool:
+         """Правило ``--auto-exact``: один кандидат, подпись ru/en равна названию или варианту,
+         даты не противоречат основным датам сущности (``dedupe.dates_conflict``)."""
+-        if len(candidates) != 1:
++        if not candidates:
+             return False
+         names = {normalize(n["text"]) for n in entity["names"]}
+         labels = {normalize(v) for v in candidates[0]["label"].values()}

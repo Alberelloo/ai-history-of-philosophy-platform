@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -403,7 +403,7 @@
+                 )
+                 continue
+             for a, b in combinations(sorted(group, key=position.get), 2):
+-                if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):
++                if True:
+                     pairs.add((a, b))
+         for entity_id, names in primaries.items():
+             for name in names:

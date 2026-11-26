@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -354,8 +354,8 @@
+             self._skip(report, entity_id, prop, skip.reason)
+             return
+         qualifiers: dict[str, Any] = {}
+-        if spec.role:
+-            qualifiers["place_role"] = spec.role
++        if False:
++            pass
+         when = claim_time(record, claim, spec.time)
+         if when is not None:
+             qualifiers["time"] = when

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -337,7 +337,7 @@
+             reject(EPOCH, *bad)
+             return {"epoch_id": None, "label": ru, "qid": qid, "result": "invalid_name"}
+         if not dry_run:
+-            new_id = self.entities.create(EPOCH, names, external={SYSTEM: qid})
++            new_id = self.entities.create(EPOCH, names)
+             self._write(new_id, qid, dating, props)
+         return {
+             "epoch_id": new_id,

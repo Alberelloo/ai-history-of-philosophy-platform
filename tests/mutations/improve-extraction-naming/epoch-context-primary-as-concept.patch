@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/epoch_context.py b/src/philograph/knowledge/epoch_context.py
+index 591f6fe..8f0b4a0 100644
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -426,7 +426,7 @@ class EpochContextImport:
+             [(PLACE, _names(place.get("label") or {}, {}, place["qid"]))] if new_place else []
+         )
+         for type_, new_names in new:
+-            bad = invalid_primary(type_, new_names)
++            bad = invalid_primary("concept", new_names)
+             if bad is not None:
+                 reject(type_, *bad)
+                 return {"result": "invalid_name"}

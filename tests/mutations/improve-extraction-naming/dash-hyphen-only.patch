@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -24,7 +24,7 @@
+ UNRESOLVED = "dating:unresolved"  # сущность элемента не определена (отказ названия и т. п.)
+ REASONS = (PARAGRAPH, QUOTE, UNPARSED, NOT_IN_QUOTE, ERA, SINGLE_YEAR)
+ 
+-_DASH = r"\s*[-–—]\s*"
++_DASH = r"\s*-\s*"
+ _YEAR = r"(\d{1,4})"
+ _APPROX = r"(?:ок\.|около|c\.|circa)\s*"
+ _ERA_TEXT = r"до\s+н\.\s?э\."

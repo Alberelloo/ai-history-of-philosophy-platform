@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -222,7 +222,7 @@
+     for r in result["criteria"]:
+         value = "не измерено" if r["value"] is None else f"{r['value']:g}"
+         verdict = "выполнен" if r["passed"] else "не выполнен"
+-        lines.append(f"{r['criterion']} {r['name']} | {value} | {r['threshold']} | {verdict}")
++        lines.append(f"{r['criterion']} {r['name']} | {value} | {verdict}")
+     lines.append("итог: " + ("выполнен" if result["passed"] else "не выполнен"))
+     return "\n".join(lines)
+ 

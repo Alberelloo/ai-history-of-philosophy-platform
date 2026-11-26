@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 907644d..651e492 100644
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -405,7 +405,7 @@ class Entities:
+                     size=len(group),
+                     limit=MAX_LAST_WORD_GROUP,
+                 )
+-                continue
++                break
+             for a, b in combinations(sorted(group, key=position.get), 2):
+                 if by_id[a]["primary"].get("dates") == by_id[b]["primary"].get("dates"):
+                     pairs.add((a, b))

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 3016536..c24949d 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -1040,7 +1040,7 @@ class Migration:
+                     )
+                 )
+         later = [r for r in rows if r["id"] not in before and r["id"] != ours["id"]]
+-        return not later
++        return True
+ 
+     def _close_review(self, run_id: str) -> None:
+         with self.engine.begin() as conn:

@@ -12,6 +12,7 @@ import json
 from collections.abc import Iterator
 from typing import Any
 
+from philograph.knowledge.entities import EntityNotFound
 from philograph.knowledge.graph import (
     attribution_label,
     attribution_link,
@@ -180,6 +181,8 @@ class Cards:
         """``attributed_to`` — режим «только выбранный учебник», ``textbook`` — пометка строк,
         которые есть в выбранном учебнике, в режиме «все источники»."""
         entity = self.entities.get(entity_id)
+        if "retired" in entity:  # снятая миграцией — как неизвестная (404)
+            raise EntityNotFound(entity_id)
         entity_id = entity["id"]  # перенаправление слитой сущности
         statements = self.statements.about(entity_id, attributed_to=attributed_to)
         sections = []

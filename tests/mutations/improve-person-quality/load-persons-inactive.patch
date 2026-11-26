@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -243,7 +243,7 @@
+ def load_persons(engine: Any, ids: Iterable[str] | None = None) -> list[Entity]:
+     """Действующие персоны (или выбранные сущности) в виде входа правила."""
+     with engine.begin() as conn:
+-        query = select(t.entities).where(t.active())
++        query = select(t.entities)
+         if ids is None:
+             query = query.where(t.entities.c.type == PERSON)
+         else:

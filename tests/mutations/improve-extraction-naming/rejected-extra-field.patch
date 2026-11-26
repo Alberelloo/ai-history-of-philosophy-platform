@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/naming.py b/src/philograph/knowledge/naming.py
+index 22b9a5d..ca7cc5c 100644
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -276,7 +276,7 @@ def reject(type_: str, label: str, reason: str) -> InvalidName:
+     ``label`` события — название после ``strip`` и NFC (как его проверяет ``check_name``),
+     обрезка — по нему же."""
+     label = clean(label)
+-    events.emit("knowledge.entity.rejected", type=type_, label=event_label(label), reason=reason)
++    events.emit("knowledge.entity.rejected", type=type_, label=event_label(label), reason=reason, quote=label)
+     return InvalidName(type_, label, reason)
+ 
+ 

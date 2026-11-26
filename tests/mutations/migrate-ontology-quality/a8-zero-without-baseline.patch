@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -188,7 +188,7 @@
+         5: sum(p["dates"] is not None for p in persons),
+         6: a6(engine),
+         7: sum(check_name(i["type"], i["label"]) is not None for i in catalog_items(engine)),
+-        8: None,
++        8: 0,
+     }
+     if baseline is not None:
+         lost = integrity.compare(baseline, engine)

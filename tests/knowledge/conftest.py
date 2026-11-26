@@ -169,3 +169,58 @@ class CatalogService:
 @pytest.fixture
 def svc(onto, clock) -> CatalogService:
     return CatalogService(onto, clock)
+
+
+# --- запрет сети (improve-extraction-naming, design.md «Наблюдаемость») -----------------
+
+
+def _allowed_hosts() -> set[str]:
+    """Хосты базы тестов (PostgreSQL в CI): к ним соединение разрешено, к остальным — нет."""
+    import os
+    from urllib.parse import urlsplit
+
+    url = os.environ.get("PHILOGRAPH_TEST_DATABASE_URL", "")
+    host = urlsplit(url).hostname if "://" in url else None
+    if not host:
+        return set()
+    if host == "localhost":
+        return {"localhost", "127.0.0.1", "::1"}
+    return {host}
+
+
+class NetworkForbidden(AssertionError):
+    pass
+
+
+@pytest.fixture(autouse=True)
+def _forbid_network(monkeypatch):
+    """Тесты знаний идут без сети: соединение сокета вне базы тестов — ошибка теста.
+
+    Модель — фейковый провайдер шлюза, Wikidata — фикстуры; попытка выйти в сеть падает
+    сразу, а не ждёт таймаута, и попадает в ``attempts``."""
+    import socket
+
+    allowed = _allowed_hosts()
+    attempts: list[str] = []
+    original = socket.socket.connect
+    original_ex = socket.socket.connect_ex
+
+    def _check(sock, address):
+        if sock.family == getattr(socket, "AF_UNIX", object()):
+            return
+        host = address[0] if isinstance(address, tuple) else str(address)
+        if host not in allowed:
+            attempts.append(repr(address))
+            raise NetworkForbidden(f"сеть запрещена в тестах знаний: {address!r}")
+
+    def connect(sock, address):
+        _check(sock, address)
+        return original(sock, address)
+
+    def connect_ex(sock, address):
+        _check(sock, address)
+        return original_ex(sock, address)
+
+    monkeypatch.setattr(socket.socket, "connect", connect)
+    monkeypatch.setattr(socket.socket, "connect_ex", connect_ex)
+    yield attempts

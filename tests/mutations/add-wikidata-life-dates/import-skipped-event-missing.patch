@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -489,7 +489,7 @@
+         imported = Provenance("imported", extra={"wikidata": qid})
+         created = []
+         for prop in record["claims"]:
+-            if prop in WIKIDATA_SKIPPED:
++            if False:
+                 events.emit(
+                     "knowledge.import.skipped", property=prop, reason=WIKIDATA_SKIPPED[prop]
+                 )

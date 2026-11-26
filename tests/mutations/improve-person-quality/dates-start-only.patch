@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -83,7 +83,7 @@
+ 
+     return apart(
+         a["earliest_start"], a["latest_start"], b["earliest_start"], b["latest_start"]
+-    ) or apart(a["earliest_end"], a["latest_end"], b["earliest_end"], b["latest_end"])
++    )
+ 
+ 
+ def same_person(

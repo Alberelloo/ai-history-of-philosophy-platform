@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -459,9 +459,6 @@
+             moved_portraits = [pid for pid, phash in portraits if phash not in kept_phash]
+             portraits_kept = [pid for pid, phash in portraits if phash in kept_phash]
+             conn.execute(
+-                update(t.names).where(t.names.c.entity_id == removed).values(entity_id=kept)
+-            )
+-            conn.execute(
+                 update(t.statements).where(t.statements.c.subject == removed).values(subject=kept)
+             )
+             conn.execute(
