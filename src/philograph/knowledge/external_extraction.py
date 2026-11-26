@@ -196,8 +196,8 @@ def read_replies(path: Path) -> dict[str, Any]:
         top = json.loads(text, object_pairs_hook=_unique)
         if isinstance(top, _Repeated):  # только номера фрагментов; внутри ответа — как в JSON
             raise CommandError(f"{path}: фрагмент {top.keys_repeated[0]} указан дважды")
-        return {str(k): v for k, v in top.items()}
-    replies: dict[str, Any] = {}
+        return _distinct(path, [(str(k), v) for k, v in top.items()])
+    pairs: list[tuple[str, Any]] = []
     for number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
@@ -207,10 +207,31 @@ def read_replies(path: Path) -> dict[str, Any]:
             raise CommandError(f"{path}: строка {number} — не JSON") from exc
         if not isinstance(row, dict) or "fragment" not in row or "reply" not in row:
             raise CommandError(f"{path}: строка {number} — нужны поля fragment и reply")
-        key = str(row["fragment"])
-        if key in replies:
-            raise CommandError(f"{path}: строка {number} — фрагмент {key} указан дважды")
-        replies[key] = row["reply"]
+        pairs.append((str(row["fragment"]), row["reply"]))
+    return _distinct(path, pairs)
+
+
+def _number(key: str) -> int | None:
+    """Номер фрагмента по ключу файла: только цифры ASCII, пробелы по краям допустимы."""
+    key = key.strip()
+    return int(key) if re.fullmatch(r"[0-9]+", key) else None
+
+
+def _distinct(path: Path, pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Повтор проверяется по номеру после приведения («1», «01», « 1» — один фрагмент):
+    иначе ``ingest`` молча заменил бы один ответ другим. Ключ не номер — как есть (в
+    ``ingest`` он даст ``reply_invalid``)."""
+    seen: dict[Any, str] = {}
+    replies: dict[str, Any] = {}
+    for key, reply in pairs:
+        number = _number(key)
+        canonical = number if number is not None else key
+        if canonical in seen:
+            raise CommandError(
+                f"{path}: фрагмент {canonical} указан дважды ({seen[canonical]!r} и {key!r})"
+            )
+        seen[canonical] = key
+        replies[key] = reply
     return replies
 
 
@@ -324,7 +345,7 @@ def ingest(
             schema = filling.registry_schema()
             numbered: dict[int, Any] = {}
             for key, reply in replies.items():
-                number = int(key) if re.fullmatch(r"[0-9]+", key.strip()) else None
+                number = _number(key)
                 if number is None or not 1 <= number <= len(fragments):
                     filling.drop(run_id, "ответ на фрагмент вне задания", codes.REPLY_INVALID)
                     continue
@@ -497,13 +518,18 @@ class Service:
         return data
 
 
-def build(env: dict[str, str], library_url: str | None = None) -> Service:
+def _knowledge(env: dict[str, str]) -> tuple[Engine, OntologyRegistry]:
     from philograph.platform.db import make_engine
 
     engine = make_engine(env["PHILOGRAPH_DATABASE_URL"], [t.SCHEMA])
     t.migrations.upgrade(engine)
     registry = OntologyRegistry(engine)
     registry.load_defaults()
+    return engine, registry
+
+
+def build(env: dict[str, str], library_url: str | None = None) -> Service:
+    engine, registry = _knowledge(env)
     url = library_url or env.get("PHILOGRAPH_LIBRARY_URL")
     if not url:
         raise CommandError("нужен PHILOGRAPH_LIBRARY_URL или --library-url")
@@ -555,6 +581,15 @@ def main(
     args = _parser().parse_args(argv)
     env = dict(os.environ) if env is None else env
     try:
+        if args.command == "report":  # отчёт читает только базу знаний, библиотека не нужна
+            if service is not None:
+                engine, entities = service.engine, service.filling.entities
+            else:
+                engine, registry = _knowledge(env)
+                entities = Entities(engine, registry)
+            runs = write_report(engine, entities, args.since, args.until, args.out)
+            print(f"{args.out}: {runs} запусков")
+            return 0
         svc = service or build(env, getattr(args, "library_url", None))
         if args.command == "export":
             path = export(svc.filling, svc.version(args.version), args.out)
@@ -574,10 +609,6 @@ def main(
                 replace=args.replace,
             )
             print(json.dumps(_summary(row), ensure_ascii=False))
-        else:
-            entities = svc.filling.entities
-            runs = write_report(svc.engine, entities, args.since, args.until, args.out)
-            print(f"{args.out}: {runs} запусков")
     except CommandError as exc:
         print(str(exc), file=sys.stderr)
         return 2

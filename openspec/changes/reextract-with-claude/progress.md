@@ -167,3 +167,10 @@
 - (1) Runbook «Извлечение связей» и tasks.md 6.1 — SQL подсчёта подтверждений без значимого текста перед переизвлечением; THEN сценария «Многоточие автора в цитате» сужен до подтверждений со значимым текстом.
 - Тесты тестировщика по прежней формулировке (3.3, не менял): `test_reextract_review.py::test_any_unrolled_external_run_blocks_repeat[statuses1]` и `[statuses3]` (`running` свежий — теперь «запись идёт», `--replace` не откатывает); `test_duplicate_key_in_json_object[{"1": {"statements": [], "statements": []}}]` (повтор внутри ответа — теперь не ошибка).
 - Прогон: юниты 35 passed; `test_reextract_*.py test_quotes_unit test_external_extraction_unit test_extraction_codes_map_unit test_extraction_entities test_entity_dating_extraction` — 465 passed, 3 failed (перечислены). ruff, format (720), lint-imports (3 kept) — чисто.
+
+## 2026-11-26 — дефект судьи Д4 и `report` без библиотеки
+
+- Д4: `read_replies` проверяет повтор по номеру фрагмента после приведения (`_number`: ASCII-цифры, пробелы по краям) в обоих форматах: `1`/`"01"`/`" 1"` — один фрагмент → код 2, ничего не записано. Ключи, которые не номер, сравниваются как есть (в `ingest` → `reply_invalid`). `ingest` берёт номер той же функцией.
+- `report` открывает только базу знаний, `PHILOGRAPH_LIBRARY_URL` не нужен.
+- Дельта «Внешний извлекатель»: повтор — по номеру после приведения; `report` — без библиотеки.
+- Прогон: `test_external_extraction_unit.py test_reextract_external.py test_reextract_review.py` — 144 passed; ruff, format, lint-imports — чисто.

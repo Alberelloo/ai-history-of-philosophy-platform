@@ -252,3 +252,29 @@ def test_unknown_version_exit_2(stand, onto, capsys):
     service = ext.Service(stand.filling, onto.statements.engine, ext._Texts(stand.filling.library))
     assert ext.main(["export", "--version", "v_nope"], service=service) == 2
     assert "не найдена" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        '{"fragment": 1, "reply": {}}\n{"fragment": "01", "reply": {"statements": []}}\n',
+        '{"fragment": "1", "reply": {}}\n{"fragment": " 1", "reply": {}}\n',
+        '{"1": {}, " 1": {"statements": []}}',
+        '{"1": {}, "001": {}}',
+    ],
+)
+def test_duplicate_number_after_normalization(tmp_path, content):
+    path = tmp_path / "r.txt"
+    path.write_text(content, "utf-8")
+    with pytest.raises(ext.CommandError, match="дважды"):
+        ext.read_replies(path)
+
+
+def test_report_without_library(stand, version, tmp_path, onto, monkeypatch, events):
+    monkeypatch.setattr(ext, "_knowledge", lambda env: (onto.statements.engine, onto.registry))
+    out = tmp_path / "report.md"
+    code = ext.main(
+        ["report", "--since", "2000-01-01", "--out", str(out)],
+        env={"PHILOGRAPH_DATABASE_URL": "sqlite://"},
+    )
+    assert code == 0 and "**Итого**" in out.read_text("utf-8")
