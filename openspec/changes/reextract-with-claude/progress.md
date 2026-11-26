@@ -67,3 +67,10 @@
   - **тесты прежнего контракта — тестировщику (3.3):** `test_mentions_cards.py::test_migration_6_adds_mention_position` (`latest() == 9`), `test_portraits.py::test_migration_7_adds_portraits_and_keeps_old_data` (`upgrade == [7, 8, 9]`), пять тестов `test_entity_dating_extraction.py` и два `test_extraction_entities.py` (см. 2.5);
   - **не из этого изменения:** `test_epoch_dates_unit.py::test_repository_manifest_is_valid_and_unconfirmed` — проверяет `sources/epochs.yaml` (у эпох есть QID), файл в ветке не менялся — падает и на базе.
 - После правки: `test_retired_unit.py test_run_actions_unit.py test_run_metrics_migration_unit.py` — 7 passed; `test_portraits.py` и `test_mentions_cards.py` падают только на номере последней миграции.
+
+## 2026-11-26 — дефекты тестировщика Д1–Д3
+
+- Д1: `Filling._item` — номер абзаца строкой принимается только из ASCII-цифр (`[0-9]+`); `"²"` проходило `str.isdigit()` и роняло `int()` → весь запуск `failed`. Теперь — `schema_item` у элемента.
+- Д2: `external_extraction.ingest` — то же для ключа ответа → `reply_invalid`.
+- Д3: `_run_spend` — сводка расходов не JSON или не список → нули; `finish_run` перенесён внутрь `try` в `extract_version`: сбой завершения тоже даёт `failed`, а не `running`.
+- Прогон: `tests/knowledge/test_reextract_*.py test_reply_items_unit.py test_external_extraction_unit.py` — 321 passed; ruff чисто. Тесты не менялись.

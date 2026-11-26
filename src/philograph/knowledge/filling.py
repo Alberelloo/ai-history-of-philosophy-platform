@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 from collections import Counter
 from collections.abc import Callable
@@ -82,6 +83,7 @@ TIMEOUT_MARGIN = 30.0  # запас сверх бюджета шлюза на в
 STANCES = ("asserts", "disputes", "mentions")
 REQUIRED = ("subject", "type", "object", "paragraph", "quote")
 FAILURE_LIMIT = 500
+_DIGITS = re.compile(r"[0-9]+")  # только ASCII: str.isdigit пропускает «²», а int() — нет
 # Wikidata: только простые факты. Влияние (P737) не берём: там нет обоснований.
 WIKIDATA_SIMPLE = {
     "P569": "birth",
@@ -271,7 +273,13 @@ class Filling:
             return empty  # запись расхода не должна валить извлечение
         if response.status_code != 200:
             return empty
-        rows = [r for r in response.json() if r.get("run_id") == run_id]
+        try:
+            body = response.json()
+        except ValueError:
+            return empty  # сводка не JSON: завершение запуска важнее метрик
+        if not isinstance(body, list):
+            return empty
+        rows = [r for r in body if isinstance(r, dict) and r.get("run_id") == run_id]
         return {
             "cost_usd": round(sum(r.get("cost_usd") or 0 for r in rows), 6),
             "input_tokens": int(sum(r.get("input_tokens") or 0 for r in rows)),
@@ -458,10 +466,10 @@ class Filling:
             with context.scope(run_id=run_id):
                 for window in fragments:
                     self._extract_fragment(window, data, source, schema, run_id, timeout)
+            return self.finish_run(run_id)  # внутри: сбой завершения тоже не оставит running
         except BaseException as exc:
             self.fail_run(run_id, exc)
             raise
-        return self.finish_run(run_id)
 
     def _extract_fragment(
         self,
@@ -596,7 +604,7 @@ class Filling:
         if not clean["type"].strip():
             raise _Skip("поле type: пустой код связи", codes.SCHEMA_ITEM)
         number = clean.get("paragraph")
-        if isinstance(number, str) and number.strip().isdigit():
+        if isinstance(number, str) and _DIGITS.fullmatch(number.strip()):
             number = int(number.strip())
         if isinstance(number, bool) or not isinstance(number, int):
             raise _Skip("поле paragraph: нужно целое число", codes.SCHEMA_ITEM)

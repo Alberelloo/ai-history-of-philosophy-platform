@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import uuid
 from collections import Counter
@@ -262,7 +263,7 @@ def ingest(
             schema = filling.registry_schema()
             numbered: dict[int, Any] = {}
             for key, reply in replies.items():
-                number = int(key) if key.strip().isdigit() else None
+                number = int(key) if re.fullmatch(r"[0-9]+", key.strip()) else None
                 if number is None or not 1 <= number <= len(fragments):
                     filling.drop(run_id, "ответ на фрагмент вне задания", codes.REPLY_INVALID)
                     continue
