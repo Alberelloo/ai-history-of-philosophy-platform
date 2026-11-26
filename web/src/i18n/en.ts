@@ -570,7 +570,19 @@ export const en: Catalog = {
     retry: "Retry",
     nobody: (y: number) => `Nobody on the map in ${y}`,
     nearest: "Go to nearest year",
-    coast: "Modern coastline, Natural Earth",
+    coast: "Modern borders and coastline, Natural Earth",
+    whereIn: (y: number) => (y < 0 ? `Where in ${-y} BC` : `Where in ${y}`),
+    roles: { birth: "birth", death: "death", activity: "activity", residence: "residence", none: "place of life", event: "event" },
+    noCountry: "country unknown",
+    afterDeath: "after death",
+    years: (from: number, to: number) => {
+      const y = (v: number) => (v < 0 ? `${-v} BC` : String(v));
+      if (from === to) return y(from);
+      if (from < 0 && to < 0) return `${-from}–${-to} BC`;
+      return from < 0 ? `${y(from)} – ${y(to)}` : `${from}–${to}`;
+    },
+    peopleShown: (n: number, m: number) => `showing ${n} of ${m} people`,
+    placeWithCountry: (label: string, country: string | null) => (country ? `${label}, ${country}` : label),
     keys: "Keys",
     keysHint:
       "Arrows rotate the globe (Shift — faster), + and − zoom in and out, 0 resets the view, PageUp and PageDown — year ±10, [ and ] — year ±1, Space — play or pause, Esc — clear the selection.",
@@ -579,8 +591,10 @@ export const en: Catalog = {
     nobodyHere: "Nobody is here this year.",
     events: "Events",
     legend: {
-      place: "place, number of people",
-      unverified: "not verified: all records were added by the model",
+      place: "person medallion: portrait or initial",
+      more: "+N — people without room; click to see all",
+      border: "state border, modern",
+      unverified: "not verified: the place was added by the model",
       influence: "influence, arrow points to the student",
       generated: "added by the model",
       trail: "places of the selected person in order of years",

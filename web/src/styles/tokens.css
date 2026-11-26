@@ -55,6 +55,8 @@
   --globe-sea: #e3d9bd;
   --globe-land: #f8f0dd;
   --globe-coast: #5a4632;
+  --globe-border: #9a8466;
+  --globe-country: #6b5539;
   --globe-graticule: #b4a07a;
   --globe-brass: #9c7634;
   --shadow-raise: 0 1px 2px #1a222f12, 0 1px 1px #1a222f0a;
@@ -117,6 +119,8 @@
   --globe-sea: #e3d9bd;
   --globe-land: #f8f0dd;
   --globe-coast: #5a4632;
+  --globe-border: #9a8466;
+  --globe-country: #6b5539;
   --globe-graticule: #b4a07a;
   --globe-brass: #9c7634;
   --shadow-raise: 0 1px 2px #00000080;
@@ -181,6 +185,8 @@
     --globe-sea: #e3d9bd;
     --globe-land: #f8f0dd;
     --globe-coast: #5a4632;
+    --globe-border: #9a8466;
+    --globe-country: #6b5539;
     --globe-graticule: #b4a07a;
     --globe-brass: #9c7634;
     --shadow-raise: 0 1px 2px #00000080;

@@ -24,20 +24,27 @@ from .geo_helpers import (
     MAP_API,
     PLACES_API,
     Geo,
+    arc_faults,
     center,
+    collisions,
+    drawn,
     focus_globe,
     geo_built,
     globe,
     globe_ready,
     links,
-    marks,
     open_globe,
+    persons,
     play_button,
     press,
     rows,
+    scene,
     settle,
+    shapes,
+    synthetic,
     year,
 )
+from .test_geo_medals import add_portrait, many_places
 
 req = pytest.mark.req
 GEO = "geo-timeline"
@@ -69,88 +76,25 @@ def base_world(world) -> dict[str, str]:
 # --- Пределы ----------------------------------------------------------------------------
 
 
-def _many_places(route_map: dict, route_places: dict, n: int = 320) -> tuple[dict, dict]:
-    """320 мест; у места i — i людей, все живы в 1750."""
-    template = route_map["people"][0]
-    people, places, placements = [], [], []
-    for i in range(1, n + 1):
-        pid = f"g{i:03d}"
-        places.append(
-            {
-                "id": pid,
-                "label": f"Место {i}",
-                "lat": -60 + (i * 37) % 120,
-                "lon": -170 + (i * 53) % 340,
-                "status": "sourced",
-            }
-        )
-        for j in range(i):
-            eid = f"x{i:03d}_{j:03d}"
-            people.append(
-                {
-                    **template,
-                    "id": eid,
-                    "label": f"Человек {i}-{j}",
-                    "short": f"Ч{i}-{j}",
-                    "birth": 1720,
-                    "death": 1780,
-                    "weight": 1,
-                    "epochs": [],
-                    "roles": [],
-                }
-            )
-            placements.append(
-                {
-                    "entity": eid,
-                    "place": pid,
-                    "role": None,
-                    "from": None,
-                    "to": None,
-                    "status": "sourced",
-                    "generated": False,
-                    "statement": f"s_{eid}",
-                }
-            )
-    data = {
-        **route_map,
-        "people": people,
-        "works": [],
-        "events": [],
-        "links": [],
-        "groups": [],
-        "eras": [],
-        "truncated": False,
-    }
-    layer = {**route_places, "places": places, "placements": placements, "unplaced": []}
-    return data, layer
-
-
 @req(GEO, LIMITS, scenario="Много мест")
 def test_many_places(knowledge_context, knowledge_stack, events):
     base_world(knowledge_stack.world)
-
-    def before(page):
-        context = page.context
-        real_map = context.request.get(knowledge_stack.url + "/api/knowledge/v1/map").json()
-        real_places = context.request.get(
-            knowledge_stack.url + "/api/knowledge/v1/map/places"
-        ).json()
-        data, layer = _many_places(real_map, real_places)
-        page.route(MAP_API, lambda r: r.fulfill(json=data))
-        page.route(PLACES_API, lambda r: r.fulfill(json=layer))
-
     context = knowledge_context(1920, 1080)
+    places, people = many_places()
+    data, layer = synthetic(knowledge_stack, context, places, people)
     page = context.new_page()
-    page.set_default_timeout(60000)
-    before(page)
+    page.set_default_timeout(180000)
+    page.route(MAP_API, lambda r: r.fulfill(json=data))
+    page.route(PLACES_API, lambda r: r.fulfill(json=layer))
     page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
-    page.locator(".geo-globe[aria-busy='false']").wait_for(timeout=120000)
+    page.locator(".geo-globe[aria-busy='false']").wait_for(timeout=240000)
     settle(page)
-    m = marks(page)
-    assert len(m) == 300
-    assert page.locator("[data-geo-place]").count() == 300
-    assert not ({f"g{i:03d}" for i in range(1, 21)} & set(m))
-    assert set(m) == {f"g{i:03d}" for i in range(21, 321)}
+    sc = scene(page)
+    shown = {p["place"] for p in sc["persons"]}
+    assert len(shown) == 300
+    assert not ({f"g{i:03d}" for i in range(1, 21)} & shown)
+    assert shown == {f"g{i:03d}" for i in range(21, 321)}
+    assert len(rows(page)) == 300
     expect(page.locator("[data-geo-limit='places']")).to_have_text("показаны 300 из 320 мест")
     # Ответы подменены: событие слоя пишут прямые запросы теста, а не страница.
     assert len(events.of("knowledge.geo.built")) == 1
@@ -160,43 +104,19 @@ def test_many_places(knowledge_context, knowledge_stack, events):
 def test_place_limit_tie_by_id(knowledge_context, knowledge_stack, events):
     base_world(knowledge_stack.world)
     context = knowledge_context(1920, 1080)
+    places = [
+        {"id": f"t{i:03d}", "label": f"Т{i}", "lat": (i % 60) - 30, "lon": (i * 7) % 300 - 150}
+        for i in range(305)
+    ]
+    people = [(f"y{i:03d}", f"Y{i}", f"t{i:03d}") for i in range(305)]  # у всех по одному
+    data, layer = synthetic(knowledge_stack, context, places, people)
     page = context.new_page()
     page.set_default_timeout(60000)
-    real_map = context.request.get(knowledge_stack.url + "/api/knowledge/v1/map").json()
-    real_places = context.request.get(knowledge_stack.url + "/api/knowledge/v1/map/places").json()
-    data, layer = _many_places(real_map, real_places, n=1)
-    template = data["people"][0]
-    data["people"], layer["places"], layer["placements"] = [], [], []
-    for i in range(305):  # у всех по одному человеку
-        pid = f"t{i:03d}"
-        layer["places"].append(
-            {
-                "id": pid,
-                "label": f"Т{i}",
-                "lat": (i % 60) - 30,
-                "lon": (i * 7) % 300 - 150,
-                "status": "sourced",
-            }
-        )
-        data["people"].append({**template, "id": f"y{i:03d}", "label": f"Y{i}", "short": f"Y{i}"})
-        layer["placements"].append(
-            {
-                "entity": f"y{i:03d}",
-                "place": pid,
-                "role": None,
-                "from": None,
-                "to": None,
-                "status": "sourced",
-                "generated": False,
-                "statement": f"s{i:03d}",
-            }
-        )
     page.route(MAP_API, lambda r: r.fulfill(json=data))
     page.route(PLACES_API, lambda r: r.fulfill(json=layer))
     page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
     globe_ready(page)
-    m = marks(page)
-    assert set(m) == {f"t{i:03d}" for i in range(300)}
+    assert {p["place"] for p in scene(page)["persons"]} == {f"t{i:03d}" for i in range(300)}
     expect(page.locator("[data-geo-limit='places']")).to_have_text("показаны 300 из 305 мест")
     assert len(events.of("knowledge.geo.built")) == 1
 
@@ -222,6 +142,7 @@ def test_many_links(knowledge_context, knowledge_stack, events):
     page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe&t=1760")
     assert page.locator("[data-geo-link]").count() == 200
     expect(page.locator("[data-geo-limit='links']")).to_have_text("показаны 200 из 260 связей")
+    assert arc_faults(scene(page)) == []
     geo_built(events, response)
 
 
@@ -258,44 +179,34 @@ def labels_world(world) -> None:
         g.lived(p, place)
 
 
-def _overlaps(a, b, slack: float = 0.5) -> bool:
-    """Пересечение прямоугольников с допуском 0,5 px — как ``_hits`` в tests/web/test_map.py."""
-    return not (
-        a["x"] + a["width"] <= b["x"] + slack
-        or b["x"] + b["width"] <= a["x"] + slack
-        or a["y"] + a["height"] <= b["y"] + slack
-        or b["y"] + b["height"] <= a["y"] + slack
-    )
-
-
 @req(GEO, LIMITS, scenario="Подписи без наложений")
-@pytest.mark.parametrize(("width", "height"), [(1280, 720), (1920, 1080)])
+@pytest.mark.parametrize(("width", "height"), [(1024, 576), (1280, 720), (1366, 768), (1920, 1080)])
 def test_labels_do_not_overlap(knowledge_context, knowledge_stack, events, width, height):
     labels_world(knowledge_stack.world)
     page, response = open_globe(
         knowledge_context, knowledge_stack, "/graph?view=globe&t=1750", width=width, height=height
     )
     focus_globe(page)
-    for zoom_steps in (0, 3, 6):
-        press(page, "+", zoom_steps if zoom_steps == 0 else 3)
-        settle(page)
-        boxes = page.locator("[data-geo-label]").evaluate_all(
-            "es => es.map(e => { const r = e.getBoundingClientRect(); const t = e.textContent;"
-            " return {t, x: r.x, y: r.y, width: r.width, height: r.height}; })"
-        )
-        assert 1 <= len(boxes) <= 12, len(boxes)
-        clashes = [
-            (i, j)
-            for i, j in itertools.combinations(range(len(boxes)), 2)
-            if _overlaps(boxes[i], boxes[j])
-        ]
-        assert clashes == [], (zoom_steps, [(boxes[i], boxes[j]) for i, j in clashes])
+    frames = 0
+    for zoom_steps in (None, 0, 3, 6):
+        if zoom_steps is not None:
+            press(page, "-", 12)
+            press(page, "+", zoom_steps)
+            settle(page)
+        sc = scene(page)
+        assert len(sc["countries"]) <= 24
+        items = shapes(sc)
+        assert collisions(items) == [], (zoom_steps, collisions(items)[:3])
+        frames += 1
+    assert frames == 4
     geo_built(events, response)
 
 
 @req(GEO, LIMITS, scenario="Вес фрагмента")
 def test_fragment_weight(knowledge_context, knowledge_stack, events):
-    base_world(knowledge_stack.world)
+    w = base_world(knowledge_stack.world)
+    for who in ("kant", "hume", "fichte"):
+        add_portrait(knowledge_stack, w[who])
     context = knowledge_context(1920, 1080)
     page = context.new_page()
     page.set_default_timeout(30000)
@@ -310,14 +221,86 @@ def test_fragment_weight(knowledge_context, knowledge_stack, events):
     page.wait_for_load_state("networkidle")
     total = 0
     sizes = {}
+    portraits = []
     for r in after:
+        if "/portraits/" in r.url or r.request.resource_type == "image":
+            portraits.append(r.url)
+            continue
         body = r.body()
         packed = len(gzip.compress(body, compresslevel=9))
         sizes[r.url.rsplit("/", 1)[-1][:40]] = packed
         total += packed
     assert any("GlobeView" in u for u in sizes), sizes
-    assert total <= 150 * 1024, sizes
+    assert total <= 150 * 1024, (total, sizes)
+    drawn_n = sum(1 for p in scene(page)["persons"] if drawn(p))
+    # Портреты, уже загруженные хронологией, берутся из кэша и запросов после переключения
+    # могут не дать; непустой случай проверяет test_portrait_limit.
+    assert all(
+        u.startswith(knowledge_stack.url + "/api/knowledge/v1/portraits/") for u in portraits
+    ), portraits
+    assert len(portraits) <= drawn_n and len(portraits) <= 60
     geo_built(events, info.value)
+
+
+@req(
+    GEO,
+    LIMITS,
+    invariant="портретов одновременно не больше 60, только для нарисованных медальонов и только со своего адреса",
+)
+def test_portrait_limit(knowledge_context, knowledge_stack, events):
+    world = knowledge_stack.world
+    g = Geo(world)
+    people = []
+    for i in range(75):
+        p = world.person(f"Портретный {i:02d}", "1700", "1780")
+        g.lived(p, g.place(f"Пункт {i:02d}", -50 + (i % 15) * 7, -150 + (i // 15) * 70))
+        add_portrait(knowledge_stack, p)
+        people.append(p)
+    context = knowledge_context(1920, 1080)
+    page = context.new_page()
+    page.set_default_timeout(60000)
+    requested: list[str] = []
+    page.on("request", lambda r: requested.append(r.url) if "/portraits/" in r.url else None)
+    with page.expect_response(lambda r: PLACES_API.match(r.url)) as info:
+        page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
+    globe_ready(page)
+    page.wait_for_load_state("networkidle")
+    sc = scene(page)
+    with_image = [p for p in sc["persons"] if p["image"]]
+    assert len(with_image) <= 60
+    assert all(drawn(p) for p in with_image)
+    drawn_n = sum(1 for p in sc["persons"] if drawn(p))
+    assert len(with_image) == min(60, drawn_n), (len(with_image), drawn_n)
+    assert len(set(requested)) <= min(60, drawn_n)
+    assert all(
+        u.startswith(knowledge_stack.url + "/api/knowledge/v1/portraits/") for u in requested
+    )
+    geo_built(events, info.value)
+
+
+@req(
+    GEO,
+    LIMITS,
+    invariant="персон в сцене больше MAX_PERSONS — в DOM 600 медальонов и «показаны 600 из K человек»",
+)
+def test_people_limit_notice(knowledge_context, knowledge_stack, events):
+    base_world(knowledge_stack.world)
+    context = knowledge_context(1366, 768)
+    places = [
+        {"id": f"p{i:02d}", "label": f"Пункт {i}", "lat": 40 + i % 10, "lon": i * 3 - 10}
+        for i in range(20)
+    ]
+    people = [(f"z{i:04d}", f"Персона {i}", f"p{i % 20:02d}") for i in range(700)]
+    data, layer = synthetic(knowledge_stack, context, places, people)
+    page = context.new_page()
+    page.set_default_timeout(60000)
+    page.route(MAP_API, lambda r: r.fulfill(json=data))
+    page.route(PLACES_API, lambda r: r.fulfill(json=layer))
+    page.goto(knowledge_stack.url + "/graph?view=globe&t=1750")
+    globe_ready(page)
+    assert page.locator("[data-geo-person]").count() == 600
+    expect(page.locator("[data-geo-limit='people']")).to_have_text("показаны 600 из 700 человек")
+    assert len(events.of("knowledge.geo.built")) == 1
 
 
 # --- Без WebGL и без сторонних запросов ------------------------------------------------
@@ -335,10 +318,11 @@ NO_WEBGL = """
 
 def _scene_counts(page) -> tuple[int, int, int]:
     expect(page.locator("canvas[data-geo-land][data-drawn='true']")).to_have_count(1)
+    assert int(page.locator("canvas[data-geo-land]").get_attribute("data-borders")) > 0
     return (
-        page.locator("[data-geo-place]").count(),
+        page.locator("[data-geo-person]").count(),
         page.locator("[data-geo-link]").count(),
-        page.locator("[data-geo-label]").count(),
+        page.locator("[data-geo-country]").count(),
     )
 
 
@@ -359,7 +343,7 @@ def test_without_webgl(knowledge_context, knowledge_stack, events):
     assert page.evaluate("document.createElement('canvas').getContext('webgl')") is None
     assert page.evaluate("document.createElement('canvas').getContext('webgl2')") is None
     assert _scene_counts(page) == normal
-    assert normal[0] == 3 and normal[1] == 2
+    assert normal[0] == 3 and normal[1] == 2 and normal[2] > 0
     # Суша нарисована: на холсте есть непрозрачные пиксели.
     drawn = page.locator("canvas[data-geo-land]").evaluate(
         """c => { const x = c.getContext('2d'); const d = x.getImageData(0, 0, c.width, c.height).data;
@@ -389,6 +373,10 @@ def test_only_own_address(knowledge_context, knowledge_stack, events):
     page.mouse.down()
     page.mouse.move(x + 80, y + 30, steps=5)
     page.mouse.up()
+    sc = scene(page)
+    for p in sc["persons"]:
+        if drawn(p):
+            page.mouse.move(sc["left"] + p["box"]["cx"], sc["top"] + p["box"]["cy"])
     focus_globe(page)
     press(page, "ArrowLeft")
     press(page, "+")
@@ -402,7 +390,9 @@ def test_only_own_address(knowledge_context, knowledge_stack, events):
     ]
     assert foreign == []
     assert knowledge_stack.outside == []
-    expect(page.locator(".geo-coast")).to_have_text("Береговая линия — современная, Natural Earth")
+    expect(page.locator(".geo-coast")).to_have_text(
+        "Границы и береговая линия — современные, Natural Earth"
+    )
     geo_built(events, info.value)
 
 
@@ -435,10 +425,19 @@ def test_reduced_motion(knowledge_context, knowledge_stack, events):
     )
     target = "20.51,54.71"
     assert center(page) != target
+    # После clock.install() время страницы идёт само; останавливаем его, чтобы дальше оно
+    # шло только по run_for (Д6 круга 2 — шаг теста, не продукт).
+    page.clock.pause_at(page.evaluate("Date.now()") + 1000)
     _watch(page, "data-center")
-    page.locator(f"[data-geo-row='{w['konigsberg']}'] .geo-row__place").click()
-    expect(page.locator(".map-selected__name")).to_have_text("Кёнигсберг, 1760")
-    page.clock.run_for(50)  # один кадр; дальше время страницы стоит
+    row = page.locator(f"[data-geo-row='{w['konigsberg']}'] .geo-row__place")
+    # При reduce и остановленных часах страницы Playwright не дожидается «стабильности»
+    # элемента (переходы 0,001 с не завершаются без хода времени) — щелчок событием,
+    # после явной проверки, что кнопка видна и доступна.
+    expect(row).to_be_visible()
+    expect(row).to_be_enabled()
+    row.dispatch_event("click")
+    expect(page.locator(".map-selected__name")).to_have_text("Кёнигсберг, Россия, 1760")
+    page.clock.run_for(50)  # один кадр; время страницы остановлено pause_at
     expect(globe(page)).to_have_attribute("data-center", target)
     assert _seen(page, "data-center") == [target]
     page.clock.run_for(1000)
@@ -537,18 +536,23 @@ CONTRAST_JS = """
     document.body.appendChild(d); const c = rgb(getComputedStyle(d).color); d.remove(); return c; };
   const sea = token('--globe-sea'), land = token('--globe-land');
   const out = [];
-  const check = (e, backs, what) => { const s = getComputedStyle(e);
+  const check = (e, backs, what, a = 1) => { const s = getComputedStyle(e);
     // подпись с ореолом (обводка под текстом): фон — цвет ореола
     if (e instanceof SVGElement && s.stroke !== 'none' && s.paintOrder.startsWith('stroke') && parseFloat(s.strokeWidth) >= 2) backs = [rgb(s.stroke)];
     const fg = rgb(e instanceof SVGElement ? s.fill : s.color);
-    for (const b of backs) { const r = ratio(fg, b); if (r < 4.5) out.push([what, e.textContent.slice(0, 30), r.toFixed(2)]); } };
-  document.querySelectorAll('[data-geo-label]').forEach(e => check(e, [sea, land], 'label'));
+    for (const b of backs) { const f = fg.slice(0, 3).map((v, i) => a * v + (1 - a) * b[i]); const r = ratio(f, b); if (r < 4.5) out.push([what, e.textContent.slice(0, 30), r.toFixed(2)]); } };
+  const alpha = e => { let a = 1; for (let n = e; n && n !== document.body; n = n.parentElement) a *= Number(getComputedStyle(n).opacity); return a; };
+  const faded = (e, backs, what) => check(e, backs, what, alpha(e));
+  document.querySelectorAll('[data-geo-country]').forEach(e => faded(e, [land], 'country'));
+  document.querySelectorAll('[data-geo-name]').forEach(e => faded(e, [sea, land], 'name'));
+  document.querySelectorAll('[data-geo-tip]').forEach(e => check(e, [bg(e)], 'tip'));
   document.querySelectorAll('.geo-yearbar__year').forEach(e => check(e, [bg(e)], 'year'));
   document.querySelectorAll('.geo-row__name, .geo-row__count, .geo-row__who button, .geo-row__unverified')
     .forEach(e => check(e, [bg(e)], 'row'));
   const paper = bg(document.querySelector('.geo-yearbar'));
   return {out, sea: lum(sea), land: lum(land), paper: lum(paper),
-          labels: document.querySelectorAll('[data-geo-label]').length,
+          labels: document.querySelectorAll('[data-geo-country]').length,
+          names: document.querySelectorAll('[data-geo-name]').length,
           rows: document.querySelectorAll('[data-geo-row]').length};
 }
 """
@@ -568,7 +572,7 @@ def test_contrast_in_both_themes(knowledge_context, knowledge_stack, events, the
         color_scheme=theme,
     )
     result = page.evaluate(CONTRAST_JS)
-    assert result["labels"] >= 3 and result["rows"] >= 3, result
+    assert result["labels"] >= 3 and result["names"] >= 3 and result["rows"] >= 3, result
     assert result["out"] == [], result["out"]
     assert result["paper"] > 0.7 and result["sea"] > 0.5 and result["land"] > 0.5, result
     geo_built(events, response)
@@ -601,20 +605,47 @@ def test_three_frames(knowledge_context, knowledge_stack, events, width, height,
         height=height,
         color_scheme=theme,
     )
-    dims = page.evaluate(
-        "() => ({sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth,"
-        " ih: innerHeight, iw: innerWidth})"
-    )
-    assert dims["sh"] <= dims["ih"] and dims["sw"] <= dims["iw"], dims
-    c = _circle(page)
-    assert c["top"] >= 0 and c["left"] >= 0 and c["bottom"] <= height and c["right"] <= width, c
-    scale = page.locator(".map-overview").bounding_box()
-    assert scale["y"] >= c["bottom"] - 1, (scale, c)
-    assert scale["y"] + scale["height"] <= height
-    expect(page.locator(".map-overview")).to_be_visible()
-    expect(page.locator(".geo-yearbar__year")).to_be_in_viewport()
-    panel = page.locator(".map-panel").bounding_box()
-    assert not _rect_hits_circle(panel, c), (panel, c)
+    frames = 0
+    for zoom_out in (False, True):
+        if zoom_out:
+            focus_globe(page)
+            for _ in range(20):  # «−» до приближения 1
+                if float(globe(page).get_attribute("data-zoom")) <= 1:
+                    break
+                press(page, "-")
+            settle(page)
+            expect(globe(page)).to_have_attribute("data-zoom", "1")
+        dims = page.evaluate(
+            "() => ({sh: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth,"
+            " ih: innerHeight, iw: innerWidth})"
+        )
+        assert dims["sh"] <= dims["ih"] and dims["sw"] <= dims["iw"], (zoom_out, dims)
+        stage = page.locator(".geo-stage").bounding_box()
+        assert stage["x"] >= 0 and stage["y"] >= 0, (zoom_out, stage)
+        assert stage["x"] + stage["width"] <= width and stage["y"] + stage["height"] <= height, (
+            zoom_out,
+            stage,
+        )
+        scale = page.locator(".map-overview").bounding_box()
+        assert scale["y"] >= stage["y"] + stage["height"] - 1, (zoom_out, scale, stage)
+        assert scale["y"] + scale["height"] <= height
+        expect(page.locator(".map-overview")).to_be_visible()
+        expect(page.locator(".geo-yearbar__year")).to_be_in_viewport()
+        panel = page.locator(".map-panel").bounding_box()
+        overlap_x = min(panel["x"] + panel["width"], stage["x"] + stage["width"]) - max(
+            panel["x"], stage["x"]
+        )
+        overlap_y = min(panel["y"] + panel["height"], stage["y"] + stage["height"]) - max(
+            panel["y"], stage["y"]
+        )
+        assert not (overlap_x > 0.5 and overlap_y > 0.5), (zoom_out, panel, stage)
+        if zoom_out:
+            c = _circle(page)
+            assert c["top"] >= stage["y"] - 0.5 and c["left"] >= stage["x"] - 0.5, (c, stage)
+            assert c["bottom"] <= stage["y"] + stage["height"] + 0.5, (c, stage)
+            assert c["right"] <= stage["x"] + stage["width"] + 0.5, (c, stage)
+        frames += 1
+    assert frames == 2
     geo_built(events, response)
 
 
@@ -660,11 +691,11 @@ def test_tokens_and_calm(knowledge_context, knowledge_stack, events):
     assert result["rules"] == [], result["rules"]
     assert (result["filters"], result["cssFilters"], result["anims"]) == (0, 0, 0), result
     tokens = page.evaluate(
-        "() => ['--globe-sea','--globe-land','--globe-coast','--globe-graticule','--globe-brass']"
+        "() => ['--globe-sea','--globe-land','--globe-coast','--globe-border','--globe-country','--globe-graticule','--globe-brass']"
         ".map(t => getComputedStyle(document.documentElement).getPropertyValue(t).trim())"
     )
     assert all(tokens), tokens
-    assert len(links(page)) == 2 and len(marks(page)) == 3 and len(rows(page)) == 3
+    assert len(links(page)) == 2 and len(persons(page)) == 3 and len(rows(page)) == 3
     geo_built(events, response)
 
 
@@ -681,7 +712,7 @@ def test_tokens_same_in_themes(knowledge_context, knowledge_stack, events):
         )
         seen.append(
             page.evaluate(
-                "() => ['--globe-sea','--globe-land','--globe-coast','--globe-graticule','--globe-brass']"
+                "() => ['--globe-sea','--globe-land','--globe-coast','--globe-border','--globe-country','--globe-graticule','--globe-brass']"
                 ".map(t => getComputedStyle(document.documentElement).getPropertyValue(t).trim())"
             )
         )

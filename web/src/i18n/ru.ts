@@ -587,7 +587,19 @@ export const ru = {
     retry: "Повторить",
     nobody: (y: number) => `В ${y} году на карте никого нет`,
     nearest: "К ближайшему году",
-    coast: "Береговая линия — современная, Natural Earth",
+    coast: "Границы и береговая линия — современные, Natural Earth",
+    whereIn: (y: number) => (y < 0 ? `Где в ${-y} году до н. э.` : `Где в ${y} году`),
+    roles: { birth: "рождение", death: "смерть", activity: "деятельность", residence: "проживание", none: "место жизни", event: "событие" },
+    noCountry: "страна не определена",
+    afterDeath: "после смерти",
+    years: (from: number, to: number) => {
+      const y = (v: number) => (v < 0 ? `${-v} до н. э.` : String(v));
+      if (from === to) return y(from);
+      if (from < 0 && to < 0) return `${-from}–${-to} до н. э.`;
+      return from < 0 ? `${y(from)} – ${y(to)}` : `${from}–${to}`;
+    },
+    peopleShown: (n: number, m: number) => `показаны ${n} из ${m.toLocaleString("ru-RU")} ${plural(m, "человека", "человек", "человек")}`,
+    placeWithCountry: (label: string, country: string | null) => (country ? `${label}, ${country}` : label),
     keys: "Клавиши",
     keysHint:
       "Стрелки — повернуть глобус (Shift — быстрее), + и − — приблизить и отдалить, 0 — исходный вид, PageUp и PageDown — год ±10, [ и ] — год ±1, пробел — играть или пауза, Esc — снять выбор.",
@@ -596,8 +608,10 @@ export const ru = {
     nobodyHere: "В этот год здесь никого нет.",
     events: "События",
     legend: {
-      place: "место, число людей",
-      unverified: "не проверено: все записи достроены моделью",
+      place: "медальон персоны: портрет или инициал",
+      more: "+N — персоны, которым не хватило места; нажмите, чтобы увидеть всех",
+      border: "граница государства, современная",
+      unverified: "не проверено: место достроено моделью",
       influence: "влияние, стрелка — к ученику",
       generated: "достроено моделью",
       trail: "места выбранного по порядку лет",

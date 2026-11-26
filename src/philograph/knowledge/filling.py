@@ -152,7 +152,10 @@ class Filling:
         return row
 
     def _run_cost(self, run_id: str) -> float:
-        response = self.llm.get("spend", params={"days": 3650, "group_by": "run_id"})
+        try:
+            response = self.llm.get("spend", params={"days": 3650, "group_by": "run_id"})
+        except ServiceUnavailable:
+            return 0.0  # запись расхода не должна валить извлечение
         if response.status_code != 200:
             return 0.0
         return round(
