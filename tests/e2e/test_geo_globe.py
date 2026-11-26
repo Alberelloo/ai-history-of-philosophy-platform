@@ -14,6 +14,7 @@ import re
 
 import pytest
 
+from ..helpers import reader_context as shared_reader_context
 from ..web.geo_helpers import (
     RU_TEXT,
     arc_end_error,
@@ -82,7 +83,7 @@ def test_demo_globe_marks_and_unplaced(browser, stack):
 @req(GEO, "Точные связи", scenario="Концы на наборе поворотов и размеров")
 @pytest.mark.parametrize(("width", "height"), [(1024, 576), (1366, 768), (1920, 1080)])
 def test_demo_globe_medals_labels_arcs(browser, stack, width, height):
-    context = reader_context(browser, viewport={"width": width, "height": height})
+    context = shared_reader_context(browser, viewport={"width": width, "height": height})
     page = context.new_page()
     page.set_default_timeout(30000)
     foreign: list[str] = []
