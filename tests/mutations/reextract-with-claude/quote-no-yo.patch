@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index d2f6132..be9c183 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -23,8 +23,6 @@ _MAP = str.maketrans(
+         **dict.fromkeys("‘’‚‛′`", "'"),
+         **dict.fromkeys("‐‑‒–—―−", "-"),
+         "…": "...",
+-        "ё": "е",
+-        "Ё": "Е",
+     }
+ )
+ _SPACE = re.compile(r"\s+")

@@ -45,7 +45,7 @@ def test_migration_9_adds_columns_to_old_entities(tmp_path):
         conn.exec_driver_sql(
             f"INSERT INTO {ks.SCHEMA}.entities VALUES ('e_old', 'person', '{{}}', NULL)"
         )
-    assert ks.migrations.upgrade(engine) == [9]
+    assert ks.migrations.upgrade(engine) == [9, 10]  # 10 — метрики запусков
     with engine.begin() as conn:
         columns = {c["name"] for c in inspect(conn).get_columns("entities", schema=ks.SCHEMA)}
         active = conn.scalar(select(func.count()).select_from(ks.entities).where(ks.active()))

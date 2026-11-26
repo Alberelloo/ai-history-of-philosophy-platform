@@ -89,7 +89,13 @@ class PassedGateway(httpx.BaseTransport):
 
 class Stand:
     def __init__(
-        self, onto, engine_for, clock, fragment_size: int = 8, passed_gateway: bool = False
+        self,
+        onto,
+        engine_for,
+        clock,
+        fragment_size: int = 8,
+        passed_gateway: bool = False,
+        fragment_chars: int | None = None,
     ) -> None:
         self.onto = onto
         engine = engine_for(llm_store.migrations, queue_migrations)
@@ -113,8 +119,9 @@ class Stand:
         library = ServiceClient(
             "library", "http://library/api", transport=httpx.MockTransport(self._library)
         )
+        extra = {} if fragment_chars is None else {"fragment_chars": fragment_chars}
         self.filling = Filling(
-            onto.statements, llm, library, clock=clock, fragment_size=fragment_size
+            onto.statements, llm, library, clock=clock, fragment_size=fragment_size, **extra
         )
 
     def _library(self, request: httpx.Request) -> httpx.Response:

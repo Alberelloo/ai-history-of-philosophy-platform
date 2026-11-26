@@ -238,7 +238,13 @@ class Store:
     ) -> list[dict[str, Any]]:
         cols = [calls.c[name] for name in group_by]
         query = (
-            select(*cols, func.sum(calls.c.cost_usd).label("cost_usd"), func.count().label("calls"))
+            select(
+                *cols,
+                func.sum(calls.c.cost_usd).label("cost_usd"),
+                func.count().label("calls"),
+                func.sum(calls.c.input_tokens).label("input_tokens"),
+                func.sum(calls.c.output_tokens).label("output_tokens"),
+            )
             .where(and_(calls.c.time >= first, calls.c.time < last))
             .group_by(*cols)
         )

@@ -21,7 +21,7 @@ def test_migration_8_adds_run_actions_and_keeps_old_data(tmp_path):
         conn.execute(
             ks.entities.insert().values(id="e_old", type="person", primary={}, redirect_to=None)
         )
-    assert ks.migrations.upgrade(engine) == [8, 9]
+    assert ks.migrations.upgrade(engine) == [8, 9, 10]  # 10 — метрики запусков
     assert ks.migrations.upgrade(engine) == []
     with engine.begin() as conn:
         columns = {c["name"] for c in inspect(conn).get_columns("run_actions", schema=ks.SCHEMA)}

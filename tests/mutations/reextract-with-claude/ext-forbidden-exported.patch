@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..383a837 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -117,7 +117,7 @@ def _instructions() -> str:
+ 
+ 
+ def _allowed(filling: Filling, data: dict[str, Any]) -> None:
+-    if not data["permissions"].get("external_processing"):
++    if False:
+         events.emit(
+             "knowledge.extraction.skipped",
+             source_id=data["source_id"],

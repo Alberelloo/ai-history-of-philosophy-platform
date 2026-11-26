@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 840d747..60c8e21 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -270,7 +270,7 @@ def _previous(engine: Engine, version_id: str) -> list[dict[str, Any]]:
+                         runs.c.target == version_id,
+                         # done, failed и брошенный running: у всех могут быть записанные
+                         # утверждения — повтор без отката удвоил бы подтверждения.
+-                        runs.c.status != "rolled_back",
++                        runs.c.status == "done",
+                     )
+                 )
+             ).mappings()

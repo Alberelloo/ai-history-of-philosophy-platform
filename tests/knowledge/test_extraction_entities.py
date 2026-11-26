@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as hs
@@ -124,9 +126,10 @@ def test_schema_with_entities_and_dating(stand, events):
     assert entities["type"] == "array"
     item = entities["items"]
     assert set(item["properties"]) == {"name", "type", "ru", "en", "original", "dating"}
-    assert set(item["properties"]["type"]["enum"]) == set(REGISTRY_TYPES)
-    assert set(item["properties"]["dating"]["properties"]) == {"text", "paragraph", "quote"}
-    assert set(item["properties"]["dating"]["required"]) == {"text", "paragraph", "quote"}
+    # reextract-with-claude: схема шлюза мягкая — перечней и типов у полей нет; допустимые
+    # типы сущностей сервер знаний проверяет сам и передаёт модели в данных запроса
+    assert "enum" not in json.dumps(schema)
+    assert set(body["data"]["entity_types"].split(", ")) == set(REGISTRY_TYPES)
     assert set(item["required"]) == {"name", "type"}
     assert "entities" not in schema["required"]
     assert body["data"]["language"] == "en"
@@ -180,8 +183,9 @@ def test_new_entity_without_type_dropped_by_code(stand, onto, events):
     assert ids_by_text(onto, "Безымянный") == []
     [drop] = [dict(e.fields) for e in events.of(DROPPED)]
     assert drop["reason"] == "entity:no_type"
+    assert drop["code"] == "entity_no_type"  # reextract-with-claude: код из перечня
     assert drop["run_id"]
-    assert set(drop) - CTX == {"reason"}
+    assert set(drop) - CTX == {"reason", "code"}
     assert events.where(CREATED, type="person") == []
     no_token(events, token)
 

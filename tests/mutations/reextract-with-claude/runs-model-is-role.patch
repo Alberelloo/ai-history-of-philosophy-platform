@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..984b6ce 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -420,7 +420,7 @@ class Filling:
+         info = response.json()
+         budget = info.get("call_budget_seconds")
+         timeout = float(budget) + TIMEOUT_MARGIN if budget else self.call_timeout
+-        return info.get("model"), timeout
++        return EXTRACT_ROLE, timeout
+ 
+     def extract_version(
+         self,

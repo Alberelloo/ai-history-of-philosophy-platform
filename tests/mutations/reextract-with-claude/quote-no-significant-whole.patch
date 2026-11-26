@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 53037ae..1c927c8 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -68,7 +68,7 @@ def check(quote: str, text: str | None) -> str | None:
+     if not normalize(quote):
+         return QUOTE_NOT_FOUND  # пустая цитата
+     whole = _unquoted(quote)
+-    if _significant(whole) < MIN_WHOLE:
++    if False:
+         return QUOTE_TOO_SHORT  # «...», «—», «, .»: подтверждать нечего
+     haystack = normalize(text)
+     if whole in haystack:

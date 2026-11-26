@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entity_items.py b/src/philograph/knowledge/entity_items.py
+index 3e6c726..2df93dc 100644
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -74,7 +74,7 @@ def _without_nulls(item: dict[str, Any]) -> dict[str, Any]:
+     return clean
+ 
+ 
+-_DIGITS = re.compile(r"[0-9]+")
++_DIGITS = re.compile(r"\d+")
+ 
+ 
+ def _dating_spec(spec: dict[str, Any]) -> dict[str, Any] | None:

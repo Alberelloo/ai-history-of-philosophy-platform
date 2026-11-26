@@ -9,10 +9,12 @@
 
 from __future__ import annotations
 
+import re
+from collections.abc import Callable
 from itertools import combinations
 from typing import Any
 
-from philograph.knowledge import dating, dedupe
+from philograph.knowledge import dating, dedupe, extraction_codes
 from philograph.knowledge import schema as t
 from philograph.knowledge.entities import Entities
 from philograph.knowledge.naming import (
@@ -32,7 +34,7 @@ events.define(
     "knowledge.extraction.dropped",
     "warning",
     "Утверждение модели отброшено",
-    required=("run_id", "reason"),
+    required=("run_id", "reason", "code"),
 )
 events.define(
     "knowledge.extraction.ambiguous",
@@ -49,7 +51,45 @@ ENTITY_AMBIGUOUS = "entity:ambiguous"
 
 
 class Skip(Exception):
-    """Утверждение (или датировка) отбрасывается с причиной; запуск продолжается."""
+    """Утверждение (или датировка) отбрасывается с причиной; запуск продолжается.
+
+    ``code`` — код из перечня ``extraction_codes``; без него выводится из причины."""
+
+    def __init__(self, reason: str, code: str | None = None) -> None:
+        super().__init__(reason)
+        self.code = code or extraction_codes.code_for(reason)
+
+
+def _without_nulls(item: dict[str, Any]) -> dict[str, Any]:
+    """Необязательные поля со значением ``null`` — как отсутствующие; написания и
+    ``original`` — только строки и объект, иначе поле отбрасывается."""
+    clean = {k: v for k, v in item.items() if v is not None}
+    for key in ("ru", "en"):
+        if key in clean and not isinstance(clean[key], str):
+            del clean[key]
+    if "original" in clean and not isinstance(clean["original"], dict):
+        del clean["original"]
+    if "dating" in clean and not isinstance(clean["dating"], dict):
+        del clean["dating"]
+    return clean
+
+
+_DIGITS = re.compile(r"[0-9]+")
+
+
+def _dating_spec(spec: dict[str, Any]) -> dict[str, Any] | None:
+    """Датировка элемента по виду: ``text`` и ``quote`` — строки, ``paragraph`` — целое или
+    строка из ASCII-цифр (приводится). Иначе ``None`` — элемент отбрасывается (``schema_item``)."""
+    spec = {k: v for k, v in spec.items() if v is not None}
+    for key in ("text", "quote"):
+        if key in spec and not isinstance(spec[key], str):
+            return None
+    number = spec.get("paragraph")
+    if isinstance(number, str) and _DIGITS.fullmatch(number.strip()):
+        spec["paragraph"] = int(number.strip())
+    elif number is not None and (isinstance(number, bool) or not isinstance(number, int)):
+        return None
+    return spec
 
 
 def _spellings(name: str, item: dict[str, Any] | None) -> list[str]:
@@ -73,21 +113,49 @@ class EntityItems:
 
     # --- элементы ответа ---
 
-    def index(self, items: list[dict[str, Any]] | None, run_id: str) -> dict[str, dict[str, Any]]:
+    def index(
+        self,
+        items: list[dict[str, Any]] | None,
+        run_id: str,
+        on_drop: Callable[[str, str], None] | None = None,
+    ) -> dict[str, dict[str, Any]]:
         """Элементы ``entities`` по ``name``. Элемент с типом вне реестра не используется:
-        сервер проверяет сам и не полагается на схему шлюза."""
+        сервер проверяет сам и не полагается на схему шлюза. ``null`` в необязательном поле
+        (``ru``, ``en``, ``original``, ``dating``) — поле отсутствует. Отказ — через
+        ``on_drop(reason, code)`` (учёт запуска в ``Filling``), без него — событие."""
         self.unresolved = set()
         known = self.registry.entity_types()
         index: dict[str, dict[str, Any]] = {}
-        for item in items or []:
-            if not isinstance(item, dict) or not item.get("name"):
+
+        def drop(reason: str, code: str) -> None:
+            if on_drop is not None:
+                on_drop(reason, code)
+            else:
+                events.emit("knowledge.extraction.dropped", run_id=run_id, reason=reason, code=code)
+
+        for item in items if isinstance(items, list) else []:
+            if not isinstance(item, dict) or not isinstance(item.get("name"), str):
                 continue
-            if item.get("type") not in known:
-                events.emit(
-                    "knowledge.extraction.dropped", run_id=run_id, reason=ENTITY_TYPE_DROPPED
-                )
+            if not item["name"]:
                 continue
-            index.setdefault(item["name"], item)
+            kind = item.get("type")
+            if kind is not None and not isinstance(kind, str):
+                drop("элемент entities: поле type не строка", extraction_codes.SCHEMA_ITEM)
+                continue
+            if kind not in known:
+                drop(ENTITY_TYPE_DROPPED, extraction_codes.ENTITY_TYPE)
+                continue
+            if item.get("dating") is not None and not isinstance(item["dating"], dict):
+                drop("элемент entities: поле dating не того вида", extraction_codes.SCHEMA_ITEM)
+                continue
+            clean = _without_nulls(item)
+            if "dating" in clean:
+                dating_spec = _dating_spec(clean["dating"])
+                if dating_spec is None:
+                    drop("элемент entities: поле dating не того вида", extraction_codes.SCHEMA_ITEM)
+                    continue
+                clean["dating"] = dating_spec
+            index.setdefault(item["name"], clean)
         return index
 
     # --- привязка ---
@@ -230,6 +298,7 @@ class EntityItems:
         window: list[dict[str, Any]],
         source_id: str,
         run_id: str,
+        model: str | None = None,
     ) -> str:
         """Датировка элемента ``entities``: привязка (или создание) сущности и ``date``.
         Сущность не определена — название отклонено, неоднозначно, без типа, в том числе уже
@@ -240,7 +309,7 @@ class EntityItems:
             entity_id = self.resolve(name, item["type"], item, resolved)
         except Skip as exc:
             raise Skip(dating.UNRESOLVED) from exc
-        return self.date(entity_id, item, window, source_id, run_id)
+        return self.date(entity_id, item, window, source_id, run_id, model)
 
     def date(
         self,
@@ -249,6 +318,7 @@ class EntityItems:
         window: list[dict[str, Any]],
         source_id: str,
         run_id: str,
+        model: str | None = None,
     ) -> str:
         """Проверенная датировка элемента — утверждение ``lifespan`` (персона) или ``dating``.
         Отказ — ``Skip`` с причиной ``dating:<код>``."""
@@ -275,6 +345,6 @@ class EntityItems:
             evidence=[Evidence(paragraph["id"], spec["quote"], source_id=source_id)],
             attributions=[Attribution("source", source_id)],
             provenance=Provenance(
-                "extracted", run_id=run_id, model="main", template="ontology.extract"
+                "extracted", run_id=run_id, model=model, template="ontology.extract"
             ),
         )

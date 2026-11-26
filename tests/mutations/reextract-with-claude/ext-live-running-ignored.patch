@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 80ee164..2bf7e74 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -297,7 +297,7 @@ def ingest(
+         for r in previous
+         if r["status"] == "running" and _age_hours(r["started_at"], now) < STALE_RUNNING_HOURS
+     ]
+-    if live:
++    if False:
+         raise CommandError(
+             f"запись идёт: версия {version_id}, запуск {', '.join(live)} (running); "
+             f"повтор — после его завершения или через {STALE_RUNNING_HOURS} ч"

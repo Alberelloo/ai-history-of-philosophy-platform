@@ -80,8 +80,13 @@ def components(env: dict[str, str]) -> Components:
     health.depends_on("database", database)
     filling = None
     if env.get("PHILOGRAPH_LLM_URL"):
+        # Таймаут вызова извлечения — бюджет шлюза на все попытки роли (``GET roles/strong``);
+        # переменная — если шлюз бюджет не сообщил.
         filling = Filling(
-            statements, ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=120), library
+            statements,
+            ServiceClient("llm", env["PHILOGRAPH_LLM_URL"], timeout=120),
+            library,
+            call_timeout=float(env.get("PHILOGRAPH_EXTRACTION_TIMEOUT_SECONDS", "1200")),
         )
     queue = Queue(engine)
     mentions = Mentions(statements, library)

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/filling.py b/src/philograph/knowledge/filling.py
+index 6dbafbd..759f458 100644
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -392,7 +392,7 @@ class Filling:
+                     result.append(window)
+                 if end >= len(chapter):
+                     break
+-                start = end - 1 if len(window) > 1 else end
++                start = end
+         return result
+ 
+     def version(self, version_id: str) -> dict[str, Any]:

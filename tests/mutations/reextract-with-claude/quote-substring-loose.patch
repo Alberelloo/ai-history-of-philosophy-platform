@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 53037ae..12b0a83 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -80,7 +80,7 @@ def check(quote: str, text: str | None) -> str | None:
+         return QUOTE_TOO_SHORT
+     position = 0
+     for part in found:
+-        at = haystack.find(part, position)
++        at = haystack.find(part.split()[0] if part.split() else part, position)
+         if at < 0:
+             return QUOTE_NOT_FOUND
+         position = at + len(part)

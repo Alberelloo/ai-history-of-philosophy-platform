@@ -12,6 +12,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    Float,
     Integer,
     MetaData,
     String,
@@ -224,7 +225,16 @@ filling_runs = Table(
     Column("created", Integer, nullable=False),
     Column("dropped", Integer, nullable=False),
     Column("cost_usd", JSON),
-    Column("status", String(20), nullable=False),  # running | done | rolled_back
+    Column("status", String(20), nullable=False),  # running | done | failed | rolled_back
+    # Метрики запуска (миграция 10): извлекатель, источник, объём, время, токены, причины.
+    Column("extractor", String(20)),  # gateway | external
+    Column("source_id", String(100)),
+    Column("fragments", Integer),
+    Column("duration_seconds", Float),
+    Column("input_tokens", Integer),
+    Column("output_tokens", Integer),
+    Column("drop_reasons", JSON),  # {код: число}
+    Column("failure", Text),
     schema=SCHEMA,
 )
 review_items = Table(
@@ -456,3 +466,33 @@ def _retired_columns(conn: Connection) -> None:
 
 
 migrations.add(9, "снятие мусорных сущностей")(_retired_columns)
+
+
+# Столбцы метрик запуска (knowledge:10): тип ``JSON`` есть и в Postgres, и в SQLite.
+RUN_METRICS = (
+    ("extractor", "VARCHAR(20)"),
+    ("source_id", "VARCHAR(100)"),
+    ("fragments", "INTEGER"),
+    ("duration_seconds", "FLOAT"),
+    ("input_tokens", "INTEGER"),
+    ("output_tokens", "INTEGER"),
+    ("drop_reasons", "JSON"),
+    ("failure", "TEXT"),
+)
+
+
+def _run_metrics(conn: Connection) -> None:
+    """Метрики запуска: старые строки сохраняются, у них столбцы пусты. Свежая база получает
+    столбцы из метаданных в ``knowledge:2`` — здесь они пропускаются."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(conn)
+    if not inspector.has_table("filling_runs", schema=SCHEMA):
+        return  # частичная схема (проверки отдельных миграций): столбцы придут с таблицей
+    columns = {c["name"] for c in inspector.get_columns("filling_runs", schema=SCHEMA)}
+    for name, kind in RUN_METRICS:
+        if name not in columns:
+            conn.execute(text(f"ALTER TABLE {SCHEMA}.filling_runs ADD COLUMN {name} {kind}"))
+
+
+migrations.add(10, "метрики запусков извлечения")(_run_metrics)

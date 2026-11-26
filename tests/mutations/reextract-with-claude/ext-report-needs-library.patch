@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 840d747..f04c6af 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -581,7 +581,7 @@ def main(
+     args = _parser().parse_args(argv)
+     env = dict(os.environ) if env is None else env
+     try:
+-        if args.command == "report":  # отчёт читает только базу знаний, библиотека не нужна
++        if False:  # отчёт читает только базу знаний, библиотека не нужна
+             if service is not None:
+                 engine, entities = service.engine, service.filling.entities
+             else:

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entity_items.py b/src/philograph/knowledge/entity_items.py
+index e2ffad8..c838768 100644
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -145,7 +145,7 @@ class EntityItems:
+             if kind not in known:
+                 drop(ENTITY_TYPE_DROPPED, extraction_codes.ENTITY_TYPE)
+                 continue
+-            if item.get("dating") is not None and not isinstance(item["dating"], dict):
++            if False:
+                 drop("элемент entities: поле dating не того вида", extraction_codes.SCHEMA_ITEM)
+                 continue
+             clean = _without_nulls(item)

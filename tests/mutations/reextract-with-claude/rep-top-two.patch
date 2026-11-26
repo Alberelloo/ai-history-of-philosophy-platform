@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 232efc1..b0ead51 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -314,7 +314,7 @@ def _rate(created: int, dropped: int) -> str:
+ 
+ 
+ def _top(reasons: Counter) -> str:
+-    return ", ".join(f"{code} {n}" for code, n in reasons.most_common(3)) or "—"
++    return ", ".join(f"{code} {n}" for code, n in reasons.most_common(2)) or "—"
+ 
+ 
+ def _num(value: Any, digits: int = 0) -> str:

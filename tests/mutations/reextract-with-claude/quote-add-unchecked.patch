@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index d85d15e..70b7baa 100644
+--- a/src/philograph/knowledge/statements.py
++++ b/src/philograph/knowledge/statements.py
+@@ -322,7 +322,7 @@ class Statements:
+         self._check_value(type_, value, qualifiers, attributions)
+         for ev in evidence:
+             text = self.paragraph_text(ev.paragraph_id)
+-            if not quotes.found(ev.quote, text):
++            if False:
+                 raise StatementError(f"цитата не найдена в абзаце {ev.paragraph_id}")
+ 
+     def add(
