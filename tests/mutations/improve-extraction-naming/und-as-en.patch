@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -192,7 +192,7 @@
+     script = script_of(text)
+     if given is not None and script is not None and LANG_SCRIPT.get(given) == script:
+         return given
+-    return SCRIPT_LANG.get(script or "", "und")
++    return SCRIPT_LANG.get(script or "", "en")
+ 
+ 
+ def is_russian(text: str) -> bool:

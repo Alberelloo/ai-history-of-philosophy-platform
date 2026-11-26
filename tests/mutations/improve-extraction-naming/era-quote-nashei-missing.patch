@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -36,7 +36,7 @@
+ _CENTURY_FORMAT = re.compile(rf"^{_ROMAN}\s*в\.(?P<era>\s+{_ERA_TEXT})?$")
+ 
+ _ERA_IN_TEXT = re.compile(_ERA_TEXT)
+-_ERA_IN_QUOTE = re.compile(r"до\s+н\.\s?э\.|до\s+нашей\s+эры")
++_ERA_IN_QUOTE = re.compile(r"до\s+н\.\s?э\.")
+ _NUMBER = re.compile(r"(?<!\d)\d{1,4}(?!\d)")
+ 
+ _ROMAN_VALUES = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -140,7 +140,7 @@
+         if len(found) > 1:
+             return self._ambiguous(name, found, resolved)
+         if not type_:
+-            raise Skip(ENTITY_NO_TYPE)
++            type_ = "concept"
+         names = names_for(type_, item) if item else [("ru", name, "primary")]
+         try:
+             resolved[name] = self.entities.create(type_, names)

@@ -162,3 +162,1117 @@ mutations:
     expect_fail:
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
       - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+
+  # --- аудит пунктов (О21): мутации по каждому нормативному пункту ---
+  - id: words-edge-kept
+    requirement: Язык названий сущностей
+    patch: words-edge-kept.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: digits-as-letters
+    requirement: Язык названий сущностей
+    patch: digits-as-letters.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: cyrillic-range-short
+    requirement: Язык названий сущностей
+    patch: cyrillic-range-short.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: tie-first-wins
+    requirement: Язык названий сущностей
+    patch: tie-first-wins.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_unit.py::test_lang_for
+  - id: given-lang-table-short
+    requirement: Язык названий сущностей
+    patch: given-lang-table-short.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: given-kept-without-script
+    requirement: Язык названий сущностей
+    patch: given-kept-without-script.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_unit.py::test_lang_for
+  - id: ru-primary-unchecked
+    requirement: Язык названий сущностей
+    patch: ru-primary-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_naming_unit.py::test_names_for_rejected_spelling_not_written
+  - id: ru-primary-not-russian
+    requirement: Язык названий сущностей
+    patch: ru-primary-not-russian.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+  - id: variants-dropped
+    requirement: Язык названий сущностей
+    patch: variants-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_russian_textbook
+      - tests/knowledge/test_naming_unit.py::test_names_for_primary_and_variants
+  - id: rejected-spelling-variant
+    requirement: Язык названий сущностей
+    patch: rejected-spelling-variant.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_naming_unit.py::test_names_for_rejected_spelling_not_written
+  - id: rule-sentence-before-number
+    requirement: Валидность названий сущностей
+    patch: rule-sentence-before-number.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-empty-as-number
+    requirement: Валидность названий сущностей
+    patch: rule-empty-as-number.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_empty_names
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-sentence-chars-unchecked
+    requirement: Валидность названий сущностей
+    patch: rule-sentence-chars-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-sentence-words-unchecked
+    requirement: Валидность названий сущностей
+    patch: rule-sentence-words-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_sentence_instead_of_term
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-limit-ge
+    requirement: Валидность названий сущностей
+    patch: rule-limit-ge.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-limits-default-only
+    requirement: Валидность названий сущностей
+    patch: rule-limits-default-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-particle-apostrophe-ignored
+    requirement: Валидность названий сущностей
+    patch: rule-particle-apostrophe-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_particles_and_roman
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-particle-case-sensitive
+    requirement: Валидность названий сущностей
+    patch: rule-particle-case-sensitive.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-glue-lower-neighbors
+    requirement: Валидность названий сущностей
+    patch: rule-glue-lower-neighbors.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-not-a-name-all-types
+    requirement: Валидность названий сущностей
+    patch: rule-not-a-name-all-types.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-lowercase-first-unchecked
+    requirement: Валидность названий сущностей
+    patch: rule-lowercase-first-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_role_instead_of_name
+      - tests/knowledge/test_entity_naming.py::test_manual_core
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: rule-patterns-dropped
+    requirement: Валидность названий сущностей
+    patch: rule-patterns-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_description_with_capital
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-glue-dropped
+    requirement: Валидность названий сущностей
+    patch: rule-glue-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_glued_names
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-stopword-raw-compare
+    requirement: Валидность названий сущностей
+    patch: rule-stopword-raw-compare.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-exempt-ignored
+    requirement: Валидность названий сущностей
+    patch: rule-exempt-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_naming_unit.py::test_check_name
+  - id: rule-no-nfc
+    requirement: Валидность названий сущностей
+    patch: rule-no-nfc.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+  - id: rule-no-strip
+    requirement: Валидность названий сущностей
+    patch: rule-no-strip.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+  - id: label-cut-80
+    requirement: Валидность названий сущностей
+    patch: label-cut-80.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_limit_boundaries
+      - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+      - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
+  - id: rejected-extra-field
+    requirement: Валидность названий сущностей
+    patch: rejected-extra-field.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_section_number
+      - tests/knowledge/test_entity_naming.py::test_manual_core
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+      - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
+  - id: rules-limits-hardcoded
+    requirement: Валидность названий сущностей
+    patch: rules-limits-hardcoded.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+  - id: rules-particles-hardcoded
+    requirement: Валидность названий сущностей
+    patch: rules-particles-hardcoded.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+  - id: rules-patterns-hardcoded
+    requirement: Валидность названий сущностей
+    patch: rules-patterns-hardcoded.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+  - id: rules-conjunctions-hardcoded
+    requirement: Валидность названий сущностей
+    patch: rules-conjunctions-hardcoded.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+  - id: rules-person-types-hardcoded
+    requirement: Валидность названий сущностей
+    patch: rules-person-types-hardcoded.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rules_are_data
+  - id: add-name-lang-given
+    requirement: Язык названий сущностей
+    patch: add-name-lang-given.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_entities_unit.py::test_add_name_lang_and_check
+  - id: create-lang-given
+    requirement: Язык названий сущностей
+    patch: create-lang-given.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_entities_unit.py::test_create_sets_lang_by_script
+  - id: rename-keeps-old-primary
+    requirement: Язык названий сущностей
+    patch: rename-keeps-old-primary.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary
+      - tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_keeps_id
+      - tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_promotes_variant
+  - id: renamed-previous-lang-wrong
+    requirement: Язык названий сущностей
+    patch: renamed-previous-lang-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary
+      - tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_keeps_id
+  - id: created-event-doubled
+    requirement: Язык названий сущностей
+    patch: created-event-doubled.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_russian_textbook
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: ambiguous-creates-new
+    requirement: Язык названий сущностей
+    patch: ambiguous-creates-new.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_spellings_found_different_entities
+      - tests/knowledge/test_extraction_entities.py::test_ambiguous_goes_to_review
+  - id: ambiguous-candidates-count
+    requirement: Язык названий сущностей
+    patch: ambiguous-candidates-count.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_spellings_found_different_entities
+      - tests/knowledge/test_extraction_entities.py::test_ambiguous_goes_to_review
+  - id: ambiguous-no-review-item
+    requirement: Язык названий сущностей
+    patch: ambiguous-no-review-item.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_spellings_found_different_entities
+      - tests/knowledge/test_extraction_entities.py::test_ambiguous_goes_to_review
+  - id: no-type-creates-entity
+    requirement: Нормализация сущностей
+    patch: no-type-creates-entity.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_new_entity_without_type_dropped_by_code
+  - id: spellings-without-ru
+    requirement: Нормализация сущностей
+    patch: spellings-without-ru.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_normalization_and_language_for_any_items
+  - id: spellings-without-original
+    requirement: Нормализация сущностей
+    patch: spellings-without-original.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_normalization_and_language_for_any_items
+  - id: dating-person-as-dating
+    requirement: Извлечение дат
+    patch: dating-person-as-dating.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_life_dates_in_text
+      - tests/knowledge/test_entity_dating_extraction.py::test_bc_dates
+      - tests/knowledge/test_entity_dating_extraction.py::test_year_not_in_quote
+      - tests/knowledge/test_entity_dating_extraction.py::test_unparsed
+  - id: dating-evidence-dropped
+    requirement: Извлечение дат
+    patch: dating-evidence-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_life_dates_in_text
+      - tests/knowledge/test_entity_dating_extraction.py::test_bc_dates
+      - tests/knowledge/test_entity_dating_extraction.py::test_work_year
+      - tests/knowledge/test_entity_dating_extraction.py::test_event_century
+  - id: dating-attribution-dropped
+    requirement: Извлечение дат
+    patch: dating-attribution-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_life_dates_in_text
+  - id: dating-provenance-manual
+    requirement: Извлечение дат
+    patch: dating-provenance-manual.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_life_dates_in_text
+  - id: check-order-quote-unparsed
+    requirement: Извлечение дат
+    patch: check-order-quote-unparsed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: check-order-numbers-era
+    requirement: Извлечение дат
+    patch: check-order-numbers-era.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: check-order-era-single
+    requirement: Извлечение дат
+    patch: check-order-era-single.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: paragraph-bounds-off
+    requirement: Извлечение дат
+    patch: paragraph-bounds-off.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: quote-case-sensitive
+    requirement: Извлечение дат
+    patch: quote-case-sensitive.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_quote_rule_like_statements
+  - id: quote-yo-kept
+    requirement: Извлечение дат
+    patch: quote-yo-kept.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_quote_rule_like_statements
+  - id: quote-spaces-kept
+    requirement: Извлечение дат
+    patch: quote-spaces-kept.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_quote_rule_like_statements
+  - id: roman-substring
+    requirement: Извлечение дат
+    patch: roman-substring.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: era-one-way
+    requirement: Извлечение дат
+    patch: era-one-way.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: century-person-allowed
+    requirement: Извлечение дат
+    patch: century-person-allowed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: approx-year-not-single
+    requirement: Извлечение дат
+    patch: approx-year-not-single.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: year-max-2101
+    requirement: Извлечение дат
+    patch: year-max-2101.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: year-zero-allowed
+    requirement: Извлечение дат
+    patch: year-zero-allowed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: century-max-22
+    requirement: Извлечение дат
+    patch: century-max-22.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: dash-hyphen-only
+    requirement: Извлечение дат
+    patch: dash-hyphen-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: approx-markers-short
+    requirement: Извлечение дат
+    patch: approx-markers-short.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: era-text-spaced-only
+    requirement: Извлечение дат
+    patch: era-text-spaced-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: era-quote-nashei-missing
+    requirement: Извлечение дат
+    patch: era-quote-nashei-missing.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: approx-slack-year-wrong
+    requirement: Извлечение дат
+    patch: approx-slack-year-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: approx-slack-interval-wrong
+    requirement: Извлечение дат
+    patch: approx-slack-interval-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: century-bounds-off
+    requirement: Извлечение дат
+    patch: century-bounds-off.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: century-bce-bounds-off
+    requirement: Извлечение дат
+    patch: century-bce-bounds-off.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: century-precision-year
+    requirement: Извлечение дат
+    patch: century-precision-year.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: approx-precision-year
+    requirement: Извлечение дат
+    patch: approx-precision-year.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_accepted
+  - id: schema-no-original
+    requirement: Структурированный вывод по реестру
+    patch: schema-no-original.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_schema_with_entities_and_dating
+  - id: schema-entities-required
+    requirement: Структурированный вывод по реестру
+    patch: schema-entities-required.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_schema_with_entities_and_dating
+      - tests/knowledge/test_extraction_entities.py::test_answer_without_entities
+      - tests/knowledge/test_extraction_entities.py::test_binding_by_variant
+      - tests/knowledge/test_extraction_entities.py::test_ambiguous_goes_to_review
+  - id: language-first-paragraph
+    requirement: Структурированный вывод по реестру
+    patch: language-first-paragraph.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_prompt_language_and_rules
+  - id: prompt-no-years-rule
+    requirement: Структурированный вывод по реестру
+    patch: prompt-no-years-rule.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_schema_with_entities_and_dating
+      - tests/knowledge/test_extraction_entities.py::test_prompt_language_and_rules
+  - id: prompt-no-not-a-name-rule
+    requirement: Структурированный вывод по реестру
+    patch: prompt-no-not-a-name-rule.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_prompt_language_and_rules
+  - id: prompt-no-ru-language-rule
+    requirement: Структурированный вывод по реестру
+    patch: prompt-no-ru-language-rule.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_prompt_language_and_rules
+  - id: epoch-unchanged-as-conflict
+    requirement: Даты эпох из Wikidata
+    patch: epoch-unchanged-as-conflict.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_repeated_run
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+      - tests/knowledge/test_epoch_dates.py::test_every_result_and_totals
+      - tests/knowledge/test_epoch_dates.py::test_existing_never_overwritten
+  - id: epoch-conflict-overwrites
+    requirement: Даты эпох из Wikidata
+    patch: epoch-conflict-overwrites.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_existing_dating_kept
+      - tests/knowledge/test_epoch_dates.py::test_existing_never_overwritten
+      - tests/knowledge/test_epoch_dates.py::test_repeated_apply_creates_no_rows
+      - tests/knowledge/test_epoch_dates_unit.py::test_conflict_is_reported_not_written
+  - id: epoch-fallback-props-dropped
+    requirement: Даты эпох из Wikidata
+    patch: epoch-fallback-props-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_fallback_properties
+      - tests/knowledge/test_epoch_dates_unit.py::test_epoch_dating_main_fallback_and_missing
+  - id: epoch-no-qid-result
+    requirement: Даты эпох из Wikidata
+    patch: epoch-no-qid-result.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+      - tests/knowledge/test_epoch_dates.py::test_without_qid
+      - tests/knowledge/test_epoch_dates.py::test_no_qid_never_fetches
+      - tests/knowledge/test_epoch_dates.py::test_every_result_and_totals
+  - id: epoch-ambiguous-picks-first
+    requirement: Даты эпох из Wikidata
+    patch: epoch-ambiguous-picks-first.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+  - id: epoch-own-qid-conflict-ignored
+    requirement: Даты эпох из Wikidata
+    patch: epoch-own-qid-conflict-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_manifest_qid_differs_from_epoch_qid
+  - id: epoch-qid-owner-ignored
+    requirement: Даты эпох из Wikidata
+    patch: epoch-qid-owner-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+  - id: epoch-fetch-failed-as-no-dates
+    requirement: Даты эпох из Wikidata
+    patch: epoch-fetch-failed-as-no-dates.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+  - id: epoch-no-dates-as-fetch-failed
+    requirement: Даты эпох из Wikidata
+    patch: epoch-no-dates-as-fetch-failed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_property_choice
+  - id: epoch-created-without-external
+    requirement: Даты эпох из Wikidata
+    patch: epoch-created-without-external.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_new_epoch_from_manifest
+  - id: epoch-added-without-external
+    requirement: Даты эпох из Wikidata
+    patch: epoch-added-without-external.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_added_from_manifest_gets_external_id
+  - id: epoch-dry-run-writes
+    requirement: Даты эпох из Wikidata
+    patch: epoch-dry-run-writes.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run
+  - id: epoch-dry-run-creates
+    requirement: Даты эпох из Wikidata
+    patch: epoch-dry-run-creates.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_dry_run_changes_no_table_for_any_result
+  - id: epoch-skipped-without-conflicts
+    requirement: Даты эпох из Wikidata
+    patch: epoch-skipped-without-conflicts.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_every_result_and_totals
+  - id: epoch-attribution-no-link
+    requirement: Даты эпох из Wikidata
+    patch: epoch-attribution-no-link.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_date_from_wikidata
+  - id: epoch-provenance-no-props
+    requirement: Даты эпох из Wikidata
+    patch: epoch-provenance-no-props.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_date_from_wikidata
+  - id: epoch-status-generated
+    requirement: Даты эпох из Wikidata
+    patch: epoch-status-generated.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_date_from_wikidata
+  - id: epoch-linked-skipped
+    requirement: Даты эпох из Wikidata
+    patch: epoch-linked-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_dates.py::test_date_from_wikidata
+  - id: ctx-undated-offered
+    requirement: Контекстные события из Wikidata
+    patch: ctx-undated-offered.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_harvest_candidates
+  - id: ctx-harvest-duplicates
+    requirement: Контекстные события из Wikidata
+    patch: ctx-harvest-duplicates.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_repeat_harvest_keeps_decisions
+  - id: ctx-kind-any-class
+    requirement: Контекстные события из Wikidata
+    patch: ctx-kind-any-class.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_harvest_candidates
+  - id: ctx-point-time-ignored
+    requirement: Контекстные события из Wikidata
+    patch: ctx-point-time-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_harvest_candidates
+  - id: ctx-pending-applied
+    requirement: Контекстные события из Wikidata
+    patch: ctx-pending-applied.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-rejected-applied
+    requirement: Контекстные события из Wikidata
+    patch: ctx-rejected-applied.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_pending_and_rejected
+  - id: ctx-exists-as-created
+    requirement: Контекстные события из Wikidata
+    patch: ctx-exists-as-created.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_repeat_apply_and_dry_run
+  - id: ctx-no-date-as-fetch-failed
+    requirement: Контекстные события из Wikidata
+    patch: ctx-no-date-as-fetch-failed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_no_date_and_fetch_failed
+  - id: ctx-fetch-failed-as-no-date
+    requirement: Контекстные события из Wikidata
+    patch: ctx-fetch-failed-as-no-date.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_no_date_and_fetch_failed
+  - id: ctx-duplicate-qid-event-ignored
+    requirement: Контекстные события из Wikidata
+    patch: ctx-duplicate-qid-event-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_duplicate_qid_other_type
+  - id: ctx-duplicate-qid-place-ignored
+    requirement: Контекстные события из Wikidata
+    patch: ctx-duplicate-qid-place-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_duplicate_qid_other_type
+  - id: ctx-membership-basis-missing
+    requirement: Контекстные события из Wikidata
+    patch: ctx-membership-basis-missing.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-kind-statement-dropped
+    requirement: Контекстные события из Wikidata
+    patch: ctx-kind-statement-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-status-generated
+    requirement: Контекстные события из Wikidata
+    patch: ctx-status-generated.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-dry-run-writes
+    requirement: Контекстные события из Wikidata
+    patch: ctx-dry-run-writes.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_repeat_apply_and_dry_run
+  - id: ctx-statements-count-zero
+    requirement: Контекстные события из Wikidata
+    patch: ctx-statements-count-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-places-created-zero
+    requirement: Контекстные события из Wikidata
+    patch: ctx-places-created-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-attribution-no-link
+    requirement: Контекстные события из Wikidata
+    patch: ctx-attribution-no-link.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_accepted_candidate
+  - id: ctx-place-always-new
+    requirement: Контекстные события из Wikidata
+    patch: ctx-place-always-new.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_found_by_qid
+  - id: ctx-event-not-reused
+    requirement: Контекстные события из Wikidata
+    patch: ctx-event-not-reused.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_repeat_apply_and_dry_run
+  - id: geo-qid-shape-unchecked
+    requirement: Места и координаты из Wikidata
+    patch: geo-qid-shape-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_bad_external_id_never_fetched
+  - id: geo-value-qid-unchecked
+    requirement: Места и координаты из Wikidata
+    patch: geo-value-qid-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_skips_reasons_and_counters
+  - id: geo-fetch-failed-as-skipped
+    requirement: Места и координаты из Wikidata
+    patch: geo-fetch-failed-as-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_skips_reasons_and_counters
+  - id: geo-skipped-entity-wrong
+    requirement: Места и координаты из Wikidata
+    patch: geo-skipped-entity-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_skips_reasons_and_counters
+  - id: geo-bad-value-as-bad-qid
+    requirement: Места и координаты из Wikidata
+    patch: geo-bad-value-as-bad-qid.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_value_without_id_is_bad_value
+  - id: geo-refused-as-bad-value
+    requirement: Места и координаты из Wikidata
+    patch: geo-refused-as-bad-value.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_skips_reasons_and_counters
+  - id: geo-dry-run-writes
+    requirement: Места и координаты из Wikidata
+    patch: geo-dry-run-writes.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_dry_run_with_existing_place_writes_nothing
+  - id: geo-dry-run-creates-places
+    requirement: Места и координаты из Wikidata
+    patch: geo-dry-run-creates-places.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_dry_run_writes_nothing
+  - id: geo-rerun-counts-again
+    requirement: Места и координаты из Wikidata
+    patch: geo-rerun-counts-again.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_rerun_adds_nothing
+  - id: geo-time-dropped
+    requirement: Места и координаты из Wikidata
+    patch: geo-time-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-place-role-dropped
+    requirement: Места и координаты из Wikidata
+    patch: geo-place-role-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-attribution-no-link
+    requirement: Места и координаты из Wikidata
+    patch: geo-attribution-no-link.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-status-generated
+    requirement: Места и координаты из Wikidata
+    patch: geo-status-generated.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-provenance-no-run
+    requirement: Места и координаты из Wikidata
+    patch: geo-provenance-no-run.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-places-kept-zero
+    requirement: Места и координаты из Wikidata
+    patch: geo-places-kept-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_rollback_keeps_verified_and_places
+  - id: geo-influence-imported
+    requirement: Места и координаты из Wikidata
+    patch: geo-influence-imported.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_influence_and_foreign_properties_not_imported
+  - id: geo-citizenship-imported
+    requirement: Места и координаты из Wikidata
+    patch: geo-citizenship-imported.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_influence_and_foreign_properties_not_imported
+  - id: geo-activity-no-time
+    requirement: Места и координаты из Wikidata
+    patch: geo-activity-no-time.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_activity_from_p937
+  - id: geo-birth-no-time
+    requirement: Места и координаты из Wikidata
+    patch: geo-birth-no-time.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_kant_from_wikidata
+  - id: geo-rollback-removes-verified
+    requirement: Места и координаты из Wikidata
+    patch: geo-rollback-removes-verified.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_rollback_keeps_verified_and_places
+  - id: geo-rollback-removes-verified
+    requirement: Места и координаты из Wikidata
+    patch: geo-rollback-removes-verified.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_geo_enrich.py::test_rollback_keeps_verified_and_places
+  - id: latin-ascii-only
+    requirement: Язык названий сущностей
+    patch: latin-ascii-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: greek-extended-dropped
+    requirement: Язык названий сущностей
+    patch: greek-extended-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+  - id: other-script-as-latin
+    requirement: Язык названий сущностей
+    patch: other-script-as-latin.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_unit.py::test_lang_for
+  - id: und-as-en
+    requirement: Язык названий сущностей
+    patch: und-as-en.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_unit.py::test_lang_for
+  - id: greek-el-as-grc
+    requirement: Язык названий сущностей
+    patch: greek-el-as-grc.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_naming_unit.py::test_lang_for
+  - id: latin-en-as-la
+    requirement: Язык названий сущностей
+    patch: latin-en-as-la.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path
+      - tests/knowledge/test_entity_naming.py::test_lang_for_any_text
+      - tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name
+      - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+  - id: is-russian-ignores-latin
+    requirement: Язык названий сущностей
+    patch: is-russian-ignores-latin.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+  - id: renamed-extra-field
+    requirement: Язык названий сущностей
+    patch: renamed-extra-field.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary
+      - tests/knowledge/test_extraction_entities.py::test_binding_by_english_spelling
+      - tests/knowledge/test_extraction_entities.py::test_normalization_and_language_for_any_items
+  - id: add-name-unchecked
+    requirement: Валидность названий сущностей
+    patch: add-name-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: set-primary-unchecked
+    requirement: Валидность названий сущностей
+    patch: set-primary-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+  - id: create-unchecked
+    requirement: Валидность названий сущностей
+    patch: create-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_section_number
+      - tests/knowledge/test_entity_naming.py::test_manual_core
+      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
+      - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
+  - id: binding-by-variant-dropped
+    requirement: Нормализация сущностей
+    patch: binding-by-variant-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_binding_by_variant
+  - id: core-reject-aborts
+    requirement: Валидность названий сущностей
+    patch: core-reject-aborts.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_manual_core
+  - id: core-reason-wrong
+    requirement: Валидность названий сущностей
+    patch: core-reason-wrong.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_core_rejection_reasons
+  - id: schema-dating-required-short
+    requirement: Структурированный вывод по реестру
+    patch: schema-dating-required-short.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_schema_with_entities_and_dating
+  - id: dating-drop-doubled
+    requirement: Извлечение дат
+    patch: dating-drop-doubled.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_year_not_in_quote
+      - tests/knowledge/test_entity_dating_extraction.py::test_unparsed
+      - tests/knowledge/test_entity_dating_extraction.py::test_paragraph_outside_fragment
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_of_type_not_allowed
+  - id: entities-required-in-answer
+    requirement: Структурированный вывод по реестру
+    patch: entities-required-in-answer.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_schema_with_entities_and_dating
+      - tests/knowledge/test_extraction_entities.py::test_prompt_language_and_rules
+      - tests/knowledge/test_extraction_entities.py::test_answer_without_entities
+      - tests/knowledge/test_extraction_entities.py::test_binding_by_variant
+  - id: fit-no-parent
+    requirement: Структурированный вывод по реестру
+    patch: fit-no-parent.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_extraction_entities.py::test_uncertain_type_falls_back_to_general
+  - id: era-one-boundary-accepted
+    requirement: Извлечение дат
+    patch: era-one-boundary-accepted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: century-interval-accepted
+    requirement: Извлечение дат
+    patch: century-interval-accepted.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+  - id: unparsed-lenient
+    requirement: Извлечение дат
+    patch: unparsed-lenient.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected
+  - id: single-year-dropped
+    requirement: Извлечение дат
+    patch: single-year-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_dating_unit.py::test_rejected

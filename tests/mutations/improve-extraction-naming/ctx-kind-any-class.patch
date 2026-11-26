@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -223,7 +223,7 @@
+ 
+ def event_kind(classes: list[str]) -> str | None:
+     """Вид события по первому классу P31 из таблицы; нет такого — ``None``."""
+-    return next((EVENT_CLASSES[c] for c in classes if c in EVENT_CLASSES), None)
++    return next((EVENT_CLASSES.get(c, c) for c in classes), None)
+ 
+ 
+ def _labels(record: WikidataRecord) -> dict[str, str]:

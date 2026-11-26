@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -236,7 +236,6 @@
+         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
+         Название, уже бывшее вариантом, повышается, а не дублируется."""
+         entity = self.get(entity_id)
+-        self._check(entity["type"], text)
+         lang = lang_for(text, lang)
+         key = normalize(text)
+         with self.engine.begin() as conn:

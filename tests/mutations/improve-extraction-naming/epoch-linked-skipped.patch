@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -280,7 +280,7 @@
+             if item["epoch_id"]:
+                 done.add(item["epoch_id"])
+             self._record(report, item)
+-        if linked:
++        if False:
+             for epoch_id, qid in known.items():
+                 if epoch_id in done or not self._is_epoch(epoch_id):
+                     continue

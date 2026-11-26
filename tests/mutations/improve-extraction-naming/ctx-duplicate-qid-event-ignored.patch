@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -413,7 +413,7 @@
+         if dating is None:
+             return {"result": "no_date"}
+         event_id = self.entities.by_external(SYSTEM, qid)
+-        if event_id is not None and not self._of_type(event_id, EVENT):
++        if False:
+             return {"result": "duplicate_qid"}  # QID занят сущностью другого типа
+         names = _names(candidate.get("label") or {}, _labels(record), qid)
+         place = candidate.get("place")

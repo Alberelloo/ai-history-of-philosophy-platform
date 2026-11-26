@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -189,7 +189,7 @@
+ def raw_dates(record: WikidataRecord) -> dict[str, Any] | None:
+     """Дата события как в манифесте (значения времени Wikidata) или ``None``: момент P585,
+     иначе начало и конец P580/P582 (оба). Неразбираемое значение — нет даты."""
+-    point = _time(record.best(POINT_IN_TIME))
++    point = None
+     if point is not None:
+         raw = {"start": point[0], "start_precision": point[1]}
+     else:

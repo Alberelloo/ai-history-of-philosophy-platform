@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -209,7 +209,7 @@
+ 
+ 
+ def _starts_with_particle(word: str, particles: frozenset[str]) -> bool:
+-    lowered = word.lower()
++    lowered = word
+     if lowered in particles:
+         return True
+     return any(

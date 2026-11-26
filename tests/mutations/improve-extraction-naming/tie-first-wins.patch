@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -183,7 +183,7 @@
+         return None
+     top = max(counts.values())
+     leaders = [s for s, n in counts.items() if n == top]
+-    return leaders[0] if len(leaders) == 1 else None
++    return leaders[0]
+ 
+ 
+ def lang_for(text: str, given: str | None = None) -> str:

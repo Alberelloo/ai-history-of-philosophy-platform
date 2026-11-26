@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -379,7 +379,7 @@
+                 reject(PLACE, *bad)
+                 self._skip(report, entity_id, prop, "refused")
+                 return
+-        if place_id is None and not report.dry_run:
++        if place_id is None:
+             place_id = self.entities.create(PLACE, _names(place_record), external={SYSTEM: target})
+             # Пометка в происхождении: при откате место остаётся, и его можно посчитать.
+             source = self._source(record.qid, prop, report.run_id, created_place=place_id)

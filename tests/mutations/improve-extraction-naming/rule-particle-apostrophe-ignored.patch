@@ -1,0 +1,13 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -212,9 +212,7 @@
+     lowered = word.lower()
+     if lowered in particles:
+         return True
+-    return any(
+-        lowered[: len(p)] == p and lowered[len(p) : len(p) + 1] in _APOSTROPHES for p in particles
+-    )
++    return False
+ 
+ 
+ def _not_a_name(label: str, rules: Rules) -> bool:

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -313,7 +313,7 @@
+                     entity_id, type_, obj=obj, value=value, qualifiers=qualifiers, **source
+                 )
+         except StatementError:
+-            raise Skip("refused") from None
++            raise Skip("bad_value") from None
+         return True
+ 
+     def _coordinates(

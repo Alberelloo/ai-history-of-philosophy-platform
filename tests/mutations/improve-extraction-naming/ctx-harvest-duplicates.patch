@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -291,7 +291,7 @@
+         except FETCH_ERRORS:
+             continue  # эпоха без записи — кандидатов нет; ``checked`` пишет только ``apply``
+         for qid in epoch.items(SIGNIFICANT_EVENT):
+-            if qid in known:
++            if False:
+                 continue  # решение и поля человека не трогаются
+             try:
+                 record = fetch_entity(qid, fetch)

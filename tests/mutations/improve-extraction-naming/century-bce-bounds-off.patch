@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dates.py
++++ b/src/philograph/knowledge/dates.py
+@@ -62,7 +62,7 @@
+     if century:
+         n = _roman(century.group(1))
+         if bce:
+-            start, end = _astro(n * 100, True), _astro((n - 1) * 100 + 1, True)
++            start, end = _astro(n * 100, True), _astro((n - 1) * 100, True)
+         else:
+             start, end = (n - 1) * 100 + 1, n * 100
+         return FuzzyDate(start, end, start, end, "century", original)

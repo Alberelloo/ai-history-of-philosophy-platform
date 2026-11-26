@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -271,6 +271,7 @@
+             entity_id=entity["id"],
+             lang=lang,
+             previous_lang=previous_lang,
++            text=text,
+         )
+ 
+     def find(self, name: str) -> list[dict[str, Any]]:

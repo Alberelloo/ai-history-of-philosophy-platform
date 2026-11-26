@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -183,6 +183,7 @@
+         item["object_type"] = {"enum": types}
+         item["proposed_type"] = {"type": "string"}
+         schema["properties"]["entities"] = _entities_schema(types)  # необязательный массив
++        schema["required"] = [*schema["required"], "entities"]
+         return schema
+ 
+     def fragments(

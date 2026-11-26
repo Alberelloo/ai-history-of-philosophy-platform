@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -583,7 +583,7 @@
+                 "original": {"type": "object", "properties": {"lang": text, "text": text}},
+                 "dating": {
+                     "type": "object",
+-                    "required": ["text", "paragraph", "quote"],
++                    "required": ["text"],
+                     "properties": {"text": text, "paragraph": {"type": "integer"}, "quote": text},
+                 },
+             },

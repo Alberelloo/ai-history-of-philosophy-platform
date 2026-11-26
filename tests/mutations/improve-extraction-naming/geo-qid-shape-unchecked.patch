@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -232,7 +232,7 @@
+         found = [
+             (entity_id, qid, kind)
+             for entity_id, qid in sorted(linked.items())
+-            if QID.fullmatch(qid) and (kind := self._kind(kinds.get(entity_id, "")))
++            if (kind := self._kind(kinds.get(entity_id, "")))
+         ]
+         return found[:limit] if limit is not None else found
+ 

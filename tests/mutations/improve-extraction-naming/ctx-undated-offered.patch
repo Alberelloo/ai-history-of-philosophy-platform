@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_context.py
++++ b/src/philograph/knowledge/epoch_context.py
+@@ -233,7 +233,7 @@
+ def _candidate(record: WikidataRecord, fetch: Fetch) -> dict[str, Any] | None:
+     dates = raw_dates(record)
+     if dates is None:
+-        return None
++        dates = {}
+     classes = record.items(INSTANCE_OF)
+     places = record.items(LOCATION)
+     place = None

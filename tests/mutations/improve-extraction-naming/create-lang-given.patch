@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -92,7 +92,7 @@
+         сохраняется, только если совпадает с ней. Основное название проверяется правилом
+         названий; отказ — событие ``knowledge.entity.rejected`` и ``InvalidName``."""
+         self.registry.entity_type(type_)
+-        names = [(lang_for(text, lang), text, kind) for lang, text, kind in names]
++        names = list(names)
+         for _, text, kind in names:
+             if kind == "primary":
+                 self._check(type_, text)

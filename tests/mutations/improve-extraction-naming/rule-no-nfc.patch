@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/naming.py
++++ b/src/philograph/knowledge/naming.py
+@@ -243,7 +243,7 @@
+     rules = rules or load_rules()
+     if type_ in rules.exempt:
+         return None
+-    label = unicodedata.normalize("NFC", label.strip())
++    label = label.strip()
+     has_letter = any(unicodedata.category(ch).startswith("L") for ch in label)
+     has_digit = any(ch.isdigit() for ch in label)
+     if not has_letter and not has_digit:

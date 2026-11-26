@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -250,7 +250,7 @@
+                 conn.execute(
+                     update(t.names)
+                     .where(t.names.c.id == row["id"])
+-                    .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
++                    .values(kind="primary", lang=lang_for(row["text"], row["lang"]))
+                 )
+             same = next((r for r in rows if r["normalized"] == key), None)
+             if same is not None:

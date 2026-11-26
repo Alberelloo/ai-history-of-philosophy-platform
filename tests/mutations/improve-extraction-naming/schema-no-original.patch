@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/filling.py
++++ b/src/philograph/knowledge/filling.py
+@@ -580,7 +580,6 @@
+                 "type": {"enum": types},
+                 "ru": text,
+                 "en": text,
+-                "original": {"type": "object", "properties": {"lang": text, "text": text}},
+                 "dating": {
+                     "type": "object",
+                     "required": ["text", "paragraph", "quote"],

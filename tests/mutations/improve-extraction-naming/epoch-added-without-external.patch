@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/epoch_dates.py
++++ b/src/philograph/knowledge/epoch_dates.py
+@@ -377,7 +377,7 @@
+             return {**item, "result": "unchanged" if same else "conflict"}
+         if not dry_run:
+             try:
+-                self.entities.add_external(epoch_id, SYSTEM, qid)
++                pass
+             except DuplicateEntity:
+                 return {**item, "result": "duplicate_qid"}
+             self._write(epoch_id, qid, dating, props)

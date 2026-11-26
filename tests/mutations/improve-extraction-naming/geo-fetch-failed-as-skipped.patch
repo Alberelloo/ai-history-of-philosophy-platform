@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/geo_enrich.py
++++ b/src/philograph/knowledge/geo_enrich.py
+@@ -269,7 +269,7 @@
+         return cache[qid]
+ 
+     def _skip(self, report: Report, entity_id: str, prop: str, reason: str) -> None:
+-        if reason == "fetch_failed":
++        if False:
+             report.failed += 1
+         else:
+             report.skipped += 1
