@@ -316,7 +316,7 @@ def test_replace_leaves_other_runs_alone(stand, tmp_path, events):
 @req(
     EO,
     EXTERNAL,
-    invariant="С --replace без прежнего запуска, а также после failed/rolled_back — обычная запись",
+    invariant="Без прежнего — запись; после failed без --replace — код 2",
 )
 def test_replace_without_previous_and_failed_previous(stand, tmp_path, events):
     vid, _ids = stand.version(TEXTS)
@@ -324,13 +324,17 @@ def test_replace_without_previous_and_failed_previous(stand, tmp_path, events):
     argv = ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
     assert cli(stand, [*argv, "--replace"]) == 0  # прежнего нет
     assert len(stand.statements()) == 1
-    # прежний запуск неудачен: повтор без --replace разрешён (блокирует только завершённый)
+    # прежний запуск неудачен: по новой формулировке повтор без --replace блокируется любым
+    # неоткатанным внешним запуском (done/failed/running)
     row = one_run(stand)
     with stand.onto.statements.engine.begin() as conn:
         conn.execute(t.filling_runs.update().values(status="failed"))
-    assert cli(stand, argv) == 0
-    assert sorted(r["status"] for r in runs(stand)) == ["done", "failed"]
-    assert row["status"] == "done"
+    before = [table_count(stand, tb) for tb in (t.statements, t.evidence, t.attributions)]
+    assert cli(stand, argv) == 2
+    assert [r["status"] for r in runs(stand)] == ["failed"] and row["status"] == "done"
+    assert [table_count(stand, tb) for tb in (t.statements, t.evidence, t.attributions)] == before
+    assert cli(stand, [*argv, "--replace"]) == 0
+    assert sorted(r["status"] for r in runs(stand)) == ["done", "rolled_back"]
 
 
 @req(EO, EXTERNAL, invariant="Ответ с номером вне фрагментов игнорируется с событием reply_invalid")
