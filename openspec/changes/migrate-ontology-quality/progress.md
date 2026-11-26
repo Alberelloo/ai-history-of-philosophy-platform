@@ -268,3 +268,8 @@
 
 - `ontology_migrate`, `quality_report`, `life_dates`: при запуске командой (`python -m …`, блок `__main__`) журнал подключается к stderr — `events.configure(sinks=[events.json_sink(sys.stderr)])`, stderr переводится в UTF-8. Подключение не в теле `main()`: `configure` заменяет список приёмников, и вызов `main()` из тестов снял бы приёмник фикстуры `events`. Так прямые вызовы `main()` пишут события в журнал фикстуры, а команда — в stderr.
 - Проверено подпроцессом на SQLite-базе: `quality_report --json` — stdout разбирается как JSON, в stderr строки событий, среди них `knowledge.quality.measured`; `life_dates rollback` — в stderr `knowledge.life_dates.rolled_back` и `knowledge.run.rolled_back`, stdout — JSON сводки.
+
+## Ведущий — итог и PR (2026-11-26)
+
+- Четвёртый судья: «принято» (d0d0bc8). База `origin/claude/embedding-docker` влита (09087b9), конфликтов нет. Итоговое соответствие «требование → тест» в verification.md всех четырёх изменений — e1076de.
+- Архив не делается, пока владелец не решит по improve-extraction-naming и improve-person-quality (предел кругов, варианты А/Б/В). Причина: migrate-ontology-quality и add-wikidata-life-dates опираются на возможности `entity-naming`, `entity-dating` и `person-quality` из этих изменений, а частичный перенос в `openspec/specs` дал бы несогласованные спецификации. Архив и синхронизацию всех четырёх изменений делаю одним шагом после решения.
