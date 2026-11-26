@@ -890,3 +890,10 @@
 | Язык названий сущностей | names-for-stops-after-rejected | tests/knowledge/test_entity_naming.py::test_primary_choice_by_item | да (1 failed, 4 passed, 1 warning in 0.42s) |
 
 (Первый прогон `reject-label-raw` до замены ожидания: test_rejection_invariant и test_rejected_label_is_name_after_strip — НЕТ, см. выше.)
+
+## Тестировщик — патчи сняты заново после 0b8b44e (`set_primary_name(conn=)`), 2026-11-26
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Валидность названий сущностей | set-primary-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 1.45s) |
+| Валидность названий сущностей | stored-raw-set-primary | tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed, 1 warning in 1.01s) |

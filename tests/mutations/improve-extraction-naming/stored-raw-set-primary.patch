@@ -1,9 +1,11 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 3d85e65..5d4abfa 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -238,7 +238,6 @@
-         """Новое основное название той же сущности: прежние основные становятся вариантами
-         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
-         Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+@@ -244,7 +244,6 @@ class Entities:
+ 
+         ``conn`` — транзакция вызывающего (запись вместе с журналом действий запуска); без неё
+         — своя транзакция."""
 -        text = clean(text)
          entity = self.get(entity_id)
          self._check(entity["type"], text)

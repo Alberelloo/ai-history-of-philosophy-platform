@@ -1,12 +1,12 @@
 diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
-index 907644d..718f211 100644
+index 3d85e65..252fbd8 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -240,7 +240,6 @@ class Entities:
-         Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+@@ -246,7 +246,6 @@ class Entities:
+         — своя транзакция."""
          text = clean(text)
          entity = self.get(entity_id)
 -        self._check(entity["type"], text)
          lang = lang_for(text, lang)
          key = normalize(text)
-         with self.engine.begin() as conn:
+         with nullcontext(conn) if conn is not None else self.engine.begin() as conn:
