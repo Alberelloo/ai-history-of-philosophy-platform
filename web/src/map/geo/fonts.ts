@@ -8,7 +8,10 @@ import { mapFonts } from "../layout";
 export const NAME_FONT = mapFonts(false).workTitle;
 export const COUNTRY_FONT = "500 10.5px Onest, Arial, sans-serif";
 export const COUNTRY_FILL_FONT = "500 9px Onest, Arial, sans-serif"; // добор: не мельче 9 px
-export const GLOBE_FONTS = [NAME_FONT, COUNTRY_FONT, COUNTRY_FILL_FONT];
+// Курсив подписей образований без русского названия (add-historical-polities).
+export const COUNTRY_ITALIC_FONT = `italic ${COUNTRY_FONT}`;
+export const COUNTRY_FILL_ITALIC_FONT = `italic ${COUNTRY_FILL_FONT}`;
+export const GLOBE_FONTS = [NAME_FONT, COUNTRY_FONT, COUNTRY_FILL_FONT, COUNTRY_ITALIC_FONT, COUNTRY_FILL_ITALIC_FONT];
 
 // Ошибки загрузки не роняют глобус: раскладка остаётся по запасному шрифту.
 export async function loadGlobeFonts(): Promise<void> {

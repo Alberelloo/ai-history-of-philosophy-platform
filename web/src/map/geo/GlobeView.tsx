@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { useT } from "../../i18n";
 import { monogram } from "../../ui";
 import type { Measure } from "../layout";
-import { COUNTRY_FILL_FONT, COUNTRY_FONT, NAME_FONT } from "./fonts";
+import { COUNTRY_FILL_FONT, COUNTRY_FILL_ITALIC_FONT, COUNTRY_FONT, COUNTRY_ITALIC_FONT, NAME_FONT } from "./fonts";
 import type { GeoLayer } from "./api";
 import { arcBetween } from "./arcs";
 import { countryName, countryOf } from "./countries";
@@ -15,6 +15,7 @@ import {
   EVENT_MARK,
   frameLayout,
   COUNTRY_MIN_LABELS,
+  type CountryInput,
   type CountryLabel,
   type Layout,
   type Frame as LFrame,
@@ -48,6 +49,7 @@ import {
 } from "./projection";
 import type { GlobeRoles } from "./selection";
 import { opacity, type Scene, type ScenePlace } from "./timeline";
+import { labelInputs, PolityStore, type PolityLayer, type PolityState } from "./polities";
 import { BORDERS, COUNTRIES, COUNTRY_COUNT, LAND } from "./world";
 
 // Вид «Глобус» карты раздела (openspec/changes/rework-globe-political-map): ортографическая
@@ -118,10 +120,41 @@ function fontMetrics(font: string, version: number): Metrics {
 }
 
 const COUNTRY_FONTS = [COUNTRY_FONT, COUNTRY_FILL_FONT];
-const COUNTRY_INPUT = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
+const ITALIC_FONTS = [COUNTRY_ITALIC_FONT, COUNTRY_FILL_ITALIC_FONT];
+const COUNTRY_INPUT: CountryInput[] = COUNTRIES.filter((c) => c.id && countryName(c.id)).map((c) => ({ id: c.id!, name: countryName(c.id)!, feature: c.feature }));
+
+// Кольца образований слоя (для data-borders: видимые — хотя бы одна вершина ближе 90°).
+const ringsCache = new WeakMap<PolityLayer, [number, number][][]>();
+function ringsOf(layer: PolityLayer): [number, number][][] {
+  let out = ringsCache.get(layer);
+  if (!out) {
+    out = [];
+    for (const p of layer.polities) {
+      const polys = p.geometry.type === "Polygon" ? [p.geometry.coordinates] : p.geometry.coordinates;
+      for (const poly of polys) for (const ring of poly) out.push(ring as [number, number][]);
+    }
+    ringsCache.set(layer, out);
+  }
+  return out;
+}
+
+// Слой образований на год глобуса: хранилище живёт столько же, сколько вид «Глобус».
+function usePolities(year: number): PolityState {
+  const store = useMemo(() => new PolityStore(), []);
+  const [state, setState] = useState<PolityState>(store.state);
+  useEffect(() => {
+    const off = store.subscribe(setState);
+    return () => {
+      off();
+      store.dispose();
+    };
+  }, [store]);
+  useEffect(() => store.request(year), [store, year]);
+  return state;
+}
 
 // --- раскладка покоя: чистые шаги (кадр, исходный вид) ---
-type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[] };
+type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[]; labels: CountryInput[] };
 
 function anchorsAt(projection: (p: [number, number]) => [number, number] | null, view: View, places: ScenePlace[], width: number, height: number): LPlace[] {
   return places.map((p) => {
@@ -150,14 +183,8 @@ function countriesAt(view: View, lf: LFrame, grid: Layout["grid"], r: RestInput)
     [0, 0],
     [r.width, r.height],
   ]);
-  return layoutCountries(
-    COUNTRY_INPUT,
-    cp.path,
-    cp.projection,
-    lf,
-    grid,
-    COUNTRY_FONTS.map((font) => ({ font, measure: (text: string) => r.measure(text, font), metrics: fontMetrics(font, r.fv) })),
-  );
+  const fontsOf = (list: string[]) => list.map((font) => ({ font, measure: (text: string) => r.measure(text, font), metrics: fontMetrics(font, r.fv) }));
+  return layoutCountries(r.labels, cp.path, cp.projection, lf, grid, fontsOf(COUNTRY_FONTS), fontsOf(ITALIC_FONTS));
 }
 
 // Исходный вид: homeView (все точки привязки в кадре), затем, пока подписей стран меньше
@@ -202,7 +229,11 @@ export default function GlobeView(props: Props) {
     setOverlays((old) => (old && JSON.stringify(old) === JSON.stringify(next) ? old : next));
   });
   const obstacles = useMemo(() => overlays ?? [], [overlays]);
-  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
+  // Исторический режим — когда нарисован слой образований года; иначе современная карта.
+  const polity = usePolities(props.year);
+  const historical = polity.mode === "historical" && polity.layer ? polity.layer : null;
+  const labels = historical ? labelInputs(historical) : COUNTRY_INPUT;
+  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels };
 
   // Исходный вид — из мест первого показа слоя (после загрузки шрифтов: от них зависят
   // подписи стран, а значит и приближение); «0» возвращает к нему для года T и размера сейчас.
@@ -385,7 +416,7 @@ export default function GlobeView(props: Props) {
   const places = useMemo(() => scene?.places ?? [], [scene]);
   const rest = useRef<RestLayout | null>(null);
   const { anchors, lay, countries } = useMemo(() => {
-    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles };
+    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels };
     const anchors = anchorsAt(pr.projection, view, places, width, height);
     const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
     const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r), obstacles);
@@ -395,7 +426,7 @@ export default function GlobeView(props: Props) {
     return { anchors, lay, countries: countriesAt(view, lf, lay.grid, r) };
     // fontsVersion: шрифты загрузились — ширины подписей меряются заново.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion, obstacles]);
+  }, [places, pr, view, frame, width, height, moving, scene, nameOf, measure, props.fontsVersion, obstacles, labels]);
   const anchorOf = new Map(anchors.map((a) => [a.id, a]));
   const slotOf = new Map<string, PersonSlot>(lay.persons.map((s) => [s.id, s]));
   const personOf = new Map((scene?.persons ?? []).map((p) => [p.id, p]));
@@ -495,7 +526,8 @@ export default function GlobeView(props: Props) {
     ctx.fillStyle = color("--globe-land");
     ctx.fill();
     ctx.beginPath();
-    path(BORDERS);
+    if (historical) for (const p of historical.polities) path(p.geometry);
+    else path(BORDERS);
     ctx.strokeStyle = color("--globe-border");
     ctx.lineWidth = 0.6;
     ctx.lineJoin = "round";
@@ -507,11 +539,22 @@ export default function GlobeView(props: Props) {
     ctx.stroke();
     // Линии границ на видимом полушарии: хотя бы одна вершина ближе 90° к центру.
     const v = { lon: -pr.projection.rotate()[0], lat: -pr.projection.rotate()[1], zoom: 1 };
-    const seen = BORDERS.coordinates.filter((line) => line.some(([lon, lat]) => isNear(v, { lon, lat }))).length;
+    const lines = historical ? ringsOf(historical) : BORDERS.coordinates;
+    const seen = lines.filter((line) => line.some(([lon, lat]) => isNear(v, { lon, lat }))).length;
     c.dataset.borders = String(seen);
     c.dataset.countries = String(COUNTRY_COUNT);
+    c.dataset.mapMode = historical ? "historical" : "modern";
+    if (historical) {
+      c.dataset.polityFrom = String(historical.valid_from);
+      c.dataset.polityTo = String(historical.valid_to);
+      c.dataset.polities = String(historical.polities.length);
+    } else {
+      delete c.dataset.polityFrom;
+      delete c.dataset.polityTo;
+      delete c.dataset.polities;
+    }
     c.dataset.drawn = "true";
-  }, [pr, frame, width, height]);
+  }, [pr, frame, width, height, historical]);
 
   const sphere = pr.path({ type: "Sphere" }) ?? "";
   const links = scene?.links ?? [];
@@ -521,7 +564,8 @@ export default function GlobeView(props: Props) {
       : null;
   const dim = roles.active;
   const busy = status === "loading";
-  const ready = !busy && (status !== "ok" || (props.fontsVersion > 0 && overlays !== null)); // слой разложен по шрифтам и препятствиям
+  // слой разложен по шрифтам и препятствиям; первый ответ слоя образований получен
+  const ready = !busy && polity.mode !== "pending" && (status !== "ok" || (props.fontsVersion > 0 && overlays !== null));
   const empty = status === "ok" && (layer?.places.length ?? 0) === 0;
   const nobody = status === "ok" && !empty && places.length === 0;
 
@@ -592,11 +636,30 @@ export default function GlobeView(props: Props) {
         </defs>
         <path className="geo-shade" d={sphere} aria-hidden="true" />
         <g className="geo-countries" aria-hidden="true">
-          {countries.map((c) => (
-            <text key={c.id} className={dim ? "geo-country is-dim" : "geo-country"} data-geo-country={c.id} data-area={c.area} data-span={c.span} x={c.x} y={c.y} textAnchor="middle" data-fill={c.fill ? "true" : undefined} style={{ font: COUNTRY_FONTS[c.font] }}>
-              {c.text}
-            </text>
-          ))}
+          {countries.map((c) =>
+            historical ? (
+              <text
+                key={c.id}
+                className={dim ? "geo-country geo-polity is-dim" : "geo-country geo-polity"}
+                data-geo-polity={c.id}
+                data-name-status={c.italic ? "original" : "ru"}
+                data-area={c.area}
+                data-span={c.span}
+                x={c.x}
+                y={c.y}
+                textAnchor="middle"
+                data-fill={c.fill ? "true" : undefined}
+                style={{ font: (c.italic ? ITALIC_FONTS : COUNTRY_FONTS)[c.font] }}
+              >
+                {c.italic && <title>{t.geo.untranslated(c.text)}</title>}
+                {c.text}
+              </text>
+            ) : (
+              <text key={c.id} className={dim ? "geo-country is-dim" : "geo-country"} data-geo-country={c.id} data-area={c.area} data-span={c.span} x={c.x} y={c.y} textAnchor="middle" data-fill={c.fill ? "true" : undefined} style={{ font: COUNTRY_FONTS[c.font] }}>
+                {c.text}
+              </text>
+            ),
+          )}
         </g>
         <g className="geo-links" aria-hidden="true">
           {trail && <path className="geo-trail map-role-self" d={trail} />}
@@ -767,9 +830,38 @@ export default function GlobeView(props: Props) {
           {tip.text}
         </div>
       )}
-      <p className="geo-coast" data-geo-overlay="coast">
-        {t.geo.coast}
-      </p>
+      {historical ? (
+        <div className="geo-coast geo-coast--historical" data-geo-overlay="coast" data-geo-source="historical">
+          <p>
+            {t.geo.historicalBorders}{" "}
+            {historical.source.url ? (
+              <a href={historical.source.url} target="_blank" rel="noopener noreferrer">
+                {historical.source.title}
+              </a>
+            ) : (
+              historical.source.title
+            )}{" "}
+            ({historical.source.publisher}): {historical.source.authors.join(", ")}, {historical.source.version},{" "}
+            {historical.source.license_url ? (
+              <a href={historical.source.license_url} target="_blank" rel="noopener noreferrer">
+                {historical.source.license}
+              </a>
+            ) : (
+              historical.source.license
+            )}
+          </p>
+          <p>{t.geo.historicalNote}</p>
+        </div>
+      ) : (
+        <p className="geo-coast" data-geo-overlay="coast" data-geo-source="modern">
+          {t.geo.coast}
+        </p>
+      )}
+      {polity.error && (
+        <p className="geo-polities-note" data-geo-overlay="polities-note" data-geo-polities-note="" role="status">
+          {t.geo.politiesError}
+        </p>
+      )}
       <div className="geo-keys">
         <button type="button" className="pg-btn pg-btn--ghost pg-btn--sm" aria-expanded={keysOpen} aria-controls="geo-keys-hint" data-geo-overlay="keys" onClick={() => setKeysOpen((o) => !o)}>
           {t.geo.keys}

@@ -385,8 +385,10 @@ export function markerOf(l: Layout, index: Map<string, PersonSlot>, id: string):
 
 // --- подписи стран ---
 
-export type CountryInput = { id: string; name: string; feature: Feature<Polygon | MultiPolygon> };
-export type CountryLabel = { id: string; text: string; x: number; y: number; area: number; span: number; rect: Rect; font: number; fill: boolean };
+// italic — подпись образования без русского названия (add-historical-polities): меряется и
+// рисуется курсивным начертанием (italicFonts), правило раскладки то же.
+export type CountryInput = { id: string; name: string; feature: Feature<Polygon | MultiPolygon>; italic?: boolean };
+export type CountryLabel = { id: string; text: string; x: number; y: number; area: number; span: number; rect: Rect; font: number; fill: boolean; italic: boolean };
 
 // Геометрия страны для отсева (один раз на страну): многоугольники, сферический центр и
 // угловой радиус (наибольшее расстояние от центра до вершины).
@@ -430,6 +432,7 @@ export function layoutCountries(
   f: Frame,
   grid: Grid,
   fonts: CountryFont[],
+  italicFonts: CountryFont[] = fonts,
 ): CountryLabel[] {
   const rot = projection.rotate();
   const center: [number, number] = [-rot[0], -rot[1]];
@@ -511,7 +514,8 @@ export function layoutCountries(
     return (k.pts = [[k.x, k.y], ...grid.slice(0, COUNTRY_TRIES).map(([gx, gy]) => [gx, gy] as [number, number])]);
   };
   const place = (k: CountryCand, fi: number, fill: boolean): boolean => {
-    const { measure, metrics: m } = fonts[fi];
+    const italic = !!k.c.italic;
+    const { measure, metrics: m } = (italic ? italicFonts : fonts)[fi];
     const tw = measure(k.c.name);
     if (tw + 2 * LABEL_PAD > k.span) return false; // прямоугольник подписи не шире видимой части
     for (const [px, py] of pointsOf(k)) {
@@ -519,7 +523,7 @@ export function layoutCountries(
       const rect: Rect = { kind: "rect", x0: px - tw / 2 - LABEL_PAD, y0: base - m.ascent - LABEL_PAD, x1: px + tw / 2 + LABEL_PAD, y1: base + m.descent + LABEL_PAD };
       if (!inFrame(f, rect) || grid.hits(rect) || !within(k, px, py)) continue;
       grid.add(rect);
-      out.push({ id: k.c.id, text: k.c.name, x: round2(px), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect, font: fi, fill });
+      out.push({ id: k.c.id, text: k.c.name, x: round2(px), y: round2(base), area: Math.round(k.area), span: Math.round(k.span), rect, font: fi, fill, italic });
       return true;
     }
     return false;

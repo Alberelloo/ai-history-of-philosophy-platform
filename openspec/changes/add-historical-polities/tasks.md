@@ -45,16 +45,16 @@
 
 ## 4. Клиент (разработчик)
 
-- [ ] 4.1 `web/src/map/geo/polities.ts`: `fetchPolities(year)`; кэш слоёв по интервалам (≤ `POLITY_CACHE` = 16); не больше одного запроса одновременно; ответ, не покрывающий текущий год, не рисуется; 503 → `unavailable`, прочие ошибки → `error` (значение, не исключение). Юнит-тесты `web/unit/geo/`
-- [ ] 4.2 `GlobeView.tsx`: режим карты (`data-map-mode`), обводка образований на canvas суши вместо `BORDERS`, `data-polity-from`/`-to`, `data-polities`, `data-borders` по кольцам; подписи `[data-geo-polity]` той же раскладкой `layout.ts` (вход `{id, name, feature}` из слоя), `data-name-status`, курсив и `<title>` у `original`; пустой слой без подстановки современных границ; `aria-busy` до первого ответа `/map/polities`; пометка `[data-geo-polities-note]`
-- [ ] 4.3 `MapPage.tsx` и `playback.ts` (если нужно): год глобуса → `polities.ts`; хронология `/map/polities` не запрашивает
-- [ ] 4.4 Подпись источника `[data-geo-source]` из блока `source` ответа; `i18n` (раздел `geo`, RU и EN): «Исторические границы — …», «Границы приблизительны: одна из версий», «Береговая линия и страны мест — современные, Natural Earth», «курсив — без русского названия», пометка об ошибке; `map-geo.css` без литералов цвета
-- [ ] 4.5 `npm run build`; вес фрагмента глобуса gzip -9 до и после — в `progress.md` (предел 150 КБ без ответов `/map/polities`); в `web/dist` нет строки версии датасета
+- [x] 4.1 `web/src/map/geo/polities.ts`: `fetchPolities(year)`; кэш слоёв по интервалам (≤ `POLITY_CACHE` = 16); не больше одного запроса одновременно; ответ, не покрывающий текущий год, не рисуется; 503 → `unavailable`, прочие ошибки → `error` (значение, не исключение). Юнит-тесты `web/unit/geo/`
+- [x] 4.2 `GlobeView.tsx`: режим карты (`data-map-mode`), обводка образований на canvas суши вместо `BORDERS`, `data-polity-from`/`-to`, `data-polities`, `data-borders` по кольцам; подписи `[data-geo-polity]` той же раскладкой `layout.ts` (вход `{id, name, feature}` из слоя), `data-name-status`, курсив и `<title>` у `original`; пустой слой без подстановки современных границ; `aria-busy` до первого ответа `/map/polities`; пометка `[data-geo-polities-note]`
+- [x] 4.3 `MapPage.tsx` и `playback.ts` (если нужно): год глобуса → `polities.ts`; хронология `/map/polities` не запрашивает
+- [x] 4.4 Подпись источника `[data-geo-source]` из блока `source` ответа; `i18n` (раздел `geo`, RU и EN): «Исторические границы — …», «Границы приблизительны: одна из версий», «Береговая линия и страны мест — современные, Natural Earth», «курсив — без русского названия», пометка об ошибке; `map-geo.css` без литералов цвета
+- [x] 4.5 `npm run build`; вес фрагмента глобуса gzip -9 до и после — в `progress.md` (предел 150 КБ без ответов `/map/polities`); в `web/dist` нет строки версии датасета
 
 ## 5. Документы (разработчик)
 
-- [ ] 5.1 `docs/product/system-design.md`: источник исторических границ (Cliopatria, авторы, версия, CC BY 4.0, DOI), шаг сборки вне git, как собрать артефакт (`fetch`, `build`, `measure`), `PHILOGRAPH_POLITIES_DB`, запасной режим
-- [ ] 5.2 `docs/design/features/geo-timeline-options.md`: раздел «Исторические границы» — ссылка на design.md этого изменения, без копии решений
+- [x] 5.1 `docs/product/system-design.md`: источник исторических границ (Cliopatria, авторы, версия, CC BY 4.0, DOI), шаг сборки вне git, как собрать артефакт (`fetch`, `build`, `measure`), `PHILOGRAPH_POLITIES_DB`, запасной режим
+- [x] 5.2 `docs/design/features/geo-timeline-options.md`: раздел «Исторические границы» — ссылка на design.md этого изменения, без копии решений
 
 ## 6. Тесты по спецификации (тестировщик)
 
@@ -83,7 +83,7 @@
 
 ## 9. Развёртывание
 
-- [ ] 9.1 Инструкция оператора (в `docs/product/system-design.md`, 5.1): как получить артефакт на сервере, где он лежит, как проверить (`measure`), что без него — запасной режим
+- [x] 9.1 Инструкция оператора (в `docs/product/system-design.md`, 5.1): как получить артефакт на сервере, где он лежит, как проверить (`measure`), что без него — запасной режим
 - [ ] 9.2 Подключение тома `data/cliopatria` и `PHILOGRAPH_POLITIES_DB` в `compose.yaml` — не в этом изменении: отдельный PR с согласия Lead'а. В `progress.md` — запись о передаче
 
 ## 10. Перед передачей судье (разработчик)

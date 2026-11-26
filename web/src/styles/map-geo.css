@@ -306,6 +306,36 @@
   pointer-events: none;
 }
 
+/* Исторический режим (add-historical-polities): подпись источника в две строки со ссылками. */
+.geo-coast--historical {
+  max-width: min(34rem, 62%);
+  line-height: 1.25;
+  pointer-events: auto;
+}
+
+.geo-coast--historical p {
+  margin: 0;
+}
+
+.geo-coast--historical a {
+  color: inherit;
+}
+
+.geo-polity[data-name-status="original"] {
+  font-style: italic;
+}
+
+.geo-polities-note {
+  position: absolute;
+  top: 2.25rem;
+  left: 0.25rem;
+  max-width: 18rem;
+  margin: 0;
+  color: var(--m-ink-2);
+  font: 400 0.75rem var(--font-read);
+  pointer-events: none;
+}
+
 .geo-keys {
   position: absolute;
   top: 0.25rem;
