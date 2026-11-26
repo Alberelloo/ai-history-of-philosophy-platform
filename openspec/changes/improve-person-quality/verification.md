@@ -436,3 +436,102 @@
    - исправленные строки аудита.
 
 Разработчику возвращать нечего.
+
+## Тестировщик — возврат судьи повторно (О25), 2026-11-26, тесты на 0f07c24
+
+Закрыты 4 пункта вердикта ee206fa, а также пройдены все MODIFIED-требования `ontology-entities`. Для каждого следствия («переносится», «пересчитывается», «возвращается») — своя проверка и мутация.
+
+1. **«Согласие пересчитывается».**
+   - В `S.ontology_with_duplicates`:
+     - позиции атрибуций — ровно из спецификации `ontology-statements` «Атрибуция»: `asserts`/`disputes`/`mentions`. Прежнее `supports` не позиция спецификации, оно заменено;
+     - до 5 атрибуций; 3 источника и персоны как независимые авторы;
+     - новый блок: утверждения третьих лиц с авторами K и R и добавками `asserts s_a + disputes s_b` / `asserts s_a` / `disputes s_c`.
+   - В `test_preservation_and_undo` два независимых оракула:
+     - (а) сценарий «Спорное»: если у оставшегося утверждения независимых «утверждает» 2 и «оспаривает» 1, то `consensus == "disputed"`;
+     - (б) после отмены то же множество атрибуций записывается у новой сущности «Эталон согласия» и даёт то же согласие, что у оставшегося после слияния.
+   - `@example`:
+     - `FOLD_DISPUTED` — свёртка: K: s_a, s_c «утверждает»; R: s_b «оспаривает»;
+     - `WHO_COLLAPSE` — авторы K, R, s_a «утверждает», s_b «оспаривает»: 3:1 ⇒ после переноса 2:1.
+2. **«Копия основных значений оставшейся пересчитывается».**
+   - Генератор даёт `lifespan` (чаще у удалённой) и `description`.
+   - Проверка: `primary.dates` и `primary.description` оставшейся равны значению одного из её действующих утверждений этого типа. Если таких утверждений нет, ключа нет.
+   - `@example(PRIMARY_FROM_REMOVED)`: годы жизни и описание только у удалённой, QID у оставшейся. Маркер `req` есть.
+3. **«Даты противоречат».**
+   - Новый вид лица `dates_any` и стратегия `S.life_bounds`:
+     - независимые несимметричные сдвиги начала и конца ±12;
+     - ширина интервала неопределённости 0/1/3/5/9/99 («ок.», десятилетие, век);
+     - вторая сторона может быть без дат.
+   - Ожидание считает `S.dates_conflict_spec` по формуле спецификации (допуск 2) и не импортирует `dedupe`.
+   - `@example(DATE_INTERVALS)` в обоих property-тестах. Случаи:
+     - расходится только начало; расходится только конец;
+     - зазор начала 4 / 5 при интервале; зазор конца 4 / 5 при интервале;
+     - даты у одной стороны.
+   - В `test_strategies_cover_spec_sets.py`:
+     - `test_person_date_shapes_generated` — 7 форм; при каждой находке сверяет ожидание лица с допуском 2;
+     - `test_person_date_one_side_generated` — проверяет `DATE_SLACK_SPEC == 2`.
+4. **`test_person_scenario_codes`** перенесён в `test_person_quality.py` и проверяет поведение, маркер `req` есть:
+   - `apart:type/qid/decided/none` — через `dedupe.same_person` на входах шагов 1, 2, 3, 9 (шаг 2 вместе с решением «разные», шаг 1 вместе с парой модели);
+   - `merge:review` — `resolve_duplicate`, событие `merged` с `reason`;
+   - `review:qid_candidate` — `LifeDates.suggest` и `Dedupe.run`;
+   - `review:qid_taken` — `LifeDates.apply` с `auto`: `merge_proposed`, нет `merged`, обе сущности на месте.
+   - Новый `test_person_codes_partition`: сгенерированные коды ∪ коды поведения = множества `merge:*` (4), `review:*` (7), `apart:*` (4) из спецификации; пересечения нет.
+
+**Проход MODIFIED `ontology-entities`.** Найдены и закрыты мутациями следствия без своей мутации:
+- свёртка переносит атрибуции и подтверждения: `fold-attributions-dropped`, `fold-evidence-dropped`;
+- id свёрнутого отдаёт оставшееся: `fold-redirect-missing` (раньше закрывал только `key-not-recomputed`);
+- петля остаётся в базе: `loop-deleted`;
+- отмена возвращает свёрнутые утверждения: `undo-fold-not-restored`;
+- отмена возвращает подтверждения: `undo-evidence-not-restored`;
+- отмена пересчитывает согласие и копии основных значений обеих сторон: `undo-consensus-stale`, `undo-primary-stale`.
+
+Прочие следствия уже имели мутации (таблица аудита О21, строки дополнены).
+
+### Сырые прогоны (SQLite, по одному pytest)
+
+- `pytest tests/knowledge/test_person_quality.py tests/knowledge/test_entity_merge.py` — 68 passed in 71.68s
+- `pytest tests/knowledge/test_strategies_cover_spec_sets.py -k person` — 17 passed, 82 deselected in 25.94s
+- `ruff check tests/knowledge/` — чисто; `ruff format --check` по 4 файлам — чисто; `check_traceability.py` — 415 из 415; `mutation_check.py --coverage improve-person-quality` — все 4 требования (мутаций 88)
+
+### Мутации, `scripts/mutation_check.py --change improve-person-quality --id <id>` на 0f07c24
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 1 warning in 0.36s) |
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.76s) |
+| Слияние вариантов персоны | dates-start-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 2.90s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 1 passed, 1 warning in 0.32s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.47s) |
+| Слияние вариантов персоны | dates-end-only | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 3.02s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval | да (1 failed, 6 passed, 1 warning in 0.30s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.50s) |
+| Слияние вариантов персоны | dates-interval-ignored | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 2.81s) |
+| Слияние с перенаправлением | fold-consensus-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.80s) |
+| Слияние с перенаправлением | who-consensus-kept | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.90s) |
+| Слияние с перенаправлением | merge-primary-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.80s) |
+| Слияние с перенаправлением | merge-primary-stale | tests/knowledge/test_person_merge_unit.py::test_merge_updates_primary_dates | да (1 failed in 0.42s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.67s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.81s) |
+| Слияние с перенаправлением | fold-attributions-dropped | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.97s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.66s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.68s) |
+| Слияние с перенаправлением | fold-evidence-dropped | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.99s) |
+| Слияние с перенаправлением | fold-redirect-missing | tests/knowledge/test_entity_merge.py::test_repeat_folds | да (1 failed, 1 warning in 0.68s) |
+| Слияние с перенаправлением | fold-redirect-missing | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.71s) |
+| Слияние с перенаправлением | loop-deleted | tests/knowledge/test_entity_merge.py::test_loop | да (1 failed, 1 warning in 0.70s) |
+| Слияние с перенаправлением | loop-deleted | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.89s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo | да (1 failed, 1 warning in 0.73s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.66s) |
+| Слияние с перенаправлением | undo-fold-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.71s) |
+| Слияние с перенаправлением | undo-evidence-not-restored | tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid | да (1 failed, 1 warning in 0.71s) |
+| Слияние с перенаправлением | undo-evidence-not-restored | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.96s) |
+| Слияние с перенаправлением | undo-consensus-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.83s) |
+| Слияние с перенаправлением | undo-primary-stale | tests/knowledge/test_entity_merge.py::test_preservation_and_undo | да (1 failed, 1 warning in 1.62s) |
+
+**Без `@example`** (зонд в worktree: строки `@example` нового вида удалены, генератор один):
+- `fold-consensus-kept` — test_preservation_and_undo упал (316 s, Hypothesis нашёл 2 разных падения);
+- `who-consensus-kept` — до блока «авторы K и R» проходил (1 passed in 20.66s); после — упал (56.69s);
+- `merge-primary-stale` — упал;
+- `dates-start-only` — оба property-теста упали;
+- `dates-end-only` и `dates-interval-ignored` — test_plan_partition_any_order упал (профиль pure, 400 примеров). test_merge_invariant_two_orders (профиль heavy, 25 примеров) без `@example` проходит: вид `dates_any` — 2 из 22 видов лица. С `@example(DATE_INTERVALS)` падают оба.
+
+**Наблюдение.** В тестах `test_author_attribution_moves` (EM) позиция `supports` осталась: её нет в спецификации «Атрибуция», но сценарий проверяет только перенос «с той же позицией». Код позицию не проверяет.
