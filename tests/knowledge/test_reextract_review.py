@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import unicodedata
+from datetime import timedelta
 
 import httpx
 import pytest
@@ -219,6 +220,12 @@ def test_entities_item_wrong_kind(stand, events):
             "dating": {"text": "1724", "paragraph": "１", "quote": "x"},
         },
         {"name": "Э", "type": "person", "dating": {"text": "1724", "paragraph": [1], "quote": "x"}},
+        {"name": "Э", "type": "person", "dating": "1724"},
+        {"name": "Э", "type": "person", "dating": 1724},
+        {"name": "Э", "type": "person", "dating": ["1724"]},
+        {"name": "Э", "type": "person", "dating": True},
+        {"name": "Э", "type": "person", "dating": ""},
+        {"name": "Э", "type": "person", "dating": 0},
         {
             "name": "Э",
             "type": "person",
@@ -407,10 +414,14 @@ def test_repeat_after_interrupted_ingest(stand, tmp_path, events, capsys):
     assert replaced == counts(stand)
 
 
+def stale_start(stand, hours=7):
+    return stand.filling.clock.now() - timedelta(hours=hours)
+
+
 @req(
     EO,
     EXTERNAL,
-    invariant="Повтор блокирует любой неоткатанный внешний запуск; --replace откатывает все",
+    invariant="Повтор блокирует неоткатанный внешний запуск; --replace откатывает (брошенный — тоже)",
 )
 @pytest.mark.parametrize(
     "statuses", [["failed"], ["running"], ["done"], ["failed", "running"], ["failed", "done"]]
@@ -426,7 +437,7 @@ def test_any_unrolled_external_run_blocks_repeat(stand, tmp_path, events, status
         conn.execute(
             t.filling_runs.update()
             .where(t.filling_runs.c.run_id == seeded[0])
-            .values(status=statuses[0])
+            .values(status=statuses[0], started_at=stale_start(stand))
         )
         for i, status in enumerate(statuses[1:]):
             conn.execute(
@@ -435,7 +446,7 @@ def test_any_unrolled_external_run_blocks_repeat(stand, tmp_path, events, status
                     kind="extraction",
                     target=vid,
                     extractor="external",
-                    started_at=stand.filling.clock.now(),
+                    started_at=stale_start(stand),
                     created=0,
                     dropped=0,
                     status=status,
@@ -485,23 +496,38 @@ def test_duplicate_fragment_in_jsonl(stand, tmp_path, events, capsys):
     assert events.of("knowledge.run.started") == []
 
 
-@req(EO, EXTERNAL, invariant="Повтор ключа в JSON-объекте ответов — код 2, ничего не записано")
-@pytest.mark.parametrize(
-    "text",
-    [
-        '{"1": {"statements": []}, "1": {"statements": []}}',
-        '{"1": {"statements": [], "statements": []}}',  # повтор на вложенном уровне
-    ],
+@req(
+    EO,
+    EXTERNAL,
+    invariant="Повтор ключа верхнего уровня JSON-объекта ответов — код 2, ничего не записано",
 )
-def test_duplicate_key_in_json_object(stand, tmp_path, events, capsys, text):
+def test_duplicate_top_level_key_in_json_object(stand, tmp_path, events, capsys):
     vid, _ = stand.version(TEXTS)
     path = tmp_path / "dup.json"
-    path.write_text(text, encoding="utf-8")
+    path.write_text('{"1": {"statements": []}, "1": {"statements": []}}', encoding="utf-8")
     code = cli(
         stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
     )
     assert code == 2 and capsys.readouterr().err.strip()
     assert runs(stand) == [] and counts(stand) == [0, 0, 0]
+
+
+@req(
+    EO,
+    EXTERNAL,
+    invariant="Повтор ключа внутри ответа — обычный JSON (последнее значение), команда продолжается",
+)
+def test_duplicate_key_inside_reply_is_plain_json(stand, tmp_path, events):
+    vid, _ = stand.version(TEXTS)
+    good = json.dumps(reply_for(0)["statements"], ensure_ascii=False)
+    path = tmp_path / "inner.json"
+    path.write_text('{"1": {"statements": [], "statements": %s}}' % good, encoding="utf-8")
+    code = cli(
+        stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
+    )
+    assert code == 0
+    assert len(stand.statements()) == 1  # последнее значение «statements» победило
+    assert one_run(stand)["status"] == "done"
 
 
 @req(
@@ -541,3 +567,102 @@ def test_version_missing_or_library_down(stand, tmp_path, events, capsys, comman
     assert captured.err.strip() and "Traceback" not in captured.err
     assert runs(stand) == [] and counts(stand) == [0, 0, 0]
     assert not (tmp_path / "out").exists() or not list((tmp_path / "out").glob("*.jsonl"))
+
+
+@req(
+    EO,
+    CHECK,
+    invariant="dating — объект, null или отсутствует; null и отсутствие — как без датировки",
+)
+@pytest.mark.parametrize("variant", ["null", "absent"])
+def test_dating_null_or_absent_is_fine(stand, events, variant):
+    entity = {"name": "Кант", "type": "person"}
+    if variant == "null":
+        entity["dating"] = None
+    external(stand, [stmt("Кант", "holds", "Опыт", 1, QUOTES[0])], entities=[entity])
+    assert events.of("knowledge.extraction.dropped") == []
+    assert len(stand.statements()) == 1
+
+
+def seed_run(stand, vid, status, hours, run_id, extractor="external", target=None):
+    with stand.onto.statements.engine.begin() as conn:
+        conn.execute(
+            t.filling_runs.insert().values(
+                run_id=run_id,
+                kind="extraction",
+                target=target or vid,
+                extractor=extractor,
+                started_at=stale_start(stand, hours),
+                created=0,
+                dropped=0,
+                status=status,
+            )
+        )
+
+
+@req(EO, EXTERNAL, scenario="Идёт запись той же версии")
+@pytest.mark.parametrize("replace", [True, False])
+@pytest.mark.parametrize("hours", [1, 0, 5.9])
+def test_running_write_in_progress_refuses(stand, tmp_path, events, capsys, replace, hours):
+    vid, argv = base_argv(stand, tmp_path, {"1": reply_for(0)})
+    seed_run(stand, vid, "running", hours, "ext_live")
+    events.clear()
+    code = cli(stand, [*argv, *(["--replace"] if replace else [])])
+    err = capsys.readouterr().err
+    assert code == 2 and "запись идёт" in err and "Traceback" not in err
+    assert [(r["run_id"], r["status"]) for r in runs(stand)] == [("ext_live", "running")]
+    assert counts(stand) == [0, 0, 0]
+    assert events.of("knowledge.run.started") == [] and events.of("knowledge.run.rolled_back") == []
+
+
+@req(
+    EO,
+    EXTERNAL,
+    invariant="Идущая запись не даёт откатить и прочие запуски версии: ничего не откатывается",
+)
+def test_live_running_blocks_rollback_of_others(stand, tmp_path, events, capsys):
+    vid, argv = base_argv(stand, tmp_path, {"1": reply_for(0)})
+    assert cli(stand, argv) == 0
+    baseline = counts(stand)
+    done_id = one_run(stand)["run_id"]
+    seed_run(stand, vid, "running", 1, "ext_live")
+    assert cli(stand, [*argv, "--replace"]) == 2
+    assert {r["run_id"]: r["status"] for r in runs(stand)} == {
+        done_id: "done",
+        "ext_live": "running",
+    }
+    assert counts(stand) == baseline
+
+
+@req(EO, EXTERNAL, scenario="Брошенная запись")
+@pytest.mark.parametrize("hours", [7, 6.5, 48])
+def test_abandoned_running_is_rolled_back_by_replace(stand, tmp_path, events, hours):
+    vid, argv = base_argv(stand, tmp_path, {"1": reply_for(0), "3": reply_for(2)})
+    seed_run(stand, vid, "running", hours, "ext_dead")
+    assert cli(stand, argv) == 2  # без --replace — по-прежнему отказ
+    assert counts(stand) == [0, 0, 0]
+    assert cli(stand, [*argv, "--replace"]) == 0
+    by_id = {r["run_id"]: r["status"] for r in runs(stand)}
+    assert by_id.pop("ext_dead") == "rolled_back"
+    assert list(by_id.values()) == ["done"]
+    assert events.where("knowledge.run.rolled_back", run_id="ext_dead")
+
+
+@req(EO, EXTERNAL, invariant="Порог 6 ч: моложе — идёт, старше — брошен")
+@pytest.mark.parametrize(("hours", "code"), [(5.99, 2), (6.01, 0)])
+def test_six_hour_threshold(stand, tmp_path, hours, code):
+    vid, argv = base_argv(stand, tmp_path, {"1": reply_for(0)})
+    seed_run(stand, vid, "running", hours, "ext_edge")
+    assert cli(stand, [*argv, "--replace"]) == code
+    status = {r["run_id"]: r["status"] for r in runs(stand)}["ext_edge"]
+    assert status == ("running" if code == 2 else "rolled_back")
+
+
+@req(EO, EXTERNAL, invariant="Идущий запуск другой версии или шлюза не блокирует запись")
+def test_live_running_of_other_version_or_gateway_does_not_block(stand, tmp_path):
+    vid, argv = base_argv(stand, tmp_path, {"1": reply_for(0)})
+    other, _ = stand.version(TEXTS)
+    seed_run(stand, other, "running", 1, "ext_other")
+    seed_run(stand, vid, "running", 1, "gw_live", extractor="gateway")
+    assert cli(stand, argv) == 0
+    assert {r["run_id"]: r["status"] for r in runs(stand)}["ext_other"] == "running"
