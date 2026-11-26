@@ -166,10 +166,10 @@
 |---|---|---|
 | C1 | нет линии жизни, нет текстовых статусов | `test_card_content.py::test_locke_header_and_summary` (нет `.pg-lifeline`, `.card-summary`, `[data-section=life]`, «1632» один раз), `::test_one_legend_and_no_status_words` (слова статусов вне легенды, одна `button.card-mark` с именем у каждой `.card-row`, нет `.pg-status`), `::test_row_marks_sourced_generated_disputed`, `test_reader_cards.py::test_t12_nature_of_each_row[light|dark]`, `::test_inferred_section_label_and_via` |
 | C2 | сводка, свёрнутые места, влияние списком, интересы, труды | `test_card_content.py::test_locke_header_and_summary`, `::test_places_collapsed_and_expanded`, `::test_short_and_long_lists`, `::test_influence_sections_without_repeats`, `::test_only_lifespan`, `::test_historical_state_in_summary`; сервер: `test_cards_redesign.py::test_locke_header_and_summary`, `::test_places_inline_collapsed`, `::test_person_section_order_and_display`, `::test_hume_interests`, `::test_main_place_*` |
-| C3 | карточки остальных типов не пусты | `test_card_content.py::test_no_card_is_empty_in_every_type` (9 типов в DOM), `::test_empty_states`; сервер: `test_cards_redesign.py::test_one_statement_never_gives_empty_card[14 типов]`, `::test_no_statements_gives_empty_card`, `::test_nothing_lost_for_every_type`, `::test_place_with_only_coordinates_is_not_empty` (**падает, дефект D4**) |
+| C3 | карточки остальных типов не пусты | `test_card_content.py::test_no_card_is_empty_in_every_type` (9 типов в DOM), `::test_empty_states`; сервер: `test_cards_redesign.py::test_one_statement_never_gives_empty_card[14 типов]`, `::test_no_statements_gives_empty_card`, `::test_nothing_lost_for_every_type`, `::test_place_with_only_coordinates_is_not_empty`, `::test_place_in_ocean_with_only_coordinates_is_not_empty` (D4 закрыт в круге 2); web: `test_card_content.py::test_place_with_only_coordinates_shows_coordinates_and_country`, `::test_place_outside_any_country_shows_only_coordinates` |
 | C4 | понятия и учения: к кому относятся | `test_card_content.py::test_doctrine_card_relates_to_and_in_works`; сервер: `test_relates_to_inferred_via_work`, `test_direct_row_replaces_inferred`, `test_relates_to_term_authors_only_for_concept_and_position_in_order`, `test_relates_to_one_row_per_person`, `test_concept_card`; `test_layout::test_popup_shows_statements_only` |
-| C5 | труды: автор, дата, сферы | `test_card_content.py::test_work_card_infobox`, `::test_work_card_infobox_labels` (**падает, дефект D1**); сервер: `test_work_card` |
-| C6 | единая индикация, одна легенда | `test_card_content.py::test_one_legend_and_no_status_words`, `::test_mark_looks_same_in_every_card` (цвет и форма метки в разных карточках), `::test_disputed_mark_accessible_name_wording` (**падает, дефект D2**); сервер: `test_legend_equals_marks_in_every_type[14 типов]`, `test_legend_is_set_of_marks`, `test_mark_rule_for_all_combinations`, `test_inferred_mark_is_weakest_link` |
+| C5 | труды: автор, дата, сферы | `test_card_content.py::test_work_card_infobox`, `::test_work_card_infobox_labels` (D1 закрыт в круге 2); сервер: `test_work_card` |
+| C6 | единая индикация, одна легенда | `test_card_content.py::test_one_legend_and_no_status_words`, `::test_mark_looks_same_in_every_card` (цвет и форма метки в разных карточках), `::test_disputed_mark_accessible_name_wording` (D2 закрыт в круге 2); сервер: `test_legend_equals_marks_in_every_type[14 типов]`, `test_legend_is_set_of_marks`, `test_mark_rule_for_all_combinations`, `test_inferred_mark_is_weakest_link` |
 | C7 | тексты — текст | `test_card_content.py::test_markup_is_text` (имя персоны, труда, места), `::test_markup_in_values_notes_and_via_is_text`; сервер: `test_markup_in_titles_served_verbatim`, `test_markup_in_value_note_via_served_verbatim` |
 | C8 | `lint-imports`, traceability, `ruff`; визуальная проверка на 1024×576 | команды ниже; `test_card_layout.py::test_card_fits_panel_in_three_sizes[light|dark]` (1024×576, 1366×768, 1920×1080: нет горизонтальной прокрутки, текст строк не обрезан, панель не на навигации), `::test_unbroken_long_word_is_wrapped`; e2e `test_s1_s4_card` — в CI |
 | C9 | карточки шире, 1024×576 не ломается, панели не перекрываются | `test_card_layout.py::test_panel_width_by_window[7 окон]` (таблица сценария, `--panel`, 62–68ch, неизменность при замене карточки ассистентом), `::test_panel_wider_than_448[1024|1366|1920]`, `::test_text_column_with_open_panel[8 окон]`, `::test_card_fits_panel_in_three_sizes`, `::test_card_on_map_in_three_sizes` (`.map-chart`, `.map-panel` в окне), `::test_strip_expands_over_text`, `::test_toc_kept_field_dropped_when_panel_opens`, `::test_pinned_navigation_collapses_while_panel_open` |
@@ -311,3 +311,41 @@ DONE
 - **Тёмная тема** — для таблицы ширины панели (`test_panel_width_by_window`) только светлая; раскладка карточки на трёх размерах — обе.
 - **Визуальные снимки** — эталоны только Windows, на Linux сравнение пропускается (по `AGENTS.md`).
 - Полный `pytest` не запускался (по условию задачи).
+
+
+## Тестировщик, круг 2 — 2026-11-27, коммит 6fc3844 (ветка claude/entity-cards)
+
+Изменения тестов: `tests/web/test_card_layout.py::test_infobox_columns_by_window_width` — окна 1920×1080 и 1280×800 (панель 528 и 472px, на 1920 две колонки, на 1280 одна; в `seen` проверены и ширины панели). Новые тесты:
+- `tests/knowledge/test_cards_redesign.py::test_place_with_only_coordinates_is_not_empty` (усилен: `sections == []`, `summary is None`, `empty=false` в ответе и в событии `knowledge.card.served`);
+- `tests/knowledge/test_cards_redesign.py::test_place_in_ocean_with_only_coordinates_is_not_empty` (точка 30.5, −40.25: `empty=false`, ответ и событие);
+- `tests/web/test_card_content.py::test_place_with_only_coordinates_shows_coordinates_and_country` (Пустые разделы / «Ни одной пустой карточки»: `[data-card-coordinates]` «54,71° с. ш., 20,51° в. д.», `[data-card-country]` «ныне Россия», нет `[data-card-empty]`, тело не пусто, событие `empty=False`);
+- `tests/web/test_card_content.py::test_place_outside_any_country_shows_only_coordinates` (Государство основного места: океан, координаты видны, `[data-card-country]` нет ни названием, ни заглушкой, нет `[data-card-empty]`, `empty=False` в ответе и событии).
+
+Сырые строки (файлы по одному, после `npm run build` в `web/`):
+
+```
+pytest -q tests/knowledge/test_cards_redesign.py   ->  166 passed, 1 warning in 160.95s
+pytest -q tests/knowledge/test_mentions_cards.py   ->  44 passed, 1 warning in 58.78s
+pytest -q tests/web/test_card_content.py           ->  27 passed, 1 warning in 129.03s
+pytest -q tests/web/test_card_layout.py            ->  41 passed, 1 warning in 219.17s
+pytest -q tests/web/test_reader_cards.py           ->  20 passed, 1 warning in 35.12s
+после правки маркера и ruff format: test_card_content -k "only_coordinates or outside_any_country" -> 2 passed;
+                                    test_cards_redesign -k "coordinates or ocean"                   -> 3 passed
+ruff check tests -> All checks passed;  python scripts/check_traceability.py -> Требований с тестами: 433 из 433
+```
+
+Дефекты круга 1: D1, D2, D3, D4 — тесты проходят (в тех файлах целиком выше). Дефектов нет.
+
+Мутации круга 2:
+
+```
+M16 cards.py:567 убрал `and geo is None` из правила empty
+    -> FAILED test_place_with_only_coordinates_is_not_empty, FAILED test_place_in_ocean_with_only_coordinates_is_not_empty (2 failed)
+M17 FullCard.tsx PlaceFacts: убрал элемент с [data-card-coordinates], npm run build
+    -> FAILED test_place_with_only_coordinates_shows_coordinates_and_country, FAILED test_place_outside_any_country_shows_only_coordinates (2 failed, 1 passed: test_place_card_shows_modern_country не проверяет координаты)
+Возврат: M16 через git checkout src/philograph/knowledge/cards.py; M17 копией файла из scratchpad (не git checkout) и пересборка клиента.
+```
+
+Оговорка: во время круга в рабочем дереве появились чужие незакоммиченные правки (`web/src/FullCard.tsx` SummaryPart, `web/src/layout.ts`, `polities*.py`, документы) — разработчик работал параллельно в том же дереве. Мои прогоны шли по дереву с ними; чтобы не потерять эти правки, мутацию M17 вернул копией, а не `git checkout`. После их коммита рекомендую повторить `test_card_layout.py` и `test_card_content.py`.
+
+Не покрыто: английский вариант подписи координат («48.86° N, 2.35° E») — не проверялся.

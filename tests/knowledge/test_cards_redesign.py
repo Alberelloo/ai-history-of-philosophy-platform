@@ -1384,9 +1384,23 @@ def test_no_empty_sections_in_any_type(cs, onto, type_):
 def test_place_with_only_coordinates_is_not_empty(cs, onto):
     """C3: утверждение о месте — координаты; карточка места показывает страну по ним."""
     place = cs.place("Кёнигсберг", 54.71, 20.51)
-    card, _ = cs.get(place)
+    card, rid = cs.get(place)
     assert card["geo"] == {"lat": 54.71, "lon": 20.51}
+    assert card["sections"] == [] and card["summary"] is None
     assert card["empty"] is False
+    assert cs.served(cs.events, rid)["empty"] is False
+
+
+@req(
+    EC, "Пустые разделы", invariant="место вне любой страны (точка в океане): координаты — не пусто"
+)
+def test_place_in_ocean_with_only_coordinates_is_not_empty(cs, onto):
+    place = cs.place("Остров в океане", 30.5, -40.25)
+    card, rid = cs.get(place)
+    assert card["geo"] == {"lat": 30.5, "lon": -40.25}
+    assert card["sections"] == [] and card["summary"] is None
+    assert card["empty"] is False
+    assert cs.served(cs.events, rid)["empty"] is False
 
 
 @req(EC, "Природа каждой строки", invariant="регион снимает подтверждение, но не меняет отметку")

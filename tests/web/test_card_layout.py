@@ -351,7 +351,7 @@ def test_unbroken_long_word_is_wrapped(knowledge_context, knowledge_stack, event
 def test_infobox_columns_by_window_width(knowledge_context, knowledge_stack, events):
     ids = kant_world(knowledge_stack)
     seen = {}
-    for width, height in ((1920, 1080), (1366, 768)):
+    for width, height in ((1920, 1080), (1280, 800)):
         page = start(knowledge_context, knowledge_stack, width, height)
         open_card(page)
         with page.expect_response(CARD) as response:
@@ -368,8 +368,9 @@ def test_infobox_columns_by_window_width(knowledge_context, knowledge_stack, eve
             }"""
         )
         page.context.close()
+    assert seen[1920]["panel"] == 528 and seen[1280]["panel"] == 472, seen
     assert abs(seen[1920]["dtTop"] - seen[1920]["ddTop"]) <= 4, seen  # две колонки
-    assert seen[1366]["ddTop"] >= seen[1366]["dtBottom"] - 1, seen  # значение под подписью
+    assert seen[1280]["ddTop"] >= seen[1280]["dtBottom"] - 1, seen  # значение под подписью
     _ = ids
 
 

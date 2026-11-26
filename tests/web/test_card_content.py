@@ -481,6 +481,45 @@ def test_place_card_shows_modern_country(knowledge_context, knowledge_stack, eve
     served(events, response, type="place", polity="skipped")
 
 
+@req(EC, "Пустые разделы", scenario="Ни одной пустой карточки")
+def test_place_with_only_coordinates_shows_coordinates_and_country(
+    knowledge_context, knowledge_stack, events
+):
+    cw.place(knowledge_stack.world, "Кёнигсберг", 54.71, 20.51)
+    page, response = open_card(knowledge_context, knowledge_stack, "Кёнигсберг")
+    loaded(page, "Кёнигсберг")
+    data = response.json()
+    assert data["empty"] is False and data["sections"] == [] and data["summary"] is None
+    expect(panel(page).locator("[data-card-empty]")).to_have_count(0)
+    coordinates = panel(page).locator("[data-card-coordinates]")
+    expect(coordinates).to_have_text("54,71° с. ш., 20,51° в. д.")
+    expect(panel(page).locator("[data-card-country]")).to_have_text("ныне Россия")
+    assert body(page).inner_text().strip() != ""
+    served(events, response, type="place", empty=False)
+
+
+@req(
+    EC,
+    "Государство основного места",
+    invariant="страна не найдена — координаты есть, страны и заглушки нет",
+)
+def test_place_outside_any_country_shows_only_coordinates(
+    knowledge_context, knowledge_stack, events
+):
+    cw.place(knowledge_stack.world, "Остров в океане", 30.5, -40.25)
+    page, response = open_card(knowledge_context, knowledge_stack, "Остров в океане")
+    loaded(page, "Остров в океане")
+    data = response.json()
+    assert data["empty"] is False and data["geo"] == {"lat": 30.5, "lon": -40.25}
+    coordinates = panel(page).locator("[data-card-coordinates]")
+    expect(coordinates).to_be_visible()
+    assert "30,50" in coordinates.inner_text() and "40,25" in coordinates.inner_text()
+    expect(panel(page).locator("[data-card-country]")).to_have_count(0)
+    expect(panel(page).locator("[data-card-empty]")).to_have_count(0)
+    assert body(page).inner_text().strip() != ""
+    served(events, response, type="place", empty=False)
+
+
 @req(EC, "Государство основного места", scenario="Без координат")
 @pytest.mark.parametrize("knowledge_stack", WITH_POLITIES, indirect=True)
 def test_no_coordinates_no_country_no_fragment(knowledge_context, knowledge_stack, events):
