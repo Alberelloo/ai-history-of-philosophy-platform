@@ -338,3 +338,49 @@
 | Миграция существующей онтологии | manifest-candidate-ignores-distinct | tests/knowledge/test_ontology_migration.py::test_pending_candidate_distinct_not_queued | да (1 failed, 1 warning in 3.48s) |
 
 Итого мутаций 83, `--coverage` — чисто.
+
+## Тестировщик — О31/О32, 2026-11-26, код 0b8b44e, спецификация fbb03ad, cf3d9a1
+
+- Новые тесты:
+  - О31: `test_rollback_keeps_later_added_name` (add_name человека), `test_rollback_keeps_name_from_later_merge` (слияние другого запуска), `test_negative_limit_rejected[plan|run]`, `test_rollback_unknown_run`;
+  - property `test_rollback_keeps_arbitrary_later_names` (heavy): поздние названия у произвольных сущностей после запуска остаются, `kept` ≥ числа переименованных с поздними названиями, сущности без поздних правок откатываются полностью;
+  - О32: `test_failure_mid_run`. Второе слияние бросает исключение. Проверяется: `knowledge.migration.failed` ровно с `run_id, dry_run, error, error_kind`, `error_kind=exception`; маркера в событии нет; в stderr есть `run_id` и `rollback <run_id>`; код 1; откат по этому `run_id` возвращает дамп.
+- До 0b8b44e тесты О31 были красными (0511502), на 0b8b44e — 7 passed in 41.09s. `test_failure_mid_run` — 1 passed.
+- `test_later_change_kept` усилен: после повторного переименования откат не трогает тексты и виды названий. Язык `lang_fix` откатывается отдельным действием.
+- Патчи после 0b8b44e:
+  - сняты заново: `normalize-key-stale`, `retired-event-label`, `verify-no-abort`, `verify-no-step-event`, `rollback-no-undo-merge`, `rollback-other-run-merges`;
+  - `run-action-not-recorded` переписан: запись идёт через `record_in` в 4 местах;
+  - `rollback-overwrites-later` переписан: теперь он снимает обе проверки повторного переименования, а снятая по отдельности каждая из них эквивалентна.
+- Новые мутации: `rollback-deletes-later-names`, `rollback-later-not-kept`, `unknown-run-silent`, `negative-limit-accepted`, `failed-event-missing`, `failed-no-run-id-in-stderr`. Всего мутаций 89, `--coverage`: migrate-ontology-quality: мутации есть у всех 5 требований. Все патчи накладываются на HEAD.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Миграция существующей онтологии | normalize-key-stale | tests/knowledge/test_ontology_migration.py::test_migration_invariant | да (1 failed, 1 warning in 2.55s) |
+| Миграция существующей онтологии | normalize-key-stale | tests/knowledge/test_ontology_migration.py::test_name_form | да (1 failed, 1 warning in 0.95s) |
+| Снятие мусорных сущностей | retired-event-label | tests/knowledge/test_ontology_migration.py::test_assistant_does_not_see_retired | да (1 failed, 1 warning in 0.81s) |
+| Снятие мусорных сущностей | retired-event-label | tests/knowledge/test_ontology_migration.py::test_restore_on_rollback | да (1 failed, 1 warning in 0.80s) |
+| Снятие мусорных сущностей | retired-event-label | tests/knowledge/test_ontology_migration.py::test_retire_invariant | да (1 failed, 1 warning in 14.15s) |
+| Снятие мусорных сущностей | retired-event-label | tests/knowledge/test_ontology_migration.py::test_section_number_retired | да (1 failed, 1 warning in 0.85s) |
+| Снятие мусорных сущностей | retired-event-label | tests/knowledge/test_ontology_migration.py::test_stand_synthetic | да (1 failed, 1 warning in 2.36s) |
+| Откат миграции | rollback-no-undo-merge | tests/knowledge/test_ontology_migration.py::test_full_rollback | да (1 failed, 1 warning in 3.01s) |
+| Откат миграции | rollback-no-undo-merge | tests/knowledge/test_ontology_migration.py::test_name_form | да (1 failed, 1 warning in 0.98s) |
+| Откат миграции | rollback-no-undo-merge | tests/knowledge/test_ontology_migration.py::test_rollback_invariant | да (1 failed, 1 warning in 1.98s) |
+| Откат миграции | rollback-other-run-merges | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_merge | да (1 failed, 1 warning in 2.85s) |
+| Миграция существующей онтологии | verify-no-abort | tests/knowledge/test_ontology_migration.py::test_loss_aborts | да (1 failed, 1 warning in 2.80s) |
+| Миграция существующей онтологии | verify-no-step-event | tests/knowledge/test_ontology_migration.py::test_stand_synthetic | да (1 failed, 1 warning in 3.08s) |
+| Откат миграции | rollback-deletes-later-names | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_added_name | да (1 failed, 1 warning in 0.77s) |
+| Откат миграции | rollback-deletes-later-names | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_name_from_later_merge | да (1 failed, 1 warning in 0.73s) |
+| Откат миграции | rollback-deletes-later-names | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_arbitrary_later_names | да (1 failed, 1 warning in 2.35s) |
+| Откат миграции | rollback-later-not-kept | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_added_name | да (1 failed, 1 warning in 0.72s) |
+| Откат миграции | rollback-later-not-kept | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_name_from_later_merge | да (1 failed, 1 warning in 0.79s) |
+| Откат миграции | unknown-run-silent | tests/knowledge/test_ontology_migration.py::test_rollback_unknown_run | да (1 failed, 1 warning in 2.28s) |
+| Миграция существующей онтологии | negative-limit-accepted | tests/knowledge/test_ontology_migration.py::test_negative_limit_rejected | да (1 failed, 1 warning in 2.31s) |
+| Миграция существующей онтологии | failed-event-missing | tests/knowledge/test_ontology_migration.py::test_failure_mid_run | да (1 failed, 1 warning in 2.61s) |
+| Миграция существующей онтологии | failed-no-run-id-in-stderr | tests/knowledge/test_ontology_migration.py::test_failure_mid_run | да (1 failed, 1 warning in 2.50s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_dry_run | да (1 failed, 1 warning in 2.67s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_loss_aborts | да (1 failed, 1 warning in 2.99s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_migration_invariant | да (1 failed, 1 warning in 1.81s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_name_form | да (1 failed, 1 warning in 0.91s) |
+| Откат миграции | rollback-overwrites-later | tests/knowledge/test_ontology_migration.py::test_later_change_kept | да (1 failed, 1 warning in 0.79s) |
+
+Первые прогоны до правки, «НЕТ»: `rollback-overwrites-later` (снята одна проверка из двух — эквивалентно), `run-action-not-recorded` по `_record` (после 0b8b44e — только слияния).
