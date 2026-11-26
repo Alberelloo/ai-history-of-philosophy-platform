@@ -200,3 +200,14 @@
 - сценарий «Утверждение на границе» через реальный шлюз с кэшем ответов — стенд берёт уникальные тексты абзацев, чтобы кэш не подменял ответы; поведение кэша шлюза не менялось дельтой;
 - повторный полный `pytest tests/knowledge` (29 мин) не гонялся: прогнаны только новые файлы, `tests/llm` и правленные прежние тесты;
 - `entity_ambiguous` проверен кодом и счётом, но не сценарием «пункт проверки» (проверка оператора — вне дельты).
+
+### Повторный прогон после исправления Д1–Д3 (коммит разработчика 09f3911)
+
+Тесты не менялись.
+
+    pytest -q tests/knowledge/test_reextract_{fragments,quotes,items,runs,external,prompt}.py tests/llm \
+              tests/knowledge/test_entity_dating_extraction.py tests/knowledge/test_extraction_entities.py \
+              tests/knowledge/test_portraits.py tests/knowledge/test_mentions_cards.py::test_migration_6_adds_mention_position
+        →  394 passed, 1 warning in 379s
+
+Д1 (`paragraph: "²"`), Д2 (ключ ответа `"²"`), Д3 (сломанная сводка расходов, `not-json` и `object`): все четыре прежде красных теста зелёные. Мутации после правки не перепрогонялись.
