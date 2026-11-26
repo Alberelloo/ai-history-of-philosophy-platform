@@ -897,3 +897,39 @@
 |---|---|---|---|
 | Валидность названий сущностей | set-primary-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 1.45s) |
 | Валидность названий сущностей | stored-raw-set-primary | tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed, 1 warning in 1.01s) |
+
+## Тестировщик — J8 (правила по типу), патчи после 40bae79, 2026-11-26
+
+Новые тесты. В `test_primary_choice_by_item` добавлены 6 случаев с расхождением правил по типу:
+- ru «слепой математик»: у персоны отклонено, у понятия стало основным;
+- вариант en «blind mathematics»: у персоны отброшен, у понятия записан;
+- ru из 8 слов: у произведения стало основным, у понятия отклонено (sentence).
+
+Ещё два теста:
+- `test_new_entity_spellings_checked_by_type`: новая персона из ответа с ru «слепой математик» → ru не записан, `rejected` с `not_a_name`;
+- `test_event_label_checked_by_event_rule` (epoch-context): событие с названием из 9 слов создано (предел event — 12), `rejected` нет.
+
+Мутации и сводка обхода — в verification.md migrate-ontology-quality, раздел J8. `renamed-extra-field`: после 40bae79 `-C0` вставил строку не туда, и тесты не собрались (`НЕТ ()`). Патч переписан на поля события в `rename_in`.
+
+`--id` (под flock):
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Валидность названий сущностей | entities-check-as-concept | tests/knowledge/test_entity_naming.py::test_core_rejection_reasons | да (1 failed, 1 warning in 1.27s) |
+| Валидность названий сущностей | entities-check-as-concept | tests/knowledge/test_entity_naming.py::test_description_with_capital | да (1 failed, 1 warning in 0.73s) |
+| Валидность названий сущностей | entities-check-as-concept | tests/knowledge/test_entity_naming.py::test_glued_names | да (1 failed, 1 warning in 1.23s) |
+| Контекстные события из Wikidata | invalid-primary-as-concept | tests/knowledge/test_epoch_context_import.py::test_event_label_checked_by_event_rule | да (1 failed in 0.73s) |
+| Контекстные события из Wikidata | epoch-context-primary-as-concept | tests/knowledge/test_epoch_context_import.py::test_event_label_checked_by_event_rule | да (1 failed in 0.61s) |
+| Язык названий сущностей | names-for-ru-as-concept | tests/knowledge/test_entity_naming.py::test_primary_choice_by_item | да (1 failed, 4 passed, 1 warning in 0.30s) |
+| Язык названий сущностей | names-for-ru-as-concept | tests/knowledge/test_entity_naming.py::test_new_entity_spellings_checked_by_type | да (1 failed, 1 warning in 1.44s) |
+| Язык названий сущностей | names-for-variant-as-concept | tests/knowledge/test_entity_naming.py::test_primary_choice_by_item | да (1 failed, 4 passed, 1 warning in 0.30s) |
+| Язык названий сущностей | items-names-for-as-concept | tests/knowledge/test_entity_naming.py::test_new_entity_spellings_checked_by_type | да (1 failed, 1 warning in 1.03s) |
+| Язык названий сущностей | items-russian-primary-as-concept | tests/knowledge/test_entity_naming.py::test_rejected_russian_spelling | да (1 failed, 1 warning in 1.06s) |
+| Язык названий сущностей | renamed-previous-lang-wrong | tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary | да (1 failed, 1 warning in 1.24s) |
+| Язык названий сущностей | renamed-previous-lang-wrong | tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_keeps_id | да (1 failed in 0.48s) |
+| Язык названий сущностей | rename-keeps-old-primary | tests/knowledge/test_entity_naming.py::test_existing_english_entity_gets_russian_primary | да (1 failed, 1 warning in 1.25s) |
+| Язык названий сущностей | rename-keeps-old-primary | tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_keeps_id | да (1 failed in 0.45s) |
+| Язык названий сущностей | rename-keeps-old-primary | tests/knowledge/test_naming_entities_unit.py::test_set_primary_name_promotes_variant | да (1 failed in 0.49s) |
+| Валидность названий сущностей | set-primary-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 1.61s) |
+| Валидность названий сущностей | stored-raw-set-primary | tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed, 1 warning in 1.17s) |
+| Язык названий сущностей | renamed-extra-field | test_entity_naming.py::test_existing_english_entity_gets_russian_primary, test_extraction_entities.py::test_binding_by_english_spelling, ::test_normalization_and_language_for_any_items | да (повтор после переписи патча) |

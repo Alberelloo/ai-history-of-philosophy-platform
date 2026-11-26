@@ -385,6 +385,64 @@
 
 Первые прогоны до правки, «НЕТ»: `rollback-overwrites-later` (снята одна проверка из двух — эквивалентно), `run-action-not-recorded` по `_record` (после 0b8b44e — только слияния).
 
+## Тестировщик — J8 и повторное ревью (тот же ключ), 2026-11-26, тесты 59d9456 и следующий, код 40bae79
+
+Тесты:
+- `test_translation_invariant`: генератор `translation_replies` даёт элементы всех типов `entity_types()`, кроме `source`, и вид ответа `lowercase` («слепой математик»). Оракул: у персоны `invalid:not_a_name`, у остальных принят; ответ из 8 слов — `sentence` у понятия, но принят у `work`, `event`, `idea_event`, `phenomenon` (предел 12). Добавлены `@example` J8 (персона и понятие, оба «слепой математик») и пример предела (произведение и понятие, оба 8 слов).
+- `test_reply_checked_by_item_type`: персона «Saunderson» и понятие «blind mathematics», ответ «слепой математик» → персона без изменений, понятие переименовано, `untranslated["invalid:not_a_name"] == 1`.
+- `test_wikidata_label_checked_by_type`: подпись Wikidata «слепой математик» у персоны (Q900011) не применяется, у понятия (Q900012) применяется.
+- `test_rollback_keeps_same_key_rename[yo|case]`: модель дала «Объем» или «Причинность», человек поставил «Объём» или «ПРИЧИННОСТЬ» → после отката название человека основное, `rolled_back.kept == 1`. На 40bae79 — зелёный.
+- `test_rollback_keeps_arbitrary_later_names` расширен: у части переименованных запуском сущностей позднее название — тот же ключ, другой текст (`upper()`). Ожидание: оно остаётся основным, сущность в `kept`.
+
+Обход вызовов правил, зависящих от типа (вызов заменён на `"concept"`; прогон файлов теста до новых тестов → после):
+
+| Место | Мутация | До новых тестов | После |
+|---|---|---|---|
+| `ontology_migrate.py` перевод, ответ модели | `j8-reply-check-as-concept` | выжила (J8 судьи) | убита |
+| `ontology_migrate.py` подписи Wikidata | `wd-label-check-as-concept` | убита новым тестом | убита |
+| `ontology_migrate.py` снятие | `retire-check-as-concept` | убита (`test_acceptance_symptoms`, `test_dry_run`, `test_full_rollback`) | убита |
+| `quality_report.py` A2 | `a2-check-as-concept` | выжила | эквивалентна: правило `number` одинаково для всех типов, кроме `source`, а источники из выборки A2 исключены. В yaml не вошла |
+| `naming.py` `invalid_primary` | `invalid-primary-as-concept` (naming) | выжила | убита `test_event_label_checked_by_event_rule` |
+| `epoch_context.py` вызов `invalid_primary` | `epoch-context-primary-as-concept` (naming) | выжила | убита |
+| `naming.py` `names_for`, проверка ru | `names-for-ru-as-concept` (naming) | выжила | убита |
+| `naming.py` `names_for`, варианты | `names-for-variant-as-concept` (naming) | выжила | убита |
+| `entity_items.py` вызов `names_for` | `items-names-for-as-concept` (naming) | выжила | убита |
+| `entity_items.py` `_russian_primary` | `items-russian-primary-as-concept` (naming) | убита | убита |
+| `entities.py` `_check` | `entities-check-as-concept` (naming) | убита | убита |
+
+Строка аудита («Перевод названий»): п. 4 «`invalid:<причина>` по правилу типа элемента». Генератор — все типы, кроме `source`; виды ответа `lowercase` и `sentence` расходятся по типам. Примеры — J8 и предел слов. Сценарий — `test_reply_checked_by_item_type`. Мутация — `j8-reply-check-as-concept`.
+
+Строка аудита («Откат миграции»): «название человека после запуска остаётся, даже с тем же ключом». Генератор — поздние названия `upper()` у переименованных. Сценарий — `test_rollback_keeps_same_key_rename`. Мутация — `rollback-own-name-key-only` (`_own_name` без сравнения текста).
+
+Патчи после 40bae79 сняты заново:
+- migrate: `failed-event-missing`, `failed-no-run-id-in-stderr`, `rename-drops-old-primary`, `rollback-overwrites-later` (теперь снимает фильтр kind в `_own_name` и проверку `ours["kind"]`), `run-action-not-recorded` (4 вызова `record_in` и `_record`), `verify-no-abort`;
+- naming: `renamed-extra-field`, `renamed-previous-lang-wrong`, `rename-keeps-old-primary`, `set-primary-unchecked`, `stored-raw-set-primary`.
+
+`git apply --check` на HEAD для всех `tests/mutations/*/*.patch` — 0 ненакладывающихся. `--coverage` по обоим изменениям чистый.
+
+`--id` (под flock), строки migrate:
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Перевод названий | j8-reply-check-as-concept | tests/knowledge/test_ontology_migration.py::test_reply_checked_by_item_type | да (1 failed, 1 warning in 0.81s) |
+| Перевод названий | j8-reply-check-as-concept | tests/knowledge/test_ontology_migration.py::test_translation_invariant | да (1 failed, 1 warning in 1.15s) |
+| Перевод названий | wd-label-check-as-concept | tests/knowledge/test_ontology_migration.py::test_wikidata_label_checked_by_type | да (1 failed, 1 warning in 0.77s) |
+| Снятие мусорных сущностей | retire-check-as-concept | tests/knowledge/test_ontology_migration.py::test_acceptance_symptoms | да (1 failed, 1 warning in 3.97s) |
+| Снятие мусорных сущностей | retire-check-as-concept | tests/knowledge/test_ontology_migration.py::test_dry_run | да (1 failed, 1 warning in 3.54s) |
+| Снятие мусорных сущностей | retire-check-as-concept | tests/knowledge/test_ontology_migration.py::test_full_rollback | да (1 failed, 1 warning in 3.74s) |
+| Откат миграции | rollback-own-name-key-only | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_same_key_rename | да (1 failed, 1 warning in 0.80s) |
+| Откат миграции | rollback-own-name-key-only | tests/knowledge/test_ontology_migration.py::test_rollback_keeps_arbitrary_later_names | да (1 failed, 1 warning in 2.33s) |
+| Миграция существующей онтологии | failed-event-missing | tests/knowledge/test_ontology_migration.py::test_failure_mid_run | да (1 failed, 1 warning in 3.02s) |
+| Миграция существующей онтологии | failed-no-run-id-in-stderr | tests/knowledge/test_ontology_migration.py::test_failure_mid_run | да (1 failed, 1 warning in 3.23s) |
+| Перевод названий | rename-drops-old-primary | tests/knowledge/test_ontology_migration.py::test_stand_synthetic | да (1 failed, 1 warning in 3.42s) |
+| Перевод названий | rename-drops-old-primary | tests/knowledge/test_ontology_migration.py::test_translation_invariant | да (1 failed, 1 warning in 1.37s) |
+| Откат миграции | rollback-overwrites-later | tests/knowledge/test_ontology_migration.py::test_later_change_kept | да (1 failed, 1 warning in 0.84s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_dry_run | да (1 failed, 1 warning in 2.80s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_loss_aborts | да (1 failed, 1 warning in 3.46s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_migration_invariant | да (1 failed, 1 warning in 1.90s) |
+| Миграция существующей онтологии | run-action-not-recorded | tests/knowledge/test_ontology_migration.py::test_name_form | да (1 failed, 1 warning in 1.13s) |
+| Миграция существующей онтологии | verify-no-abort | tests/knowledge/test_ontology_migration.py::test_loss_aborts | да (1 failed, 1 warning in 2.83s) |
+
 ## Судья — 2026-11-26, коммит 745dbe0
 
 Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.
