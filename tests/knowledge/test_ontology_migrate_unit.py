@@ -425,3 +425,65 @@ def test_normalize_names_then_duplicate_merges(onto, events):
     assert [e["reason"] for e in events.where("knowledge.entity.merged")] == ["merge:name"]
     migration(onto).rollback(report.run_id)
     assert dump(engine) == before
+
+
+@pytest.mark.parametrize("text", ["причинность", "ПРИЧИННОСТЬ"])
+def test_rollback_keeps_rerename_with_same_key(onto, events, text):
+    """Повторное переименование человеком в текст с тем же ключом — чужое: откат его не
+    удаляет, сущность — в ``kept``."""
+    from philograph.knowledge.naming import normalize
+
+    ids = build(onto)
+    report = migration(onto, FakeLLM([[{"n": 1, "ru": "Причинность"}]])).run(translate="model")
+    assert normalize(text) == normalize("Причинность")
+    onto.entities.set_primary_name(ids["causality"], "ru", text)
+    summary = migration(onto).rollback(report.run_id)
+    assert summary["kept"] == 1
+    assert primary(onto, ids["causality"]) == [text]
+
+
+def test_renamed_event_after_commit(onto, events, monkeypatch):
+    """Запись журнала действий упала — переименование откатилось, события ``renamed`` нет."""
+    from philograph.knowledge.ontology_migrate import Failed
+
+    ids = build(onto)
+    original = run_actions.record_in
+
+    def broken(conn, run_id, kind, payload):
+        if kind == "rename":
+            raise RuntimeError("сбой записи")
+        return original(conn, run_id, kind, payload)
+
+    monkeypatch.setattr(run_actions, "record_in", broken)
+    with pytest.raises(Failed):
+        migration(onto, FakeLLM([[{"n": 1, "ru": "Причинность"}]])).run(translate="model")
+    assert primary(onto, ids["causality"]) == ["causality"]
+    events.assert_none("knowledge.entity.renamed")
+
+
+def test_cli_failed_plan_no_rollback_hint(onto, events, capsys, monkeypatch):
+    def broken(self, *a, **kw):
+        raise RuntimeError("сбой")
+
+    build(onto)
+    monkeypatch.setattr(Migration, "_step_dedupe", broken)
+    code = main(["plan"], service=lambda f, llm: migration(onto))
+    err = capsys.readouterr().err
+    [failed] = events.of("knowledge.migration.failed")
+    assert code == 1 and failed["dry_run"] is True
+    assert failed["run_id"] in err and "rollback" not in err
+
+
+def test_cli_keyboard_interrupt_prints_run_id(onto, events, capsys, monkeypatch):
+    def interrupted(self, *a, **kw):
+        raise KeyboardInterrupt
+
+    build(onto)
+    monkeypatch.setattr(Migration, "_step_dedupe", interrupted)
+    with pytest.raises(KeyboardInterrupt):
+        main(["run"], service=lambda f, llm: migration(onto))
+    err = capsys.readouterr().err
+    [failed] = events.of("knowledge.migration.failed")
+    assert failed["error"] == "KeyboardInterrupt"
+    assert f"rollback {failed['run_id']}" in err
+    assert migration(onto).rollback(failed["run_id"])["actions"] > 0

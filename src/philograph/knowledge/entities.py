@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import uuid
-from contextlib import nullcontext
 from itertools import combinations
 from typing import Any
 
@@ -235,53 +234,51 @@ class Entities:
                 )
             )
 
-    def set_primary_name(
-        self, entity_id: str, lang: str, text: str, *, conn: Connection | None = None
-    ) -> None:
+    def set_primary_name(self, entity_id: str, lang: str, text: str) -> None:
         """Новое основное название той же сущности: прежние основные становятся вариантами
         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
         Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC.
+        Своя транзакция; событие ``knowledge.entity.renamed`` — после её коммита."""
+        with self.engine.begin() as conn:
+            renamed = self.rename_in(conn, entity_id, lang, text)
+        events.emit("knowledge.entity.renamed", **renamed)
 
-        ``conn`` — транзакция вызывающего (запись вместе с журналом действий запуска); без неё
-        — своя транзакция."""
+    def rename_in(self, conn: Connection, entity_id: str, lang: str, text: str) -> dict[str, Any]:
+        """``set_primary_name`` в транзакции вызывающего (запись вместе с журналом действий
+        запуска) без события: возвращает его поля, вызывающий пишет ``knowledge.entity.renamed``
+        после коммита, чтобы откаченная запись не оставила события."""
         text = clean(text)
         entity = self.get(entity_id)
         self._check(entity["type"], text)
         lang = lang_for(text, lang)
         key = normalize(text)
-        with nullcontext(conn) if conn is not None else self.engine.begin() as conn:
-            rows = (
-                conn.execute(select(t.names).where(t.names.c.entity_id == entity["id"]))
-                .mappings()
-                .all()
-            )
-            previous = [r for r in rows if r["kind"] == "primary"]
-            for row in previous:
-                conn.execute(
-                    update(t.names)
-                    .where(t.names.c.id == row["id"])
-                    .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
-                )
-            same = next((r for r in rows if r["normalized"] == key), None)
-            if same is not None:
-                conn.execute(
-                    update(t.names)
-                    .where(t.names.c.id == same["id"])
-                    .values(kind="primary", lang=lang, text=text)
-                )
-            else:
-                conn.execute(
-                    t.names.insert().values(
-                        entity_id=entity["id"], lang=lang, text=text, normalized=key, kind="primary"
-                    )
-                )
-        previous_lang = lang_for(previous[0]["text"], previous[0]["lang"]) if previous else None
-        events.emit(
-            "knowledge.entity.renamed",
-            entity_id=entity["id"],
-            lang=lang,
-            previous_lang=previous_lang,
+        rows = (
+            conn.execute(select(t.names).where(t.names.c.entity_id == entity["id"]))
+            .mappings()
+            .all()
         )
+        previous = [r for r in rows if r["kind"] == "primary"]
+        for row in previous:
+            conn.execute(
+                update(t.names)
+                .where(t.names.c.id == row["id"])
+                .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
+            )
+        same = next((r for r in rows if r["normalized"] == key), None)
+        if same is not None:
+            conn.execute(
+                update(t.names)
+                .where(t.names.c.id == same["id"])
+                .values(kind="primary", lang=lang, text=text)
+            )
+        else:
+            conn.execute(
+                t.names.insert().values(
+                    entity_id=entity["id"], lang=lang, text=text, normalized=key, kind="primary"
+                )
+            )
+        previous_lang = lang_for(previous[0]["text"], previous[0]["lang"]) if previous else None
+        return {"entity_id": entity["id"], "lang": lang, "previous_lang": previous_lang}
 
     def find(self, name: str) -> list[dict[str, Any]]:
         """Все сущности с таким названием или вариантом: выбор не делается молча."""

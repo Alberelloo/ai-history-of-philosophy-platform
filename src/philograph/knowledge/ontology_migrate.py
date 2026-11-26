@@ -180,9 +180,20 @@ class Failed(Exception):
     Автоотката нет: номер запуска ``run_id`` — для ``rollback`` оператором. Исходное
     исключение — в ``__cause__``."""
 
-    def __init__(self, run_id: str) -> None:
+    def __init__(self, run_id: str, *, dry_run: bool = False) -> None:
         super().__init__(f"запуск {run_id} прервался")
         self.run_id = run_id
+        self.dry_run = dry_run
+
+
+class Interrupted(KeyboardInterrupt):
+    """``KeyboardInterrupt`` посреди запуска с его ``run_id``: прерывание не глотается, но
+    оператор знает, что откатывать. Исходное прерывание — в ``__cause__``."""
+
+    def __init__(self, run_id: str, *, dry_run: bool = False) -> None:
+        super().__init__(f"запуск {run_id} прерван")
+        self.run_id = run_id
+        self.dry_run = dry_run
 
 
 class UnknownRun(LookupError):
@@ -458,14 +469,13 @@ class Migration:
         except Exception as exc:
             # База могла остаться в промежуточном состоянии: номер запуска — в журнал и
             # вызывающему, чтобы оператор мог откатить (``rollback <run_id>``).
-            events.emit(
-                "knowledge.migration.failed",
-                error_kind="exception",
-                run_id=report.run_id,
-                dry_run=dry_run,
-                error=type(exc).__name__,
-            )
-            raise Failed(report.run_id) from exc
+            self._emit_failed(report, exc)
+            raise Failed(report.run_id, dry_run=dry_run) from exc
+        except KeyboardInterrupt as exc:
+            # Прерывание оператором — то же промежуточное состояние; прерывание идёт дальше,
+            # но уже с номером запуска.
+            self._emit_failed(report, exc)
+            raise Interrupted(report.run_id, dry_run=dry_run) from exc
         self._emit_run(report)
         return report
 
@@ -517,6 +527,15 @@ class Migration:
         )
         if report.statements.get("lost") or report.attributions.get("lost"):
             self._abort(report)
+
+    def _emit_failed(self, report: Report, exc: BaseException) -> None:
+        events.emit(
+            "knowledge.migration.failed",
+            error_kind="exception",
+            run_id=report.run_id,
+            dry_run=report.dry_run,
+            error=type(exc).__name__,
+        )
 
     def _emit_run(self, report: Report) -> None:
         events.emit(
@@ -691,7 +710,7 @@ class Migration:
         old = view.label(entity_id)
         action = Action(step, "rename", {"entity": entity_id, "lang": "ru", "text": text, "by": by})
         if not report.dry_run:
-            # Переименование и его запись для отката — одна транзакция.
+            # Переименование и его запись для отката — одна транзакция; событие — после коммита.
             with self.engine.begin() as conn:
                 before = [
                     dict(r)
@@ -701,7 +720,7 @@ class Migration:
                         .order_by(t.names.c.id)
                     ).mappings()
                 ]
-                self.entities.set_primary_name(entity_id, "ru", text, conn=conn)
+                renamed = self.entities.rename_in(conn, entity_id, "ru", text)
                 run_actions.record_in(
                     conn,
                     report.run_id,
@@ -711,6 +730,7 @@ class Migration:
                         "names_before": [_name_json(n) for n in before],
                     },
                 )
+            events.emit("knowledge.entity.renamed", **renamed)
         report.renamed[by] += 1
         report.renamed_list.append({"id": entity_id, "from": old, "to": text, "by": by})
         return action
@@ -1067,11 +1087,16 @@ def _end(view: View, entity_id: str | None) -> str | None:
 
 
 def _own_name(p: dict[str, Any], rows: list[Any], before: dict[int, Any]) -> dict[str, Any] | None:
-    """Строка названия, которую сделал основной запуск: основная с ключом его текста. Строка
-    не из ``names_before`` — вставлена запуском (её откат удаляет), иначе — повышена им из
-    варианта. Позже добавленные строки с другим ключом сюда не попадают."""
-    key = normalize(p["text"])
-    primary = [dict(r) for r in rows if r["kind"] == "primary" and r["normalized"] == key]
+    """Строка названия, которую сделал основной запуск: основная с его ключом и его текстом
+    (``clean``). Строка не из ``names_before`` — вставлена запуском (её откат удаляет), иначе —
+    повышена им из варианта. Если текст с тех пор сменили, даже на тот же ключ («Объем» →
+    «Объём», регистр), строка уже чужая: ``None``, откат её не трогает."""
+    key, text = normalize(p["text"]), clean(p["text"])
+    primary = [
+        dict(r)
+        for r in rows
+        if r["kind"] == "primary" and r["normalized"] == key and r["text"] == text
+    ]
     primary.sort(key=lambda r: r["id"] in before)
     return primary[0] if primary else None
 
@@ -1085,6 +1110,17 @@ def _no_fetch(url: str) -> dict[str, Any]:
 
 
 # --- CLI ------------------------------------------------------------------------------
+
+
+def _failure(exc: Failed | Interrupted) -> str:
+    """Строка stderr о прерванном запуске: ``run_id`` и, если база менялась, команда отката.
+    Сухой прогон базу не меняет, и ``rollback`` его номера дал бы ``UnknownRun``."""
+    if exc.dry_run:
+        return f"сухой прогон {exc.run_id} прервался; база не менялась, откат не нужен"
+    return (
+        f"запуск {exc.run_id} прервался; база может быть в промежуточном состоянии,"
+        f" откат: rollback {exc.run_id}"
+    )
 
 
 def _llm_client() -> ServiceClient:
@@ -1189,12 +1225,11 @@ def main(
         return 1
     except Failed as exc:
         cause = exc.__cause__
-        print(
-            f"запуск {exc.run_id} прервался ({type(cause).__name__}: {cause}); база может быть"
-            f" в промежуточном состоянии, откат: rollback {exc.run_id}",
-            file=sys.stderr,
-        )
+        print(f"{_failure(exc)} ({type(cause).__name__}: {cause})", file=sys.stderr)
         return 1
+    except Interrupted as exc:
+        print(f"{_failure(exc)} (KeyboardInterrupt)", file=sys.stderr)
+        raise
     print(json.dumps(report.to_json(), ensure_ascii=False, indent=2))
     return 0
 
