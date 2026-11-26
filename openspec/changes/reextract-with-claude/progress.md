@@ -46,3 +46,8 @@
 - Отклонение от первой версии дельты: пустой `subject`/`object` — не `schema_item`, а отказ правил названий (`entity:empty`), иначе ломался сценарий `entity-naming` «Пустое название». Сценарий «Отклонения в одном ответе»: «без `quote`» заменено на `quote: 7` — элемент без обязательного поля отвергает уже мягкая схема шлюза (требование ведущего: обязательные поля в схеме шлюза); у внешнего извлекателя — `schema_item`. Дельта поправлена.
 - Тесты прежнего контракта, падающие из-за `code` в событии (тестировщику, 3.3): в `tests/knowledge/test_entity_dating_extraction.py` — `test_century_not_in_quote`, `test_era_mismatch`, `test_year_not_in_quote`, `test_number_inside_number`, `test_single_year_person` (ждут ровно `{run_id, reason}`), и два из 1.1 в `test_extraction_entities.py`.
 - Прогон: `test_reply_items_unit.py` — 24 passed; `test_filling.py test_extraction_entities.py test_context_unit.py test_entity_naming.py test_entity_dating_extraction.py test_person_quality.py` — до правки пустого названия 9 failed / 221 passed; после — падают только 7 перечисленных тестов прежнего контракта (полный прогон пакета — в 2.8).
+
+## 2026-11-26 — 2.6 промпт `ontology.extract`
+
+- Добавлены правила: «персонажи художественного текста — не персоны …», «атрибутируй автору произведения: attributed_to — автор»; к «не включай в объект вовсе» — «не пиши null».
+- Проверка: обе фразы есть в инструкции (нижний регистр); `test_extraction_entities.py -k prompt_language` — 6 passed.
