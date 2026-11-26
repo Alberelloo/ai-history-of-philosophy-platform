@@ -4,7 +4,7 @@
 и разбора времени у них нет. Правила — требование «Доступ к Wikidata» возможности ``epochs``:
 
 - сеть — только ``http_fetch``: один домен (``www.wikidata.org``), адрес строится кодом из
-  идентификатора, проверенного ``check_qid`` (``^Q\\d+$``), иначе запрос не делается;
+  идентификатора, проверенного ``check_qid`` (``^Q[0-9]+$``), иначе запрос не делается;
   ``User-Agent`` проекта без сведений об операторе, таймаут, на 429/503 — ожидание по
   ``Retry-After`` (не дольше ``max_wait``) и не больше ``retries`` повторов. Ожидание —
   внедряемой функцией ``wait``: в тестах реального ожидания нет;
@@ -35,7 +35,7 @@ import httpx
 
 from philograph.knowledge.dates import FuzzyDate, join_original
 
-QID = re.compile(r"^Q\d+$")
+QID = re.compile(r"^Q[0-9]+$")  # только ASCII-цифры: «Q１２» не QID
 HOST = "www.wikidata.org"
 USER_AGENT = "PhiloGraph/1.0 (+https://github.com/Alberelloo/ai-history-of-philosophy-platform)"
 ENTITY_URL = "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
@@ -86,7 +86,7 @@ class WikidataError(Exception):
 
 
 def check_qid(qid: str) -> str:
-    """Идентификатор записи по шаблону ``^Q\\d+$``; иначе ``WikidataError``. Запросов нет."""
+    """Идентификатор записи по шаблону ``^Q[0-9]+$``; иначе ``WikidataError``. Запросов нет."""
     if not isinstance(qid, str) or not QID.fullmatch(qid):
         raise WikidataError(f"неверный идентификатор Wikidata: {qid!r}")
     return qid
@@ -195,7 +195,7 @@ class WikidataRecord:
         return None
 
     def items(self, prop: str) -> list[str]:
-        """QID-значения свойства (кроме «устаревших»), только по шаблону ``^Q\\d+$``."""
+        """QID-значения свойства (кроме «устаревших»), только по шаблону ``^Q[0-9]+$``."""
         found = []
         for claim in self.claims.get(prop, []):
             if claim.rank == "deprecated" or not isinstance(claim.value, dict):

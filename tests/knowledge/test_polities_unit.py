@@ -345,3 +345,127 @@ def test_measure_matches_endpoint(built, events):
         assert row["bytes"] == len(body) and row["gzip_bytes"] == len(gzip.compress(body, 9))
         assert row["polities"] == part.polities and row["inactive"] == 0
     assert events.one("knowledge.polities.measured").get("years") == 3
+
+
+# --- ревью 7: вырождение на сетке, дыры, ссылки, путь артефакта ---------------------------
+
+
+def _square(x: float, y: float, d: float) -> dict:
+    return {
+        "type": "Polygon",
+        "coordinates": [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]],
+    }
+
+
+@pytest.mark.parametrize("side", [0.004, 0.00004])
+def test_degenerate_polygon_becomes_grid_cell(side):
+    from shapely.geometry import shape
+
+    from philograph.knowledge.polities_build import simplify_geometry
+
+    x, y = 12.453 - side / 2, 41.903 - side / 2  # Ватикан
+    out, _, tiny = simplify_geometry(_square(x, y, side), 0.05, 2, 0.01)
+    assert tiny and out["type"] == "Polygon"
+    ring = out["coordinates"][0]
+    assert {tuple(p) for p in ring} == {
+        (12.45, 41.9),
+        (12.46, 41.9),
+        (12.46, 41.91),
+        (12.45, 41.91),
+    }
+    assert all(round(v, 2) == v for p in ring for v in p)
+    assert shape(out).is_valid and spherical_area(out["coordinates"]) < 2 * math.pi
+
+
+def test_degenerate_records_do_not_break_build(tmp_path, events):
+    feats = [
+        {
+            "type": "Feature",
+            "properties": {
+                "Name": f"Vatican {i}",
+                "FromYear": 1929,
+                "ToYear": 2024,
+                "Area": 0.44,
+                "Type": "POLITY",
+                "Wikidata": "",
+                "Wikipedia": "",
+                "SeshatID": "",
+            },
+            "geometry": _square(12.451, 41.901, side),
+        }
+        for i, side in enumerate([0.004, 0.00004])
+    ]
+    src = tmp_path / "v.geojson"
+    src.write_text(json.dumps({"type": "FeatureCollection", "features": feats}), "utf-8")
+    archive, sha = make_archive(tmp_path / "src", src)
+    report = build(manifest(sha), archive, tmp_path / "v.sqlite", tmp_path / "l.json", offline=True)
+    assert report["polities"] == 2 and report["skipped_invalid"] == 0 and report["tiny_kept"] == 2
+
+
+def test_small_holes_dropped():
+    from philograph.knowledge.polities_build import simplify_geometry
+
+    g = {
+        "type": "Polygon",
+        "coordinates": [
+            [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]],
+            [[0.2, 0.2], [0.2, 0.25], [0.25, 0.25], [0.25, 0.2], [0.2, 0.2]],
+            [[0.5, 0.5], [0.5, 0.8], [0.8, 0.8], [0.8, 0.5], [0.5, 0.5]],
+        ],
+    }
+    out, _, _ = simplify_geometry(g, 0.05, 2, 0.01)
+    assert len(out["coordinates"]) == 2  # внешнее кольцо и большая дыра
+
+
+def test_source_links_must_be_https():
+    from philograph.knowledge.polities_build import source_block
+
+    m = manifest("0" * 64)
+    m["license_url"] = "javascript:alert(1)"
+    with pytest.raises(BuildError):
+        source_block(m)
+
+
+def test_artifact_path_with_special_chars(built, tmp_path):
+    out, *_ = built
+    odd = tmp_path / "a#b?c%d"
+    odd.mkdir()
+    target = odd / "polities.sqlite"
+    target.write_bytes(out.read_bytes())
+    assert json.loads(PolityLayer(target).serve(1650))["polities"]
+    with pytest.raises(PolitiesUnavailable) as exc:
+        PolityLayer(odd / "nope.sqlite").serve(1650)
+    assert exc.value.reason == "missing"
+
+
+def test_main_truncated_archive_exit_code(tmp_path, capsys):
+    from philograph.knowledge.polities_build import main
+
+    archive, _ = make_archive(tmp_path / "src")
+    data = archive.read_bytes()[:-200]
+    archive.write_bytes(data)
+    m = yaml_manifest(tmp_path, hashlib.sha256(data).hexdigest())
+    code = main(
+        [
+            "--manifest",
+            str(m),
+            "build",
+            "--archive",
+            str(archive),
+            "--out",
+            str(tmp_path / "x.sqlite"),
+            "--labels",
+            str(tmp_path / "l.json"),
+            "--offline",
+        ]
+    )
+    assert code == 1 and not (tmp_path / "x.sqlite").exists()
+    assert "ошибка" in capsys.readouterr().err
+
+
+def yaml_manifest(tmp_path: Path, sha: str) -> Path:
+    import yaml
+
+    p = tmp_path / "manifest.yaml"
+    p.write_text(yaml.safe_dump(manifest(sha), allow_unicode=True), "utf-8")
+    return p

@@ -49,9 +49,24 @@ export type PolityFetch = (year: number, signal?: AbortSignal) => Promise<Polity
 
 const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 
+const isStr = (v: unknown): v is string => typeof v === "string";
+const isLink = (v: unknown): boolean => v == null || (isStr(v) && v.startsWith("https://"));
+
+// Ответ не по форме — ошибка слоя (современная карта с пометкой), а не падение страницы.
+function validSource(s: unknown): s is PolitySource {
+  const v = s as PolitySource | null;
+  return !!v && typeof v === "object" && isStr(v.title) && isStr(v.publisher) && isStr(v.version) && isStr(v.license) && Array.isArray(v.authors) && v.authors.every(isStr) && isLink(v.license_url) && isLink(v.url);
+}
+
+function validItem(p: unknown): p is PolityItem {
+  const v = p as PolityItem | null;
+  const g = v?.geometry;
+  return !!v && isStr(v.id) && isStr(v.name) && (v.name_status === "ru" || v.name_status === "original") && isNum(v.from) && isNum(v.to) && (v.wikidata === null || isStr(v.wikidata)) && !!g && (g.type === "Polygon" || g.type === "MultiPolygon") && Array.isArray(g.coordinates);
+}
+
 function valid(body: unknown): body is PolityLayer {
   const b = body as PolityLayer | null;
-  return !!b && isNum(b.year) && isNum(b.valid_from) && isNum(b.valid_to) && Array.isArray(b.polities) && !!b.source && typeof b.source === "object";
+  return !!b && isNum(b.year) && isNum(b.valid_from) && isNum(b.valid_to) && Array.isArray(b.polities) && b.polities.every(validItem) && validSource(b.source);
 }
 
 export const fetchPolities: PolityFetch = async (year, signal) => {

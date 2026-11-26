@@ -72,6 +72,9 @@ const DRAG_THRESHOLD = 4; // px: меньше — щелчок
 const WHEEL_STEP = 100; // px колеса на шаг приближения
 const RIM = 16; // поле под обод и деления вокруг круга глобуса
 const COUNTRY_PRECISION = 2; // px: площадь и центр видимой части стран (расхождение с точной < 0,01 %)
+// px: то же для образований Cliopatria. У их контуров бывают длинные рёбра с редкими
+// вершинами: при 2 px передискретизация даёт ошибку площади до 1,5 %, при 0,2 px — ≤ 0,1 %.
+const POLITY_PRECISION = 0.2;
 const DRAG_PRECISION = 2.5; // px: точность передискретизации путей во время перетаскивания
 
 export type GlobeInfo = { name: string; full: string; portrait?: string | null };
@@ -154,7 +157,7 @@ function usePolities(year: number): PolityState {
 }
 
 // --- раскладка покоя: чистые шаги (кадр, исходный вид) ---
-type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[]; labels: CountryInput[] };
+type RestInput = { scene: Scene | null; nameOf: (id: string) => string | null; measure: Measure; fv: number; frame: Frame; width: number; height: number; obstacles: Rect[]; labels: CountryInput[]; labelPrecision: number };
 
 function anchorsAt(projection: (p: [number, number]) => [number, number] | null, view: View, places: ScenePlace[], width: number, height: number): LPlace[] {
   return places.map((p) => {
@@ -178,7 +181,7 @@ function markersAt(anchors: LPlace[], lf: LFrame, r: RestInput): Layout {
 }
 
 function countriesAt(view: View, lf: LFrame, grid: Layout["grid"], r: RestInput): CountryLabel[] {
-  const cp = projector(view, r.frame, COUNTRY_PRECISION);
+  const cp = projector(view, r.frame, r.labelPrecision);
   cp.projection.clipExtent([
     [0, 0],
     [r.width, r.height],
@@ -233,13 +236,15 @@ export default function GlobeView(props: Props) {
   const polity = usePolities(props.year);
   const historical = polity.mode === "historical" && polity.layer ? polity.layer : null;
   const labels = historical ? labelInputs(historical) : COUNTRY_INPUT;
-  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels };
+  const restIn: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels, labelPrecision: historical ? POLITY_PRECISION : COUNTRY_PRECISION };
 
   // Исходный вид — из мест первого показа слоя (после загрузки шрифтов: от них зависят
   // подписи стран, а значит и приближение); «0» возвращает к нему для года T и размера сейчас.
   const home = useRef<View | null>(null);
   const homeLayer = useRef<GeoLayer | null>(null);
-  if (scene && layer && props.fontsVersion > 0 && overlays && homeLayer.current !== layer) {
+  // Исходный вид — после первого ответа слоя образований: приближение подбирается по тем
+  // подписям, что будут на карте, и не зависит от порядка ответов /map/places и /map/polities.
+  if (scene && layer && props.fontsVersion > 0 && overlays && polity.mode !== "pending" && homeLayer.current !== layer) {
     homeLayer.current = layer;
     home.current = homeFor(scene.places, restIn);
   }
@@ -416,7 +421,7 @@ export default function GlobeView(props: Props) {
   const places = useMemo(() => scene?.places ?? [], [scene]);
   const rest = useRef<RestLayout | null>(null);
   const { anchors, lay, countries } = useMemo(() => {
-    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels };
+    const r: RestInput = { scene, nameOf, measure, fv: props.fontsVersion, frame, width, height, obstacles, labels, labelPrecision: historical ? POLITY_PRECISION : COUNTRY_PRECISION };
     const anchors = anchorsAt(pr.projection, view, places, width, height);
     const lf: LFrame = { w: width, h: height, cx: frame.cx, cy: frame.cy, R: pr.scale };
     const got = frameLayout(rest.current, scene, moving, anchors, lf, () => markersAt(anchors, lf, r), obstacles);

@@ -39,7 +39,7 @@ YEAR_LIMIT = 9999
 DEFAULT_PATH = "data/cliopatria/polities.sqlite"
 DEFAULT_CACHE = 64
 DEFAULT_CACHE_BYTES = 64 * 1024 * 1024
-YEAR = re.compile(r"^-?\d{1,4}$")
+YEAR = re.compile(r"^-?[0-9]{1,4}$")  # только ASCII-цифры: `\d` в Python — любые цифры Юникода
 
 events.define(
     "knowledge.polities.served",
@@ -136,7 +136,9 @@ def open_artifact(path: Path) -> sqlite3.Connection:
     if not path.is_file():
         raise PolitiesUnavailable("missing")
     try:
-        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True, check_same_thread=False)
+        conn = sqlite3.connect(
+            path.resolve().as_uri() + "?mode=ro", uri=True, check_same_thread=False
+        )
         row = conn.execute("SELECT value FROM meta WHERE key = 'format_version'").fetchone()
     except sqlite3.DatabaseError as exc:
         raise PolitiesUnavailable("format") from exc

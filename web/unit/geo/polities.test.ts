@@ -1,4 +1,4 @@
-import { covers, labelInputs, PolityStore, type PolityLayer, type PolityResult } from "../../src/map/geo/polities";
+import { covers, fetchPolities, labelInputs, PolityStore, type PolityLayer, type PolityResult } from "../../src/map/geo/polities";
 import { done, eq, ok, test } from "../harness";
 
 const src = { title: "Cliopatria", publisher: "Seshat", authors: ["A"], version: "v1", license: "CC BY 4.0", license_url: null, url: null };
@@ -99,6 +99,26 @@ const IV: [number, number][] = [
     await s.release();
   }
   test("кэш ограничен", () => eq(store.cached(), 4));
+}
+
+{
+  const reply = (body: unknown, status = 200) => (globalThis.fetch = (async () => new Response(JSON.stringify(body), { status })) as typeof fetch);
+  const good = { year: 1650, valid_from: 1650, valid_to: 1650, polities: [item("a", "Q1")], source: src };
+  reply(good);
+  const r1 = await fetchPolities(1650);
+  reply({ ...good, source: {} });
+  const r2 = await fetchPolities(1650);
+  reply({ ...good, source: { ...src, url: "javascript:alert(1)" } });
+  const r3 = await fetchPolities(1650);
+  reply({ ...good, polities: [{ ...item("a", "Q1"), geometry: null }] });
+  const r4 = await fetchPolities(1650);
+  reply({}, 503);
+  const r5 = await fetchPolities(1650);
+  test("ответ не по форме — ошибка, а не исключение", () => {
+    eq(r1.kind, "ok");
+    eq([r2.kind, r3.kind, r4.kind], ["error", "error", "error"]);
+    eq(r5.kind, "unavailable");
+  });
 }
 
 test("одна подпись на QID, без QID — каждое", () => {

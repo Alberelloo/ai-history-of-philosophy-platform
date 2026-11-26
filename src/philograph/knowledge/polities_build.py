@@ -106,14 +106,21 @@ def load_manifest(path: Path) -> dict[str, Any]:
 
 def source_block(manifest: dict[str, Any]) -> dict[str, Any]:
     """Блок атрибуции ответа ``/map/polities`` — из манифеста, через метаданные артефакта."""
+    links = {
+        "license_url": manifest.get("license_url"),
+        "url": (manifest.get("zenodo") or {}).get("url") or manifest.get("repository"),
+    }
+    for key, value in links.items():
+        if value is not None and not (isinstance(value, str) and value.startswith("https://")):
+            raise BuildError(f"ссылка атрибуции {key} не https: {value!r}")
     return {
         "title": manifest["title"],
         "publisher": manifest["publisher"],
         "authors": list(manifest["authors"]),
         "version": manifest["version"],
         "license": manifest.get("license_title", "CC BY 4.0"),
-        "license_url": manifest.get("license_url"),
-        "url": (manifest.get("zenodo") or {}).get("url") or manifest.get("repository"),
+        "license_url": links["license_url"],
+        "url": links["url"],
     }
 
 
@@ -266,36 +273,57 @@ def _round(coords: Any, precision: int) -> Any:
     return [_round(c, precision) for c in coords]
 
 
+def _grid_cell(x: float, y: float, precision: int) -> Any:
+    """Клетка сетки ``10^-precision``, содержащая точку: наименьший невырожденный
+    многоугольник на этой сетке."""
+    from shapely.geometry import box
+
+    scale = 10**precision
+    ix, iy = math.floor(x * scale), math.floor(y * scale)
+    ix = min(max(ix, -180 * scale), 180 * scale - 1)
+    iy = min(max(iy, -90 * scale), 90 * scale - 1)
+    return box(ix / scale, iy / scale, (ix + 1) / scale, (iy + 1) / scale)
+
+
 def simplify_geometry(
     geometry: dict[str, Any], tolerance: float, precision: int, min_ring: float
 ) -> tuple[dict[str, Any], int, bool]:
-    """Упрощённая геометрия GeoJSON, число вершин после и признак «оставлено самое большое
-    кольцо, потому что всё остальное меньше порога или схлопнулось»."""
+    """Упрощённая геометрия GeoJSON, число вершин после и признак «оставлен только самый
+    большой многоугольник (или клетка сетки у его центроида), потому что остальное меньше
+    порога или выродилось на сетке».
+
+    Координаты всегда на сетке ``10^-precision``. Пустая исходная геометрия —
+    ``ValueError`` (запись не по формату); вырождение на сетке исключений не даёт."""
     import shapely
-    from shapely.geometry import MultiPolygon, mapping, shape
+    from shapely.geometry import MultiPolygon, Polygon, mapping, shape
     from shapely.geometry.polygon import orient
 
     source = _polygons(shapely.make_valid(shape(geometry)))
-    simplified = _polygons(
-        shapely.make_valid(
-            MultiPolygon(source).simplify(tolerance, preserve_topology=True)
-            if source
-            else MultiPolygon()
+    if not source:
+        raise ValueError("пустая геометрия")
+    simplified = (
+        _polygons(
+            shapely.make_valid(MultiPolygon(source).simplify(tolerance, preserve_topology=True))
         )
+        or source
     )
     gridded = _polygons(shapely.set_precision(MultiPolygon(simplified), 10.0**-precision))
-    kept = [p for p in gridded if p.area >= min_ring]
+
+    def without_small_holes(p: Any) -> Any:
+        holes = [r for r in p.interiors if Polygon(r).area >= min_ring]
+        return p if len(holes) == len(p.interiors) else Polygon(p.exterior, holes)
+
+    kept = [without_small_holes(p) for p in gridded if p.area >= min_ring]
     tiny = False
     if not kept:
         tiny = True
-        pool = gridded or simplified or source
-        if not pool:
-            raise ValueError("пустая геометрия")
-        biggest = max(pool, key=lambda p: p.area)
-        if not gridded:  # схлопнулось на сетке: та же форма с более мелкой сеткой
-            biggest = _polygons(shapely.set_precision(biggest, 10.0 ** -(precision + 2)))[0]
-            precision += 2
-        kept = [biggest]
+        cell = 10.0 ** (-2 * precision)
+        biggest = max(gridded, key=lambda p: p.area) if gridded else None
+        if biggest is not None and biggest.area >= cell * (1 - 1e-9):
+            kept = [without_small_holes(biggest)]  # всё меньше порога: самый большой
+        else:  # выродился на сетке (пуст или меньше клетки): клетка у центроида
+            c = max(simplified, key=lambda p: p.area).centroid
+            kept = [_grid_cell(c.x, c.y, precision)]
     kept = [orient(p, sign=-1.0) for p in kept]
     if len(kept) == 1:
         out = {"type": "Polygon", "coordinates": _round(mapping(kept[0])["coordinates"], precision)}
@@ -340,6 +368,13 @@ def polygons_of(geometry: dict[str, Any]) -> list[Any]:
 
 
 # --- сборка ----------------------------------------------------------------------------
+
+
+def shapely_errors() -> type[Exception]:
+    """Ошибка GEOS на испорченной геометрии записи — запись не по формату, не сбой сборки."""
+    from shapely.errors import GEOSException
+
+    return GEOSException
 
 
 def polity_id(name: str) -> str:
@@ -432,7 +467,7 @@ def build(
             name, start, end, geometry = valid
             try:
                 simple, vout, tiny = simplify_geometry(geometry, tolerance, precision, min_ring)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, shapely_errors()):
                 report["skipped_invalid"] += 1
                 continue
             report["vertices_in"] += _count(geometry.get("coordinates") or [])
@@ -518,7 +553,7 @@ def build(
 
 def change_points(db: Path) -> list[int]:
     """Первые годы всех интервалов постоянного набора внутри лет датасета."""
-    conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    conn = sqlite3.connect(Path(db).resolve().as_uri() + "?mode=ro", uri=True)
     try:
         rows = conn.execute(
             "SELECT from_year FROM polity_rows UNION SELECT to_year + 1 FROM polity_rows"
@@ -584,6 +619,14 @@ def measure(db: Path, years: list[int], *, all_intervals: bool = False) -> dict[
 # --- командная строка ------------------------------------------------------------------
 
 
+def _json_error() -> type[Exception]:
+    try:
+        import ijson
+    except ImportError:  # без extra geo-build: build всё равно не запустится
+        return ValueError
+    return ijson.JSONError
+
+
 def main(argv: list[str] | None = None, *, fetch_json: wikidata.Fetch | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -639,6 +682,18 @@ def main(argv: list[str] | None = None, *, fetch_json: wikidata.Fetch | None = N
             )
     except BuildError as exc:
         print(f"ошибка: {exc}", file=sys.stderr)
+        return 1
+    except (
+        OSError,
+        zipfile.BadZipFile,
+        KeyError,
+        httpx.HTTPError,
+        ValueError,
+        _json_error(),
+    ) as exc:
+        # Обрезанный или испорченный архив (ijson), нет файла, сбой сети: артефакт не
+        # тронут (временный файл удалён), сообщение без трассировки.
+        print(f"ошибка: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
     return 0
 
