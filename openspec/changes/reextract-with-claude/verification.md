@@ -508,3 +508,46 @@
 | Внешний извлекатель | ext-dup-after-normalization-missed | tests/knowledge/test_reextract_review.py::test_duplicate_fragment_after_normalization_json | да (1 failed, 1 warning in 1.05s) |
 | Отчёт о запусках извлечения | ext-report-needs-library | tests/knowledge/test_reextract_review.py::test_report_needs_no_library | да (1 failed, 1 warning in 0.55s) |
 EXIT=0
+
+## Судья (повторно) — 2026-11-26, коммит 471c77d
+
+Окружение: worktree ветки, `PYTHONPATH=<worktree>/src`. Для вывода системы — чистая копия `src` коммита 471c77d (`git archive`), настоящий CLI `python -m philograph.knowledge.external_extraction` на временной SQLite, поддельная библиотека по HTTP (`v1` — 5 абзацев одной главы, `v40` — 40 абзацев по 130 знаков, `vforbidden` — без разрешения), события — JSON из stderr. Маршрут роли — настоящее приложение `philograph.llm.main.create` (TestClient) на `config/llm.yaml` с фиктивными ключами и на `config/llm.demo.yaml`. Шлюзовой путь извлечения — тестами со стендом (dev_stack по условию не поднимался).
+
+### Что вернул прежний судья — закрыто
+
+| Возврат | Проверка | Итог |
+|---|---|---|
+| Д4: повтор номера фрагмента после приведения → код 2 | CLI: JSONL `1`/`"01"` → код 2, «фрагмент 1 указан дважды ('1' и '01')»; JSON `"1"`/`" 1"` → код 2; запусков и записей не добавилось (5/5/5). Тесты `test_duplicate_fragment_after_normalization_{jsonl,json}` passed | закрыто |
+| Тест на Д4; патчи мутаций; полный `mutation_check` | `mutation_check.py --change reextract-with-claude` у меня: **EXIT=0, 109 строк, во всех «да»**, `git status` после — чист; `--coverage` — у всех 11 требований | закрыто |
+| Ревью bd21bb3 и Д4, 4.1 | раздел третьего ревью в `progress.md` (коммит 9182375), 4.1 отмечен | закрыто |
+| Замечание: `report` требует библиотеку | `report` без `PHILOGRAPH_LIBRARY_URL` → код 0 | закрыто |
+
+### Сверка
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Фрагменты из нескольких абзацев | 4 сценария + инварианты | `F::*` ok | passed | `export v40`: фрагменты 24 (p1…p24) и 17 (p24…p40), `knowledge.extraction.exported {version_id, fragments=2}`; `v1` — 1 фрагмент, `passages` с `[1] ` | подтверждено |
+| Цитата у каждого утверждения | кавычки и тире, многоточие по порядку/обратно, многоточие автора, без значимого текста, сирот нет | `Q::*`, review ok | passed | `«познание начинается с опыта»`, `"Он сказал: - Бог умер"`, «О, Заратустра… ты нашёл…», «сказал... и» записаны, в `evidence.quote` — как есть; обратный порядок → `quote_not_found`; «—» → `quote_too_short`; «Иероним» (цитаты нет) → `quote_not_found`, «Иеронимус» (абзац 9) → `paragraph_out_of_window`, `entity.created` для них нет | подтверждено |
+| Запуски наполнения | метрики, модель, сбой, не 200, миграция 10 | `R::*` ok | passed | `filling_runs`: `model=claude-opus-5-5`, `extractor=external`, `source_id=src_v1`, `fragments=1`, `duration_seconds=120`, токены 1000000/100000, `cost_usd=6`, `failure` пусто, `finished_at` есть; `dropped=7` = Σ `drop_reasons` = 7 событий; `provenance.model=claude-opus-5-5`, `run_id` запуска; миграции 1…10 | подтверждено |
+| Проверка ответа по утверждениям | отклонения в одном ответе, entities не того вида, мягкая схема | `I::*`, review ok | passed | `attributed_to: null` → атрибуция `source asserts`; `paragraph: "2"` принят; `rejects` → `influenced_by` + `knowledge.registry.proposal {code: rejects}`; `character` → `entity_type`; `quote: 7` → `schema_item`; `entities.type: ["person"]` → `schema_item`; остальные записаны, `fragment created=5 dropped=7` | подтверждено |
+| Коды причин отбраковки | сводка, ключи `{run_id, reason, code}` | ok | passed | все `dropped` — `{run_id, reason, code}`, коды из перечня, текста цитат нет | подтверждено |
+| Внешний извлекатель | выгрузка, запись, повтор, идёт запись, брошенная, повтор фрагмента, запрет, нет версии | `X::*`, review ok | passed | повтор без `--replace` → 2, «уже записана», `run.started` нет; с `--replace` → `knowledge.run.rolled_back {statements: 5, attributions: 5, evidence: 5}` + новый `done`, счётчики 5/5/5; `running` 1 ч → 2, «запись идёт», ничего не откатано; 7 ч → `rolled_back` + `done`; `v40` с ответом на 1 и 7 → `reply_missing:1`, `reply_invalid:1`; модель `foo` без цен → 2; `vforbidden` → 3 + `knowledge.extraction.skipped`; `nope` → 2, «версия nope не найдена в библиотеке» | подтверждено |
+| Отчёт о запусках извлечения | отчёт за день | ok | passed | 2 строки (2 `rolled_back` исключены), «Итого» 240 с / 3 фрагмента / 2000000 / 200000 / $12 / 6 / 9 / 60%, источник «Учебник v1 (`src_v1`)», топ-3; `knowledge.extraction.report {runs: 2, out}`; без адреса библиотеки | подтверждено |
+| Таймаут вызова модели | бюджет + 30, запасной 1200 | ok | passed | на боевом конфиге шлюз отдаёт `strong` 1084,5 → ожидаемый таймаут 1114,5 (сам вызов — тестом со стендом) | подтверждено |
+| Художественный текст | правила в промпте | ok | passed | `instructions` в задании содержат обе фразы | подтверждено |
+| Сведения о роли (llm-gateway) | роль извлечения, неизвестная роль | ok | passed | `config/llm.yaml`: `{"role": "strong", "model": "deepseek-v4-pro", "call_budget_seconds": 1084.5}`; `nope` → 404 `kind=unknown_role`; ни ключей, ни цен | подтверждено |
+| Сводка расходов (llm-gateway) | токены по запуску, приближение к лимиту | ok | passed | — (стенд шлюза в тестах) | подтверждено тестом |
+
+Полный pytest (`tests/knowledge tests/llm tests/test_mutation_coverage.py`): **1 failed, 2159 passed, 1 skipped за 30:07**. Упал только `test_epoch_dates_unit.py::test_repository_manifest_is_valid_and_unconfirmed`. Он падает и на чистой копии `origin/claude/embedding-docker` (c9a02aa): `1 failed in 0.21s`. `sources/` веткой не затронут, так что изменение тут ни при чём. `ruff check .` и `ruff format --check .` чисты (720 файлов), `lint-imports` — 3 kept, `check_traceability.py` — 427 из 427.
+
+Мутации: полный `mutation_check` — EXIT=0, описано выше. Две свои, вне `mutations.yaml`:
+- в `report_rows` отключён фильтр `--until` → упал `test_report_period_and_rollbacks`;
+- `TIMEOUT_MARGIN` 30 → 29 → 6 тестов таймаута упали.
+
+Код возвращён, `git status` по продуктовому коду пуст.
+
+Подгонка не найдена. Тесты прежнего контракта поменялись только по дельте: `code` в событии, миграция 10, мягкая схема. `skip`/`xfail` не добавлены. В `src` нет значений, подогнанных под тесты. Тела ключевых тестов проверяют THEN по базе и журналу. Все тесты из таблицы существуют, кроме `test_duplicate_key_in_json_object`: в журнале он описан как разделённый на `test_duplicate_top_level_key_in_json_object` и `test_duplicate_key_inside_reply_is_plain_json`.
+
+Не блокирует, на будущее: окно гонки между проверкой «запись идёт» и `start_run` при параллельных `ingest` одной версии. Если `PHILOGRAPH_DATABASE_URL` не задан, команда падает с `KeyError` (третье ревью).
+
+Вердикт: **принято**.
