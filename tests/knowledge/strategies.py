@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import re
 import unicodedata
 import uuid
 from typing import Any
@@ -247,9 +248,14 @@ def stopwords_perturbed(draw) -> tuple[tuple[str, str], str]:
     text = "".join(chars)
     if draw(st.booleans()):
         text = text.replace("е", "ё").replace("Е", "Ё")
-    sep = draw(st.sampled_from([" ", "  ", " \t", " - ", ", "]))
+    # N11: «_» — знак слова для ``\w``, но не буква и не цифра: в нормализации — пробел
+    sep = draw(st.sampled_from([" ", "  ", " \t", " - ", ", ", "_", " _ "]))
     text = sep.join(text.split(" "))
-    text = draw(st.sampled_from(["", " ", "  "])) + text + draw(st.sampled_from(["", " ", "."]))
+    text = (
+        draw(st.sampled_from(["", " ", "  ", "_"]))
+        + text
+        + draw(st.sampled_from(["", " ", ".", "_", "__"]))
+    )
     if draw(st.booleans()):
         text = unicodedata.normalize("NFD", text)
     if type_ == PERSON:
@@ -501,6 +507,37 @@ def scripts_mix(
     return (text, given), lang, {"counts": counts, "script": script, "latin": counts["latin"] > 0}
 
 
+# --- хранимая форма названия (О22, О23): вход записи --------------------------------
+
+_PAD = st.sampled_from(["", " ", "  ", *WHITESPACE, " \u00a0", "\u2003\u3000"])
+_STORED_POOL = [
+    "Пётр Абеляр",
+    "Йозеф Шумпетер",
+    "Ἀριστοτέλης",
+    "Renée Descartes",
+    "Декарт",
+    # NFC ≠ NFKC (О23, O5): лигатуры, полноширинные, надстрочные, внутренние NBSP/EM SPACE
+    "\ufb01losoﬁa",
+    "\uff2b\uff41\uff4e\uff54",
+    "Kant\u2003Hume",
+    "Kant\u00a0Hume",
+    "Пий XL",
+    "Декарт\u00b2",
+]
+
+
+@st.composite
+def raw_names(draw, pool: bool = False) -> str:
+    """Вход записи: пробелы по краям, NFD или NFC, смешанные письменности (``scripts_mix``)."""
+    text = draw(st.sampled_from(_STORED_POOL)) if pool else draw(scripts_mix())[0][0]
+    if not pool and draw(st.booleans()):  # совместимые знаки и внутренние пробелы — и в смеси
+        text = draw(st.sampled_from(_STORED_POOL)) + draw(st.sampled_from(WHITESPACE)) + text
+    form = draw(st.sampled_from(["NFC", "NFD", "NFKD"]))
+    if form != "NFKD":  # NFKD меняет совместимые знаки — не тот же текст; только NFD/NFC
+        text = unicodedata.normalize(form, text)
+    return draw(_PAD) + text + draw(_PAD)
+
+
 # --- элементы ответа модели -------------------------------------------------------------------
 
 
@@ -592,7 +629,24 @@ UNPARSED = (
     "I – V в.",
     "1 января 1724",
     "1724 – 1804 до н. э. – 3",
+    # D1: «до нашей эры» — маркер только цитаты (ERA_QUOTE − ERA_TEXT), в тексте даты нет
+    "384–322 до нашей эры",
+    "ок. 470 до нашей эры",
+    "V в. до нашей эры",
+    "427 ДО НАШЕЙ ЭРЫ",
 )
+
+
+def _any_case(draw, marker: str) -> str:
+    """Маркер в произвольном регистре: как есть, ВЕРХНИЙ, С заглавной или вперемешку."""
+    kind = draw(st.sampled_from(["keep", "upper", "capitalize", "mixed"]))
+    if kind == "upper":
+        return marker.upper()
+    if kind == "capitalize":
+        return marker.capitalize()
+    if kind == "mixed":
+        return "".join(ch.swapcase() if draw(st.booleans()) else ch for ch in marker)
+    return marker
 
 
 def _bounds_year(y: int, era: bool) -> int:
@@ -611,16 +665,15 @@ def _valid_dating(draw, person: bool, force: str | None = None) -> dict[str, Any
     era = draw(st.booleans())
     dash = draw(st.sampled_from(DASHES))
     space = draw(st.sampled_from(["", " "]))
-    era_marker = draw(st.sampled_from(ERA_TEXT))
-    approx = draw(st.sampled_from(APPROX))
-    if draw(st.booleans()):
-        approx = approx.upper() if draw(st.booleans()) else approx.capitalize()
+    era_marker = _any_case(draw, draw(st.sampled_from(ERA_TEXT)))  # D5: без учёта регистра
+    approx = _any_case(draw, draw(st.sampled_from(APPROX)))
+    century_mark = _any_case(draw, "в.")
     numbers: list[int] = []
     roman = None
     if form == "century":
         r = draw(st.integers(1, 21))
         roman = CENTURIES[r - 1]
-        text = f"{roman} в."
+        text = f"{roman} {century_mark}"  # формат «R в.»: римское число — отдельное слово
         lo, hi = (r - 1) * 100 + 1, r * 100
         if era:
             lo, hi = 1 - r * 100, 1 - ((r - 1) * 100 + 1)
@@ -665,12 +718,16 @@ def _valid_dating(draw, person: bool, force: str | None = None) -> dict[str, Any
     }
 
 
+def _drop_era(text: str) -> str:
+    """Убрать маркеры эры (текста и цитаты) в любом регистре (D5)."""
+    markers = "|".join(re.escape(m) for m in ERA_QUOTE)
+    return re.sub(rf"\s+(?:{markers})", "", text, flags=re.IGNORECASE)
+
+
 def _quote_for(draw, d: dict[str, Any], era: bool | None = None) -> str:
     """Цитата с текстом даты (или теми же числами и эрой в другом окружении)."""
     era = d["era"] if era is None else era
-    core = d["text"]
-    for marker in ERA_TEXT:
-        core = core.replace(" " + marker, "")
+    core = _drop_era(d["text"])
     if era:
         core = core + " " + draw(st.sampled_from(ERA_QUOTE))
     before = draw(st.sampled_from(CONTEXT_WORDS))
@@ -807,9 +864,7 @@ def datings(draw) -> dict[str, Any]:
             replacement = str(draw(st.integers(1, 2100).filter(lambda v: v not in d["numbers"])))
             quote = _replace_number(quote, missing, replacement)
         if target == "m_numbers_era":
-            quote = (
-                quote.replace(" до нашей эры", "").replace(" до н. э.", "").replace(" до н.э.", "")
-            )
+            quote = _drop_era(quote)
             if not d["era"]:
                 quote = quote + " до н. э."
         reason = "dating:not_in_quote"

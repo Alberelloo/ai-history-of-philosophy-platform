@@ -29,10 +29,10 @@ from ..conftest import PROFILES
 from .conftest import CatalogService
 from .extraction_stand import Stand
 from .strategies import (
-    WHITESPACE,
     expected_label,
     name_of,
     names_with_reason,
+    raw_names,
     scripts_mix,
     sentinel,
 )
@@ -798,6 +798,10 @@ def test_rules_are_data(onto, events, tmp_path, monkeypatch, mutate, type_, labe
 # --- инвариант отказа --------------------------------------------------------------------
 
 BOUNDARY_EXAMPLES = [
+    # N11 (О23): «_» — знак слова для \w, не буква и не цифра → в нормализации пробел
+    (("concept", "some_"), "stopword"),
+    (("concept", "_some"), "stopword"),
+    (("term", "every_one"), None),
     (("concept", "Один Два Три Четыре Пять Шесть"), None),
     (("concept", "Один Два Три Четыре Пять Шесть Семь"), "sentence"),
     (("concept", "Б" * 80), None),
@@ -991,34 +995,6 @@ def test_strategies_oracle_independent():
 
 
 # --- О22: хранимая форма названия — strip + NFC на любом пути записи --------------------
-
-_PAD = hs.sampled_from(["", " ", "  ", *WHITESPACE, " \u00a0", "\u2003\u3000"])
-_STORED_POOL = [
-    "Пётр Абеляр",
-    "Йозеф Шумпетер",
-    "Ἀριστοτέλης",
-    "Renée Descartes",
-    "Декарт",
-    # NFC ≠ NFKC (О23, O5): лигатуры, полноширинные, надстрочные, внутренние NBSP/EM SPACE
-    "\ufb01losoﬁa",
-    "\uff2b\uff41\uff4e\uff54",
-    "Kant\u2003Hume",
-    "Kant\u00a0Hume",
-    "Пий XL",
-    "Декарт\u00b2",
-]
-
-
-@hs.composite
-def raw_names(draw, pool: bool = False) -> str:
-    """Вход записи: пробелы по краям, NFD или NFC, смешанные письменности (``scripts_mix``)."""
-    text = draw(hs.sampled_from(_STORED_POOL)) if pool else draw(scripts_mix())[0][0]
-    if not pool and draw(hs.booleans()):  # совместимые знаки и внутренние пробелы — и в смеси
-        text = draw(hs.sampled_from(_STORED_POOL)) + draw(hs.sampled_from(WHITESPACE)) + text
-    form = draw(hs.sampled_from(["NFC", "NFD", "NFKD"]))
-    if form != "NFKD":  # NFKD меняет совместимые знаки — не тот же текст; только NFD/NFC
-        text = unicodedata.normalize(form, text)
-    return draw(_PAD) + text + draw(_PAD)
 
 
 def _stored(onto, entity_id) -> dict[str, str]:

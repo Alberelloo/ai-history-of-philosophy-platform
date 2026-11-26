@@ -17,7 +17,6 @@ import yaml
 from hypothesis import HealthCheck, find, settings
 
 from . import strategies as S
-from .test_entity_naming import raw_names
 
 req = pytest.mark.req
 NM, ED, PQ = "entity-naming", "entity-dating", "person-quality"
@@ -178,7 +177,7 @@ def test_scripts_and_langs_generated():
 def test_whitespace_generated(space):
     assert set(S.WHITESPACE) >= WHITESPACE
     _find(S.scripts_mix(), lambda c: space in _text(c).strip())
-    _find(raw_names(), lambda raw: raw.startswith(space) or raw.endswith(space))
+    _find(S.raw_names(), lambda raw: raw.startswith(space) or raw.endswith(space))
 
 
 @req(NM, VALID, invariant="Генераторы названий: NFC ≠ NFKC и NFC ≠ NFD (О23, O5)")
@@ -188,11 +187,11 @@ def test_normal_forms_distinguished():
         return unicodedata.normalize("NFKC", nfc) != nfc
 
     _find(S.scripts_mix(), lambda c: nfkc_differs(_text(c)))
-    _find(raw_names(), nfkc_differs)
-    _find(raw_names(), lambda raw: unicodedata.normalize("NFC", raw) != raw)
+    _find(S.raw_names(), nfkc_differs)
+    _find(S.raw_names(), lambda raw: unicodedata.normalize("NFC", raw) != raw)
     # лигатура: NFKC меняет число кодовых точек; внутренний NBSP/EM SPACE: NFKC → пробел
-    _find(raw_names(), lambda raw: "ﬁ" in raw)
-    _find(raw_names(pool=True), lambda raw: " " in raw.strip() or " " in raw.strip())
+    _find(S.raw_names(), lambda raw: "ﬁ" in raw)
+    _find(S.raw_names(pool=True), lambda raw: " " in raw.strip() or " " in raw.strip())
 
 
 @req(NM, VALID, invariant="Генератор правил порождает каждую причину (О23)")
@@ -295,3 +294,39 @@ def test_person_scenario_codes():
     )
     for code in SCENARIO_CODES:
         assert f'"{code}"' in sources, code
+
+
+@req(ED, DATING, invariant="Маркеры цитаты вне маркеров текста дают dating:unparsed (D1, О23)")
+@pytest.mark.parametrize("marker", sorted(ERA_QUOTE - ERA_TEXT))
+def test_quote_only_era_marker_unparsed(marker):
+    _find(
+        S.datings(),
+        lambda d: marker in d["dating"]["text"].lower() and d["reason"] == "dating:unparsed",
+    )
+
+
+@req(
+    ED,
+    DATING,
+    invariant="Регистр меняется у каждого маркера текста даты, годные остаются годными (D5, О23)",
+)
+@pytest.mark.parametrize("marker", sorted(ERA_TEXT | APPROX | {"в."}))
+def test_marker_case_generated(marker):
+    def ok(d) -> bool:
+        text = d["dating"]["text"]
+        low = text.lower()
+        if marker not in low or d["reason"] is not None:
+            return False
+        i = low.index(marker)
+        return text[i : i + len(marker)] != marker  # тот же маркер, другой регистр
+
+    _find(S.datings(), ok)
+
+
+@req(
+    NM,
+    VALID,
+    invariant="Генератор стоп-слов порождает «_» и другие знаки слова не-буквы (N11, О23)",
+)
+def test_underscore_generated():
+    _find(S.stopwords_perturbed(), lambda c: "_" in c[0][1] and c[1] == "stopword")

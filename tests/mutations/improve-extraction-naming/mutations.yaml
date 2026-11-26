@@ -1316,3 +1316,23 @@ mutations:
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc
       - tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc
+  - id: era-text-nashei
+    requirement: Извлечение дат
+    patch: era-text-nashei.patch
+    note: судья D1 — «до нашей эры» принимается в тексте даты
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+  - id: era-text-case
+    requirement: Извлечение дат
+    patch: era-text-case.patch
+    note: судья D5 — маркер эры в тексте даты с учётом регистра
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_any_input
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_invariant
+  - id: normalize-keeps-underscore
+    requirement: Валидность названий сущностей
+    patch: normalize-keeps-underscore.patch
+    note: судья N11 — «_» не заменяется пробелом в нормализации
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_check_name_any_input
