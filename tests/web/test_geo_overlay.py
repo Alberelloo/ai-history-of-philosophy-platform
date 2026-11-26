@@ -19,6 +19,7 @@ import pytest
 from .geo_helpers import (
     CITIES,
     COUNTRY_MIN_LABELS,
+    KEYS_TEXT,
     SIZES,
     crowd,
     drag_frames,
@@ -26,8 +27,10 @@ from .geo_helpers import (
     focus_globe,
     geo_built,
     globe_ready,
+    obstacle_rects,
     open_globe,
     overlap,
+    overlays,
     press,
     scene,
     settle,
@@ -38,48 +41,6 @@ req = pytest.mark.req
 GEO = "geo-timeline"
 MED = "Медальоны философов"
 POL = "Политическая карта"
-
-COAST_TEXT = "Границы и береговая линия — современные, Natural Earth"
-KEYS_TEXT = "Клавиши"
-
-# Прямоугольники наложенных элементов относительно вида глобуса. Видимые — с ненулевой
-# площадью; отдельно — элементы, найденные по тексту и роли, и их пометка.
-OVERLAYS_JS = """([coastText, keysText]) => {
-  const svg = document.querySelector('.geo-globe');
-  const s = svg.getBoundingClientRect();
-  const rect = e => { const r = e.getBoundingClientRect();
-    return {x0: r.x - s.x, y0: r.y - s.y, x1: r.right - s.x, y1: r.bottom - s.y, w: r.width, h: r.height}; };
-  const marked = [...document.querySelectorAll('[data-geo-overlay]')]
-    .map(e => ({kind: e.dataset.geoOverlay, ...rect(e)})).filter(r => r.w > 0 && r.h > 0);
-  const stage = svg.closest('.geo-stage') || svg.parentElement;
-  const byText = [...stage.querySelectorAll('p, div, span')]
-    .filter(e => e.textContent.trim() === coastText && ![...e.children].some(c => c.textContent.trim() === coastText));
-  const keys = [...stage.querySelectorAll('button')].filter(b => b.textContent.trim() === keysText);
-  const hintId = keys[0]?.getAttribute('aria-controls');
-  const hint = hintId ? document.getElementById(hintId) : null;
-  const found = [
-    ...byText.map(e => ({what: 'coast', mark: e.getAttribute('data-geo-overlay'), ...rect(e)})),
-    ...keys.map(e => ({what: 'keys', mark: e.getAttribute('data-geo-overlay'), ...rect(e)})),
-    ...(hint ? [{what: 'keys-hint', mark: hint.getAttribute('data-geo-overlay'), ...rect(hint)}] : []),
-  ];
-  return {marked, found, expanded: keys[0]?.getAttribute('aria-expanded') ?? null};
-}"""
-
-
-def overlays(page) -> dict:
-    return page.evaluate(OVERLAYS_JS, [COAST_TEXT, KEYS_TEXT])
-
-
-def obstacle_rects(ov: dict) -> list[tuple[str, tuple]]:
-    """Видимые прямоугольники: помеченные и найденные по тексту/роли (на случай, если пометки
-    нет — тогда упадёт и проверка пометки, и пересечение не спрячется)."""
-    out = [(r["kind"], ("r", r["x0"], r["y0"], r["x1"], r["y1"])) for r in ov["marked"]]
-    out += [
-        (r["what"], ("r", r["x0"], r["y0"], r["x1"], r["y1"]))
-        for r in ov["found"]
-        if r["w"] > 0 and r["h"] > 0
-    ]
-    return out
 
 
 def overlay_faults(sc: dict, ov: dict, *, moving: bool = False) -> list:

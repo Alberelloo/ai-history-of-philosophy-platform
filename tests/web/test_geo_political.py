@@ -27,6 +27,7 @@ from .geo_helpers import (
     FILL_FONT,
     LABEL_FONT,
     MAX_COUNTRY_LABELS,
+    PAD,
     PLACES_API,
     RU_JSON,
     RU_TEXT,
@@ -44,6 +45,7 @@ from .geo_helpers import (
     open_globe,
     outside,
     overlap,
+    overlay_obstacles,
     press,
     rows,
     ru_names,
@@ -79,7 +81,7 @@ def centers_world(world, centers) -> list[str]:
     return ids
 
 
-def label_faults(sc, o, names, *, with_markers=True) -> list:
+def label_faults(sc, o, names, *, with_markers=True, overlay_rects=None) -> list:
     """Нарушения правила подписей стран в кадре ``sc``: словарь, площадь, ширина, точка внутри,
     пересечения и кадр. Площадь и ширина сверяются с независимым расчётом d3-geo."""
     bad = []
@@ -146,6 +148,13 @@ def label_faults(sc, o, names, *, with_markers=True) -> list:
         if "country" in (a[0], b[0]):
             bad.append(("пересечение", a[:2], b[:2]))
     bad += [x for x in outside(sc, items) if x[0] == "country"]
+    # Правило 5 (после Д10): подпись не пересекает наложенные элементы вида.
+    for c in labels:
+        b = c["box"]
+        rect = ("r", b["x"] - PAD, b["y"] - PAD, b["x"] + b["w"] + PAD, b["y"] + b["h"] + PAD)
+        for r in overlay_rects or []:
+            if overlap(rect, r):
+                bad.append(("подпись страны на наложенном элементе вида", c["id"], r))
     return bad
 
 
@@ -302,7 +311,8 @@ def fitting_countries(page, sc, o, names) -> dict[str, list]:
     странице, ширина текста — canvas. Подписанные продуктом страны входят без проверки.
     Возвращает {код: точка подписи или «продукт»}."""
     labelled = {c["id"] for c in sc["countries"]}
-    obstacles = [s for _k, _i, s in shapes(sc)]
+    # Препятствия: фигуры SVG и наложенные элементы вида (правило 5 после Д10), измеренные тестом.
+    obstacles = [s for _k, _i, s in shapes(sc)] + overlay_obstacles(page)
     ref = sc["countries"][0] if sc["countries"] else None
     height = (ref["box"]["h"] / ref["fs"] * FILL_FONT) if ref else FILL_FONT * 1.3
     out: dict[str, list] = {cid: ["продукт"] for cid in labelled}
@@ -430,7 +440,12 @@ def test_only_large_countries(knowledge_context, knowledge_stack, events):
                 ), (lonlat, z, main, fill)
             for c in sc["countries"]:
                 assert c["box"]["w"] <= c["span"] + 0.5, c
-            assert label_faults(sc, o, names, with_markers=False) == []
+            assert (
+                label_faults(
+                    sc, o, names, with_markers=False, overlay_rects=overlay_obstacles(page)
+                )
+                == []
+            )
             if lonlat == (15, 50) and z == 1:
                 ids = {c["id"] for c in sc["countries"]}
                 assert sc["center"] == "15,50" and sc["zoom"] == 1
@@ -567,7 +582,7 @@ def test_country_label_rule_on_many_views(
             press(page, "+", steps)
             settle(page)
             sc = scene(page)
-            faults = label_faults(sc, o, names)
+            faults = label_faults(sc, o, names, overlay_rects=overlay_obstacles(page))
             assert faults == [], (lonlat, z, faults)
             n += len(sc["countries"])
     assert n > 0
