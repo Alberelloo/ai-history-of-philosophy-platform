@@ -25,6 +25,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import socket
 import threading
 import time
@@ -44,6 +45,7 @@ from philograph.knowledge.entities import Entities
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import SectionMap
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.polities import PolityLayer
 from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.snapshot import Snapshots
@@ -119,6 +121,10 @@ class KnowledgeStack:
     outside: list[str] = field(default_factory=list)
     responses: list[Seen] = field(default_factory=list)
     paragraphs: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # "N" → (id, текст)
+    # Слой образований (add-historical-polities, 6.1): задержка ответа ``/map/polities``
+    # в секундах и «ворота» — ``threading.Event``, до установки которого ответ ждёт.
+    polities_delay: float = 0.0
+    polities_gate: Any = None
     _server: Any = None
     _thread: Any = None
 
@@ -157,8 +163,14 @@ class KnowledgeStack:
         self._thread.join(5)
 
 
-def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
-    """``max_stale`` — окно устарелости справочника (0 — изменения базы видны сразу)."""
+def start(
+    tmp: Path, dist: Path, max_stale: float = 15.0, polities_env: dict[str, str] | None = None
+) -> KnowledgeStack:
+    """``max_stale`` — окно устарелости справочника (0 — изменения базы видны сразу).
+
+    ``polities_env`` — переменные ``PHILOGRAPH_POLITIES_*`` сервиса знаний (артефакт
+    исторических границ, add-historical-polities 6.1). Без них слой образований отвечает 503
+    (запасной режим): так идут все тесты глобуса, написанные до этого изменения."""
     # --- библиотека: два учебника ---
     lib_engine = make_engine(
         f"sqlite:///{(tmp / 'library.db').as_posix()}",
@@ -262,6 +274,7 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
         section_map=SectionMap(statements, snapshots=snapshots),
         graphs=graphs,
         catalog=Catalog(snapshots, onto, entities, CatalogSettings(max_stale_seconds=max_stale)),
+        polity_layer=PolityLayer.from_env(polities_env) if polities_env is not None else None,
     )
     world = World(entities, statements)
     for key, source_id in textbooks.items():
@@ -270,7 +283,19 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
     # --- шлюз ---
     import uvicorn
 
-    router = HostRouter({"library": library, "knowledge": knowledge})
+    holder: dict[str, KnowledgeStack] = {}
+
+    async def knowledge_paced(scope, receive, send):
+        """Задержка и ворота ответа ``/map/polities`` (сценарии задержанного слоя)."""
+        if scope["type"] == "http" and scope["path"].endswith("/map/polities"):
+            stack_ = holder.get("stack")
+            if stack_ is not None and stack_.polities_delay:
+                await asyncio.sleep(stack_.polities_delay)
+            if stack_ is not None and stack_.polities_gate is not None:
+                await asyncio.to_thread(stack_.polities_gate.wait, 60)
+        await knowledge(scope, receive, send)
+
+    router = HostRouter({"library": library, "knowledge": knowledge_paced})
     gateway = gateway_app(
         {
             "library": "http://library",
@@ -292,6 +317,7 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
         f"http://127.0.0.1:{port}", world, textbooks, router, model, queue, llm_calls
     )
     stack.paragraphs = paragraphs
+    holder["stack"] = stack
     stack.portraits = portraits
     stack._server, stack._thread = server, thread
     return stack
