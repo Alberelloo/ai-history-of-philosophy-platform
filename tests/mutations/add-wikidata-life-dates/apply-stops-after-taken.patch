@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..421ac80 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -427,7 +427,7 @@ class LifeDates:
+                     self._skip(report, entity_id, SYSTEM, "qid_taken")
+                     pair = (entity_id, holder)
+                     (confirmed if entry["decision"] == "accepted" else proposals).append(pair)
+-                    continue
++                    break
+                 if not dry_run:
+                     self.entities.add_external(entity_id, SYSTEM, qid)
+                     run_actions.record(

@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..38c3354 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -352,7 +352,7 @@ class LifeDates:
+                 if holder is None or holder == entity["id"]:
+                     continue
+                 if self._kind(self.entities.get(holder)["type"]) != kind:
+-                    continue
++                    break
+                 c["holder"] = holder
+                 pair = tuple(sorted((entity["id"], holder)))
+                 if pair not in distinct:

@@ -1027,6 +1027,24 @@ def test_rejected_label_is_name_after_strip(onto, events, type_, raw, reason):
     assert fields(rejected) == {"type": type_, "label": expected_label(raw), "reason": reason}
 
 
+@req(
+    NM,
+    VALID,
+    invariant="label отказа варианта из ответа модели — название после strip() и NFC (О26)",
+)
+@pytest.mark.parametrize(
+    ("raw", "reason"),
+    [("  some ", "stopword"), ("\u00a0every\u2003", "stopword"), (" 20.1 ", "number")],
+)
+def test_rejected_variant_label_after_strip(events, raw, reason):
+    """Вариант из элемента ответа модели проверяется и отклоняется в ``names_for``; поле
+    ``label`` события — название по определению спецификации, не сырой текст."""
+    names = naming.names_for("concept", {"name": "Субстанция", "type": "concept", "en": raw})
+    assert names == [("ru", "Субстанция", "primary")]
+    [rejected] = events.of(REJECTED)
+    assert fields(rejected) == {"type": "concept", "label": expected_label(raw), "reason": reason}
+
+
 def test_strategies_oracle_independent():
     """Оракул стратегий не импортирует проверяемые функции (design.md, О7)."""
     import ast

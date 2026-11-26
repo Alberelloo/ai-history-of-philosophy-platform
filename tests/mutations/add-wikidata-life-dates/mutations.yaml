@@ -371,3 +371,45 @@ mutations:
     note: О26 — проверка «QID занят» раньше «у сущности другой QID» (пара шагов 2 и 3)
     expect_fail:
       - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: suggest-stops-after-free-candidate
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-stops-after-free-candidate.patch
+    note: О26 — кандидат без держателя прекращает обход кандидатов (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped
+  - id: suggest-stops-after-other-type-holder
+    requirement: Подтверждение QID персон и произведений
+    patch: suggest-stops-after-other-type-holder.patch
+    note: О26 — держатель другого типа прекращает обход кандидатов (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped
+  - id: apply-stops-after-refused
+    requirement: Подтверждение QID персон и произведений
+    patch: apply-stops-after-refused.patch
+    note: О26 — после refused записи манифеста не обходятся (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_refused_then_applied
+  - id: apply-stops-after-taken
+    requirement: Подтверждение QID персон и произведений
+    patch: apply-stops-after-taken.patch
+    note: О26 — после qid_taken записи манифеста не обходятся (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant
+  - id: linked-stops-after-done
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-done.patch
+    note: О26 — обход связанных прекращается на сущности из манифеста (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: linked-stops-after-kind
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-kind.patch
+    note: О26 — обход связанных прекращается на типе без дат (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: linked-stops-after-bad-qid
+    requirement: Даты жизни из Wikidata
+    patch: linked-stops-after-bad-qid.patch
+    note: О26 — обход связанных прекращается после bad_qid (continue → break)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_linked_after_skips

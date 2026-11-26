@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/life_dates.py b/src/philograph/knowledge/life_dates.py
+index e634df2..1dc7329 100644
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -414,7 +414,7 @@ class LifeDates:
+                 entity_id = self.entities.get(entry["entity"])["id"]
+             except EntityNotFound:
+                 self._skip(report, entry["entity"], SYSTEM, "refused")
+-                continue
++                break
+             report.entities += 1
+             done.add(entity_id)
+             own = planned_own.get(entity_id) or self.entities.external_of(entity_id, SYSTEM)
