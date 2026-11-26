@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -708,8 +708,7 @@
+         for number, pack in enumerate(packs, start=1):
+             reply = self._ask(report, number, pack, view)
+             if reply is None:
+-                report.failed_batches += 1
+-                continue
++                raise RuntimeError("gateway")
+             for entity_id, ru in self._check(report, number, pack, view, reply):
+                 found.append(self._rename(view, report, "translate", entity_id, ru, "model"))
+         return found

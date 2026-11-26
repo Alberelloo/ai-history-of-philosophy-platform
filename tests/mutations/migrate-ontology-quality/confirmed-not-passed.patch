@@ -1,6 +1,6 @@
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -484,7 +484,7 @@
+@@ -508,7 +508,7 @@
              return []
          life = self._life()
          result = life.apply(manifest, dry_run=report.dry_run, run_id=report.run_id, merge=False)

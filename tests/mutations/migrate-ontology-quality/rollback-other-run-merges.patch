@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -910,7 +910,7 @@
+             ).all()
+         merges_undone = 0
+         for merge_id, moved in merges:
+-            if (moved or {}).get("run_id") == run_id:
++            if True:
+                 self.statements.undo_merge(merge_id)
+                 merges_undone += 1
+         restored = kept = 0

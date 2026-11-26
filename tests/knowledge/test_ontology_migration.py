@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import unicodedata
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from sqlalchemy import delete, select, text
 
 from philograph.knowledge import naming, run_actions
 from philograph.knowledge import schema as t
+from philograph.knowledge.dates import parse as dates_parse
 from philograph.knowledge.ontology_migrate import STEPS, Migration, main
 from philograph.knowledge.quality_report import main as quality_main
 from philograph.knowledge.quality_report import read_only_engine
@@ -58,7 +60,7 @@ from .migration_world import (
     verified_dropped,
     wipe,
 )
-from .strategies import sentinel
+from .strategies import search_form, sentinel
 from .wd_records import RecordFetch, record
 
 req = pytest.mark.req
@@ -1364,3 +1366,304 @@ def test_acceptance_symptoms(onto, events, capsys, tmp_path, database_url):
     assert v["a8"] == 0 and report.statements["lost"] == 0
     assert code == 0 and result["passed"] is True
     _ = LATIN_CONCEPTS
+
+
+# ============ О29: границы порогов, все страницы, обход после пропуска ====================
+# Идентификаторы задаются явно: шаги обходят сущности в порядке идентификаторов, и пропуск
+# должен стоять раньше элемента, который обязан обработаться (общее правило О26).
+
+
+def _at(onto, eid: str, type_: str, names: list[tuple], qid: str | None = None) -> str:
+    """Как ``raw_entity``, но с заданным идентификатором (порядок обхода)."""
+    with onto.entities.engine.begin() as conn:
+        conn.execute(t.entities.insert().values(id=eid, type=type_, primary={}, redirect_to=None))
+        for lang, text_, kind in names:
+            conn.execute(
+                t.names.insert().values(
+                    entity_id=eid,
+                    lang=lang,
+                    text=text_,
+                    normalized=search_form(text_),
+                    kind=kind,
+                )
+            )
+        if qid:
+            conn.execute(
+                t.external_ids.insert().values(entity_id=eid, system="wikidata", value=qid)
+            )
+    return eid
+
+
+def _open_item(onto, a: str, b: str, reason: str = "review:single_name") -> None:
+    with onto.statements.engine.begin() as conn:
+        conn.execute(
+            t.review_items.insert().values(
+                kind="duplicate",
+                status="open",
+                resolution=None,
+                payload={"pair": [a, b], "reason": reason},
+            )
+        )
+
+
+def _items(onto) -> list[dict]:
+    with onto.statements.engine.begin() as conn:
+        return [dict(r) for r in conn.execute(select(t.review_items)).mappings()]
+
+
+def _pair_items(onto, a: str, b: str) -> list[dict]:
+    return [i for i in _items(onto) if set(i["payload"]["pair"]) == {a, b}]
+
+
+@req(OM, QM, invariant="Пороги «≥» включают границу: А1 = 0,90, А5 = 20, А6 = 10 — выполнено")
+def test_thresholds_at_boundary(onto, events, capsys, tmp_path, database_url):
+    letters = "абвгдеклмнпрст"
+    for i in range(20):  # ровно 20 персон с основной датой, ровно 10 философов
+        p = raw_entity(
+            onto, "person", [("ru", "Ка" + letters[i % 14] + letters[i // 14] + "ин", "primary")]
+        )
+        add_dates(onto, p, str(1600 + i), str(1660 + i))
+        if i % 2 == 0:
+            add_role(onto, p)
+    for i in range(6):  # 20 персон + 6 понятий + произведение = 27 русских из 30
+        raw_entity(onto, "concept", [("ru", "Понятие" + letters[i] + "о", "primary")])
+    for label in ("notionb", "notionc", "notiond"):  # А1 = 27/30 = 0,90 ровно
+        raw_entity(onto, "concept", [("en", label, "primary")])
+    work = raw_entity(onto, "work", [("ru", "Трактат о природе", "primary")])
+    onto.statements.add(
+        work, "dating", value=dates_parse("1739").to_json(), attributions=[Attribution("common")]
+    )  # дата не у персоны — не в А5
+    raw_entity(onto, "source", [("en", "3.1", "primary")])  # источник — не в А1
+    base = tmp_path / "before.json"
+    quality(capsys, database_url, "--save", str(base))
+    capsys.readouterr()
+    code = quality_main(["--baseline", str(base)], url=database_url)
+    out = capsys.readouterr().out
+    code_json, result = quality(capsys, database_url, "--baseline", str(base))
+    v = values(result)
+    assert v["a1"] == pytest.approx(0.90, abs=5e-5) and v["a5"] == 20 and v["a6"] == 10, v
+    assert (v["a2"], v["a3"], v["a4"], v["a7"], v["a8"]) == (0, 0, 0, 0, 0), v
+    assert result["passed"] is True and code == code_json == 0
+    # таблица «критерий | значение | порог | итог»: у каждой строки критерия четыре столбца
+    rows = [
+        line for line in out.splitlines() if " | " in line and line.lstrip().startswith(("А", "A"))
+    ]
+    assert len(rows) == 8, out
+    for row in rows:
+        cells = [c.strip() for c in row.split(" | ")]
+        assert len(cells) == 4, row
+    thresholds = [c.split(" | ")[2].strip() for c in rows]
+    assert [re.sub(r"[^0-9,.]", "", x).replace(",", ".") for x in thresholds] == [
+        "0.9",
+        "0",
+        "0",
+        "0",
+        "20",
+        "10",
+        "0",
+        "0",
+    ], thresholds
+
+
+@req(OM, QM, invariant="А7 — все страницы справочника")
+def test_a7_all_pages(onto, events, capsys, clock, database_url):
+    for i in range(61):  # больше страницы (60): хотя бы одна негодная — не на первой
+        raw_entity(onto, "concept", [("ru", str(100 + i), "primary")])
+    raw_entity(onto, "concept", [("ru", "Субстанция", "primary")])
+    _code, result = quality(capsys, database_url)
+    # правило number (entity-naming): нет букв, есть цифра
+    api = sum(
+        bool(re.search(r"\d", i["label"])) and not re.search(r"[^\W\d_]", i["label"])
+        for i in Surface(onto, clock).catalog()
+    )
+    assert values(result)["a7"] == api == 61
+
+
+@req(OM, QM, invariant="А8 считает и потерянные атрибуции")
+def test_a8_counts_lost_attribution(onto, events, capsys, tmp_path, database_url):
+    kant = raw_entity(onto, "person", [("ru", "Кант", "primary")])
+    hume = raw_entity(onto, "person", [("ru", "Юм", "primary")])
+    sid = add_statement(
+        onto,
+        kant,
+        "influenced_by",
+        hume,
+        [Attribution("source", "s_a"), Attribution("source", "s_b")],
+    )
+    base = tmp_path / "before.json"
+    quality(capsys, database_url, "--save", str(base))
+    with onto.statements.engine.begin() as conn:  # «сбой»: одна атрибуция пропала
+        conn.execute(
+            delete(t.attributions).where(
+                t.attributions.c.statement_id == sid, t.attributions.c.who == "s_b"
+            )
+        )
+    _code, result = quality(capsys, database_url, "--baseline", str(base))
+    assert values(result)["a8"] == 1
+
+
+@req(OM, QM, invariant="А4: открытые пункты не-персон (review:same_name) в А4 не входят")
+def test_a4_ignores_non_person_items(onto, events, capsys, database_url):
+    a = raw_entity(onto, "concept", [("ru", "Субстанция", "primary")])
+    b = raw_entity(onto, "concept", [("ru", "Субстанция", "primary")])
+    _open_item(onto, a, b, "review:same_name")
+    _code, result = quality(capsys, database_url)
+    assert values(result)["a4"] == 0
+
+
+@req(
+    OM,
+    MIG,
+    invariant="Шаг 7: совпадения не-персон — в очередь review:same_name, персоны — нет",
+)
+def test_same_name_queue_after_skips(onto, events):
+    # персона раньше всех (пропуск), пара «Материя» уже открыта (пропуск), затем «Субстанция»
+    k1 = _at(onto, "e_000000000001", "person", [("ru", "Кант", "primary")], "Q9312")
+    k2 = _at(onto, "e_000000000002", "person", [("ru", "Кант", "primary")], "Q9313")
+    m1 = _at(onto, "e_000000000003", "concept", [("ru", "Материя", "primary")])
+    m2 = _at(onto, "e_000000000004", "concept", [("ru", "Материя", "primary")])
+    s1 = _at(onto, "e_000000000005", "concept", [("ru", "Субстанция", "primary")])
+    s2 = _at(onto, "e_000000000006", "concept", [("ru", "Субстанция", "primary")])
+    _open_item(onto, m1, m2)
+    migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert after.resolve(s1) == s1 and after.resolve(s2) == s2  # без автослияния
+    [queued] = _pair_items(onto, s1, s2)
+    assert queued["status"] == "open" and queued["payload"]["reason"] == "review:same_name"
+    assert len(_pair_items(onto, m1, m2)) == 1  # открытая пара повторно не ставится
+    same = [i for i in _items(onto) if i["payload"].get("reason") == "review:same_name"]
+    assert all(not ({k1, k2} & set(i["payload"]["pair"])) for i in same)
+
+
+@req(OM, MIG, invariant="Шаг 2: обход кандидатов после пары, которая уже в очереди")
+def test_pending_candidate_after_open_pair(onto, events, capsys, tmp_path):
+    def pending(ids):
+        return {
+            "entities": [
+                {
+                    "entity": ids["omir"],
+                    "wikidata": None,
+                    "decision": "pending",
+                    "candidates": [
+                        {"qid": "Q41568", "holder": ids["hume"]},  # пара уже открыта
+                        {"qid": "Q6691", "holder": ids["homer"]},
+                    ],
+                }
+            ]
+        }
+
+    ids = stand(onto)
+    _open_item(onto, ids["omir"], ids["hume"])
+    path = write_manifest(tmp_path, pending(ids))
+    code, _report = cli(onto, capsys, ["run", "--manifest", path])
+    assert code == 0
+    assert [i["status"] for i in _pair_items(onto, ids["omir"], ids["homer"])] == ["open"]
+    assert [i["payload"]["reason"] for i in _pair_items(onto, ids["omir"], ids["homer"])] == [
+        "review:qid_candidate"
+    ]
+    assert len(_pair_items(onto, ids["omir"], ids["hume"])) == 1
+
+
+@req(OM, MIG, invariant="Шаг 1: в одной сущности после чистого названия нормализуется следующее")
+def test_normalize_after_clean_name(onto, events):
+    e = raw_entity(
+        onto, "person", [("ru", "Кант", "primary"), ("ru", " Иммануил Кант ", "variant")]
+    )
+    migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert after.name_set(e) == {("ru", "Кант", "primary"), ("ru", "Иммануил Кант", "variant")}
+
+
+@req(OM, MIG, invariant="Шаг 4: источники библиотеки не снимаются, обход после источника")
+def test_source_not_retired(onto, events):
+    src = _at(onto, "e_000000000001", "source", [("en", "3.1", "primary")])
+    junk = _at(onto, "e_000000000002", "concept", [("ru", "20.1", "primary")])
+    report = migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert src in after.active() and junk not in after.active()
+    assert [x["id"] for x in report.to_json()["retired_list"]] == [junk]
+
+
+@req(OM, MIG, invariant="Событие шага: dry_run = true в plan, false в run")
+def test_step_event_dry_run(onto, events):
+    stand(onto)
+    migration(onto).plan()
+    planned = events.of("knowledge.migration.step")
+    assert planned and all(e["dry_run"] is True for e in planned)
+    events.clear()
+    migration(onto).run()
+    ran = events.of("knowledge.migration.step")
+    assert ran and all(e["dry_run"] is False for e in ran)
+
+
+@req(
+    OM,
+    TR,
+    invariant="Шаг 5: подпись ru Wikidata — только русская и годная; обход после сбоя и отказа",
+)
+def test_wikidata_labels_after_skips(onto, events):
+    records = {
+        "Q900001": record("Q900001", ru="Ошибка", en="Fail", classes=HUMAN),
+        "Q900002": record("Q900002", ru="Hobbes", en="Hobbes", classes=HUMAN),  # латиница
+        "Q900003": record("Q900003", ru="20.1", en="Twenty", classes=HUMAN),  # number
+        "Q41568": record("Q41568", ru="Юм", en="Hume", classes=HUMAN),
+    }
+    a = _at(onto, "e_000000000001", "person", [("en", "Failer", "primary")], "Q900001")
+    b = _at(onto, "e_000000000002", "person", [("en", "Hobbes", "primary")], "Q900002")
+    c = _at(onto, "e_000000000003", "concept", [("en", "twenty", "primary")], "Q900003")
+    d = _at(onto, "e_000000000004", "person", [("en", "Hume", "primary")], "Q41568")
+    report = migration(onto, fetch=RecordFetch(records, failing=["Q900001"])).run()
+    after = State.read(onto.statements.engine)
+    assert (after.label(a), after.label(b), after.label(c), after.label(d)) == (
+        "Failer",
+        "Hobbes",
+        "twenty",
+        "Юм",
+    )
+    assert report.to_json()["renamed"]["wikidata"] == 1
+
+
+@req(OM, RB, invariant="Откат закрывает пункты очереди запуска (rolled_back), чужие — нет")
+def test_rollback_closes_run_items(onto, events, capsys, tmp_path):
+    ids = stand(onto)
+    _open_item(onto, ids["kant"], ids["b1"])  # пункт человека до запуска
+    before = {i["id"]: i["status"] for i in _items(onto)}
+    s1 = raw_entity(onto, "concept", [("ru", "Материя", "primary")])
+    s2 = raw_entity(onto, "concept", [("ru", "Материя", "primary")])
+    m = migration(onto, llm=FakeLLM.by_label(TWO))
+    report = m.run(translate="model")
+    created = [i for i in _items(onto) if i["id"] not in before]
+    assert any(set(i["payload"]["pair"]) == {s1, s2} for i in created)
+    m.rollback(report.run_id)
+    now = {i["id"]: i["status"] for i in _items(onto)}
+    assert all(now[i["id"]] == "rolled_back" for i in created), now
+    assert {k: now[k] for k in before} == before
+
+
+@req(OM, RB, invariant="Откат не отменяет слияния, сделанные после запуска человеком")
+def test_rollback_keeps_later_merge(onto, events):
+    ids = stand(onto)
+    a = raw_entity(onto, "person", [("ru", "Фалес", "primary")])
+    b = raw_entity(onto, "person", [("ru", "Фалес Милетский", "primary")])
+    m = migration(onto, llm=FakeLLM.by_label(TWO))
+    report = m.run(translate="model")
+    onto.statements.merge_entities(a, b)  # оператор, после запуска
+    m.rollback(report.run_id)
+    after = State.read(onto.statements.engine)
+    assert after.resolve(b) == a
+    assert after.resolve(ids["hume"]) == ids["hume"]
+
+
+@req(OM, MIG, invariant="--limit N — предел только для перевода, прочие шаги не затронуты")
+def test_limit_only_translation(onto, events):
+    ids = _concepts(onto, ["causality", "substance", "idea"])
+    junk = [raw_entity(onto, "concept", [("ru", label, "primary")]) for label in ("20.1", "3.2.1")]
+    table = {"causality": "Причинность", "substance": "Субстанция", "idea": "Идея"}
+    llm = FakeLLM.by_label(table)
+    planned = migration(onto, llm=llm).plan(limit=1).to_json()
+    assert planned["to_translate"] == 1 and len(planned["retired_list"]) == 2
+    report = migration(onto, llm=llm).run(translate="model", limit=1).to_json()
+    after = State.read(onto.statements.engine)
+    assert report["to_translate"] == 1
+    assert sum(is_ru(after.label(e)) for e in ids.values()) == 1
+    assert all(j not in after.active() for j in junk)  # снятие не ограничено

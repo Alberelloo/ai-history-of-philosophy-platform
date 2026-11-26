@@ -1,6 +1,6 @@
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -444,8 +444,6 @@
+@@ -468,8 +468,6 @@
              actions=0,
              dry_run=dry_run,
          )

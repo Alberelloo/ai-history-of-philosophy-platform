@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -183,7 +183,7 @@
+     values: dict[int, float | None] = {
+         1: round(sum(is_russian(e["label"]) for e in named) / len(named), 4) if named else 1.0,
+         2: sum(check_name(e["type"], e["label"]) == "number" for e in named),
+-        3: sum(check_name(PERSON, p["label"]) is not None for p in persons),
++        3: sum(check_name("concept", p["label"]) is not None for p in persons),
+         4: len(a4_pairs(persons, engine)),
+         5: sum(p["dates"] is not None for p in persons),
+         6: a6(engine),

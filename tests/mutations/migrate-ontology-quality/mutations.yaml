@@ -19,50 +19,58 @@ mutations:
     patch: step-event-with-names.patch
     note: в knowledge.migration.step добавлены названия
     expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_dry_run
+      - tests/knowledge/test_ontology_migration.py::test_lang_fix_no_script
+      - tests/knowledge/test_ontology_migration.py::test_loss_aborts
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_name_form
       - tests/knowledge/test_ontology_migration.py::test_no_names_in_journal
       - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
-      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+      - tests/knowledge/test_ontology_migration.py::test_verified_untouched
   - id: confirmed-not-passed
     requirement: Миграция существующей онтологии
     patch: confirmed-not-passed.patch
     note: manifest_qids не передаёт confirmed в dedupe
     expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
       - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
   - id: dedupe-before-rename
     requirement: Миграция существующей онтологии
     patch: dedupe-before-rename.patch
     note: dedupe раньше wikidata_labels/translate
     expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
       - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
   - id: retire-skips-person
     requirement: Миграция существующей онтологии
     patch: retire-skips-person.patch
     note: retire не снимает мусорные персоны
     expect_fail:
-      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+      - tests/knowledge/test_ontology_migration.py::test_dry_run
       - tests/knowledge/test_ontology_migration.py::test_migration_invariant
-      - tests/knowledge/test_ontology_migration.py::test_assistant_does_not_see_retired
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
   - id: snapshot-keeps-retired-ends
     requirement: Снятие мусорных сущностей
     patch: snapshot-keeps-retired-ends.patch
     note: снимок не фильтрует утверждения со снятым концом
     expect_fail:
-      - tests/knowledge/test_ontology_migration.py::test_section_number_retired
-      - tests/knowledge/test_ontology_migration.py::test_assistant_does_not_see_retired
       - tests/knowledge/test_ontology_migration.py::test_retire_invariant
   - id: snapshot-shows-retired
     requirement: Снятие мусорных сущностей
     patch: snapshot-shows-retired.patch
     note: снимок не фильтрует снятые сущности
     expect_fail:
-      - tests/knowledge/test_ontology_migration.py::test_section_number_retired
       - tests/knowledge/test_ontology_migration.py::test_retire_invariant
+      - tests/knowledge/test_ontology_migration.py::test_section_number_retired
   - id: accept-latin
     requirement: Перевод названий
     patch: accept-latin.patch
     note: латиница принимается
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
       - tests/knowledge/test_ontology_migration.py::test_translation_invariant
   - id: duplicate-rejects-second-only
     requirement: Перевод названий
@@ -70,6 +78,7 @@ mutations:
     note: при повторе номера отклоняется только повтор
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
       - tests/knowledge/test_ontology_migration.py::test_translation_invariant
   - id: model-without-flag
     requirement: Перевод названий
@@ -84,6 +93,7 @@ mutations:
     note: откат без undo_merge
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_full_rollback
+      - tests/knowledge/test_ontology_migration.py::test_name_form
       - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
   - id: rollback-no-manifest
     requirement: Откат миграции
@@ -91,6 +101,7 @@ mutations:
     note: откат не отменяет manifest_qids
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_verified_qid
   - id: rollback-overwrites-later
     requirement: Откат миграции
     patch: rollback-overwrites-later.patch
@@ -102,8 +113,8 @@ mutations:
     patch: a4-no-queue.patch
     note: А4 без открытых duplicate
     expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
       - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
-      - tests/knowledge/test_ontology_migration.py::test_a4_union_and_distinct
   - id: a4-sum
     requirement: Замер качества онтологии
     patch: a4-sum.patch
@@ -122,6 +133,7 @@ mutations:
     note: А4 только по основным с обеих сторон
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_a4_primary_in_variants
+      - tests/knowledge/test_ontology_migration.py::test_a4_union_and_distinct
   - id: quality-writable
     requirement: Замер качества онтологии
     patch: quality-writable.patch
@@ -140,3 +152,412 @@ mutations:
     note: А6 без фильтра philosopher
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_a6_a7_match_api
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+  - id: a1-threshold-gt
+    requirement: Замер качества онтологии
+    patch: a1-threshold-gt.patch
+    note: A1 — порог «≥» заменён на «>»
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_thresholds_at_boundary
+  - id: a2-any-reason
+    requirement: Замер качества онтологии
+    patch: a2-any-reason.patch
+    note: A2 считает любую причину отказа, а не только number
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_before_after
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+  - id: a3-concept-rule
+    requirement: Замер качества онтологии
+    patch: a3-concept-rule.patch
+    note: A3 проверяет персон правилом понятия (без not_a_name)
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_before_after
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+  - id: a4-non-persons
+    requirement: Замер качества онтологии
+    patch: a4-non-persons.patch
+    note: A4 берёт открытые пары не только персон
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_a4_ignores_non_person_items
+  - id: a5-all-types
+    requirement: Замер качества онтологии
+    patch: a5-all-types.patch
+    note: A5 считает даты у всех типов
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_thresholds_at_boundary
+  - id: a5-threshold-gt
+    requirement: Замер качества онтологии
+    patch: a5-threshold-gt.patch
+    note: A5 — порог «≥» заменён на «>»
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_thresholds_at_boundary
+  - id: a6-threshold-gt
+    requirement: Замер качества онтологии
+    patch: a6-threshold-gt.patch
+    note: A6 — порог «≥» заменён на «>»
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_thresholds_at_boundary
+  - id: a7-concept-rule
+    requirement: Замер качества онтологии
+    patch: a7-concept-rule.patch
+    note: A7 проверяет все записи каталога правилом понятия
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+  - id: a7-first-page
+    requirement: Замер качества онтологии
+    patch: a7-first-page.patch
+    note: A7 берёт только первую страницу каталога
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_a7_all_pages
+  - id: a8-statements-only
+    requirement: Замер качества онтологии
+    patch: a8-statements-only.patch
+    note: A8 не считает потерянные атрибуции
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_a8_counts_lost_attribution
+  - id: a8-zero-without-baseline
+    requirement: Замер качества онтологии
+    patch: a8-zero-without-baseline.patch
+    note: A8 без исходного замера — 0 вместо «нет данных»
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_without_baseline
+  - id: aborted-no-error-kind
+    requirement: Миграция существующей онтологии
+    patch: aborted-no-error-kind.patch
+    note: аварийный откат без error_kind=integrity_lost
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_loss_aborts
+  - id: batch-ignored
+    requirement: Перевод названий
+    patch: batch-ignored.patch
+    note: перевод одной пачкой, --batch игнорируется
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: estimate-no-multiply
+    requirement: Перевод названий
+    patch: estimate-no-multiply.patch
+    note: оценка стоимости не умножается на число пачек
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_estimate
+  - id: exit-always-zero
+    requirement: Замер качества онтологии
+    patch: exit-always-zero.patch
+    note: замер всегда завершается кодом 0
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_quality_before_after
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+      - tests/knowledge/test_ontology_migration.py::test_without_baseline
+  - id: gateway-failure-raises
+    requirement: Перевод названий
+    patch: gateway-failure-raises.patch
+    note: сбой шлюза модели обрывает перевод вместо failed_batches
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: invalid-unchecked
+    requirement: Перевод названий
+    patch: invalid-unchecked.patch
+    note: перевод модели не проверяется правилами названий
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_russian_stopword
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: lang-fix-skipped
+    requirement: Миграция существующей онтологии
+    patch: lang-fix-skipped.patch
+    note: шаг исправления языка пропущен
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_lang_fix_no_script
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+  - id: lang-fix-stops-after-right-name
+    requirement: Миграция существующей онтологии
+    patch: lang-fix-stops-after-right-name.patch
+    note: continue → break — lang_fix прекращает обход названий сущности после верного
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_lang_fix_no_script
+  - id: limit-ignored
+    requirement: Миграция существующей онтологии
+    patch: limit-ignored.patch
+    note: --limit игнорируется
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_limit_only_translation
+  - id: manifest-candidate-stops-after-free
+    requirement: Миграция существующей онтологии
+    patch: manifest-candidate-stops-after-free.patch
+    note: continue → break — обход кандидатов QID после свободного
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+  - id: manifest-candidate-stops-after-open
+    requirement: Миграция существующей онтологии
+    patch: manifest-candidate-stops-after-open.patch
+    note: continue → break — обход кандидатов QID после уже открытой пары
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_pending_candidate_after_open_pair
+  - id: manifest-pending-stops-after-decided
+    requirement: Миграция существующей онтологии
+    patch: manifest-pending-stops-after-decided.patch
+    note: continue → break — обход манифеста QID после решённой записи
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+  - id: measured-extra-field
+    requirement: Замер качества онтологии
+    patch: measured-extra-field.patch
+    note: в событии замера лишнее поле rows
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_a4_primary_in_variants
+      - tests/knowledge/test_ontology_migration.py::test_a4_union_and_distinct
+      - tests/knowledge/test_ontology_migration.py::test_a6_a7_match_api
+      - tests/knowledge/test_ontology_migration.py::test_acceptance_symptoms
+      - tests/knowledge/test_ontology_migration.py::test_old_schema
+      - tests/knowledge/test_ontology_migration.py::test_quality_before_after
+      - tests/knowledge/test_ontology_migration.py::test_quality_invariant
+      - tests/knowledge/test_ontology_migration.py::test_read_only
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+      - tests/knowledge/test_ontology_migration.py::test_without_baseline
+  - id: missing-not-counted
+    requirement: Перевод названий
+    patch: missing-not-counted.patch
+    note: пропущенные моделью позиции не считаются в missing
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: normalize-key-stale
+    requirement: Миграция существующей онтологии
+    patch: normalize-key-stale.patch
+    note: нормализация меняет текст, ключ поиска остаётся старым
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_name_form
+  - id: normalize-skipped
+    requirement: Миграция существующей онтологии
+    patch: normalize-skipped.patch
+    note: шаг нормализации названий пропущен
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_name_form
+  - id: normalize-stops-after-clean-name
+    requirement: Миграция существующей онтологии
+    patch: normalize-stops-after-clean-name.patch
+    note: continue → break — нормализация после чистого названия
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_normalize_after_clean_name
+  - id: not-russian-before-duplicate
+    requirement: Перевод названий
+    patch: not-russian-before-duplicate.patch
+    note: проверка not_russian раньше duplicate_item
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+  - id: pack-n-from-zero
+    requirement: Перевод названий
+    patch: pack-n-from-zero.patch
+    note: номера позиций пачки с 0
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_russian_stopword
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: pack-with-ids
+    requirement: Перевод названий
+    patch: pack-with-ids.patch
+    note: в пачку модели уходят идентификаторы сущностей
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+  - id: plan-folds-zero
+    requirement: Миграция существующей онтологии
+    patch: plan-folds-zero.patch
+    note: план не считает свёртки по перенаправлениям
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_dry_run
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+  - id: qid-candidate-reason
+    requirement: Миграция существующей онтологии
+    patch: qid-candidate-reason.patch
+    note: кандидат QID идёт в очередь с причиной qid_taken
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_transliteration_pending
+  - id: queue-stops-after-open-pair
+    requirement: Миграция существующей онтологии
+    patch: queue-stops-after-open-pair.patch
+    note: continue → break — очередь дублей после открытой пары
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_queue_after_skips
+  - id: rename-drops-old-primary
+    requirement: Перевод названий
+    patch: rename-drops-old-primary.patch
+    note: прежнее основное не становится вариантом при переименовании
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: reply-duplicate-before-unknown
+    requirement: Перевод названий
+    patch: reply-duplicate-before-unknown.patch
+    note: порядок проверок ответа — duplicate_item раньше unknown_item
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: reply-invalid-before-duplicate
+    requirement: Перевод названий
+    patch: reply-invalid-before-duplicate.patch
+    note: порядок проверок ответа — invalid раньше duplicate_item
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+  - id: reply-invalid-before-not-russian
+    requirement: Перевод названий
+    patch: reply-invalid-before-not-russian.patch
+    note: порядок проверок ответа — invalid раньше not_russian
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+  - id: retire-stops-after-source
+    requirement: Снятие мусорных сущностей
+    patch: retire-stops-after-source.patch
+    note: continue → break — снятие после источника
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_retire_invariant
+  - id: retired-event-label
+    requirement: Снятие мусорных сущностей
+    patch: retired-event-label.patch
+    note: в событии снятия название (запрещено журналом)
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_assistant_does_not_see_retired
+      - tests/knowledge/test_ontology_migration.py::test_restore_on_rollback
+      - tests/knowledge/test_ontology_migration.py::test_retire_invariant
+      - tests/knowledge/test_ontology_migration.py::test_section_number_retired
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+  - id: rollback-kept-ignored
+    requirement: Откат миграции
+    patch: rollback-kept-ignored.patch
+    note: откат не считает сохранённые поздние правки
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_later_change_kept
+  - id: rollback-no-lang
+    requirement: Откат миграции
+    patch: rollback-no-lang.patch
+    note: откат не возвращает прежний язык
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_full_rollback
+      - tests/knowledge/test_ontology_migration.py::test_name_form
+      - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
+  - id: rollback-no-restore
+    requirement: Откат миграции
+    patch: rollback-no-restore.patch
+    note: откат не возвращает снятые сущности
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_full_rollback
+      - tests/knowledge/test_ontology_migration.py::test_restore_on_rollback
+      - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
+  - id: rollback-no-restored-event
+    requirement: Снятие мусорных сущностей
+    patch: rollback-no-restored-event.patch
+    note: откат без события knowledge.entity.restored
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_restore_on_rollback
+  - id: rollback-no-text
+    requirement: Откат миграции
+    patch: rollback-no-text.patch
+    note: откат не возвращает прежний текст названия
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_name_form
+      - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
+  - id: rollback-other-run-merges
+    requirement: Откат миграции
+    patch: rollback-other-run-merges.patch
+    note: откат отменяет слияния чужих запусков
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_later_merge
+  - id: rollback-review-open
+    requirement: Откат миграции
+    patch: rollback-review-open.patch
+    note: откат не закрывает очередь проверки запуска
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items
+  - id: run-action-not-recorded
+    requirement: Миграция существующей онтологии
+    patch: run-action-not-recorded.patch
+    note: действия запуска не пишутся в журнал запуска
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_dry_run
+      - tests/knowledge/test_ontology_migration.py::test_loss_aborts
+      - tests/knowledge/test_ontology_migration.py::test_migration_invariant
+      - tests/knowledge/test_ontology_migration.py::test_name_form
+  - id: same-name-includes-person
+    requirement: Миграция существующей онтологии
+    patch: same-name-includes-person.patch
+    note: пары одного названия включают персон
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_queue_after_skips
+  - id: same-name-not-queued
+    requirement: Миграция существующей онтологии
+    patch: same-name-not-queued.patch
+    note: пары одного названия не идут в очередь
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items
+      - tests/knowledge/test_ontology_migration.py::test_same_name_queue_after_skips
+  - id: same-name-stops-after-person
+    requirement: Снятие мусорных сущностей
+    patch: same-name-stops-after-person.patch
+    note: continue → break — пары одного названия после персоны
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items
+      - tests/knowledge/test_ontology_migration.py::test_same_name_queue_after_skips
+  - id: step-dry-run-false
+    requirement: Миграция существующей онтологии
+    patch: step-dry-run-false.patch
+    note: событие шага всегда с dry_run=false
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_step_event_dry_run
+  - id: table-no-threshold
+    requirement: Замер качества онтологии
+    patch: table-no-threshold.patch
+    note: в таблице замера нет столбца порога
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_thresholds_at_boundary
+  - id: translate-stops-after-failed-batch
+    requirement: Перевод названий
+    patch: translate-stops-after-failed-batch.patch
+    note: continue → break — перевод после сбойной пачки
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: translated-extra-field
+    requirement: Перевод названий
+    patch: translated-extra-field.patch
+    note: в событии перевода лишнее поле size
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_batch_with_model_errors
+      - tests/knowledge/test_ontology_migration.py::test_estimate
+      - tests/knowledge/test_ontology_migration.py::test_reply_check_order_pairs
+      - tests/knowledge/test_ontology_migration.py::test_russian_stopword
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: verify-no-step-event
+    requirement: Миграция существующей онтологии
+    patch: verify-no-step-event.patch
+    note: шаг verify без события knowledge.migration.step
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_stand_synthetic
+  - id: wd-label-latin
+    requirement: Перевод названий
+    patch: wd-label-latin.patch
+    note: подпись Wikidata принимается латиницей
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_after_skips
+  - id: wd-label-unchecked
+    requirement: Перевод названий
+    patch: wd-label-unchecked.patch
+    note: подпись Wikidata не проверяется правилами названий
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_after_skips
+  - id: wd-labels-stops-after-bad-label
+    requirement: Перевод названий
+    patch: wd-labels-stops-after-bad-label.patch
+    note: continue → break — подписи Wikidata после негодной подписи
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_after_skips
+  - id: wd-labels-stops-after-fetch-error
+    requirement: Перевод названий
+    patch: wd-labels-stops-after-fetch-error.patch
+    note: continue → break — подписи Wikidata после сбоя загрузки
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_after_skips

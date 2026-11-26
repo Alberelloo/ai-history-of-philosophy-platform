@@ -1,11 +1,13 @@
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -118,7 +118,7 @@
-     required=("entity_id", "run_id"),
+@@ -132,9 +132,9 @@
+     "manifest_qids",
+     "lang_fix",
+     "retire",
++    "dedupe",
+     "wikidata_labels",
+     "translate",
+-    "dedupe",
+     "verify",
  )
- 
--STEPS = ("manifest_qids", "lang_fix", "retire", "wikidata_labels", "translate", "dedupe", "verify")
-+STEPS = ("manifest_qids", "lang_fix", "retire", "dedupe", "wikidata_labels", "translate", "verify")
  SOURCE = "source"
- PERSON = "person"
- QID_SYSTEM = "wikidata"

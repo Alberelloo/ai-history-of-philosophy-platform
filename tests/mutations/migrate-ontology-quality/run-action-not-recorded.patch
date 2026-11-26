@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -493,8 +493,7 @@
+         )
+ 
+     def _record(self, report: Report, action: Action) -> None:
+-        if not report.dry_run:
+-            run_actions.record(self.engine, report.run_id, action.kind, action.to_json())
++        return
+ 
+     # --- шаги ---
+ 

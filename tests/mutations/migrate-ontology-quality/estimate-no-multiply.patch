@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -698,7 +698,7 @@
+         if estimate and packs and self.llm is not None:
+             reply = self._ask(report, 1, packs[0], view)
+             cost = self._run_cost(report.run_id)
+-            report.estimate_usd = round(cost * report.batches, 6) if reply is not None else None
++            report.estimate_usd = round(cost, 6) if reply is not None else None
+             if reply is not None:
+                 self._check(report, 1, packs[0], view, reply)  # счёт причин; не записывается
+             return []

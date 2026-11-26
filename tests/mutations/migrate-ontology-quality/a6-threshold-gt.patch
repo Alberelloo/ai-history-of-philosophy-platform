@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -66,7 +66,7 @@
+     Criterion(3, "персоны с названием не по правилу", 0, operator.eq, "="),
+     Criterion(4, "пары возможных дублей персон", 0, operator.eq, "="),
+     Criterion(5, "персоны с основной датой", 20, operator.ge, "≥"),
+-    Criterion(6, "философы на карте всей библиотеки", 10, operator.ge, "≥"),
++    Criterion(6, "философы на карте всей библиотеки", 10, operator.gt, "≥"),
+     Criterion(7, "элементы справочника с названием не по правилу", 0, operator.eq, "="),
+     Criterion(8, "потерянные утверждения и атрибуции", 0, operator.eq, "="),
+ )

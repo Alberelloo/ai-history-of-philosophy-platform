@@ -1,0 +1,16 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -461,13 +461,6 @@
+             )
+         self._verify(report, base, view)
+         report.steps["verify"] = 0
+-        events.emit(
+-            "knowledge.migration.step",
+-            run_id=report.run_id,
+-            step="verify",
+-            actions=0,
+-            dry_run=dry_run,
+-        )
+         if report.statements.get("lost") or report.attributions.get("lost"):
+             self._abort(report)
+         self._emit_run(report)

@@ -1,6 +1,6 @@
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -906,8 +906,6 @@
+@@ -973,8 +973,6 @@
                  .all()
              )
              primary = [r for r in rows if r["kind"] == "primary"]

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/quality_report.py
++++ b/src/philograph/knowledge/quality_report.py
+@@ -171,7 +171,7 @@
+     while True:
+         result = catalog.list(lang="ru", page=str(page), limit="60")
+         items.extend(result["items"])
+-        if not result["items"] or len(items) >= result["total"]:
++        if True:
+             return items
+         page += 1
+ 

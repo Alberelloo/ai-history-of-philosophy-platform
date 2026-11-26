@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
+index 2eabca9..7db716b 100644
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -526,7 +526,7 @@ class Migration:
+                     continue
+                 pair = tuple(sorted((entry["entity"], holder)))
+                 if pair in open_ or pair in distinct:
+-                    continue
++                    break
+                 report.review += 1
+                 if report.dry_run:
+                     open_.add(pair)

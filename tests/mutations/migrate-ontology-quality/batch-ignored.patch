@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -694,7 +694,7 @@
+             todo = todo[:limit]
+         report.to_translate = len(todo)
+         report.batches = math.ceil(len(todo) / batch) if todo else 0
+-        packs = [todo[i : i + batch] for i in range(0, len(todo), batch)]
++        packs = [todo] if todo else []
+         if estimate and packs and self.llm is not None:
+             reply = self._ask(report, 1, packs[0], view)
+             cost = self._run_cost(report.run_id)

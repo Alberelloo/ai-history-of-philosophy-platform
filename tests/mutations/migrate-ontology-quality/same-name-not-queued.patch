@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -809,7 +809,6 @@
+                 found.append(action)
+                 report.merged += 1
+         queue = [(a, b, r) for a, b, r in result.review]
+-        queue += self._same_name_pairs(view)
+         for a, b, reason in queue:
+             pair = tuple(sorted((a, b)))
+             if pair in open_ or pair in distinct:

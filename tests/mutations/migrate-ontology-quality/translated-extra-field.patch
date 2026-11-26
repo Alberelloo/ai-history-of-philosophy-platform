@@ -1,0 +1,10 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -774,6 +774,7 @@
+             "knowledge.migration.translated",
+             run_id=report.run_id,
+             batch=number,
++            size=len(pack),
+             accepted=len(accepted),
+             rejected=rejected,
+         )

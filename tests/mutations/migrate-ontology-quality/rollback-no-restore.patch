@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/ontology_migrate.py
++++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -926,7 +926,7 @@
+                         .where(
+                             and_(t.entities.c.id == p["entity"], t.entities.c.retired_run == run_id)
+                         )
+-                        .values(retired_run=None, retired_reason=None)
++                        .values(retired_reason=None)
+                     ).rowcount
+                 if changed:
+                     restored += 1
