@@ -264,3 +264,31 @@
 В первом прогоне `check-dating-kind-unchecked` пережила property `test_arbitrary_entities_never_crash_property`: без проверки вида `dating` дальнейшая проверка датировки (`dating_*`) всё равно отбрасывает элемент, и запуск не падает. Мутацию убивает сценарий «Элемент entities не того вида» (`schema_item` вместо `dating_*`); property из `expect_fail` этой мутации убран. Остальные 11 убиты всеми заявленными тестами.
 
 Наблюдение (не дефект по тексту дельты): раз цитата ищется целиком, цитата из одного многоточия (`...`) находится в любом абзаце, где есть многоточие автора, и проходит как подтверждение с пустым смыслом; без многоточия в абзаце — `quote_not_found`.
+
+## Тестировщик — дополнение: «Значимый текст» (дельта в коммите 98d643f)
+
+Обновлено по дельте: `test_degenerate_quotes_never_found` (пустая после нормализации → `quote_not_found`; знаки без букв и цифр → `quote_too_short`; в журнале соответствующий `code`); генераторы `test_any_substring_found_property` и `test_substring_with_authors_ellipsis_property` берут только подстроки с буквой/цифрой. Заодно исправлен маркер `test_single_short_part_allowed` (пропущена возможность). Другие проверки не ослаблялись.
+
+| Требование | Сценарий / инвариант | Тест | Вывод и журнал |
+|---|---|---|---|
+| Цитата у каждого утверждения | Цитата без значимого текста («...», «—», «, .», «…», «[...]», ««...»», `" - "`) | `test_quote_without_significant_text` ×7 | утверждение не записано, сущностей нет, одно `dropped code=quote_too_short` с ключами `{run_id,reason,code}` |
+| то же | то же, AND: короткие реальные находятся («априори», «tabula rasa», «Бог», «я», «1») | `test_short_real_quotes_still_found` ×5 | утверждение записано, `dropped` нет |
+| то же | инвариант: каждая часть при делении содержит букву/цифру | `test_part_without_significant_text` ×3 | `quote_too_short` |
+| то же | инвариант: подстрока без букв/цифр никогда не подтверждает (property, в т.ч. с типографикой и кавычками) | `test_substring_without_significant_text_refused_property` (400) | `quote_too_short` (или `quote_not_found`, если после нормализации пусто) |
+| то же | инвариант: пустая — `quote_not_found`; вырожденные (14) | `test_degenerate_quotes_never_found` ×14 | код по правилу выше, события |
+
+Прогон:
+
+    python scripts/check_traceability.py   →  Требований с тестами: 427 из 427
+    ruff check . / ruff format --check .   →  All checks passed! / 720 files already formatted
+    pytest -q все test_reextract_*.py + tests/llm + правленные прежние + test_quotes_unit + test_statements
+                                           →  511 passed, 1 warning in 436s
+
+Мутации на новое правило (сырой вывод):
+
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_quote_without_significant_text | да (1 failed, 1 warning in 1.72s) |
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_substring_without_significant_text_refused_property | да (1 failed, 1 warning in 1.14s) |
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_degenerate_quotes_never_found | да (1 failed, 2 passed, 1 warning in 3.22s) |
+| Цитата у каждого утверждения | quote-no-significant-part | tests/knowledge/test_reextract_quotes.py::test_part_without_significant_text | да (1 failed, 2 passed, 1 warning in 0.43s) |
+
+Уточнение по трактовке: цитата `""` (только обрамляющие кавычки) после нормализации не пуста, но значимого текста нет, поэтому ожидается `quote_too_short`; код выбран по формулировке «пустая цитата — `quote_not_found`», «без букв и цифр после снятия кавычек — `quote_too_short`».
