@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 276259b..a4b0e9d 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -58,8 +58,6 @@ def check(quote: str, text: str | None) -> str | None:
+         return QUOTE_NOT_FOUND
+     haystack = normalize(text)
+     whole = _unquoted(quote)
+-    if whole and whole in haystack:
+-        return None
+     found = parts(quote)
+     if not found:
+         return QUOTE_NOT_FOUND

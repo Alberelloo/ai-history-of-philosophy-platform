@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 276259b..5b7e420 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -16,7 +16,7 @@ QUOTE_NOT_FOUND = "quote_not_found"
+ QUOTE_TOO_SHORT = "quote_too_short"
+ MIN_PART = 10  # символов после нормализации у каждой части, если частей больше одной
+ 
+-_REMOVE = dict.fromkeys(map(ord, "­́̀​⁠﻿"))
++_REMOVE = dict.fromkeys(map(ord, "­́̀"))
+ _MAP = str.maketrans(
+     {
+         **dict.fromkeys("«»„“”‟″", '"'),

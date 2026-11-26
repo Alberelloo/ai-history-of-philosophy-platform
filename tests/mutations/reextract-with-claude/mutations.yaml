@@ -323,3 +323,79 @@ mutations:
   note: миграция 10 ничего не добавляет
   expect_fail:
   - tests/knowledge/test_reextract_runs.py::test_migration_10_keeps_old_rows
+- id: quote-whole-first-removed
+  requirement: Цитата у каждого утверждения
+  patch: quote-whole-first-removed.patch
+  note: цитата не ищется целиком, многоточие автора делит её
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_authors_ellipsis_in_quote
+  - tests/knowledge/test_reextract_review.py::test_whole_first_then_parts
+- id: quote-no-zero-width
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-zero-width.patch
+  note: знаки нулевой ширины не удаляются
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_zero_width_removed
+- id: quote-no-primes
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-primes.patch
+  note: штрих ′ и обратный апостроф не приводятся
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_primes_and_backtick
+- id: check-entities-type-unchecked
+  requirement: Проверка ответа по утверждениям
+  patch: check-entities-type-unchecked.patch
+  note: type элемента entities не проверяется по виду
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind
+  - tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property
+- id: check-dating-kind-unchecked
+  requirement: Проверка ответа по утверждениям
+  patch: check-dating-kind-unchecked.patch
+  note: вид dating элемента entities не проверяется
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind
+  - tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property
+- id: check-unicode-digits
+  requirement: Проверка ответа по утверждениям
+  patch: check-unicode-digits.patch
+  note: dating.paragraph принимает «цифры» Unicode
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept
+- id: ext-repeat-after-failed-allowed
+  requirement: Внешний извлекатель
+  patch: ext-repeat-after-failed-allowed.patch
+  note: повтор блокирует только завершённый запуск
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_repeat_after_interrupted_ingest
+  - tests/knowledge/test_reextract_review.py::test_any_unrolled_external_run_blocks_repeat
+- id: ext-duplicate-fragment-allowed
+  requirement: Внешний извлекатель
+  patch: ext-duplicate-fragment-allowed.patch
+  note: повтор фрагмента в JSONL молча берёт последний
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_duplicate_fragment_in_jsonl
+- id: ext-json-duplicate-allowed
+  requirement: Внешний извлекатель
+  patch: ext-json-duplicate-allowed.patch
+  note: повтор ключа в JSON-объекте не замечается
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_duplicate_key_in_json_object
+- id: ext-library-down-traceback
+  requirement: Внешний извлекатель
+  patch: ext-library-down-traceback.patch
+  note: библиотека недоступна — трассировка вместо кода 2
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down
+- id: ext-404-not-handled
+  requirement: Внешний извлекатель
+  patch: ext-404-not-handled.patch
+  note: версия не найдена — трассировка
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down
+- id: check-statement-unicode-digits
+  requirement: Проверка ответа по утверждениям
+  patch: check-statement-unicode-digits.patch
+  note: paragraph строкой принимает «цифры» Unicode
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_paragraph_unicode_digits_refused

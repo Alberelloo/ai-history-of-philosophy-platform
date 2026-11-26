@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/entity_items.py b/src/philograph/knowledge/entity_items.py
+index 3e6c726..9414652 100644
+--- a/src/philograph/knowledge/entity_items.py
++++ b/src/philograph/knowledge/entity_items.py
+@@ -139,7 +139,7 @@ class EntityItems:
+             if not item["name"]:
+                 continue
+             kind = item.get("type")
+-            if kind is not None and not isinstance(kind, str):
++            if False:
+                 drop("элемент entities: поле type не строка", extraction_codes.SCHEMA_ITEM)
+                 continue
+             if kind not in known:
