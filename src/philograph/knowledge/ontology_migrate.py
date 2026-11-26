@@ -109,6 +109,12 @@ events.define(
     required=("run_id", "lost", "lost_attributions"),
 )
 events.define(
+    "knowledge.migration.failed",
+    "error",
+    "Миграция прервалась исключением; откат — по run_id",
+    required=("run_id", "dry_run", "error"),
+)
+events.define(
     "knowledge.migration.rolled_back",
     "info",
     "Запуск миграции откачен",
@@ -166,6 +172,21 @@ class Aborted(Exception):
     def __init__(self, report: Report) -> None:
         super().__init__("потеряны утверждения или атрибуции")
         self.report = report
+
+
+class Failed(Exception):
+    """Запуск прервался исключением; база может быть в промежуточном состоянии.
+
+    Автоотката нет: номер запуска ``run_id`` — для ``rollback`` оператором. Исходное
+    исключение — в ``__cause__``."""
+
+    def __init__(self, run_id: str) -> None:
+        super().__init__(f"запуск {run_id} прервался")
+        self.run_id = run_id
+
+
+class UnknownRun(LookupError):
+    """Такого запуска не было: нет ни отметки начала, ни действий, ни слияний."""
 
 
 @dataclass(frozen=True)
@@ -420,12 +441,46 @@ class Migration:
             check_manifest(manifest)
         if batch < 1:
             raise ValueError("batch ≥ 1")
+        if limit is not None and limit < 0:
+            raise ValueError("limit ≥ 0")
         report = Report(run_id=f"mig_{uuid.uuid4().hex[:12]}", dry_run=dry_run, translate=translate)
         base = integrity.baseline(self.engine)
         view = View.load(self.engine)
         report.statements = {"before": len(base.statements)}
         report.attributions = {"before": sum(sum(c.values()) for c in base.attributions.values())}
         report.a1["before"] = a1(view)
+        if not dry_run:
+            run_actions.start(self.engine, report.run_id)
+        try:
+            self._steps(report, base, view, manifest, translate, batch, limit, estimate)
+        except Aborted:
+            raise
+        except Exception as exc:
+            # База могла остаться в промежуточном состоянии: номер запуска — в журнал и
+            # вызывающему, чтобы оператор мог откатить (``rollback <run_id>``).
+            events.emit(
+                "knowledge.migration.failed",
+                error_kind="exception",
+                run_id=report.run_id,
+                dry_run=dry_run,
+                error=type(exc).__name__,
+            )
+            raise Failed(report.run_id) from exc
+        self._emit_run(report)
+        return report
+
+    def _steps(
+        self,
+        report: Report,
+        base: Any,
+        view: View,
+        manifest: dict[str, Any] | None,
+        translate: str,
+        batch: int,
+        limit: int | None,
+        estimate: bool,
+    ) -> None:
+        dry_run = report.dry_run
         confirmed: list[tuple[str, str]] = []
         for step in STEPS:
             if step == "verify":
@@ -462,8 +517,6 @@ class Migration:
         )
         if report.statements.get("lost") or report.attributions.get("lost"):
             self._abort(report)
-        self._emit_run(report)
-        return report
 
     def _emit_run(self, report: Report) -> None:
         events.emit(
@@ -485,6 +538,7 @@ class Migration:
         )
 
     def _record(self, report: Report, action: Action) -> None:
+        """Действие без записи в базу через ``engine`` (слияние ведёт свой журнал ``merges``)."""
         if not report.dry_run:
             run_actions.record(self.engine, report.run_id, action.kind, action.to_json())
 
@@ -562,7 +616,7 @@ class Migration:
                             .where(t.names.c.id == n["id"])
                             .values(text=text, normalized=key)
                         )
-                self._record(report, action)
+                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
                 found.append(action)
         report.names_normalized = len(found)
         return found
@@ -584,7 +638,7 @@ class Migration:
                         conn.execute(
                             update(t.names).where(t.names.c.id == n["id"]).values(lang=lang)
                         )
-                self._record(report, action)
+                        run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
                 found.append(action)
         report.lang_fixed = len(found)
         return found
@@ -609,6 +663,7 @@ class Migration:
                         .where(t.entities.c.id == entity_id)
                         .values(retired_run=report.run_id, retired_reason=reason)
                     )
+                    run_actions.record_in(conn, report.run_id, action.kind, action.to_json())
                 events.emit(
                     "knowledge.entity.retired",
                     entity_id=entity_id,
@@ -616,7 +671,6 @@ class Migration:
                     reason=reason,
                     run_id=report.run_id,
                 )
-            self._record(report, action)
             report.retired[reason] += 1
             report.retired_list.append(
                 {"id": entity_id, "type": type_, "label": label, "reason": reason}
@@ -634,9 +688,10 @@ class Migration:
     def _rename(
         self, view: View, report: Report, step: str, entity_id: str, text: str, by: str
     ) -> Action:
-        before = [dict(n) for n in view.entities[entity_id]["names"]]
         old = view.label(entity_id)
+        action = Action(step, "rename", {"entity": entity_id, "lang": "ru", "text": text, "by": by})
         if not report.dry_run:
+            # Переименование и его запись для отката — одна транзакция.
             with self.engine.begin() as conn:
                 before = [
                     dict(r)
@@ -646,15 +701,16 @@ class Migration:
                         .order_by(t.names.c.id)
                     ).mappings()
                 ]
-            self.entities.set_primary_name(entity_id, "ru", text)
-        action = Action(step, "rename", {"entity": entity_id, "lang": "ru", "text": text, "by": by})
-        if not report.dry_run:
-            run_actions.record(
-                self.engine,
-                report.run_id,
-                action.kind,
-                {**action.to_json(), "names_before": [_name_json(n) for n in before]},
-            )
+                self.entities.set_primary_name(entity_id, "ru", text, conn=conn)
+                run_actions.record_in(
+                    conn,
+                    report.run_id,
+                    action.kind,
+                    {
+                        **action.to_json(),
+                        "names_before": [_name_json(n) for n in before],
+                    },
+                )
         report.renamed[by] += 1
         report.renamed_list.append({"id": entity_id, "from": old, "to": text, "by": by})
         return action
@@ -900,11 +956,13 @@ class Migration:
                 .where(t.merges.c.undone.is_(False))
                 .order_by(t.merges.c.id.desc())
             ).all()
+        mine = [m for m in merges if (m[1] or {}).get("run_id") == run_id]
+        if not done and not mine and not run_actions.known(self.engine, run_id):
+            raise UnknownRun(run_id)
         merges_undone = 0
-        for merge_id, moved in merges:
-            if (moved or {}).get("run_id") == run_id:
-                self.statements.undo_merge(merge_id)
-                merges_undone += 1
+        for merge_id, _moved in mine:
+            self.statements.undo_merge(merge_id)
+            merges_undone += 1
         restored = kept = 0
         externals: list[dict[str, Any]] = []
         for item in done:
@@ -956,7 +1014,10 @@ class Migration:
         return summary
 
     def _undo_rename(self, p: dict[str, Any]) -> bool:
-        """Названия до переименования; если основное с тех пор сменили — не трогается."""
+        """Названия до переименования. Чужое не трогается, сущность тогда — в ``kept``:
+        основное с тех пор сменили — откат пропускается; названия, добавленные после запуска
+        (человеком или слиянием другого запуска), остаются. Удаляется только строка, которую
+        вставил сам запуск."""
         entity_id = p["entity"]
         with self.engine.begin() as conn:
             rows = (
@@ -964,13 +1025,12 @@ class Migration:
                 .mappings()
                 .all()
             )
-            primary = [r for r in rows if r["kind"] == "primary"]
-            if not any(r["text"] == p["text"] for r in primary):
-                return False  # переименовали после запуска: чужое изменение
             before = {n["id"]: n for n in p["names_before"]}
-            for r in rows:
-                if r["id"] not in before:
-                    conn.execute(delete(t.names).where(t.names.c.id == r["id"]))
+            ours = _own_name(p, rows, before)
+            if ours is None or ours["kind"] != "primary":
+                return False  # переименовали после запуска: чужое изменение
+            if ours["id"] not in before:
+                conn.execute(delete(t.names).where(t.names.c.id == ours["id"]))
             for n in before.values():
                 conn.execute(
                     update(t.names)
@@ -979,7 +1039,8 @@ class Migration:
                         lang=n["lang"], text=n["text"], normalized=n["normalized"], kind=n["kind"]
                     )
                 )
-        return True
+        later = [r for r in rows if r["id"] not in before and r["id"] != ours["id"]]
+        return not later
 
     def _close_review(self, run_id: str) -> None:
         with self.engine.begin() as conn:
@@ -1003,6 +1064,16 @@ def _end(view: View, entity_id: str | None) -> str | None:
         seen.add(entity_id)
         entity_id = view.redirect[entity_id]
     return entity_id
+
+
+def _own_name(p: dict[str, Any], rows: list[Any], before: dict[int, Any]) -> dict[str, Any] | None:
+    """Строка названия, которую сделал основной запуск: основная с ключом его текста. Строка
+    не из ``names_before`` — вставлена запуском (её откат удаляет), иначе — повышена им из
+    варианта. Позже добавленные строки с другим ключом сюда не попадают."""
+    key = normalize(p["text"])
+    primary = [dict(r) for r in rows if r["kind"] == "primary" and r["normalized"] == key]
+    primary.sort(key=lambda r: r["id"] in before)
+    return primary[0] if primary else None
 
 
 def _name_json(n: dict[str, Any]) -> dict[str, Any]:
@@ -1070,6 +1141,9 @@ def main(
         if args.batch < 1:
             print("--batch: не меньше 1", file=sys.stderr)
             return 2
+        if args.limit is not None and args.limit < 0:
+            print("--limit: не меньше 0", file=sys.stderr)
+            return 2
         if args.manifest is not None:
             try:
                 manifest = load_manifest(args.manifest)
@@ -1091,7 +1165,12 @@ def main(
         llm = _llm_client()
     migration = service(fetch, llm if wants_model else None)
     if args.command == "rollback":
-        print(json.dumps(migration.rollback(args.run_id), ensure_ascii=False, indent=2))
+        try:
+            summary = migration.rollback(args.run_id)
+        except UnknownRun:
+            print(f"rollback: запуск {args.run_id} не найден, ничего не изменено", file=sys.stderr)
+            return 2
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
         return 0
     try:
         if args.command == "plan":
@@ -1107,6 +1186,14 @@ def main(
             )
     except Aborted as exc:
         print(json.dumps(exc.report.to_json(), ensure_ascii=False, indent=2))
+        return 1
+    except Failed as exc:
+        cause = exc.__cause__
+        print(
+            f"запуск {exc.run_id} прервался ({type(cause).__name__}: {cause}); база может быть"
+            f" в промежуточном состоянии, откат: rollback {exc.run_id}",
+            file=sys.stderr,
+        )
         return 1
     print(json.dumps(report.to_json(), ensure_ascii=False, indent=2))
     return 0

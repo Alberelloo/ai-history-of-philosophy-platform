@@ -233,6 +233,7 @@ python -m philograph.knowledge.quality_report [--save before.json] [--baseline b
 | `knowledge.migration.translated` | info | `run_id`, `batch`, `accepted`, `rejected` |
 | `knowledge.migration.run` | info | `run_id`, `dry_run`, `translate`, `retired`, `renamed_wikidata`, `renamed_model`, `merged`, `folded`, `review`, `statements_before`, `statements_after`, `lost`, `a1_before`, `a1_after` |
 | `knowledge.migration.aborted` | error | `run_id`, `lost`, `lost_attributions`, `error_kind="integrity_lost"` (обязательно для уровня error) |
+| `knowledge.migration.failed` | error | `run_id`, `dry_run`, `error` (имя класса исключения), `error_kind="exception"`; автоотката нет, откат — `rollback <run_id>` |
 | `knowledge.migration.rolled_back` | info | `run_id`, `actions`, `merges_undone`, `restored` |
 | `knowledge.entity.retired` | info | `entity_id`, `type`, `reason`, `run_id` |
 | `knowledge.entity.restored` | info | `entity_id`, `run_id` |

@@ -7,10 +7,11 @@
 from __future__ import annotations
 
 import uuid
+from contextlib import nullcontext
 from itertools import combinations
 from typing import Any
 
-from sqlalchemy import Engine, and_, delete, select, update
+from sqlalchemy import Connection, Engine, and_, delete, select, update
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.naming import (
@@ -234,16 +235,21 @@ class Entities:
                 )
             )
 
-    def set_primary_name(self, entity_id: str, lang: str, text: str) -> None:
+    def set_primary_name(
+        self, entity_id: str, lang: str, text: str, *, conn: Connection | None = None
+    ) -> None:
         """Новое основное название той же сущности: прежние основные становятся вариантами
         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
-        Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+        Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC.
+
+        ``conn`` — транзакция вызывающего (запись вместе с журналом действий запуска); без неё
+        — своя транзакция."""
         text = clean(text)
         entity = self.get(entity_id)
         self._check(entity["type"], text)
         lang = lang_for(text, lang)
         key = normalize(text)
-        with self.engine.begin() as conn:
+        with nullcontext(conn) if conn is not None else self.engine.begin() as conn:
             rows = (
                 conn.execute(select(t.names).where(t.names.c.entity_id == entity["id"]))
                 .mappings()
