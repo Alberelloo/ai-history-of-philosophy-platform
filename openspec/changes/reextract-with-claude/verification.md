@@ -375,3 +375,136 @@
 - разработчику: Д4 — повтор номера фрагмента определять по номеру после приведения (`"1"`, `"01"`, `" 1"`, `1`), в обоих форматах → код 2, ничего не записано;
 - тестировщику: тест на Д4 (разные записи одного номера в JSONL и JSON-объекте); обновить 12 неприменяемых патчей под итоговый код и прогнать `mutation_check.py --change reextract-with-claude` целиком на итоговом коммите, сырой вывод — в журнал;
 - ревьюверу: вычитать bd21bb3 и правку Д4, отметить 4.1.
+
+## Тестировщик — ответ на вердикт судьи (коммит 6b789af и далее)
+
+**Д4 и report без библиотеки.** Добавлено в `tests/knowledge/test_reextract_review.py`:
+- `test_duplicate_fragment_after_normalization_jsonl` ×6 (`1`/`"01"`, `"1"`/`" 1"`, `1`/`"1"`, `"001"`/`1`, `" 1 "`/`"1"`, `"01"`/`"001"`) и `test_duplicate_fragment_after_normalization_json` ×4 (`"1"`/`" 1"`, `"1"`/`"001"`, `"01"`/`"1"`, `" 2"`/`"2 "`): код 2, stderr без Traceback, нет запуска, `run.started` нет, счётчики 0/0/0;
+- `test_distinct_fragment_numbers_are_not_duplicates`: разные номера и нечисловой ключ — не повтор (`reply_invalid:1`);
+- `test_report_needs_no_library`: `main(["report", …])` с одним `PHILOGRAPH_DATABASE_URL` (без `PHILOGRAPH_LIBRARY_URL`) → код 0, таблица и «Итого»; со строкой запуска в базе — источник, модель, топ кодов; `knowledge.extraction.report runs=0/1`; `export` без адреса библиотеки — по-прежнему код 2.
+
+**Патчи мутаций.** Пересозданы под итоговый код все не применявшиеся (в том числе 12 названных судьёй и `ext-duplicate-fragment-allowed`, `ext-dup-top-level-allowed`): `git apply --check` проходит у всех 77 патчей. Добавлены `ext-dup-after-normalization-missed` и `ext-report-needs-library`. У `ext-json-duplicate-allowed` ожидаемый тест заменён на актуальный `test_duplicate_top_level_key_in_json_object` (в первом полном прогоне этой мутации «НЕТ» из-за переименованного теста — исправлено и прогон повторён целиком).
+
+Итоговые прогоны на коммите с этим разделом:
+
+    python scripts/mutation_check.py --coverage reextract-with-claude  →  мутации есть у всех 11 требований
+    python scripts/mutation_check.py --change reextract-with-claude    →  EXIT=0, все ожидаемые тесты упали (ниже сырой вывод), git status по коду чист
+    python scripts/check_traceability.py                                →  Требований с тестами: 427 из 427
+    ruff check . / ruff format --check .                                →  All checks passed! / 720 files already formatted
+    pytest -q все test_reextract_*.py + tests/llm + правленные прежние + test_{quotes,external_extraction}_unit + test_statements
+                                                                        →  563 passed, 1 warning in 430s
+
+Сырой вывод `mutation_check.py --change reextract-with-claude` (все мутации):
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Фрагменты из нескольких абзацев | frag-ignore-volume | tests/knowledge/test_reextract_fragments.py::test_short_paragraphs_gather_by_volume | да (1 failed, 1 warning in 0.93s) |
+| Фрагменты из нескольких абзацев | frag-ignore-volume | tests/knowledge/test_reextract_fragments.py::test_fragment_rules_property | да (1 failed, 1 warning in 1.03s) |
+| Фрагменты из нескольких абзацев | frag-no-overlap | tests/knowledge/test_reextract_fragments.py::test_statement_on_boundary_is_stored_once | да (1 failed, 1 warning in 1.05s) |
+| Фрагменты из нескольких абзацев | frag-no-overlap | tests/knowledge/test_reextract_fragments.py::test_paragraph_limit_gives_overlapping_pairs | да (1 failed, 1 warning in 1.01s) |
+| Фрагменты из нескольких абзацев | frag-size-off-by-one | tests/knowledge/test_reextract_fragments.py::test_paragraph_limit_gives_overlapping_pairs | да (1 failed, 1 warning in 0.98s) |
+| Фрагменты из нескольких абзацев | frag-size-off-by-one | tests/knowledge/test_reextract_fragments.py::test_fragment_rules_property | да (1 failed, 1 warning in 1.38s) |
+| Фрагменты из нескольких абзацев | frag-changed-ignored | tests/knowledge/test_reextract_fragments.py::test_changed_limits_extraction_run | да (1 failed, 1 warning in 1.01s) |
+| Фрагменты из нескольких абзацев | frag-changed-ignored | tests/knowledge/test_reextract_fragments.py::test_changed_filters_fragments_property | да (1 failed, 1 warning in 2.58s) |
+| Цитата у каждого утверждения | quote-order-ignored | tests/knowledge/test_reextract_quotes.py::test_ellipsis_gap_in_order_and_reversed | да (1 failed, 1 warning in 1.02s) |
+| Цитата у каждого утверждения | quote-order-ignored | tests/knowledge/test_reextract_quotes.py::test_ellipsis_parts_property | да (1 failed, 1 warning in 4.22s) |
+| Цитата у каждого утверждения | quote-overlap-allowed | tests/knowledge/test_reextract_quotes.py::test_overlapping_parts_rejected | да (1 failed, 1 warning in 0.24s) |
+| Цитата у каждого утверждения | quote-no-min-part | tests/knowledge/test_reextract_quotes.py::test_ellipsis_parts_property | да (1 failed, 1 warning in 5.27s) |
+| Цитата у каждого утверждения | quote-no-min-part | tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere | да (1 failed, 9 passed, 1 warning in 7.88s) |
+| Цитата у каждого утверждения | quote-no-edge-strip | tests/knowledge/test_reextract_quotes.py::test_outer_quotes_and_other_dash | да (1 failed, 1 warning in 0.88s) |
+| Цитата у каждого утверждения | quote-no-edge-strip | tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property | да (1 failed, 1 warning in 5.09s) |
+| Цитата у каждого утверждения | quote-no-dash-map | tests/knowledge/test_reextract_quotes.py::test_outer_quotes_and_other_dash | да (1 failed, 1 warning in 0.93s) |
+| Цитата у каждого утверждения | quote-no-dash-map | tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property | да (1 failed, 1 warning in 6.92s) |
+| Цитата у каждого утверждения | quote-no-yo | tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere | да (1 failed, 1 passed, 1 warning in 1.56s) |
+| Цитата у каждого утверждения | quote-no-yo | tests/knowledge/test_reextract_quotes.py::test_any_substring_found_property | да (1 failed, 1 warning in 6.40s) |
+| Цитата у каждого утверждения | quote-substring-loose | tests/knowledge/test_reextract_quotes.py::test_paraphrase_and_extra_words_rejected_property | да (1 failed, 1 warning in 4.22s) |
+| Цитата у каждого утверждения | quote-substring-loose | tests/knowledge/test_reextract_quotes.py::test_quote_not_found | да (1 failed, 1 warning in 1.01s) |
+| Цитата у каждого утверждения | quote-add-unchecked | tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere | да (1 failed, 4 passed, 1 warning in 3.88s) |
+| Цитата у каждого утверждения | quote-recheck-unchecked | tests/knowledge/test_reextract_quotes.py::test_one_check_everywhere | да (1 failed, 4 passed, 1 warning in 4.12s) |
+| Цитата у каждого утверждения | quote-dating-own-check | tests/knowledge/test_reextract_quotes.py::test_dating_uses_same_quote_check | да (1 failed, 1 warning in 0.95s) |
+| Цитата у каждого утверждения | quote-checked-after-entities | tests/knowledge/test_reextract_quotes.py::test_no_orphans | да (1 failed, 1 warning in 0.98s) |
+| Цитата у каждого утверждения | quote-checked-after-entities | tests/knowledge/test_reextract_quotes.py::test_refusal_creates_no_entities_with_attribution_and_entities_block | да (1 failed, 1 warning in 0.93s) |
+| Запуски наполнения | runs-no-fail-run | tests/knowledge/test_reextract_runs.py::test_failure_in_second_fragment | да (1 failed, 1 warning in 1.14s) |
+| Запуски наполнения | runs-no-fail-run | tests/knowledge/test_reextract_runs.py::test_failure_text_limited | да (1 failed, 1 warning in 0.90s) |
+| Запуски наполнения | runs-model-is-role | tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics | да (1 failed, 1 warning in 1.07s) |
+| Запуски наполнения | runs-model-is-role | tests/knowledge/test_reextract_runs.py::test_run_model_is_identifier_never_role | да (1 failed, 1 warning in 0.93s) |
+| Запуски наполнения | runs-tokens-lost | tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics | да (1 failed, 1 warning in 1.06s) |
+| Запуски наполнения | runs-duration-lost | tests/knowledge/test_reextract_runs.py::test_gateway_run_model_and_metrics | да (1 failed, 1 warning in 1.13s) |
+| Запуски наполнения | runs-429-as-refused | tests/knowledge/test_reextract_runs.py::test_gateway_429_budget | да (1 failed, 1 warning in 0.95s) |
+| Запуски наполнения | runs-gateway-failure-not-counted | tests/knowledge/test_reextract_runs.py::test_gateway_429_budget | да (1 failed, 1 warning in 0.93s) |
+| Проверка ответа по утверждениям | check-isolation-broken | tests/knowledge/test_reextract_items.py::test_bad_item_does_not_reject_the_rest_property | да (1 failed, 1 warning in 9.15s) |
+| Проверка ответа по утверждениям | check-isolation-broken | tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply | да (1 failed, 1 warning in 1.24s) |
+| Проверка ответа по утверждениям | check-null-not-absent | tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply | да (1 failed, 1 warning in 1.38s) |
+| Проверка ответа по утверждениям | check-null-not-absent | tests/knowledge/test_reextract_items.py::test_null_equals_absent | да (1 failed, 1 warning in 1.07s) |
+| Проверка ответа по утверждениям | check-paragraph-string | tests/knowledge/test_reextract_items.py::test_paragraph_digit_string | да (1 failed, 1 warning in 0.83s) |
+| Проверка ответа по утверждениям | check-unknown-relation-dropped | tests/knowledge/test_reextract_items.py::test_unknown_relation_becomes_proposal | да (1 failed, 1 warning in 0.97s) |
+| Проверка ответа по утверждениям | check-unknown-relation-dropped | tests/knowledge/test_reextract_items.py::test_deviations_in_one_reply | да (1 failed, 1 warning in 1.15s) |
+| Проверка ответа по утверждениям | check-stance-unchecked | tests/knowledge/test_reextract_items.py::test_item_fault_is_isolated_and_coded | да (1 failed, 25 passed, 1 warning in 17.09s) |
+| Проверка ответа по утверждениям | check-hard-schema | tests/knowledge/test_reextract_items.py::test_soft_schema_in_request | да (1 failed, 1 warning in 1.10s) |
+| Проверка ответа по утверждениям | check-reply-invalid-ignored | tests/knowledge/test_reextract_items.py::test_reply_invalid | да (1 failed, 1 warning in 0.95s) |
+| Коды причин отбраковки | codes-always-refused | tests/knowledge/test_reextract_items.py::test_drop_reasons_summary | да (1 failed, 1 warning in 1.07s) |
+| Коды причин отбраковки | codes-always-refused | tests/knowledge/test_reextract_quotes.py::test_quote_not_found | да (1 failed, 1 warning in 1.03s) |
+| Коды причин отбраковки | codes-summary-not-counted | tests/knowledge/test_reextract_items.py::test_drop_reasons_summary | да (1 failed, 1 warning in 1.33s) |
+| Коды причин отбраковки | codes-summary-not-counted | tests/knowledge/test_reextract_items.py::test_summary_matches_events_over_fragments | да (1 failed, 1 warning in 2.40s) |
+| Коды причин отбраковки | codes-leak-quote | tests/knowledge/test_reextract_items.py::test_reason_is_cut_to_300 | да (1 failed, 1 warning in 0.93s) |
+| Внешний извлекатель | ext-output-price-wrong | tests/knowledge/test_reextract_external.py::test_cost_formula | да (1 failed, 1 warning in 0.95s) |
+| Внешний извлекатель | ext-output-price-wrong | tests/knowledge/test_reextract_external.py::test_ingest_claude_replies | да (1 failed, 1 warning in 1.04s) |
+| Внешний извлекатель | ext-replace-no-rollback | tests/knowledge/test_reextract_external.py::test_ingest_repeat | да (1 failed, 1 warning in 1.21s) |
+| Внешний извлекатель | ext-replace-no-rollback | tests/knowledge/test_reextract_external.py::test_replace_does_not_double_property | да (1 failed, 1 warning in 66.58s (0:01:06)) |
+| Внешний извлекатель | ext-repeat-allowed | tests/knowledge/test_reextract_external.py::test_ingest_repeat | да (1 failed, 1 warning in 1.29s) |
+| Внешний извлекатель | ext-missing-not-dropped | tests/knowledge/test_reextract_external.py::test_ingest_claude_replies | да (1 failed, 1 warning in 1.10s) |
+| Внешний извлекатель | ext-missing-not-dropped | tests/knowledge/test_reextract_external.py::test_missing_reply_one_drop_each | да (1 failed, 1 warning in 1.02s) |
+| Внешний извлекатель | ext-forbidden-exported | tests/knowledge/test_reextract_external.py::test_export_forbidden_exit_3 | да (1 failed, 1 warning in 0.78s) |
+| Внешний извлекатель | ext-forbidden-exported | tests/knowledge/test_reextract_external.py::test_ingest_forbidden_exit_3 | да (1 failed, 1 warning in 1.02s) |
+| Внешний извлекатель | ext-fragment-numbering | tests/knowledge/test_reextract_external.py::test_export_task | да (1 failed, 1 warning in 0.80s) |
+| Внешний извлекатель | ext-out-of-range-applied | tests/knowledge/test_reextract_external.py::test_reply_out_of_range_ignored | да (1 failed, 1 passed, 1 warning in 1.51s) |
+| Внешний извлекатель | ext-model-fixed | tests/knowledge/test_reextract_external.py::test_model_is_passed_identifier | да (1 failed, 1 warning in 0.97s) |
+| Внешний извлекатель | ext-model-fixed | tests/knowledge/test_reextract_external.py::test_ingest_claude_replies | да (1 failed, 1 warning in 1.32s) |
+| Отчёт о запусках извлечения | rep-includes-rolled-back | tests/knowledge/test_reextract_external.py::test_report_for_a_day | да (1 failed, 1 warning in 1.19s) |
+| Отчёт о запусках извлечения | rep-includes-rolled-back | tests/knowledge/test_reextract_external.py::test_report_period_and_rollbacks | да (1 failed, 1 warning in 1.35s) |
+| Отчёт о запусках извлечения | rep-total-tokens-swapped | tests/knowledge/test_reextract_external.py::test_report_for_a_day | да (1 failed, 1 warning in 1.01s) |
+| Отчёт о запусках извлечения | rep-top-two | tests/knowledge/test_reextract_external.py::test_report_top_codes_and_rates | да (1 failed, 1 warning in 0.88s) |
+| Таймаут вызова модели при извлечении | to-no-margin | tests/knowledge/test_reextract_runs.py::test_timeout_by_role_budget | да (1 failed, 1 warning in 0.87s) |
+| Таймаут вызова модели при извлечении | to-fallback-ignored | tests/knowledge/test_reextract_runs.py::test_timeout_fallback_default | да (1 failed, 3 passed, 1 warning in 2.96s) |
+| Художественный текст | fic-prompt-rule-dropped | tests/knowledge/test_reextract_prompt.py::test_prompt_rules_reach_the_model | да (1 failed, 1 warning in 0.92s) |
+| Художественный текст | fic-prompt-rule-dropped | tests/knowledge/test_reextract_prompt.py::test_prompt_rules_in_external_task | да (1 failed, 1 warning in 0.68s) |
+| Сводка расходов | spend-no-tokens | tests/llm/test_reextract_role_spend.py::test_spend_tokens_by_run | да (1 failed, 1 warning in 0.57s) |
+| Сводка расходов | spend-no-tokens | tests/llm/test_reextract_role_spend.py::test_every_group_has_token_sums | да (1 failed, 1 warning in 0.49s) |
+| Сведения о роли | role-budget-no-schema-retries | tests/llm/test_reextract_role_spend.py::test_role_info_extraction_role | да (1 failed, 1 warning in 0.39s) |
+| Сведения о роли | role-budget-no-schema-retries | tests/llm/test_reextract_role_spend.py::test_role_budget_formula_property | да (1 failed, 1 warning in 8.82s) |
+| Сведения о роли | role-leaks-price | tests/llm/test_reextract_role_spend.py::test_role_info_has_no_secrets_or_prices | да (1 failed, 1 warning in 0.40s) |
+| Сведения о роли | role-leaks-price | tests/llm/test_reextract_role_spend.py::test_role_info_extraction_role | да (1 failed, 1 warning in 0.40s) |
+| Запуски наполнения | runs-migration-noop | tests/knowledge/test_reextract_runs.py::test_migration_10_keeps_old_rows | да (1 failed, 1 warning in 0.46s) |
+| Цитата у каждого утверждения | quote-whole-first-removed | tests/knowledge/test_reextract_review.py::test_authors_ellipsis_in_quote | да (1 failed, 1 warning in 1.00s) |
+| Цитата у каждого утверждения | quote-whole-first-removed | tests/knowledge/test_reextract_review.py::test_whole_first_then_parts | да (1 failed, 1 warning in 0.25s) |
+| Цитата у каждого утверждения | quote-no-zero-width | tests/knowledge/test_reextract_review.py::test_zero_width_removed | да (1 failed, 1 warning in 0.25s) |
+| Цитата у каждого утверждения | quote-no-primes | tests/knowledge/test_reextract_review.py::test_primes_and_backtick | да (1 failed, 1 passed, 1 warning in 0.27s) |
+| Проверка ответа по утверждениям | check-entities-type-unchecked | tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind | да (1 failed, 1 warning in 1.03s) |
+| Проверка ответа по утверждениям | check-entities-type-unchecked | tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property | да (1 failed, 1 warning in 19.87s) |
+| Проверка ответа по утверждениям | check-dating-kind-unchecked | tests/knowledge/test_reextract_review.py::test_entities_item_wrong_kind | да (1 failed, 1 warning in 1.01s) |
+| Проверка ответа по утверждениям | check-unicode-digits | tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept | да (1 failed, 7 passed, 1 warning in 4.83s) |
+| Внешний извлекатель | ext-repeat-after-failed-allowed | tests/knowledge/test_reextract_review.py::test_repeat_after_interrupted_ingest | да (1 failed, 1 warning in 1.10s) |
+| Внешний извлекатель | ext-repeat-after-failed-allowed | tests/knowledge/test_reextract_review.py::test_any_unrolled_external_run_blocks_repeat | да (1 failed, 1 warning in 1.02s) |
+| Внешний извлекатель | ext-duplicate-fragment-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_fragment_in_jsonl | да (1 failed, 1 warning in 0.84s) |
+| Внешний извлекатель | ext-json-duplicate-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_top_level_key_in_json_object | да (1 failed, 1 warning in 0.84s) |
+| Внешний извлекатель | ext-library-down-traceback | tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down | да (1 failed, 2 passed, 1 warning in 1.84s) |
+| Внешний извлекатель | ext-404-not-handled | tests/knowledge/test_reextract_review.py::test_version_missing_or_library_down | да (1 failed, 1 warning in 0.77s) |
+| Проверка ответа по утверждениям | check-statement-unicode-digits | tests/knowledge/test_reextract_review.py::test_paragraph_unicode_digits_refused | да (1 failed, 1 passed, 1 warning in 1.41s) |
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_quote_without_significant_text | да (1 failed, 1 warning in 1.00s) |
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_substring_without_significant_text_refused_property | да (1 failed, 1 warning in 0.78s) |
+| Цитата у каждого утверждения | quote-no-significant-whole | tests/knowledge/test_reextract_quotes.py::test_degenerate_quotes_never_found | да (1 failed, 2 passed, 1 warning in 1.94s) |
+| Цитата у каждого утверждения | quote-no-significant-part | tests/knowledge/test_reextract_quotes.py::test_part_without_significant_text | да (1 failed, 2 passed, 1 warning in 0.26s) |
+| Внешний извлекатель | ext-live-running-ignored | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 0.99s) |
+| Внешний извлекатель | ext-live-running-ignored | tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others | да (1 failed, 1 warning in 1.05s) |
+| Внешний извлекатель | ext-live-blocks-only-without-replace | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 1.04s) |
+| Внешний извлекатель | ext-live-blocks-only-without-replace | tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others | да (1 failed, 1 warning in 0.98s) |
+| Внешний извлекатель | ext-threshold-huge | tests/knowledge/test_reextract_review.py::test_abandoned_running_is_rolled_back_by_replace | да (1 failed, 1 warning in 0.86s) |
+| Внешний извлекатель | ext-threshold-huge | tests/knowledge/test_reextract_review.py::test_six_hour_threshold | да (1 failed, 1 passed, 1 warning in 1.29s) |
+| Внешний извлекатель | ext-threshold-zero | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 0.93s) |
+| Внешний извлекатель | ext-threshold-zero | tests/knowledge/test_reextract_review.py::test_six_hour_threshold | да (1 failed, 1 warning in 1.06s) |
+| Внешний извлекатель | ext-dup-top-level-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_top_level_key_in_json_object | да (1 failed, 1 warning in 1.04s) |
+| Проверка ответа по утверждениям | check-dating-not-object | tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept | да (1 failed, 10 passed, 1 warning in 7.93s) |
+| Внешний извлекатель | ext-dup-after-normalization-missed | tests/knowledge/test_reextract_review.py::test_duplicate_fragment_after_normalization_jsonl | да (1 failed, 1 warning in 0.83s) |
+| Внешний извлекатель | ext-dup-after-normalization-missed | tests/knowledge/test_reextract_review.py::test_duplicate_fragment_after_normalization_json | да (1 failed, 1 warning in 1.05s) |
+| Отчёт о запусках извлечения | ext-report-needs-library | tests/knowledge/test_reextract_review.py::test_report_needs_no_library | да (1 failed, 1 warning in 0.55s) |
+EXIT=0
