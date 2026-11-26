@@ -62,6 +62,9 @@ events.define(
 TEMPLATE = "ontology.extract"
 PRICES = Path(__file__).with_name("extraction_prices.yaml")
 EXTERNAL = "external"
+# Запуск ``running`` моложе этого считается идущей записью (параллельный ingest): повтор
+# отказывает. Старше — брошенный (процесс упал), его откатывает ``--replace``.
+STALE_RUNNING_HOURS = 6
 
 
 class CommandError(Exception):
@@ -190,11 +193,10 @@ def read_replies(path: Path) -> dict[str, Any]:
     except ValueError:
         whole = None
     if isinstance(whole, dict) and "fragment" not in whole:
-        try:
-            pairs = json.loads(text, object_pairs_hook=_unique)
-        except _Duplicate as exc:
-            raise CommandError(f"{path}: ключ {exc} повторяется") from None
-        return {str(k): v for k, v in pairs.items()}
+        top = json.loads(text, object_pairs_hook=_unique)
+        if isinstance(top, _Repeated):  # только номера фрагментов; внутри ответа — как в JSON
+            raise CommandError(f"{path}: фрагмент {top.keys_repeated[0]} указан дважды")
+        return {str(k): v for k, v in top.items()}
     replies: dict[str, Any] = {}
     for number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
@@ -212,28 +214,35 @@ def read_replies(path: Path) -> dict[str, Any]:
     return replies
 
 
-class _Duplicate(Exception):
-    pass
+class _Repeated(dict):
+    """Объект JSON с повтором ключа (последний выигрывает, как в обычном JSON); повторы —
+    в ``keys_repeated``. Для верхнего уровня файла ответов повтор номера — ошибка файла."""
+
+    keys_repeated: list[str]
 
 
 def _unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    """Объект JSON без повторов ключей — на любом уровне (повтор в ответе тоже ошибка файла)."""
     result: dict[str, Any] = {}
+    repeated = []
     for key, value in pairs:
         if key in result:
-            raise _Duplicate(key)
+            repeated.append(key)
         result[key] = value
-    return result
+    if not repeated:
+        return result
+    marked = _Repeated(result)
+    marked.keys_repeated = repeated
+    return marked
 
 
-def _previous(engine: Engine, version_id: str) -> list[str]:
-    """Прежние внешние запуски версии, которые не откатаны (любой статус, кроме
-    ``rolled_back``)."""
+def _previous(engine: Engine, version_id: str) -> list[dict[str, Any]]:
+    """Прежние внешние запуски версии, которые не откатаны: ``run_id``, ``status``,
+    ``started_at``."""
     runs = t.filling_runs
     with engine.begin() as conn:
         return list(
-            conn.scalars(
-                select(runs.c.run_id).where(
+            conn.execute(
+                select(runs.c.run_id, runs.c.status, runs.c.started_at).where(
                     and_(
                         runs.c.kind == "extraction",
                         runs.c.extractor == EXTERNAL,
@@ -243,8 +252,16 @@ def _previous(engine: Engine, version_id: str) -> list[str]:
                         runs.c.status != "rolled_back",
                     )
                 )
-            )
+            ).mappings()
         )
+
+
+def _age_hours(started: datetime, now: datetime) -> float:
+    if started.tzinfo is None:  # SQLite хранит без пояса: время сервиса — UTC
+        started = started.replace(tzinfo=UTC)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=UTC)
+    return (now - started).total_seconds() / 3600
 
 
 def ingest(
@@ -261,22 +278,35 @@ def ingest(
 ) -> dict[str, Any]:
     """Запуск ``extractor=external``: каждый ответ — через ``Filling.apply_reply``; фрагмент
     без ответа — ``reply_missing``; номер вне фрагментов — ``reply_invalid``. Повтор версии —
-    только с ``replace``: все прежние неоткатанные внешние запуски версии (``done``,
-    ``failed``, ``running``) откатываются целиком.
+    только с ``replace``: прежние внешние запуски версии ``done``, ``failed`` и брошенные
+    ``running`` (старше ``STALE_RUNNING_HOURS``) откатываются. Идущая запись (``running``
+    моложе порога) — отказ «запись идёт» и с ``replace``.
 
-    Риск ``replace``: откат снимает всё, что записал прежний запуск, — и подтверждения,
-    добавленные к утверждениям, которые уже были (другой учебник, шлюз), и проверенные
-    человеком решения по утверждениям этого запуска. Перед ``--replace`` на боевой базе —
-    резервная копия (docs/operations/runbook.md, «Извлечение связей»)."""
+    Риск ``replace``: откат снимает всё, что записал прежний запуск, в том числе
+    подтверждения и атрибуции, добавленные к утверждениям, которые уже были (другой учебник,
+    шлюз). Проверенные человеком (``verified``) утверждения остаются вместе со своими
+    подтверждениями и атрибуциями (``Statements.rollback_run``); новая запись добавит к ним
+    подтверждения ещё раз. Перед ``--replace`` на боевой базе — резервная копия
+    (docs/operations/runbook.md, «Извлечение связей»)."""
     _allowed(filling, data)
     version_id = data["version_id"]
     previous = _previous(filling.statements.engine, version_id)
-    if previous and not replace:
+    now = filling.clock.now()
+    live = [
+        r["run_id"]
+        for r in previous
+        if r["status"] == "running" and _age_hours(r["started_at"], now) < STALE_RUNNING_HOURS
+    ]
+    if live:
         raise CommandError(
-            f"версия {version_id} уже записана запуском {', '.join(previous)}: повтор — с --replace"
+            f"запись идёт: версия {version_id}, запуск {', '.join(live)} (running); "
+            f"повтор — после его завершения или через {STALE_RUNNING_HOURS} ч"
         )
-    for run_id in previous:
-        filling.rollback(run_id)
+    if previous and not replace:
+        ids = ", ".join(r["run_id"] for r in previous)
+        raise CommandError(f"версия {version_id} уже записана запуском {ids}: повтор — с --replace")
+    for row in previous:
+        filling.rollback(row["run_id"])
     run_id = filling.start_run(
         "extraction",
         version_id,

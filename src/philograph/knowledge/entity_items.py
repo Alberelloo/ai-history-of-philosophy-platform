@@ -145,6 +145,9 @@ class EntityItems:
             if kind not in known:
                 drop(ENTITY_TYPE_DROPPED, extraction_codes.ENTITY_TYPE)
                 continue
+            if item.get("dating") is not None and not isinstance(item["dating"], dict):
+                drop("элемент entities: поле dating не того вида", extraction_codes.SCHEMA_ITEM)
+                continue
             clean = _without_nulls(item)
             if "dating" in clean:
                 dating_spec = _dating_spec(clean["dating"])

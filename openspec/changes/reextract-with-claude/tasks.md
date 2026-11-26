@@ -43,4 +43,4 @@
 
 ## 6. Ведущий (после принятия)
 
-- [ ] 6.1 Переизвлечение всех 208 источников: `export` → ответы Claude → `ingest --model claude-opus-5-5 …`; отчёт `report --since 2026-11-26 --out docs/audit/extraction-run-2026-11-26.md`; критерии R1–R8 задачи.
+- [ ] 6.1 Перед переизвлечением на боевой базе — число подтверждений без значимого текста (`SELECT count(*) FROM knowledge.evidence WHERE NOT lost AND (quote IS NULL OR btrim(quote) = '' OR quote !~ '[[:alnum:]]')`, runbook «Извлечение связей»): при перепроверке абзаца они станут потерянными; число — в отчёт. Переизвлечение всех 208 источников: `export` → ответы Claude → `ingest --model claude-opus-5-5 …`; отчёт `report --since 2026-11-26 --out docs/audit/extraction-run-2026-11-26.md`; критерии R1–R8 задачи.

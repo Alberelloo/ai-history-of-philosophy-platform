@@ -229,6 +229,23 @@ def test_duplicate_fragment_refused(tmp_path):
     for path in (lines, whole):
         with pytest.raises(ext.CommandError):
             ext.read_replies(path)
+    nested = tmp_path / "n.json"
+    nested.write_text('{"1": {"statements": [], "statements": [1]}}', "utf-8")
+    assert ext.read_replies(nested) == {"1": {"statements": [1]}}  # внутри — как в JSON
+
+
+def test_running_blocks_and_stale_running_rolled_back(stand, version, clock):
+    data, _ = version
+    replies = {"1": {"statements": [st("Кант", "holds", "Опыт", 1, "всякое знание")]}}
+    first = _ingest(stand, data, replies)
+    with stand.onto.statements.engine.begin() as conn:
+        conn.execute(t.filling_runs.update().values(status="running"))
+    with pytest.raises(ext.CommandError, match="запись идёт"):
+        _ingest(stand, data, replies, replace=True)
+    clock.advance(hours=ext.STALE_RUNNING_HOURS + 1)
+    _ingest(stand, data, replies, replace=True)
+    statuses = {r["run_id"]: r["status"] for r in runs(stand)}
+    assert statuses[first["run_id"]] == "rolled_back"
 
 
 def test_unknown_version_exit_2(stand, onto, capsys):

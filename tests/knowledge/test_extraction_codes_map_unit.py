@@ -79,3 +79,12 @@ def test_index_dating_paragraph_string(onto):
     items = EntityItems(onto.entities, onto.statements)
     item = {"name": "Кант", "type": "person", "dating": {"text": "1724", "paragraph": " 2 "}}
     assert items.index([item], "run1")["Кант"]["dating"]["paragraph"] == 2
+
+
+@pytest.mark.parametrize("dating", ["1724", 1724, ["1724"]])
+def test_index_dating_not_object(onto, dating):
+    items = EntityItems(onto.entities, onto.statements)
+    dropped: list[str] = []
+    item = {"name": "Кант", "type": "person", "dating": dating}
+    assert items.index([item], "run1", on_drop=lambda r, c: dropped.append(c)) == {}
+    assert dropped == ["schema_item"]
