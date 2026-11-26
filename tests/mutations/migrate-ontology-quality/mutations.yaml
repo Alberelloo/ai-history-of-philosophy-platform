@@ -561,3 +561,15 @@ mutations:
     note: continue → break — подписи Wikidata после сбоя загрузки
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_wikidata_labels_after_skips
+  - id: same-name-includes-source
+    requirement: Миграция существующей онтологии
+    patch: same-name-includes-source.patch
+    note: О30 С3 — источники с одинаковым названием ставятся в очередь review:same_name
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_same_name_sources_not_queued
+  - id: manifest-candidate-ignores-distinct
+    requirement: Миграция существующей онтологии
+    patch: manifest-candidate-ignores-distinct.patch
+    note: О30 С4 — шаг 2 ставит в очередь пару, закрытую решением «разные»
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_pending_candidate_distinct_not_queued

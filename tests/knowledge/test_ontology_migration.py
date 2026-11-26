@@ -1667,3 +1667,48 @@ def test_limit_only_translation(onto, events):
     assert report["to_translate"] == 1
     assert sum(is_ru(after.label(e)) for e in ids.values()) == 1
     assert all(j not in after.active() for j in junk)  # снятие не ограничено
+
+
+@req(
+    OM,
+    MIG,
+    invariant="Шаг 7: источники библиотеки с одинаковым названием в очередь не идут (О30, С3)",
+)
+def test_same_name_sources_not_queued(onto, events):
+    a = _at(onto, "e_000000000001", "source", [("ru", "Хрестоматия", "primary")])
+    b = _at(onto, "e_000000000002", "source", [("ru", "Хрестоматия", "primary")])
+    c1 = _at(onto, "e_000000000003", "concept", [("ru", "Субстанция", "primary")])
+    c2 = _at(onto, "e_000000000004", "concept", [("ru", "Субстанция", "primary")])
+    migration(onto).run()
+    assert _pair_items(onto, a, b) == []
+    [queued] = _pair_items(onto, c1, c2)
+    assert queued["payload"]["reason"] == "review:same_name"
+
+
+@req(OM, MIG, invariant="Шаг 2: пара, закрытая человеком «разные», в очередь не идёт (О30, С4)")
+def test_pending_candidate_distinct_not_queued(onto, events, capsys, tmp_path):
+    ids = stand(onto)
+    with onto.statements.engine.begin() as conn:
+        conn.execute(
+            t.review_items.insert().values(
+                kind="duplicate",
+                status="resolved",
+                resolution={"merge": False},
+                payload={"pair": [ids["omir"], ids["homer"]], "reason": "review:single_name"},
+            )
+        )
+    manifest = {
+        "entities": [
+            {
+                "entity": ids["omir"],
+                "wikidata": None,
+                "decision": "pending",
+                "candidates": [{"qid": "Q6691", "holder": ids["homer"]}],
+            }
+        ]
+    }
+    code, _report = cli(onto, capsys, ["run", "--manifest", write_manifest(tmp_path, manifest)])
+    assert code == 0
+    items = _pair_items(onto, ids["omir"], ids["homer"])
+    assert [i["status"] for i in items] == ["resolved"]
+    events.assert_none("knowledge.entity.merge_proposed")
