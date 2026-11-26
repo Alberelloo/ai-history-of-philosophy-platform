@@ -14,7 +14,7 @@ from datetime import timedelta
 
 import httpx
 import pytest
-from hypothesis import HealthCheck, given, settings
+from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as hst
 
 from philograph.knowledge import quotes
@@ -333,6 +333,9 @@ gateway_entity = hst.fixed_dictionaries(
     CHECK,
     invariant="Произвольные значения полей entities не роняют запуск; верные утверждения записаны",
 )
+@example([{"name": "Платон", "type": "person", "dating": "1724"}])
+@example([{"name": "Платон", "type": "work", "dating": 5}])
+@example([{"name": "Платон", "type": "person", "dating": ["x"]}])
 @given(hst.lists(entity_item, max_size=6))
 @settings(
     parent=PROFILES["heavy"],
