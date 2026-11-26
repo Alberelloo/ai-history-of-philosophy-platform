@@ -195,7 +195,7 @@ stopwords: [some, every, this author, the author above mentioned, your Lordship,
   | `pure` | 400 | чистые функции (`naming`, `dating`, `dedupe.same_person`, разбор времени Wikidata) — декоратором `@settings(parent=…)` |
   | `heavy` | 25 | миграция, откат, слияние на онтологиях из генератора |
 
-  **Бюджет:** весь слой property-тестов четырёх изменений — не дольше 3 минут на CI (`pytest --durations` в `verification.md`).
+  **Бюджет:** слой property-тестов каждого из четырёх изменений — не дольше 3 минут на CI (О30 migrate-ontology-quality; суммарное время — в verification.md) (`pytest --durations` в `verification.md`).
 - **Стратегии «вход + ожидание»** (`tests/knowledge/strategies.py`). Стратегия собирает вход из частей с известным ответом и возвращает пару `(вход, ожидание)`. Например, `numbers()` → `("§ 20.1", "number")`, `datings()` → `({"text": "427–347 до н. э.", "quote": …}, ((−426, −346), "year"))`. Оракул **не импортирует** проверяемые функции (`check_name`, `lang_for`, `dates.parse`, `claim_date`, `same_person`). Ожидание выводится из того, как стратегия построила вход.
 
   | Стратегия | Что даёт |
