@@ -459,6 +459,65 @@
 
 С7 закрыт. `git apply --check` для всех `tests/mutations/*/*.patch` на HEAD — 0 ненакладывающихся, `--coverage` чистый.
 
+## Тестировщик — второй возврат судьи (J11, J13, J14; условия отбора шагов), 2026-11-26, код 033001b
+
+Что сделано по замечаниям судьи:
+- J11: в генератор `ontologies` добавлены сущности из `RU_QID` — понятия с русским основным названием и QID, у которых подпись `ru` в Wikidata другая. Ожидается, что название не меняется. Такая же сущность «Монада» добавлена в `SYMPTOMS_SPEC`. Сценарий — `test_wikidata_labels_skip_russian_primary` («Монада», «Юм» и контрольная «substance»).
+- J14: в `test_rollback_invariant` проверяются статусы пунктов очереди: все `rolled_back`, и их число равно `report.review`. Добавлен пример `PENDING_SPEC`: «Омир» в манифесте без решения, поэтому запуск создаёт пункт очереди.
+- J13: эквивалентность не подтвердилась. Вход, где поведение отличается от спецификации: понятие с основными ru «Причинность» и en «20.1». По спецификации А7 = 0, с `lang=en` А7 = 1. Тест — `test_a7_catalog_lang_ru`.
+
+Обход условий отбора (правило судьи: для каждого «только X» нужен вход, где есть не-X и где он привёл бы к изменению). Прогон мутантов — `-x` по файлу тестов миграции, до новых тестов:
+
+| Шаг | Условие «только X» | Вход с не-X | Мутация | На тестах до правки | Убийца |
+|---|---|---|---|---|---|
+| 5 wikidata_labels | «с нерусским основным» | русское основное с QID, подпись ru другая (генератор RU_QID, SYMPTOMS_SPEC «Монада», сценарий) | `j11-wd-labels-include-russian` | убита (test_migration_invariant) | test_wikidata_labels_skip_russian_primary |
+| 5 | действующие (снятые на шаге 4 — нет) | снятая персона «your Lordship» с QID и годной подписью «Милорд» | `wd-labels-include-retired` | выжила | test_retired_not_renamed_from_wikidata |
+| 6 | «остальные нерусские» | русские основные стенда | `translate-include-russian` | убита (test_no_model_without_flag) | test_no_model_without_flag (уже была) |
+| 6 | действующие | снятые «20.1» и «Every» с ответом модели | `translate-include-retired` | убита (test_no_model_without_flag) | test_retired_not_sent_to_model |
+| 4 retire | «основное название не проходит» | годное основное, негодный вариант «20.1» | `retire-any-name` | выжила | test_retire_by_primary_only |
+| 4 | «действующая» | — | `retire-include-inactive` | выжила | эквивалентна: до шага 4 в View нет снятых и слитых этого запуска (View.load берёт только действующие; шаг 2 сливает с merge=False — слияние на шаге 7) |
+| 7 dedupe | «не-персоны одного типа» | concept и term «Форма вещи» | `same-name-any-type` | выжила | test_same_name_other_type_not_queued |
+| 7 | «совпадения основных названий» | вариант одной = основное другой | `same-name-any-kind` | выжила | test_same_name_variant_not_queued |
+| 7 | действующие | две снятые «20.1» | `same-name-include-inactive` | выжила | test_same_name_retired_not_queued |
+| 2 manifest_qids | «записи без решения (pending)» | accepted с держателем | `manifest-queue-decided` | выжила | test_manifest_accepted_with_holder_not_queued |
+| 2 | держатель — действующая сущность | держатель снят прошлым запуском | `manifest-queue-inactive` | выжила | test_manifest_pending_retired_holder_not_queued |
+| замер А3 | только персоны | строчное понятие | `a3-all-types` | убита (test_quality_before_after) | test_quality_before_after, test_a3_ignores_non_persons |
+| замер А7 | `lang=ru` | понятие: ru «Причинность», en «20.1» (оба основные) | `j13-a7-lang-en` | убита (test_a7_catalog_lang_ru) | test_a7_catalog_lang_ru |
+| откат | пункты запуска → rolled_back | PENDING_SPEC (Омир без решения); инвариант: статусы ⊆ {rolled_back} и их число = report.review | `j14-rollback-closed` | убита (test_rollback_invariant) | test_rollback_invariant |
+
+Полный прогон `tests/knowledge/test_ontology_migration.py` на 5902632: 77 passed in 291.25s.
+
+Шаги без условия «только X»:
+- шаг 1 `normalize_names` и шаг 3 `lang_fix`: по спецификации «каждое название»;
+- шаг 8 `verify`;
+- шаг 5 «с QID» выполняется сам собой: без QID нечего запрашивать;
+- «кроме источников» уже покрыто: в шаге 4 исключение эквивалентно (правило названий источники не проверяет, есть `test_source_not_retired`), в шагах 5–7 и замере — О33, `same-name-includes-source`, `a1-with-source`;
+- А4, А5, А6 только по персонам и философам: `a4-non-persons`, `a5-all-types`, `a6-no-filter`.
+
+Наблюдение С8 (для ведущего): шаги 1 и 3 спецификация описывает как «каждое название», но `View.load` берёт только действующие сущности. Поэтому названия сущностей, снятых прошлым запуском, к форме и языку не приводятся. Я не считаю это дефектом: снятые не видны ни в справочнике, ни в замере. Но формулировку спецификации стоит уточнить.
+
+`--id` (под flock):
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Перевод названий | j11-wd-labels-include-russian | tests/knowledge/test_ontology_migration.py::test_migration_invariant | да (1 failed, 1 warning in 2.87s) |
+| Перевод названий | j11-wd-labels-include-russian | tests/knowledge/test_ontology_migration.py::test_wikidata_labels_skip_russian_primary | да (1 failed, 1 warning in 0.80s) |
+| Перевод названий | wd-labels-include-retired | tests/knowledge/test_ontology_migration.py::test_retired_not_renamed_from_wikidata | да (1 failed, 1 warning in 0.77s) |
+| Перевод названий | translate-include-russian | tests/knowledge/test_ontology_migration.py::test_no_model_without_flag | да (1 failed, 1 warning in 3.12s) |
+| Перевод названий | translate-include-retired | tests/knowledge/test_ontology_migration.py::test_no_model_without_flag | да (1 failed, 1 warning in 3.14s) |
+| Перевод названий | translate-include-retired | tests/knowledge/test_ontology_migration.py::test_retired_not_sent_to_model | да (1 failed, 1 warning in 0.83s) |
+| Снятие мусорных сущностей | retire-any-name | tests/knowledge/test_ontology_migration.py::test_retire_by_primary_only | да (1 failed, 1 warning in 0.89s) |
+| Миграция существующей онтологии | same-name-any-type | tests/knowledge/test_ontology_migration.py::test_same_name_other_type_not_queued | да (1 failed, 1 warning in 0.98s) |
+| Миграция существующей онтологии | same-name-any-kind | tests/knowledge/test_ontology_migration.py::test_same_name_variant_not_queued | да (1 failed, 1 warning in 0.70s) |
+| Миграция существующей онтологии | same-name-include-inactive | tests/knowledge/test_ontology_migration.py::test_same_name_retired_not_queued | да (1 failed, 1 warning in 0.85s) |
+| Миграция существующей онтологии | manifest-queue-decided | tests/knowledge/test_ontology_migration.py::test_manifest_accepted_with_holder_not_queued | да (1 failed, 1 warning in 0.75s) |
+| Миграция существующей онтологии | manifest-queue-inactive | tests/knowledge/test_ontology_migration.py::test_manifest_pending_retired_holder_not_queued | да (1 failed, 1 warning in 0.72s) |
+| Замер качества онтологии | a3-all-types | tests/knowledge/test_ontology_migration.py::test_quality_before_after | да (1 failed, 1 warning in 2.43s) |
+| Замер качества онтологии | a3-all-types | tests/knowledge/test_ontology_migration.py::test_a3_ignores_non_persons | да (1 failed, 1 warning in 0.77s) |
+| Замер качества онтологии | j13-a7-lang-en | tests/knowledge/test_ontology_migration.py::test_a7_catalog_lang_ru | да (1 failed, 1 warning in 0.75s) |
+| Откат миграции | j14-rollback-closed | tests/knowledge/test_ontology_migration.py::test_rollback_invariant | да (1 failed, 1 warning in 3.49s) |
+| Откат миграции | j14-rollback-closed | tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items | да (1 failed, 1 warning in 3.32s) |
+
 ## Судья — 2026-11-26, коммит 745dbe0
 
 Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.
