@@ -384,3 +384,26 @@
 | Откат миграции | rollback-overwrites-later | tests/knowledge/test_ontology_migration.py::test_later_change_kept | да (1 failed, 1 warning in 0.79s) |
 
 Первые прогоны до правки, «НЕТ»: `rollback-overwrites-later` (снята одна проверка из двух — эквивалентно), `run-action-not-recorded` по `_record` (после 0b8b44e — только слияния).
+
+## Судья — 2026-11-26, коммит 745dbe0
+
+Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Миграция | все сценарии + test_migration_invariant | passed, 24+ мутаций убиты | 61 passed in 247 s (весь test_ontology_migration.py); J2 «verify без отката» → test_loss_aborts упал; J5 «normalize без NFC» → test_name_form упал; verify-no-abort (yaml) упал | CLI на синтетическом стенде (файл SQLite): `plan` — дамп не изменился, 7 снятий по причинам, 4 слияния, `lost=0`; `run --translate model` (фейк, 1 вызов) — код 0, `a1 0.7292→0.973` | подтверждено |
+| Снятие | сценарии + test_retire_invariant | passed | J1 «`Entities.find` отдаёт снятых» → retire_invariant; J6 «`Statements.about` без фильтра объекта» → section_number_retired; J7 «без фильтра атрибуций со снятым автором» → retire_invariant | `rollback`: `restored=7` | подтверждено |
+| Перевод | сценарии + test_translation_invariant | passed | **J8 выжила**: `check_name("concept", ru)` вместо типа элемента — 61 passed | `renamed.model=2`, `missing=3` | **не подтверждено** |
+| Откат | сценарии + test_rollback_invariant, test_rollback_keeps_arbitrary_later_names | passed | passed | `rollback` через CLI — дамп данных равен дампу до `run`, `merges_undone=4`; неизвестный `run_id` — код 2 | подтверждено |
+| Замер | сценарии + test_quality_invariant | passed | J4 «название = первое название, а не по определению» → test_quality_before_after; quality-writable (yaml) → test_read_only упал. Моя J3 (без `mode=ro` только у основного файла) выжила, но она эквивалентна: таблицы знаний в присоединённом файле `?mode=ro` | `quality_report` подпроцессом: до — код 1 (А2=1, А3=4, А4=3, А7=7, А8 «не измерено»); после `--baseline` — код 0: А1=0.973, А2=А3=А4=А7=0, А5=24, А6=12, А8=0; md5 файлов базы не изменились | подтверждено |
+
+Приёмка владельца А1–А8 на синтетических данных показана (test_acceptance_symptoms, test_quality_before_after и мой прогон CLI выше). Замер запускается командой `python -m philograph.knowledge.quality_report` с `PHILOGRAPH_DATABASE_URL`, на стенде Lead'а его можно запустить так же. А9: `lint-imports` — 3 kept; трассировка — 415 из 415. `ruff check` (E501 в `scripts/dev_stack.py:100`) и `ruff format --check` (2 файла) падают. Эти файлы — Lead'а, они пришли из базы `claude/embedding-docker`: дифф ветки с базой по `dev_stack.py` и `queue.py` пуст. От изменения это не зависит, нужен пункт для Lead в PR.
+
+Полный pytest: не запускался (ограничение машины). Прослеживаемость: чисто.
+Мутации: свои J1–J8 и повтор verify-no-abort и quality-writable. J8 выжила.
+Подгонка: не найдена. `skip`/`xfail` не добавлены, в прежних тестах изменён только номер схемы.
+Пункт 4.1 (ревьювер) не отмечен: повторного ревью кода 0b8b44e, которым закрыто блокирующее замечание, нет.
+
+Вердикт: **не принято**.
+- Вернуть тестировщику: «Перевод названий → Проверка ответа, п. 4 `invalid:<причина>` по правилу **для типа элемента**» не доказан. `translation_replies` порождает только понятия. Нужен property или сценарий с персонами, где ответ проходит правило понятия, но не правило персоны (например, «слепой математик»: для персоны `not_a_name`, для понятия причины нет). Мутацию J8 (`check_name("concept", ru)`) добавить в `mutations.yaml`.
+- Вернуть ревьюверу: ревью 0b8b44e и cf3d9a1, пункт 4.1.
