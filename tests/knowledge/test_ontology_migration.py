@@ -2231,3 +2231,46 @@ def test_manifest_accepted_with_holder_not_queued(onto, events):
     after = State.read(onto.statements.engine)
     assert after.entities[omir]["redirect_to"] == homer  # слиты
     assert _pair_items(onto, omir, homer) == [] and report.review == 0
+
+
+@req(
+    OM,
+    MIG,
+    invariant="О34: шаги 1 и 3 — только действующие; названия снятой прошлым запуском не меняются",
+)
+def test_retired_names_not_normalized(onto, events):
+    gone = raw_entity(onto, "concept", [("en", "20.1", "primary")])
+    first = migration(onto).run()
+    assert State.read(onto.statements.engine).retired(gone)
+    nfd = unicodedata.normalize("NFD", "Ёж вещи")
+    assert nfd != "Ёж вещи"
+    with onto.statements.engine.begin() as conn:  # «старые» данные у уже снятой: NFD, язык en
+        conn.execute(
+            t.names.insert().values(
+                entity_id=gone, lang="en", text=f" {nfd}", normalized="stale", kind="variant"
+            )
+        )
+    before = State.read(onto.statements.engine).name_set(gone)
+    with onto.statements.engine.begin() as conn:
+        raw_before = {
+            (r.lang, r.text, r.normalized)
+            for r in conn.execute(select(t.names).where(t.names.c.entity_id == gone))
+        }
+    second = migration(onto).run()
+    with onto.statements.engine.begin() as conn:
+        raw_after = {
+            (r.lang, r.text, r.normalized)
+            for r in conn.execute(select(t.names).where(t.names.c.entity_id == gone))
+        }
+    assert raw_after == raw_before
+    assert State.read(onto.statements.engine).name_set(gone) == before
+    assert second.names_normalized == 0 and second.lang_fixed == 0
+    migration(onto).rollback(first.run_id)
+    after = State.read(onto.statements.engine)
+    assert not after.retired(gone)
+    with onto.statements.engine.begin() as conn:
+        raw_back = {
+            (r.lang, r.text, r.kind)
+            for r in conn.execute(select(t.names).where(t.names.c.entity_id == gone))
+        }
+    assert raw_back == {("en", "20.1", "primary"), ("en", f" {nfd}", "variant")}, raw_back
