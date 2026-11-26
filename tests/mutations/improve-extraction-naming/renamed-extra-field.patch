@@ -1,10 +1,12 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index c7344ef..b0e8d5e 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -271,6 +271,7 @@
-             entity_id=entity["id"],
-             lang=lang,
-             previous_lang=previous_lang,
+@@ -265,6 +265,7 @@ class Entities:
+                 .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
+             )
+         same = next((r for r in rows if r["normalized"] == key), None)
 +            text=text,
-         )
- 
-     def find(self, name: str) -> list[dict[str, Any]]:
+         if same is not None:
+             conn.execute(
+                 update(t.names)

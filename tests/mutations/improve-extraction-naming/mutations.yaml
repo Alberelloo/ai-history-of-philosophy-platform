@@ -1374,3 +1374,48 @@ mutations:
     note: О26 — после отклонённого написания остальные написания не обходятся (continue → break)
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+  - id: entities-check-as-concept
+    requirement: Валидность названий сущностей
+    patch: entities-check-as-concept.patch
+    note: J8-правило — Entities._check проверяет правилом понятия
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_core_rejection_reasons
+      - tests/knowledge/test_entity_naming.py::test_description_with_capital
+      - tests/knowledge/test_entity_naming.py::test_glued_names
+  - id: invalid-primary-as-concept
+    requirement: Контекстные события из Wikidata
+    patch: invalid-primary-as-concept.patch
+    note: J8-правило — invalid_primary проверяет правилом понятия (событие 9 слов отклоняется)
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_event_label_checked_by_event_rule
+  - id: epoch-context-primary-as-concept
+    requirement: Контекстные события из Wikidata
+    patch: epoch-context-primary-as-concept.patch
+    note: J8-правило — импорт контекста проверяет событие правилом понятия
+    expect_fail:
+      - tests/knowledge/test_epoch_context_import.py::test_event_label_checked_by_event_rule
+  - id: names-for-ru-as-concept
+    requirement: Язык названий сущностей
+    patch: names-for-ru-as-concept.patch
+    note: J8-правило — ru ответа проверяется правилом понятия
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+      - tests/knowledge/test_entity_naming.py::test_new_entity_spellings_checked_by_type
+  - id: names-for-variant-as-concept
+    requirement: Язык названий сущностей
+    patch: names-for-variant-as-concept.patch
+    note: J8-правило — варианты ответа проверяются правилом понятия
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_primary_choice_by_item
+  - id: items-names-for-as-concept
+    requirement: Язык названий сущностей
+    patch: items-names-for-as-concept.patch
+    note: J8-правило — извлечение собирает названия по правилу понятия
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_new_entity_spellings_checked_by_type
+  - id: items-russian-primary-as-concept
+    requirement: Язык названий сущностей
+    patch: items-russian-primary-as-concept.patch
+    note: J8-правило — русское основное найденной сущности по правилу понятия
+    expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rejected_russian_spelling

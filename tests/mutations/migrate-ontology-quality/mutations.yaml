@@ -612,3 +612,31 @@ mutations:
     note: О32 — в stderr нет run_id и команды отката
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_failure_mid_run
+  - id: j8-reply-check-as-concept
+    requirement: Перевод названий
+    patch: j8-reply-check-as-concept.patch
+    note: J8 судьи — ответ модели проверяется правилом понятия вместо типа элемента
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_reply_checked_by_item_type
+      - tests/knowledge/test_ontology_migration.py::test_translation_invariant
+  - id: wd-label-check-as-concept
+    requirement: Перевод названий
+    patch: wd-label-check-as-concept.patch
+    note: J8-правило — подпись Wikidata проверяется правилом понятия
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_wikidata_label_checked_by_type
+  - id: retire-check-as-concept
+    requirement: Снятие мусорных сущностей
+    patch: retire-check-as-concept.patch
+    note: J8-правило — снятие проверяет правилом понятия (персоны-описания остаются)
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_acceptance_symptoms
+      - tests/knowledge/test_ontology_migration.py::test_dry_run
+      - tests/knowledge/test_ontology_migration.py::test_full_rollback
+  - id: rollback-own-name-key-only
+    requirement: Откат миграции
+    patch: rollback-own-name-key-only.patch
+    note: повторное ревью — своё название отката ищется только по ключу (Объем/Объём)
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_same_key_rename
+      - tests/knowledge/test_ontology_migration.py::test_rollback_keeps_arbitrary_later_names

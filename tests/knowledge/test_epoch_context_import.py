@@ -355,3 +355,16 @@ def test_duplicate_qid_other_type(onto, importer, events, no_network, taken):
     run = events.one("knowledge.context_import.run")
     assert (run["created"], run["statements"], run["places_created"]) == (0, 0, 0)
     assert run["skipped"] == 2  # duplicate_qid и второй кандидат pending
+
+
+@req(EC, WD, invariant="Название события проверяется правилом типа event: 8 слов в пределе 12 (J8)")
+def test_event_label_checked_by_event_rule(onto, importer, enl, events, no_network):
+    manifest = decide(harvested(), **{REVOLUTION: "accepted"})
+    revolution = manifest["epochs"][0]["candidates"][0]
+    long_label = "Великая французская революция и падение старого порядка во Франции"  # 9 слов
+    revolution["label"] = {"ru": long_label}
+    report = importer.apply(manifest, FixtureFetch())
+    assert report.totals()["created"] == 1
+    event = onto.entities.by_external("wikidata", REVOLUTION)
+    assert onto.entities.label(event) == long_label
+    events.assert_none("knowledge.entity.rejected")

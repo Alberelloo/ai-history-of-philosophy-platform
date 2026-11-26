@@ -1,15 +1,17 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index c7344ef..f8b1f02 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -251,11 +251,7 @@
-             )
-             previous = [r for r in rows if r["kind"] == "primary"]
-             for row in previous:
--                conn.execute(
--                    update(t.names)
--                    .where(t.names.c.id == row["id"])
--                    .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
--                )
-+                conn.execute(t.names.delete().where(t.names.c.id == row["id"]))
-             same = next((r for r in rows if r["normalized"] == key), None)
-             if same is not None:
-                 conn.execute(
+@@ -259,11 +259,7 @@ class Entities:
+         )
+         previous = [r for r in rows if r["kind"] == "primary"]
+         for row in previous:
+-            conn.execute(
+-                update(t.names)
+-                .where(t.names.c.id == row["id"])
+-                .values(kind="variant", lang=lang_for(row["text"], row["lang"]))
+-            )
++            conn.execute(t.names.delete().where(t.names.c.id == row["id"]))
+         same = next((r for r in rows if r["normalized"] == key), None)
+         if same is not None:
+             conn.execute(

@@ -25,6 +25,7 @@ from philograph.knowledge.dates import parse as dates_parse
 from philograph.knowledge.ontology_migrate import STEPS, Migration, main
 from philograph.knowledge.quality_report import main as quality_main
 from philograph.knowledge.quality_report import read_only_engine
+from philograph.knowledge.registry_data import ENTITY_TYPES
 from philograph.knowledge.statements import Attribution
 
 from ..conftest import PROFILES
@@ -883,15 +884,31 @@ def test_estimate(onto, events, capsys):
 
 
 RU_OK = ("Причинность", "Субстанция", "Опыт", "Пространство", "Ум", "Интуиция", "Идея", "Время")
-REPLIES = ("ok", "latin", "stopword", "sentence", "duplicate", "missing", "ok_dup_unknown")
+REPLIES = (
+    "ok",
+    "latin",
+    "stopword",
+    "sentence",
+    "duplicate",
+    "missing",
+    "ok_dup_unknown",
+    "lowercase",  # «слепой математик»: правило понятия проходит, правило персоны — нет (J8)
+)
+# Типы элементов перевода — все типы реестра, кроме источников (шаг 6 их не переводит). Список —
+# вход генератора, не оракул; правило, зависящее от типа, — not_a_name только у персоны.
+TRANSLATE_TYPES = tuple(sorted({code for code, *_ in ENTITY_TYPES} - {"source"}))
+LOWERCASE_RU = "слепой математик"
+SENTENCE_RU = "это очень длинное название понятия из восьми слов"  # 8 слов
+LONG_TYPES = {"work", "event", "idea_event", "phenomenon"}  # entity-naming: предел 12 слов
 
 
 @hst.composite
 def translation_replies(draw):
     """Пакеты латинских понятий и ответ модели по каждому элементу + ожидание."""
     k = draw(hst.integers(1, 8))
-    labels = [f"word{chr(97 + i)}x" for i in range(k)]
+    labels = [f"Word{chr(97 + i)}x" for i in range(k)]  # с заглавной: персона не снимается
     plan = {label: draw(hst.sampled_from(REPLIES)) for label in labels}
+    types = {label: draw(hst.sampled_from(TRANSLATE_TYPES)) for label in labels}
     batch = draw(hst.integers(1, max(1, k)))
     failed = set(
         draw(hst.lists(hst.integers(1, (k + batch - 1) // batch), max_size=1, unique=True))
@@ -903,6 +920,7 @@ def translation_replies(draw):
         "batch": batch,
         "failed": failed,
         "unknown": unknown,
+        "types": types,
         "ru": {
             label: RU_OK[i % len(RU_OK)] + "ий" * (i // len(RU_OK))
             for i, label in enumerate(labels)
@@ -923,8 +941,10 @@ def _answer(case):
                 out.append({"n": i["n"], "ru": "Causality"})
             elif kind == "stopword":
                 out.append({"n": i["n"], "ru": "Поэт"})  # стоп-слово данных (naming_rules.yaml)
+            elif kind == "lowercase":
+                out.append({"n": i["n"], "ru": LOWERCASE_RU})
             elif kind == "sentence":
-                out.append({"n": i["n"], "ru": "это очень длинное название понятия из восьми слов"})
+                out.append({"n": i["n"], "ru": SENTENCE_RU})
             elif kind == "duplicate":
                 out += [{"n": i["n"], "ru": ru}, {"n": i["n"], "ru": ru}]
         out += [{"n": len(items) + 1 + j, "ru": "Лишнее"} for j in range(case["unknown"])]
@@ -948,6 +968,11 @@ def _expected_translation(case, calls, llm):
                 "sentence": "invalid:sentence",
                 "missing": "missing",
             }.get(kind)
+            type_ = case.get("types", {}).get(item["label"], "concept")
+            if kind == "lowercase" and type_ == "person":
+                reason = "invalid:not_a_name"  # entity-naming: правило 4 только для персоны
+            if kind == "sentence" and type_ in LONG_TYPES:
+                reason = None  # 8 слов — в пределе 12 для этих типов
             if kind == "duplicate":
                 reasons["duplicate_item"] = reasons.get("duplicate_item", 0) + 2
             elif reason:
@@ -962,32 +987,61 @@ def _expected_translation(case, calls, llm):
 @given(case=translation_replies())
 @example(
     {
-        "labels": ["wordax"],
-        "plan": {"wordax": "duplicate"},
+        "labels": ["Wordax"],
+        "plan": {"Wordax": "duplicate"},
         "batch": 1,
         "failed": set(),
         "unknown": 0,
-        "ru": {"wordax": "Причинность"},
+        "ru": {"Wordax": "Причинность"},
     }
 )
 @example(
     {
-        "labels": ["wordax", "wordbx"],
-        "plan": {"wordax": "ok", "wordbx": "ok"},
+        "labels": ["Wordax", "Wordbx"],
+        "plan": {"Wordax": "ok", "Wordbx": "ok"},
         "batch": 1,
         "failed": {2},
         "unknown": 1,
-        "ru": {"wordax": "Причинность", "wordbx": "Субстанция"},
+        "ru": {"Wordax": "Причинность", "Wordbx": "Субстанция"},
+    }
+)
+@example(  # предел слов типа: 8 слов — sentence для понятия, но не для произведения
+    {
+        "labels": ["Wordax", "Wordbx"],
+        "plan": {"Wordax": "sentence", "Wordbx": "sentence"},
+        "types": {"Wordax": "work", "Wordbx": "concept"},
+        "batch": 2,
+        "failed": set(),
+        "unknown": 0,
+        "ru": {"Wordax": "Причинность", "Wordbx": "Субстанция"},
+    }
+)
+@example(  # J8 судьи: ответ проходит правило понятия, но не персоны
+    {
+        "labels": ["Wordax", "Wordbx"],
+        "plan": {"Wordax": "lowercase", "Wordbx": "lowercase"},
+        "types": {"Wordax": "person", "Wordbx": "concept"},
+        "batch": 2,
+        "failed": set(),
+        "unknown": 0,
+        "ru": {"Wordax": "Причинность", "Wordbx": "Субстанция"},
     }
 )
 def test_translation_invariant(onto, events, case):
+    def build_items():
+        types = case.get("types", {})
+        return {
+            label: raw_entity(onto, types.get(label, "concept"), [("en", label, "primary")])
+            for label in case["labels"]
+        }
+
     wipe(onto)
-    ids = _concepts(onto, case["labels"])
+    ids = build_items()
     off = FakeLLM(_answer(case))
     migration(onto, llm=off).run(translate="off")
     assert off.calls == []  # без флага запросов нет
     wipe(onto)
-    ids = _concepts(onto, case["labels"])
+    ids = build_items()
     llm = FakeLLM(_answer(case))
     events.clear()
     report = migration(onto, llm=llm).run(translate="model", batch=case["batch"])
@@ -998,7 +1052,10 @@ def test_translation_invariant(onto, events, case):
     written = {label for label, e in ids.items() if after.label(e) != label}
     assert written == accepted
     for label in written:
-        assert after.label(ids[label]) == case["ru"][label]
+        want = {"lowercase": LOWERCASE_RU, "sentence": SENTENCE_RU}.get(
+            case["plan"][label], case["ru"][label]
+        )
+        assert after.label(ids[label]) == want
         assert ("en", label, "variant") in after.name_set(ids[label])
     assert {k: v for k, v in report.to_json()["untranslated"].items() if v} == reasons
     assert sum(e["accepted"] for e in events.of("knowledge.migration.translated")) == len(written)
@@ -1823,7 +1880,13 @@ def test_rollback_keeps_arbitrary_later_names(onto, events, spec, data):
             else []
         )
     later = {}
+    renamed_to = {r["id"]: r["to"] for r in report.renamed_list}
+    same_key = {}  # О-ревью: тот же ключ, другой текст (верхний регистр) — у переименованных
     for i, e in enumerate(chosen):
+        if e in renamed_to and (data is None or data.draw(hst.booleans())):
+            same_key[e] = renamed_to[e].upper()
+            onto.entities.set_primary_name(e, "ru", same_key[e])
+            continue
         later[e] = f"Позднее имя {LATER[i % len(LATER)]}{LATER[i // len(LATER)]}"
         onto.entities.add_name(e, "ru", later[e])
     events.clear()
@@ -1831,12 +1894,14 @@ def test_rollback_keeps_arbitrary_later_names(onto, events, spec, data):
     after = State.read(engine)
     for e, text_ in later.items():
         assert ("ru", text_, "variant") in after.name_set(e), (e, after.name_set(e))
+    for e, text_ in same_key.items():
+        assert after.label(e) == text_, (e, after.name_set(e))
     renamed = {r["id"] for r in report.renamed_list}
     [rolled] = events.of("knowledge.migration.rolled_back")
-    assert rolled["kept"] >= len(renamed & set(later))
+    assert rolled["kept"] >= len(renamed & (set(later) | set(same_key)))
     # сущности без последующих изменений откатываются полностью
     for e in pre.entities:
-        if e not in later:
+        if e not in later and e not in same_key:
             assert after.name_set(e) == pre.name_set(e), e
 
 
@@ -1879,3 +1944,55 @@ def test_failure_mid_run(onto, events, capsys, monkeypatch, tmp_path):
     code, _ = cli(onto, capsys, ["rollback", run_id])
     assert code == 0
     assert dump(onto.statements.engine) == before
+
+
+@req(
+    OM,
+    TR,
+    invariant="Ответ модели проверяется правилом типа элемента: персона «слепой математик» (J8)",
+)
+def test_reply_checked_by_item_type(onto, events):
+    person = raw_entity(onto, "person", [("en", "Saunderson", "primary")])
+    concept = raw_entity(onto, "concept", [("en", "blind mathematics", "primary")])
+    llm = FakeLLM(lambda items, _n: [{"n": i["n"], "ru": LOWERCASE_RU} for i in items])
+    report = migration(onto, llm=llm).run(translate="model").to_json()
+    after = State.read(onto.statements.engine)
+    assert after.label(person) == "Saunderson"
+    assert after.label(concept) == LOWERCASE_RU
+    assert report["untranslated"].get("invalid:not_a_name") == 1
+
+
+@req(
+    OM,
+    TR,
+    invariant="Подпись ru Wikidata проверяется правилом типа: у персоны «слепой математик» — нет",
+)
+def test_wikidata_label_checked_by_type(onto, events):
+    records = {
+        "Q900011": record("Q900011", ru=LOWERCASE_RU, en="Blind", classes=HUMAN),
+        "Q900012": record("Q900012", ru=LOWERCASE_RU, en="Blind", classes=HUMAN),
+    }
+    person = raw_entity(onto, "person", [("en", "Saunderson", "primary")], "Q900011")
+    concept = raw_entity(onto, "concept", [("en", "blind mathematics", "primary")], "Q900012")
+    migration(onto, fetch=RecordFetch(records)).run()
+    after = State.read(onto.statements.engine)
+    assert after.label(person) == "Saunderson"
+    assert after.label(concept) == LOWERCASE_RU
+
+
+@req(OM, RB, invariant="Откат: название человека с тем же ключом, но другим текстом остаётся, kept")
+@pytest.mark.parametrize(
+    ("model", "human"), [("Объем", "Объём"), ("Причинность", "ПРИЧИННОСТЬ")], ids=["yo", "case"]
+)
+def test_rollback_keeps_same_key_rename(onto, events, model, human):
+    ids = _concepts(onto, ["causality"])
+    m = migration(onto, llm=FakeLLM.by_label({"causality": model}))
+    report = m.run(translate="model")
+    e = ids["causality"]
+    assert State.read(onto.statements.engine).label(e) == model
+    onto.entities.set_primary_name(e, "ru", human)
+    events.clear()
+    m.rollback(report.run_id)
+    after = State.read(onto.statements.engine)
+    assert after.label(e) == human, after.name_set(e)
+    assert events.one("knowledge.migration.rolled_back")["kept"] == 1

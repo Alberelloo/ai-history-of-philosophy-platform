@@ -1,15 +1,14 @@
 diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
-index 3016536..1aeecaa 100644
+index e179585..b38f26a 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
-@@ -1190,8 +1190,8 @@ def main(
-     except Failed as exc:
-         cause = exc.__cause__
-         print(
--            f"запуск {exc.run_id} прервался ({type(cause).__name__}: {cause}); база может быть"
--            f" в промежуточном состоянии, откат: rollback {exc.run_id}",
-+            f"запуск прервался ({type(cause).__name__}: {cause}); база может быть"
-+            " в промежуточном состоянии",
-             file=sys.stderr,
-         )
-         return 1
+@@ -1118,8 +1118,7 @@ def _failure(exc: Failed | Interrupted) -> str:
+     if exc.dry_run:
+         return f"сухой прогон {exc.run_id} прервался; база не менялась, откат не нужен"
+     return (
+-        f"запуск {exc.run_id} прервался; база может быть в промежуточном состоянии,"
+-        f" откат: rollback {exc.run_id}"
++        "запуск прервался; база может быть в промежуточном состоянии"
+     )
+ 
+ 

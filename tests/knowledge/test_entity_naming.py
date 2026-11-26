@@ -425,6 +425,44 @@ def test_no_latin_name_has_ru(onto, events, text, is_ru):
         ),
         # ru русское, но не прошло проверку: основное — name, ru не записано
         ({"name": "Plato", "type": "person", "ru": "поэт"}, {("en", "Plato", "primary")}),
+        # J8 (тип правила): «слепой математик» — not_a_name у персоны, годно у понятия
+        (
+            {"name": "Saunderson", "type": "person", "ru": "слепой математик"},
+            {("en", "Saunderson", "primary")},
+        ),
+        (
+            {"name": "blindness", "type": "concept", "ru": "слепой математик"},
+            {("ru", "слепой математик", "primary"), ("en", "blindness", "variant")},
+        ),
+        # вариант проверяется правилом своего типа
+        (
+            {"name": "Saunderson", "type": "person", "en": "blind mathematics"},
+            {("en", "Saunderson", "primary")},
+        ),
+        (
+            {"name": "Слепота", "type": "concept", "en": "blind mathematics"},
+            {("ru", "Слепота", "primary"), ("en", "blind mathematics", "variant")},
+        ),
+        # предел слов типа: 8 слов — sentence у понятия, годно у произведения (предел 12)
+        (
+            {
+                "name": "Treatise",
+                "type": "work",
+                "ru": "Опыт о человеческом разумении в четырёх книгах сочинение",
+            },
+            {
+                ("ru", "Опыт о человеческом разумении в четырёх книгах сочинение", "primary"),
+                ("en", "Treatise", "variant"),
+            },
+        ),
+        (
+            {
+                "name": "Essay",
+                "type": "concept",
+                "ru": "Опыт о человеческом разумении в четырёх книгах сочинение",
+            },
+            {("en", "Essay", "primary")},
+        ),
         # О26: после отклонённого написания следующие написания проверяются и записываются
         (
             {
@@ -1123,3 +1161,23 @@ def test_stored_form_via_extraction(stand, onto, events, raw):
     with onto.statements.engine.begin() as conn:
         texts = list(conn.scalars(select(t.names.c.text)))
     assert all(x == name_of(x) for x in texts), texts
+
+
+@req(NM, LANG, invariant="Новая сущность из ответа: написания проверяются правилом её типа (J8)")
+def test_new_entity_spellings_checked_by_type(stand, onto, events):
+    stand.extract(
+        ["Саундерсон, слепой математик, спорил о зрении."],
+        {
+            "statements": [st("Saunderson", "holds", "Учение о зрении", 1, "спорил о зрении")],
+            "entities": [{"name": "Saunderson", "type": "person", "ru": "слепой математик"}],
+        },
+    )
+    [person] = by_text(onto, "Saunderson")
+    assert names(onto, person) == {("en", "Saunderson", "primary")}
+    assert by_text(onto, "слепой математик") == []
+    [rejected] = events.of(REJECTED)
+    assert fields(rejected) == {
+        "type": "person",
+        "label": "слепой математик",
+        "reason": "not_a_name",
+    }
