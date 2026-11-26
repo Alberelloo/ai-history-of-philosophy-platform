@@ -232,10 +232,52 @@ def test_only_lifespan(knowledge_context, knowledge_stack, events):
     knowledge_stack.world.person("Томас Гоббс", "1588", "1679")
     page, response = open_card(knowledge_context, knowledge_stack, "Томас Гоббс")
     loaded(page, "Томас Гоббс")
-    expect(panel(page).locator("[data-card-summary]")).to_contain_text("1588–1679")
-    for selector in ("[data-card-empty]", "[data-card-legend]", SECTION):
+    data = response.json()
+    mark = data["summary"]["years_row"]["mark"]
+    assert data["sections"] == [] and data["legend"] == [mark]
+    summary = panel(page).locator("[data-card-summary]")
+    expect(summary).to_contain_text("1588–1679")
+    expect(summary.locator("button.card-mark")).to_have_count(1)
+    expect(summary.locator("button.card-mark")).to_have_attribute("data-mark", mark)
+    expect(summary.locator("[data-summary=years] button.card-mark")).to_have_count(0)
+    legend = panel(page).locator("[data-card-legend]")
+    expect(legend).to_have_count(1)
+    expect(legend.locator("[data-legend]")).to_have_count(1)
+    expect(legend.locator(f"[data-legend={mark}]")).to_have_count(1)
+    for selector in ("[data-card-empty]", SECTION):
         expect(panel(page).locator(selector)).to_have_count(0)
     served(events, response, sections=0, rows=0, empty=False)
+
+
+@req(EC, "Карточка персоны", scenario="Сгенерированная роль и годы помечены")
+def test_generated_role_and_years_marked(knowledge_context, knowledge_stack, events):
+    w = knowledge_stack.world
+    hume = w.entities.create("person", [("ru", "Давид Юм", "primary")])
+    cw.add(w, hume, "person_role", value="philosopher", provenance=cw.Provenance("generated"))
+    cw.add(w, hume, "lifespan", value=cw.parse("1711–1776").to_json(), attributions=cw.src())
+    page, response = open_card(knowledge_context, knowledge_stack, "Давид Юм")
+    loaded(page, "Давид Юм")
+    data = response.json()
+    assert data["summary"]["roles"][0]["mark"] == "generated"
+    assert data["summary"]["years_row"]["mark"] == "sourced"
+    assert data["legend"] == ["sourced", "generated"]
+    summary = panel(page).locator("[data-card-summary]")
+    expect(summary.locator("button.card-mark")).to_have_count(2)
+    role_mark = summary.locator("button.card-mark[data-mark=generated]")
+    years_mark = summary.locator("button.card-mark[data-mark=sourced]")
+    expect(role_mark).to_have_count(1)
+    expect(years_mark).to_have_count(1)
+    assert role_mark.get_attribute("aria-label").startswith("Сгенерировано")
+    unverified = summary.locator('[data-unverified="true"]')
+    expect(unverified).to_have_count(1)
+    expect(unverified.locator("button.card-mark[data-mark=generated]")).to_have_count(1)
+    expect(summary.locator("[data-summary=years] button.card-mark")).to_have_count(0)
+    expect(summary.locator("[data-summary=years]")).to_have_text("1711–1776")
+    legend = panel(page).locator("[data-card-legend]")
+    shown = legend.locator("[data-legend]").evaluate_all("els => els.map(e => e.dataset.legend)")
+    assert shown == ["sourced", "generated"]
+    assert not STATUS_WORDS.search(summary.inner_text())  # слова статусов — только в легенде
+    served(events, response, type="person", empty=False)
 
 
 # --- Природа каждой строки -----------------------------------------------------------------
@@ -446,6 +488,25 @@ def test_no_layer_shows_modern_country_with_note(knowledge_context, knowledge_st
     expect(country).to_have_attribute("data-country-kind", "modern")
     expect(country).to_have_text("ныне Россия")
     assert any("countries" in u for u in chunks)  # модуль границ подгружен по требованию
+    served(events, response, polity="unavailable")
+
+
+@req(
+    EC,
+    "Государство основного места",
+    invariant="повреждённый артефакт слоя: ответ 200, polity unavailable, запасной вариант «ныне …»",
+)
+@pytest.mark.parametrize(
+    "knowledge_stack", [{"polities_env": cw.damaged_polities_env()}], indirect=True
+)
+def test_damaged_layer_falls_back_to_modern_country(knowledge_context, knowledge_stack, events):
+    kant_in_koenigsberg(knowledge_stack.world)
+    page, response = open_card(knowledge_context, knowledge_stack, "Иммануил Кант")
+    loaded(page, "Иммануил Кант")
+    assert response.status == 200 and response.json()["summary"]["polity"] is None
+    country = panel(page).locator("[data-summary=country]")
+    expect(country).to_have_attribute("data-country-kind", "modern")
+    expect(country).to_have_text("ныне Россия")
     served(events, response, polity="unavailable")
 
 

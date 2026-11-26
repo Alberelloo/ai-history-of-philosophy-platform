@@ -164,10 +164,10 @@
 
 | # | Критерий владельца | Тесты |
 |---|---|---|
-| C1 | нет линии жизни, нет текстовых статусов | `test_card_content.py::test_locke_header_and_summary` (нет `.pg-lifeline`, `.card-summary`, `[data-section=life]`, «1632» один раз), `::test_one_legend_and_no_status_words` (слова статусов вне легенды, одна `button.card-mark` с именем у каждой `.card-row`, нет `.pg-status`), `::test_row_marks_sourced_generated_disputed`, `test_reader_cards.py::test_t12_nature_of_each_row[light|dark]`, `::test_inferred_section_label_and_via` |
+| C1 | нет линии жизни, нет текстовых статусов; метки у частей сводки (круг 3) | `test_card_content.py::test_generated_role_and_years_marked`, `::test_only_lifespan` (метка и легенда из одного пункта), `test_card_content.py::test_locke_header_and_summary` (нет `.pg-lifeline`, `.card-summary`, `[data-section=life]`, «1632» один раз), `::test_one_legend_and_no_status_words` (слова статусов вне легенды, одна `button.card-mark` с именем у каждой `.card-row`, нет `.pg-status`), `::test_row_marks_sourced_generated_disputed`, `test_reader_cards.py::test_t12_nature_of_each_row[light|dark]`, `::test_inferred_section_label_and_via` |
 | C2 | сводка, свёрнутые места, влияние списком, интересы, труды | `test_card_content.py::test_locke_header_and_summary`, `::test_places_collapsed_and_expanded`, `::test_short_and_long_lists`, `::test_influence_sections_without_repeats`, `::test_only_lifespan`, `::test_historical_state_in_summary`; сервер: `test_cards_redesign.py::test_locke_header_and_summary`, `::test_places_inline_collapsed`, `::test_person_section_order_and_display`, `::test_hume_interests`, `::test_main_place_*` |
 | C3 | карточки остальных типов не пусты | `test_card_content.py::test_no_card_is_empty_in_every_type` (9 типов в DOM), `::test_empty_states`; сервер: `test_cards_redesign.py::test_one_statement_never_gives_empty_card[14 типов]`, `::test_no_statements_gives_empty_card`, `::test_nothing_lost_for_every_type`, `::test_place_with_only_coordinates_is_not_empty`, `::test_place_in_ocean_with_only_coordinates_is_not_empty` (D4 закрыт в круге 2); web: `test_card_content.py::test_place_with_only_coordinates_shows_coordinates_and_country`, `::test_place_outside_any_country_shows_only_coordinates` |
-| C4 | понятия и учения: к кому относятся | `test_card_content.py::test_doctrine_card_relates_to_and_in_works`; сервер: `test_relates_to_inferred_via_work`, `test_direct_row_replaces_inferred`, `test_relates_to_term_authors_only_for_concept_and_position_in_order`, `test_relates_to_one_row_per_person`, `test_concept_card`; `test_layout::test_popup_shows_statements_only` |
+| C4 | понятия и учения: к кому относятся (круг 3: все звенья вывода в режиме учебника) | `test_cards_redesign.py::test_source_scope_every_link_of_the_chain`, `::test_source_scope_chain_variants` (труд, автор, термин, интересы), `test_card_content.py::test_doctrine_card_relates_to_and_in_works`; сервер: `test_relates_to_inferred_via_work`, `test_direct_row_replaces_inferred`, `test_relates_to_term_authors_only_for_concept_and_position_in_order`, `test_relates_to_one_row_per_person`, `test_concept_card`; `test_layout::test_popup_shows_statements_only` |
 | C5 | труды: автор, дата, сферы | `test_card_content.py::test_work_card_infobox`, `::test_work_card_infobox_labels` (D1 закрыт в круге 2); сервер: `test_work_card` |
 | C6 | единая индикация, одна легенда | `test_card_content.py::test_one_legend_and_no_status_words`, `::test_mark_looks_same_in_every_card` (цвет и форма метки в разных карточках), `::test_disputed_mark_accessible_name_wording` (D2 закрыт в круге 2); сервер: `test_legend_equals_marks_in_every_type[14 типов]`, `test_legend_is_set_of_marks`, `test_mark_rule_for_all_combinations`, `test_inferred_mark_is_weakest_link` |
 | C7 | тексты — текст | `test_card_content.py::test_markup_is_text` (имя персоны, труда, места), `::test_markup_in_values_notes_and_via_is_text`; сервер: `test_markup_in_titles_served_verbatim`, `test_markup_in_value_note_via_served_verbatim` |
@@ -349,3 +349,51 @@ M17 FullCard.tsx PlaceFacts: убрал элемент с [data-card-coordinates
 Оговорка: во время круга в рабочем дереве появились чужие незакоммиченные правки (`web/src/FullCard.tsx` SummaryPart, `web/src/layout.ts`, `polities*.py`, документы) — разработчик работал параллельно в том же дереве. Мои прогоны шли по дереву с ними; чтобы не потерять эти правки, мутацию M17 вернул копией, а не `git checkout`. После их коммита рекомендую повторить `test_card_layout.py` и `test_card_content.py`.
 
 Не покрыто: английский вариант подписи координат («48.86° N, 2.35° E») — не проверялся.
+
+
+## Тестировщик, круг 3 — 2026-11-27, коммит d159004 (ветка claude/entity-cards, дерево тестировщика)
+
+Переписано под изменённые сценарии: `test_cards_redesign.py::test_legend_equals_marks_in_every_type[person]` (в легенду входит `summary.years_row.mark`), `::test_region_hides_evidence_but_keeps_mark` (легенда `["verified", "sourced"]`: годы Канта проверены), `::test_generated_row` (легенда `["verified", "generated"]`, найдено при прогоне круга), `::test_only_lifespan` (`years_row.mark`, `legend == [mark]`), `::test_polity_needs_birth_year` (ровно `skipped`, по замечанию ревьювера; строка 869), `test_card_content.py::test_only_lifespan` (метка у годов, легенда из одного пункта).
+
+Новые тесты:
+- `test_cards_redesign.py`: `test_generated_role_and_years_marked` (сценарий «Сгенерированная роль и годы помечены»), `test_years_row_is_the_lifespan_statement_or_null`, `test_years_row_mark_follows_status_scale`, `test_source_scope_every_link_of_the_chain` (сценарий «Только выбранный учебник — все звенья»), `test_source_scope_chain_variants` (труд, автор, путь через термин, интересы), `test_damaged_layer_is_unavailable_not_500[no_table|broken_geometry|not_a_database]`;
+- `test_card_content.py`: `test_generated_role_and_years_marked` (DOM), `test_damaged_layer_falls_back_to_modern_country` (200, «ныне Россия», `polity=unavailable`); маркер `test_place_with_only_coordinates_shows_coordinates_and_country` указывает на «Пустые разделы» / «Ни одной пустой карточки» (требование существует);
+- `test_card_layout.py::test_text_column_with_open_panel_and_pinned_navigation` (13 окон, 1471–1476 с закреплённой навигацией: колонка 62–68ch, нет горизонтальной прокрутки, состояние навигации объяснено);
+- `test_polities_build_spec.py::test_antimeridian_ring_is_build_error` (6 колец: два разрезанных по ±180° проходят, четыре — скачок 340° и 185°, долгота 190 и −190 — код выхода 1, артефакта нет, в ошибке названо образование).
+
+Сырые строки (файлы по одному, `npm run build` перед браузерными):
+
+```
+pytest -q tests/knowledge/test_cards_redesign.py        -> 1 failed (test_generated_row: ожидание легенды без годов), 173 passed; после правки теста: -k "generated_row or legend or region" -> 18 passed
+pytest -q tests/knowledge/test_mentions_cards.py        -> 44 passed
+pytest -q tests/knowledge/test_polities_build_spec.py   -> 29 passed
+pytest -q tests/knowledge/test_polities_layer_spec.py   -> 46 passed
+pytest -q tests/knowledge/test_polities_unit.py         -> 40 passed
+pytest -q tests/knowledge/test_cards_redesign_unit.py   -> 11 passed
+pytest -q tests/web/test_card_content.py                -> 29 passed
+pytest -q tests/web/test_card_layout.py                 -> 54 passed
+pytest -q tests/web/test_reader_cards.py                -> 20 passed
+pytest -q tests/web/test_reader_layout.py               -> 3 passed
+ruff check tests -> All checks passed; ruff format -> без изменений; check_traceability.py -> Требований с тестами: 433 из 433
+```
+
+Падавшие в начале круга `test_legend_equals_marks_in_every_type[person]`, `test_region_hides_evidence_but_keeps_mark`, `test_card_content.py::test_only_lifespan` — переписаны по дельте, проходят. Это не дефекты кода: прежние ожидания противоречили новой дельте (годы — помеченная часть сводки).
+
+Мутации круга 3 (продукт возвращён `git checkout`, клиент пересобран):
+
+```
+M18 cards.py: убрал отметку years_row из legend   -> 6 failed (only_lifespan, generated_role_and_years_marked, years_row_mark_follows_status_scale, generated_row, legend_equals_marks[person], region_hides_evidence)
+M19 cards.py: _work_facts без attributed_to       -> 2 failed (source_scope_every_link_of_the_chain, source_scope_chain_variants)
+M20 cards.py: путь через термин без attributed_to -> 1 failed (source_scope_chain_variants)
+M21 polities.py: убрал перевод повреждённого артефакта в PolitiesUnavailable -> 2 failed (damaged_layer[no_table], [broken_geometry]); [not_a_database] проходит: такой файл слой и раньше не открывает
+M22 polities_build.py: убрал check_antimeridian    -> 4 failed (кольца со скачком 340°, 185°, долготой 190 и −190)
+M23 layout.ts: порог навигации обратно 46.5rem     -> 1 failed (text_column_with_open_panel_and_pinned_navigation[1472]; 1473–1475 проходят)
+M24 FullCard.tsx: годы без метки                   -> 2 failed (web only_lifespan, generated_role_and_years_marked)
+M25 cards.py: years_row всегда None                -> 4 failed
+```
+
+Замечание: в сценарии визуального требования окна 1472–1475 названы целиком, но мутация старого порога ломает только 1472: на 1473–1475 прежний и новый пороги дают колонку не уже 62ch. Тест на 1472 различает правила, остальные окна — охрана границы.
+
+Дефектов нет. Расхождение дельты и дизайна: правило «повреждённый артефакт слоя — `polity = unavailable`, ответ 200» и «ребро через антимеридиан — ошибка сборки» записаны в `design.md`, но не в `specs/*/spec.md` этого изменения; тесты написаны от design.md (риски), маркеры — на существующие требования «Государство основного места» и «Сборка исторических границ» (geo-timeline).
+
+Не покрыто: английские подписи; e2e и полный pytest — не запускались (по условию).

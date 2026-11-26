@@ -73,6 +73,24 @@ def polities_env() -> dict[str, str]:
     return {"PHILOGRAPH_POLITIES_DB": str(_POLITIES)}
 
 
+_DAMAGED = Path(tempfile.mkdtemp(prefix="philograph-card-polities-damaged-")) / "polities.sqlite"
+
+
+def damaged_polities_env() -> dict[str, str]:
+    """Артефакт образований без таблицы строк: слой открывается, поиск в точке падает."""
+    if not _DAMAGED.exists():
+        import sqlite3
+
+        _artifact(
+            _DAMAGED, [("prussia", "Королевство Пруссия", 1701, 1918, (19, 53, 23, 56), 10.0)]
+        )
+        conn = sqlite3.connect(_DAMAGED)
+        conn.execute("DROP TABLE polity_rows")
+        conn.commit()
+        conn.close()
+    return {"PHILOGRAPH_POLITIES_DB": str(_DAMAGED)}
+
+
 def locke(world) -> dict[str, str]:
     """Локк: роль, пять мест (Лондон — основное), девять трудов с датами."""
     p = world.person("Джон Локк", "1632", "1704")

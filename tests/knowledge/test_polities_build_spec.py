@@ -638,6 +638,37 @@ def test_failed_build_keeps_artifact(tmp_path, events):
     events.assert_none("knowledge.polities.built")
 
 
+@req(
+    GEO,
+    BUILD,
+    invariant="кольцо разрезано по ±180°: скачок долготы больше 180° или долгота за ±180° — ошибка сборки",
+)
+@pytest.mark.parametrize(
+    "ring,ok",
+    [
+        ([[170, 0], [180, 0], [180, 10], [170, 10], [170, 0]], True),  # граница на самом ±180°
+        ([[-180, 0], [-170, 0], [-170, 10], [-180, 10], [-180, 0]], True),
+        ([[170, 0], [-170, 0], [-170, 10], [170, 10], [170, 0]], False),  # ребро 340°
+        ([[10, 0], [-175, 0], [-175, 10], [10, 10], [10, 0]], False),  # ребро 185°
+        ([[170, 0], [190, 0], [190, 10], [170, 10], [170, 0]], False),  # долгота 190
+        ([[-190, 0], [-170, 0], [-170, 10], [-190, 10], [-190, 0]], False),  # долгота −190
+    ],
+)
+def test_antimeridian_ring_is_build_error(tmp_path, events, capsys, ring, ok):
+    geojson = write_geojson(
+        tmp_path / "am.geojson",
+        [feature("Тихоокеанская держава", 1700, 1800, poly(ring))],
+    )
+    code, out, _labels, _ = run_build(tmp_path, geojson)
+    if ok:
+        assert code == 0 and out.exists()
+        events.one("knowledge.polities.built")
+    else:
+        assert code == 1 and not out.exists()
+        assert "Тихоокеанская держава" in capsys.readouterr().err  # назван виновник
+        events.assert_none("knowledge.polities.built")
+
+
 @req(GEO, BUILD, invariant="при неверной сумме артефакт не создаётся, код выхода ненулевой")
 def test_checksum_mismatch_no_artifact_created(tmp_path, events):
     archive, _sha = make_archive(tmp_path / "src")

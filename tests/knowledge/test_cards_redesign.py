@@ -234,8 +234,79 @@ def test_only_lifespan(cs, onto, events):
     card, rid = cs.get(hobbes)
     assert card["sections"] == [] and card["empty"] is False
     assert card["summary"]["years"] == "1588–1679"
+    row = card["summary"]["years_row"]
+    assert row["mark"] == "verified" and row["type"] == "lifespan"
+    assert card["legend"] == [row["mark"]]
     event = cs.served(events, rid)
     assert (event["sections"], event["rows"], event["empty"]) == (0, 0, False)
+
+
+def lifespan_statement(onto, person: str) -> str:
+    [found] = [
+        s["id"]
+        for s in onto.statements.about(person, derived=False)
+        if s["type"] == "lifespan" and s["direction"] == "out"
+    ]
+    return found
+
+
+@req(EC, "Карточка персоны", scenario="Сгенерированная роль и годы помечены")
+def test_generated_role_and_years_marked(cs, onto, events):
+    hume = onto.entities.create("person", [("ru", "Юм", "primary")])
+    st = onto.statements
+    st.add(hume, "person_role", value="philosopher", provenance=Provenance("generated"))
+    st.add(
+        hume,
+        "lifespan",
+        value=parse("1711–1776").to_json(),
+        attributions=src(),
+        provenance=Provenance("imported"),
+    )
+    card, rid = cs.get(hume)
+    summary = card["summary"]
+    assert summary["roles"][0]["mark"] == "generated"
+    assert summary["years_row"]["mark"] == "sourced"
+    assert summary["years"] == "1711–1776"
+    assert card["legend"] == ["sourced", "generated"]
+    assert card["sections"] == [] and card["empty"] is False
+    event = cs.served(events, rid)
+    assert (event["type"], event["empty"]) == ("person", False)
+
+
+@req(
+    EC,
+    "Карточка персоны",
+    invariant="годы сводки: years_row — видимое утверждение lifespan, null без него",
+)
+def test_years_row_is_the_lifespan_statement_or_null(cs, onto):
+    kant = onto.person("Кант", "1724", "1804")
+    card, _ = cs.get(kant)
+    row = card["summary"]["years_row"]
+    assert row["statement_id"] == lifespan_statement(onto, kant)
+    assert row["statement_id"] not in {r["statement_id"] for r in all_rows(card)}
+    nameless = onto.person("Аноним")
+    card, _ = cs.get(nameless)
+    assert card["summary"]["years"] is None and card["summary"]["years_row"] is None
+    assert card["legend"] == []
+
+
+@req(
+    EC,
+    "Природа каждой строки",
+    invariant="отметка годов: по шкале статусов, входит в легенду",
+)
+def test_years_row_mark_follows_status_scale(cs, onto):
+    hume = onto.entities.create("person", [("ru", "Юм", "primary")])
+    onto.statements.add(
+        hume,
+        "lifespan",
+        value=parse("1711–1776").to_json(),
+        attributions=src(),
+        provenance=Provenance("generated"),
+    )
+    card, _ = cs.get(hume)
+    assert card["summary"]["years_row"]["mark"] == "generated"
+    assert card["legend"] == ["generated"]
 
 
 # --- Карточка персоны: инварианты ----------------------------------------------------------
@@ -432,6 +503,77 @@ def test_work_note_is_year_only_when_dated(cs, onto):
 
 
 # --- К кому относится ---------------------------------------------------------------------
+
+
+@req(EC, "Выведенные строки", scenario="Только выбранный учебник — все звенья")
+def test_source_scope_every_link_of_the_chain(cs, onto, events):
+    hume = onto.person("Юм", "1711", "1776")
+    berkeley = onto.person("Беркли", "1685", "1753")
+    causality = onto.thing("concept", "причинность")
+    hume_work = onto.thing("work", "Трактат Юма")
+    berkeley_work = onto.thing("work", "Трактат Беркли")
+    st = onto.statements
+    st.add(hume_work, "discusses", obj=causality, attributions=src("s_t"))
+    st.add(hume_work, "author", obj=hume, attributions=src("wikidata"))
+    st.add(berkeley_work, "discusses", obj=causality, attributions=src("s_t"))
+    st.add(berkeley_work, "author", obj=berkeley, attributions=src("s_t"))
+    card, rid = cs.get(causality, attributed_to="s_t")
+    labels = [r["label"] for r in section(card, "relates_to")["rows"]]
+    assert labels == ["Беркли"]
+    assert cs.served(events, rid)["inferred"] == len([r for r in all_rows(card) if r["inferred"]])
+    card, _ = cs.get(causality)
+    assert sorted(r["label"] for r in section(card, "relates_to")["rows"]) == ["Беркли", "Юм"]
+
+
+@req(
+    EC,
+    "Выведенные строки",
+    invariant="режим учебника: звено цепочки вне учебника выводов не даёт",
+)
+def test_source_scope_chain_variants(cs, onto, events):
+    locke = onto.person("Локк", "1632", "1704")
+    term = onto.thing("term", "tabula rasa")
+    concept = onto.thing("concept", "Чистая доска")
+    st = onto.statements
+    st.add(term, "denotes", obj=concept, attributions=src("s_t"))
+    st.add(term, "introduced_by", obj=locke, attributions=src("wikidata"))
+    st.add(concept, "definition", value="ум без идей", attributions=src("s_t"))
+    # Путь через термин: introduced_by не из учебника — вывода нет; без режима есть.
+    card, _ = cs.get(concept, attributed_to="s_t")
+    assert "relates_to" not in codes(card)
+    card, _ = cs.get(concept)
+    assert [r["label"] for r in section(card, "relates_to")["rows"]] == ["Локк"]
+    # Связь «термин обозначает понятие» не из учебника — вывода нет и при верном introduced_by.
+    other_term = onto.thing("term", "blank slate")
+    other_concept = onto.thing("concept", "Пустая доска")
+    st.add(other_term, "denotes", obj=other_concept, attributions=src("wikidata"))
+    st.add(other_term, "introduced_by", obj=locke, attributions=src("s_t"))
+    st.add(other_concept, "definition", value="ум без идей", attributions=src("s_t"))
+    card, _ = cs.get(other_concept, attributed_to="s_t")
+    assert "relates_to" not in codes(card)
+    # Интересы: труд автора из учебника, но discusses не из учебника — интереса нет.
+    hume = onto.person("Юм", "1711", "1776")
+    work = onto.thing("work", "Трактат")
+    kept, dropped, hidden_author = (
+        onto.thing("concept", "причинность"),
+        onto.thing("concept", "индукция"),
+        onto.thing("concept", "привычка"),
+    )
+    other_work = onto.thing("work", "Статья")
+    st.add(work, "author", obj=hume, attributions=src("s_t"))
+    st.add(work, "discusses", obj=kept, attributions=src("s_t"))
+    st.add(work, "discusses", obj=dropped, attributions=src("wikidata"))
+    st.add(other_work, "author", obj=hume, attributions=src("wikidata"))
+    st.add(other_work, "discusses", obj=hidden_author, attributions=src("s_t"))
+    card, rid = cs.get(hume, attributed_to="s_t")
+    assert [r["label"] for r in section(card, "interests")["rows"]] == ["причинность"]
+    assert cs.served(events, rid)["inferred"] == 1
+    card, _ = cs.get(hume)
+    assert {r["label"] for r in section(card, "interests")["rows"]} == {
+        "индукция",
+        "причинность",
+        "привычка",
+    }
 
 
 @req(EC, "К кому относится", scenario="Учение без сторонников, но с трудом")
@@ -809,6 +951,39 @@ def test_outside_layer_coverage(onto, tmp_path, events):
     assert svc.served(events, rid)["polity"] == "none"
 
 
+@req(
+    EC,
+    "Государство основного места",
+    invariant="повреждённый артефакт слоя — как недоступный: polity unavailable, ответ 200",
+)
+@pytest.mark.parametrize("damage", ["no_table", "broken_geometry", "not_a_database"])
+def test_damaged_layer_is_unavailable_not_500(onto, tmp_path, events, damage):
+    import sqlite3
+
+    path = _artifact(
+        tmp_path / "polities.sqlite",
+        [("prussia", "Королевство Пруссия", 1701, 1918, (19, 53, 23, 56), 10.0)],
+    )
+    if damage == "no_table":
+        conn = sqlite3.connect(path)
+        conn.execute("DROP TABLE polity_rows")
+        conn.commit()
+        conn.close()
+    elif damage == "broken_geometry":
+        conn = sqlite3.connect(path)
+        conn.execute("UPDATE polity_rows SET geometry = '{не json'")
+        conn.commit()
+        conn.close()
+    else:
+        path.write_bytes(b"not a database" * 200)
+    svc = CardSvc(onto, events=events, polities=PolityLayer(path))
+    kant = kant_world(svc, onto)
+    card, rid = svc.get(kant)  # статус 200 проверяет CardSvc.get
+    assert card["summary"]["polity"] is None
+    assert card["summary"]["place"]["geo"] == {"lat": 54.71, "lon": 20.51}
+    assert svc.served(events, rid)["polity"] == "unavailable"
+
+
 @req(EC, "Государство основного места", scenario="Место с координатами")
 def test_place_card_has_geo_without_polity(onto, tmp_path, events):
     svc = CardSvc(onto, events=events, polities=prussia_layer(tmp_path))
@@ -866,7 +1041,7 @@ def test_polity_needs_birth_year(onto, tmp_path, events):
     svc.lived(nameless, city, "activity")
     card, rid = svc.get(nameless)
     assert card["summary"]["polity"] is None
-    assert svc.served(events, rid)["polity"] in ("skipped", "unavailable")
+    assert svc.served(events, rid)["polity"] == "skipped"
     # Город известный, но слоя нет: название государства не берётся ни из какого словаря.
     bare = CardSvc(onto, events=events)
     kant = kant_world(bare, onto)
@@ -1100,6 +1275,7 @@ def shown_ids(card: dict) -> set[str]:
         ids |= {r["statement_id"] for r in summary["roles"]}
         if summary["place"]:
             ids |= {summary["place"]["statement_id"], *summary["place"]["also"]}
+        # summary.years_row — утверждение lifespan: из множества видимых оно вычтено (NOT_LISTED)
     return ids
 
 
@@ -1196,7 +1372,9 @@ def test_generated_row(cs, onto, events):
     card, rid = cs.get(kant)
     [row] = section(card, "influenced_by")["rows"]
     assert (row["mark"], row["generated"], row["status"]) == ("generated", True, "generated")
-    assert card["legend"] == ["generated"]
+    # Легенда — отметки строк и частей сводки: годы Канта (lifespan, общее знание) проверены.
+    assert card["summary"]["years_row"]["mark"] == "verified"
+    assert card["legend"] == ["verified", "generated"]
     assert cs.served(events, rid)["rows"] == 1
 
 
@@ -1272,6 +1450,8 @@ def test_legend_equals_marks_in_every_type(cs, onto, type_):
         marks |= {r["mark"] for r in summary["roles"]}
         if summary["place"]:
             marks.add(summary["place"]["mark"])
+        if summary["years_row"]:
+            marks.add(summary["years_row"]["mark"])
     if card["description"] and card["description"]["generated"]:
         marks.add("generated")
     assert card["legend"] == [m for m in MARKS if m in marks]
@@ -1423,5 +1603,7 @@ def test_region_hides_evidence_but_keeps_mark(cs, onto, events):
     [row] = section(card, "influenced_by")["rows"]
     assert (row["mark"], row["status"]) == ("sourced", "sourced")
     assert row["evidence"] == [] and row["attributions"] == []
-    assert card["legend"] == ["sourced"]
+    # Легенда: отметка строки и отметка годов сводки (lifespan Канта — общее знание).
+    assert card["summary"]["years_row"]["mark"] == "verified"
+    assert card["legend"] == ["verified", "sourced"]
     assert [e["rows"] for e in events.of(SERVED)] == [1, 1]

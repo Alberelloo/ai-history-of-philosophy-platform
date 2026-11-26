@@ -212,6 +212,33 @@ def test_text_column_with_open_panel(knowledge_context, knowledge_stack, events,
     served_for(events, response, type="person")
 
 
+@req(
+    VD,
+    "Раскладка экрана чтения",
+    invariant="при закреплённой навигации и открытой панели колонка текста не уже 62ch (порог K4)",
+)
+@pytest.mark.parametrize(
+    "width", [1280, 1366, 1440, 1471, 1472, 1473, 1474, 1475, 1476, 1480, 1600, 1680, 1920]
+)
+def test_text_column_with_open_panel_and_pinned_navigation(
+    knowledge_context, knowledge_stack, events, width
+):
+    kant_world(knowledge_stack)
+    page = start(knowledge_context, knowledge_stack, width, 800, pinned=True)
+    response = open_card(page)
+    found = metrics(page)
+    assert 62 * found["ch"] - 1 <= found["textWidth"] <= 68 * found["ch"] + 1, found
+    assert found["scrollW"] <= found["innerW"], found
+    sidebar = page.locator(".sidebar")
+    state = sidebar.get_attribute("data-state")
+    assert state in ("pinned", "collapsed"), state
+    if state == "collapsed":  # причина сворачивания названа: закрепление недоступно
+        expect(sidebar.locator('button[aria-disabled="true"]')).to_have_count(1)
+    else:
+        expect(sidebar.locator('button[aria-disabled="true"]')).to_have_count(0)
+    served_for(events, response, type="person")
+
+
 @req(VD, "Раскладка экрана чтения", scenario="Полоска справа")
 def test_strip_expands_over_text(knowledge_context, knowledge_stack, events):
     kant_world(knowledge_stack)
