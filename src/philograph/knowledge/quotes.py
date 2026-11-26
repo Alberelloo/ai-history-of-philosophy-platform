@@ -39,22 +39,32 @@ def normalize(text: str) -> str:
     return _SPACE.sub(" ", text).strip().lower()
 
 
-def parts(quote: str) -> list[str]:
-    """Части цитаты: нормализация, снятие обрамляющих кавычек, деление по многоточию."""
+def _unquoted(quote: str) -> str:
     q = normalize(quote)
     while len(q) >= 2 and q[0] in _EDGE_QUOTES and q[-1] in _EDGE_QUOTES:
         q = q[1:-1].strip()
-    return [p for p in (s.strip() for s in _ELLIPSIS.split(q)) if p]
+    return q
+
+
+def parts(quote: str) -> list[str]:
+    """Части цитаты: нормализация, снятие обрамляющих кавычек, деление по многоточию."""
+    return [p for p in (s.strip() for s in _ELLIPSIS.split(_unquoted(quote))) if p]
 
 
 def check(quote: str, text: str | None) -> str | None:
-    """``None``, если цитата есть в абзаце; иначе код причины."""
+    """``None``, если цитата есть в абзаце; иначе код причины. Сначала цитата ищется целиком
+    (многоточие автора — часть текста), и только если её нет — по частям многоточия."""
+    if text is None:
+        return QUOTE_NOT_FOUND
+    haystack = normalize(text)
+    whole = _unquoted(quote)
+    if whole and whole in haystack:
+        return None
     found = parts(quote)
-    if not found or text is None:
+    if not found:
         return QUOTE_NOT_FOUND
     if len(found) > 1 and any(len(p) < MIN_PART for p in found):
         return QUOTE_TOO_SHORT
-    haystack = normalize(text)
     position = 0
     for part in found:
         at = haystack.find(part, position)

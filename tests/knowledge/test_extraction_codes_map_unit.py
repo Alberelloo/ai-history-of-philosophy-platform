@@ -56,3 +56,26 @@ def test_index_nulls_and_drop_callback(onto):
 def test_index_not_a_list(onto):
     items = EntityItems(onto.entities, onto.statements)
     assert items.index({"name": "Кант"}, "run1") == {}
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"name": "Кант", "type": ["person"]},
+        {"name": "Кант", "type": "person", "dating": {"text": 1724, "paragraph": 1, "quote": "К"}},
+        {"name": "Кант", "type": "person", "dating": {"text": "1724", "paragraph": 1, "quote": 5}},
+        {"name": "Кант", "type": "person", "dating": {"text": "x", "paragraph": "²", "quote": "К"}},
+        {"name": "Кант", "type": "person", "dating": {"text": "x", "paragraph": 1.5, "quote": "К"}},
+    ],
+)
+def test_index_entity_item_kinds(onto, bad):
+    items = EntityItems(onto.entities, onto.statements)
+    dropped: list[tuple[str, str]] = []
+    index = items.index([bad], "run1", on_drop=lambda r, c: dropped.append((r, c)))
+    assert index == {} and [c for _, c in dropped] == ["schema_item"]
+
+
+def test_index_dating_paragraph_string(onto):
+    items = EntityItems(onto.entities, onto.statements)
+    item = {"name": "Кант", "type": "person", "dating": {"text": "1724", "paragraph": " 2 "}}
+    assert items.index([item], "run1")["Кант"]["dating"]["paragraph"] == 2

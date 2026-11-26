@@ -58,3 +58,9 @@ def test_parts_do_not_overlap():
 
 def test_single_short_quote_allowed():
     assert quotes.found("Бог", PARAGRAPH)  # одна часть — без минимума длины
+
+
+def test_author_ellipsis_found_whole():
+    text = "Он сказал... и замолчал."
+    assert quotes.check("сказал... и", text) is None  # целиком; по частям было бы too_short
+    assert quotes.check("Он сказал… и замолчал", text) is None

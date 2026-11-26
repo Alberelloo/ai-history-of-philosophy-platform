@@ -194,3 +194,44 @@ def test_main_ingest_and_codes(stand, version, tmp_path, onto):
     assert ext.main([*argv, "--replace"], service=service) == 0
     unknown = [*argv[:6], "nope-model", *argv[7:], "--replace"]
     assert ext.main(unknown, service=service) == 2
+
+
+def test_failed_run_counts_as_previous(stand, version, monkeypatch):
+    data, _ = version
+    replies = {"1": {"statements": [st("Кант", "holds", "Опыт", 1, "всякое знание")]}}
+    calls = {"n": 0}
+    original = stand.filling.apply_reply
+
+    def flaky(*a, **k):
+        calls["n"] += 1
+        result = original(*a, **k)
+        if calls["n"] == 1:
+            raise RuntimeError("обрыв")
+        return result
+
+    monkeypatch.setattr(stand.filling, "apply_reply", flaky)
+    with pytest.raises(RuntimeError):
+        _ingest(stand, data, replies)
+    assert [r["status"] for r in runs(stand)] == ["failed"]
+    counts = [count(stand, tb) for tb in (t.statements, t.evidence, t.attributions)]
+    with pytest.raises(ext.CommandError):
+        _ingest(stand, data, replies)
+    _ingest(stand, data, replies, replace=True)
+    assert [count(stand, tb) for tb in (t.statements, t.evidence, t.attributions)] == counts
+    assert sorted(r["status"] for r in runs(stand)) == ["done", "rolled_back"]
+
+
+def test_duplicate_fragment_refused(tmp_path):
+    lines = tmp_path / "d.jsonl"
+    lines.write_text('{"fragment": 1, "reply": {}}\n{"fragment": 1, "reply": {}}\n', "utf-8")
+    whole = tmp_path / "d.json"
+    whole.write_text('{"1": {}, "1": {"statements": []}}', "utf-8")
+    for path in (lines, whole):
+        with pytest.raises(ext.CommandError):
+            ext.read_replies(path)
+
+
+def test_unknown_version_exit_2(stand, onto, capsys):
+    service = ext.Service(stand.filling, onto.statements.engine, ext._Texts(stand.filling.library))
+    assert ext.main(["export", "--version", "v_nope"], service=service) == 2
+    assert "не найдена" in capsys.readouterr().err

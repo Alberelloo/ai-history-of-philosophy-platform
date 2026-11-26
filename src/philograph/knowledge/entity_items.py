@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from itertools import combinations
 from typing import Any
@@ -73,6 +74,24 @@ def _without_nulls(item: dict[str, Any]) -> dict[str, Any]:
     return clean
 
 
+_DIGITS = re.compile(r"[0-9]+")
+
+
+def _dating_spec(spec: dict[str, Any]) -> dict[str, Any] | None:
+    """Датировка элемента по виду: ``text`` и ``quote`` — строки, ``paragraph`` — целое или
+    строка из ASCII-цифр (приводится). Иначе ``None`` — элемент отбрасывается (``schema_item``)."""
+    spec = {k: v for k, v in spec.items() if v is not None}
+    for key in ("text", "quote"):
+        if key in spec and not isinstance(spec[key], str):
+            return None
+    number = spec.get("paragraph")
+    if isinstance(number, str) and _DIGITS.fullmatch(number.strip()):
+        spec["paragraph"] = int(number.strip())
+    elif number is not None and (isinstance(number, bool) or not isinstance(number, int)):
+        return None
+    return spec
+
+
 def _spellings(name: str, item: dict[str, Any] | None) -> list[str]:
     found = [name]
     if item:
@@ -107,23 +126,33 @@ class EntityItems:
         self.unresolved = set()
         known = self.registry.entity_types()
         index: dict[str, dict[str, Any]] = {}
+
+        def drop(reason: str, code: str) -> None:
+            if on_drop is not None:
+                on_drop(reason, code)
+            else:
+                events.emit("knowledge.extraction.dropped", run_id=run_id, reason=reason, code=code)
+
         for item in items if isinstance(items, list) else []:
             if not isinstance(item, dict) or not isinstance(item.get("name"), str):
                 continue
             if not item["name"]:
                 continue
-            if item.get("type") not in known:
-                if on_drop is not None:
-                    on_drop(ENTITY_TYPE_DROPPED, extraction_codes.ENTITY_TYPE)
-                else:
-                    events.emit(
-                        "knowledge.extraction.dropped",
-                        run_id=run_id,
-                        reason=ENTITY_TYPE_DROPPED,
-                        code=extraction_codes.ENTITY_TYPE,
-                    )
+            kind = item.get("type")
+            if kind is not None and not isinstance(kind, str):
+                drop("элемент entities: поле type не строка", extraction_codes.SCHEMA_ITEM)
                 continue
-            index.setdefault(item["name"], _without_nulls(item))
+            if kind not in known:
+                drop(ENTITY_TYPE_DROPPED, extraction_codes.ENTITY_TYPE)
+                continue
+            clean = _without_nulls(item)
+            if "dating" in clean:
+                dating_spec = _dating_spec(clean["dating"])
+                if dating_spec is None:
+                    drop("элемент entities: поле dating не того вида", extraction_codes.SCHEMA_ITEM)
+                    continue
+                clean["dating"] = dating_spec
+            index.setdefault(item["name"], clean)
         return index
 
     # --- привязка ---

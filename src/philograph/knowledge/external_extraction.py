@@ -43,7 +43,7 @@ from philograph.knowledge.filling import Filling
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.statements import Statements
 from philograph.platform import context, events
-from philograph.platform.client import ServiceClient
+from philograph.platform.client import ServiceClient, ServiceUnavailable
 from philograph.prompts import PROMPTS
 
 events.define(
@@ -190,7 +190,11 @@ def read_replies(path: Path) -> dict[str, Any]:
     except ValueError:
         whole = None
     if isinstance(whole, dict) and "fragment" not in whole:
-        return {str(k): v for k, v in whole.items()}
+        try:
+            pairs = json.loads(text, object_pairs_hook=_unique)
+        except _Duplicate as exc:
+            raise CommandError(f"{path}: ключ {exc} повторяется") from None
+        return {str(k): v for k, v in pairs.items()}
     replies: dict[str, Any] = {}
     for number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
@@ -201,11 +205,30 @@ def read_replies(path: Path) -> dict[str, Any]:
             raise CommandError(f"{path}: строка {number} — не JSON") from exc
         if not isinstance(row, dict) or "fragment" not in row or "reply" not in row:
             raise CommandError(f"{path}: строка {number} — нужны поля fragment и reply")
-        replies[str(row["fragment"])] = row["reply"]
+        key = str(row["fragment"])
+        if key in replies:
+            raise CommandError(f"{path}: строка {number} — фрагмент {key} указан дважды")
+        replies[key] = row["reply"]
     return replies
 
 
+class _Duplicate(Exception):
+    pass
+
+
+def _unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Объект JSON без повторов ключей — на любом уровне (повтор в ответе тоже ошибка файла)."""
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise _Duplicate(key)
+        result[key] = value
+    return result
+
+
 def _previous(engine: Engine, version_id: str) -> list[str]:
+    """Прежние внешние запуски версии, которые не откатаны (любой статус, кроме
+    ``rolled_back``)."""
     runs = t.filling_runs
     with engine.begin() as conn:
         return list(
@@ -215,7 +238,9 @@ def _previous(engine: Engine, version_id: str) -> list[str]:
                         runs.c.kind == "extraction",
                         runs.c.extractor == EXTERNAL,
                         runs.c.target == version_id,
-                        runs.c.status == "done",
+                        # done, failed и брошенный running: у всех могут быть записанные
+                        # утверждения — повтор без отката удвоил бы подтверждения.
+                        runs.c.status != "rolled_back",
                     )
                 )
             )
@@ -236,7 +261,13 @@ def ingest(
 ) -> dict[str, Any]:
     """Запуск ``extractor=external``: каждый ответ — через ``Filling.apply_reply``; фрагмент
     без ответа — ``reply_missing``; номер вне фрагментов — ``reply_invalid``. Повтор версии —
-    только с ``replace`` (прежний внешний запуск откатывается)."""
+    только с ``replace``: все прежние неоткатанные внешние запуски версии (``done``,
+    ``failed``, ``running``) откатываются целиком.
+
+    Риск ``replace``: откат снимает всё, что записал прежний запуск, — и подтверждения,
+    добавленные к утверждениям, которые уже были (другой учебник, шлюз), и проверенные
+    человеком решения по утверждениям этого запуска. Перед ``--replace`` на боевой базе —
+    резервная копия (docs/operations/runbook.md, «Извлечение связей»)."""
     _allowed(filling, data)
     version_id = data["version_id"]
     previous = _previous(filling.statements.engine, version_id)
@@ -426,7 +457,12 @@ class Service:
     texts: _Texts
 
     def version(self, version_id: str) -> dict[str, Any]:
-        data = self.filling.version(version_id)
+        response = self.filling.library.get(f"internal/versions/{version_id}/paragraphs")
+        if response.status_code == 404:
+            raise CommandError(f"версия {version_id} не найдена в библиотеке")
+        if response.status_code != 200:
+            raise CommandError(f"библиотека ответила {response.status_code} на версию {version_id}")
+        data = response.json()
         self.texts.prime(data["paragraphs"])
         return data
 
@@ -518,7 +554,7 @@ def main(
     except Forbidden as exc:
         print(f"источник {exc} без разрешения на внешнюю обработку", file=sys.stderr)
         return 3
-    except OSError as exc:
+    except (OSError, ServiceUnavailable) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     return 0
