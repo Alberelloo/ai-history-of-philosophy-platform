@@ -429,10 +429,20 @@ class Entities:
                 .mappings()
                 .all()
             )
-            kinds = _merged_kinds(kept, removed, all_names)
+            own = sorted((n for n in all_names if n["entity_id"] == kept), key=lambda n: n["id"])
+            other = sorted(
+                (n for n in all_names if n["entity_id"] == removed), key=lambda n: n["id"]
+            )
+            kept_kinds, removed_kinds = merge_names(own, other)
+            pairs = list(zip([*own, *other], [*kept_kinds, *removed_kinds], strict=True))
+            kinds = {n["id"]: kind for n, kind in pairs if kind is not None and kind != n["kind"]}
+            dropped = [dict(n) for n, kind in pairs if kind is None]
             for name_id, kind in kinds.items():
                 conn.execute(update(t.names).where(t.names.c.id == name_id).values(kind=kind))
-            moved_names = [n["id"] for n in all_names if n["entity_id"] == removed]
+            if dropped:
+                conn.execute(delete(t.names).where(t.names.c.id.in_([n["id"] for n in dropped])))
+            gone = {n["id"] for n in dropped}
+            moved_names = [n["id"] for n in other if n["id"] not in gone]
             moved_subject = list(
                 conn.scalars(select(t.statements.c.id).where(t.statements.c.subject == removed))
             )
@@ -511,6 +521,7 @@ class Entities:
                         "object": moved_object,
                         "mentions": moved_mentions,
                         "kinds": {str(n["id"]): n["kind"] for n in all_names if n["id"] in kinds},
+                        "names_dropped": dropped,
                         "externals": moved_externals,
                         "attributions_who": moved_who,
                         "portraits": moved_portraits,
@@ -534,6 +545,8 @@ class Entities:
             )
             for name_id, kind in (moved.get("kinds") or {}).items():
                 conn.execute(update(t.names).where(t.names.c.id == int(name_id)).values(kind=kind))
+            for row in moved.get("names_dropped") or []:
+                conn.execute(t.names.insert().values(**row))
             conn.execute(
                 update(t.statements)
                 .where(t.statements.c.id.in_(moved["subject"]))
@@ -576,22 +589,38 @@ class Entities:
         return dict(m)
 
 
-def _merged_kinds(kept: str, removed: str, names: Any) -> dict[int, str]:
-    """Новые виды названий после слияния: ровно одно основное — русское основное любой из
-    сторон (сначала оставшейся), иначе основное оставшейся (иначе удалённой); прочие бывшие
-    основные и точные повторы названий оставшейся — варианты. Только изменённые строки."""
-    primaries = [n for n in names if n["kind"] == "primary"]
-    order = sorted(primaries, key=lambda n: (n["entity_id"] != kept, n["id"]))
-    russian = [n for n in order if is_russian(n["text"])]
-    chosen = (russian or order or [None])[0]
-    seen = {(n["lang"], n["normalized"]) for n in names if n["entity_id"] == kept}
-    kinds: dict[int, str] = {}
-    for n in names:
-        new = n["kind"]
-        if n["kind"] == "primary" and n is not chosen:
-            new = "variant"
-        if n["entity_id"] == removed and n is not chosen and (n["lang"], n["normalized"]) in seen:
-            new = "variant"
-        if new != n["kind"]:
-            kinds[n["id"]] = new
-    return kinds
+def merge_names(
+    kept: list[dict[str, Any]], removed: list[dict[str, Any]]
+) -> tuple[list[str | None], list[str | None]]:
+    """Виды названий обеих сторон после слияния (по позициям списков; ``None`` — убрать).
+
+    Ровно одно основное — русское основное любой из сторон (сначала оставшейся), иначе
+    основное оставшейся (иначе удалённой); прочие бывшие основные — варианты. Точный повтор
+    ``(язык, normalized)`` между сторонами остаётся одной строкой: у основного, если оно в
+    повторе, иначе у оставшейся; строки другой стороны убираются. Повторы внутри одной
+    стороны слияние не трогает."""
+    sides = [("kept", n) for n in kept] + [("removed", n) for n in removed]
+    primaries = [n for _, n in sides if n["kind"] == "primary"]
+    chosen = next((n for n in primaries if is_russian(n["text"])), None)
+    if chosen is None and primaries:
+        chosen = primaries[0]
+    keys = {
+        side: {(n["lang"], n["normalized"]) for s, n in sides if s == side}
+        for side in ("kept", "removed")
+    }
+    shared = keys["kept"] & keys["removed"]
+    owner = {k: "kept" for k in shared}
+    if chosen is not None:
+        chosen_side = "kept" if any(n is chosen for n in kept) else "removed"
+        if (chosen["lang"], chosen["normalized"]) in shared:
+            owner[(chosen["lang"], chosen["normalized"])] = chosen_side
+    result: dict[str, list[str | None]] = {"kept": [], "removed": []}
+    for side, n in sides:
+        key = (n["lang"], n["normalized"])
+        if key in owner and owner[key] != side:
+            result[side].append(None)
+        elif n["kind"] == "primary" and n is not chosen:
+            result[side].append("variant")
+        else:
+            result[side].append(n["kind"])
+    return result["kept"], result["removed"]

@@ -668,6 +668,20 @@ class Statements:
                         )
                     )
                 )
+            if survivor is not None and row["status"] == "verified":
+                # Проверенное человеком не сворачивается в непроверенное: повтор уходит в него,
+                # проверенное сохраняет идентификатор и статус и берёт пересчитанный ключ.
+                with self.engine.begin() as conn:
+                    other = dict(
+                        conn.execute(select(t.statements).where(t.statements.c.id == survivor))
+                        .mappings()
+                        .one()
+                    )
+                if other["status"] != "verified":
+                    fold = self._fold(other, sid)
+                    attributions += len(fold["attributions"])
+                    folded.append(fold)
+                    survivor = None
             if survivor is None:
                 keys[sid] = row["key"]
                 with self.engine.begin() as conn:
@@ -781,10 +795,17 @@ class Statements:
             m = conn.execute(select(t.merges).where(t.merges.c.id == merge_id)).mappings().one()
         moved = m["moved"]
         folded = moved.get("folded") or []
+        # Ключи — до возврата свёрнутых: проверенное, принявшее ключ свёрнутого, освобождает его;
+        # свёрнутое, чей ключ пересчитан в этом же слиянии, возвращается с прежним ключом.
+        keys = moved.get("keys") or {}
+        for sid, key in keys.items():
+            with self.engine.begin() as conn:
+                conn.execute(update(t.statements).where(t.statements.c.id == sid).values(key=key))
         survivors = []
         for fold in reversed(folded):
             with self.engine.begin() as conn:
-                conn.execute(t.statements.insert().values(**fold["row"]))
+                row = {**fold["row"], "key": keys.get(fold["id"], fold["row"]["key"])}
+                conn.execute(t.statements.insert().values(**row))
                 if fold["attributions"]:
                     conn.execute(
                         update(t.attributions)
@@ -800,9 +821,6 @@ class Statements:
                         .values(statement_id=fold["id"])
                     )
             survivors.append(fold["into"])
-        for sid, key in (moved.get("keys") or {}).items():
-            with self.engine.begin() as conn:
-                conn.execute(update(t.statements).where(t.statements.c.id == sid).values(key=key))
         self.entities.undo_merge(merge_id, emit=False)
         touched = set(survivors)
         for aid in moved.get("attributions_who", []):

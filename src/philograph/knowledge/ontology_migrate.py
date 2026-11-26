@@ -52,6 +52,7 @@ from sqlalchemy import and_, delete, select, update
 
 from philograph.knowledge import dedupe, integrity, run_actions
 from philograph.knowledge import schema as t
+from philograph.knowledge.entities import merge_names
 from philograph.knowledge.epoch_dates import ManifestError, load_manifest
 from philograph.knowledge.geo_enrich import file_fetch
 from philograph.knowledge.life_dates import LifeDates, check_manifest
@@ -238,23 +239,15 @@ class View:
             self.entities[p["entity"]]["qid"] = p["qid"]
         elif action.kind == "merge":
             kept, removed = self.entities[p["kept"]], self.entities[p["removed"]]
-            # Правило ``Entities.merge``: названия удалённой переходят оставшейся, основное
-            # одно — русское основное любой из сторон (сначала оставшейся), иначе оставшейся.
-            primaries = [n for n in kept["names"] + removed["names"] if n["kind"] == "primary"]
-            chosen = ([n for n in primaries if is_russian(n["text"])] or primaries or [None])[0]
-            seen = {(n["lang"], normalize(n["text"])) for n in kept["names"]}
-            moved = []
-            for n in removed["names"]:
-                n = dict(n)
-                if (n["lang"], normalize(n["text"])) in seen and n is not chosen:
-                    n["kind"] = "variant"
-                moved.append(n)
-            if chosen is not None and chosen in removed["names"]:
-                chosen = moved[removed["names"].index(chosen)]
-            for n in kept["names"] + moved:
-                if n["kind"] == "primary" and n is not chosen:
-                    n["kind"] = "variant"
-            kept["names"] = kept["names"] + moved
+            # Правило ``Entities.merge`` — одна функция ``merge_names``.
+            kept_kinds, removed_kinds = merge_names(kept["names"], removed["names"])
+            names = []
+            for n, kind in zip(
+                [*kept["names"], *removed["names"]], [*kept_kinds, *removed_kinds], strict=True
+            ):
+                if kind is not None:
+                    names.append({**n, "kind": kind})
+            kept["names"] = names
             kept["qid"] = kept["qid"] or removed["qid"]
             kept["dates"] = kept["dates"] or removed["dates"]
             self.redirect[p["removed"]] = p["kept"]
