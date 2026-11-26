@@ -24,17 +24,17 @@
 
 ## 3. Клиент (разработчик)
 
-- [ ] 3.1 `layout.ts`: `panelWidth(m)` (полоска, 1280–1439, от 1440 — design.md «Ширина панели»); `computeLayout` берёт ширину оттуда, временное сворачивание — при 28rem. Хук `useLayoutMetrics` вынесен из `ReaderPage`; `SidePanel.tsx` выставляет `--panel` на `documentElement`. Проверка раскладки на 1024, 1280, 1366, 1440, 1680 (свёрнута и закреплена), 1920 и 2560 (62–68ch, ожидаемая раскладка)
-- [ ] 3.2 `FullCard.tsx`: шаблоны по `layout`; шапка персоны со строкой сводки (`[data-card-summary]`, части `[data-summary=*]`), без `Lifeline`, `.card-summary` и `.card-dates`; инфобокс `dl.card-facts`, `display` `list`/`inline`; «Показать все» (`[data-card-more]`, `aria-expanded`); `[data-inferred]`; пустое состояние `[data-card-empty]`; «Где читать» по `where_to_read`
-- [ ] 3.3 Метка `button.card-mark[data-mark]` (форма и цвет по токенам `--ok`, `--accent`, `--generated`, `--danger`), доступное имя, раскрытие `.card-row__details`, `data-unverified`; одна легенда `[data-card-legend]` по `legend`. Ссылки `a.pg-cite` остаются. Без литералов цвета в CSS
-- [ ] 3.4 Государство: `summary.polity` → `[data-summary=country][data-country-kind=historical]`; иначе `import("./map/geo/countries")` по требованию, `countryAt` → «ныне …» (`data-country-kind=modern`); у места — `[data-card-country]` «ныне …»; ни названия, ни заглушки, пока страна не найдена. `CardPopup.topStatements` отбрасывает `inferred`. Вес фрагмента точки входа (gzip -9) до и после — в `progress.md`
-- [ ] 3.5 `i18n` (RU и EN): заголовки новых разделов, значения `person_role`, `group_kind`, `event_kind`, подписи легенды, «Показать все (N)», «Свернуть», «по трудам и связям», пустое состояние, доступные имена меток. `Lifeline` удалить из `ui.tsx` и `components.css`, превью `docs/design/system/previews/Lifeline.html` — из дизайн-системы
-- [ ] 3.6 `npm run build`; ширина и раскладка на 1024×576, 1366×768, 1920×1080 — ручной прогон одного браузерного файла, вывод в `progress.md`
+- [x] 3.1 `layout.ts`: `panelWidth(m)` (полоска, 1280–1439, от 1440 — design.md «Ширина панели»); `computeLayout` берёт ширину оттуда, временное сворачивание — при 28rem. Хук `useLayoutMetrics` вынесен из `ReaderPage`; `SidePanel.tsx` выставляет `--panel` на `documentElement`. Проверка раскладки на 1024, 1280, 1366, 1440, 1680 (свёрнута и закреплена), 1920 и 2560 (62–68ch, ожидаемая раскладка)
+- [x] 3.2 `FullCard.tsx`: шаблоны по `layout`; шапка персоны со строкой сводки (`[data-card-summary]`, части `[data-summary=*]`), без `Lifeline`, `.card-summary` и `.card-dates`; инфобокс `dl.card-facts`, `display` `list`/`inline`; «Показать все» (`[data-card-more]`, `aria-expanded`); `[data-inferred]`; пустое состояние `[data-card-empty]`; «Где читать» по `where_to_read`
+- [x] 3.3 Метка `button.card-mark[data-mark]` (форма и цвет по токенам `--ok`, `--accent`, `--generated`, `--danger`), доступное имя, раскрытие `.card-row__details`, `data-unverified`; одна легенда `[data-card-legend]` по `legend`. Ссылки `a.pg-cite` остаются. Без литералов цвета в CSS
+- [x] 3.4 Государство: `summary.polity` → `[data-summary=country][data-country-kind=historical]`; иначе `import("./map/geo/countries")` по требованию, `countryAt` → «ныне …» (`data-country-kind=modern`); у места — `[data-card-country]` «ныне …»; ни названия, ни заглушки, пока страна не найдена. `CardPopup.topStatements` отбрасывает `inferred`. Вес фрагмента точки входа (gzip -9) до и после — в `progress.md`
+- [x] 3.5 `i18n` (RU и EN): заголовки новых разделов, значения `person_role`, `group_kind`, `event_kind`, подписи легенды, «Показать все (N)», «Свернуть», «по трудам и связям», пустое состояние, доступные имена меток. `Lifeline` удалить из `ui.tsx` и `components.css`, превью `docs/design/system/previews/Lifeline.html` — из дизайн-системы
+- [x] 3.6 `npm run build`; ширина и раскладка на 1024×576, 1366×768, 1920×1080 — ручной прогон одного браузерного файла, вывод в `progress.md`
 
 ## 4. Документы и проверки (разработчик)
 
-- [ ] 4.1 `docs/design/features/reader-panels.md`: 2.2–2.4 (ширина панели по ступеням, пересчёт схем 1440 и 1920), 4.5–4.6 (новая полная карточка: шапка, инфобокс, метки, легенда, без линии жизни и «Где читать» у персоны). `docs/design/design-system.md`: `Lifeline` выведен из карточки. `docs/design/tokens.json`: комментарий у `panel` о ступенях
-- [ ] 4.2 `ruff check . && ruff format --check . && lint-imports`, `python scripts/check_traceability.py` (после 6.x), `pytest -q tests/knowledge`; результат — в `progress.md`
+- [x] 4.1 `docs/design/features/reader-panels.md`: 2.2–2.4 (ширина панели по ступеням, пересчёт схем 1440 и 1920), 4.5–4.6 (новая полная карточка: шапка, инфобокс, метки, легенда, без линии жизни и «Где читать» у персоны). `docs/design/design-system.md`: `Lifeline` выведен из карточки. `docs/design/tokens.json`: комментарий у `panel` о ступенях
+- [x] 4.2 `ruff check . && ruff format --check . && lint-imports`, `python scripts/check_traceability.py` (после 6.x), `pytest -q tests/knowledge`; результат — в `progress.md`
 
 ## 5. Ревью кода (ревьювер)
 

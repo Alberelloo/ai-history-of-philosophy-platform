@@ -6,6 +6,7 @@ import { CARD_POPUP_ID, CardPopup } from "./CardPopup";
 import { FootnoteRef } from "./Footnote";
 import { fieldItems, MarginCol } from "./Footnote";
 import { useAssistantShortcut } from "./hooks/useAssistantShortcut";
+import { useLayoutMetrics } from "./hooks/useLayoutMetrics";
 import { useReadingAnchor } from "./hooks/useReadingAnchor";
 import { useTocLocation } from "./hooks/useTocLocation";
 import { Toc } from "./ReaderToc";
@@ -22,41 +23,11 @@ type Props = {
   setPanel: Dispatch<SetStateAction<PanelState | null>>;
 };
 
-// Ширина окна: раскладка K1–K4 пересчитывается при её изменении.
-function useWindowWidth(): number {
-  const [width, setWidth] = useState(() => window.innerWidth);
-  useEffect(() => {
-    const onResize = () => setWidth(window.innerWidth);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-  return width;
-}
-
-// Раскладка по свободной ширине (2.2). Корневой кегль и ширина 1ch измеряются: на окнах шире
-// 1920px кегль растёт (9.7), и все величины в rem/ch масштабируются.
+// Раскладка по свободной ширине (2.2): замеры общие с шириной панели (useLayoutMetrics).
 function useReaderLayout(panelOpen: boolean): Layout {
-  const width = useWindowWidth();
+  const metrics = useLayoutMetrics();
   const pinned = useStored((s) => s.sidebarPinned);
-  const [metrics, setMetrics] = useState({ root: 16, ch: 11 });
-  useEffect(() => {
-    const measure = () => {
-      const root = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const probe = document.createElement("span");
-      probe.style.cssText = "position:absolute;visibility:hidden;width:1ch;font:var(--type-read-body);";
-      document.body.appendChild(probe);
-      const ch = probe.getBoundingClientRect().width || 11;
-      probe.remove();
-      setMetrics({ root, ch });
-    };
-    measure();
-    // До загрузки Literata ширина 1ch берётся из запасного шрифта и отличается: после
-    // загрузки шрифта раскладка пересчитывается (document.fonts.ready).
-    document.fonts?.ready.then(measure).catch(() => {});
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-  return computeLayout({ root: metrics.root, ch: metrics.ch, width, pinned, panelOpen });
+  return computeLayout({ root: metrics.root, ch: metrics.ch, width: metrics.width, pinned, panelOpen });
 }
 
 function replace(path: string) {

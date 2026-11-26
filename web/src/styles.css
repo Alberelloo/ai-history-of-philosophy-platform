@@ -1388,12 +1388,6 @@ blockquote.block {
   color: var(--ink-2);
 }
 
-.card-summary {
-  color: var(--ink-3);
-  font: var(--type-ui-caption);
-  letter-spacing: var(--type-ui-caption-tracking);
-}
-
 .card-disputed {
   display: inline-flex;
   align-items: center;

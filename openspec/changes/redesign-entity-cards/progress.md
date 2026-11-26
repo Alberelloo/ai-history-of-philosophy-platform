@@ -83,3 +83,42 @@
   - `test_mentions_cards.py::test_sections_by_type` — `"life" in codes` у Канта (раздела `life` больше нет);
   - `test_mentions_cards.py::test_no_empty_sections` — `["life"]` и `where_to_read[0]` у Гоббса.
 - `ruff check` и `lint-imports` чисто (3 контракта соблюдены). `tests/web/test_design_system.py -k "ontology_names or client_styles"` — 2 passed.
+
+## 2026-11-26 — решение владельца по C9 (через ведущего)
+
+«Ширина важнее»: карточка шире 448px на 1366 обязательна, на 1024 и 1920 её тоже не ограничивать 448px. Оглавление можно свернуть или увести в выдвижную панель. Колонка текста ≥ 62ch, без перекрытий и горизонтальной прокрутки. Записано в design.md (вопрос 5) и в дельту visual-design: на 1280–1439 при открытой панели раскладка K4, оглавление — кнопкой «Оглавление»; на 1024, 1366 и 1920 ширина MUST быть > 448px. Принятая формула уже даёт 576, 560 и 528px.
+
+## 2026-11-26 — клиент и документы, задачи 3.1–3.6, 4.1–4.2 (разработчик)
+
+- **3.1.** `layout.ts`: `panelWidth(m)` — единственное место правила ширины. Временное сворачивание навигации решается при 28rem. Замеры вынесены в `hooks/useLayoutMetrics.ts`: ими пользуются `ReaderPage` и `SidePanel`; `SidePanel` выставляет `--panel` (px) на `documentElement`.
+- **3.2–3.3.** `FullCard.tsx` переписан:
+  - шаблоны по `layout`, строка сводки персоны, инфобокс `dl.card-facts` (две колонки через container query от 32rem), `inline` и `list`;
+  - «Показать все (N)» / «Свернуть»; подпись «по трудам и связям»;
+  - метка `button.card-mark[data-mark]` с доступным именем и раскрытием `.card-row__details`, одна легенда;
+  - пустое состояние; «Где читать» по `where_to_read`.
+  
+  Подпись связи у строки показывается, только если в разделе встречаются разные связи. Ответ без новых полей (старые моки тестов) не ломает карточку: отметка берётся из `status` и `disputed`. Стили — в `styles/card.css`, только токены; `.card-summary` из `styles.css` удалён.
+- **3.4.** Государство: `summary.polity` → `data-country-kind=historical`; иначе `import("./map/geo/countries")` → «ныне …» (`modern`); у места — `[data-card-country]`. `CardPopup.topStatements` отбрасывает `inferred`.
+- **3.5.** i18n RU и EN: ключи `card.*` (легенда, «Показать все», «ныне», пустое состояние, «вывод: через …»), `card.summary` (счётчики) удалён. `Lifeline` удалён из `ui.tsx` и `components.css`, превью `docs/design/system/previews/Lifeline.html` удалено.
+- **Вес фрагмента точки входа (gzip -9):** до изменения клиента — 158 566 байт (`index-C_uEtC0C.js`, сборка с `git stash` в scratchpad), после — 159 981 байт (`index-DEznCzHV.js`), то есть +1 415 байт. Модуль `countries` — отдельный фрагмент (`countries-*.js`, 46,7 КБ gzip), в точку входа он не попал.
+- **3.6.** `npm run build` (tsc + vite, пишет `web/dist`, он в `.gitignore`) — rc=0.
+  - `pytest tests/web/test_reader_layout.py` — 3 passed.
+  - Временный файл `tests/web/test_zz_coder_smoke_tmp.py` (удалён, не коммитился): карточка Канта на моке `page.route`, вывод `evaluate`:
+    - 1024×576 — `.side-panel` 576px, `--panel` 576px, K3, `scrollWidth` 1024, переполнения тела панели нет;
+    - 1366×768 — 560px, K4, правый край текста 782 = левый край панели 806 − 24;
+    - 1920×1080 — 528px, K1, правый край текста 1032 < 1392.
+    
+    На всех трёх: одна легенда, `.pg-lifeline` нет, `pageerror` нет. Сводка: «философ · Кёнигсберг <b>x</b> · ныне Россия · 1724–1804» — разметка выведена текстом.
+  - `pytest tests/web/test_reader_cards.py` — 18 passed, 2 failed: `test_t12_nature_of_each_row[light|dark]` ищет `.pg-status--verified` со словом «Проверено» у строки и `.card-summary`. Это тест MODIFIED «Природа каждой строки», он ждёт тестировщика.
+- **4.1.** `docs/design/features/reader-panels.md` (4.5 переписан, 2.2 — ширина по свободному месту), `docs/design/design-system.md`, `docs/design/tokens.json` (`usage` токена `panel`), `docs/design/system/components/Lifeline.md` (пометка).
+- **4.2.**
+  - `ruff check .`, `ruff format --check .` — чисто; `lint-imports` — 3 kept, 0 broken.
+  - `check_traceability.py` — 426 из 433: нет тестов для семи ADDED-требований entity-cards. Это ожидаемо до задачи 6.x.
+  - `pytest tests/knowledge/test_cards_redesign_unit.py test_epoch_card_unit.py test_polities_layer_spec.py` — 58 passed; `tests/web/test_design_system.py` — 8 passed.
+
+Тесты, которые ждут тестировщика (ожидания противоречат новой спецификации; разработчик их не менял):
+- `tests/knowledge/test_mentions_cards.py::test_where_to_read_first_paragraph`, `::test_sections_by_type`, `::test_no_empty_sections`;
+- `tests/web/test_reader_cards.py::test_t12_nature_of_each_row[light|dark]`;
+- не запускались, но по коду противоречат: `tests/e2e/test_reader_snapshots.py::test_s1_s4_card` (линия жизни S4), `tests/e2e/test_site.py::test_mention_opens_card_and_navigates` (`[data-section=influence]` у персоны и «так считает»).
+
+Следующий шаг: 5.1 (ревью кода), затем 6.x (тестировщик).

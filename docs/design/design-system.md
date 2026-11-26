@@ -69,7 +69,7 @@
 
 ## Компоненты первой волны
 
-Button, SegmentedControl, Switch, TextField, EntityChip, StatusMark, Citation, Mention, Sidenote, Portrait, PortraitGallery, Lifeline, ListRow, Popover, SidePanel, Tooltip, Notice. У каждого в артефакте — правила и живое превью в обеих темах.
+Button, SegmentedControl, Switch, TextField, EntityChip, StatusMark, Citation, Mention, Sidenote, Portrait, PortraitGallery, ListRow, Popover, SidePanel, Tooltip, Notice. У каждого в артефакте — правила и живое превью в обеих темах. `Lifeline` (линия жизни) выведен из карточки персоны и из клиента (redesign-entity-cards); его превью `previews/Lifeline.html` удалено.
 
 Вторая волна: Sidebar (боковая панель навигации) и FilterMenu (выпадающий фильтр с флажками), правила — в `system/components/`.
 
