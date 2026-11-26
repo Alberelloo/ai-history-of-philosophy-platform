@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 80ee164..2380366 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -64,7 +64,7 @@ PRICES = Path(__file__).with_name("extraction_prices.yaml")
+ EXTERNAL = "external"
+ # Запуск ``running`` моложе этого считается идущей записью (параллельный ingest): повтор
+ # отказывает. Старше — брошенный (процесс упал), его откатывает ``--replace``.
+-STALE_RUNNING_HOURS = 6
++STALE_RUNNING_HOURS = 0
+ 
+ 
+ class CommandError(Exception):

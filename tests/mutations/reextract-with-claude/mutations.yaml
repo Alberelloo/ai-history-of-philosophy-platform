@@ -412,3 +412,44 @@ mutations:
   note: часть при многоточии без букв и цифр принимается
   expect_fail:
   - tests/knowledge/test_reextract_quotes.py::test_part_without_significant_text
+- id: ext-live-running-ignored
+  requirement: Внешний извлекатель
+  patch: ext-live-running-ignored.patch
+  note: идущая запись не блокирует
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses
+  - tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others
+- id: ext-live-blocks-only-without-replace
+  requirement: Внешний извлекатель
+  patch: ext-live-blocks-only-without-replace.patch
+  note: с --replace идущая запись откатывается
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses
+  - tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others
+- id: ext-threshold-huge
+  requirement: Внешний извлекатель
+  patch: ext-threshold-huge.patch
+  note: брошенная запись никогда не откатывается
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_abandoned_running_is_rolled_back_by_replace
+  - tests/knowledge/test_reextract_review.py::test_six_hour_threshold
+- id: ext-threshold-zero
+  requirement: Внешний извлекатель
+  patch: ext-threshold-zero.patch
+  note: любой running считается брошенным
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses
+  - tests/knowledge/test_reextract_review.py::test_six_hour_threshold
+- id: ext-dup-top-level-allowed
+  requirement: Внешний извлекатель
+  patch: ext-dup-top-level-allowed.patch
+  note: повтор номера верхнего уровня не замечается
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_duplicate_top_level_key_in_json_object
+- id: check-dating-not-object
+  requirement: Проверка ответа по утверждениям
+  patch: check-dating-not-object.patch
+  note: dating не объект не проверяется
+  expect_fail:
+  - tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept
+  - tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property

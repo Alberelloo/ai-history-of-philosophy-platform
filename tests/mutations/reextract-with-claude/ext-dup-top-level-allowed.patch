@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/external_extraction.py b/src/philograph/knowledge/external_extraction.py
+index 80ee164..e561749 100644
+--- a/src/philograph/knowledge/external_extraction.py
++++ b/src/philograph/knowledge/external_extraction.py
+@@ -194,7 +194,7 @@ def read_replies(path: Path) -> dict[str, Any]:
+         whole = None
+     if isinstance(whole, dict) and "fragment" not in whole:
+         top = json.loads(text, object_pairs_hook=_unique)
+-        if isinstance(top, _Repeated):  # только номера фрагментов; внутри ответа — как в JSON
++        if False:  # только номера фрагментов; внутри ответа — как в JSON
+             raise CommandError(f"{path}: фрагмент {top.keys_repeated[0]} указан дважды")
+         return {str(k): v for k, v in top.items()}
+     replies: dict[str, Any] = {}
