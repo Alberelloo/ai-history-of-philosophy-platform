@@ -239,3 +239,5 @@
 - Код выхода 2 и текст сообщения `apply` с неверным манифестом проверяет `test_bad_manifest`; мутаций на слой CLI нет.
 
 **Дефекты:** расхождений кода со спецификацией не найдено.
+
+Штатный прогон `scripts/mutation_check.py --change add-wikidata-life-dates --id suggest-work-needs-no-date` в worktree: test_work_candidate_needs_publication_date упал. Остальные мутации — тем же способом (патч в worktree от HEAD, pytest по связанным файлам).

@@ -680,3 +680,5 @@
 - Форма хранимого текста названия (NFD, пробелы по краям) спецификацией не определена: проверяется только решение о создании и `label` отказа.
 
 **Дефекты:** найдены только пробелы тестов (перечислены выше), расхождений кода со спецификацией нет.
+
+Штатный прогон `scripts/mutation_check.py --change improve-extraction-naming --id <id>` в отдельном worktree: ru-primary-not-russian → тест test_primary_choice_by_item упал; no-type-creates-entity → test_new_entity_without_type_dropped_by_code упал. Остальные мутации прогнаны тем же способом (патч в worktree от HEAD, pytest по связанным файлам), строки выше — их результат.
