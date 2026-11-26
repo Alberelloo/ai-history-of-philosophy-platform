@@ -223,12 +223,16 @@ mutations:
     note: аудит пунктов (О21), см. verification.md
     expect_fail:
       - tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
   - id: dates-end-only
     requirement: Слияние вариантов персоны
     patch: dates-end-only.patch
     note: аудит пунктов (О21), см. verification.md
     expect_fail:
       - tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
   - id: kept-qid-ignored
     requirement: Слияние вариантов персоны
     patch: kept-qid-ignored.patch
@@ -487,3 +491,87 @@ mutations:
     note: аудит пунктов (О21), см. verification.md
     expect_fail:
       - tests/knowledge/test_entity_merge.py::test_last_word_group_cap
+  - id: dates-interval-ignored
+    requirement: Слияние вариантов персоны
+    patch: dates-interval-ignored.patch
+    note: J-B судьи (О25) — интервал неопределённости дат не учитывается, только ранние границы
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: fold-consensus-kept
+    requirement: Слияние с перенаправлением
+    patch: fold-consensus-kept.patch
+    note: J-A судьи (О25) — в _fold не пересчитывается согласие
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: who-consensus-kept
+    requirement: Слияние с перенаправлением
+    patch: who-consensus-kept.patch
+    note: О25 — после переноса атрибуции-автора согласие не пересчитывается
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-primary-stale
+    requirement: Слияние с перенаправлением
+    patch: merge-primary-stale.patch
+    note: J-E судьи (О25) — копия основных значений оставшейся не пересчитывается
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+      - tests/knowledge/test_person_merge_unit.py::test_merge_updates_primary_dates
+  - id: fold-attributions-dropped
+    requirement: Слияние с перенаправлением
+    patch: fold-attributions-dropped.patch
+    note: О25 — при свёртке атрибуции повтора удаляются, а не переносятся
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: fold-evidence-dropped
+    requirement: Слияние с перенаправлением
+    patch: fold-evidence-dropped.patch
+    note: О25 — при свёртке подтверждения повтора удаляются
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: fold-redirect-missing
+    requirement: Слияние с перенаправлением
+    patch: fold-redirect-missing.patch
+    note: О25 — id свёрнутого утверждения не отдаёт оставшееся
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: loop-deleted
+    requirement: Слияние с перенаправлением
+    patch: loop-deleted.patch
+    note: О25 — петля удаляется из базы
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_loop
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-fold-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-fold-not-restored.patch
+    note: О25 — отмена не возвращает свёрнутые утверждения
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-evidence-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-evidence-not-restored.patch
+    note: О25 — отмена не возвращает подтверждения свёрнутого
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-consensus-stale
+    requirement: Слияние с перенаправлением
+    patch: undo-consensus-stale.patch
+    note: О25 — после отмены согласие не пересчитывается
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-primary-stale
+    requirement: Слияние с перенаправлением
+    patch: undo-primary-stale.patch
+    note: О25 — после отмены копии основных значений обеих сторон не пересчитываются
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo

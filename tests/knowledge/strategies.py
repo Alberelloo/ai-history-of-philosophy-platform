@@ -948,6 +948,45 @@ def _person_reason_kept(case) -> bool:
 
 
 DATE_BASE = (1685, 1753)
+DATE_SLACK_SPEC = 2  # person-quality «Даты противоречат»: допуск 2 года
+
+
+def date_bounds(dates) -> tuple[int, int, int, int] | None:
+    """(начало, конец) — точные годы; (ранн. начало, поздн. начало, ранн. конец, поздн. конец)
+    — с интервалами неопределённости."""
+    if dates is None:
+        return None
+    return (dates[0], dates[0], dates[1], dates[1]) if len(dates) == 2 else tuple(dates)
+
+
+def dates_conflict_spec(a, b) -> bool:
+    """Оракул по формулировке спецификации: у обеих есть дата и не пересекаются интервалы
+    начала ``[earliest_start − 2, latest_start + 2]`` или интервалы конца."""
+    a, b = date_bounds(a), date_bounds(b)
+    if a is None or b is None:
+        return False
+    d = DATE_SLACK_SPEC
+
+    def disjoint(lo1, hi1, lo2, hi2):
+        return not (max(lo1 - d, lo2 - d) <= min(hi1 + d, hi2 + d))
+
+    return disjoint(a[0], a[1], b[0], b[1]) or disjoint(a[2], a[3], b[2], b[3])
+
+
+# ширина интервала неопределённости: точный год, «ок.» (±несколько лет), десятилетие, век
+_DATE_WIDTH = st.sampled_from([0, 0, 1, 3, 5, 9, 99])
+
+
+@st.composite
+def life_bounds(draw) -> tuple[int, int, int, int]:
+    """Годы жизни с интервалами неопределённости. Сдвиги начала и конца независимы и
+    несимметричны, поэтому расходиться может только начало, только конец или оба; сдвиги
+    в ±12 лет часто дают зазор ровно 4 (допуски касаются) и 5 (противоречие)."""
+    es = DATE_BASE[0] + draw(st.integers(-12, 12))
+    ee = DATE_BASE[1] + draw(st.integers(-12, 12))
+    return (es, es + draw(_DATE_WIDTH), ee, ee + draw(_DATE_WIDTH))
+
+
 FACE_KINDS = (
     "plain",
     "plain",
@@ -964,6 +1003,8 @@ FACE_KINDS = (
     "model_pair",
     "mixed_type",
     "review_inside",
+    "dates_any",
+    "dates_any",
 )
 _TAGS = "бвгджзклмн"
 _LTAGS = "bcdfghklmn"
@@ -1028,6 +1069,18 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
             rec(0, [(lang, word, "primary")], None, DATE_BASE)
             rec(1, [(lang, word, "primary")], None, (DATE_BASE[0] + gap, DATE_BASE[1] + gap))
             face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:dates"}
+        elif kind == "dates_any":
+            # Две записи одного названия, даты с интервалами или у одной стороны; итог — по
+            # оракулу спецификации: противоречие → review:dates, иначе merge:name.
+            one = draw(st.one_of(life_bounds(), st.just(DATE_BASE)))
+            two = draw(st.one_of(life_bounds(), life_bounds(), st.none()))
+            rec(0, [(lang, word, "primary")], None, one)
+            rec(1, [(lang, word, "primary")], None, two)
+            if dates_conflict_spec(one, two):
+                face["queue"] = {frozenset({(f, 0), (f, 1)}): "review:dates"}
+            else:
+                face["merge"] = [[(f, 0), (f, 1)]]
+                face["reason"] = "merge:name"
         elif kind == "date_chain":
             # Компонента «даты A — без дат — противоречащие даты C»: рёбра merge:name через
             # среднюю, у крайних review:dates → слияний нет, все пары в очередь review:dates.
@@ -1127,6 +1180,7 @@ def expected_kept(face_records: list[dict[str, Any]], ids: dict, links: dict | N
 
 REL_TYPES = ("influenced_by", "criticizes")  # персона → персона, несимметричные
 SOURCES = ("s_a", "s_b", "s_c")
+LIFESPANS = ("1711–1776", "1685–1753")
 
 
 @st.composite
@@ -1168,13 +1222,12 @@ def ontology_with_duplicates(draw) -> dict[str, Any]:
     persons_ix = list(range(n_persons))
     positions_ix = list(range(n_persons, n_persons + n_positions))
 
+    # позиции из спецификации ontology-statements «Атрибуция»; «оспаривает» нужна, чтобы
+    # согласие после свёртки и переноса атрибуции-автора менялось (О25)
+    stance = st.sampled_from(["asserts", "disputes", "mentions"])
     attribution = st.one_of(
-        st.tuples(
-            st.just("source"), st.sampled_from(SOURCES), st.sampled_from(["asserts", "supports"])
-        ),
-        st.tuples(
-            st.just("entity"), st.sampled_from(persons_ix), st.sampled_from(["asserts", "supports"])
-        ),
+        st.tuples(st.just("source"), st.sampled_from(SOURCES), stance),
+        st.tuples(st.just("entity"), st.sampled_from(persons_ix), stance),
     )
     evidence = st.tuples(st.sampled_from(["p1", "p2", "p3"]), st.sampled_from(SOURCES))
 
@@ -1184,19 +1237,28 @@ def ontology_with_duplicates(draw) -> dict[str, Any]:
             "type": type_,
             "object": obj,
             "value": value,
-            "attributions": draw(st.lists(attribution, min_size=1, max_size=3, unique=True)),
+            "attributions": draw(st.lists(attribution, min_size=1, max_size=5, unique=True)),
             "evidence": draw(st.lists(evidence, max_size=2, unique=True)),
         }
 
     statements = []
     for _ in range(draw(st.integers(0, 12))):
-        kind = draw(st.sampled_from(["rel", "holds", "description"]))
+        kind = draw(st.sampled_from(["rel", "holds", "description", "lifespan"]))
         subject = draw(st.sampled_from(persons_ix))
         if kind == "rel":
             obj = draw(st.sampled_from([i for i in persons_ix if i != subject]))
             statements.append(statement(subject, draw(st.sampled_from(REL_TYPES)), obj))
         elif kind == "holds" and positions_ix:
             statements.append(statement(subject, "holds", draw(st.sampled_from(positions_ix))))
+        elif kind == "lifespan":
+            # годы жизни задаются текстом «рождение–смерть»; тест превращает их в значение.
+            # Часто — только у удалённой: копия основных значений оставшейся пересчитывается
+            years = draw(st.sampled_from(LIFESPANS))
+            statements.append(
+                statement(
+                    draw(st.sampled_from([0, 1, 1, subject])), "lifespan", value=f"lifespan:{years}"
+                )
+            )
         else:
             statements.append(
                 statement(subject, "description", value=draw(st.sampled_from(["один", "два"])))
@@ -1210,6 +1272,28 @@ def ontology_with_duplicates(draw) -> dict[str, Any]:
         if draw(st.booleans()):
             second["attributions"] = list(first["attributions"])  # точный повтор
         statements += [first, second]
+    # атрибуции-автор K и R на одном утверждении третьих лиц: после переноса R → K
+    # независимых «утверждает» становится меньше, и согласие должно пересчитаться (О25)
+    if n_persons >= 4:
+        for _ in range(draw(st.integers(0, 2))):
+            a, b = draw(st.permutations(persons_ix[2:]))[:2]
+            authors = [("entity", 0, "asserts"), ("entity", 1, "asserts")]
+            extra = draw(
+                st.sampled_from(
+                    [
+                        [("source", "s_a", "asserts"), ("source", "s_b", "disputes")],
+                        [("source", "s_a", "asserts")],
+                        [("source", "s_c", "disputes")],
+                        [],
+                    ]
+                )
+            )
+            statements.append(
+                {
+                    **statement(a, draw(st.sampled_from(REL_TYPES)), b),
+                    "attributions": authors + extra,
+                }
+            )
     # петли R → K
     for type_ in draw(st.lists(st.sampled_from(REL_TYPES), max_size=2, unique=True)):
         statements.append(statement(1, type_, 0))

@@ -79,17 +79,20 @@ QUEUE_GENERATED = (
     "review:single_name",
     "review:variant",
 )
-# Коды person-quality, которые дают не генератор лиц, а решения человека и команда QID:
-# проверяются сценариями и таблицей шагов правила (по тексту тестов).
-SCENARIO_CODES = (
-    "merge:review",
+# Множества кодов из спецификации person-quality «Слияние вариантов персоны»: журнал
+# `merged.reason`, `merge_proposed.reason` и вердикты `apart:*` правила same_person.
+SPEC_MERGE = {"merge:qid_confirmed", "merge:name", "merge:model_pair", "merge:review"}
+SPEC_REVIEW = {
+    "review:dates",
+    "review:variant",
+    "review:single_name",
+    "review:qid_cluster",
+    "review:decided_conflict",
     "review:qid_candidate",
     "review:qid_taken",
-    "apart:decided",
-    "apart:none",
-    "apart:qid",
-    "apart:type",
-)
+}
+SPEC_APART = {"apart:type", "apart:qid", "apart:decided", "apart:none"}
+DATE_SLACK = 2  # «при допуске 2 года»
 
 HERE = Path(__file__).parent
 
@@ -286,14 +289,74 @@ def test_person_codes_generated(code):
     _find(S.persons_with_variants(), has)
 
 
-def test_person_scenario_codes():
-    """Коды решений человека и команды QID — в сценарных тестах (не генератор лиц)."""
-    sources = "".join(
-        (HERE / f).read_text(encoding="utf-8")
-        for f in ("test_person_quality.py", "test_entity_merge.py", "test_life_dates.py")
+@req(
+    PQ,
+    "Слияние вариантов персоны",
+    invariant="Каждый код спецификации — в генераторе лиц или в тесте поведения (О25)",
+)
+def test_person_codes_partition():
+    from .test_person_quality import SCENARIO_CODES
+
+    generated = set(MERGE_GENERATED) | set(QUEUE_GENERATED)
+    assert not generated & set(SCENARIO_CODES)
+    assert generated | set(SCENARIO_CODES) == SPEC_MERGE | SPEC_REVIEW | SPEC_APART
+
+
+def _gap(a, b, side: int) -> int:
+    """Зазор между интервалами начала (side=0) или конца (side=1) без допуска."""
+    lo, hi = 2 * side, 2 * side + 1
+    return max(b[lo] - a[hi], a[lo] - b[hi])
+
+
+def _date_pairs(case):
+    for face in case["faces"]:
+        if face["kind"] == "dates_any":
+            one, two = (r["dates"] for r in face["records"])
+            yield S.date_bounds(one), S.date_bounds(two), face
+
+
+DATE_SHAPES = {
+    # имя: (условие на пару дат, ожидаемый вердикт лица — противоречие или нет)
+    "только начало врозь": (lambda a, b: _gap(a, b, 0) > 4 >= _gap(a, b, 1), True),
+    "только конец врозь": (lambda a, b: _gap(a, b, 1) > 4 >= _gap(a, b, 0), True),
+    "начало: зазор 4, интервал": (lambda a, b: _gap(a, b, 0) == 4 and a[0] != a[1], False),
+    "начало: зазор 5, интервал": (lambda a, b: _gap(a, b, 0) == 5 and a[0] != a[1], True),
+    "конец: зазор 4, интервал": (lambda a, b: _gap(a, b, 1) == 4 and b[2] != b[3], False),
+    "конец: зазор 5, интервал": (lambda a, b: _gap(a, b, 1) == 5 and b[2] != b[3], True),
+    "интервалы перекрываются при далёких ранних границах": (
+        lambda a, b: abs(a[0] - b[0]) > 4 and max(_gap(a, b, 0), _gap(a, b, 1)) <= 4,
+        False,
+    ),
+}
+
+
+@req(
+    PQ,
+    "Слияние вариантов персоны",
+    invariant="Генератор лиц даёт расхождение начала, конца и интервалы у границы допуска (О25)",
+)
+@pytest.mark.parametrize("shape", sorted(DATE_SHAPES))
+def test_person_date_shapes_generated(shape):
+    cond, conflict = DATE_SHAPES[shape]
+
+    def ok(case) -> bool:
+        for a, b, face in _date_pairs(case):
+            if a and b and cond(a, b):
+                # ожидание лица посчитано по допуску 2 года из спецификации
+                assert bool(face["queue"]) == conflict, (a, b)
+                return True
+        return False
+
+    _find(S.persons_with_variants(), ok)
+
+
+@req(PQ, "Слияние вариантов персоны", invariant="Даты у одной стороны — не противоречие (О25)")
+def test_person_date_one_side_generated():
+    assert S.DATE_SLACK_SPEC == DATE_SLACK
+    _find(
+        S.persons_with_variants(),
+        lambda c: any((a is None) != (b is None) and f["merge"] for a, b, f in _date_pairs(c)),
     )
-    for code in SCENARIO_CODES:
-        assert f'"{code}"' in sources, code
 
 
 @req(ED, DATING, invariant="Маркеры цитаты вне маркеров текста дают dating:unparsed (D1, О23)")

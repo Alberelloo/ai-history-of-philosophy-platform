@@ -533,7 +533,91 @@ def test_only_variant_matched(onto, review, events):
     events.assert_none(MERGED)
 
 
+# --- коды, которые генератор лиц не порождает: по поведению (О25, п. 4 судьи) ------------
+
+# Коды из спецификации person-quality вне генератора persons_with_variants: шаги 1, 2, 3, 9
+# правила same_person, слияние по решению человека и пары очереди команд QID.
+SCENARIO_CODES = (
+    "apart:type",
+    "apart:qid",
+    "apart:decided",
+    "apart:none",
+    "merge:review",
+    "review:qid_candidate",
+    "review:qid_taken",
+)
+
+
+def _code_by_rule(code: str) -> str:
+    hume = Entity("a", "person", (("primary", "hume"),), None, None)
+    if code == "apart:type":  # шаг 1: не обе — персоны (общее название и пара модели)
+        other = Entity("b", "concept", (("primary", "hume"),), None, None)
+        return dedupe.same_person(hume, other, paired_by_model=True).reason
+    if code == "apart:qid":  # шаг 2: у обеих QID
+        a = Entity("a", "person", (("primary", "hume"),), None, "Q1")
+        b = Entity("b", "person", (("primary", "hume"),), None, "Q2")
+        return dedupe.same_person(a, b, decided_apart=True).reason
+    if code == "apart:decided":  # шаг 3: решение «разные», общее название
+        other = Entity("b", "person", (("primary", "hume"),), None, None)
+        return dedupe.same_person(hume, other, decided_apart=True).reason
+    other = Entity("b", "person", (("primary", "locke"),), None, None)  # шаг 9
+    return dedupe.same_person(hume, other).reason
+
+
+@req(PQ, MERGE, invariant="Каждый код вне генератора лиц порождается поведением системы")
+@pytest.mark.parametrize("code", SCENARIO_CODES)
+def test_person_scenario_codes(onto, review, events, no_network, code):
+    if code.startswith("apart:"):
+        assert _code_by_rule(code) == code
+        return
+    events.clear()
+    if code == "merge:review":
+        first, second = onto.person("Бэкон"), onto.person("Фрэнсис Бэкон")
+        dedupe.propose(onto.statements.engine, first, second, "review:single_name", set())
+        [item] = review.queue(kind="duplicate")
+        events.clear()
+        review.resolve_duplicate(item["item_id"], True, "operator")
+        assert [e["reason"] for e in events.of(MERGED)] == [code]
+        return
+    homer = onto.entities.create(
+        "person", [("ru", "Гомер", "primary")], external={"wikidata": "Q6691"}
+    )
+    omir = onto.person("Омир")
+    if code == "review:qid_candidate":  # QID ждёт решения человека
+        fetch = RecordFetch({"Q6691": HOMER}, searches={("Омир", "ru"): [{"id": "Q6691"}]})
+        LifeDates(onto.statements, fetch, review).suggest({"entities": []})
+        Dedupe(onto.statements, review).run()
+    else:  # review:qid_taken — QID занят, решение не человека
+        manifest = {
+            "entities": [
+                {"entity": omir, "wikidata": "Q6691", "decision": "auto", "candidates": []}
+            ]
+        }
+        LifeDates(onto.statements, RecordFetch({"Q6691": HOMER}), review).apply(manifest)
+    assert code in {e["reason"] for e in events.of(PROPOSED)}
+    events.assert_none(MERGED)
+    assert {onto.entities.resolve(homer), onto.entities.resolve(omir)} == {homer, omir}
+
+
 # --- инвариант слияния -------------------------------------------------------------------
+
+
+def dates_value(dates) -> dict | None:
+    """Значение «годы жизни» из записи генератора: точные годы — через разбор текста,
+    интервалы неопределённости — границами (точность «десятилетие» при ширине > 0)."""
+    if dates is None:
+        return None
+    if len(dates) == 2:
+        return lifespan(str(dates[0]), str(dates[1])).to_json()
+    es, ls, ee, le = dates
+    return {
+        "earliest_start": es,
+        "latest_start": ls,
+        "earliest_end": ee,
+        "latest_end": le,
+        "precision": "year" if (es, ee) == (ls, le) else "decade",
+        "original": f"{es}/{ls}–{ee}/{le}",
+    }
 
 
 def _pure_entities(case) -> tuple[list[Entity], dict]:
@@ -542,9 +626,7 @@ def _pure_entities(case) -> tuple[list[Entity], dict]:
         for r in face["records"]:
             ids[r["key"]] = f"e_{r['key'][0]:02d}{r['key'][1]}"
             names_ = tuple((kind, normalize(text)) for _lang, text, kind in r["names"])
-            dates = (
-                lifespan(str(r["dates"][0]), str(r["dates"][1])).to_json() if r["dates"] else None
-            )
+            dates = dates_value(r["dates"])
             out.append(Entity(ids[r["key"]], r.get("type", PERSON), names_, dates, r["qid"]))
     return out, ids
 
@@ -691,6 +773,46 @@ REVIEW_INSIDE = {  # review:single_name внутри сливаемой комп
     "confirmed": [((0, 1), (0, 0)), ((0, 2), (0, 0))],
     "decided": [],
 }
+
+
+def _two(f, kind, name, lang, one, two, conflict):
+    face = {
+        "kind": kind,
+        "records": [
+            {"key": (f, 0), "names": [(lang, name, "primary")], "qid": None, "dates": one},
+            {"key": (f, 1), "names": [(lang, name, "primary")], "qid": None, "dates": two},
+        ],
+        "merge": [] if conflict else [[(f, 0), (f, 1)]],
+        "queue": {frozenset({(f, 0), (f, 1)}): "review:dates"} if conflict else {},
+    }
+    if not conflict:
+        face["reason"] = "merge:name"
+    return face
+
+
+# Границы «Даты противоречат» (О25, п. 3 судьи): расходится только начало, только конец;
+# интервалы неопределённости, зазор которых 4 (допуски касаются) и 5 (противоречие); даты у
+# одной стороны.
+EXACT = (1685, 1685, 1753, 1753)
+DATE_INTERVALS = {
+    "faces": [
+        _two(0, "dates_any", "Berkeley", "en", EXACT, (1690, 1690, 1753, 1753), True),
+        _two(1, "dates_any", "Беркли", "ru", EXACT, (1685, 1685, 1758, 1758), True),
+        _two(
+            2, "dates_any", "Reid", "en", (1680, 1687, 1753, 1753), (1691, 1700, 1753, 1753), False
+        ),
+        _two(3, "dates_any", "Рид", "ru", (1680, 1687, 1753, 1753), (1692, 1700, 1753, 1753), True),
+        _two(
+            4, "dates_any", "Hume", "en", (1685, 1685, 1740, 1749), (1685, 1685, 1753, 1760), False
+        ),
+        _two(5, "dates_any", "Юм", "ru", (1685, 1685, 1740, 1748), (1685, 1685, 1753, 1760), True),
+        _two(6, "dates_any", "Locke", "en", EXACT, None, False),
+    ],
+    "confirmed": [],
+    "decided": [],
+    "model": [],
+}
+
 BOUNDARY_DATES = {
     "faces": [
         {
@@ -746,6 +868,7 @@ BOUNDARY_DATES = {
 @example(DATE_CHAIN, random.Random(5))
 @example(MODEL_PAIR, random.Random(7))
 @example(REVIEW_INSIDE, random.Random(8))
+@example(DATE_INTERVALS, random.Random(11))
 def test_plan_partition_any_order(case, rnd):
     entities, ids = _pure_entities(case)
     confirmed = [(ids[a], ids[b]) for a, b in case["confirmed"]]
@@ -776,7 +899,7 @@ def _create_case(onto, case, order) -> dict:
             onto.statements.add(
                 ids[r["key"]],
                 "lifespan",
-                value=lifespan(str(r["dates"][0]), str(r["dates"][1])).to_json(),
+                value=dates_value(r["dates"]),
                 attributions=[Attribution("common")],
             )
     return ids
@@ -807,6 +930,7 @@ def _outcome(onto, review, case, ids, events) -> tuple:
 @example(DATE_CHAIN, random.Random(6))
 @example(MODEL_PAIR, random.Random(9))
 @example(REVIEW_INSIDE, random.Random(10))
+@example(DATE_INTERVALS, random.Random(12))
 def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
     outcomes = []
     for _ in range(2):

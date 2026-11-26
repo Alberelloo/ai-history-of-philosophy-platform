@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 
 import pytest
@@ -18,6 +19,7 @@ from sqlalchemy import select
 
 from philograph.knowledge import schema as t
 from philograph.knowledge.app import build_app
+from philograph.knowledge.dates import lifespan
 from philograph.knowledge.map import SectionMap
 from philograph.knowledge.review import Review
 from philograph.knowledge.statements import Attribution, Evidence
@@ -344,6 +346,10 @@ def _build(onto, case) -> tuple[list[str], dict[int, list[str]]]:
         external = {"wikidata": "Q41568"} if case["qid_side"] == i else None
         ids.append(onto.entities.create(e["type"], list(e["names"]), external=external))
     created: dict[int, list[str]] = {}
+    for s in case["statements"]:
+        if isinstance(s["value"], str) and s["value"].startswith("lifespan:"):
+            birth, death = s["value"].removeprefix("lifespan:").split("–")
+            s["value"] = lifespan(birth, death).to_json()
     for n, s in enumerate(case["statements"]):
         attributions = [
             Attribution(kind, ids[who] if kind == "entity" else who, stance=stance)
@@ -367,8 +373,13 @@ def _build(onto, case) -> tuple[list[str], dict[int, list[str]]]:
     return ids, created
 
 
+def _value(v):
+    """Значение-словарь (годы жизни) — в хешируемую запись."""
+    return json.dumps(v, sort_keys=True, ensure_ascii=False) if isinstance(v, dict) else v
+
+
 def _content(s: dict, r) -> tuple:
-    return (r(s["subject"]), s["type"], r(s["object"]), s["value"])
+    return (r(s["subject"]), s["type"], r(s["object"]), _value(s["value"]))
 
 
 EXACT_REPEAT = {
@@ -402,7 +413,7 @@ EXACT_REPEAT = {
             "type": "criticizes",
             "object": 0,
             "value": None,
-            "attributions": [("entity", 1, "supports")],
+            "attributions": [("entity", 1, "mentions")],
             "evidence": [],
         },
         {
@@ -419,11 +430,91 @@ EXACT_REPEAT = {
 }
 
 
+def _three_persons():
+    return [
+        {"type": "person", "names": [("en", "Hume", "primary")]},
+        {"type": "person", "names": [("ru", "Юм", "primary")]},
+        {"type": "person", "names": [("ru", "Персона 2", "primary")]},
+        {"type": "person", "names": [("ru", "Персона 3", "primary")]},
+    ]
+
+
+def _st(subject, obj, attributions, type_="influenced_by", value=None):
+    return {
+        "subject": subject,
+        "type": type_,
+        "object": obj,
+        "value": value,
+        "attributions": attributions,
+        "evidence": [],
+    }
+
+
+# Свёртка: у K «утверждает» два источника, у R «оспаривает» третий. После свёртки две
+# «утверждает» и одна «оспаривает» — сценарий «Спорное» ontology-statements (О25, J-A).
+FOLD_DISPUTED = {
+    "entities": _three_persons(),
+    "qid_side": None,
+    "statements": [
+        _st(0, 2, [("source", "s_a", "asserts"), ("source", "s_c", "asserts")]),
+        _st(1, 2, [("source", "s_b", "disputes")]),
+    ],
+    "mentions": [],
+    "portraits": [],
+}
+# Атрибуция-автор: «утверждает» K, R и s_a, «оспаривает» s_b — до слияния три независимых
+# «утверждает»; после переноса автора R → K их две, и снова сценарий «Спорное» (О25).
+WHO_COLLAPSE = {
+    "entities": _three_persons(),
+    "qid_side": None,
+    "statements": [
+        _st(
+            2,
+            3,
+            [
+                ("entity", 0, "asserts"),
+                ("entity", 1, "asserts"),
+                ("source", "s_a", "asserts"),
+                ("source", "s_b", "disputes"),
+            ],
+        ),
+    ],
+    "mentions": [],
+    "portraits": [],
+}
+# Копия основных значений: годы жизни и описание только у удалённой (О25, J-E).
+PRIMARY_FROM_REMOVED = {
+    "entities": _three_persons(),
+    "qid_side": 0,
+    "statements": [
+        _st(1, None, [("source", "s_b", "asserts")], "lifespan", "lifespan:1711–1776"),
+        _st(1, None, [("source", "s_a", "asserts")], "description", "два"),
+        _st(0, 2, [("source", "s_a", "asserts")]),
+    ],
+    "mentions": [],
+    "portraits": [],
+}
+
+PRIMARY_KEYS = {"lifespan": "dates", "description": "description"}  # ontology-entities
+
+
+def _independent(attributions) -> tuple[set, set]:
+    """Независимые атрибуции по позициям (ontology-statements «Согласие и ранг»)."""
+    asserts = {(k, w) for k, w, stance in attributions if stance == "asserts"}
+    disputes = {(k, w) for k, w, stance in attributions if stance == "disputes"}
+    return asserts, disputes
+
+
 @req(OE, MERGE, scenario="Инвариант сохранения")
 @req(OE, MERGE, invariant="Не потеряно утверждение, атрибуция, подтверждение; отмена ⇒ дамп")
+@req(OE, MERGE, invariant="Согласие пересчитывается при свёртке и переносе атрибуции-автора")
+@req(OE, MERGE, invariant="Копия основных значений оставшейся пересчитывается")
 @HEAVY
 @given(ontology_with_duplicates())
 @example(EXACT_REPEAT)
+@example(FOLD_DISPUTED)
+@example(WHO_COLLAPSE)
+@example(PRIMARY_FROM_REMOVED)
 def test_preservation_and_undo(onto, events, case):
     wipe(onto)
     ids, created = _build(onto, case)
@@ -466,9 +557,8 @@ def test_preservation_and_undo(onto, events, case):
         got = {onto.statements.get(i)["id"] for i in g["ids"]}
         assert len(got) == 1, content
         survivor = onto.statements.get(next(iter(got)))
-        assert (survivor["subject"], survivor["type"], survivor["object"], survivor["value"]) == (
-            content
-        )
+        got_content = (survivor["subject"], survivor["type"], survivor["object"])
+        assert (*got_content, _value(survivor["value"])) == content
         survivors[content] = survivor
     assert len({s["id"] for s in survivors.values()}) == len(groups)
     # атрибуции и подтверждения
@@ -480,6 +570,29 @@ def test_preservation_and_undo(onto, events, case):
         # при повторном add — до слияния (наблюдение в verification.md), поэтому без счёта
         ev = {(e["paragraph_id"], e["source_id"]) for e in s["evidence"]}
         assert ev >= g["evidence"], content
+    # согласие: пересчитано по атрибуциям после слияния. Оракул 1 — сценарий «Спорное»
+    # (две «утверждает» и одна «оспаривает» ⇒ disputed). Оракул 2 — то же утверждение,
+    # записанное заново с этими атрибуциями, получает то же согласие (сверка после отмены).
+    consensus_after = {}
+    for content, g in groups.items():
+        got = onto.statements.get(survivors[content]["id"])
+        asserts, disputes = _independent(g["attributions"])
+        if (len(asserts), len(disputes)) == (2, 1):
+            assert got["consensus"] == "disputed", content
+        consensus_after[content] = (got["consensus"], sorted(g["attributions"], key=str))
+    # копия основных значений оставшейся = значение одного из её действующих утверждений
+    primary = onto.entities.get(kept)["primary"]
+    for type_, key in PRIMARY_KEYS.items():
+        values = [
+            onto.statements.get(i)["value"]
+            for c, g in groups.items()
+            if c[0] == kept and c[1] == type_
+            for i in g["ids"]
+        ]
+        if values:
+            assert primary.get(key) in values, (type_, primary)
+        else:
+            assert key not in primary, (type_, primary)
     for loop in loops:
         got = onto.statements.get(loop)
         assert got["subject"] == got["object"] == kept
@@ -508,6 +621,17 @@ def test_preservation_and_undo(onto, events, case):
     assert dump(onto.statements.engine) == before
     [undone] = events.of(UNDONE)
     assert keys(undone) == UNDONE_KEYS
+
+    # оракул 2 для согласия: эталонная запись с теми же атрибуциями у новой сущности
+    probe = onto.entities.create("person", [("ru", "Эталон согласия", "primary")])
+    for n, (content, (consensus, attributions)) in enumerate(consensus_after.items()):
+        ref = onto.statements.add(
+            probe,
+            "description",
+            value=f"эталон {n}",
+            attributions=[Attribution(k, w, stance=stance) for k, w, stance in attributions],
+        )
+        assert onto.statements.get(ref)["consensus"] == consensus, content
 
 
 # --- предел группы «тип + последнее слово» (О18) -------------------------------------------

@@ -230,8 +230,9 @@
 | Одно лицо в разных написаниях — одна сущность | S.persons_with_variants plain (n≥2) | PQ::test_merge_invariant_two_orders; test_common_primary_name | step-name-merge-dropped |
 | Внешний QID уникален | S.persons_with_variants two_qids | EM::test_candidates…; PQ::test_different_qids (фактически роняет: test_external_id_unique) | external-not-unique |
 | Даты противоречат: допуск 2 года | S.persons_with_variants dates (gap 5…200), plain within (сдвиг 0…4) | PQ::test_conflicting_dates, test_plan_partition_any_order | dates-slack-zero, dates-slack-three |
-| Даты противоречат: интервалы начала | S.persons_with_variants dates | PQ::test_conflicting_dates (фактически роняет: test_dates_conflict_on_start_or_end_interval) | dates-end-only |
-| Даты противоречат: интервалы конца | S.persons_with_variants dates | PQ::test_conflicting_dates (фактически роняет: test_dates_conflict_on_start_or_end_interval) | dates-start-only |
+| Даты противоречат: интервалы начала | S.persons_with_variants dates_any (S.life_bounds: независимые сдвиги начала и конца ±12, ширина интервала 0/1/3/5/9/99; ожидание по S.dates_conflict_spec) — исправлено в О25 | PQ::DATE_INTERVALS (только начало врозь; зазор начала 4 и 5 при интервале) в test_plan_partition_any_order и test_merge_invariant_two_orders; test_dates_conflict_on_start_or_end_interval | dates-end-only, dates-interval-ignored |
+| Даты противоречат: интервалы конца | S.persons_with_variants dates_any — исправлено в О25 | PQ::DATE_INTERVALS (только конец врозь; зазор конца 4 и 5 при интервале); test_dates_conflict_on_start_or_end_interval | dates-start-only, dates-interval-ignored |
+| Даты противоречат: интервал неопределённости `[earliest − 2, latest + 2]` (earliest ≠ latest) | S.persons_with_variants dates_any — добавлено в О25 | PQ::DATE_INTERVALS (Reid/Рид, Hume/Юм) | dates-interval-ignored |
 | Даты у одной стороны — не противоречие | S.persons_with_variants plain one_side | PQ::test_dates_on_one_side (фактически роняет: test_date_chain_component) | dates-one-side-conflict |
 | Шаг 1 `apart:type` | S.persons_with_variants mixed_type | PQ::test_merge_invariant_two_orders; PM (фактически роняет: test_plan_partition_any_order) | type-rule-dropped |
 | Шаг 2 `apart:qid` | S.persons_with_variants qids_distinct | PQ::test_different_qids (фактически роняет: test_transliteration_with_decision) | step-qid-dropped |
@@ -297,12 +298,18 @@
 | Названия: одно основное, русское если есть у любой | S.ontology_with_duplicates | EM::test_preservation_and_undo; пример «Locke»←«Локк» | merge-russian-not-preferred, kept-primary-stays |
 | Прочие бывшие основные — варианты; виды — в запись слияния | S.ontology_with_duplicates | EM::test_preservation_and_undo | kept-primary-stays, undo-names-kinds-not-restored |
 | Ключи перенесённых пересчитываются, повтор сворачивается | S.ontology_with_duplicates (repeats) | EM::test_repeat_folds | key-not-recomputed |
-| Ссылка по id свёрнутого отдаёт оставшееся | S.ontology_with_duplicates | EM::test_repeat_folds | key-not-recomputed |
-| Петля остаётся в базе, не показывается, считается как петля | S.ontology_with_duplicates (loops) | EM::test_loop | loop-shown, merged-loops-zero |
+| Свёртка: атрибуции и подтверждения повтора переносятся | S.ontology_with_duplicates (repeats) | EM::test_repeat_folds, test_preservation_and_undo | fold-attributions-dropped, fold-evidence-dropped (О25) |
+| Свёртка: согласие пересчитывается | S.ontology_with_duplicates (repeats, позиции asserts/disputes/mentions, 3 источника + персоны) — О25 | EM::FOLD_DISPUTED (2 «утверждает» + 1 «оспаривает» ⇒ disputed) в test_preservation_and_undo | fold-consensus-kept (J-A) |
+| Перенос атрибуции-автора: согласие пересчитывается | S.ontology_with_duplicates (утверждения третьих лиц с авторами K и R) — О25 | EM::WHO_COLLAPSE в test_preservation_and_undo | who-consensus-kept |
+| Ссылка по id свёрнутого отдаёт оставшееся | S.ontology_with_duplicates | EM::test_repeat_folds | key-not-recomputed, fold-redirect-missing (О25) |
+| Петля остаётся в базе, не показывается, считается как петля | S.ontology_with_duplicates (loops) | EM::test_loop | loop-shown, merged-loops-zero, loop-deleted (О25) |
+| Копия основных значений оставшейся пересчитывается | S.ontology_with_duplicates (lifespan чаще у удалённой, description) — О25 | EM::PRIMARY_FROM_REMOVED в test_preservation_and_undo; PM::test_merge_updates_primary_dates | merge-primary-stale (J-E) |
 | Перенаправление: старый id отдаёт оставшуюся | S.ontology_with_duplicates | EM::test_old_link | merge-redirect-missing |
 | Отмена: названия и их вид | S.ontology_with_duplicates | EM::test_preservation_and_undo (фактически роняет: test_undo) | undo-names-kinds-not-restored |
 | Отмена: утверждения, включая свёрнутые, с прежними id | S.ontology_with_duplicates | EM::test_undo_with_fold_and_qid | undo-subject-not-restored |
-| Отмена: атрибуции и подтверждения | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-attributions-not-restored |
+| Отмена: свёрнутые утверждения с прежними id | S.ontology_with_duplicates (repeats) | EM::test_undo_with_fold_and_qid | undo-fold-not-restored (О25) |
+| Отмена: атрибуции и подтверждения | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-attributions-not-restored, undo-evidence-not-restored (О25) |
+| Отмена: согласие и копии основных значений обеих — как до слияния (дамп) | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-consensus-stale, undo-primary-stale (О25) |
 | Отмена: QID возвращается удалённой | сценарный (Hume Q41568) | EM::test_undo_with_fold_and_qid | undo-without-externals |
 | Отмена: упоминания и портреты | S.ontology_with_duplicates | EM::test_preservation_and_undo | undo-mentions-not-restored, undo-portraits-not-restored |
 | Отмена снимает перенаправление | S.ontology_with_duplicates | EM::test_undo | undo-redirect-kept |
