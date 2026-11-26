@@ -11,7 +11,7 @@
 
 В онтологии уже есть тип `place` и связи `lived_in` и `happened_in`, а у мест из Wikidata есть внешний id. Координат нет нигде, вида места в биографии (рождение, смерть, деятельность) тоже нет.
 
-Варианты рендера, модель данных, доступность, производительность и рекомендация разобраны в [geo-timeline-options.md](../../../docs/design/features/geo-timeline-options.md).
+Варианты рендера, модель данных, доступность, производительность и рекомендация разобраны в [geo-timeline-options.md](../../../../docs/design/features/geo-timeline-options.md).
 
 ## What Changes
 

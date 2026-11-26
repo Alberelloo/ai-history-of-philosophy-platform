@@ -44,6 +44,7 @@ from philograph.knowledge.entities import Entities
 from philograph.knowledge.graph import Graphs, GraphSettings
 from philograph.knowledge.map import SectionMap
 from philograph.knowledge.mentions import Mentions
+from philograph.knowledge.portraits import Portraits
 from philograph.knowledge.registry import OntologyRegistry
 from philograph.knowledge.snapshot import Snapshots
 from philograph.knowledge.statements import Statements
@@ -112,6 +113,7 @@ class KnowledgeStack:
     textbooks: dict[str, str]  # "N" | "R" → id источника библиотеки
     router: HostRouter
     model: Any = None  # FakeProvider достройки графа
+    portraits: Any = None  # портреты персон: файлы отдаёт /api/knowledge/v1/portraits/<id>
     queue: Any = None  # очередь сохранения достроенного
     llm_calls: list[str] = field(default_factory=list)
     outside: list[str] = field(default_factory=list)
@@ -250,8 +252,10 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
     graph_llm = ServiceClient("llm", "http://llm", transport=asgi_transport(llm_app(model_gateway)))
     queue = Queue(jobs_engine)
     graphs = Graphs(statements, graph_llm, queue, GraphSettings(min_edges=5, max_nodes=60))
+    portraits = Portraits(engine, FileStore(tmp / "portraits"))
     knowledge = knowledge_app(
         statements,
+        portraits=portraits,
         library=library_client,
         mentions=mentions,
         cards=Cards(statements, mentions, llm_client),
@@ -288,5 +292,6 @@ def start(tmp: Path, dist: Path, max_stale: float = 15.0) -> KnowledgeStack:
         f"http://127.0.0.1:{port}", world, textbooks, router, model, queue, llm_calls
     )
     stack.paragraphs = paragraphs
+    stack.portraits = portraits
     stack._server, stack._thread = server, thread
     return stack
