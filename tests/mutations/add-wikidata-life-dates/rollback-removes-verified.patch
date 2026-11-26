@@ -1,8 +1,19 @@
+diff --git a/src/philograph/knowledge/statements.py b/src/philograph/knowledge/statements.py
+index 5a83808..ee60598 100644
 --- a/src/philograph/knowledge/statements.py
 +++ b/src/philograph/knowledge/statements.py
-@@ -1090,7 +1090,7 @@
+@@ -1085,7 +1085,7 @@ class Statements:
+     def rollback_run(self, run_id: str) -> dict[str, int]:
+         """Убирает всё, что добавил запуск, кроме проверенного человеком."""
+         # Проверенное утверждение остаётся вместе со своими атрибуциями и подтверждениями.
+-        verified = select(t.statements.c.id).where(t.statements.c.status == "verified")
++        verified = select(t.statements.c.id).where(t.statements.c.status == "__none__")
+         with self.engine.begin() as conn:
+             attrs = conn.execute(
+                 delete(t.attributions).where(
+@@ -1099,7 +1099,7 @@ class Statements:
+                 )
              ).rowcount
-             evs = conn.execute(delete(t.evidence).where(t.evidence.c.run_id == run_id)).rowcount
              candidates = (
 -                conn.execute(select(t.statements).where(t.statements.c.status != "verified"))
 +                conn.execute(select(t.statements))

@@ -26,7 +26,7 @@ mutations:
   - id: rollback-removes-verified
     requirement: Даты жизни из Wikidata
     patch: rollback-removes-verified.patch
-    note: откат удаляет и проверенные утверждения запуска
+    note: откат удаляет и проверенные утверждения запуска вместе с их атрибуциями и подтверждениями (патч снят заново от HEAD, О26)
     expect_fail:
       - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified
       - tests/knowledge/test_life_dates.py::test_rollback_keeps_verified_and_qid
