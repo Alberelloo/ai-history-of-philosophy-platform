@@ -285,6 +285,49 @@ def test_tiny_polity_kept(tmp_path, events):
     assert ev["polities"] == 2
 
 
+@req(GEO, BUILD, scenario="Вырожденное кольцо")
+def test_degenerate_ring_becomes_grid_cell(tmp_path, events):
+    # Квадраты со стороной 0,004° (Ватикан) и 0,00004° при precision = 2 (клетка 0,01°).
+    def centered(lon, lat, side):
+        h = side / 2
+        return poly(
+            [
+                [lon - h, lat - h],
+                [lon + h, lat - h],
+                [lon + h, lat + h],
+                [lon - h, lat + h],
+                [lon - h, lat - h],
+            ]
+        )
+
+    cases = {
+        "Vatican": ((12.453, 41.903), 0.004, (12.45, 12.46, 41.90, 41.91)),
+        "Speck": ((30.1234, 50.4567), 0.00004, (30.12, 30.13, 50.45, 50.46)),
+    }
+    features = [
+        feature(n, 1600, 1700, centered(*c, side), qid="Q4948") for n, (c, side, _) in cases.items()
+    ]
+    features.append(feature("Ordinary", 1600, 1700, poly(square(0.0, 45.0, 3.0)), qid="Q12548"))
+    features.append(feature("Broken", 1700, 1600, poly(square(5.0, 45.0, 1.0))))  # пропуск
+    src = write_geojson(tmp_path / "degenerate.geojson", features)
+    code, out, _, _ = run_build(tmp_path, src, precision=2)
+    assert code == 0
+    rows = {r["original"]: r for r in artifact_rows(out)}
+    assert set(rows) == {"Vatican", "Speck", "Ordinary"}
+    for name, (_, _, (x0, x1, y0, y1)) in cases.items():
+        g = json.loads(rows[name]["geometry"])
+        ps = polygons(g)
+        assert len(ps) == 1, (name, g)
+        assert check_geometry(rows[name]["geometry"], 2) == [], name
+        cell = shape({"type": "Polygon", "coordinates": ps[0]})
+        assert [round(v, 6) for v in cell.bounds] == [x0, y0, x1, y1], (name, cell.bounds)
+        assert cell.area == pytest.approx(0.0001, rel=1e-6), name
+        assert len(ps[0]) == 1, (name, "у клетки нет дыр")
+    ev = events.one("knowledge.polities.built")
+    assert ev["polities"] == 3
+    assert ev["skipped_invalid"] == 1  # только «Broken»
+
+
 @req(GEO, BUILD, scenario="Одно образование — один id")
 def test_one_polity_one_id(tmp_path, events):
     code, out, _, _ = run_build(tmp_path, "europe.geojson")
