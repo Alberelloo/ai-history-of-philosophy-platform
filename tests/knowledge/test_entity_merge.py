@@ -127,6 +127,15 @@ def test_candidates(onto):
     assert frozenset({a, b}) in pairs
 
 
+@req(OE, SEARCH, scenario="Кандидаты")
+def test_candidates_need_equal_dates_for_last_word(onto):
+    """Совпадает последнее слово, но годы разные — не кандидаты (поиск по названию и датам)."""
+    a = onto.person("Дж. Локк", "1632", "1704")
+    b = onto.person("Джон Локк", "1700", "1750")
+    pairs = {frozenset(p) for p in onto.entities.duplicate_candidates()}
+    assert frozenset({a, b}) not in pairs
+
+
 @req(OE, SEARCH, scenario="Основное название на разных записях")
 def test_primary_on_different_records(onto, clock):
     ids = [onto.entities.create("person", [("en", "Berkeley", "primary")]) for _ in range(3)]

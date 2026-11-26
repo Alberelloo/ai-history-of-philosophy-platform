@@ -948,3 +948,76 @@ def test_link_counts_subject_object_author(onto):
     onto.statements.add(work, "author", obj=p3, attributions=[Attribution("entity", p1)])
     counts = dedupe.link_counts(onto.statements.engine, [p1, p2, p3])
     assert counts == {p1: 3, p2: 1, p3: 2}
+
+
+@req(PQ, MERGE, invariant="Порядок проверок: первая сработавшая даёт вердикт")
+@pytest.mark.parametrize(
+    ("a", "b", "flags", "verdict"),
+    [
+        # шаг 2 раньше шага 3: два QID и решение «разные» → apart:qid
+        (
+            Entity("a", "person", (("primary", "x"),), None, "Q1"),
+            Entity("b", "person", (("primary", "x"),), None, "Q2"),
+            {"decided_apart": True},
+            "apart:qid",
+        ),
+        # шаг 3 раньше шага 4: решение «разные» и противоречащие даты → apart:decided
+        (
+            Entity("a", "person", (("primary", "x"),), _bounds(1685, 1685, 1753, 1753), None),
+            Entity("b", "person", (("primary", "x"),), _bounds(1885, 1885, 1953, 1953), None),
+            {"decided_apart": True},
+            "apart:decided",
+        ),
+        # шаг 4 раньше шага 5: подтверждённый QID, но даты противоречат → review:dates
+        (
+            Entity("a", "person", (("primary", "x"),), _bounds(1685, 1685, 1753, 1753), "Q1"),
+            Entity("b", "person", (("primary", "y"),), _bounds(1885, 1885, 1953, 1953), None),
+            {"qid_confirmed": True},
+            "review:dates",
+        ),
+        # шаг 5 раньше шага 6: подтверждение и общее название → merge:qid_confirmed
+        (
+            Entity("a", "person", (("primary", "x"),), None, "Q1"),
+            Entity("b", "person", (("primary", "x"),), None, None),
+            {"qid_confirmed": True},
+            "merge:qid_confirmed",
+        ),
+        # шаг 6 раньше шага 7: общее название и пара модели → merge:name
+        (
+            Entity("a", "person", (("primary", "x"),), None, None),
+            Entity("b", "person", (("primary", "x"),), None, None),
+            {"paired_by_model": True},
+            "merge:name",
+        ),
+        # шаг 7 раньше шага 8: пара модели и совпавший вариант → merge:model_pair
+        (
+            Entity("a", "person", (("primary", "x"),), None, None),
+            Entity("b", "person", (("primary", "y"), ("variant", "x")), None, None),
+            {"paired_by_model": True},
+            "merge:model_pair",
+        ),
+        # шаг 1 раньше всех: не обе персоны, пара модели, общее название → apart:type
+        (
+            Entity("a", "person", (("primary", "x"),), None, None),
+            Entity("b", "concept", (("primary", "x"),), None, None),
+            {"paired_by_model": True, "qid_confirmed": True},
+            "apart:type",
+        ),
+    ],
+)
+def test_same_person_step_order(a, b, flags, verdict):
+    assert dedupe.same_person(a, b, **flags).reason == verdict
+    assert dedupe.same_person(b, a, **flags).reason == verdict
+
+
+@req(PQ, MERGE, invariant="Внешний идентификатор уникален: два QID у двух сущностей невозможны")
+def test_external_id_unique(onto):
+    from philograph.knowledge.entities import DuplicateEntity
+
+    first = onto.entities.create("person", [("en", "Hume", "primary")], external={"wikidata": "Q1"})
+    with pytest.raises(DuplicateEntity):
+        onto.entities.create("person", [("ru", "Юм", "primary")], external={"wikidata": "Q1"})
+    other = onto.entities.create("person", [("ru", "Юм", "primary")])
+    with pytest.raises(DuplicateEntity):
+        onto.entities.add_external(other, "wikidata", "Q1")
+    assert onto.entities.externals("wikidata") == {first: "Q1"}
