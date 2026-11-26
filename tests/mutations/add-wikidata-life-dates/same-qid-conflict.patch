@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -418,7 +418,7 @@
+             report.entities += 1
+             done.add(entity_id)
+             own = planned_own.get(entity_id) or self.entities.external_of(entity_id, SYSTEM)
+-            if own is not None and own != qid:
++            if own is not None:
+                 self._skip(report, entity_id, SYSTEM, "qid_conflict")
+                 continue
+             if own is None:

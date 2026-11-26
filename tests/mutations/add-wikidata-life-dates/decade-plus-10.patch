@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/wikidata.py
++++ b/src/philograph/knowledge/wikidata.py
+@@ -308,7 +308,7 @@
+         y = _astro(year, bce)
+         return y, y, "year"
+     if precision == 8:  # десятилетие: «1680» — 1680–1689
+-        a, b = _astro(year, bce), _astro(year + 9, bce)
++        a, b = _astro(year, bce), _astro(year + 10, bce)
+         return min(a, b), max(a, b), "decade"
+     if precision == 7:  # век: номер — ⌈|год| / 100⌉, «+1800» и «+1701» — XVIII век
+         n = math.ceil(year / 100)

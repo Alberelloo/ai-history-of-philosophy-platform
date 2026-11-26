@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -355,7 +355,7 @@
+                     continue
+                 c["holder"] = holder
+                 pair = tuple(sorted((entity["id"], holder)))
+-                if pair not in distinct:
++                if True:
+                     propose(self.engine, entity["id"], holder, "review:qid_candidate", open_)
+             if entry is None:
+                 entry = {

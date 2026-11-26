@@ -1,0 +1,12 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -451,9 +451,6 @@
+                     continue
+                 report.entities += 1
+                 done.add(entity_id)
+-                if not QID.fullmatch(qid):
+-                    self._skip(report, entity_id, "item", "bad_qid")
+-                    continue
+                 self._import(report, entity_id, qid)
+         self._settle(report, confirmed, proposals, merge)
+         summary = report.to_json()

@@ -1,0 +1,14 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -629,10 +629,7 @@
+                 .join(a, a.c.statement_id == s.c.id)
+                 .where(and_(s.c.subject == entity_id, a.c.who == f"{SYSTEM}:{qid}"))
+             ).all()
+-        return any(
+-            status == "verified" or (provenance or {}).get("run_id") != run_id
+-            for status, provenance in rows
+-        )
++        return False
+ 
+ 
+ # --- CLI ------------------------------------------------------------------------------

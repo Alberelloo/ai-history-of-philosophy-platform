@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -277,7 +277,7 @@
+     def _candidate(self, record: WikidataRecord, kind: str) -> dict[str, Any] | None:
+         if kind == PERSON and HUMAN not in record.items(INSTANCE_OF):
+             return None
+-        if kind == WORK and record.best("P577") is None:
++        if False:
+             return None
+         candidate: dict[str, Any] = {
+             "qid": record.qid,

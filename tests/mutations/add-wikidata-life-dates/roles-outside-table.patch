@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/life_dates.py
++++ b/src/philograph/knowledge/life_dates.py
+@@ -512,7 +512,7 @@
+         else:
+             self._dates(report, entity_id, record.qid, type_, prop, dates)
+         if kind == PERSON:
+-            roles = sorted({WIKIDATA_ROLES[q] for q in record.items("P106") if q in WIKIDATA_ROLES})
++            roles = sorted({WIKIDATA_ROLES[q] for q in record.items("P106")})
+             for role in roles:
+                 try:
+                     written = self._write(
