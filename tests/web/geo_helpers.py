@@ -712,13 +712,13 @@ ORACLE_JS = """
       return m.coordinates.sort((p, q) => q.length - p.length)[0]; },
     project: (v, lon, lat) => proj(v)([lon, lat]),
     // Точки подписи по правилу 3 «Политической карты» для каждой страны видимой стороны
-    // с кодом: центр видимой части самого большого многоугольника, затем узлы сетки
-    // ``step`` в рамке видимой части по возрастанию расстояния от центра (при равенстве —
-    // сверху вниз, слева направо), не больше ``tries``; точка годится, если она и четыре
-    // точки в ``inset`` по осям внутри страны. Начало сетки дельта не называет, поэтому
-    // узлы считаются от левого верхнего угла рамки (``grid: 'corner'``) или от центра
-    // (``grid: 'center'``). Возвращает {id: {span, points: [[x, y], ...]}}.
-    labelSpots: (v, step, tries, inset, grid) => {
+    // с кодом: центр — экранный центроид видимой части самого большого видимого
+    // многоугольника; затем узлы с координатами, кратными ``step``, в рамке видимой части
+    // всей страны (x от ⌈x0/step⌉·step до x1, y так же, включительно), по возрастанию
+    // расстояния до центра, при равенстве — по y, затем по x; первые ``tries`` узлов. Точка
+    // годится, если она и четыре точки в ``inset`` по осям внутри страны (центр — без запаса).
+    // Возвращает {id: {span, points: [[x, y], ...]}}.
+    labelSpots: (v, step, tries, inset) => {
       const p = proj(v); const path = d3.geoPath(p); const out = {};
       const inside = (f, x, y) => { const g = p.invert([x, y]);
         return !!g && d3.geoContains(f, g) && d3.geoDistance(g, [v.lon, v.lat]) < Math.PI / 2; };
@@ -731,11 +731,8 @@ ORACLE_JS = """
         if (!big) continue;
         const c = path.centroid(big); const b = path.bounds(f);
         const nodes = [];
-        const ox = grid === 'center' ? c[0] - Math.ceil((c[0] - b[0][0]) / step) * step : b[0][0];
-        const oy = grid === 'center' ? c[1] - Math.ceil((c[1] - b[0][1]) / step) * step : b[0][1];
-        for (let x = ox; x <= b[1][0] + 1e-9; x += step)
-          for (let y = oy; y <= b[1][1] + 1e-9; y += step)
-            if (x >= b[0][0] - 1e-9 && y >= b[0][1] - 1e-9) nodes.push([x, y]);
+        for (let x = Math.ceil(b[0][0] / step) * step; x <= b[1][0]; x += step)
+          for (let y = Math.ceil(b[0][1] / step) * step; y <= b[1][1]; y += step) nodes.push([x, y]);
         nodes.sort((m, n) => Math.hypot(m[0] - c[0], m[1] - c[1]) - Math.hypot(n[0] - c[0], n[1] - c[1])
           || m[1] - n[1] || m[0] - n[0]);
         const ok = q => [[0, 0], [inset, 0], [-inset, 0], [0, inset], [0, -inset]]

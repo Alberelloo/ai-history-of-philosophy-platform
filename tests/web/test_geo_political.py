@@ -300,41 +300,40 @@ def fitting_countries(page, sc, o, names) -> dict[str, list]:
     3–5, считая препятствиями всё, что нарисовано в кадре (медальоны, значки, подписи персон и
     уже поставленные подписи стран). Независимый расчёт: d3-geo и world-atlas на пустой
     странице, ширина текста — canvas. Подписанные продуктом страны входят без проверки.
-    Возвращает {код: [начало сетки, точка]} для обоих толкований начала сетки."""
+    Возвращает {код: точка подписи или «продукт»}."""
     labelled = {c["id"] for c in sc["countries"]}
     obstacles = [s for _k, _i, s in shapes(sc)]
     ref = sc["countries"][0] if sc["countries"] else None
     height = (ref["box"]["h"] / ref["fs"] * FILL_FONT) if ref else FILL_FONT * 1.3
     out: dict[str, list] = {cid: ["продукт"] for cid in labelled}
-    for grid in ("corner", "center"):
-        spots = o("labelSpots", view_arg(sc), COUNTRY_STEP, COUNTRY_TRIES, COUNTRY_INSET, grid)
-        texts = [names[c] for c in spots if c in names and c not in labelled]
-        width = page.evaluate(TEXT_WIDTH_JS, [texts, FILL_FONT])
-        for cid, spot in spots.items():
-            if cid in labelled or cid not in names:
+    spots = o("labelSpots", view_arg(sc), COUNTRY_STEP, COUNTRY_TRIES, COUNTRY_INSET)
+    texts = [names[c] for c in spots if c in names and c not in labelled]
+    width = page.evaluate(TEXT_WIDTH_JS, [texts, FILL_FONT])
+    for cid, spot in spots.items():
+        if cid in labelled or cid not in names:
+            continue
+        w = width[names[cid]]
+        if w > spot["span"]:
+            continue
+        for x, y in spot["points"]:
+            rect = (
+                "r",
+                x - w / 2 - 1.5,
+                y - height / 2 - 1.5,
+                x + w / 2 + 1.5,
+                y + height / 2 + 1.5,
+            )
+            if (
+                x - w / 2 < 0
+                or y - height / 2 < 0
+                or x + w / 2 > sc["w"]
+                or y + height / 2 > sc["h"]
+            ):
                 continue
-            w = width[names[cid]]
-            if w > spot["span"]:
+            if any(overlap(rect, ob) for ob in obstacles):
                 continue
-            for x, y in spot["points"]:
-                rect = (
-                    "r",
-                    x - w / 2 - 1.5,
-                    y - height / 2 - 1.5,
-                    x + w / 2 + 1.5,
-                    y + height / 2 + 1.5,
-                )
-                if (
-                    x - w / 2 < 0
-                    or y - height / 2 < 0
-                    or x + w / 2 > sc["w"]
-                    or y + height / 2 > sc["h"]
-                ):
-                    continue
-                if any(overlap(rect, ob) for ob in obstacles):
-                    continue
-                out.setdefault(cid, []).append((grid, round(x, 1), round(y, 1)))
-                break
+            out[cid] = [round(x, 1), round(y, 1)]
+            break
     return out
 
 
