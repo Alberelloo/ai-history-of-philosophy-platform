@@ -19,6 +19,7 @@ from playwright.sync_api import expect
 from philograph.knowledge.statements import Attribution
 
 from .geo_helpers import (
+    COUNTRY_MIN_LABELS,
     GEO_BUILT,
     MAP_API,
     PLACES_API,
@@ -290,10 +291,26 @@ def test_home_zoom(knowledge_context, knowledge_stack, events, key):
     assert z in SERIES and z <= 4, z
     lat, lon = centroid(pts)
     assert sc["center"] == f"{fmt(lon)},{fmt(lat)}", (sc["center"], lon, lat)
+    labels = len(sc["countries"])
+    if z > 1:
+        assert labels >= COUNTRY_MIN_LABELS, ("при приближении > 1 подписей меньше 5", z, labels)
     if fits(sc, pts, 1.0):
         assert fits(sc, pts, z)
         nxt = round(z * 1.25, 2)
-        assert nxt > 4 or not fits(sc, pts, z * 1.25), (z, nxt)
+        if nxt <= 4 and fits(sc, pts, z * 1.25):
+            # Следующее значение ряда помещает места: тогда на нём подписей стран было бы
+            # меньше 5. Проверяется на том же центре клавишей «+».
+            focus_globe(page)
+            press(page, "+")
+            settle(page)
+            up = scene(page)
+            assert (up["center"], up["zoom"]) == (sc["center"], nxt), (up["center"], up["zoom"])
+            assert len(up["countries"]) < COUNTRY_MIN_LABELS, (
+                "следующее приближение помещает места и даёт 5 подписей, а выбрано меньшее",
+                z,
+                nxt,
+                len(up["countries"]),
+            )
     else:
         assert z == 1
     assert z >= 1

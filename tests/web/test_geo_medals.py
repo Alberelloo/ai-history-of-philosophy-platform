@@ -729,11 +729,31 @@ def medal_click(page, entity: str) -> None:
 
 
 @req(GEO, WHERE, scenario="Нажатие на медальон")
-def test_click_medal(knowledge_context, knowledge_stack, events):
+@pytest.mark.parametrize(("width", "height"), SIZES)
+def test_click_medal(knowledge_context, knowledge_stack, events, width, height):
+    # На всех трёх размерах: в тесной панели (1024×576, 1366×768) блок «Где» SHALL быть
+    # виден без раскрытия «Выбрано» (Д8). Тест раздел не раскрывает.
     w = athens_world(knowledge_stack.world)
-    page, response = open_globe(knowledge_context, knowledge_stack, "/graph?view=globe&t=-360")
+    page, response = open_globe(
+        knowledge_context,
+        knowledge_stack,
+        "/graph?view=globe&t=-360",
+        width=width,
+        height=height,
+    )
     medal_click(page, w["plato"])
-    expect(page.locator(".map-selected__name")).to_contain_text("Платон")
+    # Выбранное названо в «Выбрано»: заголовком раздела («Выбрано · Платон», тесная панель)
+    # или строкой имени под ним.
+    expect(page.locator("h2", has_text="Выбрано").first).to_be_visible()
+    chosen = page.locator("h2", has_text="Выбрано").first.text_content() or ""
+    if page.locator(".map-selected__name").count():
+        chosen += " " + (page.locator(".map-selected__name").first.text_content() or "")
+    assert "Платон" in chosen, chosen
+    expect(page.locator("[data-geo-where]")).to_be_visible()
+    for part in ("place", "country", "role", "years"):
+        expect(page.locator(f"[data-geo-where-{part}]")).to_be_visible()
+    box = page.locator("[data-geo-where]").bounding_box()
+    assert box and box["y"] >= 0 and box["y"] + box["height"] <= height, box
     block = where_block(page)
     assert (block["place"], block["country"], block["role"], block["years"]) == (
         "Афины",

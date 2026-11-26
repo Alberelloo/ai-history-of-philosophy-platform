@@ -19,8 +19,11 @@ import pytest
 
 from .geo_helpers import (
     CITIES,
+    COUNTRY_INSET,
     COUNTRY_MIN_AREA,
     COUNTRY_MIN_LABELS,
+    COUNTRY_STEP,
+    COUNTRY_TRIES,
     FILL_FONT,
     LABEL_FONT,
     MAX_COUNTRY_LABELS,
@@ -40,6 +43,7 @@ from .geo_helpers import (
     globe_ready,
     open_globe,
     outside,
+    overlap,
     press,
     rows,
     ru_names,
@@ -279,6 +283,101 @@ def test_labels_on_home_view(knowledge_context, knowledge_stack, events, width, 
     clashes = [(a[:2], b[:2]) for a, b in collisions(shapes(sc)) if "country" in (a[0], b[0])]
     assert clashes == [], clashes
     geo_built(events, response)
+
+
+# Ширина подписи — тем же начертанием, что подписи стран на странице (кегль задаёт тест).
+TEXT_WIDTH_JS = """([texts, size]) => {
+  const ref = document.querySelector('[data-geo-country]') || document.querySelector('.geo-globe text');
+  const st = getComputedStyle(ref);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = `${st.fontStyle} ${st.fontWeight} ${size}px ${st.fontFamily}`;
+  return Object.fromEntries(texts.map(t => [t, ctx.measureText(t).width]));
+}"""
+
+
+def fitting_countries(page, sc, o, names) -> dict[str, list]:
+    """Страны видимой стороны с кодом, чья подпись кеглем добора (9 px) помещается по правилам
+    3–5, считая препятствиями всё, что нарисовано в кадре (медальоны, значки, подписи персон и
+    уже поставленные подписи стран). Независимый расчёт: d3-geo и world-atlas на пустой
+    странице, ширина текста — canvas. Подписанные продуктом страны входят без проверки.
+    Возвращает {код: [начало сетки, точка]} для обоих толкований начала сетки."""
+    labelled = {c["id"] for c in sc["countries"]}
+    obstacles = [s for _k, _i, s in shapes(sc)]
+    ref = sc["countries"][0] if sc["countries"] else None
+    height = (ref["box"]["h"] / ref["fs"] * FILL_FONT) if ref else FILL_FONT * 1.3
+    out: dict[str, list] = {cid: ["продукт"] for cid in labelled}
+    for grid in ("corner", "center"):
+        spots = o("labelSpots", view_arg(sc), COUNTRY_STEP, COUNTRY_TRIES, COUNTRY_INSET, grid)
+        texts = [names[c] for c in spots if c in names and c not in labelled]
+        width = page.evaluate(TEXT_WIDTH_JS, [texts, FILL_FONT])
+        for cid, spot in spots.items():
+            if cid in labelled or cid not in names:
+                continue
+            w = width[names[cid]]
+            if w > spot["span"]:
+                continue
+            for x, y in spot["points"]:
+                rect = (
+                    "r",
+                    x - w / 2 - 1.5,
+                    y - height / 2 - 1.5,
+                    x + w / 2 + 1.5,
+                    y + height / 2 + 1.5,
+                )
+                if (
+                    x - w / 2 < 0
+                    or y - height / 2 < 0
+                    or x + w / 2 > sc["w"]
+                    or y + height / 2 > sc["h"]
+                ):
+                    continue
+                if any(overlap(rect, ob) for ob in obstacles):
+                    continue
+                out.setdefault(cid, []).append((grid, round(x, 1), round(y, 1)))
+                break
+    return out
+
+
+@req(
+    GEO,
+    POL,
+    invariant="на видах после действий читателя подписей меньше 5 только тогда, когда меньше 5 стран с кодом помещают подпись по правилам 3–5",
+)
+@pytest.mark.parametrize(("width", "height"), SIZES)
+def test_fewer_labels_only_when_few_fit(knowledge_context, knowledge_stack, events, width, height):
+    crowd(knowledge_stack.world, CITIES[:30], 1)
+    page, response = open_globe(
+        knowledge_context,
+        knowledge_stack,
+        "/graph?view=globe&t=1750",
+        width=width,
+        height=height,
+        reduced_motion="reduce",
+    )
+    o = Oracle(page.context)
+    names = ru_names()
+    focus_globe(page)
+    views = []
+    for keys in (["+", "+"], ["+"], ["Shift+ArrowLeft"], ["Shift+ArrowUp"], ["+", "+"]):
+        for k in keys:
+            press(page, k)
+        settle(page)
+        sc = scene(page)
+        n = len(sc["countries"])
+        views.append((sc["center"], sc["zoom"], n))
+        if n >= COUNTRY_MIN_LABELS:
+            continue
+        fit = fitting_countries(page, sc, o, names)
+        assert len(fit) < COUNTRY_MIN_LABELS, (
+            "подписей меньше 5, а помещается подпись у 5 и больше стран",
+            sc["center"],
+            sc["zoom"],
+            [c["id"] for c in sc["countries"]],
+            fit,
+        )
+    assert len(views) == 5, views
+    geo_built(events, response)
+    errors(page)
 
 
 def empty_scene_world(world, centers) -> list[str]:

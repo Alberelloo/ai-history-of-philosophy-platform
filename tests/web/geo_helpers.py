@@ -59,6 +59,9 @@ PAD = 1.5
 MAX_SHIFT = 3 * (MEDAL + MEDAL_GAP)
 COUNTRY_MIN_AREA = 1500
 COUNTRY_MIN_LABELS = 5
+COUNTRY_STEP = 12  # шаг сетки запасных точек подписи страны, px (правило 3)
+COUNTRY_TRIES = 64  # не больше узлов сетки
+COUNTRY_INSET = 2  # запас точки от границы страны, px
 LABEL_FONT = 10.5  # основной кегль подписи страны
 FILL_FONT = 9.0  # кегль добора
 MAX_COUNTRY_LABELS = 24
@@ -708,6 +711,41 @@ ORACLE_JS = """
         (x, y) => (x.id === a && y.id === b) || (x.id === b && y.id === a));
       return m.coordinates.sort((p, q) => q.length - p.length)[0]; },
     project: (v, lon, lat) => proj(v)([lon, lat]),
+    // Точки подписи по правилу 3 «Политической карты» для каждой страны видимой стороны
+    // с кодом: центр видимой части самого большого многоугольника, затем узлы сетки
+    // ``step`` в рамке видимой части по возрастанию расстояния от центра (при равенстве —
+    // сверху вниз, слева направо), не больше ``tries``; точка годится, если она и четыре
+    // точки в ``inset`` по осям внутри страны. Начало сетки дельта не называет, поэтому
+    // узлы считаются от левого верхнего угла рамки (``grid: 'corner'``) или от центра
+    // (``grid: 'center'``). Возвращает {id: {span, points: [[x, y], ...]}}.
+    labelSpots: (v, step, tries, inset, grid) => {
+      const p = proj(v); const path = d3.geoPath(p); const out = {};
+      const inside = (f, x, y) => { const g = p.invert([x, y]);
+        return !!g && d3.geoContains(f, g) && d3.geoDistance(g, [v.lon, v.lat]) < Math.PI / 2; };
+      for (const f of fc) {
+        if (f.id === undefined || !(path.area(f) > 0)) continue;
+        const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+        let big = null, ba = 0;
+        for (const poly of polys) { const g = {type: 'Polygon', coordinates: poly};
+          const a = path.area(g); if (a > ba) { ba = a; big = g; } }
+        if (!big) continue;
+        const c = path.centroid(big); const b = path.bounds(f);
+        const nodes = [];
+        const ox = grid === 'center' ? c[0] - Math.ceil((c[0] - b[0][0]) / step) * step : b[0][0];
+        const oy = grid === 'center' ? c[1] - Math.ceil((c[1] - b[0][1]) / step) * step : b[0][1];
+        for (let x = ox; x <= b[1][0] + 1e-9; x += step)
+          for (let y = oy; y <= b[1][1] + 1e-9; y += step)
+            if (x >= b[0][0] - 1e-9 && y >= b[0][1] - 1e-9) nodes.push([x, y]);
+        nodes.sort((m, n) => Math.hypot(m[0] - c[0], m[1] - c[1]) - Math.hypot(n[0] - c[0], n[1] - c[1])
+          || m[1] - n[1] || m[0] - n[0]);
+        const ok = q => [[0, 0], [inset, 0], [-inset, 0], [0, inset], [0, -inset]]
+          .every(([dx, dy]) => inside(f, q[0] + dx, q[1] + dy));
+        const pts = [];
+        if (Number.isFinite(c[0]) && inside(f, c[0], c[1])) pts.push(c);
+        for (const q of nodes.slice(0, tries)) if (ok(q)) pts.push(q);
+        out[f.id] = {span: b[1][0] - b[0][0], points: pts};
+      }
+      return out; },
     noId: () => fc.filter(f => f.id === undefined).map(f => ({name: f.properties.name,
       bounds: d3.geoBounds(f)})),
     nearBorderInside: (name, km) => {
