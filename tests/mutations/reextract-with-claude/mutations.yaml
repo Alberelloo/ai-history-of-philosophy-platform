@@ -379,7 +379,7 @@ mutations:
   patch: ext-json-duplicate-allowed.patch
   note: повтор ключа в JSON-объекте не замечается
   expect_fail:
-  - tests/knowledge/test_reextract_review.py::test_duplicate_key_in_json_object
+  - tests/knowledge/test_reextract_review.py::test_duplicate_top_level_key_in_json_object
 - id: ext-library-down-traceback
   requirement: Внешний извлекатель
   patch: ext-library-down-traceback.patch
