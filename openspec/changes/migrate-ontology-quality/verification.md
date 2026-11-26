@@ -518,6 +518,23 @@
 | Откат миграции | j14-rollback-closed | tests/knowledge/test_ontology_migration.py::test_rollback_invariant | да (1 failed, 1 warning in 3.49s) |
 | Откат миграции | j14-rollback-closed | tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items | да (1 failed, 1 warning in 3.32s) |
 
+## Тестировщик — О34 (С8), 2026-11-26, код и спецификация f01fe63
+
+`test_retired_names_not_normalized` проверяет, что шаги 1 и 3 не трогают названия сущностей, снятых прошлым запуском:
+1. Первый запуск снимает понятие «20.1».
+2. У снятой сущности появляется «старое» название: пробел по краю, NFD «Ёж вещи», язык `en`, устаревший ключ поиска.
+3. Второй запуск. Сырые строки названий (язык, текст, ключ) не изменились, `names_normalized = lang_fixed = 0`.
+4. Откат первого запуска. Сущность снова действующая, названия как до запуска: `("en", "20.1", "primary")` и позднее `(" Ёж вещи" в NFD, variant)` без изменений.
+
+Мутанты дописывают в конце шага обработку названий сущностей вне View, то есть снятых прошлым запуском. Первая версия мутантов (цикл по всем названиям) падала `KeyError` в `View.apply`, а не на проверке. Её заменил, теперь тест падает на `assert raw_after == raw_before`.
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Миграция существующей онтологии | normalize-include-retired | tests/knowledge/test_ontology_migration.py::test_retired_names_not_normalized | да (1 failed, 1 warning in 0.80s) |
+| Миграция существующей онтологии | lang-fix-include-retired | tests/knowledge/test_ontology_migration.py::test_retired_names_not_normalized | да (1 failed, 1 warning in 0.83s) |
+
+С8 закрыт. Все патчи ветки накладываются на HEAD.
+
 ## Судья — 2026-11-26, коммит 745dbe0
 
 Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.

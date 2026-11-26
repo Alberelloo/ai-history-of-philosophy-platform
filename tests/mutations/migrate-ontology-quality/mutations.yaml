@@ -734,3 +734,15 @@ mutations:
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_rollback_invariant
       - tests/knowledge/test_ontology_migration.py::test_rollback_closes_run_items
+  - id: normalize-include-retired
+    requirement: Миграция существующей онтологии
+    patch: normalize-include-retired.patch
+    note: О34 — шаг 1 приводит и названия снятых прошлым запуском
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_retired_names_not_normalized
+  - id: lang-fix-include-retired
+    requirement: Миграция существующей онтологии
+    patch: lang-fix-include-retired.patch
+    note: О34 — шаг 3 исправляет язык и у снятых прошлым запуском
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_retired_names_not_normalized
