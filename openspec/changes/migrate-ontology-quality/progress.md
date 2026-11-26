@@ -263,3 +263,8 @@
 - Дефект Д4-mig: команды `ontology_migrate` и `quality_report` не подключают журнал (`events.configure`), поэтому при запуске командой событий спецификации нет. Тот же пробел есть в команде `life_dates` из принятого add-wikidata-life-dates. Решение: все три новые команды оператора подключают журнал так же, как остальные (`events.configure(sinks=[events.json_sink(sys.stderr)])`). События идут в stderr, чтобы stdout с JSON отчёта оставался разбираемым. Это поведение журнала, а не отчёта; в add-wikidata-life-dates правка записывается как дополнение после вердикта.
 - Тестировщику: тесты с запуском команд отдельным процессом и проверкой событий, мутация «без configure»; J22 (позиция атрибуции в `integrity.compare`).
 - Это третий возврат, до предела change-loop остаётся один круг судьи.
+
+## Д4-mig (разработчик, 2026-11-26): журнал в командах оператора
+
+- `ontology_migrate`, `quality_report`, `life_dates`: при запуске командой (`python -m …`, блок `__main__`) журнал подключается к stderr — `events.configure(sinks=[events.json_sink(sys.stderr)])`, stderr переводится в UTF-8. Подключение не в теле `main()`: `configure` заменяет список приёмников, и вызов `main()` из тестов снял бы приёмник фикстуры `events`. Так прямые вызовы `main()` пишут события в журнал фикстуры, а команда — в stderr.
+- Проверено подпроцессом на SQLite-базе: `quality_report --json` — stdout разбирается как JSON, в stderr строки событий, среди них `knowledge.quality.measured`; `life_dates rollback` — в stderr `knowledge.life_dates.rolled_back` и `knowledge.run.rolled_back`, stdout — JSON сводки.
