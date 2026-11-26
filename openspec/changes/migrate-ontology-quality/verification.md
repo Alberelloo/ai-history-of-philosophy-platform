@@ -481,3 +481,38 @@
 Вердикт: **не принято**.
 - Вернуть тестировщику: «Перевод названий → Проверка ответа, п. 4 `invalid:<причина>` по правилу **для типа элемента**» не доказан. `translation_replies` порождает только понятия. Нужен property или сценарий с персонами, где ответ проходит правило понятия, но не правило персоны (например, «слепой математик»: для персоны `not_a_name`, для понятия причины нет). Мутацию J8 (`check_name("concept", ru)`) добавить в `mutations.yaml`.
 - Вернуть ревьюверу: ревью 0b8b44e и cf3d9a1, пункт 4.1.
+
+## Судья (повторно) — 2026-11-26, коммит 232de6a
+
+Машина: 1 ГБ ОЗУ, 1 CPU, без Docker. Полный `pytest` и e2e не запускались. Каждый pytest шёл под `flock`. Мутации делались во временном worktree (`PYTHONPATH` на его `src`), после проверки worktree удалён. Рабочая копия не менялась: `git diff` пуст.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Миграция | 8 сценариев + test_migration_invariant | passed, мутации убиты | passed. J10 «аварийный откат только по утверждениям» → test_loss_aborts упал. Повтор verify-no-abort (yaml) → упал. **J11 выжила** (ниже) | CLI-подпроцессы на файле SQLite (стенд П1–П4 + 24 датированные персоны, шлюз модели — HTTP-заглушка). `plan`: дамп не изменился, снято 7 (number 1, stopword 1, empty 1, not_a_name 4), merged 4, lost 0. `run --translate model`: код 0, 1 вызов модели, «Hume» в запросе нет, renamed wikidata 1 / model 5, lost 0, attributions.lost 0 | не подтверждено (J11) |
+| Снятие | 3 сценария + test_retire_invariant | passed | passed | после `rollback`: restored 7 | подтверждено |
+| Перевод | 5 сценариев + test_translation_invariant, J8 | passed, J8 убита | passed. J9 «принятое пишется первому элементу пакета» → translation_invariant и batch_with_model_errors упали. J16 (повтор J8) → translation_invariant и reply_checked_by_item_type упали | см. строку «Миграция» | подтверждено, кроме шага 5 (J11) |
+| Откат | 2 сценария + test_rollback_invariant, test_rollback_keeps_arbitrary_later_names | passed | passed. J14 «пункты очереди закрываются статусом closed» → test_rollback_closes_run_items упал (test_rollback_invariant эту мутацию не ловит) | `rollback` через CLI: дамп данных равен дампу до `run`, merges_undone 4, restored 7, kept 0. Неизвестный run_id — код 2 | подтверждено |
+| Замер | 6 сценариев + test_quality_invariant | passed | passed. J12 «А1–А7 без фильтра действующих» → quality_invariant и quality_before_after упали. Повтор quality-writable → test_read_only упал. J13 «справочник с lang=en» выжила: после миграции у сущностей нет основного `en`, практически эквивалентна | `quality_report` подпроцессом. До: код 1, А1=0,7292, А2=1, А3=4, А4=3, А5=24, А6=12, А7=7, А8 «не измерено». После `--baseline`: код 0, А1=1, А2=А3=А4=А7=0, А5=24, А6=12, А8=0. md5 обоих файлов базы не изменились | подтверждено |
+
+Прогоны:
+- `test_ontology_migration.py` + `test_ontology_migrate_unit.py` — 87 passed за 309 s.
+- Соседние тесты (integrity_unit, entity_naming, epoch_context_import, entity_merge, snapshot, statements, mentions_cards, catalog, map) — 317 passed.
+- `lint-imports`: 3 kept. Трассировка: 415 из 415. `mutation_check --coverage`: чисто.
+- `ruff check` и `ruff format --check` падают на `scripts/dev_stack.py:100` и `queue.py`. Это файлы Lead'а: дифф ветки с `origin/claude/embedding-docker` по ним пуст. Нужен пункт для Lead'а в PR.
+
+Приёмка владельца А1–А8 показана на синтетике: test_acceptance_symptoms и мой прогон CLI выше. Замер — `python -m philograph.knowledge.quality_report [--save|--baseline] [--json]` с `PHILOGRAPH_DATABASE_URL`, только на чтение. На стенде Lead'а он запускается так же. А9: всё чисто, кроме ruff в файлах Lead'а.
+
+Мутации судьи, итог:
+- убиты: J9, J10, J12, J14, J16; повторы verify-no-abort и quality-writable тоже упали;
+- J15 «`_same` всегда истинно» ловит только юнит-тест `test_integrity_unit.py::test_substituted_target_is_loss` (без маркера `req`);
+- эквивалентна: J17 «мусор по исходным концам». Снятая сущность не бывает перенаправлена;
+- практически эквивалентна: J13.
+
+**Выжила J11.** Шаг 5 `wikidata_labels` обходит все действующие сущности, кроме источников, а не только те, у которых основное название нерусское (`self._not_russian(view)` → `[e for e in view.active() if type != SOURCE]`). Все тесты прошли: test_migration_invariant, test_stand_synthetic, test_wikidata_labels_after_skips. Так нарушается условие шага 5 «с нерусским основным названием»: сущность с русским основным и QID, у которой подпись `ru` в Wikidata другая («Юм» и «Дэвид Юм»), будет переименована. В генераторе такого входа нет.
+
+Подгонка: не найдена. `skip` и `xfail` нет. Удалённые строки тестов после 745dbe0 только усиливают проверки.
+Пункт 4.1 (ревьювер) не отмечен. Код 40bae79 (правка по повторному ревью: `_own_name`, `rename_in`, `KeyboardInterrupt`) ревьювер не смотрел.
+
+Вердикт: **не принято**.
+- Тестировщику: в генератор `ontologies` и в сценарий добавить сущность с русским основным названием и QID, у которой подпись `ru` в Wikidata другая. Ожидание: название не меняется. Мутацию J11 добавить в `mutations.yaml`. Желательно: J13 (справочник с `lang=ru`) и J14 в test_rollback_invariant.
+- Ревьюверу: ревью 40bae79, пункт 4.1.
