@@ -332,3 +332,46 @@
 | Проверка ответа по утверждениям | check-dating-not-object | tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property | НЕТ (1 passed, 1 warning in 18.05s) |
 
 `check-dating-not-object` в первом прогоне пережила property `test_arbitrary_entities_never_crash_property` даже с явными `@example` (`dating` строка/число/список): без проверки вида `_dating_spec` всё равно возвращает отказ, итог тот же `schema_item` — для property мутация эквивалентна. Убивает сценарный `test_entities_item_kinds_dropped_rest_kept` (на `dating: 0`, `""`); property из `expect_fail` убрана.
+
+## Судья — 2026-11-26, коммит 5f52770
+
+Своё окружение: worktree ветки, `PYTHONPATH=<worktree>/src` (проверено: `philograph.__file__` из worktree). Система — настоящий CLI `python -m philograph.knowledge.external_extraction` на временной SQLite с поддельным сервисом библиотеки по HTTP (5 абзацев одной главы; при `fragment_chars=3000` — один фрагмент), события — JSON в stderr. Шлюзовой путь — тестами со стендом настоящего `LLMGateway` (dev_stack по условию не поднимался).
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Фрагменты из нескольких абзацев | 4 сценария + инварианты (граница, объём, длинный абзац, предел, `changed`) | `F::*` ok | passed (полный пакет) | `export`: 5 коротких абзацев → 1 фрагмент, `knowledge.extraction.exported {version_id, fragments=1}`, `passages` с `[1] ` | подтверждено |
+| Цитата у каждого утверждения | кавычки и тире, многоточие по порядку/обратно, без значимого текста, сирот нет, не найдена | `Q::*`, `test_reextract_review.py` ok | passed | `ingest`: `"\"Он сказал: - Бог умер\""` записана как есть (evidence p4); «О, Заратустра… ты нашёл счастье своё» прошла сверку; обратный порядок → `quote_not_found`; `«—»` → `quote_too_short`; «Иероним»/«Иеронимус» (цитата не найдена / абзац 9) — нет `entity.created` | подтверждено |
+| Запуски наполнения | модель и метрики через шлюз, сбой посреди запуска, не 200, проба, миграция 10 | `R::*` ok | passed | `filling_runs`: `model=claude-opus-5-5`, `extractor=external`, `source_id`, `fragments=1`, `duration=120`, токены 1e6/1e5, `cost_usd=6`, `drop_reasons` = 8 = `dropped` = 8 событий; `provenance.model=claude-opus-5-5`; миграции 1…10 на пустой базе | подтверждено |
+| Проверка ответа по утверждениям | отклонения в одном ответе, entities не того вида, мягкая схема | `I::*`, review ok | passed | в одном ответе: `attributed_to: null`, `paragraph: "4"`, `rejects` → `influenced_by` + `knowledge.registry.proposal rejects`, `character` → `entity_type`, `quote: 7` → `schema_item`, `entities.type: ["person"]` → `schema_item`; 3 записаны, `fragment created=3 dropped=7` | подтверждено |
+| Коды причин отбраковки | сводка причин; ключи `{run_id, reason, code}` | ok | passed | все `dropped` с `code` из перечня, без текста цитат | подтверждено |
+| Внешний извлекатель | выгрузка, запись Claude, повтор, повтор после прерванной, идёт запись, брошенная, повтор фрагмента в JSONL; запрет → 3; нет версии/библиотеки → 2 | `X::*`, review ok | passed | повтор без `--replace` → код 2, счётчики 3/3/3 те же; с `--replace` → `run.rolled_back` + новый `done`, 3/3/3; `running` 1 ч → «запись идёт», код 2, ничего не откатано; 7 ч → откат + `done`; JSONL `fragment:1` дважды → код 2; `vforbidden` → код 3 + `knowledge.extraction.skipped`; `nope` → код 2; библиотека недоступна → код 2 без трассировки; `{}` → `reply_missing:1`; модель без тарифа → код 2 | подтверждено, **кроме норматива «повтор номера фрагмента» — см. Д4** |
+| Отчёт о запусках извлечения | отчёт за день | ok | passed | таблица: 1 строка (`rolled_back` исключён), «Итого», доля 73%, топ-3 кодов; `knowledge.extraction.report {runs, out}` | подтверждено |
+| Таймаут вызова модели | бюджет + 30, запасной 1200 | `R::test_timeout_*` ok | passed | — (только тестом со стендом шлюза) | подтверждено тестом |
+| Художественный текст | правила в промпте | `P::*` ok | passed | в `instructions` задания обе фразы есть | подтверждено |
+| Сведения о роли, Сводка расходов (llm-gateway) | роль извлечения 1084,5; 404 `unknown_role`; токены по `run_id` | `G::*` ok | passed (`tests/llm`) | — (стенд шлюза в тестах) | подтверждено тестом |
+
+Полный pytest (`tests/knowledge tests/llm`, один раз): **1 failed, 2137 passed, 1 skipped за 30:56**. Единственное падение — `test_epoch_dates_unit.py::test_repository_manifest_is_valid_and_unconfirmed`; проверено мной на чистом worktree `origin/claude/embedding-docker` (c9a02aa): `1 failed`; `sources/` веткой не тронут — не от изменения.
+`ruff check .` / `ruff format --check .` — чисто (720); `lint-imports` — 3 kept; `check_traceability.py` — 427 из 427; `mutation_check --coverage` — у всех 11 требований.
+
+Мутации:
+- `mutation_check --id ext-live-running-ignored` — оба теста упали;
+- своя: `_role()` отдаёт имя роли вместо `NULL` (`info.get("model") or EXTRACT_ROLE`) → упали `test_run_model_is_identifier_never_role[1,2]`;
+- своя, вместо устаревшего патча `runs-no-fail-run`: убран `fail_run` из `except` в `extract_version` → 15 failed (`test_failure_in_second_fragment`, `test_no_running_run_after_exit`). Код возвращён, `git status` по продуктовому коду пуст.
+
+**Патчи мутаций устарели:** `git apply --check` не проходит у 12 из 69 (`check-paragraph-string`, `ext-json-duplicate-allowed`, `ext-out-of-range-applied`, `ext-repeat-after-failed-allowed`, `ext-repeat-allowed`, `ext-replace-no-rollback`, `quote-no-edge-strip`, `quote-no-min-part`, `quote-no-zero-width`, `quote-substring-loose`, `quote-whole-first-removed`, `runs-no-fail-run`). `mutation_check --id runs-no-fail-run` → «патч не применился». Значит `mutation_check --change reextract-with-claude` (пункт 3.4) на итоговом коде завершается ошибкой, а строки таблицы мутаций для этих 12 не воспроизводятся на 5f52770 («Мутации после правки не перепрогонялись»).
+
+**Д4 (дефект кода).** «Внешний извлекатель», норматив: «повтор номера фрагмента в файле ответов → отказ команды, код выхода 2, ничего не записано». `ingest` сам приводит `"01"` и `" 1"` к номеру 1 (`re.fullmatch(r"[0-9]+", key.strip())` → `int`), но `read_replies` проверяет повтор по строке ключа. Вывод системы:
+- JSONL `{"fragment": 1, "reply": <3 верных утверждения>}` + `{"fragment": "01", "reply": {"statements": []}}` → код 0, `created=0, dropped=0`; ответ на фрагмент 1 молча заменён, событий нет;
+- JSON-объект `{"1": <ответ>, " 1": {...}}` — так же, код 0, `created=0`.
+Ответ теряется без следа в `drop_reasons` и журнале.
+
+Подгонка: не найдена. Тесты прежнего контракта изменены по дельте: добавлены `code` и номер миграции 10, мягкая схема проверяется по `entity_types` в данных. Проверки не ослаблены, `skip`/`xfail` нет. Прочитанные тела тестов проверяют THEN по базе и журналу. `platform/queue.py` в диффе — только форматирование.
+
+Процесс: пункт 4.1 в `tasks.md` не отмечен. Коммит bd21bb3 (`external_extraction.py` +84/−27: порог `running` 6 ч, повтор ключа только верхнего уровня; `entity_items.py`: `dating` не объект) сделан после вердикта повторного ревью «можно к судье» и ревьювером не вычитан. Д4 — как раз в этом коде.
+
+Замечание, не блокирует: `report` требует `PHILOGRAPH_LIBRARY_URL`, хотя библиотеку не использует, а у подкоманды нет `--library-url` («нужен PHILOGRAPH_LIBRARY_URL или --library-url»).
+
+Вердикт: **не принято**. Вернуть:
+- разработчику: Д4 — повтор номера фрагмента определять по номеру после приведения (`"1"`, `"01"`, `" 1"`, `1`), в обоих форматах → код 2, ничего не записано;
+- тестировщику: тест на Д4 (разные записи одного номера в JSONL и JSON-объекте); обновить 12 неприменяемых патчей под итоговый код и прогнать `mutation_check.py --change reextract-with-claude` целиком на итоговом коммите, сырой вывод — в журнал;
+- ревьюверу: вычитать bd21bb3 и правку Д4, отметить 4.1.
