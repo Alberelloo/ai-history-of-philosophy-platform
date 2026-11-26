@@ -748,3 +748,37 @@ def test_dating_codes(stand, events, dating, code):
     assert dropped_codes(events) == [code]
     check_run_accounting(stand, events)
     assert_event_keys(events)
+
+
+@req(EO, CODE, invariant="statement_refused — иной отказ записи утверждения")
+def test_statement_refused_code(stand, events, monkeypatch):
+    """Иной отказ записи (не тип, не уточнитель): код statement_refused; остальные пишутся."""
+    from philograph.knowledge.statements import StatementError, Statements
+
+    real = Statements.add
+
+    def refusing(self, subject, type_, **kwargs):
+        if self.entities.label(subject) == "Юм":
+            raise StatementError("запись отклонена по иной причине")
+        return real(self, subject, type_, **kwargs)
+
+    monkeypatch.setattr(Statements, "add", refusing)
+    external(
+        stand,
+        [stmt("Юм", "holds", "Привычка", 2, Q2), stmt("Кант", "holds", "Опыт", 1, Q1)],
+    )
+    assert dropped_codes(events) == ["statement_refused"]
+    assert len(stand.statements()) == 1
+    assert check_run_accounting(stand, events)["drop_reasons"] == {"statement_refused": 1}
+
+
+@req(EO, CODE, invariant="entity_ambiguous — неоднозначная привязка, сущность не создаётся молча")
+def test_entity_ambiguous_code(stand, events):
+    stand.onto.person("Иоанн")
+    stand.onto.person("Иоанн")
+    before = stand.entities_of("person")
+    external(stand, [stmt("Иоанн", "holds", "Опыт", 1, Q1)])
+    assert dropped_codes(events) == ["entity_ambiguous"]
+    assert stand.entities_of("person") == before
+    assert stand.statements() == []
+    check_run_accounting(stand, events)
