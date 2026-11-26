@@ -2,7 +2,7 @@
 
 ## Why
 
-Диагноз [docs/audit/extraction-diagnosis.md](../../../docs/audit/extraction-diagnosis.md) (26.11.2026) по задаче [spec-ontology-reextraction.md](../../../docs/process/spec-ontology-reextraction.md):
+Диагноз [docs/audit/extraction-diagnosis.md](../../../../docs/audit/extraction-diagnosis.md) (26.11.2026) по задаче [spec-ontology-reextraction.md](../../../../docs/process/spec-ontology-reextraction.md):
 
 - Отброшено ~95% (20 557 против 1099 созданных). Почти всё — не утверждения, а целые фрагменты: строгая схема шлюза бракует весь ответ из-за одного поля (П2), клиент знаний рвёт вызов раньше, чем шлюз заканчивает повторы (П1).
 - 639 из 817 запусков навсегда «running»: исключение внутри `extract_version` не завершает запуск.

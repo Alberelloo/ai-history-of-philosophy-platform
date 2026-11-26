@@ -1,6 +1,6 @@
 # Tasks
 
-Ветка `claude/reextract-claude` от `origin/claude/embedding-docker`. Задача — [spec-ontology-reextraction.md](../../../docs/process/spec-ontology-reextraction.md), диагноз — [extraction-diagnosis.md](../../../docs/audit/extraction-diagnosis.md).
+Ветка `claude/reextract-claude` от `origin/claude/embedding-docker`. Задача — [spec-ontology-reextraction.md](../../../../docs/process/spec-ontology-reextraction.md), диагноз — [extraction-diagnosis.md](../../../../docs/audit/extraction-diagnosis.md).
 
 ## 1. План
 
