@@ -592,3 +592,32 @@
 Вердикт: **не принято**.
 - Тестировщику: в генератор `ontologies` и в сценарий добавить сущность с русским основным названием и QID, у которой подпись `ru` в Wikidata другая. Ожидание: название не меняется. Мутацию J11 добавить в `mutations.yaml`. Желательно: J13 (справочник с `lang=ru`) и J14 в test_rollback_invariant.
 - Ревьюверу: ревью 40bae79, пункт 4.1.
+
+## Судья (третий круг) — 2026-11-26, коммит 7b258e1
+
+Машина: 1 ГБ ОЗУ, 1 CPU, без Docker. Полный `pytest` и e2e не запускались. Каждый pytest шёл под `flock`. Мутации делались в отдельном worktree (`PYTHONPATH` на его `src`), после проверки worktree удалён. Рабочая копия не менялась: `git diff` пуст. С 232de6a код `src/` не менялся. Поменялись тесты, мутации и спецификация (О34, запись в `progress.md`). Пункт 4.1 отмечен по третьему ревью.
+
+| Требование | Сценарий / инвариант | Журнал тестировщика | Мой прогон | Вывод системы (CLI-подпроцессы, файл SQLite: стенд П1–П4 и 24 датированные персоны, шлюз модели — HTTP-заглушка) | Итог |
+|---|---|---|---|---|---|
+| Миграция | 8 сценариев, test_migration_invariant, О29/О34 | passed, мутации убиты | passed. J23 (`plan`: мусор только по субъекту) → test_dry_run упал | `plan`: код 0, дамп не изменился, снято 7 (number 1, stopword 1, empty 1, not_a_name 4), merged 4, lost 0. `run --translate model`: код 0, 1 вызов модели, «Hume» в запросе нет, renamed wikidata 1 / model 5, lost 0, attributions.lost 0. **Событий нет: stdout и stderr без единой строки журнала** | **не подтверждено** (журнал; J22) |
+| Снятие | 3 сценария, test_retire_invariant | passed | passed. J20 (утверждение со всеми скрытыми атрибуциями показывается) → test_retire_invariant упал | после `rollback` restored 7. Событий `knowledge.entity.retired/restored` в выводе нет | не подтверждено (журнал) |
+| Перевод | сценарии, test_translation_invariant | passed | passed | см. «Миграция». `knowledge.migration.translated` в выводе нет | не подтверждено (журнал) |
+| Откат | сценарии, test_rollback_invariant | passed | passed. J21 (откат закрывает все открытые пункты, а не только пункты запуска) → test_rollback_closes_run_items упал | `rollback`: код 0, дамп данных равен дампу до `run`, merges_undone 4, restored 7, kept 0. Неизвестный run_id: код 2. `knowledge.migration.rolled_back` в выводе нет | не подтверждено (журнал) |
+| Замер | сценарии, test_quality_invariant | passed | passed | до: код 1, А1=0,7292, А2=1, А3=4, А4=3, А5=24, А6=12, А7=7, А8 «не измерено». После `--baseline`: код 0, А1=1, А2=А3=А4=А7=0, А5=24, А6=12, А8=0. md5 файлов базы не изменились. **`knowledge.quality.measured` в выводе нет** | не подтверждено (журнал) |
+
+Прогоны:
+- `test_ontology_migration.py`, `test_ontology_migrate_unit.py`, `test_integrity_unit.py`: 107 passed за 342 s.
+- `lint-imports`: 3 kept. Трассировка: 415 из 415.
+- `ruff check` (E501 в `scripts/dev_stack.py:100`) и `ruff format --check` (2 файла) падают. Это файлы Lead'а из базы `claude/embedding-docker`, а не этого изменения.
+
+Приёмка А1–А8 на синтетике показана (таблица выше). Замер на стенде Lead'а запускается так же: `python -m philograph.knowledge.quality_report` с `PHILOGRAPH_DATABASE_URL`. А9 чисто, кроме ruff в файлах Lead'а.
+
+**Дыра 1: команды не пишут журнал.** `ontology_migrate` и `quality_report` нигде не вызывают `events.configure(sinks=…)`. В `knowledge/main.py` такой вызов есть, в CLI — нет. Поэтому при запуске командой все события спецификации уходят в пустоту, включая `knowledge.migration.aborted` и `knowledge.migration.failed` уровня error. Тесты этого не видят: они вызывают `main()` в процессе, где приёмник подключает фикстура `events`. По 3.4 это признак «событие в журнале есть, а на стенде его нет». То же есть у `life_dates`, `geo_enrich` и `epoch_context`, но спецификация этого изменения журнал команды требует.
+
+**Дыра 2: выжила J22.** В `integrity.compare` атрибуция сравнивается по `(вид, автор)` без позиции: `if (kind, who_now) not in {(k, w) for k, w, _s in have}`. Прошли все 78 тестов `test_ontology_migration.py` и 8 тестов `test_integrity_unit.py`. Спецификация определяет потерю по тройке `(вид, автор, позиция)`. Смену позиции при слиянии сейчас ничто не ловит.
+
+Подгонка не найдена. `skip` и `xfail` нет. Изменения тестов после 232de6a только усиливают проверки. Сужение шагов 1 и 3 в спецификации записано решением ведущего О34.
+
+Вердикт: **не принято**.
+- Разработчику: подключить приёмник журнала в CLI `ontology_migrate` и `quality_report`. Нужен поток, который не ломает JSON отчёта в stdout. Нужен ли общий подход для остальных команд оператора, решает ведущий.
+- Тестировщику: (1) тест, который запускает обе команды подпроцессом и проверяет события в выводе (`knowledge.migration.step/run/rolled_back`, `knowledge.quality.measured`, `knowledge.migration.aborted`), плюс мутация «без `events.configure`»; (2) сценарий или property, где шаг меняет позицию атрибуции, → аварийный откат и А8 > 0, плюс мутация J22 в `mutations.yaml`.
