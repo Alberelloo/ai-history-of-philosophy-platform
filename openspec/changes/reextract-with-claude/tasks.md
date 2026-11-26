@@ -14,7 +14,7 @@
 - [x] 2.4 `llm`: `LLMGateway.role_info`, маршрут `GET /v1/roles/{role}`, токены в `spend_summary`. Юнит-тесты `tests/llm/test_role_info_unit.py`.
 - [x] 2.5 `filling.py`: мягкая схема шлюзу, `_item` (поштучная проверка), `apply_reply`, проверки абзаца и цитаты до сущностей, `_drop` с кодом и счётом, ветка «не 200» считается, коды отказов шлюза, таймаут по бюджету роли, модель роли в запуске и `Provenance`, метрики, `fail_run` и `knowledge.run.failed`, фрагменты по объёму; `main.py` — `PHILOGRAPH_EXTRACTION_TIMEOUT_SECONDS`. Юнит-тесты `tests/knowledge/test_reply_items_unit.py`, `test_fragments_unit.py`, `test_run_lifecycle_unit.py`.
 - [x] 2.6 Промпт `ontology.extract`: художественный текст, атрибуция автору, поля без `null`.
-- [ ] 2.7 `knowledge/external_extraction.py`, `knowledge/extraction_prices.yaml` (package data): `export`, `ingest` (`--replace`), `report`. Юнит-тесты `tests/knowledge/test_external_extraction_unit.py`.
+- [x] 2.7 `knowledge/external_extraction.py`, `knowledge/extraction_prices.yaml` (package data): `export`, `ingest` (`--replace`), `report`. Юнит-тесты `tests/knowledge/test_external_extraction_unit.py`.
 - [ ] 2.8 `ruff check . && ruff format --check .`, `lint-imports`, `python scripts/check_traceability.py` (ADDED без тестов до 3.x — ожидаемо), `pytest -q tests/knowledge tests/llm`. Список тестов прежнего контракта — в `progress.md`.
 
 ## 3. Тестировщик

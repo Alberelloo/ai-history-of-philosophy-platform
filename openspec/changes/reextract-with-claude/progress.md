@@ -51,3 +51,9 @@
 
 - Добавлены правила: «персонажи художественного текста — не персоны …», «атрибутируй автору произведения: attributed_to — автор»; к «не включай в объект вовсе» — «не пиши null».
 - Проверка: обе фразы есть в инструкции (нижний регистр); `test_extraction_entities.py -k prompt_language` — 6 passed.
+
+## 2026-11-26 — 2.7 внешний извлекатель
+
+- `knowledge/external_extraction.py`: `task`/`export` (JSONL: строка `task` + строки `fragment`), `read_replies` (JSON-объект или JSONL), `ingest` (через `Filling.apply_reply`; `reply_missing`, `reply_invalid`; `--replace` — откат прежних внешних `done`-запусков версии), `report`/`write_report`, `Price`/`price_for` (тариф `knowledge/extraction_prices.yaml`, аргументы важнее), `build` (база знаний + клиент библиотеки, кэш текстов абзацев версии), `main` (коды выхода 0/2/3). События `knowledge.extraction.exported`, `knowledge.extraction.report`.
+- В дельту «Отчёт о запусках» добавлен столбец «статус» (видно `failed`).
+- Прогон: `test_external_extraction_unit.py` — 9 passed (в том числе повтор без/с `--replace`: число утверждений, подтверждений, атрибуций после `--replace` то же).
