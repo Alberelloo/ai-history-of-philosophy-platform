@@ -915,6 +915,25 @@ class LLMGateway:
                 )
         return result
 
+    def role_info(self, role: str) -> dict[str, Any]:
+        """Модель роли и бюджет структурированного вызова со всеми попытками, в секундах:
+        ``(schema_retries + 1) · ((max_retries + 1) · timeout + Σ пауз повторов)``. По нему
+        клиент ставит таймаут вызова (ontology-extraction, «Таймаут вызова модели»)."""
+        try:
+            conf = self.config.roles[role]
+        except KeyError:
+            raise UnknownRole(role) from None
+        pauses = sum(
+            self.config.retry_base_seconds * 2 ** (k - 1)
+            for k in range(1, self.config.max_retries + 1)
+        )
+        attempt = (self.config.max_retries + 1) * conf.timeout_seconds + pauses
+        return {
+            "role": role,
+            "model": conf.model,
+            "call_budget_seconds": round((self.config.schema_retries + 1) * attempt, 3),
+        }
+
     def spend_summary(
         self, days: int = 1, group_by: tuple[str, ...] = ("budget",)
     ) -> list[dict[str, Any]]:

@@ -33,3 +33,9 @@
 
 - `filling_runs`: `extractor`, `source_id`, `fragments`, `duration_seconds`, `input_tokens`, `output_tokens`, `drop_reasons` (JSON), `failure`; миграция `_run_metrics` по образцу `knowledge:9` (пропуск существующих столбцов). Статус `failed` добавлен в комментарий перечня.
 - Прогон: `test_run_metrics_migration_unit.py` — 2 passed (база до миграции на SQLite, повтор, свежая база).
+
+## 2026-11-26 — 2.4 шлюз: сведения о роли, токены в сводке
+
+- `LLMGateway.role_info(role)` и `GET /v1/roles/{role}` (404 `unknown_role`); `Store.spend_summary` — суммы `input_tokens`, `output_tokens`.
+- Тест прежнего контракта, который меняет новая миграция (тестировщику, 3.3): `tests/knowledge/test_mentions_cards.py` (`assert ks.migrations.latest() == 9`) — теперь последняя `knowledge:10`.
+- Прогон: `pytest -q tests/llm` — 23 passed (в том числе `test_role_info_unit.py`, 3).
