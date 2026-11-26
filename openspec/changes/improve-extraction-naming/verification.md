@@ -683,3 +683,48 @@
 **Дефекты:** найдены только пробелы тестов (перечислены выше), расхождений кода со спецификацией нет.
 
 Штатный прогон `scripts/mutation_check.py --change improve-extraction-naming --id <id>` в отдельном worktree: ru-primary-not-russian → тест test_primary_choice_by_item упал; no-type-creates-entity → test_new_entity_without_type_dropped_by_code упал. Остальные мутации прогнаны тем же способом (патч в worktree от HEAD, pytest по связанным файлам), строки выше — их результат.
+
+## Судья — третий круг, 2026-11-26, коммит 5e86f9c
+
+Судья — новый субагент без истории разработки. Тесты гонялись по одному файлу (1 ГБ RAM). Мутации и проба системы — в отдельном `git worktree` на 5e86f9c (PYTHONPATH на worktree). Worktree удалён, `git diff -- src` пуст.
+
+**Замечания прежних судей:**
+- RUF043 закрыто: `match=r"^dating:type$"`, `ruff check` по 27 файлам изменения чисто.
+- strip в property-тесте закрыто: `test_rejection_invariant` берёт сырой вход, `label` сверяется с оракулом.
+- J1 закрыто: `roman-any-case` через `--id` валит оба property-теста языка.
+- J3 закрыто: `reverse-interval-accepted` валит оба property-теста дат.
+- Ревью О17/О18 закрыто: круг 2 кода, 49f6b99. **Но О22 (c1a9177: код и правка дельты — хранимая форма strip+NFC) ревьювер не вычитывал**: после 49f6b99 записей ревьювера в progress.md нет.
+
+| Требование | Журнал тестировщика | Мой прогон | Вывод системы (мой фрагмент, настоящий `Filling.extract_version`, фейковая модель) | Итог |
+|---|---|---|---|---|
+| entity-naming «Язык названий сущностей» | аудит О21, мутации roman-any-case и др. | test_entity_naming 54 passed in 74s; roman-any-case 2/2 упали; **своя O1 выжила** | «John Locke» (en) → тот же `e_3c659bd29e3b`, основное `ru` «Локк», вариант `en`; `renamed {entity_id, lang: ru, previous_lang: en}`; справочник `q=Локк` → тот же id, `label="Локк"`; `language="ru"` в запросе | **не подтверждено** (O1) |
+| entity-naming «Валидность названий сущностей» (вкл. О22 strip+NFC) | аудит, stored-raw-* | 54 passed; stored-raw-set-primary и rule-particle-case-sensitive упали; своя O2 поймана; **своя O5 выжила** | `rejected {person, "2.3", number}` + `dropped entity:number`; `rejected {person, "the teacher of Hume", not_a_name}` + `dropped entity:not_a_name` | **не подтверждено** (O5) |
+| entity-dating «Извлечение дат» | аудит, мутации | test_entity_dating_extraction 15 passed in 60s; reverse-interval-accepted и check-order-era-single упали; своя O3 поймана | Локк «1632–1704» → `lifespan` (1632, 1704) `year`; произведение «1690» → `dating`; Демокрит «ок. 460–370 до н. э.» с цитатой «до н.э.» → `lifespan` approx, границы −464…−364; Спиноза «XVII в.» и Беркли «1685» → `dropped dating:single_year`; абзац 7 из 3 → `dropped dating:paragraph` | подтверждено |
+| ontology-extraction «Структурированный вывод» / «Нормализация» | аудит | test_extraction_entities 16 passed; no-type-creates-entity упала; своя O4 поймана | привязка «Локк» к «John Locke» по `en`, новой персоны нет | подтверждено |
+| epochs / epoch-context / geo-timeline (MODIFIED) | 6 passed | test_invalid_name_external 6 passed | — (тестовый стенд) | подтверждено |
+
+Прочие прогоны (все passed): test_entity_items_unit 12, test_extraction_codes_unit 11, test_filling 30 (ожидания прежние). `mutation_check.py --coverage improve-extraction-naming`: мутации есть у всех 8 требований. `ruff check` и `ruff format --check` по 27 файлам изменения чисто. `lint-imports`: 3 kept, 0 broken. `check_traceability.py`: 415 из 415. Полный pytest не запускался: ограничение машины, не проверено.
+
+Мутации из списка через `--id`: roman-any-case, reverse-interval-accepted, stored-raw-set-primary, check-order-era-single, rule-particle-case-sensitive, no-type-creates-entity. Все ожидаемые тесты упали.
+
+Свои мутации (в списке их нет):
+- **O1 (язык, п. 1).** `_ROMAN_WORD = ^[IVXCDM]+$` — без `L`. Не эквивалентна: `lang_for("Ли XL")` даёт `und` вместо `ru`, `is_russian("Пий XL")` — False вместо True, а значит меняется выбор основного. Результат: test_lang_for_any_text, test_language_invariant_create_and_add_name, test_no_latin_name_has_ru, test_naming_unit (68) прошли — **не поймана**. Причина: в `strategies.ROMAN` нет ни одного слова с `L` (L, XL, LX, LIV…).
+- **O2 (порядок причин).** `not_a_name` раньше `sentence`. Упали test_check_name_any_input, test_sentence_instead_of_term, test_rejection_invariant. При этом в таблице аудита пункт «Порядок: sentence раньше not_a_name» ссылается на мутацию `rule-sentence-before-number`, которая этот порядок не ломает: строка таблицы неверна.
+- **O3 (даты, Г1 ≤ Г2).** `values[0] >= values[1]`, то есть «1724–1724» → `unparsed`. Упал test_dating_check_any_input. test_dating_invariant прошёл: равных годов генератор почти не даёт, `@example` на них нет.
+- **O4 (коды событий).** Новая сущность без типа даёт `entity:type` вместо `entity:no_type`. Упали test_extraction_entities (1) и test_extraction_codes_unit (1).
+- **O5 (хранимая форма strip+NFC).** `naming.clean` через NFKC вместо NFC. Не эквивалентна: «Kant Hume» хранится как «Kant Hume», а 41 лигатура «ﬁ» даёт `sentence` вместо `None`, потому что знаков 82 вместо 41. Результат: test_stored_form_strip_nfc, test_stored_form_via_extraction, test_signs_counted_after_nfc прошли — **не поймана**. Причина: `raw_names` не даёт символов, которые NFC и NFKC нормализуют по-разному (внутренний EM SPACE/NBSP, лигатуры, полноширинные, надстрочные цифры).
+
+Файлы Lead'а: в `filling.py` только точки вызова (`EntityItems`, `language`, цикл `date_item`, `accept_core_report`, перехват `InvalidName`, `entity_types()`) и данные схемы `_entities_schema`. Переход на `simple_time` относится к `add-wikidata-life-dates`. Логики правил названий и дат в этих файлах нет.
+
+Подгонка: не найдена. Оракул стратегий не импортирует `naming`, `dating`, `dates`. Ожидания под вывод не правились: вывод системы на моём фрагменте совпадает со спецификацией. O1 и O5 — пробелы в области входов генераторов, как J1 и J3.
+
+Вердикт: **не принято** — вернуть:
+- тестировщику:
+  - O1: добавить в `ROMAN` слова с `L` (L, XL, LX, LIV) и `@example` «Ли XL» → `ru` в test_lang_for_any_text и test_language_invariant_create_and_add_name;
+  - O5: добавить в `raw_names` и `scripts_mix` символы, различающие NFC и NFKC (внутренний EM SPACE/NBSP, «ﬁ», полноширинные), и `@example` в test_stored_form_strip_nfc и test_signs_counted_after_nfc;
+  - O1, O5 и O2 записать в `mutations.yaml` с ожидаемыми property-тестами;
+  - исправить строку аудита «sentence раньше not_a_name» (мутация O2);
+  - желательно: `@example` равных годов «1724–1724» в test_dating_invariant;
+- ревьюверу: вычитать О22 (c1a9177 и правку дельты `entity-naming`, определение «Название»).
+
+Разработчику и Lead'у возвратов нет.
