@@ -56,3 +56,40 @@
 - Фикстуры: `tests/knowledge/fixtures/cliopatria/{build10,europe}.geojson`, `labels.json`, `manifest.yaml` (24 КБ) и помощник `tests/knowledge/cliopatria_fixture.py` (архив во временный каталог, `FakeWikidata`).
 - Юнит-тесты разработчика `tests/knowledge/test_polities_unit.py`: `33 passed in 2.38s`. Затронутые: `test_geo_layer.py` 34 passed, `test_geo_enrich.py` 39 passed, `test_wikidata_unit.py` 36 passed, `test_wikidata.py` 52 passed. `ruff check`, `ruff format --check` по изменённым файлам чисто, `lint-imports`: 3 kept, 0 broken.
 - Пробная сборка на реальном архиве (`--offline`, без меток, в scratchpad): 50,6 с, maxrss 64 792 КБ, артефакт 54 МБ; `measure`: max gzip 136 935 Б (2000 год), `inactive=0`, `full_sphere=0`. Цифры 8.x — ниже, со всеми метками.
+
+## 2026-11-26 — замеры на реальном датасете 8.1–8.3 (разработчик, круг 1)
+
+Сырые файлы — в `data/cliopatria/` (вне git): `build.out`, `build.err`, `measure.json`, `measure.err`, `measure-all.json`, `measure-all.err`. Во время сборки на сервере работал чужой стенд (`.venv313 … dev_stack.py --demo`), свободно было ~855 МБ. Мой стенд не запускался.
+
+- **8.1.** `python -m philograph.knowledge.polities_build fetch` → `data/cliopatria/cliopatria.geojson.zip`, 47 151 553 Б, SHA-256 `20d8e38baf8ea958d149883bc9b8e10f72c703bfdc79cb655b4fe16534c2f003`, совпадает с манифестом (повторный `fetch` без `--record` сверил сумму и прошёл). Внутри архива — `cliopatria.geojson`, 177 317 136 Б.
+- **8.2.** `/usr/bin/time -v python -m philograph.knowledge.polities_build build` (с сетью, пустой кэш меток): код выхода 0; Elapsed 1:14.76, User 47.40 с; **Maximum resident set size 74 312 КБ** (предел 600 МБ — выполнен). Событие:
+  `{"event": "knowledge.polities.built", "dataset_version": "v0.2.2", "rows": 13246, "polities": 12869, "skipped_relation": 377, "skipped_invalid": 0, "qids": 1526, "ru_labels": 12536, "ru_sitelinks": 1, "label_requests": 31, "label_failures": 0, "intervals": 509, "vertices_in": 3678493, "vertices_out": 3225145, "tiny_kept": 17, "seconds": 74.325}`.
+  Артефакт `polities.sqlite` — 54 378 496 Б, кэш меток `labels.ru.json` — 149 179 Б.
+- **8.3.** `measure` (13 контрольных лет):
+
+  | год | образований | ru | тело, Б | gzip -9, Б |
+  |---|---|---|---|---|
+  | −500 | 47 | 44 | 44 845 | 11 749 |
+  | −300 | 40 | 39 | 51 428 | 14 132 |
+  | 0 | 43 | 40 | 62 475 | 18 836 |
+  | 400 | 51 | 50 | 74 954 | 22 631 |
+  | 800 | 80 | 77 | 109 682 | 30 301 |
+  | 1000 | 131 | 123 | 143 093 | 40 271 |
+  | 1300 | 150 | 141 | 177 578 | 49 171 |
+  | 1500 | 136 | 131 | 220 742 | 58 256 |
+  | 1650 | 124 | 115 | 273 619 | 69 536 |
+  | 1700 | 111 | 102 | 301 041 | 78 646 |
+  | 1800 | 128 | 115 | 343 312 | 86 795 |
+  | 1900 | 93 | 86 | 429 536 | 120 264 |
+  | 2000 | 191 | 188 | 485 915 | 139 104 |
+
+  Событие: `{"event": "knowledge.polities.measured", "years": 13, "max_gzip_bytes": 139104, "max_gzip_year": 2000, "ru_share": 0.9442, "inactive": 0, "full_sphere": 0}`.
+  `measure --all-intervals` (509 интервалов, 31 с): `max_gzip_bytes` 147 926 (1919 год), `intervals_inactive` 0, `intervals_full_sphere` 0.
+  - **H2** — выполнен: максимум 139 104 Б на контрольных годах, 147 926 Б по всем интервалам; предел 512 000 Б. Допуск `tolerance_deg` 0,05 не менялся, попытка одна.
+  - **H3** — выполнен: `ru_share` 0,9442 (1251 из 1325 по контрольным годам); предел 0,90. Запасной путь `ruwiki` дал одну строку (`ru_sitelinks=1`), без него доля та же с точностью до 0,0001.
+  - **H1 на реальных данных:** `inactive` 0 на контрольных годах и на всех 509 интервалах.
+  - **Обход колец:** `full_sphere` 0 везде, в том числе у образований через антимеридиан.
+- Наблюдения для клиента (круг 2), не дефекты сборки:
+  - в v0.2.2 владения и колонии — строки `POLITY` с именем в скобках («(Spanish Empire)», «(Holy Roman Empire)»), у них тот же QID, что у метрополии. Поэтому на 1650 две разные строки подписаны «Испанская империя», а у «(Holy Roman Empire)» и «Holy Roman Empire Minor States» подпись «Священная Римская империя». Повторяющиеся подписи — вопрос раскладки подписей в 4.2, риск R8 в design.md;
+  - метка Wikidata бывает шире образования: у «Tibet» метка — «история Тибета». Метка берётся как есть, правок по строке нет;
+  - упрощение сокращает вершины слабо (3 678 493 → 3 225 145): контуры Cliopatria и так грубые. H2 выполнен с запасом в 3,5 раза.
