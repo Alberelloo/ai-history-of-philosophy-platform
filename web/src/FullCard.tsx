@@ -408,18 +408,26 @@ function PersonSummary({ card }: { card: Card }) {
   );
 }
 
-function PlaceCountry({ geo }: { geo: Geo | null | undefined }) {
+// Инфобокс места: координаты всегда (тело не пустое при любом исходе поиска страны),
+// страна — только когда найдена по координатам.
+function PlaceFacts({ geo }: { geo: Geo | null | undefined }) {
   const t = useT();
   const modern = useModernCountry(geo, false);
-  if (!modern) return null;
+  if (!geo) return null;
   return (
-    <dl className="card-facts card-facts--country">
+    <dl className="card-facts card-facts--place">
       <div className="card-facts__item">
-        <dt>{t.card.country}</dt>
-        <dd data-card-country="" data-country-kind="modern">
-          {t.card.nowCountry(modern)}
-        </dd>
+        <dt>{t.card.coordinatesLabel}</dt>
+        <dd data-card-coordinates="">{t.card.coordinates(geo.lat, geo.lon)}</dd>
       </div>
+      {modern && (
+        <div className="card-facts__item">
+          <dt>{t.card.country}</dt>
+          <dd data-card-country="" data-country-kind="modern">
+            {t.card.nowCountry(modern)}
+          </dd>
+        </div>
+      )}
     </dl>
   );
 }
@@ -588,7 +596,7 @@ export function FullCard({
                 )}
               </p>
             )}
-            {card.type === "place" && <PlaceCountry geo={card.geo} />}
+            {card.type === "place" && <PlaceFacts geo={card.geo} />}
             {card.empty && (
               <div className="card-empty" data-card-empty="">
                 <p>{t.card.emptyTitle}</p>

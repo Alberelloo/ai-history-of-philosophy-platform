@@ -289,6 +289,11 @@ export const ru = {
     collapse: "Свернуть",
     polityYear: (year: number) => (year < 0 ? `на ${-year} год до н. э.` : `на ${year} год`),
     nowCountry: (name: string) => `ныне ${name}`,
+    coordinatesLabel: "Координаты",
+    coordinates: (lat: number, lon: number) => {
+      const n = (x: number) => Math.abs(x).toFixed(2).replace(".", ",");
+      return `${n(lat)}° ${lat < 0 ? "ю. ш." : "с. ш."}, ${n(lon)}° ${lon < 0 ? "з. д." : "в. д."}`;
+    },
     country: "Страна",
     facts: {
       author: "Автор",

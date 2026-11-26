@@ -277,6 +277,11 @@ export const en: Catalog = {
     collapse: "Collapse",
     polityYear: (year: number) => (year < 0 ? `in ${-year} BCE` : `in ${year}`),
     nowCountry: (name: string) => `now ${name}`,
+    coordinatesLabel: "Coordinates",
+    coordinates: (lat: number, lon: number) => {
+      const n = (x: number) => Math.abs(x).toFixed(2);
+      return `${n(lat)}° ${lat < 0 ? "S" : "N"}, ${n(lon)}° ${lon < 0 ? "W" : "E"}`;
+    },
     country: "Country",
     facts: {
       author: "Author",
