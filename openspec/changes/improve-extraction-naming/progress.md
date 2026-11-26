@@ -214,3 +214,17 @@
 
 - Spec `entity-naming`, определение *Название*: текст SHALL храниться в форме strip+NFC на любом пути записи. Код: `naming.clean` (strip+NFC; им же пользуются `check_name` и `reject`), применён в `Entities.create`, `add_name`, `set_primary_name` — раньше хранился сырой текст. Юнит: `test_extraction_codes_unit.py::test_names_stored_strip_nfc`.
 - Прогоны: `test_extraction_codes_unit` 11, `test_entity_naming` 50, `test_registry_entities` 33 + 1 skipped, `test_entity_items_unit` 12, `test_invalid_name_paths_unit` 4, `test_ontology_migrate_unit` 13 — passed.
+
+## Ревьювер — О22, 2026-11-26, коммит c1a9177 и тесты 09be57a (субагент `reviewer`)
+
+`naming.clean` (strip + NFC) теперь стоит в `Entities.create`, `add_name`, `set_primary_name`, в `check_name` и `reject`, так что хранится то же, что проверяется. Дельта `entity-naming` согласована с кодом. Три мутации `stored-raw-*` соответствуют трём путям записи.
+
+Прогоны: `test_extraction_codes_unit.py` — 11 passed. `ruff check` и `format --check` чисто.
+
+Влияние на существующие данные:
+- **Пробелы по краям.** Поиск, дубли и А4 работают по столбцу `names.normalized`, а он и раньше обрезался. Старые названия с пробелами находятся новыми, как прежде. Подпись в справочнике и на карте у старых строк остаётся прежней, у новых — без пробелов. Сценарии принятых `entity-catalog` и `knowledge-graph` от этого не зависят.
+- **Старые названия в NFD.** NFC в `normalize` появился раньше, ещё в этом изменении, а не в О22. Строки, записанные до него в NFD, хранят `normalized` без NFC. Пример: «Йоганн» в NFD при старом правиле даёт «и» и отдельный знак бреве. Новый запрос даёт NFC «й» и такую строку не находит, поэтому возможна новая сущность-дубль.
+
+Блокирует: нет. На стенде NFD маловероятен: тексты приходят через нормализацию библиотеки.
+
+Желательно: в миграции онтологии (шаг `lang_fix` или отдельный) пересчитать `names.normalized` текущим `normalize` для всех строк, а `text` привести к `clean`, с записью в журнал действий для отката. Альтернатива — задача в `quality-followups`.
