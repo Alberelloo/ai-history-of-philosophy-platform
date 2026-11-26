@@ -1996,3 +1996,43 @@ def test_rollback_keeps_same_key_rename(onto, events, model, human):
     after = State.read(onto.statements.engine)
     assert after.label(e) == human, after.name_set(e)
     assert events.one("knowledge.migration.rolled_back")["kept"] == 1
+
+
+@req(
+    OM,
+    "Перевод названий",
+    invariant="О33: источники не переводятся ни из Wikidata (шаг 5), ни моделью (шаг 6)",
+)
+def test_sources_not_translated(onto, events):
+    records = {
+        "Q900021": record("Q900021", ru="Опыт о человеческом разумении", en="Essay", classes=HUMAN),
+        "Q900022": record("Q900022", ru="Причинность", en="Causality", classes=HUMAN),
+    }
+    src_wd = raw_entity(
+        onto, "source", [("en", "An Essay Concerning Human Understanding", "primary")], "Q900021"
+    )
+    con_wd = raw_entity(onto, "concept", [("en", "causality", "primary")], "Q900022")
+    src_llm = raw_entity(onto, "source", [("en", "Treatise of Human Nature", "primary")], None)
+    con_llm = raw_entity(onto, "concept", [("en", "substance", "primary")], None)
+    llm = FakeLLM.by_label(
+        {
+            "An Essay Concerning Human Understanding": "Опыт о разумении",
+            "Treatise of Human Nature": "Трактат о человеческой природе",
+            "substance": "Субстанция",
+        }
+    )
+    before = State.read(onto.statements.engine)
+    migration(onto, fetch=RecordFetch(records), llm=llm).run(translate="model")
+    after = State.read(onto.statements.engine)
+    assert after.label(con_wd) == "Причинность"  # шаг 5 для понятия
+    assert after.label(con_llm) == "Субстанция"  # шаг 6 для понятия
+    for src in (src_wd, src_llm):
+        assert after.name_set(src) == before.name_set(src), after.name_set(src)
+    sent = [i["label"] for call in llm.calls for i in llm.items(call)]
+    assert "substance" in sent
+    assert not {"An Essay Concerning Human Understanding", "Treatise of Human Nature"} & set(
+        sent
+    ), sent
+    assert not [
+        e for e in events.of("knowledge.entity.renamed") if e["entity_id"] in (src_wd, src_llm)
+    ]
