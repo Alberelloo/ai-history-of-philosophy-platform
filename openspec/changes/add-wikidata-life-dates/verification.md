@@ -299,3 +299,20 @@ Worktree удалён, `git diff -- src` пуст.
 Правило О23 (каждое множество спецификации — в генераторах целиком) проверяется тестом `tests/knowledge/test_strategies_cover_spec_sets.py`: множества переписаны из дельт руками, для каждого элемента `hypothesis.find` ищет пример в генераторе (82 passed). По этому изменению:
 - person-quality: генератор лиц `persons_with_variants` порождает `merge:name`, `merge:model_pair`, `merge:qid_confirmed`, `review:dates`, `review:decided_conflict`, `review:qid_cluster`, `review:single_name`, `review:variant`; коды решений человека и команды QID (`merge:review`, `review:qid_candidate`, `review:qid_taken`, `apart:decided/none/qid/type`) есть в сценарных тестах. Найденные пробелы закрыты: шаги 8–9 `same_person` (`review:single_name`, `review:variant`, `apart:none`) — test_person_quality::test_same_person_step_order (11 passed); `review:qid_taken` — test_life_dates::test_qid_taken_queued (`auto` и не-персона, 2 passed).
 - life-dates: `wd_times` порождает каждую строку таблицы точностей (11, 10, 9, 8, 7, 6), точность ниже 6, год 0000, оба знака; `wd_claim_values` — все три ранга; `DECISIONS` = {pending, accepted, auto, rejected}.
+
+## Тестировщик — О26 (пары порядка, обход после пропуска), 2026-11-26, тесты на 1978deb
+
+- Пара шагов 2/3 `apply` (другой QID и занятый QID) — `@example` в `test_qid_confirmation_invariant`, мутация `taken-before-conflict`.
+- `continue → break`: выжили `suggest` (L353, L355), `apply` (L417, L430), обход связанных (L448, L451, L456) — закрыты `test_candidate_holder_after_skipped`, `test_refused_then_applied`, `@example` после `qid_taken`, `test_linked_after_skips`. Эквивалентны по спецификации: `validate` L138/L157 (код 2 тот же), `_search` L308 (сбой поиска для `suggest` не задан), `_import` L523 (отказ роли недостижим).
+- Не накладывается `rollback-removes-verified.patch` (код отката менялся вне этого изменения) — не правил, сообщаю.
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Подтверждение QID персон и произведений | taken-before-conflict | tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant | да (1 failed, 1 warning in 2.70s) |
+| Подтверждение QID персон и произведений | suggest-stops-after-free-candidate | tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped | да (1 failed, 1 warning in 0.93s) |
+| Подтверждение QID персон и произведений | suggest-stops-after-other-type-holder | tests/knowledge/test_life_dates.py::test_candidate_holder_after_skipped | да (1 failed, 1 warning in 0.98s) |
+| Подтверждение QID персон и произведений | apply-stops-after-refused | tests/knowledge/test_life_dates.py::test_refused_then_applied | да (1 failed, 1 warning in 1.00s) |
+| Подтверждение QID персон и произведений | apply-stops-after-taken | tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant | да (1 failed, 1 warning in 1.82s) |
+| Даты жизни из Wikidata | linked-stops-after-done | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.28s) |
+| Даты жизни из Wikidata | linked-stops-after-kind | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.45s) |
+| Даты жизни из Wikidata | linked-stops-after-bad-qid | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.80s) |

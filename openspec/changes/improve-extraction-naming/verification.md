@@ -838,3 +838,55 @@
 | Валидность названий сущностей | normalize-keeps-underscore (N11) | test_entity_naming.py::test_check_name_any_input | да (1 failed) |
 
 Первая версия D1 (`|до\s+нашей\s+эры` без группы) оказалась эквивалентной. Из-за приоритета `|` в `(?P<era>\s+…)` она не принимала «… до нашей эры», поэтому оба теста прошли. Патч переписан с группой `(?:…|…)`: так мутант действительно принимает маркер, и он упал.
+
+## Тестировщик — О26 (все пары порядка, обход после пропуска), 2026-11-26, тесты на 1978deb
+
+Подробности — в `improve-person-quality/verification.md`, раздел «О26». Здесь — итог по naming и dating.
+
+- `test_rule_order_pairs`: 6 возможных пар правил, 6 невозможных; `test_dating_check_order_pairs`: 14 пар, 1 невозможная; оба `*_complete` сверяют перечень пар со спецификацией.
+- Обход после пропуска: в `names_for` выжила `names-for-stops-after-rejected` — закрыта случаем `test_primary_choice_by_item[item4]`.
+- 11 устаревших патчей (после О22) сняты заново от HEAD. У `reject-label-raw` ожидаемый тест заменён на `test_rejected_variant_label_after_strip`: прежние пути больше не доходят до `reject` с сырым текстом.
+
+`scripts/mutation_check.py --change improve-extraction-naming --id <id>`:
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Извлечение дат | check-order-unparsed-paragraph | tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs | да (1 failed, 7 passed, 1 warning in 0.30s) |
+| Извлечение дат | check-order-era-quote | tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs | да (1 failed, 1 passed, 1 warning in 0.27s) |
+| Извлечение дат | check-order-era-unparsed | tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs | да (1 failed, 1 passed, 1 warning in 0.24s) |
+| Извлечение дат | check-order-single-numbers | tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs | да (1 failed, 1 warning in 0.24s) |
+| Извлечение дат | check-order-numbers-quote | tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs | да (1 failed, 8 passed, 1 warning in 0.34s) |
+| Валидность названий сущностей | rule-sentence-before-number | tests/knowledge/test_entity_naming.py::test_rule_order_pairs | да (1 failed, 1 warning in 0.39s) |
+| Валидность названий сущностей | rule-sentence-before-number | tests/knowledge/test_entity_naming.py::test_check_name_any_input | да (1 failed, 1 warning in 0.99s) |
+| Валидность названий сущностей | not-a-name-before-sentence | tests/knowledge/test_entity_naming.py::test_rule_order_pairs | да (1 failed, 5 passed, 1 warning in 0.29s) |
+| Валидность названий сущностей | not-a-name-before-sentence | tests/knowledge/test_entity_naming.py::test_check_name_any_input | да (1 failed, 1 warning in 0.48s) |
+| Валидность названий сущностей | not-a-name-before-sentence | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 1.39s) |
+| Валидность названий сущностей | stopword-before-person | tests/knowledge/test_entity_naming.py::test_rule_order_pairs | да (1 failed, 2 passed, 1 warning in 0.32s) |
+| Валидность названий сущностей | stopword-before-person | tests/knowledge/test_entity_naming.py::test_role_instead_of_name | да (1 failed, 1 warning in 1.14s) |
+| Валидность названий сущностей | stopword-before-person | tests/knowledge/test_entity_naming.py::test_check_name_any_input | да (1 failed, 1 warning in 0.73s) |
+| Валидность названий сущностей | stopword-before-person | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 3.15s) |
+| Валидность названий сущностей | add-name-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 3.25s) |
+| Язык названий сущностей | create-lang-given | tests/knowledge/test_entity_naming.py::test_language_by_script_on_every_path | да (1 failed, 1 warning in 1.94s) |
+| Язык названий сущностей | create-lang-given | tests/knowledge/test_entity_naming.py::test_language_invariant_create_and_add_name | да (1 failed, 1 warning in 1.14s) |
+| Язык названий сущностей | create-lang-given | tests/knowledge/test_naming_entities_unit.py::test_create_sets_lang_by_script | да (1 failed in 0.41s) |
+| Валидность названий сущностей | create-unchecked | tests/knowledge/test_entity_naming.py::test_section_number | да (1 failed, 1 warning in 1.07s) |
+| Валидность названий сущностей | create-unchecked | tests/knowledge/test_entity_naming.py::test_manual_core | да (1 failed, 1 warning in 0.79s) |
+| Валидность названий сущностей | create-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 3.03s) |
+| Валидность названий сущностей | create-unchecked | tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip | да (1 failed, 1 warning in 0.89s) |
+| Валидность названий сущностей | rejected-extra-field | tests/knowledge/test_entity_naming.py::test_section_number | да (1 failed, 1 warning in 1.65s) |
+| Валидность названий сущностей | rejected-extra-field | tests/knowledge/test_entity_naming.py::test_manual_core | да (1 failed, 1 warning in 2.53s) |
+| Валидность названий сущностей | rejected-extra-field | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 2.72s) |
+| Валидность названий сущностей | rejected-extra-field | tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip | да (1 failed, 1 warning in 1.64s) |
+| Валидность названий сущностей | rule-empty-as-number | tests/knowledge/test_entity_naming.py::test_empty_names | да (1 failed, 1 warning in 1.70s) |
+| Валидность названий сущностей | rule-empty-as-number | tests/knowledge/test_entity_naming.py::test_check_name_any_input | да (1 failed, 1 warning in 1.91s) |
+| Валидность названий сущностей | rule-empty-as-number | tests/knowledge/test_naming_unit.py::test_check_name | да (1 failed in 0.15s) |
+| Валидность названий сущностей | rule-exempt-ignored | tests/knowledge/test_entity_naming.py::test_rules_are_data | да (1 failed, 6 passed, 1 warning in 4.18s) |
+| Валидность названий сущностей | rule-exempt-ignored | tests/knowledge/test_entity_naming.py::test_check_name_any_input | да (1 failed, 1 warning in 1.40s) |
+| Валидность названий сущностей | rule-exempt-ignored | tests/knowledge/test_naming_unit.py::test_check_name | да (1 failed, 33 passed in 0.20s) |
+| Валидность названий сущностей | rule-no-nfc | tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc | да (1 failed, 1 warning in 1.16s) |
+| Валидность названий сущностей | rule-no-strip | tests/knowledge/test_entity_naming.py::test_signs_counted_after_nfc | да (1 failed, 2 passed, 1 warning in 2.07s) |
+| Валидность названий сущностей | set-primary-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 2.86s) |
+| Валидность названий сущностей | reject-label-raw | tests/knowledge/test_entity_naming.py::test_rejected_variant_label_after_strip | да (1 failed, 1 warning in 0.63s) |
+| Язык названий сущностей | names-for-stops-after-rejected | tests/knowledge/test_entity_naming.py::test_primary_choice_by_item | да (1 failed, 4 passed, 1 warning in 0.42s) |
+
+(Первый прогон `reject-label-raw` до замены ожидания: test_rejection_invariant и test_rejected_label_is_name_after_strip — НЕТ, см. выше.)

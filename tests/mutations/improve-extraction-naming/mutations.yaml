@@ -145,11 +145,9 @@ mutations:
   - id: reject-label-raw
     requirement: Валидность названий сущностей
     patch: reject-label-raw.patch
-    note: M3 судьи — reject пишет label без strip()/NFC (откат Д2)
+    note: после О22 create/add_name чистят название до reject — путь отказа варианта модели (О26); M3 судьи — reject пишет label без strip()/NFC (откат Д2)
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_rejected_variant_label_after_strip
-      - tests/knowledge/test_entity_naming.py::test_rejection_invariant
-      - tests/knowledge/test_entity_naming.py::test_rejected_label_is_name_after_strip
   - id: roman-any-case
     requirement: Язык названий сущностей
     patch: roman-any-case.patch

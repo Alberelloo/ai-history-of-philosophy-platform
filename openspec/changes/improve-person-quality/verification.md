@@ -566,3 +566,71 @@
 2. «Поиск дублей»: большая группа не мешает перебору остальных групп. Нужны: в test_last_word_group_cap (или property) малая группа с парой по последнему слову и датам рядом с большой, в любом порядке создания; мутация J3-3 в `mutations.yaml`; уточнённая строка аудита.
 
 Разработчику возвращать нечего: оба зонда на текущем коде дают поведение по спецификации.
+
+## Тестировщик — третий возврат судьи (О26), 2026-11-26, тесты на a126568 и 1978deb
+
+1. **Порядок причин компоненты — все сочетания.** В `S.persons_with_variants` новый вид лица `reasons_mix`.
+   - Компонента одного названия; в ней любое непустое сочетание преград, чаще ≥ 2:
+     - пара с двумя QID;
+     - пара с противоречащими датами;
+     - пара с решением «разные».
+   - Записи без QID, дат и решений связывают преграды рёбрами `merge:name`.
+   - Ожидание по порядку спецификации (`COMPONENT_REASONS`):
+     - рёбра `merge:*` уходят в очередь с причиной первой по порядку преграды;
+     - пара с противоречием дат идёт со своей `review:dates`;
+     - пары `apart:*` в очередь не идут.
+   - `@example(DATES_AND_DECIDED)` — пример судьи «Бэкон»: a 1561–1626, b и d без дат, c 1214–1292, «разные» c–d. Пример стоит в `test_plan_partition_any_order` и в `test_merge_invariant_two_orders`.
+   - `test_component_reason_combos_generated` проверяет, что генератор даёт все 7 сочетаний и что при каждой находке побеждает первая по порядку причина.
+   - Мутации, обе падают на обоих property-тестах:
+     - `reason-decided-before-dates` (J3-1);
+     - `reason-decided-before-qid` — пара qid/decided. Пару qid/dates уже закрывала `cluster-reason-dates-first`.
+2. **Поиск дублей: большая группа не прекращает перебор.**
+   - В `test_last_word_group_cap` [200/201] малые группы последнего слова создаются до большой («Кант») и после неё («Юм», «Беркли»). Их пары должны быть в кандидатах.
+   - Мутация `capped-group-stops-scan` (J3-3, `continue` → `break`) роняет `[201]`.
+3. **Общее правило «все пары порядка».**
+   - naming:
+     - `test_rule_order_pairs` — 6 возможных пар правил 1–5;
+     - `test_rule_order_pairs_complete` — 6 невозможных пар, с обоснованием по определениям и данным стоп-списка.
+   - dating:
+     - `test_dating_check_order_pairs` — 14 пар проверок 1–6;
+     - невозможна одна пара: `unparsed`/`single_year`, одиночный год определён только через формат;
+     - новые мутации: `check-order-unparsed-paragraph`, `-era-quote`, `-era-unparsed`, `-single-numbers`, `-numbers-quote`.
+   - life-dates: `@example` с шагами 2 и 3 сразу (другой QID и занятый QID ⇒ `qid_conflict`); мутация `taken-before-conflict`.
+   - Перевод миграции: `test_reply_check_order_pairs` — 6 пар `unknown`/`duplicate`/`not_russian`/`invalid`; мутации `reply-*` (yaml миграции — вместе с цепочкой мутаций).
+4. **Общее правило «элементы после пропуска».**
+   - Прогон «`continue` → `break`» на каждом цикле. Сайтов: `dedupe` 1, `naming` 3, `life_dates` 14, `ontology_migrate` 15.
+   - Выжившие и что их закрывает:
+     - naming `names_for` после отклонённого написания: новый случай `test_primary_choice_by_item[item4]`;
+     - life-dates `suggest` после кандидата без держателя и после держателя другого типа: `test_candidate_holder_after_skipped`;
+     - `apply` после `refused`: `test_refused_then_applied`;
+     - `apply` после `qid_taken`: `@example` в `test_qid_confirmation_invariant`;
+     - обход связанных после «уже в манифесте», «тип без дат» и `bad_qid`: `test_linked_after_skips`.
+   - Мутации добавлены в yaml: `names-for-stops-after-rejected`, `suggest-stops-after-*`, `apply-stops-after-*`, `linked-stops-after-*`.
+   - Эквивалентны по спецификации:
+     - `validate` L138/L157: форма манифеста уже ошибочна, код 2 тот же;
+     - `_search` L308: поведение при сбое поиска для `suggest` спецификацией не задано;
+     - `_import` L523: отказ реестра роли персоны недостижим, все роли таблицы допустимы.
+   - `ontology_migrate` — в журнале миграции.
+5. **Устаревшие патчи.** После О22 код `naming` поменялся, и 12 патчей перестали накладываться:
+   - `add-name-unchecked`, `create-lang-given`, `create-unchecked`, `rejected-extra-field`, `reject-label-raw`, `rule-empty-as-number`, `rule-exempt-ignored`, `rule-no-nfc`, `rule-no-strip`, `rule-sentence-before-number`, `set-primary-unchecked`;
+   - `person-empty-as-number` (person-quality).
+
+   Все сняты заново от HEAD, все падают. `reject-label-raw`: create и add_name теперь чистят название до `reject`, поэтому прежние ожидаемые тесты этот путь не проходят. Добавлен путь отказа варианта модели — `test_rejected_variant_label_after_strip`. Вне моих изменений не накладывается `add-wikidata-life-dates/rollback-removes-verified.patch`, сообщаю, не правил.
+
+### Сырые прогоны
+
+- `pytest test_person_quality.py test_entity_merge.py` — 68 passed in 70.19s; `test_strategies_cover_spec_sets.py -k "person or component"` — 24 passed in 32.20s
+- `-k order_pairs` (naming + migration) — 13 passed in 2.39s; dating `-k order_pairs` — 15 passed in 0.54s; `test_rejected_variant_label_after_strip` — 3 passed
+- база прогона «после пропуска» на новых тестах (worktree): `test_entity_naming.py` 66 passed; `test_life_dates.py` 44 passed in 104.36s
+- `ruff check`/`format --check tests/knowledge/` — чисто; `check_traceability.py` — 415 из 415
+
+### Мутации, `scripts/mutation_check.py --change improve-person-quality --id <id>`
+
+| Требование | Мутация | Ожидаемый тест | Упал |
+|---|---|---|---|
+| Слияние вариантов персоны | reason-decided-before-dates | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.67s) |
+| Слияние вариантов персоны | reason-decided-before-dates | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.14s) |
+| Слияние вариантов персоны | reason-decided-before-qid | tests/knowledge/test_person_quality.py::test_plan_partition_any_order | да (1 failed, 1 warning in 0.52s) |
+| Слияние вариантов персоны | reason-decided-before-qid | tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders | да (1 failed, 1 warning in 4.08s) |
+| Поиск дублей | capped-group-stops-scan | tests/knowledge/test_entity_merge.py::test_last_word_group_cap | да (1 failed, 1 passed, 1 warning in 3.94s) |
+| Качество персон | person-empty-as-number | tests/knowledge/test_person_quality.py::test_person_quality_invariant | да (1 failed, 1 warning in 2.56s) |
