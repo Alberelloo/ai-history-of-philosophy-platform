@@ -535,6 +535,47 @@
 
 С8 закрыт. Все патчи ветки накладываются на HEAD.
 
+## Тестировщик — третий возврат судьи (Д4-mig, J22), 2026-11-26, код de7e9bd
+
+**Журнал при настоящем запуске команды.** Новый файл `tests/knowledge/test_operator_commands_journal.py`. Каждая команда запускается отдельным процессом на файловой SQLite. Модуль исполняется как `__main__` (`runpy.run_module(..., run_name="__main__")`, то же, что `python -m`), поэтому `events.configure` из блока `__main__` срабатывает. Процесс-обёртка до запуска только закрывает сеть (`wikidata.http_fetch`). Код продукта не меняется. События берутся из stderr (строки JSON журнала), stdout разбирается `json.loads` целиком.
+
+Чем проверяется каждый случай:
+- `ontology_migrate plan` и `run`: `step` по 8 шагам в порядке спецификации с `dry_run` и `run_id` отчёта; `run`; `entity.retired` с причиной `number`; `entity.merged`. `rollback`: `rolled_back` с `run_id` и `entity.restored`.
+- `aborted`: процесс-обёртка подменяет `Statements.merge_entities` так, что слияние теряет атрибуцию. Результат: код 1, stdout — JSON отчёта, `aborted` уровня error с `error_kind="integrity_lost"`, `lost_attributions ≥ 1`, `run_id` совпадает с отчётом, затем `rolled_back`.
+- `failed`: процесс-обёртка подменяет слияние, чтобы оно бросало исключение. Результат: код 1, stdout пуст, `failed` уровня error с `error_kind="exception"`, в stderr есть `run_id` и `rollback <run_id>`.
+- `quality_report --json`: `knowledge.quality.measured` с `a2 = 1`, `passed = false`, совпадает с JSON stdout.
+- `life_dates apply` и `rollback`: `knowledge.life_dates.run` и `rolled_back` с `run_id` отчёта.
+
+**J22.** `test_stance_change_aborts`: подмена слияния меняет позицию атрибуции `asserts` → `disputes`. Результат: код 1, `aborted` с `lost_attributions = 1`, `lost = 0`, откат. После него замер с базой сравнения, снятой до запуска, даёт А8 = 1.
+
+`--id` (под flock):
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Миграция существующей онтологии | migrate-no-journal | tests/knowledge/test_operator_commands_journal.py::test_migrate_plan_and_run_journal | да (1 failed, 1 warning in 1.30s) |
+| Миграция существующей онтологии | migrate-no-journal | tests/knowledge/test_operator_commands_journal.py::test_migrate_aborted_journal | да (1 failed, 1 warning in 1.63s) |
+| Миграция существующей онтологии | migrate-no-journal | tests/knowledge/test_operator_commands_journal.py::test_migrate_failed_journal | да (1 failed, 1 warning in 3.47s) |
+| Замер качества онтологии | quality-no-journal | tests/knowledge/test_operator_commands_journal.py::test_quality_report_journal | да (1 failed, 1 warning in 1.89s) |
+| Миграция существующей онтологии | j22-attribution-no-stance | tests/knowledge/test_ontology_migration.py::test_stance_change_aborts | да (1 failed, 1 warning in 3.22s) |
+| Даты жизни из Wikidata | life-dates-no-journal | tests/knowledge/test_operator_commands_journal.py::test_life_dates_journal | да (1 failed, 1 warning in 1.27s) |
+
+**Дефект Д5 (вне этого изменения, improve-extraction-naming): команды `geo_enrich`, `epoch_dates` и `epoch_context` не подключают журнал.**
+- Ожидалось по спецификации: события `knowledge.geo.enriched` и `rolled_back`, `knowledge.epoch_dates.checked` и `run`, `knowledge.context_import.harvested`, `checked` и `run` при запуске командой.
+- Получено: в stderr событий нет.
+- Красные тесты: `test_geo_enrich_journal`, `test_epoch_dates_journal`, `test_epoch_context_journal`.
+- Проверка данных сценария: если подключить приёмник в процессе-обёртке, все три теста зелёные. Значит, не хватает только `events.configure` в блоке `__main__`.
+- Мутации «без configure» для этих команд появятся вместе с исправлением.
+
+Команды оператора в четырёх изменениях:
+- add-wikidata-life-dates: `life_dates`;
+- improve-extraction-naming: `geo_enrich`, `epoch_dates`, `epoch_context`;
+- improve-person-quality: своей команды нет, слияния идут через `life_dates` и миграцию;
+- migrate-ontology-quality: `ontology_migrate`, `quality_report`.
+
+Подбор (`suggest`) в `life_dates` и `epoch_dates` отдельным процессом не запускался. Журнал подключается один раз на процесс, и это уже покрыто командами `apply`.
+
+Все патчи ветки накладываются на HEAD. `--coverage` по migrate-ontology-quality и add-wikidata-life-dates чистый.
+
 ## Судья — 2026-11-26, коммит 745dbe0
 
 Машина: 1 ГБ ОЗУ, без Docker. Полный `pytest` и e2e не запускались. Мутации шли в отдельном worktree (`PYTHONPATH` на его `src`), рабочая копия не менялась.

@@ -746,3 +746,23 @@ mutations:
     note: О34 — шаг 3 исправляет язык и у снятых прошлым запуском
     expect_fail:
       - tests/knowledge/test_ontology_migration.py::test_retired_names_not_normalized
+  - id: migrate-no-journal
+    requirement: Миграция существующей онтологии
+    patch: migrate-no-journal.patch
+    note: Д4-mig — без events.configure в блоке __main__ команда не пишет журнал
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_migrate_plan_and_run_journal
+      - tests/knowledge/test_operator_commands_journal.py::test_migrate_aborted_journal
+      - tests/knowledge/test_operator_commands_journal.py::test_migrate_failed_journal
+  - id: quality-no-journal
+    requirement: Замер качества онтологии
+    patch: quality-no-journal.patch
+    note: Д4-mig — замер без events.configure в блоке __main__
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_quality_report_journal
+  - id: j22-attribution-no-stance
+    requirement: Миграция существующей онтологии
+    patch: j22-attribution-no-stance.patch
+    note: J22 судьи — атрибуция сравнивается без позиции
+    expect_fail:
+      - tests/knowledge/test_ontology_migration.py::test_stance_change_aborts

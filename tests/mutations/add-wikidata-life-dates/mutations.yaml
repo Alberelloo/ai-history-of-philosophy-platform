@@ -413,3 +413,9 @@ mutations:
     note: О26 — обход связанных прекращается после bad_qid (continue → break)
     expect_fail:
       - tests/knowledge/test_life_dates.py::test_linked_after_skips
+  - id: life-dates-no-journal
+    requirement: Даты жизни из Wikidata
+    patch: life-dates-no-journal.patch
+    note: Д4-mig — life_dates без events.configure в блоке __main__
+    expect_fail:
+      - tests/knowledge/test_operator_commands_journal.py::test_life_dates_journal

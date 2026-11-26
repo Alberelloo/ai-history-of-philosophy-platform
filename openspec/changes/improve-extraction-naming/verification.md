@@ -933,3 +933,11 @@
 | Валидность названий сущностей | set-primary-unchecked | tests/knowledge/test_entity_naming.py::test_rejection_invariant | да (1 failed, 1 warning in 1.61s) |
 | Валидность названий сущностей | stored-raw-set-primary | tests/knowledge/test_entity_naming.py::test_stored_form_strip_nfc | да (1 failed, 1 warning in 1.17s) |
 | Язык названий сущностей | renamed-extra-field | test_entity_naming.py::test_existing_english_entity_gets_russian_primary, test_extraction_entities.py::test_binding_by_english_spelling, ::test_normalization_and_language_for_any_items | да (повтор после переписи патча) |
+
+## Тестировщик — О35: журнал команд при настоящем запуске, 2026-11-26, код de7e9bd
+
+**Дефект Д5: команды `geo_enrich`, `epoch_dates` и `epoch_context` не подключают журнал.**
+- Ожидалось по спецификации: события `knowledge.geo.*`, `knowledge.epoch_dates.*`, `knowledge.context_import.*` при запуске командой.
+- Получено: в stderr событий нет.
+- Красные тесты: `test_geo_enrich_journal`, `test_epoch_dates_journal`, `test_epoch_context_journal` (`tests/knowledge/test_operator_commands_journal.py`).
+- Если подключить приёмник в процессе-обёртке, все три теста зелёные. Подробно — в verification.md migrate-ontology-quality, раздел «третий возврат».

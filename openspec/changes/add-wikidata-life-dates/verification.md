@@ -316,3 +316,11 @@ Worktree удалён, `git diff -- src` пуст.
 | Даты жизни из Wikidata | linked-stops-after-done | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.28s) |
 | Даты жизни из Wikidata | linked-stops-after-kind | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.45s) |
 | Даты жизни из Wikidata | linked-stops-after-bad-qid | tests/knowledge/test_life_dates.py::test_linked_after_skips | да (1 failed, 1 warning in 1.80s) |
+
+## Тестировщик — О35 / Д4-mig: журнал команды `life_dates`, 2026-11-26, код de7e9bd
+
+`test_life_dates_journal` (`tests/knowledge/test_operator_commands_journal.py`): `life_dates` запускается отдельным процессом. `apply` пишет `knowledge.life_dates.run` в stderr, `rollback` — `rolled_back`; stdout в обоих случаях JSON.
+
+| Требование | Мутация | Тест | Убита |
+|---|---|---|---|
+| Даты жизни из Wikidata | life-dates-no-journal | tests/knowledge/test_operator_commands_journal.py::test_life_dates_journal | да (1 failed, 1 warning in 1.27s) |
