@@ -122,3 +122,11 @@
 - не запускались, но по коду противоречат: `tests/e2e/test_reader_snapshots.py::test_s1_s4_card` (линия жизни S4), `tests/e2e/test_site.py::test_mention_opens_card_and_navigates` (`[data-section=influence]` у персоны и «так считает»).
 
 Следующий шаг: 5.1 (ревью кода), затем 6.x (тестировщик).
+
+## 2026-11-27 — тесты, задачи 6.1–6.7 (тестировщик)
+
+- Файлы: `tests/knowledge/test_cards_redesign.py` (165), `tests/web/test_card_content.py` (25), `tests/web/test_card_layout.py` (41); правки `test_mentions_cards.py`, `tests/web/test_reader_cards.py`, e2e `test_site.py` и `test_reader_snapshots.py` (не запускались, CI e2e), стенд `tests/web/knowledge_stack.py` (слой образований и для карточек), данные `tests/web/card_world.py`.
+- Все 46 сценариев дельт и 41 инвариант покрыты; `check_traceability.py`: 433 из 433.
+- Мутации: 15 из 15 пойманы (раздел «Мутации» в verification.md).
+- Дефекты продукта (4, подробности в verification.md): D1 подписи `dt` инфобокса труда («автор», «датировка» вместо «Автор», «Дата»); D2 регистр в имени метки спорной строки; D3 инфобокс на 1366px — сценарий и правило 32rem противоречат друг другу; D4 место только с координатами даёт `empty = true`. Тесты на них падают намеренно.
+- Следующий шаг: разработчик правит D1–D4 (или решает по D3 вместе с ведущим), затем ревью (5.x) и судья (7.1).
