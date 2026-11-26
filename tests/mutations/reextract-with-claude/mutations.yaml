@@ -398,3 +398,17 @@ mutations:
   note: paragraph строкой принимает «цифры» Unicode
   expect_fail:
   - tests/knowledge/test_reextract_review.py::test_paragraph_unicode_digits_refused
+- id: quote-no-significant-whole
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-significant-whole.patch
+  note: цитата без букв и цифр не отбрасывается
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_quote_without_significant_text
+  - tests/knowledge/test_reextract_quotes.py::test_substring_without_significant_text_refused_property
+  - tests/knowledge/test_reextract_quotes.py::test_degenerate_quotes_never_found
+- id: quote-no-significant-part
+  requirement: Цитата у каждого утверждения
+  patch: quote-no-significant-part.patch
+  note: часть при многоточии без букв и цифр принимается
+  expect_fail:
+  - tests/knowledge/test_reextract_quotes.py::test_part_without_significant_text

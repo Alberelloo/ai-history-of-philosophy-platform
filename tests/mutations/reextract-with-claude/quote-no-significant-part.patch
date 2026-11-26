@@ -1,0 +1,13 @@
+diff --git a/src/philograph/knowledge/quotes.py b/src/philograph/knowledge/quotes.py
+index 53037ae..26ac9f7 100644
+--- a/src/philograph/knowledge/quotes.py
++++ b/src/philograph/knowledge/quotes.py
+@@ -76,7 +76,7 @@ def check(quote: str, text: str | None) -> str | None:
+     found = parts(quote)
+     if not found:
+         return QUOTE_NOT_FOUND
+-    if len(found) > 1 and any(len(p) < MIN_PART or not _significant(p) for p in found):
++    if len(found) > 1 and any(len(p) < MIN_PART for p in found):
+         return QUOTE_TOO_SHORT
+     position = 0
+     for part in found:

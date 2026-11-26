@@ -156,7 +156,7 @@ def test_substring_with_authors_ellipsis_property(ws, data):
     a = data.draw(hst.integers(0, len(text) - 1))
     b = data.draw(hst.integers(a + 1, len(text)))
     sub = text[a:b]
-    if sub.strip():
+    if any(ch.isalnum() for ch in sub):  # без значимого текста — отказ, см. test_reextract_quotes
         assert quotes.check(sub, text) is None
         assert quotes.check(unicodedata.normalize("NFD", sub), text) is None
 

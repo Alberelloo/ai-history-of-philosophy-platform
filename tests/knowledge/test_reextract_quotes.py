@@ -373,8 +373,8 @@ def test_any_substring_found_property(ws, seed, data):
     a = data.draw(st.integers(0, len(text) - 1))
     b = data.draw(st.integers(a + 1, len(text)))
     sub = text[a:b]
-    if not sub.strip():
-        return
+    if not any(ch.isalnum() for ch in sub):
+        return  # подстроки без значимого текста — отдельный property
     assert quotes.check(sub, text) is None
     assert quotes.check(typographic(sub, rnd), text) is None
     assert quotes.check(sub, typographic(text, rnd)) is None
@@ -455,18 +455,102 @@ HOSTILE = [
 
 
 @pytest.mark.parametrize("quote", HOSTILE)
-@req(EO, QUOTE, invariant="Пустая и вырожденная цитата никогда не находится")
+@req(
+    EO,
+    QUOTE,
+    invariant="Пустая цитата — not_found; без букв и цифр — too_short; не находится",
+)
 def test_degenerate_quotes_never_found(stand, events, quote):
-    assert quotes.check(quote, "Кант писал, что всякое знание начинается с опыта.") == (
-        "quote_not_found"
-    )
+    # пустая после нормализации — quote_not_found; есть знаки, но нет букв/цифр — quote_too_short
+    expected = "quote_not_found" if not quotes.normalize(quote) else "quote_too_short"
+    assert quotes.check(quote, "Кант писал, что всякое знание начинается с опыта.") == expected
     assert quotes.check(quote, None) == "quote_not_found"
     stand.extract(
         ["Кант писал, что всякое знание начинается с опыта."],
         {"statements": [stmt("Кант", "holds", "Опыт", 1, quote)]},
     )
     assert stand.statements() == []
-    assert dropped_codes(events) == ["quote_not_found"]
+    assert dropped_codes(events) == [expected]
+    assert stand.entities_of("person") == 0
+
+
+@req(EO, QUOTE, scenario="Цитата без значимого текста")
+@pytest.mark.parametrize("quote", ["...", "—", ", .", "…", "[...]", "«...»", '" - "'])
+def test_quote_without_significant_text(stand, events, quote):
+    text = "Он сказал... и замолчал — так."
+    stand.extract([text], {"statements": [stmt("Ницше", "holds", "Молчание", 1, quote)]})
+    assert stand.statements() == []
+    assert dropped_codes(events) == ["quote_too_short"]
+    assert stand.entities_of("person") == 0
+    # строка «...» буквально есть в абзаце — и всё равно ничего не подтверждает
+    assert (quote not in ("...", "—")) or quote in text
+    [event] = events.of("knowledge.extraction.dropped")
+    assert set(event.fields) - {"request_id", "service"} == {"run_id", "reason", "code"}
+
+
+@req(EO, QUOTE, scenario="Цитата без значимого текста")
+@pytest.mark.parametrize(
+    ("quote", "text"),
+    [
+        ("априори", "Знание априори не зависит от опыта."),
+        ("tabula rasa", "The mind is a tabula rasa at birth."),
+        ("Бог", "Он сказал: Бог умер."),
+        ("я", "Я мыслю"),
+        ("1", "Глава 1 начинается"),
+    ],
+)
+def test_short_real_quotes_still_found(stand, events, quote, text):
+    assert quotes.check(quote, text) is None
+    stand.extract([text], {"statements": [stmt("Автор", "holds", "Тезис", 1, quote)]})
+    assert len(stand.statements()) == 1 and events.of("knowledge.extraction.dropped") == []
+
+
+@req(EO, QUOTE, invariant="Каждая часть при делении по многоточию содержит букву или цифру")
+@pytest.mark.parametrize(
+    "quote",
+    [
+        "достаточно длинная часть ... — — —",
+        "— — — ... достаточно длинная часть",
+        "достаточно длинная часть ... , , , , , , ... вторая длинная часть",
+    ],
+)
+def test_part_without_significant_text(quote):
+    text = "достаточно длинная часть — — — , , , , , , вторая длинная часть"
+    assert quotes.check(quote, text) == "quote_too_short"
+
+
+@req(EO, QUOTE, invariant="Подстрока без букв и цифр никогда не подтверждает цитату")
+@given(
+    st.lists(
+        st.one_of(
+            st.text(alphabet=LETTERS, min_size=1, max_size=6),
+            st.sampled_from(
+                ["...", "…", " - ", "—", ", ", ".", "«", "»", '"', "(...)", "[...]", "  "]
+            ),
+        ),
+        min_size=2,
+        max_size=12,
+    ),
+    st.integers(0, 10**6),
+    st.data(),
+)
+@SETTINGS
+def test_substring_without_significant_text_refused_property(pieces, seed, data):
+    rnd = random.Random(seed)
+    text = "".join(pieces)
+    if not text:
+        return
+    a = data.draw(st.integers(0, len(text) - 1))
+    b = data.draw(st.integers(a + 1, len(text)))
+    sub = text[a:b]
+    if any(ch.isalnum() for ch in sub):
+        return
+    for variant in (sub, typographic(sub, rnd), '"' + sub + '"', "«" + sub + "»"):
+        got = quotes.check(variant, text)
+        assert got in ("quote_too_short", "quote_not_found")
+        if quotes.normalize(variant):
+            assert got == "quote_too_short"  # знаки есть, значимого текста нет
+        assert got is not None
 
 
 @req(EO, QUOTE, invariant="Части многоточия без наложения: общий кусок не считается дважды")
@@ -481,6 +565,7 @@ def test_overlapping_parts_rejected():
 
 
 @req(
+    EO,
     QUOTE,
     invariant="Единственная часть короче 10 знаков допустима (минимум — только при многоточии)",
 )
