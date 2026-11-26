@@ -575,3 +575,23 @@ mutations:
     note: О25 — после отмены копии основных значений обеих сторон не пересчитываются
     expect_fail:
       - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: reason-decided-before-dates
+    requirement: Слияние вариантов персоны
+    patch: reason-decided-before-dates.patch
+    note: J3-1 судьи (О26) — причина компоненты review:decided_conflict раньше review:dates
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: reason-decided-before-qid
+    requirement: Слияние вариантов персоны
+    patch: reason-decided-before-qid.patch
+    note: О26 — причина компоненты review:decided_conflict раньше review:qid_cluster
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: capped-group-stops-scan
+    requirement: Поиск дублей
+    patch: capped-group-stops-scan.patch
+    note: J3-3 судьи (О26) — после большой группы перебор групп прекращается (continue → break)
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_last_word_group_cap

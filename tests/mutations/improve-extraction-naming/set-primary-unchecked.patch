@@ -1,8 +1,10 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 907644d..718f211 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -236,7 +236,6 @@
-         (язык по письменности), идентификатор и всё, что на него ссылается, не меняются.
-         Название, уже бывшее вариантом, повышается, а не дублируется."""
+@@ -240,7 +240,6 @@ class Entities:
+         Название, уже бывшее вариантом, повышается, а не дублируется. Текст — ``strip`` + NFC."""
+         text = clean(text)
          entity = self.get(entity_id)
 -        self._check(entity["type"], text)
          lang = lang_for(text, lang)

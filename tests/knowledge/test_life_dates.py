@@ -191,6 +191,34 @@ def test_person_with_qid(onto, events, no_network):
     no_token(events, TOKEN)
 
 
+@req(
+    ED, LIFE, invariant="Обход связанных: после пропущенных сущностей следующие импортируются (О26)"
+)
+def test_linked_after_skips(onto, events, no_network):
+    """Порядок обхода — по идентификатору: пропуски (уже в манифесте, тип без дат, QID не по
+    шаблону) идут раньше годной персоны."""
+    ents = onto.entities
+    kant = ents.create(
+        "person", [("ru", "Кант", "primary")], external={"wikidata": "Q9312"}, entity_id="a1"
+    )
+    ents.create(
+        "concept", [("ru", "Причинность", "primary")], external={"wikidata": "Q5"}, entity_id="a2"
+    )
+    ents.create(
+        "person", [("ru", "Безномер", "primary")], external={"wikidata": "QX"}, entity_id="a3"
+    )
+    plato = ents.create(
+        "person", [("ru", "Платон", "primary")], external={"wikidata": "Q859"}, entity_id="a4"
+    )
+    kant_rec = person("Q9312", "Кант", P569=(y("+1724-04-22"), 11), P570=(y("+1804-02-12"), 11))
+    fetch = RecordFetch({"Q9312": kant_rec, "Q859": PLATO})
+    life(onto, fetch).apply({"entities": [entry(kant, "Q9312")]}, linked=True)
+    assert bounds(dates_of(onto, kant)) == (1724, 1724, 1804, 1804)
+    assert bounds(dates_of(onto, plato)) == (-426, -426, -346, -346)
+    assert ("a3", "bad_qid") in [(e["entity"], e["reason"]) for e in events.of(SKIPPED)]
+    check_keys(events)
+
+
 @req(ED, LIFE, scenario="Кант с днями")
 def test_kant_with_days(onto, events, no_network):
     kant = create(onto, "Кант", qid="Q9312")
@@ -618,6 +646,30 @@ def test_candidate_held_by_other(onto, events, clock, no_network):
     check_keys(events)
 
 
+@req(ED, QIDS, invariant="Держатель ищется у каждого кандидата, после пропущенных тоже (О26)")
+def test_candidate_holder_after_skipped(onto, events, clock, no_network):
+    """Кандидаты по порядку: свободный QID, QID у сущности другого типа, QID у персоны.
+    Первые два держателя не дают, третий — даёт (пропуск не прекращает обход)."""
+    homer = create(onto, "Гомер", qid="Q6691")
+    create(onto, "Илиада", type_="work", qid="Q8275")
+    omir = create(onto, "Омир")
+    fetch = RecordFetch(
+        {
+            "Q999": person("Q999", "Омир Другой", "Omir Other"),
+            "Q8275": person("Q8275", "Илиада", "Iliad"),
+            "Q6691": person("Q6691", "Гомер", "Homer"),
+        },
+        searches={("Омир", "ru"): [{"id": "Q999"}, {"id": "Q8275"}, {"id": "Q6691"}]},
+    )
+    review = review_of(onto, clock)
+    manifest = life(onto, fetch, review).suggest({"entities": []})
+    [e] = [x for x in manifest["entities"] if x["entity"] == omir]
+    holders = {c["qid"]: c.get("holder") for c in e["candidates"]}
+    assert holders == {"Q999": None, "Q8275": None, "Q6691": homer}
+    assert [set(i["payload"]["pair"]) for i in review.queue(kind="duplicate")] == [{homer, omir}]
+    check_keys(events)
+
+
 @req(ED, QIDS, scenario="Точное совпадение с флагом")
 def test_exact_with_flag(onto, events, no_network):
     plato = create(onto, "Платон")
@@ -818,6 +870,15 @@ def test_two_confirmations(onto, events, clock, no_network):
     check_keys(events)
 
 
+@req(ED, QIDS, invariant="После пропуска refused следующие записи манифеста применяются (О26)")
+def test_refused_then_applied(onto, events, no_network):
+    kant = create(onto, "Кант")
+    life(onto, RecordFetch()).apply({"entities": [entry("нет-такой", "Q1"), entry(kant, "Q9312")]})
+    assert onto.entities.external_of(kant, "wikidata") == "Q9312"
+    assert ("нет-такой", "refused") in [(e["entity"], e["reason"]) for e in events.of(SKIPPED)]
+    check_keys(events)
+
+
 @req(ED, QIDS, scenario="У сущности другой QID")
 def test_entity_has_other_qid(onto, events, no_network):
     kant = create(onto, "Кант", qid="Q9312")
@@ -888,6 +949,27 @@ def test_bad_manifest_forms(onto, bad):
         ],
         "written": {},
         "skipped": [(0, "qid_conflict"), (1, "qid_taken")],
+    }
+)
+@example(
+    {  # О26: шаги 2 и 3 сразу — у сущности другой QID, а этот QID занят: первое — qid_conflict
+        "n": 2,
+        "held": {0: "Q11", 1: "Q12"},
+        "entries": [{"index": 0, "wikidata": "Q12", "decision": "accepted"}],
+        "written": {},
+        "skipped": [(0, "qid_conflict")],
+    }
+)
+@example(
+    {  # О26: после пропуска qid_taken следующие записи манифеста применяются
+        "n": 3,
+        "held": {0: "Q11"},
+        "entries": [
+            {"index": 1, "wikidata": "Q11", "decision": "accepted"},
+            {"index": 2, "wikidata": "Q13", "decision": "accepted"},
+        ],
+        "written": {2: "Q13"},
+        "skipped": [(1, "qid_taken")],
     }
 )
 def test_qid_confirmation_invariant(onto, events, clock, case):

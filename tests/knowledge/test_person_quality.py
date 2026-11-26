@@ -813,6 +813,35 @@ DATE_INTERVALS = {
     "model": [],
 }
 
+
+# Пример судьи J3-1: в одной компоненте и противоречие дат (a–c), и решение «разные» (c–d).
+# По порядку причин спецификации все рёбра merge:name уходят с review:dates.
+def _bacon(i, dates):
+    return {"key": (0, i), "names": [("ru", "Бэкон", "primary")], "qid": None, "dates": dates}
+
+
+DATES_AND_DECIDED = {
+    "faces": [
+        {
+            "kind": "reasons_mix",
+            "records": [
+                _bacon(0, (1561, 1626)),
+                _bacon(1, None),
+                _bacon(2, (1214, 1292)),
+                _bacon(3, None),
+            ],
+            "merge": [],
+            "queue": {
+                frozenset({(0, a), (0, b)}): "review:dates"
+                for a, b in ((0, 1), (0, 2), (0, 3), (1, 2), (1, 3))
+            },
+        }
+    ],
+    "confirmed": [],
+    "decided": [((0, 2), (0, 3))],
+    "model": [],
+}
+
 BOUNDARY_DATES = {
     "faces": [
         {
@@ -869,6 +898,7 @@ BOUNDARY_DATES = {
 @example(MODEL_PAIR, random.Random(7))
 @example(REVIEW_INSIDE, random.Random(8))
 @example(DATE_INTERVALS, random.Random(11))
+@example(DATES_AND_DECIDED, random.Random(13))
 def test_plan_partition_any_order(case, rnd):
     entities, ids = _pure_entities(case)
     confirmed = [(ids[a], ids[b]) for a, b in case["confirmed"]]
@@ -931,6 +961,7 @@ def _outcome(onto, review, case, ids, events) -> tuple:
 @example(MODEL_PAIR, random.Random(9))
 @example(REVIEW_INSIDE, random.Random(10))
 @example(DATE_INTERVALS, random.Random(12))
+@example(DATES_AND_DECIDED, random.Random(14))
 def test_merge_invariant_two_orders(stand, onto, review, events, case, rnd):
     outcomes = []
     for _ in range(2):

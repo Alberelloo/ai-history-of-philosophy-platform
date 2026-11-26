@@ -1,0 +1,24 @@
+diff --git a/src/philograph/knowledge/dating.py b/src/philograph/knowledge/dating.py
+index d1b27ad..23de5d2 100644
+--- a/src/philograph/knowledge/dating.py
++++ b/src/philograph/knowledge/dating.py
+@@ -101,6 +101,9 @@ def check(
+     is_person: bool,
+ ) -> FuzzyDate | str:
+     """Датировка или причина отказа — первая несработавшая проверка по порядку требования."""
++    fmt = _format(text or "")
++    if fmt is None:
++        return UNPARSED
+     if isinstance(paragraph, bool) or not isinstance(paragraph, int):
+         return PARAGRAPH
+     if not 1 <= paragraph <= len(paragraphs):
+@@ -108,9 +111,6 @@ def check(
+     key = _quote_key(quote or "")
+     if not key or key not in _quote_key(paragraphs[paragraph - 1]):
+         return QUOTE
+-    fmt = _format(text or "")
+-    if fmt is None:
+-        return UNPARSED
+     in_quote = {int(n) for n in _NUMBER.findall(quote)}
+     if not fmt.numbers <= in_quote:
+         return NOT_IN_QUOTE

@@ -1005,6 +1005,16 @@ FACE_KINDS = (
     "review_inside",
     "dates_any",
     "dates_any",
+    "reasons_mix",
+    "reasons_mix",
+)
+# Причины отказа компоненты по порядку спецификации person-quality «Компоненты»: два QID или
+# apart:qid → review:qid_cluster; иначе противоречащие даты → review:dates; иначе решение
+# «разные» → review:decided_conflict. Первая по порядку побеждает (J3-1).
+COMPONENT_REASONS = (
+    ("qids", "review:qid_cluster"),
+    ("dates", "review:dates"),
+    ("decided", "review:decided_conflict"),
 )
 _TAGS = "бвгджзклмн"
 _LTAGS = "bcdfghklmn"
@@ -1081,6 +1091,54 @@ def persons_with_variants(draw, max_faces: int = 4) -> dict[str, Any]:
             else:
                 face["merge"] = [[(f, 0), (f, 1)]]
                 face["reason"] = "merge:name"
+        elif kind == "reasons_mix":
+            # Компонента одного названия, где одновременно есть несколько преград: пара с двумя
+            # QID, пара с противоречащими датами, пара с решением «разные» (любое непустое
+            # сочетание, чаще ≥ 2). Связывают их записи без QID, дат и решений. Слияний нет;
+            # рёбра merge:name — в очередь с причиной первой по порядку преграды; пара с
+            # противоречащими датами — со своей review:dates; пары apart:* — не в очередь.
+            present = draw(
+                st.sets(st.sampled_from([c for c, _ in COMPONENT_REASONS]), min_size=1).filter(
+                    lambda x: len(x) >= 2
+                )
+                | st.sets(st.sampled_from([c for c, _ in COMPONENT_REASONS]), min_size=1)
+            )
+            own: dict[frozenset, str | None] = {}
+            i = 0
+            for _ in range(draw(st.integers(1, 2))):
+                rec(i, [(lang, word, "primary")])
+                i += 1
+            if "qids" in present:
+                rec(i, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+                rec(i + 1, [(lang, word, "primary")], f"Q{next(qid_counter)}")
+                own[frozenset({(f, i), (f, i + 1)})] = None  # apart:qid
+                i += 2
+            if "dates" in present:
+                gap = draw(st.integers(5, 400))
+                far = (DATE_BASE[0] + gap, DATE_BASE[1] + gap)
+                rec(i, [(lang, word, "primary")], None, DATE_BASE)
+                rec(i + 1, [(lang, word, "primary")], None, far)
+                own[frozenset({(f, i), (f, i + 1)})] = "review:dates"
+                i += 2
+            if "decided" in present:
+                rec(i, [(lang, word, "primary")])
+                rec(i + 1, [(lang, word, "primary")])
+                decided.append(((f, i), (f, i + 1)))
+                own[frozenset({(f, i), (f, i + 1)})] = None  # apart:decided
+                i += 2
+            reason = next(r for c, r in COMPONENT_REASONS if c in present)
+            keys = [(f, k) for k in range(i)]
+            queue = {}
+            for x in range(i):
+                for y in range(x + 1, i):
+                    pair = frozenset({keys[x], keys[y]})
+                    if pair in own:
+                        if own[pair] is not None:
+                            queue[pair] = own[pair]
+                    else:
+                        queue[pair] = reason
+            face["queue"] = queue
+            face["present"] = [c for c, _ in COMPONENT_REASONS if c in present]
         elif kind == "date_chain":
             # Компонента «даты A — без дат — противоречащие даты C»: рёбра merge:name через
             # среднюю, у крайних review:dates → слияний нет, все пары в очередь review:dates.

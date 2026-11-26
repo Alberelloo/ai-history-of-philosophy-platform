@@ -46,6 +46,7 @@ from .migration_world import (
     build,
     event_values,
     is_ru,
+    langs_broken,
     losses,
     name_forms_broken,
     name_texts,
@@ -332,18 +333,25 @@ def test_stand_synthetic(onto, events, capsys, tmp_path):
 
 
 @req(OM, MIG, scenario="Транслитерация без решения человека")
-def test_transliteration_pending(onto, events, capsys, tmp_path, database_url):
+@req(
+    OM,
+    MIG,
+    invariant="Очередь кандидатов: после пропущенных записей и кандидатов — следующие (О26)",
+)
+@pytest.mark.parametrize("after_skips", [False, True], ids=["plain", "after_skips"])
+def test_transliteration_pending(onto, events, capsys, tmp_path, database_url, after_skips):
     def pending(ids):
-        return {
-            "entities": [
-                {
-                    "entity": ids["omir"],
-                    "wikidata": None,
-                    "decision": "pending",
-                    "candidates": [{"qid": "Q6691", "holder": ids["homer"]}],
-                }
-            ]
+        held = {"qid": "Q6691", "holder": ids["homer"]}
+        omir = {
+            "entity": ids["omir"],
+            "wikidata": None,
+            "decision": "pending",
+            # О26: кандидат без держателя раньше кандидата с держателем
+            "candidates": [{"qid": "Q999"}, held] if after_skips else [held],
         }
+        # О26: запись с принятым решением раньше записи без решения
+        first = {"entity": ids["causality"], "wikidata": None, "decision": "rejected"}
+        return {"entities": [first, omir] if after_skips else [omir]}
 
     ids, code, _report, _ = run_stand(onto, capsys, tmp_path, manifest=pending)
     assert code == 0
@@ -516,6 +524,30 @@ def _expect_run(world, after: State) -> None:
     for e in after.active():  # ни одна действующая (кроме источников) не даёт причины
         assert reason_of(after.entities[e]["type"], after.label(e)) is None
     assert name_forms_broken(after) == []  # О24: текст strip+NFC, normalized по правилу
+    # шаг 3: язык каждого названия с письменностью — по правилу (О26); без письменности — Д3-mig
+    assert langs_broken(after, scripted_only=True) == []
+
+
+@req(
+    OM,
+    MIG,
+    invariant="Шаг 3: язык названия без письменности — und по правилу entity-naming (Д3-mig)",
+)
+def test_lang_fix_no_script(onto, events):
+    """entity-naming п. 4–5: без письменности язык — ``und``, переданный не сохраняется.
+    Источник библиотеки «3.1» не снимается, поэтому его название остаётся и должно
+    получить ``und``."""
+    source = raw_entity(onto, "source", [("en", "3.1", "primary")])
+    concept = raw_entity(
+        onto, "concept", [("ru", "Причинность", "primary"), ("ru", "§ 7", "variant")]
+    )
+    migration(onto).run()
+    after = State.read(onto.statements.engine)
+    assert {n["text"]: n["lang"] for n in after.names[source]} == {"3.1": "und"}
+    assert {n["text"]: n["lang"] for n in after.names[concept]} == {
+        "Причинность": "ru",
+        "§ 7": "und",
+    }
 
 
 @req(OM, MIG, scenario="Форма названий")
@@ -752,6 +784,40 @@ def test_batch_with_model_errors(onto, events):
     for call in llm.calls:  # без идентификаторов сущностей
         for item in llm.items(call):
             assert set(item) == {"n", "type", "label"}
+    check_keys(events)
+
+
+LONG_RU = "Один два три четыре пять шесть семь"  # invalid:sentence для понятия
+# Порядок проверок ответа — все пары (i < j): ответ нарушает обе, причина — первая (О26).
+REPLY_PAIRS = {
+    ("unknown_item", "duplicate_item"): ([(9, "Ум"), (9, "Ум")], {"unknown_item": 2}),
+    ("unknown_item", "not_russian"): ([(9, "mind")], {"unknown_item": 1}),
+    ("unknown_item", "invalid"): ([(9, LONG_RU)], {"unknown_item": 1}),
+    ("duplicate_item", "not_russian"): (
+        [(1, "Substanz"), (1, "Субстанция")],
+        {"duplicate_item": 2},
+    ),
+    ("duplicate_item", "invalid"): ([(1, LONG_RU), (1, "Причинность")], {"duplicate_item": 2}),
+    ("not_russian", "invalid"): ([(1, "one two three four five six seven")], {"not_russian": 1}),
+}
+
+
+@req(OM, TR, invariant="Порядок проверок ответа: каждая пара — первая по порядку (О26)")
+@pytest.mark.parametrize("pair", sorted(REPLY_PAIRS), ids="/".join)
+def test_reply_check_order_pairs(onto, events, pair):
+    ids = _concepts(onto, ["causality", "substance"])
+    reply, expected = REPLY_PAIRS[pair]
+    proposed = {n for n, _ru in reply if 1 <= n <= 2}
+
+    def answer(items, _n):
+        return [{"n": n, "ru": ru} for n, ru in reply]
+
+    report = migration(onto, llm=FakeLLM(answer)).run(translate="model", batch=2)
+    after = State.read(onto.statements.engine)
+    for label in ("causality", "substance"):
+        assert after.label(ids[label]) == label
+    u = {k: v for k, v in report.to_json()["untranslated"].items() if v}
+    assert u == {**expected, **({"missing": 2 - len(proposed)} if len(proposed) < 2 else {})}
     check_keys(events)
 
 

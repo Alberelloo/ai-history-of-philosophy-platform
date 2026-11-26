@@ -770,3 +770,57 @@ def test_dating_check_any_input(case):
     )
     assert span(value) == expect["span"]
     assert value["precision"] == expect["precision"]
+
+
+# --- порядок проверок сервера: все пары (О26) ---------------------------------------------
+
+DATING_CHECKS = (
+    "dating:paragraph",
+    "dating:quote",
+    "dating:unparsed",
+    "dating:not_in_quote",
+    "dating:era",
+    "dating:single_year",
+)
+PAIR_PARAS = ["Родился в 1724 году. Платон родился в 427 году."]
+# пара (i, j) → (текст, цитата, номер абзаца, персона); вход нарушает обе проверки по их
+# определениям в спецификации, ожидается первая по порядку
+DATING_PAIRS = {
+    ("dating:paragraph", "dating:quote"): ("1724", "Умер в 1804", 5, False),
+    ("dating:paragraph", "dating:unparsed"): ("когда-то", "Родился в 1724 году", 5, False),
+    ("dating:paragraph", "dating:not_in_quote"): ("1700–1750", "Родился в 1724 году", 5, False),
+    ("dating:paragraph", "dating:era"): ("427 до н. э.", "Платон родился в 427", 5, False),
+    ("dating:paragraph", "dating:single_year"): ("1724", "Родился в 1724 году", 5, True),
+    ("dating:quote", "dating:unparsed"): ("когда-то", "Умер в 1804", 1, False),
+    ("dating:quote", "dating:not_in_quote"): ("1700–1750", "Умер в 1804", 1, False),
+    ("dating:quote", "dating:era"): ("427 до н. э.", "Умер в 1804", 1, False),
+    ("dating:quote", "dating:single_year"): ("1804", "Умер в 1804", 1, True),
+    # нераспознанный текст с числом вне цитаты и с маркером эры вне цитаты
+    ("dating:unparsed", "dating:not_in_quote"): (
+        "когда-то в 1999",
+        "Родился в 1724 году",
+        1,
+        False,
+    ),
+    ("dating:unparsed", "dating:era"): ("когда-то до н. э.", "Родился в 1724 году", 1, False),
+    ("dating:not_in_quote", "dating:era"): ("427–347 до н. э.", "Платон родился в 427", 1, True),
+    ("dating:not_in_quote", "dating:single_year"): ("1725", "Родился в 1724 году", 1, True),
+    ("dating:era", "dating:single_year"): ("1724 до н. э.", "Родился в 1724 году", 1, True),
+}
+# одиночный год и век определены через формат таблицы: нераспознанный текст их не имеет
+DATING_PAIRS_IMPOSSIBLE = {("dating:unparsed", "dating:single_year")}
+
+
+@req(ED, EXTRACT, invariant="Порядок проверок сервера: каждая пара — первая несработавшая (О26)")
+@pytest.mark.parametrize("pair", sorted(DATING_PAIRS), ids="/".join)
+def test_dating_check_order_pairs(pair):
+    from philograph.knowledge import dating
+
+    text, quote, paragraph, person = DATING_PAIRS[pair]
+    assert dating.check(text, quote, paragraph, PAIR_PARAS, is_person=person) == pair[0]
+
+
+@req(ED, EXTRACT, invariant="Порядок проверок сервера: все пары перечислены (О26)")
+def test_dating_check_order_pairs_complete():
+    pairs = {(a, b) for i, a in enumerate(DATING_CHECKS) for b in DATING_CHECKS[i + 1 :]}
+    assert set(DATING_PAIRS) | DATING_PAIRS_IMPOSSIBLE == pairs

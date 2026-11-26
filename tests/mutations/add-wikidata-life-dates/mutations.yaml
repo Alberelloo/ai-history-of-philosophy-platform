@@ -365,3 +365,9 @@ mutations:
     note: аудит пунктов (О21), см. verification.md
     expect_fail:
       - tests/knowledge/test_life_dates.py::test_import_one_date
+  - id: taken-before-conflict
+    requirement: Подтверждение QID персон и произведений
+    patch: taken-before-conflict.patch
+    note: О26 — проверка «QID занят» раньше «у сущности другой QID» (пара шагов 2 и 3)
+    expect_fail:
+      - tests/knowledge/test_life_dates.py::test_qid_confirmation_invariant

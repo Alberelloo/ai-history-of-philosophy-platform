@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/entities.py b/src/philograph/knowledge/entities.py
+index 907644d..332b9c1 100644
 --- a/src/philograph/knowledge/entities.py
 +++ b/src/philograph/knowledge/entities.py
-@@ -92,7 +92,7 @@
+@@ -93,7 +93,7 @@ class Entities:
          сохраняется, только если совпадает с ней. Основное название проверяется правилом
          названий; отказ — событие ``knowledge.entity.rejected`` и ``InvalidName``."""
          self.registry.entity_type(type_)
--        names = [(lang_for(text, lang), text, kind) for lang, text, kind in names]
-+        names = list(names)
+-        names = [(lang_for(clean(text), lang), clean(text), kind) for lang, text, kind in names]
++        names = [(lang, clean(text), kind) for lang, text, kind in names]
          for _, text, kind in names:
              if kind == "primary":
                  self._check(type_, text)

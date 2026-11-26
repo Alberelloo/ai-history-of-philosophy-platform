@@ -302,6 +302,39 @@ def test_person_codes_partition():
     assert generated | set(SCENARIO_CODES) == SPEC_MERGE | SPEC_REVIEW | SPEC_APART
 
 
+# Порядок причин отказа компоненты — переписан из спецификации («Компоненты»).
+REASON_ORDER = ("qids", "dates", "decided")
+REASON_CODE = {
+    "qids": "review:qid_cluster",
+    "dates": "review:dates",
+    "decided": "review:decided_conflict",
+}
+REASON_COMBOS = [
+    tuple(c for i, c in enumerate(REASON_ORDER) if (mask >> i) & 1) for mask in range(1, 8)
+]
+
+
+@req(
+    PQ,
+    "Слияние вариантов персоны",
+    invariant="Компоненты со всеми сочетаниями преград: побеждает первая по порядку (J3-1)",
+)
+@pytest.mark.parametrize("combo", REASON_COMBOS, ids="+".join)
+def test_component_reason_combos_generated(combo):
+    winner = REASON_CODE[combo[0]]
+
+    def ok(case) -> bool:
+        for face in case["faces"]:
+            if face["kind"] == "reasons_mix" and tuple(face["present"]) == combo:
+                reasons = set(face["queue"].values()) - {"review:dates"}
+                assert reasons <= {winner}, (combo, reasons)
+                assert face["merge"] == []
+                return True
+        return False
+
+    _find(S.persons_with_variants(), ok)
+
+
 def _gap(a, b, side: int) -> int:
     """Зазор между интервалами начала (side=0) или конца (side=1) без допуска."""
     lo, hi = 2 * side, 2 * side + 1

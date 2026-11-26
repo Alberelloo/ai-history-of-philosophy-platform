@@ -425,6 +425,17 @@ def test_no_latin_name_has_ru(onto, events, text, is_ru):
         ),
         # ru русское, но не прошло проверку: основное — name, ru не записано
         ({"name": "Plato", "type": "person", "ru": "поэт"}, {("en", "Plato", "primary")}),
+        # О26: после отклонённого написания следующие написания проверяются и записываются
+        (
+            {
+                "name": "Plato",
+                "type": "person",
+                "ru": "поэт",
+                "en": "Platon",
+                "original": {"text": "Πλάτων", "lang": "grc"},
+            },
+            {("en", "Plato", "primary"), ("en", "Platon", "variant"), ("grc", "Πλάτων", "variant")},
+        ),
     ],
 )
 def test_primary_choice_by_item(events, item, expected):
@@ -894,6 +905,44 @@ def test_check_name_any_input(case):
     (type_, raw), reason = case
     assert naming.check_name(type_, name_of(raw)) == reason
     assert naming.event_label(name_of(raw)) == expected_label(raw)
+
+
+# Порядок правил 1–5 — все пары (i < j). Вход удовлетворяет обоим правилам по построению,
+# ожидается первое. Невозможные пары — по определениям спецификации (О26).
+RULE_PAIRS = {
+    ("empty", "sentence"): (("concept", "." * 81), "empty"),  # нет букв и цифр, > 80 знаков
+    ("empty", "sentence", "слова"): (("concept", " ".join(["—"] * 7)), "empty"),  # 7 слов
+    ("number", "sentence"): (("concept", "1." * 41), "number"),  # нет букв, цифра, 82 знака
+    ("number", "sentence", "слова"): (("concept", "1 2 3 4 5 6 7"), "number"),
+    ("sentence", "not_a_name"): (("person", "кант сказал что то там было вот"), "sentence"),
+    ("not_a_name", "stopword"): (("person", "every"), "not_a_name"),  # строчная + стоп-слово
+}
+RULE_PAIRS_IMPOSSIBLE = {
+    ("empty", "number"): "empty — нет цифр, number — есть цифра",
+    ("empty", "not_a_name"): "not_a_name требует букв или слов с заглавной",
+    ("empty", "stopword"): "стоп-список без пустых элементов",
+    ("number", "not_a_name"): "not_a_name требует букв",
+    ("number", "stopword"): "в стоп-списке нет элементов без букв",
+    ("sentence", "stopword"): "элементы стоп-списка короче пределов (≤ 6 слов, ≤ 80 знаков)",
+}
+
+
+@req(NM, VALID, invariant="Порядок правил: каждая пара, где срабатывают оба, — первое (О26)")
+@pytest.mark.parametrize("pair", sorted(RULE_PAIRS), ids="/".join)
+def test_rule_order_pairs(pair):
+    (type_, label), first = RULE_PAIRS[pair]
+    assert naming.check_name(type_, label) == first
+
+
+@req(NM, VALID, invariant="Порядок правил: все пары перечислены, невозможные — по данным (О26)")
+def test_rule_order_pairs_complete():
+    order = ("empty", "number", "sentence", "not_a_name", "stopword")
+    pairs = {(a, b) for i, a in enumerate(order) for b in order[i + 1 :]}
+    covered = {p[:2] for p in RULE_PAIRS} | set(RULE_PAIRS_IMPOSSIBLE)
+    assert covered == pairs
+    stop = yaml.safe_load(naming.RULES_PATH.read_text(encoding="utf-8"))["stopwords"]
+    assert all(any(ch.isalpha() for ch in w) for w in stop)
+    assert all(len(w.split()) <= 6 and len(w) <= 80 for w in stop)
 
 
 @req(NM, VALID, scenario="Инвариант отказа")

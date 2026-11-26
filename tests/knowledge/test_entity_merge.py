@@ -648,14 +648,29 @@ def _first_name(i: int) -> str:
 @req(OE, SEARCH, invariant="Группа последнего слова больше 200 не перебирается — событие")
 @pytest.mark.parametrize("size", [LIMIT, LIMIT + 1])
 def test_last_word_group_cap(onto, events, size):
+    before = frozenset(
+        onto.entities.create("person", [("ru", f"{first} Кант", "primary")])
+        for first in ("Пётр", "Иван")
+    )
     ids = [
         onto.entities.create("person", [("ru", f"{_first_name(i)} Локк", "primary")])
         for i in range(size - 2)
     ]
     twins = [onto.entities.create("person", [("ru", "Джон Локк", "primary")]) for _ in range(2)]
+    # малые группы последнего слова до и после большой (J3-3): пропуск большой группы не
+    # прекращает перебор остальных; пары — по последнему слову и равным датам (без дат)
+    small = {
+        when: frozenset(
+            onto.entities.create("person", [("ru", f"{first} {last}", "primary")])
+            for first in ("Пётр", "Иван")
+        )
+        for when, last in (("после", "Юм"), ("после-2", "Беркли"))
+    }
     events.clear()
     pairs = {frozenset(p) for p in onto.entities.duplicate_candidates()}
     assert frozenset(twins) in pairs  # совпадение полного названия — и в большой группе
+    for when, pair in {**small, "до": before}.items():
+        assert pair in pairs, when
     last_word_pair = frozenset({ids[0], ids[1]})
     if size <= LIMIT:
         assert last_word_pair in pairs

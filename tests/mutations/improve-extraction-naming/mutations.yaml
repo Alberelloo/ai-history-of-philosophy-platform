@@ -37,6 +37,7 @@ mutations:
     patch: stopword-before-person.patch
     note: not_a_name и stopword поменяны местами
     expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rule_order_pairs
       - tests/knowledge/test_entity_naming.py::test_role_instead_of_name
       - tests/knowledge/test_entity_naming.py::test_check_name_any_input
       - tests/knowledge/test_entity_naming.py::test_rejection_invariant
@@ -240,6 +241,7 @@ mutations:
     patch: rule-sentence-before-number.patch
     note: аудит пунктов (О21), см. verification.md
     expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rule_order_pairs
       - tests/knowledge/test_entity_naming.py::test_check_name_any_input
   - id: rule-empty-as-number
     requirement: Валидность названий сущностей
@@ -1307,6 +1309,7 @@ mutations:
     patch: not-a-name-before-sentence.patch
     note: судья O2 (О23) — not_a_name раньше sentence
     expect_fail:
+      - tests/knowledge/test_entity_naming.py::test_rule_order_pairs
       - tests/knowledge/test_entity_naming.py::test_check_name_any_input
       - tests/knowledge/test_entity_naming.py::test_rejection_invariant
   - id: clean-nfkc
@@ -1336,3 +1339,33 @@ mutations:
     note: судья N11 — «_» не заменяется пробелом в нормализации
     expect_fail:
       - tests/knowledge/test_entity_naming.py::test_check_name_any_input
+  - id: check-order-unparsed-paragraph
+    requirement: Извлечение дат
+    patch: check-order-unparsed-paragraph.patch
+    note: О26 — разбор формата раньше проверки номера абзаца
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs
+  - id: check-order-era-quote
+    requirement: Извлечение дат
+    patch: check-order-era-quote.patch
+    note: О26 — проверка эры раньше проверки цитаты
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs
+  - id: check-order-era-unparsed
+    requirement: Извлечение дат
+    patch: check-order-era-unparsed.patch
+    note: О26 — проверка эры раньше разбора формата
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs
+  - id: check-order-single-numbers
+    requirement: Извлечение дат
+    patch: check-order-single-numbers.patch
+    note: О26 — одиночный год персоны раньше проверки чисел в цитате
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs
+  - id: check-order-numbers-quote
+    requirement: Извлечение дат
+    patch: check-order-numbers-quote.patch
+    note: О26 — числа в цитате раньше проверки цитаты
+    expect_fail:
+      - tests/knowledge/test_entity_dating_extraction.py::test_dating_check_order_pairs

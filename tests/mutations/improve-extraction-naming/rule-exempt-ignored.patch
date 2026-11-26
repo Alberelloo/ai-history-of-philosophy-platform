@@ -1,11 +1,13 @@
+diff --git a/src/philograph/knowledge/naming.py b/src/philograph/knowledge/naming.py
+index 22b9a5d..7c4f2ed 100644
 --- a/src/philograph/knowledge/naming.py
 +++ b/src/philograph/knowledge/naming.py
-@@ -241,8 +241,6 @@
+@@ -247,8 +247,6 @@ def _not_a_name(label: str, rules: Rules) -> bool:
  def check_name(type_: str, label: str, rules: Rules | None = None) -> str | None:
      """Причина отказа (первая по порядку правил) или ``None``, если название годится."""
      rules = rules or load_rules()
 -    if type_ in rules.exempt:
 -        return None
-     label = unicodedata.normalize("NFC", label.strip())
+     label = clean(label)
      has_letter = any(unicodedata.category(ch).startswith("L") for ch in label)
      has_digit = any(ch.isdigit() for ch in label)

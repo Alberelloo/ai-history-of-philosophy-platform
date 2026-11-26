@@ -134,6 +134,68 @@ def name_forms_broken(state) -> list[tuple[str, str]]:
     ]
 
 
+# --- язык по письменности (entity-naming «Письменность и язык», пп. 1–5) -----------------
+
+_EDGE = ".,;:!?()[]«»\"'„“”"
+_ROMAN_WORD = re.compile(r"^[IVXLCDM]+$")
+_LANG_SCRIPT = {
+    "ru": "cyr",
+    "en": "lat",
+    "de": "lat",
+    "fr": "lat",
+    "la": "lat",
+    "it": "lat",
+    "el": "grc",
+    "grc": "grc",
+}
+_SCRIPT_LANG = {"cyr": "ru", "lat": "en", "grc": "el"}
+
+
+def _script(text: str) -> str | None:
+    counts = {"cyr": 0, "lat": 0, "grc": 0, "other": 0}
+    for word in text.split():
+        word = word.strip(_EDGE)
+        if _ROMAN_WORD.match(word):
+            continue
+        for ch in word:
+            if not unicodedata.category(ch).startswith("L"):
+                continue
+            code = ord(ch)
+            if 0x0400 <= code <= 0x052F:
+                counts["cyr"] += 1
+            elif unicodedata.name(ch, "").startswith("LATIN"):
+                counts["lat"] += 1
+            elif 0x0370 <= code <= 0x03FF or 0x1F00 <= code <= 0x1FFF:
+                counts["grc"] += 1
+            else:
+                counts["other"] += 1
+    top = max(counts.values())
+    leaders = [k for k, v in counts.items() if v == top]
+    if top == 0 or len(leaders) > 1:
+        return None
+    return leaders[0]
+
+
+def lang_by_spec(text: str, given: str | None) -> str:
+    script = _script(text)
+    if script is not None and given is not None and _LANG_SCRIPT.get(given) == script:
+        return given
+    return _SCRIPT_LANG.get(script, "und")
+
+
+def langs_broken(state, *, scripted_only: bool = False) -> list[tuple[str, str, str]]:
+    """Шаг 3 ``lang_fix``: после миграции язык каждого названия действующей сущности —
+    по правилу entity-naming (неподвижная точка правила). ``scripted_only`` — только
+    названия с письменностью (без них — отдельный сценарий, Д3-mig)."""
+    return [
+        (e, n["text"], n["lang"])
+        for e in state.active()
+        for n in state.names.get(e, [])
+        if (not scripted_only or _script(n["text"]) is not None)
+        and n["lang"] != lang_by_spec(n["text"], n["lang"])
+    ]
+
+
 def reason_of(type_: str, label: str) -> str | None:
     """Причина правила названий для названий пулов (по построению входа)."""
     return GARBAGE.get((type_, name_form(label)), GARBAGE.get((type_, label)))
