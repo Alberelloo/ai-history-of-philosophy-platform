@@ -492,4 +492,9 @@ def main(
 
 
 if __name__ == "__main__":
+    # Журнал подключается только при запуске командой: stdout занят отчётом, события
+    # идут в stderr. Вызов main() из тестов оставляет приёмник фикстуры как есть.
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+    events.configure(sinks=[events.json_sink(sys.stderr)])
     sys.exit(main())
