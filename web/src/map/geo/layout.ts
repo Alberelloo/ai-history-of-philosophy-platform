@@ -30,6 +30,7 @@ export const TEXT_GAP = 2; // px: запас раскладки у текста 
 export const COUNTRY_MIN_AREA = 1500;
 export const MAX_COUNTRY_LABELS = 24;
 export const COUNTRY_STEP = 12; // px: шаг сетки запасных точек подписи страны
+export const COUNTRY_INSET = 2; // px: точка подписи внутри страны с этим запасом
 export const COUNTRY_TRIES = 64; // запасных точек на страну, не больше
 export const COUNTRY_MIN_LABELS = 5; // меньше — добор (layoutCountries)
 
@@ -480,12 +481,18 @@ export function layoutCountries(
   // возрастанию расстояния от центра (при равенстве — сверху вниз, слева направо), не больше
   // COUNTRY_TRIES. Точка годится, только если она внутри страны.
   const inside = new Map<string, boolean>();
+  // Внутри — с запасом COUNTRY_INSET по четырём сторонам: точка у самой границы не годится
+  // (округление прямоугольника текста на полпикселя не выводит её из страны).
   const within = (k: CountryCand, x: number, y: number): boolean => {
     const key = `${k.c.id}:${x}:${y}`;
     let v = inside.get(key);
     if (v === undefined) {
-      const ll = projection.invert?.([x, y]);
-      inside.set(key, (v = !!ll && geoContains(k.c.feature, ll)));
+      const d = COUNTRY_INSET;
+      v = ([[x, y], [x - d, y], [x + d, y], [x, y - d], [x, y + d]] as [number, number][]).every((pt) => {
+        const ll = projection.invert?.(pt);
+        return !!ll && geoContains(k.c.feature, ll);
+      });
+      inside.set(key, v);
     }
     return v;
   };

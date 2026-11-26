@@ -222,6 +222,7 @@
 | `COUNTRY_MIN_LABELS` | 5 | `layout.ts` |
 | `COUNTRY_STEP` | 12 px | `layout.ts` |
 | `COUNTRY_TRIES` | 64 | `layout.ts` |
+| `COUNTRY_INSET` | 2 px | `layout.ts` |
 | кегль подписей стран | 10,5 px, добор — 9 px | `fonts.ts` |
 | `TEXT_GAP` | 2 px | `layout.ts` |
 | бюджет раскладки в покое | 150 мс процессора (node, «Много мест», 1366×768) | `web/unit/geo/budget.test.ts` |
