@@ -1,7 +1,16 @@
 diff --git a/src/philograph/knowledge/ontology_migrate.py b/src/philograph/knowledge/ontology_migrate.py
-index 3016536..62f442e 100644
+index 3016536..cf9e452 100644
 --- a/src/philograph/knowledge/ontology_migrate.py
 +++ b/src/philograph/knowledge/ontology_migrate.py
+@@ -1027,7 +1027,7 @@ class Migration:
+             )
+             before = {n["id"]: n for n in p["names_before"]}
+             ours = _own_name(p, rows, before)
+-            if ours is None or ours["kind"] != "primary":
++            if ours is None:
+                 return False  # переименовали после запуска: чужое изменение
+             if ours["id"] not in before:
+                 conn.execute(delete(t.names).where(t.names.c.id == ours["id"]))
 @@ -1071,7 +1071,7 @@ def _own_name(p: dict[str, Any], rows: list[Any], before: dict[int, Any]) -> dic
      не из ``names_before`` — вставлена запуском (её откат удаляет), иначе — повышена им из
      варианта. Позже добавленные строки с другим ключом сюда не попадают."""
