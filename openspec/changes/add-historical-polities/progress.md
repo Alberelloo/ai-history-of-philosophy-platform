@@ -201,3 +201,4 @@
   - web-юниты: `polities.test.ts` — passed 12, `countries-layout.test.ts` — passed 67, остальные файлы `unit/geo` — 0 failed;
   - `tsc` чисто.
 - Реальный артефакт пересобран новым кодом (`build --offline`, метки из кэша): 0:49.34, maxrss 65 268 КБ, `vertices_out` 3 221 799 (было 3 225 145: ушли малые дыры), `tiny_kept` 17, `skipped_invalid` 0. `measure`: `max_gzip_bytes` 138 836 (2000 год; было 139 104), `ru_share` 0,9442, `inactive` 0, `full_sphere` 0. Строк с координатами длиннее 2 знаков — 0. Числа H2 в `verification.md` (139 104) от прежней сборки, тестировщику их нужно обновить.
+- Браузер, один прогон после `npm run build`: `tests/web/test_geo_polities.py` — 10 passed за 3:43. Вес `GlobeView` (gzip -9) — 20 547 Б: было 20 385, прибавила проверка формы ответа в `polities.ts`.
