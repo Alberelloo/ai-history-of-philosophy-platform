@@ -424,7 +424,7 @@ def stale_start(stand, hours=7):
 @req(
     EO,
     EXTERNAL,
-    invariant="Повтор блокирует неоткатанный внешний запуск; --replace откатывает (брошенный — тоже)",
+    invariant="Повтор блокирует неоткатанный внешний запуск; --replace откатывает брошенный",
 )
 @pytest.mark.parametrize(
     "statuses", [["failed"], ["running"], ["done"], ["failed", "running"], ["failed", "done"]]
@@ -518,13 +518,13 @@ def test_duplicate_top_level_key_in_json_object(stand, tmp_path, events, capsys)
 @req(
     EO,
     EXTERNAL,
-    invariant="Повтор ключа внутри ответа — обычный JSON (последнее значение), команда продолжается",
+    invariant="Повтор ключа внутри ответа — обычный JSON, команда продолжается",
 )
 def test_duplicate_key_inside_reply_is_plain_json(stand, tmp_path, events):
     vid, _ = stand.version(TEXTS)
     good = json.dumps(reply_for(0)["statements"], ensure_ascii=False)
     path = tmp_path / "inner.json"
-    path.write_text('{"1": {"statements": [], "statements": %s}}' % good, encoding="utf-8")
+    path.write_text(f'{{"1": {{"statements": [], "statements": {good}}}}}', encoding="utf-8")
     code = cli(
         stand, ["ingest", "--version", vid, "--replies", str(path), *ARGS, "--duration", "1"]
     )

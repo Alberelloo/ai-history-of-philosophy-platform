@@ -452,4 +452,3 @@ mutations:
   note: dating не объект не проверяется
   expect_fail:
   - tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept
-  - tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property

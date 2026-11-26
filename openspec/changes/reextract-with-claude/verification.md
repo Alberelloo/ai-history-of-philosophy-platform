@@ -292,3 +292,43 @@
 | Цитата у каждого утверждения | quote-no-significant-part | tests/knowledge/test_reextract_quotes.py::test_part_without_significant_text | да (1 failed, 2 passed, 1 warning in 0.43s) |
 
 Уточнение по трактовке: цитата `""` (только обрамляющие кавычки) после нормализации не пуста, но значимого текста нет, поэтому ожидается `quote_too_short`; код выбран по формулировке «пустая цитата — `quote_not_found`», «без букв и цифр после снятия кавычек — `quote_too_short`».
+
+## Тестировщик — дополнение: повторное ревью (дельта в коммите bd21bb3) и итоговая матрица
+
+Обновлено по дельте: `test_any_unrolled_external_run_blocks_repeat` (запуск `running` в наборе — брошенный, старше 6 ч; `--replace` откатывает все); `test_duplicate_key_in_json_object` разделён: `test_duplicate_top_level_key_in_json_object` (код 2) и `test_duplicate_key_inside_reply_is_plain_json` (код 0, побеждает последнее значение). Остальные проверки не ослаблялись.
+
+| Требование | Сценарий / инвариант | Тест | Вывод и журнал |
+|---|---|---|---|
+| Проверка ответа по утверждениям | шаг 1: `dating` — объект / `null` / нет; иначе `schema_item` (в список видов добавлены строка, число, список, `True`, `""`, `0`) | `test_entities_item_kinds_dropped_rest_kept` ×17, `test_dating_null_or_absent_is_fine` ×2 | один `dropped code=schema_item`, верное утверждение записано; `null`/нет — без отказа |
+| Цитата у каждого утверждения | Многоточие автора: подтверждение со значимым текстом не теряется | `test_authors_ellipsis_in_quote` (без изменений: `lost=0`) | `knowledge.library.event lost=0` (подтверждения без значимого текста дельта оставляет возможно потерянными, тестом не фиксируется) |
+| Внешний извлекатель | Идёт запись той же версии (`running` 0, 1, 5.9 ч; с `--replace` и без) | `test_running_write_in_progress_refuses` ×6 | код 2, «запись идёт», нет Traceback; запуск не откатан, новый не создан, `run.started`/`run.rolled_back` нет |
+| то же | идущая запись не даёт откатить и `done` той же версии | `test_live_running_blocks_rollback_of_others` | `done` и `running` на месте, счётчики те же |
+| то же | Брошенная запись (7, 6.5, 48 ч) | `test_abandoned_running_is_rolled_back_by_replace` ×3 | без `--replace` код 2; с `--replace` — `rolled_back` + новый `done`; `knowledge.run.rolled_back` |
+| то же | порог 6 ч (5.99 → 2, 6.01 → откат) | `test_six_hour_threshold` ×2 | — |
+| то же | идущий запуск другой версии или шлюза не блокирует | `test_live_running_of_other_version_or_gateway_does_not_block` | — |
+| то же | повтор номера фрагмента верхнего уровня JSON — код 2; ключ внутри ответа — обычный JSON | `test_duplicate_top_level_key_in_json_object`, `test_duplicate_key_inside_reply_is_plain_json` | код 2 / код 0 |
+
+Итоговый прогон всех моих файлов и правленых прежних:
+
+    python scripts/check_traceability.py   →  Требований с тестами: 427 из 427
+    ruff check . / ruff format --check .   →  All checks passed! / 720 files already formatted
+    pytest -q tests/knowledge/test_reextract_{fragments,quotes,items,runs,external,prompt,review}.py tests/llm
+              tests/knowledge/test_{entity_dating_extraction,extraction_entities,portraits,quotes_unit,statements,external_extraction_unit}.py
+              tests/knowledge/test_mentions_cards.py::test_migration_6_adds_mention_position
+                                           →  546 passed, 1 warning in 444s
+
+Итого мутаций в `tests/mutations/reextract-with-claude/mutations.yaml`: 49 (первый круг) + 12 (ревью 1) + 2 (значимый текст) + 6 (ревью 2) = 69; на каждое из 11 требований есть мутация (`--coverage`). Мутации ревью 2 (сырой вывод):
+
+| Внешний извлекатель | ext-live-running-ignored | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 0.84s) |
+| Внешний извлекатель | ext-live-running-ignored | tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others | да (1 failed, 1 warning in 1.37s) |
+| Внешний извлекатель | ext-live-blocks-only-without-replace | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 1.00s) |
+| Внешний извлекатель | ext-live-blocks-only-without-replace | tests/knowledge/test_reextract_review.py::test_live_running_blocks_rollback_of_others | да (1 failed, 1 warning in 1.02s) |
+| Внешний извлекатель | ext-threshold-huge | tests/knowledge/test_reextract_review.py::test_abandoned_running_is_rolled_back_by_replace | да (1 failed, 1 warning in 0.73s) |
+| Внешний извлекатель | ext-threshold-huge | tests/knowledge/test_reextract_review.py::test_six_hour_threshold | да (1 failed, 1 passed, 1 warning in 1.26s) |
+| Внешний извлекатель | ext-threshold-zero | tests/knowledge/test_reextract_review.py::test_running_write_in_progress_refuses | да (1 failed, 1 warning in 0.82s) |
+| Внешний извлекатель | ext-threshold-zero | tests/knowledge/test_reextract_review.py::test_six_hour_threshold | да (1 failed, 1 warning in 0.93s) |
+| Внешний извлекатель | ext-dup-top-level-allowed | tests/knowledge/test_reextract_review.py::test_duplicate_top_level_key_in_json_object | да (1 failed, 1 warning in 0.89s) |
+| Проверка ответа по утверждениям | check-dating-not-object | tests/knowledge/test_reextract_review.py::test_entities_item_kinds_dropped_rest_kept | да (1 failed, 10 passed, 1 warning in 6.68s) |
+| Проверка ответа по утверждениям | check-dating-not-object | tests/knowledge/test_reextract_review.py::test_arbitrary_entities_never_crash_property | НЕТ (1 passed, 1 warning in 18.05s) |
+
+`check-dating-not-object` в первом прогоне пережила property `test_arbitrary_entities_never_crash_property` даже с явными `@example` (`dating` строка/число/список): без проверки вида `_dating_spec` всё равно возвращает отказ, итог тот же `schema_item` — для property мутация эквивалентна. Убивает сценарный `test_entities_item_kinds_dropped_rest_kept` (на `dating: 0`, `""`); property из `expect_fail` убрана.
