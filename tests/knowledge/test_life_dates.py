@@ -22,7 +22,7 @@ from philograph.knowledge import schema as t
 from philograph.knowledge.dates import parse
 from philograph.knowledge.life_dates import LifeDates, ManifestError, main
 from philograph.knowledge.review import Review
-from philograph.knowledge.statements import Attribution
+from philograph.knowledge.statements import Attribution, Provenance
 from philograph.knowledge.wikidata import wikidata_time
 from philograph.operator.access import ActionLog
 
@@ -641,6 +641,130 @@ def test_two_candidates(onto, events, no_network):
     assert (e["wikidata"], e["decision"]) == (None, "pending")
     assert events.one(SUGGESTED)["auto"] == 0
     check_keys(events)
+
+
+@req(ED, QIDS, invariant="Кандидат произведения — запись с P577")
+def test_work_candidate_needs_publication_date(onto, events, no_network):
+    work = create(onto, "Критика чистого разума", type_="work")
+    with_date = record(
+        "Q1", ru="Критика чистого разума", classes=(), times={"P577": (y("+1781-00-00"), 9)}
+    )
+    without = record("Q2", ru="Критика чистого разума", classes=())
+    fetch = RecordFetch(
+        {"Q1": with_date, "Q2": without},
+        searches={("Критика чистого разума", "ru"): [{"id": "Q1"}, {"id": "Q2"}]},
+    )
+    manifest = life(onto, fetch).suggest({"entities": []})
+    [e] = [x for x in manifest["entities"] if x["entity"] == work]
+    assert [c["qid"] for c in e["candidates"]] == ["Q1"]
+    assert events.one(SUGGESTED)["candidates"] == 1
+
+
+@req(ED, QIDS, invariant="auto: даты кандидата не противоречат датам сущности")
+def test_auto_exact_needs_compatible_dates(onto, events, no_network):
+    from philograph.knowledge.dates import lifespan
+
+    kant = create(onto, "Кант")
+    onto.statements.add(
+        kant,
+        "lifespan",
+        value=lifespan("1724", "1804").to_json(),
+        attributions=[Attribution("common")],
+        provenance=Provenance("manual", actor="tester"),
+    )
+    far = person("Q1", "Кант", "Kant", P569=(y("+1824-00-00"), 9), P570=(y("+1904-00-00"), 9))
+    near = person("Q2", "Кант", "Kant", P569=(y("+1724-04-22"), 11), P570=(y("+1804-02-12"), 11))
+    for qid, record_ in (("Q1", far), ("Q2", near)):
+        manifest = life(
+            onto, RecordFetch({qid: record_}, searches={("Кант", "ru"): [{"id": qid}]})
+        ).suggest({"entities": []}, auto_exact=True)
+        [e] = [x for x in manifest["entities"] if x["entity"] == kant]
+        expected = (None, "pending") if qid == "Q1" else ("Q2", "auto")
+        assert (e["wikidata"], e["decision"]) == expected, qid
+
+
+@req(ED, QIDS, invariant="suggest ищет по основному названию и вариантам")
+def test_suggest_searches_variants(onto, events, no_network):
+    plato = onto.entities.create(
+        "person", [("ru", "Платон", "primary"), ("en", "Plato", "variant")]
+    )
+    fetch = RecordFetch(
+        {"Q859": person("Q859", "Платон", "Plato")},
+        searches={("Plato", "en"): [{"id": "Q859"}]},  # только по варианту
+    )
+    manifest = life(onto, fetch).suggest({"entities": []})
+    [e] = [x for x in manifest["entities"] if x["entity"] == plato]
+    assert [c["qid"] for c in e["candidates"]] == ["Q859"]
+
+
+@req(ED, QIDS, invariant="Решение человека подбор не меняет: auto не перезаписывает accepted")
+def test_suggest_keeps_human_decision(onto, events, no_network):
+    plato = create(onto, "Платон")
+    manifest = {
+        "entities": [{"entity": plato, "wikidata": "Q1", "decision": "accepted", "candidates": []}]
+    }
+    out = life(onto, _plato_fetch()).suggest(manifest, auto_exact=True)
+    [e] = [x for x in out["entities"] if x["entity"] == plato]
+    assert (e["wikidata"], e["decision"], e["candidates"]) == ("Q1", "accepted", [])
+    assert events.one(SUGGESTED)["entities"] == 0
+
+
+@req(ED, QIDS, invariant="Держатель QID другого вида (произведение) не становится holder")
+def test_holder_of_other_kind_ignored(onto, events, clock, no_network):
+    create(onto, "Платон", type_="work", qid="Q859")
+    plato = create(onto, "Платон")
+    fetch = RecordFetch(
+        {"Q859": person("Q859", "Платон", "Plato")}, searches={("Платон", "ru"): [{"id": "Q859"}]}
+    )
+    review = review_of(onto, clock)
+    manifest = life(onto, fetch, review).suggest({"entities": []})
+    [e] = [x for x in manifest["entities"] if x["entity"] == plato]
+    assert [c.get("holder") for c in e["candidates"]] == [None]
+    assert review.queue(kind="duplicate") == []
+    events.assert_none(PROPOSED)
+
+
+@req(ED, QIDS, invariant="Пара с решением «разные» повторно в очередь не ставится")
+def test_holder_pair_decided_apart_not_requeued(onto, events, clock, no_network):
+    homer = create(onto, "Гомер", qid="Q6691")
+    omir = create(onto, "Омир")
+    fetch = RecordFetch(
+        {"Q6691": person("Q6691", "Гомер", "Homer")},
+        searches={("Омир", "ru"): [{"id": "Q6691"}]},
+    )
+    review = review_of(onto, clock)
+    life(onto, fetch, review).suggest({"entities": []})
+    [item] = review.queue(kind="duplicate")
+    review.resolve_duplicate(item["item_id"], False, "operator")
+    events.clear()
+    manifest = life(onto, fetch, review).suggest({"entities": []})
+    [e] = [x for x in manifest["entities"] if x["entity"] == omir]
+    assert e["candidates"][0]["holder"] == homer  # держатель записан в кандидата
+    assert review.queue(kind="duplicate") == []  # решённая пара не вернулась в очередь
+    events.assert_none(PROPOSED)
+
+
+@req(ED, LIFE, invariant="Режим --linked: QID не по шаблону — bad_qid без обращения к сети")
+def test_linked_bad_qid_skipped_without_fetch(onto, events, no_network):
+    kant = onto.entities.create("person", [("ru", "Кант", "primary")], external={"wikidata": "x1"})
+    fetch = RecordFetch()
+    life(onto, fetch).apply({"entities": []}, linked=True)
+    assert [(e["entity"], e["property"], e["reason"]) for e in events.of(SKIPPED)] == [
+        (kant, "item", "bad_qid")
+    ]
+    assert fetch.entity_calls() == []
+    assert events.one(RUN)["skipped"] == 1
+
+
+@req(ED, LIFE, invariant="Запись не получена — fetch_failed считается в failed, не в skipped")
+def test_fetch_failed_counted_as_failed(onto, events, no_network):
+    kant = create(onto, "Кант", qid="Q9312")
+    fetch = RecordFetch(failing={"Q9312"})
+    life(onto, fetch).apply({"entities": []}, linked=True)
+    assert [(e["entity"], e["reason"]) for e in events.of(SKIPPED)] == [(kant, "fetch_failed")]
+    run = events.one(RUN)
+    assert (run["failed"], run["skipped"]) == (1, 0)
+    assert dates_of(onto, kant) is None
 
 
 @req(ED, QIDS, scenario="QID занят")
