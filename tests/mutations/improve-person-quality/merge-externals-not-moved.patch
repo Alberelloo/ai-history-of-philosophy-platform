@@ -1,0 +1,14 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -467,11 +467,6 @@
+             conn.execute(
+                 update(t.statements).where(t.statements.c.object == removed).values(object=kept)
+             )
+-            conn.execute(
+-                update(t.external_ids)
+-                .where(t.external_ids.c.entity_id == removed)
+-                .values(entity_id=kept)
+-            )
+             moved_mentions = list(
+                 conn.scalars(select(t.mentions.c.id).where(t.mentions.c.entity_id == removed))
+             )

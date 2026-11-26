@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -103,8 +103,6 @@
+                         and_(t.external_ids.c.system == system, t.external_ids.c.value == value)
+                     )
+                 )
+-            if existing:
+-                raise DuplicateEntity(self.resolve(existing))
+         entity_id = entity_id or f"e_{uuid.uuid4().hex[:12]}"
+         with self.engine.begin() as conn:
+             conn.execute(

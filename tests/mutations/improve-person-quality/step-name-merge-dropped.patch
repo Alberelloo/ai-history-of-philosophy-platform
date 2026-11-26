@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -105,8 +105,6 @@
+         return Verdict.of("review:dates")
+     if qid_confirmed:
+         return Verdict.of("merge:qid_confirmed")
+-    if a.primaries & b.primaries:
+-        return Verdict.of("merge:name")
+     if paired_by_model:
+         return Verdict.of("merge:model_pair")
+     shared = (a.primaries & b.variants) | (b.primaries & a.variants)

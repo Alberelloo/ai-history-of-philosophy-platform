@@ -1,0 +1,15 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -101,10 +101,10 @@
+         return Verdict.of("apart:qid")
+     if decided_apart:
+         return Verdict.of("apart:decided")
++    if qid_confirmed:
++        return Verdict.of("merge:qid_confirmed")
+     if dates_conflict(a.dates, b.dates):
+         return Verdict.of("review:dates")
+-    if qid_confirmed:
+-        return Verdict.of("merge:qid_confirmed")
+     if a.primaries & b.primaries:
+         return Verdict.of("merge:name")
+     if paired_by_model:

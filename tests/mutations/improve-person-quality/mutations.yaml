@@ -185,3 +185,305 @@ mutations:
     expect_fail:
       - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
       - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+
+  # --- аудит пунктов (О21): мутации по каждому нормативному пункту ---
+  - id: step-qid-dropped
+    requirement: Слияние вариантов персоны
+    patch: step-qid-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_transliteration_with_decision
+  - id: step-name-merge-dropped
+    requirement: Слияние вариантов персоны
+    patch: step-name-merge-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_common_primary_name
+  - id: step-none-as-review
+    requirement: Слияние вариантов персоны
+    patch: step-none-as-review.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_dedupe_unit.py::test_same_person
+  - id: dates-slack-zero
+    requirement: Слияние вариантов персоны
+    patch: dates-slack-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: dates-slack-three
+    requirement: Слияние вариантов персоны
+    patch: dates-slack-three.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: dates-start-only
+    requirement: Слияние вариантов персоны
+    patch: dates-start-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval
+  - id: dates-end-only
+    requirement: Слияние вариантов персоны
+    patch: dates-end-only.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_dates_conflict_on_start_or_end_interval
+  - id: kept-qid-ignored
+    requirement: Слияние вариантов персоны
+    patch: kept-qid-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_variants_merge_by_model_pair
+  - id: kept-counts-ignored
+    requirement: Слияние вариантов персоны
+    patch: kept-counts-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_merge_invariant_two_orders
+  - id: kept-id-tiebreak-reversed
+    requirement: Слияние вариантов персоны
+    patch: kept-id-tiebreak-reversed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_plan_partition_any_order
+  - id: cluster-reason-dates-first
+    requirement: Слияние вариантов персоны
+    patch: cluster-reason-dates-first.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_component_reason_priority_qid_cluster_over_dates
+  - id: decided-pair-requeued
+    requirement: Слияние вариантов персоны
+    patch: decided-pair-requeued.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_decided_pair_not_requeued_after_merge_mapping
+  - id: propose-repeats
+    requirement: Слияние вариантов персоны
+    patch: propose-repeats.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_dedupe_unit.py::test_dedupe_run_merges_and_proposes
+  - id: load-persons-inactive
+    requirement: Слияние вариантов персоны
+    patch: load-persons-inactive.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_redirected_person_not_loaded
+  - id: link-counts-no-authors
+    requirement: Слияние вариантов персоны
+    patch: link-counts-no-authors.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_link_counts_subject_object_author
+  - id: link-counts-no-object
+    requirement: Слияние вариантов персоны
+    patch: link-counts-no-object.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_link_counts_subject_object_author
+  - id: candidates-ignore-variants
+    requirement: Поиск дублей
+    patch: candidates-ignore-variants.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_only_variant_matched
+  - id: merge-subject-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-subject-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+  - id: merge-object-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-object-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-externals-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-externals-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_external_rows_move_to_kept
+  - id: merge-mentions-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-mentions-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-names-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-names-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-portraits-same-phash-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-portraits-same-phash-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-portraits-not-moved
+    requirement: Слияние с перенаправлением
+    patch: merge-portraits-not-moved.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: merge-redirect-missing
+    requirement: Слияние с перенаправлением
+    patch: merge-redirect-missing.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_old_link
+  - id: merge-russian-not-preferred
+    requirement: Слияние с перенаправлением
+    patch: merge-russian-not-preferred.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-names-kinds-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-names-kinds-not-restored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo
+  - id: undo-subject-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-subject-not-restored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo
+  - id: undo-mentions-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-mentions-not-restored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-portraits-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-portraits-not-restored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-attributions-not-restored
+    requirement: Слияние с перенаправлением
+    patch: undo-attributions-not-restored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_preservation_and_undo
+  - id: undo-redirect-kept
+    requirement: Слияние с перенаправлением
+    patch: undo-redirect-kept.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo
+  - id: undo-event-restored-zero
+    requirement: Слияние с перенаправлением
+    patch: undo-event-restored-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo_with_fold_and_qid
+  - id: undo-event-kept-removed-swapped
+    requirement: Слияние с перенаправлением
+    patch: undo-event-kept-removed-swapped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_undo
+  - id: merged-statements-count
+    requirement: Слияние с перенаправлением
+    patch: merged-statements-count.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_merge_unit.py::test_merge_entities_folds_repeat_and_undo_restores
+  - id: merged-attributions-zero
+    requirement: Слияние с перенаправлением
+    patch: merged-attributions-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_author_attribution_moves
+  - id: merged-folded-zero
+    requirement: Слияние с перенаправлением
+    patch: merged-folded-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_repeat_folds
+  - id: merged-loops-zero
+    requirement: Слияние с перенаправлением
+    patch: merged-loops-zero.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_loop
+  - id: person-stopword-skipped
+    requirement: Качество персон
+    patch: person-stopword-skipped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_person_quality_invariant
+  - id: person-sentence-unchecked
+    requirement: Качество персон
+    patch: person-sentence-unchecked.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_person_quality_invariant
+  - id: dates-one-side-conflict
+    requirement: Слияние вариантов персоны
+    patch: dates-one-side-conflict.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_date_chain_component
+  - id: dates-after-confirmed
+    requirement: Слияние вариантов персоны
+    patch: dates-after-confirmed.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_same_person_step_order
+  - id: decided-before-qid
+    requirement: Слияние вариантов персоны
+    patch: decided-before-qid.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_same_person_step_order
+  - id: model-pair-before-name
+    requirement: Слияние вариантов персоны
+    patch: model-pair-before-name.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_same_person_step_order
+  - id: external-not-unique
+    requirement: Слияние вариантов персоны
+    patch: external-not-unique.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_external_id_unique
+  - id: add-external-duplicate
+    requirement: Слияние вариантов персоны
+    patch: add-external-duplicate.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_person_quality.py::test_external_id_unique
+  - id: candidates-dates-ignored
+    requirement: Поиск дублей
+    patch: candidates-dates-ignored.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_candidates_need_equal_dates_for_last_word
+  - id: candidates-last-word-dropped
+    requirement: Поиск дублей
+    patch: candidates-last-word-dropped.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_candidates
+  - id: capped-event-leaks-name
+    requirement: Поиск дублей
+    patch: capped-event-leaks-name.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_last_word_group_cap
+  - id: capped-group-aborts
+    requirement: Поиск дублей
+    patch: capped-group-aborts.patch
+    note: аудит пунктов (О21), см. verification.md
+    expect_fail:
+      - tests/knowledge/test_entity_merge.py::test_last_word_group_cap

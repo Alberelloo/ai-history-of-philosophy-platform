@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/entities.py
++++ b/src/philograph/knowledge/entities.py
+@@ -528,8 +528,6 @@
+                 .where(t.names.c.id.in_(moved["names"]))
+                 .values(entity_id=m["removed"])
+             )
+-            for name_id, kind in (moved.get("kinds") or {}).items():
+-                conn.execute(update(t.names).where(t.names.c.id == int(name_id)).values(kind=kind))
+             conn.execute(
+                 update(t.statements)
+                 .where(t.statements.c.id.in_(moved["subject"]))

@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -122,7 +122,7 @@
+     with_qid = [e for e in members if e.qid]
+     if with_qid:
+         return with_qid[0].id
+-    return min(members, key=lambda e: (-counts.get(e.id, 0), e.id)).id
++    return min(members, key=lambda e: (-counts.get(e.id, 0), [-ord(c) for c in e.id])).id
+ 
+ 
+ class _Union:

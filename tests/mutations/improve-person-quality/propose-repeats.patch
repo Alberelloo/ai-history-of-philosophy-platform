@@ -1,0 +1,11 @@
+--- a/src/philograph/knowledge/dedupe.py
++++ b/src/philograph/knowledge/dedupe.py
+@@ -319,8 +319,6 @@
+     """Пункт очереди ``duplicate`` с причиной, если открытого по паре нет. ``run_id`` —
+     запуск, поставивший пункт: его откат закрывает пункт (``rolled_back``)."""
+     pair = pair_key(a, b)
+-    if pair in open_:
+-        return False
+     with engine.begin() as conn:
+         conn.execute(
+             t.review_items.insert().values(
