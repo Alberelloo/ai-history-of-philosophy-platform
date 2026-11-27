@@ -1,6 +1,6 @@
 """Требования entity-cards изменения redesign-entity-cards: сценарии и инварианты сервера.
 
-Тесты написаны по дельте ``openspec/changes/redesign-entity-cards/specs/entity-cards``. Карточка
+Тесты написаны по дельте ``openspec/specs/entity-cards``. Карточка
 запрашивается по HTTP (``GET /v1/entities/{id}/card``) с ``X-Request-Id``; журнал —
 ``knowledge.card.served`` этого ``request_id``.
 """

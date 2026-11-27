@@ -632,7 +632,6 @@ def test_country_module_failure_shows_nothing(knowledge_context, knowledge_stack
 
 
 @req(EC, "К кому относится", scenario="Учение без сторонников, но с трудом")
-@req(EC, "Выведенные строки", scenario="Компактное окно без выводов")
 def test_doctrine_card_relates_to_and_in_works(knowledge_context, knowledge_stack, events):
     w = knowledge_stack.world
     berkeley = w.person("Джордж Беркли", "1685", "1753")

@@ -1,6 +1,6 @@
 # Карточки сущностей: почему пустые и что можно показать
 
-Дата: 2026-11-26. Задача владельца: `PHILO-SPEC-CARDS.md` (редизайн карточек). Изменение OpenSpec: `openspec/changes/redesign-entity-cards/`.
+Дата: 2026-11-26. Задача владельца: `PHILO-SPEC-CARDS.md` (редизайн карточек). Изменение OpenSpec: `openspec/changes/archive/2026-11-27-redesign-entity-cards/`.
 
 ## 1. Как устроена карточка сейчас
 
