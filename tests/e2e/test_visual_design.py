@@ -432,7 +432,14 @@ def test_english_card_and_graph(browser, site, ids):
         assert section_labels and not [text for text in section_labels if cyrillic.search(text)], (
             section_labels
         )
-        assert "common opinion" in panel.locator(".card-section").first.inner_text()
+        # Слов атрибуции в строке нет: она в доступном имени метки (и в подробностях по нажатию).
+        # Метки есть и у строк разделов, и у частей сводки персоны (годы, место); первая строка
+        # может быть сгенерированной, без атрибуции, поэтому ищем среди всех меток карточки.
+        names = [
+            mark.get_attribute("aria-label") or ""
+            for mark in panel.locator("button.card-mark").all()
+        ]
+        assert any("common opinion" in name for name in names), names
         page.goto(f"{site.url}/graph/{ids['kant']}")
         page.get_by_role("button", name="Кант was influenced by Юм", exact=True).focus()
         page.keyboard.press("Enter")

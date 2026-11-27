@@ -54,6 +54,27 @@ def row(statement_id: str, type_: str, relation: str, **extra) -> dict:
         "in_textbook": None,
         "attributed_to": [],
         "evidence": [],
+        "inferred": False,
+        "via": [],
+        "note": None,
+        "geo": None,
+        "also": [],
+    }
+    base.update(extra)
+    # Отметку строки вычисляет сервер: «спорное» важнее статуса (redesign-entity-cards).
+    base.setdefault("mark", "disputed" if base["disputed"] else base["status"])
+    return base
+
+
+def section(code: str, title: str, rows: list[dict], **extra) -> dict:
+    base = {
+        "code": code,
+        "title": title,
+        "rows": rows,
+        "display": "list",
+        "visible": 5,
+        "total": len(rows),
+        "inferred": False,
     }
     base.update(extra)
     return base
@@ -72,8 +93,25 @@ def card(entity_id: str, **extra) -> dict:
         "sections": [],
         "where_to_read": [],
         "recipes": [],
+        "layout": "entity",
+        "summary": None,
+        "geo": None,
+        "legend": [],
+        "empty": False,
     }
     base.update(extra)
+    marks = {r["mark"] for sec in base["sections"] for r in sec["rows"]}
+    base["legend"] = [m for m in ("verified", "sourced", "generated", "disputed") if m in marks]
+    if base["type"] == "person":
+        base["layout"] = "person"
+        base["where_to_read"] = []
+        dates = base["dates"]
+        base["summary"] = {
+            "roles": [],
+            "place": None,
+            "years": dates["original"] if dates else None,
+            "polity": None,
+        }
     return base
 
 
@@ -99,10 +137,10 @@ CARDS = {
             "Автор трёх «Критик»."
         ),
         sections=[
-            {
-                "code": "influence",
-                "title": "Влияния",
-                "rows": [
+            section(
+                "influenced_by",
+                "Повлияли",
+                [
                     row(
                         "s1",
                         "influenced_by",
@@ -123,7 +161,7 @@ CARDS = {
                         "s3", "influenced_by", "испытал влияние", entity_id="e_wolff", label="Вольф"
                     ),
                 ],
-            }
+            )
         ],
     ),
     HUME: card(
@@ -132,10 +170,10 @@ CARDS = {
         dates={"original": "1711–1776"},
         description=description("Шотландский философ."),
         sections=[
-            {
-                "code": "influence",
-                "title": "Влияния",
-                "rows": [
+            section(
+                "influenced",
+                "Повлиял на",
+                [
                     row(
                         "s4",
                         "influenced_by",
@@ -146,7 +184,7 @@ CARDS = {
                         status="verified",
                     ),
                 ],
-            }
+            )
         ],
     ),
     EXPERIENCE: card(EXPERIENCE, type="concept", title="Опыт"),
@@ -502,7 +540,7 @@ def test_t10_link_and_back_in_popover_and_panel(browser, site, texts):
         dialog.get_by_role("button", name="Открыть карточку").click()
         panel = page.get_by_role("complementary", name="Карточка")
         panel.locator("h3", has_text="Кант").wait_for()
-        panel.locator("[data-section=influence]").get_by_role("button", name="Юм").click()
+        panel.locator("[data-section=influenced_by]").get_by_role("button", name="Юм").click()
         expect(panel.locator("h3.pg-entity-head__name")).to_have_text("Юм")
         back = panel.get_by_role("button", name="Назад: Кант")
         expect(back).to_be_visible()
@@ -714,19 +752,26 @@ def open_full(page, site):
     return panel
 
 
-@req(EC, "Природа каждой строки")
+@req(EC, "Природа каждой строки", scenario="Сгенерированная строка")
+@req(EC, "Природа каждой строки", scenario="Спорное")
+@req(EC, "Природа каждой строки", scenario="Одна легенда")
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_t12_nature_of_each_row(browser, site, texts, theme):
+    """T12 по новой спецификации: статус строки — цветная метка без текста, слова статусов —
+    только в легенде, подробности раскрываются нажатием на метку."""
     context = reader_context(browser, viewport={"width": 1440, "height": 900}, color_scheme=theme)
     page = context.new_page()
     knowledge = Knowledge(page, texts)
-    knowledge.cards[KANT] = dict(
-        CARDS[KANT],
+    knowledge.cards[KANT] = card(
+        KANT,
+        title="Кант",
+        dates={"original": "1724–1804"},
+        description=description("Немецкий философ."),
         sections=[
-            {
-                "code": "influence",
-                "title": "Влияния",
-                "rows": [
+            section(
+                "influenced_by",
+                "Повлияли",
+                [
                     row(
                         "v1",
                         "influenced_by",
@@ -751,36 +796,75 @@ def test_t12_nature_of_each_row(browser, site, texts, theme):
                         entity_id="e_wolff",
                         label="Вольф",
                         disputed=True,
+                        disputed_by=["Рассел"],
                         evidence=[{"paragraph_id": "x", "link": "/p/x"}],
                         attributions=[
                             {"who": "Асмус", "kind": "source", "stance": "asserts"},
                             {"who": "Рассел", "kind": "source", "stance": "disputes"},
                         ],
                     ),
+                    row(
+                        "s1",
+                        "influenced_by",
+                        "испытал влияние",
+                        entity_id="e_wolff2",
+                        label="Кнутцен",
+                    ),
                 ],
-            }
+            )
         ],
     )
     try:
         panel = open_full(page, site)
-        rows = panel.locator("[data-section=influence] li.card-row")
-        expect(rows).to_have_count(3)
-        verified, generated, disputed = rows.nth(0), rows.nth(1), rows.nth(2)
-        # Проверенная — StatusMark значком и словом.
-        expect(verified.locator(".pg-status--verified")).to_have_text("Проверено")
-        assert verified.locator(".pg-generated").count() == 0
-        # Сгенерированная — pg-generated с ромбом и словом.
-        expect(generated.locator(".pg-generated")).to_have_count(1)
-        mark = generated.locator(".pg-generated").get_by_role("img", name="Сгенерировано")
-        expect(mark).to_be_visible()
-        expect(generated.locator(".pg-status--generated")).to_have_text("Сгенерировано")
-        # Спорная — «Спорно» и «не согласны: …»; кто так считает.
-        expect(disputed.locator(".card-disputed")).to_contain_text("Спорно")
-        expect(disputed).to_contain_text("не согласны: Рассел")
-        expect(disputed).to_contain_text("так считает: Асмус, Рассел")
-        # Сводка природы знания, без отдельной метки карточки (Р4).
-        expect(panel.locator(".card-summary")).to_have_text(
-            "Проверено: 1 · По источникам: 1 · Сгенерировано: 1"
+        rows = panel.locator("[data-section=influenced_by] li.card-row")
+        expect(rows).to_have_count(4)
+        verified, generated, disputed, sourced = (rows.nth(i) for i in range(4))
+        for r, mark in (
+            (verified, "verified"),
+            (generated, "generated"),
+            (disputed, "disputed"),
+            (sourced, "sourced"),
+        ):
+            expect(r.locator("button.card-mark")).to_have_count(1)
+            expect(r.locator("button.card-mark")).to_have_attribute("data-mark", mark)
+            assert (r.locator("button.card-mark").get_attribute("aria-label") or "").strip()
+            assert r.locator(".pg-status").count() == 0
+        # Сгенерированная: пометка непроверенного и имя метки с «Сгенерировано», без слова в строке.
+        expect(generated).to_have_attribute("data-unverified", "true")
+        name = generated.locator("button.card-mark").get_attribute("aria-label")
+        assert name.startswith("Сгенерировано"), name
+        assert "сгенерировано" not in generated.inner_text().lower()
+        # Спорная: до нажатия слов «спорно» и «не согласны» нет, в имени метки они есть.
+        text = disputed.inner_text().lower()
+        assert "спорно" not in text and "не согласны" not in text and "так считает" not in text
+        mark = disputed.locator("button.card-mark")
+        assert "Спорно" in mark.get_attribute("aria-label")
+        assert "Рассел" in mark.get_attribute("aria-label")
+        expect(mark).to_have_attribute("aria-expanded", "false")
+        mark.click()
+        expect(mark).to_have_attribute("aria-expanded", "true")
+        details = disputed.locator(".card-row__details")
+        expect(details).to_contain_text("так считает: Асмус")
+        expect(details).to_contain_text("не согласны: Рассел")
+        # Подтверждение остаётся видимым номером.
+        expect(disputed.locator("a.pg-cite")).to_have_count(1)
+        # Одна легенда: ровно отметки ответа, сводки-счётчиков нет.
+        legend = panel.locator("[data-card-legend]")
+        expect(legend).to_have_count(1)
+        shown = legend.locator("[data-legend]").evaluate_all(
+            "els => els.map(e => e.dataset.legend)"
+        )
+        assert shown == ["verified", "sourced", "generated", "disputed"]
+        expect(legend.locator("[data-legend=generated]")).to_have_count(1)
+        expect(panel.locator(".card-summary")).to_have_count(0)
+        # Слова статусов — только в легенде.
+        outside = panel.locator(".pg-panel__body").evaluate(
+            """el => { const c = el.cloneNode(true);
+              c.querySelectorAll('[data-card-legend], title, [hidden]').forEach(e => e.remove());
+              return c.textContent; }"""
+        )
+        assert not re.search(r"проверено|по источникам|сгенерировано|спорно", outside, re.I), (
+            outside
         )
     finally:
         context.close()
@@ -919,8 +1003,9 @@ def test_n10_where_to_read_opens_first_paragraph(browser, site, texts):
     target_chapter, target = later[3]  # абзац в середине главы 2, не первый
     last_chapter = blocks[-1][0]
     source = site.ids["textbook"]
-    knowledge.cards[KANT] = dict(
-        CARDS[KANT],
+    knowledge.cards[EXPERIENCE] = dict(
+        CARDS[EXPERIENCE],
+        title="Опыт",
         where_to_read=[
             {
                 "source_id": source,
@@ -943,7 +1028,13 @@ def test_n10_where_to_read_opens_first_paragraph(browser, site, texts):
         ],
     )
     try:
-        panel = open_full(page, site)
+        goto_chapter(page, site)
+        page.locator("p.block .mention", has_text="опыт").first.click()
+        dialog = page.get_by_role("dialog", name="Карточка")
+        opened(dialog, "Опыт")
+        dialog.get_by_role("button", name="Открыть карточку").click()
+        panel = page.get_by_role("complementary", name="Карточка")
+        panel.locator("h3.pg-entity-head__name", has_text="Опыт").wait_for()
         where = panel.locator("[data-section=where]")
         where.get_by_role("button", name="Глава 2. Рассудок").click()
         page.wait_for_url(re.compile(f"/read/{source}/{target_chapter}#p-{target}$"))

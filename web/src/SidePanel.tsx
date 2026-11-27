@@ -1,5 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useLayoutMetrics } from "./hooks/useLayoutMetrics";
 import { useT } from "./i18n";
+import { panelWidth } from "./layout";
+import { useStored } from "./storage";
 import { Icon } from "./ui";
 
 // Каркас правой панели (docs/design/features/reader-panels.md, 2.3): на ширине окна ≥1280px
@@ -36,6 +39,18 @@ export function SidePanel({ expanded, onExpand, ariaLabel, kind = "assistant", a
   const compact = useMedia(COMPACT_MEDIA);
   const open = !compact || expanded;
   const expandLabel = kind === "card" ? t.panel.expandCard : t.panel.expandAssistant;
+  const metrics = useLayoutMetrics();
+  const pinned = useStored((s) => s.sidebarPinned);
+  const width = panelWidth({ ...metrics, pinned });
+
+  // Ширина панели — из той же функции, что и раскладка (layout.ts): CSS читает --panel.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--panel", `${width}px`);
+    return () => {
+      root.style.removeProperty("--panel");
+    };
+  }, [width]);
 
   // На ≥1280 панель занимает место и сдвигает содержимое: уведомления над текстом сужаются,
   // чтобы не уходить под панель (правило для .first-run в styles.css).

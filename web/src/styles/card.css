@@ -14,3 +14,185 @@
 .card-row__value .card-row__entity {
   vertical-align: baseline;
 }
+
+/* ---------- Полная карточка: инфобокс, списки, метки, легенда (redesign-entity-cards) ---------- */
+/* Раскладка инфобокса зависит от ширины панели, а не окна: контейнер — панель. */
+.side-panel {
+  container-type: inline-size;
+}
+
+.card-summary-line {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font: var(--type-ui-body-sm);
+  overflow-wrap: anywhere;
+}
+
+.card-summary-line [data-country-kind="modern"] {
+  color: var(--ink-3);
+}
+
+.card-facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.card-facts__item {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.card-facts dt {
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+.card-facts dd {
+  margin: 0;
+  min-width: 0;
+}
+
+@container (min-width: 32rem) {
+  .card-facts__item {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+}
+
+.card-inline {
+  margin: 0;
+  color: var(--ink);
+  font: var(--type-ui-body-sm);
+  overflow-wrap: anywhere;
+}
+
+.card-row {
+  overflow-wrap: anywhere;
+}
+
+.card-row__note {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.card-row__details:not([hidden]) {
+  display: grid;
+  gap: 0.125rem;
+  margin-top: var(--space-1);
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--line);
+  color: var(--ink-2);
+  font: var(--type-ui-caption);
+}
+
+.card-section__inferred {
+  color: var(--ink-3);
+  font: var(--type-ui-caption);
+  text-transform: none;
+}
+
+.card-more {
+  justify-self: start;
+}
+
+/* Метка статуса: цвет и форма по отметке (круг, кольцо, ромб, треугольник), без текста. */
+.card-mark {
+  --tone: var(--ink-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin: 0 0 0 0.125rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  vertical-align: -0.3125rem;
+  cursor: pointer;
+}
+
+.card-mark:hover {
+  background: var(--sunken);
+}
+
+.card-mark:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.card-mark--static {
+  cursor: default;
+}
+
+.card-mark__shape {
+  display: block;
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--tone);
+}
+
+.card-mark[data-mark="verified"] { --tone: var(--ok); }
+.card-mark[data-mark="verified"] .card-mark__shape { border-radius: 50%; }
+.card-mark[data-mark="sourced"] { --tone: var(--accent); }
+.card-mark[data-mark="sourced"] .card-mark__shape { border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 2px var(--tone); }
+.card-mark[data-mark="generated"] { --tone: var(--generated); }
+.card-mark[data-mark="generated"] .card-mark__shape { width: 0.5625rem; height: 0.5625rem; transform: rotate(45deg); border-radius: 1px; }
+.card-mark[data-mark="disputed"] { --tone: var(--danger); }
+.card-mark[data-mark="disputed"] .card-mark__shape { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+.card-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font: var(--type-ui-caption);
+  letter-spacing: var(--type-ui-caption-tracking);
+}
+
+.card-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.card-legend__label {
+  color: var(--ink);
+}
+
+.card-legend__hint {
+  color: var(--ink-3);
+}
+
+.card-empty {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
+  font: var(--type-ui-body-sm);
+}
+
+.card-empty p {
+  margin: 0;
+}
+
+.card-empty__hint {
+  color: var(--ink-2);
+}
+
+.card-inline .card-row__entity {
+  margin: 0;
+  padding: 0;
+}
+
+.card-inline .card-mark {
+  width: 1.125rem;
+  margin: 0;
+}

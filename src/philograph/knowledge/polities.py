@@ -28,7 +28,7 @@ import re
 import sqlite3
 import threading
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +39,7 @@ YEAR_LIMIT = 9999
 DEFAULT_PATH = "data/cliopatria/polities.sqlite"
 DEFAULT_CACHE = 64
 DEFAULT_CACHE_BYTES = 64 * 1024 * 1024
+INDEX_CACHE = 8  # интервалов с рамками строк для поиска образования в точке
 YEAR = re.compile(r"^-?[0-9]{1,4}$")  # только ASCII-цифры: `\d` в Python — любые цифры Юникода
 
 events.define(
@@ -215,6 +216,96 @@ def build_slice(conn: sqlite3.Connection, year: int) -> Slice:
     )
 
 
+def _rings(geometry: dict[str, Any]) -> list[list[list[list[float]]]]:
+    """Многоугольники геометрии: список колец (первое — внешнее, остальные — дыры)."""
+    if geometry.get("type") == "Polygon":
+        return [geometry["coordinates"]]
+    if geometry.get("type") == "MultiPolygon":
+        return list(geometry["coordinates"])
+    return []
+
+
+def _bbox(polygons: list[list[list[list[float]]]]) -> tuple[float, float, float, float] | None:
+    xs = [p[0] for poly in polygons for p in poly[0]] if polygons else []
+    ys = [p[1] for poly in polygons for p in poly[0]] if polygons else []
+    return (min(xs), min(ys), max(xs), max(ys)) if xs else None
+
+
+def _in_ring(lon: float, lat: float, ring: list[list[float]]) -> bool:
+    """Лучевой алгоритм на плоскости lon/lat. Верен, только если кольца разрезаны по ±180°
+    (RFC 7946): это проверяет сборка артефакта (``polities_build``, ребро со скачком долготы
+    больше 180° — ошибка сборки)."""
+    inside = False
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+        if (yi > lat) != (yj > lat) and lon < (xj - xi) * (lat - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
+def contains(polygons: list[list[list[list[float]]]], lon: float, lat: float) -> bool:
+    for poly in polygons:
+        if (
+            poly
+            and _in_ring(lon, lat, poly[0])
+            and not any(_in_ring(lon, lat, h) for h in poly[1:])
+        ):
+            return True
+    return False
+
+
+@dataclass(frozen=True)
+class Located:
+    """Рамки строк интервала. Геометрия строки разбирается один раз на запись кэша — когда
+    её рамка впервые содержит точку; разобранное хранится в ``parsed`` (только кандидаты,
+    а не весь интервал, чтобы не держать в памяти все многоугольники)."""
+
+    valid_from: int
+    valid_to: int
+    rows: tuple[tuple[tuple[float, float, float, float], str, str, str, float, str], ...]
+    parsed: dict[int, list[list[list[list[float]]]]] = field(
+        default_factory=dict, compare=False, repr=False
+    )
+
+
+def build_index(conn: sqlite3.Connection, year: int) -> Located:
+    valid_from, valid_to = interval(conn, year)
+    rows = []
+    for pid, name, status, area, geometry in conn.execute(
+        "SELECT id, name, name_status, area, geometry FROM polity_rows"
+        " WHERE from_year <= ? AND to_year >= ? ORDER BY row",
+        (year, year),
+    ):
+        box = _bbox(_rings(json.loads(geometry)))
+        if box is not None:
+            rows.append((box, pid, name, status, area, geometry))
+    return Located(valid_from, valid_to, tuple(rows))
+
+
+def locate(index: Located, lat: float, lon: float) -> dict[str, Any] | None:
+    """Образование, чей многоугольник содержит точку; из нескольких — меньшее по площади
+    (более частное). Строки одного ``id`` — одно образование, площадь — их сумма."""
+    hits: dict[str, dict[str, Any]] = {}
+    for n, ((x0, y0, x1, y1), pid, name, status, area, geometry) in enumerate(index.rows):
+        if not (x0 <= lon <= x1 and y0 <= lat <= y1):
+            continue
+        polygons = index.parsed.get(n)
+        if polygons is None:
+            polygons = index.parsed.setdefault(n, _rings(json.loads(geometry)))
+        if contains(polygons, lon, lat):
+            hit = hits.setdefault(
+                pid, {"id": pid, "name": name, "name_status": status, "area": 0.0}
+            )
+            hit["area"] += area
+    if not hits:
+        return None
+    best = min(hits.values(), key=lambda h: (h["area"], h["id"]))
+    return {"id": best["id"], "name": best["name"], "name_status": best["name_status"]}
+
+
 def response_body(year: int, part: Slice, source: str, cached: bool) -> bytes:
     """Тело ответа ``/map/polities``: поля года вокруг готового массива образований."""
     head = (
@@ -238,6 +329,7 @@ class PolityLayer:
         self._cache: OrderedDict[tuple, Slice] = OrderedDict()
         self._source: tuple[tuple, str] | None = None
         self._lock = threading.Lock()
+        self._index: OrderedDict[tuple, Located] = OrderedDict()
 
     @classmethod
     def from_env(cls, env: dict[str, str]) -> PolityLayer:
@@ -297,6 +389,44 @@ class PolityLayer:
             return build_slice(conn, year), source
         finally:
             conn.close()
+
+    def at(self, lat: float, lon: float, year: int) -> dict[str, Any] | None:
+        """Образование в точке на год (карточка персоны, redesign-entity-cards); без
+        артефакта — ``PolitiesUnavailable``. Рамки строк кэшируются по интервалу."""
+        if not -YEAR_LIMIT <= year <= YEAR_LIMIT:
+            return None
+        sig = self._signature()
+        with self._lock:
+            key = next(
+                (
+                    k
+                    for k, v in self._index.items()
+                    if k[0] == sig and v.valid_from <= year <= v.valid_to
+                ),
+                None,
+            )
+            index = None
+            if key is not None:
+                self._index.move_to_end(key)  # вытеснение по давности использования (LRU)
+                index = self._index[key]
+        # Повреждённый артефакт (нет таблицы, битая геометрия) — как недоступный слой:
+        # карточка получает ``polity = unavailable`` и запасной путь «ныне …», а не 500.
+        try:
+            if index is None:
+                conn = open_artifact(self.path) if self.path is not None else None
+                if conn is None:
+                    raise PolitiesUnavailable("missing")
+                try:
+                    index = build_index(conn, year)
+                finally:
+                    conn.close()
+                with self._lock:
+                    self._index[(sig, index.valid_from, index.valid_to)] = index
+                    while len(self._index) > INDEX_CACHE:
+                        self._index.popitem(last=False)
+            return locate(index, lat, lon)
+        except (sqlite3.DatabaseError, ValueError, KeyError, TypeError, IndexError) as exc:
+            raise PolitiesUnavailable("format") from exc
 
     def serve(self, year: int) -> bytes:
         """Тело ответа на год; события ``served`` или ``unavailable``."""

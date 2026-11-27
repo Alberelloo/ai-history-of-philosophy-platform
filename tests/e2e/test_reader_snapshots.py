@@ -328,6 +328,9 @@ def test_s1_s4_card(browser, site, ids, theme, lang):
             page.locator(".side-panel .card-section h4").first.wait_for()
             aside(page)
             assert_full_card_head(page)
+            # Раскладка полной карточки: шире 448px, без горизонтальной прокрутки.
+            visual.assert_no_horizontal_scroll(page)
+            assert page.locator(".side-panel").bounding_box()["width"] > 448
             shoot(snaps, page, "s4", theme, lang)
     finally:
         context.close()
@@ -335,15 +338,19 @@ def test_s1_s4_card(browser, site, ids, theme, lang):
 
 
 def assert_full_card_head(page) -> None:
-    """S4 (4.5, Lifeline.md): годы один раз в голове рядом с меткой семьи и линия жизни — шкала
-    с полосой и веком, а не вторая строка с теми же годами. Тело панели прокручивается само:
-    последняя кнопка графа, срезанная краем окна, достижима прокруткой."""
+    """S4 (redesign-entity-cards, «Карточка персоны»): в голове имя и строка сводки с годами
+    один раз; линии жизни, сводки-счётчиков и «Где читать» у персоны нет. Тело панели
+    прокручивается само: последняя кнопка графа, срезанная краем окна, достижима прокруткой.
+    Проверяется в CI e2e (Docker); эталоны снимков — только Windows."""
     panel = page.locator(".side-panel")
-    life = panel.locator(".pg-lifeline")
-    assert life.get_attribute("aria-hidden") == "true"
-    assert life.locator(".pg-lifeline__life").bounding_box()["width"] > 20
-    assert life.locator(".pg-lifeline__century").count() >= 1
-    assert panel.locator(".card-dates").count() == 1
+    assert panel.locator(".pg-lifeline").count() == 0
+    assert panel.locator(".card-summary").count() == 0
+    assert panel.locator("[data-section=where]").count() == 0
+    summary = panel.locator("[data-card-summary]")
+    assert summary.count() == 1
+    assert "1711–1776" in summary.inner_text()
+    assert panel.locator(".pg-panel__body").inner_text().count("1711") == 1
+    assert panel.locator(".card-dates").count() == 0
     last = panel.locator(".card-section, .card-graph, button").last
     scroller = last.evaluate(
         """e => { for (let p = e.parentElement; p; p = p.parentElement) {

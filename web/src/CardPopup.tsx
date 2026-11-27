@@ -26,6 +26,7 @@ type Row = {
   in_textbook: boolean | null;
   attributed_to: string[];
   evidence: { paragraph_id: string; link: string }[];
+  inferred?: boolean; // выведенная строка (redesign-entity-cards): в окне не показывается
 };
 type Card = {
   id: string;
@@ -131,9 +132,9 @@ function twoSentences(text: string): string {
 }
 
 // До двух утверждений: сначала проверенные, затем по источникам, затем остальные;
-// сгенерированные — только если других нет.
+// сгенерированные — только если других нет. Выведенные строки — не утверждения, их нет.
 function topStatements(card: Card): Row[] {
-  const rows = card.sections.flatMap((s) => s.rows);
+  const rows = card.sections.flatMap((s) => s.rows).filter((r) => !r.inferred);
   const by = (pred: (r: Row) => boolean) => rows.filter(pred);
   const verified = by((r) => r.status === "verified");
   const sourced = by((r) => r.status !== "verified" && r.evidence.length > 0);

@@ -99,7 +99,15 @@ def components(env: dict[str, str]) -> Components:
         else None
     )
     portraits = Portraits(engine, FileStore(Path(env["PHILOGRAPH_FILES_ROOT"])))
-    cards = Cards(statements, mentions, llm, on_view=review.record_views, portraits=portraits)
+    polity_layer = PolityLayer.from_env(env)
+    cards = Cards(
+        statements,
+        mentions,
+        llm,
+        on_view=review.record_views,
+        portraits=portraits,
+        polities=polity_layer,
+    )
     graphs = Graphs(
         statements,
         llm,
@@ -145,7 +153,7 @@ def components(env: dict[str, str]) -> Components:
         snapshots,
         catalog,
         place_layer,
-        PolityLayer.from_env(env),
+        polity_layer,
     )
 
 

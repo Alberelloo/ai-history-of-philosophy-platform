@@ -26,8 +26,11 @@ export type LayoutMetrics = {
 // Токены в rem; 1rem = корневой кегль. До 1920px кегль 16px, дальше растёт (9.7).
 const NAV_COLLAPSED = 3.5;
 const NAV_PINNED = 17.5;
-const PANEL = 28;
+const PANEL = 28; // наименьшая ширина правой панели и ширина для правила сворачивания навигации
+const PANEL_MAX = 36;
+const PANEL_STEP = 0.5; // округление вниз
 const PANEL_STRIP = 3;
+const STRIP_GAP = 2; // развёрнутая полоска не доходит до навигации на 2rem
 const TOC_MIN = 13;
 const TOC_MAX = 17;
 const FIELD = 18;
@@ -38,26 +41,64 @@ const GAP_FIELD = 2.5; // текст → поле (40px)
 const OFF_MIN = 2; // внешний отступ (32px)
 const TEXT_MIN_CH = 62;
 const TEXT_MAX_CH = 68;
-// Минимальная свободная ширина A, при которой закреплённая навигация не сворачивается.
-const PIN_A_MIN = 46.5; // 744px
+
+// Сколько свободной ширины нужно каждой раскладке (px), по порядку K1–K4.
+function needs(root: number, ch: number): [number, number, number, number] {
+  const textMin = TEXT_MIN_CH * ch;
+  return [
+    OFF_MIN * 2 * root + TOC_MIN * root + GAP_FULL * root + textMin + GAP_FIELD * root + FIELD * root,
+    OFF_MIN * 2 * root + TOC_MIN * root + GAP_FULL * root + textMin,
+    OFF_MIN * 2 * root + RAIL * root + GAP_RAIL * root + textMin,
+    2.5 * root + textMin + 1.5 * root,
+  ];
+}
+
+// Навигация с учётом временного сворачивания: оно решается при наименьшей панели (28rem),
+// иначе правило зависело бы от ширины, которую само определяет. Порог — потребность K4
+// (самой узкой раскладки): если при закреплённой навигации ей не хватает места, колонка
+// стала бы уже 62ch, поэтому навигация временно сворачивается.
+function navigation(m: LayoutMetrics): { navW: number; tempCollapse: boolean } {
+  const wide = m.width >= 1280;
+  let navPinned = m.pinned && wide;
+  const tempCollapse =
+    navPinned && m.panelOpen && m.width - NAV_PINNED * m.root - PANEL * m.root < needs(m.root, m.ch)[3];
+  if (tempCollapse) navPinned = false;
+  return { navW: navPinned ? NAV_PINNED * m.root : NAV_COLLAPSED * m.root, tempCollapse };
+}
+
+// Ширина правой панели, px (redesign-entity-cards, visual-design «Раскладка экрана чтения»).
+// Единственное место правила: раскладка K1–K4 и CSS-переменная --panel берут её отсюда.
+// - полоска (окно 1024–1279): min(36rem, окно − навигация − 2rem), поверх текста;
+// - 1280–1439: clamp(28rem, окно − навигация − потребность K4, 36rem);
+// - от 1440: clamp(28rem, окно − навигация − потребность раскладки при 28rem, 36rem) —
+//   раскладка при открытой панели та же, что при 28rem.
+// Округление вниз до 0.5rem.
+export function panelWidth(m: Omit<LayoutMetrics, "panelOpen">): number {
+  const step = PANEL_STEP * m.root;
+  const floor = (px: number) => Math.floor(px / step + 1e-6) * step;
+  const min = PANEL * m.root;
+  const max = PANEL_MAX * m.root;
+  if (m.width < 1280) return floor(Math.max(min, Math.min(max, m.width - NAV_COLLAPSED * m.root - STRIP_GAP * m.root)));
+  const { navW } = navigation({ ...m, panelOpen: true });
+  const all = needs(m.root, m.ch);
+  let need = all[3];
+  if (m.width >= 1440) {
+    const free = m.width - navW - min;
+    need = all.find((n) => free >= n) ?? all[3];
+  }
+  return floor(Math.max(min, Math.min(max, m.width - navW - need)));
+}
 
 export function computeLayout(m: LayoutMetrics): Layout {
   const wide = m.width >= 1280;
-  const panelW = !m.panelOpen ? 0 : wide ? PANEL * m.root : PANEL_STRIP * m.root;
+  const panelW = !m.panelOpen ? 0 : wide ? panelWidth(m) : PANEL_STRIP * m.root;
   const textMin = TEXT_MIN_CH * m.ch;
   const textMax = TEXT_MAX_CH * m.ch;
 
-  let navPinned = m.pinned && wide;
-  const tempCollapse =
-    navPinned && m.panelOpen && m.width - NAV_PINNED * m.root - PANEL * m.root < PIN_A_MIN * m.root;
-  if (tempCollapse) navPinned = false;
-  const navW = navPinned ? NAV_PINNED * m.root : NAV_COLLAPSED * m.root;
+  const { navW, tempCollapse } = navigation(m);
   const A = m.width - navW - panelW;
 
-  const k1Need = OFF_MIN * 2 * m.root + TOC_MIN * m.root + GAP_FULL * m.root + textMin + GAP_FIELD * m.root + FIELD * m.root;
-  const k2Need = OFF_MIN * 2 * m.root + TOC_MIN * m.root + GAP_FULL * m.root + textMin;
-  const k3Need = OFF_MIN * 2 * m.root + RAIL * m.root + GAP_RAIL * m.root + textMin;
-  const k4Need = 2.5 * m.root + textMin + 1.5 * m.root;
+  const [k1Need, k2Need, k3Need, k4Need] = needs(m.root, m.ch);
 
   // Лишняя ширина: сначала колонка текста до 68ch, затем оглавление до 17rem, остаток — отступы.
   const distribute = (need: number, withToc: boolean, withField: boolean) => {

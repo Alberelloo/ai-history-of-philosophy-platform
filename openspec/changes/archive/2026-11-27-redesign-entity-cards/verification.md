@@ -1,0 +1,500 @@
+# Verification — redesign-entity-cards
+
+## Тестировщик — 2026-11-27, коммит f8f02fb (ветка claude/entity-cards)
+
+Тесты написаны по дельтам `specs/{entity-cards,entity-mentions,visual-design}/spec.md`, не по коду. Код читался только ради
+имён полей и селекторов, которые называет дельта. Продуктовый код не менялся (`git diff -- src web/src docs` пуст).
+
+### Файлы тестов
+
+| Файл | Тестов | Что |
+|---|---|---|
+| `tests/knowledge/test_cards_redesign.py` (новый) | 165 | сервер: сценарии и инварианты, запрос по HTTP с `X-Request-Id`, журнал сверяется автоматически в каждом запросе |
+| `tests/knowledge/test_mentions_cards.py` (правка) | 44 | «Где читать» (3 сценария + инвариант по типам), «Мало данных», переписанные ожидания MODIFIED |
+| `tests/web/test_card_content.py` (новый) | 25 | браузер, настоящий стенд `knowledge_stack`: шапка, метки, легенда, списки, страна, пустые состояния, XSS |
+| `tests/web/test_card_layout.py` (новый) | 41 | браузер: таблица ширины панели, раскладка 3 размера × 2 темы, карта, инфобокс, компактное окно, сборка |
+| `tests/web/test_reader_cards.py` (правка) | 20 | моки `/card` приведены к новому контракту; T12 и N10 переписаны |
+| `tests/web/card_world.py`, `tests/web/knowledge_stack.py` | — | данные для стенда; стенд передаёт `PolityLayer` и в `Cards` (правка тестовой инфраструктуры) |
+| `tests/e2e/test_site.py`, `tests/e2e/test_reader_snapshots.py` | — | переписаны, **не запускались** (Docker): проверяется в CI e2e |
+
+Вывод и журнал. Серверные тесты: ответ `GET /v1/entities/{id}/card`; `CardSvc.get` в каждом запросе проверяет, что событие
+`knowledge.card.served` с этим `request_id` одно и его `entity_id`, `type`, `sections`, `rows`, `layout`, `empty`, `inferred` равны ответу.
+Браузерные тесты: DOM и ответ карточки, событие — по заголовку `x-request-id` ответа, полученного страницей (`served(...)`,
+`served_for(...)`).
+
+### Матрица: требование → сценарий / инвариант → тест
+
+Сценариев в трёх дельтах 46, у каждого есть тест с `scenario=` (проверено разбором маркеров). Инвариантов с отдельным тестом 41. Строки с «—» — прежние тесты, переписанные по новой спецификации.
+
+| Возможность | Требование | Вид | Сценарий / инвариант | Тест |
+|---|---|---|---|---|
+| entity-cards | Выведенные строки | инвариант | выведенная строка берётся только из видимых утверждений | tests/knowledge/test_cards_redesign.py::test_inference_ignores_statements_of_hidden_source |
+| entity-cards | Выведенные строки | инвариант | выведенная строка — полная строка с прежними полями | tests/knowledge/test_cards_redesign.py::test_inferred_row_has_all_old_fields |
+| entity-cards | Выведенные строки | инвариант | выведенное не пишется в онтологию и не идёт в очередь проверки | tests/knowledge/test_cards_redesign.py::test_inferred_rows_not_written_and_not_queued |
+| entity-cards | Выведенные строки | инвариант | интересы: просматривается не больше 30 трудов | tests/knowledge/test_cards_redesign.py::test_interests_scan_limit |
+| entity-cards | Выведенные строки | инвариант | интересы: типы, порядок, исключение учений, пределы | tests/knowledge/test_cards_redesign.py::test_interests_rules |
+| entity-cards | Выведенные строки | инвариант | отметка вывода не сильнее самого слабого звена | tests/knowledge/test_cards_redesign.py::test_inferred_mark_is_weakest_link |
+| entity-cards | Выведенные строки | инвариант | раздел с выведенным подписан «по трудам и связям», подробности — через что | tests/web/test_card_content.py::test_inferred_section_label_and_via |
+| entity-cards | Выведенные строки | сценарий | Интересы Юма | tests/knowledge/test_cards_redesign.py::test_hume_interests |
+| entity-cards | Выведенные строки | сценарий | Компактное окно без выводов | tests/web/test_card_content.py::test_doctrine_card_relates_to_and_in_works |
+| entity-cards | Выведенные строки | сценарий | Компактное окно без выводов | tests/web/test_card_layout.py::test_popup_shows_statements_only |
+| entity-cards | Выведенные строки | сценарий | Отвергнутое звено не даёт вывода | tests/knowledge/test_cards_redesign.py::test_rejected_link_gives_no_inference |
+| entity-cards | Государство основного места | инвариант | без года рождения образование не ищется; название не из словаря | tests/knowledge/test_cards_redesign.py::test_polity_needs_birth_year |
+| entity-cards | Государство основного места | инвариант | образование — на год рождения, из слоя, меньшее по площади | tests/knowledge/test_cards_redesign.py::test_polity_depends_on_birth_year_and_picks_smallest |
+| entity-cards | Государство основного места | инвариант | страна не показывается ни названием, ни заглушкой, если модуль границ не загрузился | tests/web/test_card_content.py::test_country_module_failure_shows_nothing |
+| entity-cards | Государство основного места | сценарий | Без координат | tests/knowledge/test_cards_redesign.py::test_no_coordinates |
+| entity-cards | Государство основного места | сценарий | Без координат | tests/web/test_card_content.py::test_no_coordinates_no_country_no_fragment |
+| entity-cards | Государство основного места | сценарий | Вне покрытия слоя | tests/knowledge/test_cards_redesign.py::test_outside_layer_coverage |
+| entity-cards | Государство основного места | сценарий | Вне покрытия слоя | tests/web/test_card_content.py::test_outside_layer_coverage |
+| entity-cards | Государство основного места | сценарий | Историческое государство | tests/knowledge/test_cards_redesign.py::test_historical_polity |
+| entity-cards | Государство основного места | сценарий | Историческое государство | tests/web/test_card_content.py::test_historical_state_in_summary |
+| entity-cards | Государство основного места | сценарий | Место с координатами | tests/knowledge/test_cards_redesign.py::test_place_card_has_geo_without_polity |
+| entity-cards | Государство основного места | сценарий | Место с координатами | tests/web/test_card_content.py::test_place_card_shows_modern_country |
+| entity-cards | Государство основного места | сценарий | Основной фрагмент не растёт | tests/web/test_card_layout.py::test_country_data_is_a_separate_chunk |
+| entity-cards | Государство основного места | сценарий | Слоя нет — современная страна с пометкой | tests/knowledge/test_cards_redesign.py::test_no_layer |
+| entity-cards | Государство основного места | сценарий | Слоя нет — современная страна с пометкой | tests/web/test_card_content.py::test_no_layer_shows_modern_country_with_note |
+| entity-cards | К кому относится | инвариант | набор типов, выводы у понятия, место раздела | tests/knowledge/test_cards_redesign.py::test_relates_to_term_authors_only_for_concept_and_position_in_order |
+| entity-cards | К кому относится | инвариант | одна строка на персону, прямая вытесняет выведенную | tests/knowledge/test_cards_redesign.py::test_relates_to_one_row_per_person |
+| entity-cards | К кому относится | сценарий | Прямая строка вытесняет вывод | tests/knowledge/test_cards_redesign.py::test_direct_row_replaces_inferred |
+| entity-cards | К кому относится | сценарий | Учение без сторонников, но с трудом | tests/knowledge/test_cards_redesign.py::test_relates_to_inferred_via_work |
+| entity-cards | К кому относится | сценарий | Учение без сторонников, но с трудом | tests/web/test_card_content.py::test_doctrine_card_relates_to_and_in_works |
+| entity-cards | Карточка персоны | инвариант | не больше одной строки на сущность в местах, влияниях, учителях и трудах | tests/knowledge/test_cards_redesign.py::test_one_row_per_entity |
+| entity-cards | Карточка персоны | инвариант | основное место: роль, отметка, подтверждения, порядок | tests/knowledge/test_cards_redesign.py::test_main_place_by_role |
+| entity-cards | Карточка персоны | инвариант | основное место: роль, отметка, подтверждения, порядок | tests/knowledge/test_cards_redesign.py::test_main_place_tie_breaks_by_evidence_count |
+| entity-cards | Карточка персоны | инвариант | основное место: роль, отметка, подтверждения, порядок | tests/knowledge/test_cards_redesign.py::test_main_place_tie_breaks_by_mark_then_order |
+| entity-cards | Карточка персоны | инвариант | порядок разделов персоны и их вид показа | tests/knowledge/test_cards_redesign.py::test_person_section_order_and_display |
+| entity-cards | Карточка персоны | инвариант | примечание строки труда — год, если труд датирован | tests/knowledge/test_cards_redesign.py::test_work_note_is_year_only_when_dated |
+| entity-cards | Карточка персоны | инвариант | у персоны нет influence, studied_with и «Где читать» | tests/knowledge/test_cards_redesign.py::test_person_has_no_influence_code_and_no_where |
+| entity-cards | Карточка персоны | сценарий | Влияние в обе стороны без повторов | tests/knowledge/test_cards_redesign.py::test_influence_both_ways_without_repeats |
+| entity-cards | Карточка персоны | сценарий | Влияние в обе стороны без повторов | tests/web/test_card_content.py::test_influence_sections_without_repeats |
+| entity-cards | Карточка персоны | сценарий | Где жил свёрнут | tests/knowledge/test_cards_redesign.py::test_places_inline_collapsed |
+| entity-cards | Карточка персоны | сценарий | Где жил свёрнут | tests/web/test_card_content.py::test_places_collapsed_and_expanded |
+| entity-cards | Карточка персоны | сценарий | Только годы жизни | tests/knowledge/test_cards_redesign.py::test_only_lifespan |
+| entity-cards | Карточка персоны | сценарий | Только годы жизни | tests/web/test_card_content.py::test_only_lifespan |
+| entity-cards | Карточка персоны | сценарий | Шапка и сводка Локка | tests/knowledge/test_cards_redesign.py::test_locke_header_and_summary |
+| entity-cards | Карточка персоны | сценарий | Шапка и сводка Локка | tests/web/test_card_content.py::test_locke_header_and_summary |
+| entity-cards | Природа каждой строки | инвариант | легенда: отметки строк, сводки и сгенерированного описания по шкале | tests/knowledge/test_cards_redesign.py::test_legend_equals_marks_in_every_type |
+| entity-cards | Природа каждой строки | инвариант | метка одинакова во всех карточках и различима по отметке | tests/web/test_card_content.py::test_mark_looks_same_in_every_card |
+| entity-cards | Природа каждой строки | инвариант | отметка — «спорное» либо статус, одна шкала | tests/knowledge/test_cards_redesign.py::test_mark_rule_for_all_combinations |
+| entity-cards | Природа каждой строки | инвариант | регион снимает подтверждение, но не меняет отметку | tests/knowledge/test_cards_redesign.py::test_region_hides_evidence_but_keeps_mark |
+| entity-cards | Природа каждой строки | инвариант | сгенерированное описание попадает в легенду, пустая карточка — без легенды | tests/knowledge/test_cards_redesign.py::test_generated_description_in_legend_and_none_when_empty |
+| entity-cards | Природа каждой строки | инвариант | только цвет: у каждой строки одна метка с именем, слов статуса нет | tests/web/test_card_content.py::test_one_legend_and_no_status_words |
+| entity-cards | Природа каждой строки | сценарий | Одна легенда | tests/knowledge/test_cards_redesign.py::test_legend_is_set_of_marks |
+| entity-cards | Природа каждой строки | сценарий | Одна легенда | tests/web/test_card_content.py::test_one_legend_and_no_status_words |
+| entity-cards | Природа каждой строки | сценарий | Одна легенда | tests/web/test_reader_cards.py::test_t12_nature_of_each_row |
+| entity-cards | Природа каждой строки | сценарий | По источникам без подтверждения | tests/knowledge/test_cards_redesign.py::test_sourced_without_evidence |
+| entity-cards | Природа каждой строки | сценарий | По источникам без подтверждения | tests/web/test_card_content.py::test_row_marks_sourced_generated_disputed |
+| entity-cards | Природа каждой строки | сценарий | Сгенерированная строка | tests/knowledge/test_cards_redesign.py::test_generated_row |
+| entity-cards | Природа каждой строки | сценарий | Сгенерированная строка | tests/web/test_card_content.py::test_row_marks_sourced_generated_disputed |
+| entity-cards | Природа каждой строки | сценарий | Сгенерированная строка | tests/web/test_reader_cards.py::test_t12_nature_of_each_row |
+| entity-cards | Природа каждой строки | сценарий | Спорное | tests/knowledge/test_cards_redesign.py::test_disputed_row |
+| entity-cards | Природа каждой строки | сценарий | Спорное | tests/web/test_card_content.py::test_disputed_mark_accessible_name_wording |
+| entity-cards | Природа каждой строки | сценарий | Спорное | tests/web/test_card_content.py::test_row_marks_sourced_generated_disputed |
+| entity-cards | Природа каждой строки | сценарий | Спорное | tests/web/test_reader_cards.py::test_t12_nature_of_each_row |
+| entity-cards | Природа каждой строки | — | (общий) | tests/e2e/test_site.py::test_mention_opens_card_and_navigates |
+| entity-cards | Природа каждой строки | — | (общий) | tests/knowledge/test_mentions_cards.py::test_row_attribution_status_and_dispute |
+| entity-cards | Пустые разделы | инвариант | место только с координатами: карточка не пуста | tests/knowledge/test_cards_redesign.py::test_place_with_only_coordinates_is_not_empty |
+| entity-cards | Пустые разделы | инвариант | ни одного пустого раздела; пустая персона — без раздела, но с сводкой | tests/knowledge/test_cards_redesign.py::test_no_empty_sections_in_any_type |
+| entity-cards | Пустые разделы | инвариант | ни одной пустой карточки: у типа с утверждением есть раздел или сводка | tests/knowledge/test_cards_redesign.py::test_one_statement_never_gives_empty_card |
+| entity-cards | Пустые разделы | инвариант | сущность без утверждений — empty = true, разделов нет | tests/knowledge/test_cards_redesign.py::test_no_statements_gives_empty_card |
+| entity-cards | Пустые разделы | сценарий | Мало данных | tests/knowledge/test_mentions_cards.py::test_little_data_doctrine_with_where_to_read |
+| entity-cards | Пустые разделы | сценарий | Мало данных | tests/web/test_card_content.py::test_empty_states |
+| entity-cards | Пустые разделы | сценарий | Ни одной пустой карточки | tests/web/test_card_content.py::test_no_card_is_empty_in_every_type |
+| entity-cards | Пустые разделы | сценарий | Совсем пусто | tests/knowledge/test_cards_redesign.py::test_place_completely_empty |
+| entity-cards | Пустые разделы | сценарий | Совсем пусто | tests/web/test_card_content.py::test_empty_states |
+| entity-cards | Пустые разделы | — | (общий) | tests/knowledge/test_mentions_cards.py::test_no_empty_sections |
+| entity-cards | Разделы карточки по типу | инвариант | «Исторический контекст» — у понятия, персоны, произведения и учений | tests/knowledge/test_mentions_cards.py::test_context_section_for_types |
+| entity-cards | Разделы карточки по типу | инвариант | ни одно видимое утверждение не пропадает | tests/knowledge/test_cards_redesign.py::test_nothing_lost_for_every_type |
+| entity-cards | Разделы карточки по типу | инвариант | принадлежность по датам не показывается строками | tests/knowledge/test_mentions_cards.py::test_epoch_card_without_date_membership |
+| entity-cards | Разделы карточки по типу | инвариант | разделы по типам: порядок и состав | tests/knowledge/test_cards_redesign.py::test_section_codes_order_by_type |
+| entity-cards | Разделы карточки по типу | инвариант | у события «стимулировало» — не «Исторический контекст» | tests/knowledge/test_mentions_cards.py::test_event_card_has_no_context_section |
+| entity-cards | Разделы карточки по типу | сценарий | Исторический контекст учения | tests/knowledge/test_mentions_cards.py::test_doctrine_historical_context |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка группы | tests/knowledge/test_cards_redesign.py::test_group_card |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка группы | tests/web/test_card_content.py::test_group_and_event_cards |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка понятия | tests/knowledge/test_cards_redesign.py::test_concept_card |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка события | tests/knowledge/test_cards_redesign.py::test_event_card |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка события | tests/web/test_card_content.py::test_group_and_event_cards |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка труда | tests/knowledge/test_cards_redesign.py::test_work_card |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка труда | tests/web/test_card_content.py::test_work_card_infobox |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка труда | tests/web/test_card_content.py::test_work_card_infobox_labels |
+| entity-cards | Разделы карточки по типу | сценарий | Карточка эпохи | tests/knowledge/test_mentions_cards.py::test_epoch_card |
+| entity-cards | Разделы карточки по типу | сценарий | Ничего не теряется | tests/knowledge/test_cards_redesign.py::test_nothing_lost_tabula_rasa |
+| entity-cards | Разделы карточки по типу | сценарий | Ничего не теряется | tests/web/test_card_content.py::test_other_section_in_dom |
+| entity-cards | Разделы карточки по типу | — | (общий) | tests/e2e/test_site.py::test_concept_card_with_definition_and_where_to_read |
+| entity-cards | Разделы карточки по типу | — | (общий) | tests/knowledge/test_mentions_cards.py::test_sections_by_type |
+| entity-cards | Раскладка полной карточки | инвариант | инфобокс: две колонки от 32rem ширины панели, иначе одна | tests/web/test_card_layout.py::test_infobox_columns_follow_panel_width |
+| entity-cards | Раскладка полной карточки | инвариант | текст строк не обрезается: длинное слово без пробелов переносится | tests/web/test_card_layout.py::test_unbroken_long_word_is_wrapped |
+| entity-cards | Раскладка полной карточки | сценарий | Инфобокс по ширине | tests/web/test_card_layout.py::test_infobox_columns_by_window_width |
+| entity-cards | Раскладка полной карточки | сценарий | Карточка на карте | tests/web/test_card_layout.py::test_card_on_map_in_three_sizes |
+| entity-cards | Раскладка полной карточки | сценарий | Три размера окна | tests/web/test_card_layout.py::test_card_fits_panel_in_three_sizes |
+| entity-cards | Свёрнутые списки | инвариант | кнопка «Показать все (N)» при total > visible, без нового запроса | tests/web/test_card_content.py::test_places_collapsed_and_expanded |
+| entity-cards | Свёрнутые списки | инвариант | у каждого раздела есть display, visible и total = числу строк | tests/knowledge/test_cards_redesign.py::test_every_section_has_display_visible_total |
+| entity-cards | Свёрнутые списки | сценарий | Длинный список | tests/knowledge/test_cards_redesign.py::test_long_list_totals |
+| entity-cards | Свёрнутые списки | сценарий | Длинный список | tests/web/test_card_content.py::test_short_and_long_lists |
+| entity-cards | Свёрнутые списки | сценарий | Короткий список без кнопки | tests/knowledge/test_cards_redesign.py::test_short_list_totals |
+| entity-cards | Свёрнутые списки | сценарий | Короткий список без кнопки | tests/web/test_card_content.py::test_short_and_long_lists |
+| entity-cards | Тексты карточки — текст | инвариант | значение, примечание и «через» выводятся текстом | tests/web/test_card_content.py::test_markup_in_values_notes_and_via_is_text |
+| entity-cards | Тексты карточки — текст | инвариант | значения, примечания и названия «через» отдаются как есть | tests/knowledge/test_cards_redesign.py::test_markup_in_value_note_via_served_verbatim |
+| entity-cards | Тексты карточки — текст | сценарий | Разметка в названии | tests/knowledge/test_cards_redesign.py::test_markup_in_titles_served_verbatim |
+| entity-cards | Тексты карточки — текст | сценарий | Разметка в названии | tests/web/test_card_content.py::test_markup_is_text |
+| entity-mentions | Где читать | инвариант | у персоны указатель не вызывается, у остальных типов блок остаётся | tests/knowledge/test_mentions_cards.py::test_where_to_read_for_every_non_person_type |
+| entity-mentions | Где читать | сценарий | Где читать в карточке понятия | tests/knowledge/test_mentions_cards.py::test_where_to_read_in_concept_card |
+| entity-mentions | Где читать | сценарий | Где читать о причинности | tests/knowledge/test_mentions_cards.py::test_where_to_read_causality |
+| entity-mentions | Где читать | сценарий | Персона без «Где читать» | tests/knowledge/test_mentions_cards.py::test_person_without_where_to_read |
+| entity-mentions | Где читать | — | (общий) | tests/e2e/test_site.py::test_concept_card_with_definition_and_where_to_read |
+| entity-mentions | Где читать | — | (общий) | tests/knowledge/test_mentions_cards.py::test_migration_6_adds_mention_position |
+| entity-mentions | Где читать | — | (общий) | tests/knowledge/test_mentions_cards.py::test_where_to_read |
+| entity-mentions | Где читать | — | (общий) | tests/knowledge/test_mentions_cards.py::test_where_to_read_first_paragraph |
+| entity-mentions | Где читать | — | (общий) | tests/knowledge/test_mentions_cards.py::test_where_to_read_without_position |
+| entity-mentions | Где читать | — | (общий) | tests/web/test_reader_cards.py::test_n10_where_to_read_opens_first_paragraph |
+| visual-design | Раскладка экрана чтения | инвариант | колонка текста при открытой панели не уже 62ch | tests/web/test_card_layout.py::test_text_column_with_open_panel |
+| visual-design | Раскладка экрана чтения | инвариант | ширина открытой панели > 448px на 1024, 1366 и 1920 | tests/web/test_card_layout.py::test_panel_wider_than_448 |
+| visual-design | Раскладка экрана чтения | сценарий | Временное сворачивание навигации | tests/web/test_card_layout.py::test_pinned_navigation_collapses_while_panel_open |
+| visual-design | Раскладка экрана чтения | сценарий | Колонка текста в пределах меры | tests/web/test_card_layout.py::test_closed_panel_layout_modes |
+| visual-design | Раскладка экрана чтения | сценарий | Оглавление важнее поля | tests/web/test_card_layout.py::test_toc_kept_field_dropped_when_panel_opens |
+| visual-design | Раскладка экрана чтения | сценарий | Панель сдвигает колонки | tests/web/test_card_layout.py::test_toc_kept_field_dropped_when_panel_opens |
+| visual-design | Раскладка экрана чтения | сценарий | Плавный масштаб | tests/web/test_card_layout.py::test_root_font_scales_above_1920 |
+| visual-design | Раскладка экрана чтения | сценарий | Полоска справа | tests/web/test_card_layout.py::test_strip_expands_over_text |
+| visual-design | Раскладка экрана чтения | сценарий | Состав раскладок | tests/web/test_card_layout.py::test_closed_panel_layout_modes |
+| visual-design | Раскладка экрана чтения | сценарий | Ширина панели по окну | tests/web/test_card_layout.py::test_panel_width_by_window |
+| visual-design | Раскладка экрана чтения | — | (общий) | tests/e2e/test_reader_snapshots.py::test_s0_s5_layout |
+| visual-design | Раскладка экрана чтения | — | (общий) | tests/e2e/test_reader_snapshots.py::test_strip |
+
+### C1–C9 → тесты
+
+| # | Критерий владельца | Тесты |
+|---|---|---|
+| C1 | нет линии жизни, нет текстовых статусов; метки у частей сводки (круг 3) | `test_card_content.py::test_generated_role_and_years_marked`, `::test_only_lifespan` (метка и легенда из одного пункта), `test_card_content.py::test_locke_header_and_summary` (нет `.pg-lifeline`, `.card-summary`, `[data-section=life]`, «1632» один раз), `::test_one_legend_and_no_status_words` (слова статусов вне легенды, одна `button.card-mark` с именем у каждой `.card-row`, нет `.pg-status`), `::test_row_marks_sourced_generated_disputed`, `test_reader_cards.py::test_t12_nature_of_each_row[light|dark]`, `::test_inferred_section_label_and_via` |
+| C2 | сводка, свёрнутые места, влияние списком, интересы, труды | `test_card_content.py::test_locke_header_and_summary`, `::test_places_collapsed_and_expanded`, `::test_short_and_long_lists`, `::test_influence_sections_without_repeats`, `::test_only_lifespan`, `::test_historical_state_in_summary`; сервер: `test_cards_redesign.py::test_locke_header_and_summary`, `::test_places_inline_collapsed`, `::test_person_section_order_and_display`, `::test_hume_interests`, `::test_main_place_*` |
+| C3 | карточки остальных типов не пусты | `test_card_content.py::test_no_card_is_empty_in_every_type` (9 типов в DOM), `::test_empty_states`; сервер: `test_cards_redesign.py::test_one_statement_never_gives_empty_card[14 типов]`, `::test_no_statements_gives_empty_card`, `::test_nothing_lost_for_every_type`, `::test_place_with_only_coordinates_is_not_empty`, `::test_place_in_ocean_with_only_coordinates_is_not_empty` (D4 закрыт в круге 2); web: `test_card_content.py::test_place_with_only_coordinates_shows_coordinates_and_country`, `::test_place_outside_any_country_shows_only_coordinates` |
+| C4 | понятия и учения: к кому относятся (круг 3: все звенья вывода в режиме учебника) | `test_cards_redesign.py::test_source_scope_every_link_of_the_chain`, `::test_source_scope_chain_variants` (труд, автор, термин, интересы), `test_card_content.py::test_doctrine_card_relates_to_and_in_works`; сервер: `test_relates_to_inferred_via_work`, `test_direct_row_replaces_inferred`, `test_relates_to_term_authors_only_for_concept_and_position_in_order`, `test_relates_to_one_row_per_person`, `test_concept_card`; `test_layout::test_popup_shows_statements_only` |
+| C5 | труды: автор, дата, сферы | `test_card_content.py::test_work_card_infobox`, `::test_work_card_infobox_labels` (D1 закрыт в круге 2); сервер: `test_work_card` |
+| C6 | единая индикация, одна легенда | `test_card_content.py::test_one_legend_and_no_status_words`, `::test_mark_looks_same_in_every_card` (цвет и форма метки в разных карточках), `::test_disputed_mark_accessible_name_wording` (D2 закрыт в круге 2); сервер: `test_legend_equals_marks_in_every_type[14 типов]`, `test_legend_is_set_of_marks`, `test_mark_rule_for_all_combinations`, `test_inferred_mark_is_weakest_link` |
+| C7 | тексты — текст | `test_card_content.py::test_markup_is_text` (имя персоны, труда, места), `::test_markup_in_values_notes_and_via_is_text`; сервер: `test_markup_in_titles_served_verbatim`, `test_markup_in_value_note_via_served_verbatim` |
+| C8 | `lint-imports`, traceability, `ruff`; визуальная проверка на 1024×576 | команды ниже; `test_card_layout.py::test_card_fits_panel_in_three_sizes[light|dark]` (1024×576, 1366×768, 1920×1080: нет горизонтальной прокрутки, текст строк не обрезан, панель не на навигации), `::test_unbroken_long_word_is_wrapped`; e2e `test_s1_s4_card` — в CI |
+| C9 | карточки шире, 1024×576 не ломается, панели не перекрываются | `test_card_layout.py::test_panel_width_by_window[7 окон]` (таблица сценария, `--panel`, 62–68ch, неизменность при замене карточки ассистентом), `::test_panel_wider_than_448[1024|1366|1920]`, `::test_text_column_with_open_panel[8 окон]`, `::test_card_fits_panel_in_three_sizes`, `::test_card_on_map_in_three_sizes` (`.map-chart`, `.map-panel` в окне), `::test_strip_expands_over_text`, `::test_toc_kept_field_dropped_when_panel_opens`, `::test_pinned_navigation_collapses_while_panel_open`, `::test_text_column_with_open_panel_and_pinned_navigation[13 окон, 1471–1476]` (круг 3, порог K4) |
+
+### Команды и итоги (сырые строки)
+
+```
+### pytest -q tests/knowledge/test_mentions_cards.py
+44 passed, 1 warning in 50.30s
+### pytest -q tests/knowledge/test_cards_redesign_unit.py tests/knowledge/test_context.py tests/knowledge/test_context_unit.py tests/knowledge/test_epoch_card_unit.py tests/knowledge/test_regions.py tests/knowledge/test_graph.py tests/knowledge/test_retired_unit.py tests/knowledge/test_polities_layer_spec.py
+205 passed, 1 warning in 225.93s (0:03:45)
+### pytest -q tests/web/test_reader_cards.py
+20 passed, 1 warning in 30.77s
+### pytest -q tests/web/test_reader_layout.py
+3 passed, 1 warning in 6.24s
+### pytest -q tests/web/test_design_system.py
+8 passed, 1 warning in 3.48s
+```
+
+Прогоны трёх новых файлов (последняя редакция; первый прогон давал те же падения плюс `test_root_font_scales_above_1920`, исправленный в самом тесте — проверялась привязка к `nav`, а не к rem):
+
+```
+### pytest -q tests/knowledge/test_cards_redesign.py
+FAILED tests/knowledge/test_cards_redesign.py::test_place_with_only_coordinates_is_not_empty
+1 failed, 164 passed, 1 warning in 161.51s (0:02:41)
+### pytest -q tests/web/test_card_layout.py
+FAILED tests/web/test_card_layout.py::test_infobox_columns_by_window_width - ...
+1 failed, 40 passed, 1 warning in 207.71s (0:03:27)
+### pytest -q tests/web/test_card_content.py
+FAILED tests/web/test_card_content.py::test_disputed_mark_accessible_name_wording
+FAILED tests/web/test_card_content.py::test_work_card_infobox_labels - Assert...
+2 failed, 23 passed, 1 warning in 82.08s (0:01:22)
+```
+
+Проверки стиля и связей:
+
+```
+All checks passed!
+722 files already formatted
+### traceability
+Требований с тестами: 433 из 433
+### git diff product
+(пусто = нет)
+lint-imports: Contracts: 3 kept, 0 broken.
+```
+
+Сборка клиента перед браузерными прогонами: `cd web && npm run build` — rc=0.
+
+### Мутации (15 из 15 пойманы)
+
+Каждая мутация вносилась в продуктовый файл, прогонялся целевой тест (`-k`, `-x`), затем `git checkout -- <файл>` и пересборка клиента.
+После всех мутаций `git status` по `src`, `web/src` пуст.
+
+| # | Мутация | Упавший тест |
+|---|---|---|
+| 1 | `mark_of` всегда `status` | `test_cards_redesign.py::test_disputed_row` |
+| 2 | отметка вывода — сильнейшее звено (`max`) | `test_cards_redesign.py::test_hume_interests` |
+| 3 | в шапку персоны возвращён `.pg-lifeline` | `test_card_content.py::test_locke_header_and_summary` |
+| 4 | у метки строки видимый текст статуса | `test_card_content.py::test_one_legend_and_no_status_words`, `test_reader_cards.py::test_t12_nature_of_each_row[light]` |
+| 5 | вторая легенда в каждом разделе | `test_card_content.py::test_one_legend_and_no_status_words` |
+| 6 | убран раздел `other` | `test_cards_redesign.py::test_nothing_lost_tabula_rasa` |
+| 7 | `where_to_read` у персоны заполнен | `test_cards_redesign.py::test_person_has_no_influence_code_and_no_where`, `test_mentions_cards.py::test_person_without_where_to_read` |
+| 8 | клиент игнорирует `visible` | `test_card_content.py::test_places_collapsed_and_expanded` |
+| 9a | `panelWidth` всегда 36rem | `test_card_layout.py::test_panel_width_by_window[1280-False-472-K4]` |
+| 9b | `panelWidth` всегда 28rem | `test_card_layout.py::test_panel_wider_than_448[1024]` |
+| 10 | `dangerouslySetInnerHTML` для `label` | `test_card_content.py::test_markup_is_text` |
+| 11 | основное место — без правила ролей | `test_cards_redesign.py::test_main_place_by_role[order0]` |
+| 12 | `studied_with` в `influenced_by` | `test_cards_redesign.py::test_influence_both_ways_without_repeats` |
+| 13 | страна без «ныне» | `test_card_content.py::test_no_layer_shows_modern_country_with_note` |
+| 14 | `CardPopup` показывает выведенные строки | `test_card_layout.py::test_popup_shows_statements_only` |
+| 15 | образование ищется без учёта года | `test_cards_redesign.py::test_polity_depends_on_birth_year_and_picks_smallest` |
+
+Сырой журнал серверных мутаций (1, 2, 6, 7, 11, 12, 15):
+
+```
+1 [["tests/knowledge/test_cards_redesign.py", "disputed_row or mark_rule or legend_is_set", "1 failed, 156 deselected, 1 warning in 0.98s", ["FAILED tests/knowledge/test_cards_redesign.py::test_disputed_row - AssertionE..."]]]
+2 [["tests/knowledge/test_cards_redesign.py", "weakest_link or hume_interests", "1 failed, 145 deselected, 1 warning in 0.91s", ["FAILED tests/knowledge/test_cards_redesign.py::test_hume_interests - Assertio..."]]]
+6 [["tests/knowledge/test_cards_redesign.py", "nothing_lost", "1 failed, 149 deselected, 1 warning in 0.83s", ["FAILED tests/knowledge/test_cards_redesign.py::test_nothing_lost_tabula_rasa"]]]
+7 [["tests/knowledge/test_cards_redesign.py", "no_influence_code_and_no_where", "1 failed, 163 deselected, 1 warning in 0.97s", ["FAILED tests/knowledge/test_cards_redesign.py::test_person_has_no_influence_code_and_no_where"]], ["tests/knowledge/test_mentions_cards.py", "person_without_where", "1 failed, 43 deselected, 1 warning in 1.93s", ["FAILED tests/knowledge/test_mentions_cards.py::test_person_without_where_to_read"]]]
+11 [["tests/knowledge/test_cards_redesign.py", "main_place", "1 failed, 150 deselected, 1 warning in 0.89s", ["FAILED tests/knowledge/test_cards_redesign.py::test_main_place_by_role[order0]"]]]
+12 [["tests/knowledge/test_cards_redesign.py", "influence_both or no_influence_code", "1 failed, 162 deselected, 1 warning in 1.09s", ["FAILED tests/knowledge/test_cards_redesign.py::test_influence_both_ways_without_repeats"]]]
+15 [["tests/knowledge/test_cards_redesign.py", "birth_year", "1 failed, 162 deselected, 1 warning in 1.25s", ["FAILED tests/knowledge/test_cards_redesign.py::test_polity_depends_on_birth_year_and_picks_smallest"]]]
+DONE
+```
+
+Сырой журнал клиентских мутаций (3, 4, 5, 8, 9a, 9b, 10, 13, 14):
+
+```
+3 [["tests/web/test_card_content.py", "locke_header", "1 failed, 24 deselected, 1 warning in 12.90s", ["FAILED tests/web/test_card_content.py::test_locke_header_and_summary[knowledge_stack0]"]]]
+4 [["tests/web/test_card_content.py", "one_legend_and_no_status_words", "1 failed, 24 deselected, 1 warning in 5.90s", ["FAILED tests/web/test_card_content.py::test_one_legend_and_no_status_words - ..."]], ["tests/web/test_reader_cards.py", "t12", "1 failed, 18 deselected, 1 warning in 3.21s", ["FAILED tests/web/test_reader_cards.py::test_t12_nature_of_each_row[light] - A..."]]]
+5 [["tests/web/test_card_content.py", "one_legend_and_no_status_words", "1 failed, 24 deselected, 1 warning in 13.09s", ["FAILED tests/web/test_card_content.py::test_one_legend_and_no_status_words - ..."]]]
+8 [["tests/web/test_card_content.py", "places_collapsed or short_and_long", "1 failed, 23 deselected, 1 warning in 4.71s", ["FAILED tests/web/test_card_content.py::test_places_collapsed_and_expanded - a..."]]]
+9a [["tests/web/test_card_layout.py", "panel_width_by_window and 1280 or text_column_with_open_panel and 1280", "1 failed, 39 deselected, 1 warning in 6.02s", ["FAILED tests/web/test_card_layout.py::test_panel_width_by_window[1280-False-472-K4]"]]]
+9b [["tests/web/test_card_layout.py", "wider_than_448", "1 failed, 38 deselected, 1 warning in 5.64s", ["FAILED tests/web/test_card_layout.py::test_panel_wider_than_448[1024] - Asser..."]]]
+10 [["tests/web/test_card_content.py", "markup_is_text", "1 failed, 24 deselected, 1 warning in 3.69s", ["FAILED tests/web/test_card_content.py::test_markup_is_text - AssertionError: b"]]]
+13 [["tests/web/test_card_content.py", "no_layer_shows_modern or place_card_shows_modern", "1 failed, 23 deselected, 1 warning in 11.39s", ["FAILED tests/web/test_card_content.py::test_no_layer_shows_modern_country_with_note"]]]
+14 [["tests/web/test_card_layout.py", "popup_shows", "1 failed, 40 deselected, 1 warning in 11.97s", ["FAILED tests/web/test_card_layout.py::test_popup_shows_statements_only - Asse..."]]]
+DONE
+```
+
+### Дефекты (тест падает, продукт не правился)
+
+**D1. Карточка труда: подписи инфобокса.** Сценарий «Карточка труда» (entity-cards «Разделы карточки по типу»): в DOM `dt` «Автор» и `dt` «Дата».
+Получено: `['автор', 'датировка']` (строчная буква, «датировка» вместо «Дата»).
+Тест: `tests/web/test_card_content.py::test_work_card_infobox_labels`. Значения `dd` («Джон Локк», «1689») и метки `verified`, `sourced` проверяет `test_work_card_infobox` — он проходит.
+
+**D2. Имя метки спорной строки.** Сценарий «Спорное»: доступное имя метки содержит «Спорно» и «Не согласны: B».
+Получено: `Спорно. так считает: Учебник N, Рассел. не согласны: Рассел` (строчная «не»).
+Тест: `tests/web/test_card_content.py::test_disputed_mark_accessible_name_wording`. Остальная часть сценария (нет слов до нажатия, `aria-expanded`, `.card-row__details`) проходит в `test_row_marks_sourced_generated_disputed`. Мелкое расхождение в регистре. Замечание рядом: в «так считает» попал и тот, кто не согласен (Рассел); подстрока «так считает: A» есть, поэтому тест её не отвергает, но по смыслу сценария «так считает» — только A.
+
+**D3. Инфобокс на 1366 — две колонки вместо одной (противоречие внутри дельты).** Сценарий «Инфобокс по ширине»: на 1920 две колонки, на 1366 значение под подписью.
+Правило того же требования: две колонки при ширине панели от 32rem (512px). Панель на 1366 — 560px (35rem), на 1920 — 528px (33rem): по правилу обе дают две колонки. Получено: на обоих окнах `dt` и `dd` на одной высоте (1920: dtTop 327, ddTop 323; 1366: dtTop 301, ddTop 297, dtBottom 317).
+Тест: `tests/web/test_card_layout.py::test_infobox_columns_by_window_width` (сценарий буквально). Правило по ширине панели проверено отдельно и проходит: `::test_infobox_columns_follow_panel_width` (1280 → одна колонка при 472px, 1680 и 1920 → две). Нужно решение: поправить сценарий или порог (чтобы на 1366 колонка была одна, порог должен быть больше 35rem, но тогда на 1920 при 33rem колонка тоже одна).
+
+**D4. Место только с координатами — `empty = true`.** Сценарий «Ни одной пустой карточки»: у сущности каждого типа с хотя бы одним видимым утверждением, кроме `description`, `empty = false`. Получено: у места, у которого единственное утверждение — `coordinates`, `empty = true` (правило «нет строк, описания и сводки» не считает координаты; поле `geo` в расчёте не участвует). Клиент покажет «Об этом пока известно мало» рядом со страной по координатам.
+Тест: `tests/knowledge/test_cards_redesign.py::test_place_with_only_coordinates_is_not_empty`.
+
+### Переписанные ожидания MODIFIED-требований (по новой спецификации, не удалены и не ослаблены)
+
+- `tests/knowledge/test_mentions_cards.py`: `test_where_to_read_first_paragraph` (у Канта `where_to_read == []`, поле проверено на карточке понятия), `test_sections_by_type` (нет `life`, `influence`; `layout`, `summary.years`), `test_no_empty_sections` (Гоббс: `sections == []`, `summary.years`, `empty = false`), `test_epoch_card` (+`layout = epoch`, нет `other`), `test_doctrine_historical_context` (+`mark`, `legend`, `layout`, `inferred`).
+- `tests/web/test_reader_cards.py`: моки `/card` — новый контракт (`layout`, `summary`, `legend`, `mark`, `display`, `visible`, `total`); `test_t10_...` (`[data-section=influenced_by]`); `test_t12_nature_of_each_row` — метки вместо слов, одна легенда, подробности по нажатию, слова статусов только в легенде (светлая и тёмная темы); `test_n10_...` — «Где читать» теперь у карточки понятия.
+- `tests/e2e/test_site.py::test_mention_opens_card_and_navigates` (сводка с годами, `influenced_by|influenced`, метка, «так считает» после нажатия), `::test_concept_card_with_definition_and_where_to_read` («так считает» после нажатия) — **проверяется в CI e2e**.
+- `tests/e2e/test_reader_snapshots.py::test_s1_s4_card` (S4 без линии жизни: нет `.pg-lifeline`, `.card-summary`, `[data-section=where]`; сводка с годами один раз; шире 448px; нет горизонтальной прокрутки) — **проверяется в CI e2e**; эталоны снимков только Windows.
+- `tests/web/test_reader_layout.py` — прежние 3 теста проходят без правок (`3 passed`).
+
+### Исключения из проверки журнала
+
+- `tests/web/test_card_layout.py::test_country_data_is_a_separate_chunk` — свойство сборки, события нет (сказано в сценарии «Основной фрагмент не растёт»).
+- `tests/web/test_card_layout.py::test_root_font_scales_above_1920`, `::test_closed_panel_layout_modes` — панель закрыта, карточка не запрашивается; последний проверяет, что `knowledge.card.served` не писалось.
+- `tests/knowledge/test_mentions_cards.py::test_where_to_read_causality` — указатель `/where`, не карточка.
+
+### Не покрыто
+
+- **E2E (Docker)** не запускались по ограничению сервера: `tests/e2e/test_site.py`, `tests/e2e/test_reader_snapshots.py`. Ожидания переписаны по спецификации, проверка — в CI e2e.
+- **«Основной фрагмент не растёт»:** вес точки входа сравнивается с константой 158 566 байт из `progress.md` (3.x), собранной разработчиком до изменения; я не пересобирал базовый коммит. Проверяется: `countries-*.js` лежит отдельно, в точке входа нет границ, gzip -9 точки входа не больше константы + 15 КБ.
+- **«Тексты карточки — текст»:** покрыты `title`, `label`, `value`, `note`, `via[].label`, названия труда и места. Не покрыты отдельными тестами: атрибуции, названия источников и глав в «Где читать», подписи портретов (механизм вывода — тот же текстовый узел React; мутация 10 ловится на `label`).
+- **«Выведенные строки», скрытие по региону:** проверено скрытие источника оператором (`_set_source_hidden`) и отвергнутые утверждения; регион сам утверждение не скрывает, а снимает подтверждение и атрибуции (`test_region_hides_evidence_but_keeps_mark`: отметка `sourced` остаётся). Строка «не скрытых по региону читателя» из дельты трактуется так же.
+- **Английский интерфейс** (`i18n/en.ts`: «now …», «Show all»): не проверялся.
+- **Тёмная тема** — для таблицы ширины панели (`test_panel_width_by_window`) только светлая; раскладка карточки на трёх размерах — обе.
+- **Визуальные снимки** — эталоны только Windows, на Linux сравнение пропускается (по `AGENTS.md`).
+- Полный `pytest` не запускался (по условию задачи).
+
+
+## Тестировщик, круг 2 — 2026-11-27, коммит 6fc3844 (ветка claude/entity-cards)
+
+Изменения тестов: `tests/web/test_card_layout.py::test_infobox_columns_by_window_width` — окна 1920×1080 и 1280×800 (панель 528 и 472px, на 1920 две колонки, на 1280 одна; в `seen` проверены и ширины панели). Новые тесты:
+- `tests/knowledge/test_cards_redesign.py::test_place_with_only_coordinates_is_not_empty` (усилен: `sections == []`, `summary is None`, `empty=false` в ответе и в событии `knowledge.card.served`);
+- `tests/knowledge/test_cards_redesign.py::test_place_in_ocean_with_only_coordinates_is_not_empty` (точка 30.5, −40.25: `empty=false`, ответ и событие);
+- `tests/web/test_card_content.py::test_place_with_only_coordinates_shows_coordinates_and_country` (Пустые разделы / «Ни одной пустой карточки»: `[data-card-coordinates]` «54,71° с. ш., 20,51° в. д.», `[data-card-country]` «ныне Россия», нет `[data-card-empty]`, тело не пусто, событие `empty=False`);
+- `tests/web/test_card_content.py::test_place_outside_any_country_shows_only_coordinates` (Государство основного места: океан, координаты видны, `[data-card-country]` нет ни названием, ни заглушкой, нет `[data-card-empty]`, `empty=False` в ответе и событии).
+
+Сырые строки (файлы по одному, после `npm run build` в `web/`):
+
+```
+pytest -q tests/knowledge/test_cards_redesign.py   ->  166 passed, 1 warning in 160.95s
+pytest -q tests/knowledge/test_mentions_cards.py   ->  44 passed, 1 warning in 58.78s
+pytest -q tests/web/test_card_content.py           ->  27 passed, 1 warning in 129.03s
+pytest -q tests/web/test_card_layout.py            ->  41 passed, 1 warning in 219.17s
+pytest -q tests/web/test_reader_cards.py           ->  20 passed, 1 warning in 35.12s
+после правки маркера и ruff format: test_card_content -k "only_coordinates or outside_any_country" -> 2 passed;
+                                    test_cards_redesign -k "coordinates or ocean"                   -> 3 passed
+ruff check tests -> All checks passed;  python scripts/check_traceability.py -> Требований с тестами: 433 из 433
+```
+
+Дефекты круга 1: D1, D2, D3, D4 — тесты проходят (в тех файлах целиком выше). Дефектов нет.
+
+Мутации круга 2:
+
+```
+M16 cards.py:567 убрал `and geo is None` из правила empty
+    -> FAILED test_place_with_only_coordinates_is_not_empty, FAILED test_place_in_ocean_with_only_coordinates_is_not_empty (2 failed)
+M17 FullCard.tsx PlaceFacts: убрал элемент с [data-card-coordinates], npm run build
+    -> FAILED test_place_with_only_coordinates_shows_coordinates_and_country, FAILED test_place_outside_any_country_shows_only_coordinates (2 failed, 1 passed: test_place_card_shows_modern_country не проверяет координаты)
+Возврат: M16 через git checkout src/philograph/knowledge/cards.py; M17 копией файла из scratchpad (не git checkout) и пересборка клиента.
+```
+
+Оговорка: во время круга в рабочем дереве появились чужие незакоммиченные правки (`web/src/FullCard.tsx` SummaryPart, `web/src/layout.ts`, `polities*.py`, документы) — разработчик работал параллельно в том же дереве. Мои прогоны шли по дереву с ними; чтобы не потерять эти правки, мутацию M17 вернул копией, а не `git checkout`. После их коммита рекомендую повторить `test_card_layout.py` и `test_card_content.py`.
+
+Не покрыто: английский вариант подписи координат («48.86° N, 2.35° E») — не проверялся.
+
+
+## Тестировщик, круг 3 — 2026-11-27, коммит d159004 (ветка claude/entity-cards, дерево тестировщика)
+
+Переписано под изменённые сценарии: `test_cards_redesign.py::test_legend_equals_marks_in_every_type[person]` (в легенду входит `summary.years_row.mark`), `::test_region_hides_evidence_but_keeps_mark` (легенда `["verified", "sourced"]`: годы Канта проверены), `::test_generated_row` (легенда `["verified", "generated"]`, найдено при прогоне круга), `::test_only_lifespan` (`years_row.mark`, `legend == [mark]`), `::test_polity_needs_birth_year` (ровно `skipped`, по замечанию ревьювера; строка 869), `test_card_content.py::test_only_lifespan` (метка у годов, легенда из одного пункта).
+
+Новые тесты:
+- `test_cards_redesign.py`: `test_generated_role_and_years_marked` (сценарий «Сгенерированная роль и годы помечены»), `test_years_row_is_the_lifespan_statement_or_null`, `test_years_row_mark_follows_status_scale`, `test_source_scope_every_link_of_the_chain` (сценарий «Только выбранный учебник — все звенья»), `test_source_scope_chain_variants` (труд, автор, путь через термин, интересы), `test_damaged_layer_is_unavailable_not_500[no_table|broken_geometry|not_a_database]`;
+- `test_card_content.py`: `test_generated_role_and_years_marked` (DOM), `test_damaged_layer_falls_back_to_modern_country` (200, «ныне Россия», `polity=unavailable`); маркер `test_place_with_only_coordinates_shows_coordinates_and_country` указывает на «Пустые разделы» / «Ни одной пустой карточки» (требование существует);
+- `test_card_layout.py::test_text_column_with_open_panel_and_pinned_navigation` (13 окон, 1471–1476 с закреплённой навигацией: колонка 62–68ch, нет горизонтальной прокрутки, состояние навигации объяснено);
+- `test_polities_build_spec.py::test_antimeridian_ring_is_build_error` (6 колец: два разрезанных по ±180° проходят, четыре — скачок 340° и 185°, долгота 190 и −190 — код выхода 1, артефакта нет, в ошибке названо образование).
+
+Сырые строки (файлы по одному, `npm run build` перед браузерными):
+
+```
+pytest -q tests/knowledge/test_cards_redesign.py        -> 1 failed (test_generated_row: ожидание легенды без годов), 173 passed; после правки теста: -k "generated_row or legend or region" -> 18 passed
+pytest -q tests/knowledge/test_mentions_cards.py        -> 44 passed
+pytest -q tests/knowledge/test_polities_build_spec.py   -> 29 passed
+pytest -q tests/knowledge/test_polities_layer_spec.py   -> 46 passed
+pytest -q tests/knowledge/test_polities_unit.py         -> 40 passed
+pytest -q tests/knowledge/test_cards_redesign_unit.py   -> 11 passed
+pytest -q tests/web/test_card_content.py                -> 29 passed
+pytest -q tests/web/test_card_layout.py                 -> 54 passed
+pytest -q tests/web/test_reader_cards.py                -> 20 passed
+pytest -q tests/web/test_reader_layout.py               -> 3 passed
+ruff check tests -> All checks passed; ruff format -> без изменений; check_traceability.py -> Требований с тестами: 433 из 433
+```
+
+Падавшие в начале круга `test_legend_equals_marks_in_every_type[person]`, `test_region_hides_evidence_but_keeps_mark`, `test_card_content.py::test_only_lifespan` — переписаны по дельте, проходят. Это не дефекты кода: прежние ожидания противоречили новой дельте (годы — помеченная часть сводки).
+
+Мутации круга 3 (продукт возвращён `git checkout`, клиент пересобран):
+
+```
+M18 cards.py: убрал отметку years_row из legend   -> 6 failed (only_lifespan, generated_role_and_years_marked, years_row_mark_follows_status_scale, generated_row, legend_equals_marks[person], region_hides_evidence)
+M19 cards.py: _work_facts без attributed_to       -> 2 failed (source_scope_every_link_of_the_chain, source_scope_chain_variants)
+M20 cards.py: путь через термин без attributed_to -> 1 failed (source_scope_chain_variants)
+M21 polities.py: убрал перевод повреждённого артефакта в PolitiesUnavailable -> 2 failed (damaged_layer[no_table], [broken_geometry]); [not_a_database] проходит: такой файл слой и раньше не открывает
+M22 polities_build.py: убрал check_antimeridian    -> 4 failed (кольца со скачком 340°, 185°, долготой 190 и −190)
+M23 layout.ts: порог навигации обратно 46.5rem     -> 1 failed (text_column_with_open_panel_and_pinned_navigation[1472]; 1473–1475 проходят)
+M24 FullCard.tsx: годы без метки                   -> 2 failed (web only_lifespan, generated_role_and_years_marked)
+M25 cards.py: years_row всегда None                -> 4 failed
+```
+
+Замечание: в сценарии визуального требования окна 1472–1475 названы целиком, но мутация старого порога ломает только 1472: на 1473–1475 прежний и новый пороги дают колонку не уже 62ch. Тест на 1472 различает правила, остальные окна — охрана границы.
+
+Дефектов нет. Расхождение дельты и дизайна: правило «повреждённый артефакт слоя — `polity = unavailable`, ответ 200» и «ребро через антимеридиан — ошибка сборки» записаны в `design.md`, но не в `specs/*/spec.md` этого изменения; тесты написаны от design.md (риски), маркеры — на существующие требования «Государство основного места» и «Сборка исторических границ» (geo-timeline).
+
+Не покрыто: английские подписи; e2e и полный pytest — не запускались (по условию).
+
+## Судья — 2026-11-27, коммит f2342d3
+
+Продуктовый код с коммита круга 3 тестировщика (d159004) не менялся: `git diff --stat d159004 HEAD` трогает только `tests/` и `openspec/`. Свои прогоны шли на f2342d3, после `npm run build`. Рабочее дерево до и после прогонов чистое.
+
+### Свой прогон (файлы по одному)
+
+```
+pytest -q tests/knowledge/test_cards_redesign.py        -> 174 passed in 188.56s
+pytest -q tests/knowledge/test_mentions_cards.py        -> 44 passed in 49.65s
+pytest -q tests/knowledge/test_cards_redesign_unit.py   -> 11 passed
+pytest -q tests/knowledge/test_polities_build_spec.py   -> 29 passed
+pytest -q tests/knowledge/test_polities_layer_spec.py   -> 46 passed
+pytest -q tests/knowledge/test_polities_unit.py         -> 40 passed
+pytest -q tests/web/test_card_content.py                -> 29 passed in 73.58s
+pytest -q tests/web/test_card_layout.py                 -> 54 passed in 230.34s
+pytest -q tests/web/test_reader_cards.py                -> 20 passed
+pytest -q tests/web/test_reader_layout.py               -> 3 passed
+pytest -q tests/web/test_design_system.py               -> 8 passed
+ruff check . -> All checks passed; ruff format --check . -> 723 files already formatted
+lint-imports -> Contracts: 3 kept, 0 broken
+python scripts/check_traceability.py -> Требований с тестами: 433 из 433
+```
+
+Числа совпадают с журналом тестировщика (круг 3: 174/44/29/54/20/3, полисы 29/46/40, unit 11).
+
+Вес точки входа (сценарий «Основной фрагмент не растёт»): я собрал базу `origin/claude/embedding-docker` в отдельном worktree. gzip -9 точки входа: база 158 260 байт, ветка 160 496 байт, то есть +2,2 КБ при допуске 15 КБ. Константа теста (158 566) от моего замера отличается на 0,2 %.
+
+### Вывод системы
+
+`dev_stack.py --demo` (данные в scratchpad, порт 8091, `.stack` владельца не тронут).
+- **API:** по 1–3 сущности каждого типа из справочника, всего 24 карточки, все ответили 200. Пустые только у сущностей без утверждений (понятие «Субстанция», термин «Эпистемология»): `empty=true`, `legend=[]`. Остальные `empty=false`, у каждой свои разделы:
+  - работа — `facts` (автор и дата);
+  - группа — `facts` + `membership`;
+  - событие — `when` (facts);
+  - место — `residents`;
+  - учение «Имматериализм» и позиция «Методическое сомнение» — `relates_to` (выведено) + `in_works`;
+  - эпоха — `dating` и `members`.
+
+  У персон `layout=person`, `where_to_read=0`, в `summary` роли, основное место и образование на год рождения: Беркли — «Королевство Англия» (1685), Вольф — «Священная Римская империя» (1679), Декарт — «Республика Соединённых провинций» (1596).
+- **Браузер (Chromium):** карточка Вольфа через справочник на 1024×576, 1366×768 и 1920×1080, светлая и тёмная тема.
+  - Ширина `.side-panel` — 576, 560 и 528px. `scrollWidth == innerWidth`, у тела панели `scrollWidth == clientWidth`.
+  - Легенда одна. Нет `.pg-lifeline`, `.card-summary`, `[data-section=where]`.
+  - На 6 строк приходится 6 `button.card-mark`. Слов статусов и «так считает» в строках нет. `pageerror` нет.
+  - Скриншоты смотрел: на 1024 полоска развёрнута поверх текста, навигацию не закрывает.
+- **Журнал по `request_id`:** gateway пишет `http.request.completed`, knowledge — `knowledge.card.served`. Примеры:
+  - `8673100a…`: person, sections=4, rows=6, layout=person, empty=false, inferred=0, polity=found — совпадает с DOM;
+  - `judge-doctrine-…`: doctrine, 2/2, inferred=1;
+  - `judge-term-…`: term, 0/0, empty=true.
+
+### Сверка по требованиям
+
+| Требование | Сценарии / инварианты | Журнал тестировщика | Мой прогон | Вывод системы | Итог |
+|---|---|---|---|---|---|
+| Карточка персоны | 5 сценариев + 6 инвариантов | passed (круг 3), событие с layout/polity | те же тесты passed | сводка, «Где жил», «Повлияли», труды с годом, нет линии жизни и «Где читать» | подтверждено |
+| К кому относится | 2 + 2 | passed, `inferred` в событии | passed; мутация «без вытеснения прямой строкой» → 2 failed | `relates_to` у учения и позиции, `inferred=1` в журнале | подтверждено |
+| Выведенные строки | 4 + 6 | passed | passed; мутация «сильнейшее звено» → 13 failed | `relates_to.inferred=true` | подтверждено |
+| Свёрнутые списки | 2 + 2 | passed | passed | `display/visible/total` в каждом разделе | подтверждено |
+| Государство основного места | 7 + 4 | passed | passed; вес фрагмента перемерен от базы | `polity=found`, историческое имя в сводке | подтверждено |
+| Тексты карточки — текст | 1 + 2 | passed | passed; `dangerouslySetInnerHTML`/`innerHTML` в `web/src` нет | — | подтверждено |
+| Раскладка полной карточки | 3 + 2 | passed | passed | без горизонтальной прокрутки на трёх размерах и в двух темах | подтверждено |
+| Разделы карточки по типу | 7 + 5 | passed | passed | разделы у всех типов, `other` в коде | подтверждено |
+| Природа каждой строки | 4 + 6 | passed | passed | метки без текста, одна легенда | подтверждено |
+| Пустые разделы | 3 + 4 | passed | passed | пустые — только сущности без утверждений, `empty=true` | подтверждено |
+| entity-mentions / Где читать | 3 + 1 | passed | passed | у персон `where_to_read=0`, у понятия 2 | подтверждено |
+| visual-design / Раскладка экрана чтения | 8 + 2 | passed | passed | 576/560/528px | подтверждено |
+
+### C1–C9 (задание владельца)
+
+| # | Итог | Чем подтверждено |
+|---|---|---|
+| C1 | выполнен | нет `.pg-lifeline` и `.card-summary`; статусы — метками без текста (тесты и DOM демо) |
+| C2 | выполнен | сводка «роль · место · государство · годы», «Где жил» через запятую со сворачиванием, «Повлияли»/«Повлиял на», «Интересы» (вывод), «Труды» |
+| C3 | выполнен | у всех 9 типов свои разделы; честное пустое состояние; место только с координатами не пусто |
+| C4 | выполнен | `relates_to` у понятий и идей, прямые и выведенные строки, фильтр учебника на каждом звене |
+| C5 | выполнен | инфобокс труда: автор, дата; `topics` — вопросы и сферы |
+| C6 | выполнен | одна шкала `mark`, одна легенда, `legend` = множество отметок |
+| C7 | выполнен | разметка выводится текстом (мутация 10 у тестировщика); в клиенте нет `innerHTML` |
+| C8 | выполнен локально | ruff, format, lint-imports, traceability 433/433; DOM-проверки на 1024×576 без наложений. e2e и снимки — в CI |
+| C9 | выполнен | 576/560/528px вместо 448; на 1024×576 нет горизонтальной прокрутки, навигация не перекрыта |
+
+**Полный pytest:** локально не запускался. Ведущий запретил его по ограничению сервера (2 CPU / 4 ГБ). Прогнаны все файлы, которые затрагивает изменение, и соседние пакеты карточек, раскладки и полисов: всё зелёное. `tests/e2e` (переписанные `test_site.py`, `test_reader_snapshots.py`) не запускались, их проверит CI.
+
+**Прослеживаемость:** 433 из 433.
+
+**Мутации (свои, код возвращён `git checkout`, клиент пересобран):**
+1. `_weakest`: `min` → `max` (сильнейшее звено) — 13 failed (`test_inferred_mark_is_weakest_link[…]`).
+2. `_relates_to` без исключения `have` (прямая строка не вытесняет вывод) — 2 failed (`test_direct_row_replaces_inferred`, `test_relates_to_one_row_per_person`). Этой мутации нет в журнале тестировщика.
+3. `CardPopup` без фильтра `!r.inferred` — failed `test_popup_shows_statements_only`.
+
+**Подгонка:** не найдена.
+- Переписанные тесты MODIFIED-требований не ослаблены: проверки «так считает» и `where_to_read` перенесены на новое поведение и дополнены проверкой указателя.
+- Особых случаев по идентификаторам нет. Ожидания взяты из сценариев дельты, а не из фактического вывода.
+
+**Замечания (не блокируют):**
+1. **Лишний маркер.** `tests/web/test_card_content.py::test_doctrine_card_relates_to_and_in_works` помечен `scenario="Компактное окно без выводов"`, но компактное окно не открывает. Мутация 3 его не роняет. Сценарий действительно покрыт `test_card_layout.py::test_popup_shows_statements_only`. Маркер стоит убрать, чтобы матрица не завышала покрытие.
+2. **Копия правила в клиенте.** `FullCard.tsx` `markOf` при отсутствии `row.mark` повторяет серверное правило (`disputed` → иначе `status`). Сервер всегда отдаёт `mark`, так что это мёртвая ветка совместимости. По «Выбору решения» правило должно жить только на сервере.
+3. **Правила вне дельты.** «Повреждённый слой → `polity=unavailable`, 200» и «антимеридиан — ошибка сборки» есть в `design.md`, но не в `specs/` (это отметил и тестировщик). Тесты на них есть.
+4. Английский интерфейс тестами не покрыт. На демо в EN роли и подписи переведены, метки стоят у частей сводки.
+
+**Вердикт: принято.** Условие для выхода PR из draft — зелёный CI: `checks` (полный pytest) и e2e. Если CI упадёт на `tests/e2e/test_site.py` или `test_reader_snapshots.py`, это возврат тестировщику (ожидания e2e) или разработчику, смотря по причине. Замечания 1–2 можно закрыть отдельным мелким коммитом до слияния, вердикт от них не зависит.

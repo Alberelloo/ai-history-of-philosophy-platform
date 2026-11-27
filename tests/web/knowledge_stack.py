@@ -265,16 +265,17 @@ def start(
     queue = Queue(jobs_engine)
     graphs = Graphs(statements, graph_llm, queue, GraphSettings(min_edges=5, max_nodes=60))
     portraits = Portraits(engine, FileStore(tmp / "portraits"))
+    polity_layer = PolityLayer.from_env(polities_env) if polities_env is not None else None
     knowledge = knowledge_app(
         statements,
         portraits=portraits,
         library=library_client,
         mentions=mentions,
-        cards=Cards(statements, mentions, llm_client),
+        cards=Cards(statements, mentions, llm_client, polities=polity_layer),
         section_map=SectionMap(statements, snapshots=snapshots),
         graphs=graphs,
         catalog=Catalog(snapshots, onto, entities, CatalogSettings(max_stale_seconds=max_stale)),
-        polity_layer=PolityLayer.from_env(polities_env) if polities_env is not None else None,
+        polity_layer=polity_layer,
     )
     world = World(entities, statements)
     for key, source_id in textbooks.items():

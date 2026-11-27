@@ -250,9 +250,19 @@ def test_mention_opens_card_and_navigates(page, stack):
     # Полная карточка — в правой панели.
     card.get_by_role("button", name="Открыть карточку").click()
     panel = page.get_by_role("complementary", name="Карточка")
-    influence = panel.locator("[data-section=influence]")
+    # Полная карточка персоны (redesign-entity-cards): сводка с годами, влияния двумя
+    # разделами, статус строки — меткой без слов; «так считает» — только после нажатия.
+    panel.locator("[data-card-summary]").wait_for()
+    assert "1711–1776" in panel.locator("[data-card-summary]").inner_text()
+    assert panel.locator("[data-section=influence]").count() == 0
+    influence = panel.locator("[data-section=influenced_by], [data-section=influenced]").first
     influence.wait_for()
-    assert "так считает" in influence.inner_text()
+    row = influence.locator(".card-row").first
+    assert "так считает" not in row.inner_text()
+    mark = row.locator("button.card-mark")
+    assert mark.count() == 1 and mark.get_attribute("aria-label")
+    mark.click()
+    assert "так считает" in row.locator(".card-row__details").inner_text()
 
     indexed = wait_logs(stack, "knowledge", lambda e: e["event"] == "knowledge.mentions.indexed")
     assert any(e["mentions"] > 0 for e in indexed)
@@ -278,7 +288,9 @@ def test_concept_card_with_definition_and_where_to_read(page, stack):
     definitions = panel.locator("[data-section=definitions]")
     definitions.wait_for()
     assert "априорная категория рассудка" in definitions.inner_text()
-    assert "так считает: Кант" in definitions.inner_text()
+    assert "так считает" not in definitions.inner_text()  # статус — меткой, слова — по нажатию
+    definitions.locator("button.card-mark").first.click()
+    assert "так считает: Кант" in definitions.locator(".card-row__details").first.inner_text()
     where = panel.locator("[data-section=where]")
     # По одному упоминанию в каждой главе, поэтому порядок между ними не задан.
     assert sorted(where.get_by_role("button").all_inner_texts()) == [
