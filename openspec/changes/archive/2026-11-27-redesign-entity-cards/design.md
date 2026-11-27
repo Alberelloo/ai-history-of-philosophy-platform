@@ -5,7 +5,7 @@
 - Карточку строит `Cards.card()` в `src/philograph/knowledge/cards.py`, адрес — `GET /v1/entities/{id}/card`. Разделы задаёт словарь `SECTIONS`: тип → `(код, заголовок, связи, направление)`. Утверждения, которые не попали ни в один раздел, клиенту не отдаются.
 - Клиент: полная карточка `web/src/FullCard.tsx` в правой панели `SidePanel` (общая с ассистентом, стек «Назад»). Компактное окно `web/src/CardPopup.tsx` берёт до двух строк из `sections`. Шаблон один на все типы. У персоны есть `Lifeline` и сводка-счётчики. У строки — `StatusMark` с подписью, «— так считает: …», «не согласны: …» и ссылки `pg-cite`. Внизу — «Где читать» и рецепты графа.
 - Ширина панели — токен `--panel: 28rem` (`docs/design/tokens.json` → `web/src/styles/tokens.css`). Та же величина записана константой `PANEL = 28` в `web/src/layout.ts`: раскладка K1–K4 считает свободную ширину `A = окно − навигация − панель`. Колонка текста — 62–68ch шрифта чтения (≈ 684–750px при 19px).
-- Диагноз пустых карточек — [docs/audit/card-design-diagnosis.md](../../../docs/audit/card-design-diagnosis.md). Главная причина — код: нет разделов для `term`, `group` и `place`, у `work` только `context`, перечисления не показаны. Вторая причина — редкие данные.
+- Диагноз пустых карточек — [docs/audit/card-design-diagnosis.md](../../../../docs/audit/card-design-diagnosis.md). Главная причина — код: нет разделов для `term`, `group` и `place`, у `work` только `context`, перечисления не показаны. Вторая причина — редкие данные.
 - В реестре (`registry_data.py`) у `lived_in` есть уточнитель `place_role` (`birth`, `death`, `activity`, `residence`). У места есть значение `coordinates` (`{lat, lon}`), но нет страны. Поля «интересы» нет.
 
 ## Контракт ответа карточки
