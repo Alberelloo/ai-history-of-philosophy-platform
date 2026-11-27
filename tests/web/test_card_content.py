@@ -869,8 +869,12 @@ def test_markup_is_text(knowledge_context, knowledge_stack, events):
     assert_inert()
     assert evil_work in panel(page).inner_text()
     # Назад к персоне, затем к месту из сводки.
-    panel(page).get_by_role("button", name="Назад").click()
-    panel(page).locator("h3.pg-entity-head__name").first.wait_for()
+    # Возврат заново запрашивает карточку персоны: ждём её ответ и её шапку, иначе этот ответ
+    # попадёт в ожидание карточки места (гонка на медленной машине CI).
+    with page.expect_response(CARD) as back_card:
+        panel(page).get_by_role("button", name="Назад").click()
+    assert back_card.value.json()["title"] == evil_person
+    panel(page).locator("h3.pg-entity-head__name", has_text="pwned=1").wait_for()
     with page.expect_response(CARD) as place_card:
         panel(page).locator("[data-summary=place] button").click()
     assert place_card.value.json()["title"] == evil_place
